@@ -45,7 +45,7 @@
             float2 overlay      : TEXCOORD6;
         #endif
         #ifndef _GL_LEVEL_OFF
-            float lightPower    : COLOR1;
+            float lightPower    : COLOR0;
         #endif
         UNITY_FOG_COORDS(7)
     };
