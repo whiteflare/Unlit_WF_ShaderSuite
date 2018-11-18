@@ -19,7 +19,7 @@
 
     /*
      * authors:
-     *      ver:2018/11/12 whiteflare,
+     *      ver:2018/11/18 whiteflare,
      */
 
     struct appdata {
@@ -114,25 +114,62 @@
         return color.r * 0.21 + color.g * 0.72 + color.b * 0.07;
     }
 
-    inline float calcLightPower(float4 ls_vertex, float3 normal) {
+    inline float3 OmniDirectional_ShadeSH9() {
+        // UnityCG.cginc にある ShadeSH9 の等方向版
+        float3 col = 0;
+        col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
+        col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
+        col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
+        col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
+        col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
+        col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
+        return col;
+    }
+
+    inline float3 OmniDirectional_Shade4PointLights(
+        float4 lpX, float4 lpY, float4 lpZ,
+        float3 col0, float3 col1, float3 col2, float3 col3,
+        float4 lightAttenSq, float3 ws_pos) {
+        // UnityCG.cginc にある Shade4PointLights の等方向版
+
+        float4 toLightX = lpX - ws_pos.x;
+        float4 toLightY = lpY - ws_pos.y;
+        float4 toLightZ = lpZ - ws_pos.z;
+
+        float4 lengthSq
+            = toLightX * toLightX
+            + toLightY * toLightY
+            + toLightZ * toLightZ;
+        // ws_normal との内積は取らない。これによって反射光の強さではなく、頂点に当たるライトの強さが取れる。
+
+        // attenuation
+        float4 atten = 1.0 / (1.0 + lengthSq * lightAttenSq);
+
+        float3 col
+            = col0 * atten.x
+            + col1 * atten.y
+            + col2 * atten.z
+            + col3 * atten.w;
+        return col;
+    }
+
+    inline float calcLightPower(float4 ls_vertex) {
         // directional light
         float light_intensity = calcBrightness(_LightColor0);
         float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
         #if UNITY_SHOULD_SAMPLE_SH
-            float3 ws_normal = UnityObjectToWorldNormal(normal);
             // ambient
-            float3 ambient = max(0, ShadeSH9( float4(ws_normal, 1)) );
-            #if defined(VERTEXLIGHT_ON)
+            float3 ambient = OmniDirectional_ShadeSH9();
+            #ifdef VERTEXLIGHT_ON
                 // not important lights
-                ambient += Shade4PointLights(
+                ambient += OmniDirectional_Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                     unity_LightColor[0].rgb,
                     unity_LightColor[1].rgb,
                     unity_LightColor[2].rgb,
                     unity_LightColor[3].rgb,
                     unity_4LightAtten0,
-                    ws_vertex,
-                    ws_normal
+                    ws_vertex
                 );
             #endif
             light_intensity += calcBrightness(ambient);
@@ -176,7 +213,7 @@
         #endif
 
         #ifndef _GL_LEVEL_OFF
-            o.lightPower = saturate(calcLightPower(v.vertex, v.normal) * 2
+            o.lightPower = saturate(calcLightPower(v.vertex) * 2
                 #ifdef _GL_LEVEL_BRIGHT
                     + 0.2
                 #elif _GL_LEVEL_DARK

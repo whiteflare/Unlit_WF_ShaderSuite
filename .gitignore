@@ -1,2 +1,4 @@
 *.bak
+*.bak.meta
 *.tmp
+*.tmp.meta
