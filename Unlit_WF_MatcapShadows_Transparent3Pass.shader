@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2018/11/08 whiteflare,
+     *      ver:2018/11/21 whiteflare,
      */
 
     Properties {
@@ -156,7 +156,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             #include "Lighting.cginc"
             #include "WF_MatcapShadows.cginc"
 
-            fixed4 frag_clip(v2f i, float facing : VFACE) : SV_Target {
+            fixed4 frag_clip(v2f i) : SV_Target {
                 float4 color = frag_baseonly(i);
                 clip(_AL_CutOff - color.a);
                 return color;
@@ -190,8 +190,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             #include "Lighting.cginc"
             #include "WF_MatcapShadows.cginc"
 
-            fixed4 frag_clip(v2f i, float facing : VFACE) : SV_Target {
-                float4 color = frag(i, facing);
+            fixed4 frag_clip(v2f i) : SV_Target {
+                float4 color = frag(i);
                 clip(_AL_CutOff - color.a);
                 return color;
             }
