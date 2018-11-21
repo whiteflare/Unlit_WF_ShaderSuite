@@ -19,23 +19,23 @@
 
     /*
      * authors:
-     *      ver:2018/11/21 whiteflare,
+     *      ver:2018/11/22 whiteflare,
      */
 
     struct appdata {
-        float4 vertex   : POSITION;
-        float2 uv       : TEXCOORD0;
-        float3 normal   : NORMAL;
+        float4 vertex       : POSITION;
+        float2 uv           : TEXCOORD0;
+        float3 normal       : NORMAL;
         #ifdef _NM_ENABLE
             float4 tangent  : TANGENT;
         #endif
     };
 
     struct v2f {
-        float4 vertex       : SV_POSITION;
-        float4 ls_vertex    : TEXCOORD0;
-        float2 uv           : TEXCOORD1;
-        float3 normal       : TEXCOORD2;
+        float4 vertex           : SV_POSITION;
+        float4 ls_vertex        : TEXCOORD0;
+        float2 uv               : TEXCOORD1;
+        float3 normal           : TEXCOORD2;
         #ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD3;
             float3 bitangent    : TEXCOORD4;
@@ -50,13 +50,13 @@
         UNITY_FOG_COORDS(7)
     };
 
-    uniform sampler2D   _MainTex;
-    uniform float4      _MainTex_ST;
-    uniform float4      _SolidColor;
+    uniform sampler2D       _MainTex;
+    uniform float4          _MainTex_ST;
+    uniform float4          _SolidColor;
 
-    uniform float       _AL_Power;
-    uniform sampler2D   _AL_MaskTex;
-    uniform float       _AL_CutOff;
+    uniform float           _AL_Power;
+    uniform sampler2D       _AL_MaskTex;
+    uniform float           _AL_CutOff;
 
     #ifdef _NM_ENABLE
         uniform sampler2D   _BumpMap;
@@ -276,11 +276,6 @@
             color.rgb = saturate(color.rgb * i.lightPower);
         #endif
 
-        // EmissiveScroll
-        #ifdef _ES_ENABLE
-            color.rgb = max(0, color.rgb + _ES_Color.rgb * calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb);
-        #endif
-
         // Alpha
         #ifdef _AL_SOURCE_MAIN_TEX_ALPHA
             color.a = mainTex.a * _AL_Power;
@@ -291,6 +286,14 @@
         #else
             color.a = 1.0;
         #endif
+
+        // EmissiveScroll
+        #ifdef _ES_ENABLE
+            float es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
+            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power);
+            color.a = max(color.a, _ES_Color.a * es_power);
+        #endif
+
         color.a = saturate(color.a);
 
         // fog
@@ -319,11 +322,6 @@
             color.rgb = saturate(color.rgb * i.lightPower);
         #endif
 
-        // EmissiveScroll
-        #ifdef _ES_ENABLE
-            color.rgb = max(0, color.rgb + _ES_Color.rgb * calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb);
-        #endif
-
         // Alpha
         #ifdef _AL_SOURCE_MAIN_TEX_ALPHA
             color.a = mainTex.a * _AL_Power;
@@ -334,6 +332,14 @@
         #else
             color.a = 1.0;
         #endif
+
+        // EmissiveScroll
+        #ifdef _ES_ENABLE
+            float es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
+            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power);
+            color.a = max(color.a, _ES_Color.a * es_power);
+        #endif
+
         color.a = saturate(color.a);
 
         // fog
