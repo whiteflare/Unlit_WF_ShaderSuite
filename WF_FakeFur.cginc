@@ -19,7 +19,7 @@
 
     /*
      * authors:
-     *      ver:2018/11/18 whiteflare,
+     *      ver:2018/11/22 whiteflare,
      */
 
     struct appdata {
@@ -76,6 +76,7 @@
     uniform float4      _FurNoiseTex_ST;
     uniform float       _FurHeight;
     uniform float       _FurShadowPower;
+    uniform uint        _FurRepeat;
     uniform float4      _FurVector;
 
     uniform float4      _WaveSpeed;
@@ -228,7 +229,40 @@
         UNITY_TRANSFER_FOG(o, o.vertex);
     }
 
-    [maxvertexcount(14)]
+    inline v2g lerp_v2g(v2g x, v2g y, float div) {
+        v2g o;
+        UNITY_INITIALIZE_OUTPUT(v2g, o);
+        o.vertex    = lerp(x.vertex,    y.vertex,   div);
+        o.normal    = lerp(x.normal,    y.normal,   div);
+        o.uv        = lerp(x.uv,        y.uv,       div);
+        o.uv2       = lerp(x.uv2,       y.uv2,      div);
+        o.waving    = lerp(x.waving,    y.waving,   div);
+        #ifndef _GL_LEVEL_OFF
+            o.lightPower = lerp(x.lightPower, y.lightPower, div);
+        #endif
+        return o;
+    }
+
+    void fakefur(v2g v[3], inout TriangleStream<g2f> triStream) {
+        float4 vb[3] = { v[0].vertex, v[1].vertex, v[2].vertex };
+        float4 vu[3] = vb;
+        {
+            for (uint i = 0; i < 3; i++) {
+                vu[i].xyz += (normalize(v[i].normal) + v[i].waving.xyz) * _FurHeight;
+            }
+        }
+        {
+            // 1回あたり8頂点
+            for (uint i = 0; i < 4; i++) {
+                uint n = i % 3;
+                g2f o = initGeomOutput(v[n]);
+                transferGeomVertex(o, vb[n], vu[n], 0); triStream.Append(o);
+                transferGeomVertex(o, vb[n], vu[n], 1); triStream.Append(o);
+            }
+        }
+    }
+
+    [maxvertexcount(64)]
     void geom_fakefur(triangle v2g v[3], inout TriangleStream<g2f> triStream) {
         float4 vb[3] = { v[0].vertex, v[1].vertex, v[2].vertex };
         float4 vu[3] = vb;
@@ -238,39 +272,12 @@
             }
         }
         {
-            for (uint i = 0; i <
-                    #ifdef _FUR_QUALITY_FAST
-                        2
-                    #elif _FUR_QUALITY_NORMAL
-                        3
-                    #else
-                        4
-                    #endif
-                ; i++) {
-                uint n = i % 3;
-                g2f o = initGeomOutput(v[n]);
-                transferGeomVertex(o, vb[n], vu[n], 0); triStream.Append(o);
-                transferGeomVertex(o, vb[n], vu[n], 1); triStream.Append(o);
+            v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
+            for (uint i = 0; i < _FurRepeat; i++) {
+                float rate = i / (float) _FurRepeat;
+                v2g v2[3] = { lerp_v2g(v[0], c, rate), lerp_v2g(v[1], c, rate), lerp_v2g(v[2], c, rate) };
+                fakefur(v2, triStream);
             }
-            triStream.RestartStrip();
-        }
-        {
-            #if defined(_FUR_QUALITY_NORMAL) || defined(_FUR_QUALITY_DETAIL)
-                for (uint i = 0; i < 3; i++) {
-                    g2f o = initGeomOutput(v[i]);
-                    transferGeomVertex(o, vb[i], vu[i], 0.2); triStream.Append(o);
-                }
-                triStream.RestartStrip();
-            #endif
-        }
-        {
-            #if defined(_FUR_QUALITY_DETAIL)
-                for (uint i = 0; i < 3; i++) {
-                    g2f o = initGeomOutput(v[i]);
-                    transferGeomVertex(o, vb[i], vu[i], 0.4); triStream.Append(o);
-                }
-                triStream.RestartStrip();
-            #endif
         }
     }
 
@@ -289,7 +296,7 @@
         #endif
 
         float3 noise = tex2D(_FurNoiseTex, i.uv2).rgb;
-        color = saturate( float4( color - (1 - noise) * _FurShadowPower,  calcBrightness(noise) - pow(i.height, 3)) );
+        color = saturate( float4( color - (1 - noise) * _FurShadowPower, calcBrightness(noise) - pow(i.height, 3)) );
 
         UNITY_APPLY_FOG(i.fogCoord, color);
         return color;

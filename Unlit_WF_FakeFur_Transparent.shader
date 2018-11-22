@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
     /*
      * authors:
-     *      ver:2018/11/08 whiteflare,
+     *      ver:2018/11/22 whiteflare,
      */
 
     Properties {
@@ -34,8 +34,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _FurNoiseTex    ("Fur Noise Texture", 2D) = "white" {}
             _FurHeight      ("Fur Height", Float) = 0.1
             _FurShadowPower ("Fur ShadowPower", Range(0, 1)) = 0
-        [KeywordEnum(FAST,NORMAL,DETAIL)]
-            _FUR_QUALITY    ("Fur Quality", Float) = 1
+            _FurRepeat      ("Fur Repeat", Range(1, 8)) = 3
             _FurVector      ("Fur Static Vector", Vector) = (0, 0, 0, 0)
 
         [Header(Fur Wave Animation)]
