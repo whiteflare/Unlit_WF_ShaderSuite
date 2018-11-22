@@ -19,23 +19,23 @@
 
     /*
      * authors:
-     *      ver:2018/11/18 whiteflare,
+     *      ver:2018/11/22 whiteflare,
      */
 
     struct appdata {
-        float4 vertex   : POSITION;
-        float2 uv       : TEXCOORD0;
-        float3 normal   : NORMAL;
+        float4 vertex       : POSITION;
+        float2 uv           : TEXCOORD0;
+        float3 normal       : NORMAL;
         #ifdef _NM_ENABLE
             float4 tangent  : TANGENT;
         #endif
     };
 
     struct v2f {
-        float4 vertex       : SV_POSITION;
-        float4 ls_vertex    : TEXCOORD0;
-        float2 uv           : TEXCOORD1;
-        float3 normal       : TEXCOORD2;
+        float4 vertex           : SV_POSITION;
+        float4 ls_vertex        : TEXCOORD0;
+        float2 uv               : TEXCOORD1;
+        float3 normal           : TEXCOORD2;
         #ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD3;
             float3 bitangent    : TEXCOORD4;
@@ -50,13 +50,13 @@
         UNITY_FOG_COORDS(7)
     };
 
-    uniform sampler2D   _MainTex;
-    uniform float4      _MainTex_ST;
-    uniform float4      _SolidColor;
+    uniform sampler2D       _MainTex;
+    uniform float4          _MainTex_ST;
+    uniform float4          _SolidColor;
 
-    uniform float       _AL_Power;
-    uniform sampler2D   _AL_MaskTex;
-    uniform float       _AL_CutOff;
+    uniform float           _AL_Power;
+    uniform sampler2D       _AL_MaskTex;
+    uniform float           _AL_CutOff;
 
     #ifdef _NM_ENABLE
         uniform sampler2D   _BumpMap;
@@ -195,7 +195,7 @@
 
         #ifdef _NM_ENABLE
             o.normal = v.normal;
-            o.tangent = v.tangent.xyz * v.tangent.w;
+            o.tangent = v.tangent;
             o.bitangent = cross(o.normal, o.tangent);
             o.lightDir = calcLocalSpaceLightDir();
         #else
@@ -226,23 +226,20 @@
         return o;
     }
 
-    fixed4 frag(v2f i, float facing : VFACE) : SV_Target {
+    fixed4 frag(v2f i) : SV_Target {
         float4 mainTex = tex2D(_MainTex, i.uv);
         float4 color = float4( lerp(mainTex.rgb, _SolidColor.rgb, _SolidColor.a), 1 );
-
-        facing = sign(facing);
-        // float forward = step(0, facing);
 
         float3 matcapVector;
 
         // BumpMap
         #ifdef _NM_ENABLE
             // 法線計算
-            float3x3 tangentTransform = float3x3( normalize(i.tangent), normalize(i.bitangent), normalize(i.normal) ); // vertexのworld回転行列
+            float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertexのworld回転行列
             float3 ls_normal = UnpackNormal( tex2D(_BumpMap, i.uv) ); // 法線マップ参照
             float3 ws_normal = normalize( mul(ls_normal, tangentTransform) ); // world内の法線を作成
             // 光源とブレンド
-            float diffuse = abs(dot(ws_normal, i.lightDir.xyz)) * _NM_Power + (1.0 - _NM_Power); // _NM_Power = 0.5 の時は Half Lambert と同じ
+            float diffuse = saturate((dot(ws_normal, i.lightDir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power));
             color.rgb *= diffuse; // Unlitなのでライトの色は考慮しない
             // Matcap計算
             matcapVector = calcMatcapVector(i.ls_vertex, ws_normal);
@@ -254,7 +251,7 @@
         // Highlight
         #ifdef _HL_ENABLE
             // Matcap highlight color
-            float2 matcap_uv = normalize(matcapVector.xyz) * facing * 0.5 * _HL_Range + 0.5;
+            float2 matcap_uv = normalize(matcapVector.xyz) * 0.5 * _HL_Range + 0.5;
             float4 hl_color = tex2D(_HL_MatcapTex, matcap_uv);
             color.rgb += (hl_color.rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, i.uv).rgb * _HL_Power;  // MatcapColor を加算(減算)合成
         #endif
@@ -279,11 +276,6 @@
             color.rgb = saturate(color.rgb * i.lightPower);
         #endif
 
-        // EmissiveScroll
-        #ifdef _ES_ENABLE
-            color.rgb = max(0, color.rgb + _ES_Color.rgb * calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb);
-        #endif
-
         // Alpha
         #ifdef _AL_SOURCE_MAIN_TEX_ALPHA
             color.a = mainTex.a * _AL_Power;
@@ -294,6 +286,14 @@
         #else
             color.a = 1.0;
         #endif
+
+        // EmissiveScroll
+        #ifdef _ES_ENABLE
+            float es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
+            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power);
+            color.a = max(color.a, _ES_Color.a * es_power);
+        #endif
+
         color.a = saturate(color.a);
 
         // fog
@@ -309,22 +309,17 @@
         // BumpMap
         #ifdef _NM_ENABLE
             // 法線計算
-            float3x3 tangentTransform = float3x3( normalize(i.tangent), normalize(i.bitangent), normalize(i.normal) ); // vertexのworld回転行列
+            float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertexのworld回転行列
             float3 ls_normal = UnpackNormal( tex2D(_BumpMap, i.uv) ); // 法線マップ参照
             float3 ws_normal = normalize( mul(ls_normal, tangentTransform) ); // world内の法線を作成
             // 光源とブレンド
-            float diffuse = abs(dot(ws_normal, i.lightDir.xyz)) * _NM_Power + (1.0 - _NM_Power); // _NM_Power = 0.5 の時は Half Lambert と同じ
+            float diffuse = saturate((dot(ws_normal, i.lightDir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power));
             color.rgb *= diffuse; // Unlitなのでライトの色は考慮しない
         #endif
 
         // Anti-Glare
         #ifndef _GL_LEVEL_OFF
             color.rgb = saturate(color.rgb * i.lightPower);
-        #endif
-
-        // EmissiveScroll
-        #ifdef _ES_ENABLE
-            color.rgb = max(0, color.rgb + _ES_Color.rgb * calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb);
         #endif
 
         // Alpha
@@ -337,6 +332,14 @@
         #else
             color.a = 1.0;
         #endif
+
+        // EmissiveScroll
+        #ifdef _ES_ENABLE
+            float es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
+            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power);
+            color.a = max(color.a, _ES_Color.a * es_power);
+        #endif
+
         color.a = saturate(color.a);
 
         // fog
@@ -345,8 +348,8 @@
         return color;
     }
 
-    fixed4 frag_cutoff(v2f i, float facing : VFACE) : SV_Target {
-        float4 color = frag(i, facing);
+    fixed4 frag_cutoff(v2f i) : SV_Target {
+        float4 color = frag(i);
         clip(color.a - _AL_CutOff);
         return color;
     }
