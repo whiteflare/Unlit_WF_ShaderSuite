@@ -62,6 +62,13 @@
     uniform sampler2D       _AL_MaskTex;
     uniform float           _AL_CutOff;
 
+    #ifdef _CL_ENABLE
+        uniform float3      _CL_Red;
+        uniform float3      _CL_Green;
+        uniform float3      _CL_Blue;
+        uniform float       _CL_Offset;
+    #endif
+
     #ifdef _NM_ENABLE
         uniform sampler2D   _BumpMap;
         uniform float       _NM_Power;
@@ -261,12 +268,16 @@
     fixed4 frag(v2f i) : SV_Target {
         float4 color =
         #ifdef _SOLID_COLOR
-        	_Color;
+            _Color;
         #else
-        	tex2D(_MainTex, i.uv);
+            tex2D(_MainTex, i.uv);
         #endif
 
-        float3 matcapVector;
+        // 色変換
+        #ifdef _CL_ENABLE
+            float3x3 colorTransform = float3x3( _CL_Red, _CL_Green, _CL_Blue );
+            color.rgb = saturate( mul(color.rgb, colorTransform) + _CL_Offset );
+        #endif
 
         // BumpMap
         #ifdef _NM_ENABLE
@@ -278,10 +289,10 @@
             float diffuse = saturate((dot(ws_normal, i.lightDir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power));
             color.rgb *= diffuse; // Unlitなのでライトの色は考慮しない
             // Matcap計算
-            matcapVector = calcMatcapVector(i.ls_vertex, ws_normal);
+            float3 matcapVector = calcMatcapVector(i.ls_vertex, ws_normal);
         #else
             // NormalMap未使用時はvertで計算したMatcapVectorを使う
-            matcapVector = i.normal;
+            float3 matcapVector = i.normal;
         #endif
 
         // Highlight

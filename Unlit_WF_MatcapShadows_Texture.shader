@@ -30,6 +30,15 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
 
+        // 色変換
+        [Header(Color Change)]
+        [Toggle(_CL_ENABLE)]
+            _CL_Enable      ("[CL] Enable", Float) = 0
+            _CL_Red         ("[CL] R change to", Color) = (1, 0, 0, 1)
+            _CL_Green       ("[CL] G change to", Color) = (0, 1, 0, 1)
+            _CL_Blue        ("[CL] B change to", Color) = (0, 0, 1, 1)
+            _CL_Offset      ("[CL] brightness", Range(-1, 1)) = 0
+
         // 法線マップ
         [Header(NormalMap)]
         [Toggle(_NM_ENABLE)]
@@ -94,6 +103,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             #pragma target 3.0
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
+            #pragma shader_feature _CL_ENABLE
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _OL_ENABLE
