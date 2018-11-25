@@ -34,6 +34,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _FurNoiseTex    ("Fur Noise Texture", 2D) = "white" {}
             _FurHeight      ("Fur Height", Float) = 0.1
             _FurShadowPower ("Fur ShadowPower", Range(0, 1)) = 0
+        [IntRange]
             _FurRepeat      ("Fur Repeat", Range(1, 8)) = 3
             _FurVector      ("Fur Static Vector", Vector) = (0, 0, 0, 0)
 
