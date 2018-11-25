@@ -18,14 +18,13 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
 
     /*
      * authors:
-     *      ver:2018/11/08 whiteflare,
+     *      ver:2018/11/25 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
-            _SolidColor     ("Solid Color", Color) = (0, 0, 0, 0)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode       ("Cull Mode", int) = 2
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
@@ -110,4 +109,6 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             ENDCG
         }
     }
+
+    CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -18,14 +18,13 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2018/11/21 whiteflare,
+     *      ver:2018/11/25 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
-            _SolidColor     ("Solid Color", Color) = (0, 0, 0, 0)
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
 
@@ -102,7 +101,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutoff
+            #pragma fragment frag_cutout_upper
 
             #pragma target 3.0
 
@@ -138,14 +137,13 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_clip
+            #pragma fragment frag_cutout_lower
 
             #pragma target 3.0
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
             #pragma shader_feature _AL_SOURCE_MAIN_TEX_ALPHA _AL_SOURCE_MASK_TEX_RED _AL_SOURCE_MASK_TEX_ALPHA
             #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _OL_ENABLE
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
@@ -155,12 +153,6 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
             #include "WF_MatcapShadows.cginc"
-
-            fixed4 frag_clip(v2f i) : SV_Target {
-                float4 color = frag_baseonly(i);
-                clip(_AL_CutOff - color.a);
-                return color;
-            }
 
             ENDCG
         }
@@ -172,7 +164,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_clip
+            #pragma fragment frag_cutout_lower
 
             #pragma target 3.0
 
@@ -190,13 +182,9 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             #include "Lighting.cginc"
             #include "WF_MatcapShadows.cginc"
 
-            fixed4 frag_clip(v2f i) : SV_Target {
-                float4 color = frag(i);
-                clip(_AL_CutOff - color.a);
-                return color;
-            }
-
             ENDCG
         }
     }
+
+    CustomEditor "UnlitWF.ShaderCustomEditor"
 }

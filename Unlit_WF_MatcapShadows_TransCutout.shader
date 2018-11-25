@@ -18,14 +18,13 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
     /*
      * authors:
-     *      ver:2018/11/08 whiteflare,
+     *      ver:2018/11/25 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
-            _SolidColor     ("Solid Color", Color) = (0, 0, 0, 0)
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
 
@@ -98,14 +97,13 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_baseonly_cutoff
+            #pragma fragment frag_cutout_upper
 
             #pragma target 3.0
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
             #pragma shader_feature _AL_SOURCE_MAIN_TEX_ALPHA _AL_SOURCE_MASK_TEX_RED _AL_SOURCE_MASK_TEX_ALPHA
             #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _OL_ENABLE
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
@@ -114,6 +112,7 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
+            
             #include "WF_MatcapShadows.cginc"
 
             ENDCG
@@ -125,7 +124,7 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutoff
+            #pragma fragment frag_cutout_upper
 
             #pragma target 3.0
 
@@ -146,4 +145,6 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
             ENDCG
         }
     }
+
+    CustomEditor "UnlitWF.ShaderCustomEditor"
 }
