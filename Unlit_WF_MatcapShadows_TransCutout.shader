@@ -41,10 +41,9 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
         [Header(Color Change)]
         [Toggle(_CL_ENABLE)]
             _CL_Enable      ("[CL] Enable", Float) = 0
-            _CL_Red         ("[CL] R change to", Color) = (1, 0, 0, 1)
-            _CL_Green       ("[CL] G change to", Color) = (0, 1, 0, 1)
-            _CL_Blue        ("[CL] B change to", Color) = (0, 0, 1, 1)
-            _CL_Offset      ("[CL] brightness", Range(-1, 1)) = 0
+            _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
+            _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
+            _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // 法線マップ
         [Header(NormalMap)]

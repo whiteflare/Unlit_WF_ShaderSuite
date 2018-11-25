@@ -63,10 +63,9 @@
     uniform float           _AL_CutOff;
 
     #ifdef _CL_ENABLE
-        uniform float3      _CL_Red;
-        uniform float3      _CL_Green;
-        uniform float3      _CL_Blue;
-        uniform float       _CL_Offset;
+        uniform float       _CL_DeltaH;
+        uniform float       _CL_DeltaS;
+        uniform float       _CL_DeltaV;
     #endif
 
     #ifdef _NM_ENABLE
@@ -202,28 +201,21 @@
         #endif
     }
 
-    inline float3 colorize(float3 base, float3 over) {
-        float bBase = (base.r + base.g + base.b) / 3;
-        float bOver = (over.r + over.g + over.b) / 3;
-        float3 a1 = (over - bOver) / bOver;
-        float3 a2 = (over - 1 + bOver) / (1 - bOver);
-        float3 s = sign(a1);
-        return saturate( bBase + s * min( s * a1 * bBase, s * a2 * (1 - bBase) ) );
+    float3 rgb2hsv(float3 c) {
+        // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+        float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
+        float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
+        float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
+        float d = q.x - min(q.w, q.y);
+        float e = 1.0e-10;
+        return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
     }
 
-    inline float3 blendColor(float3 base, float3 over, float rate) {
-        #ifdef _COLOR_ARRANGE_ENABLE
-            if (rate <= 0) {
-                return base;
-            }
-            float3 middle = colorize(base, over);
-            if (rate <= 0.5) {
-                return lerp( base, middle, saturate(rate * 2) );
-            }
-            return lerp( middle, over, saturate( (rate - 0.5) * 2) );
-        #else
-            return lerp( base, over, rate);
-        #endif
+    float3 hsv2rgb(float3 c) {
+        // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+        float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
+        float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
+        return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
     }
 
     v2f vert(in appdata v) {
@@ -275,8 +267,10 @@
 
         // 色変換
         #ifdef _CL_ENABLE
-            float3x3 colorTransform = float3x3( _CL_Red, _CL_Green, _CL_Blue );
-            color.rgb = saturate( mul(color.rgb, colorTransform) + _CL_Offset );
+            float3 hsv = rgb2hsv( saturate(color.rgb) );
+            hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
+            hsv.r = frac(hsv.r);
+            color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
         #endif
 
         // BumpMap
