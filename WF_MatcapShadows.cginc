@@ -267,6 +267,11 @@
 
         // 色変換
         #ifdef _CL_ENABLE
+            #ifdef _CL_MONOCHROME
+                color.r += color.g + color.b;
+                color.g = (color.r - 1) / 2;
+                color.b = (color.r - 1) / 2;
+            #endif
             float3 hsv = rgb2hsv( saturate(color.rgb) );
             hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
             hsv.r = frac(hsv.r);

@@ -34,6 +34,8 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
         [Header(Color Change)]
         [Toggle(_CL_ENABLE)]
             _CL_Enable      ("[CL] Enable", Float) = 0
+        [Toggle(_CL_MONOCHROME)]
+            _CL_Monochrome  ("[CL] monochrome", Float) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
@@ -103,6 +105,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
             #pragma shader_feature _CL_ENABLE
+            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _OL_ENABLE
