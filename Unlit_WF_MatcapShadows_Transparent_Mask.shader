@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_Mask" {
 
     /*
      * authors:
-     *      ver:2018/11/25 whiteflare,
+     *      ver:2018/11/27 whiteflare,
      */
 
     Properties {
