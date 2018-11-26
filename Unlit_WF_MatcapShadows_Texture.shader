@@ -18,18 +18,27 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
 
     /*
      * authors:
-     *      ver:2018/11/08 whiteflare,
+     *      ver:2018/11/27 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
-            _SolidColor     ("Solid Color", Color) = (0, 0, 0, 0)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode       ("Cull Mode", int) = 2
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
+
+        // 色変換
+        [Header(Color Change)]
+        [Toggle(_CL_ENABLE)]
+            _CL_Enable      ("[CL] Enable", Float) = 0
+        [Toggle(_CL_MONOCHROME)]
+            _CL_Monochrome  ("[CL] monochrome", Float) = 0
+            _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
+            _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
+            _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // 法線マップ
         [Header(NormalMap)]
@@ -95,6 +104,8 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             #pragma target 3.0
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
+            #pragma shader_feature _CL_ENABLE
+            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _OL_ENABLE
@@ -110,4 +121,6 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             ENDCG
         }
     }
+
+    CustomEditor "UnlitWF.ShaderCustomEditor"
 }

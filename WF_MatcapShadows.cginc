@@ -15,12 +15,16 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// WF_MatcapShadows.cginc
+#ifndef INC_UNLIT_WF_MATCAPSHADOWS
+#define INC_UNLIT_WF_MATCAPSHADOWS
 
     /*
      * authors:
-     *      ver:2018/11/22 whiteflare,
+     *      ver:2018/11/27 whiteflare,
      */
+
+    #define _MATCAP_VIEW_CORRECT_ENABLE
+    #define _COLOR_ARRANGE_ENABLE
 
     struct appdata {
         float4 vertex       : POSITION;
@@ -52,11 +56,17 @@
 
     uniform sampler2D       _MainTex;
     uniform float4          _MainTex_ST;
-    uniform float4          _SolidColor;
+    uniform float4          _Color;
 
     uniform float           _AL_Power;
     uniform sampler2D       _AL_MaskTex;
     uniform float           _AL_CutOff;
+
+    #ifdef _CL_ENABLE
+        uniform float       _CL_DeltaH;
+        uniform float       _CL_DeltaS;
+        uniform float       _CL_DeltaV;
+    #endif
 
     #ifdef _NM_ENABLE
         uniform sampler2D   _BumpMap;
@@ -88,14 +98,20 @@
         uniform float       _ES_Speed;
     #endif
 
-    #define _MATCAP_VIEW_CORRECT_ENABLE
+    static float3 BT709 = { 0.21, 0.72, 0.07 };
 
     inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
         float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
 
         #ifdef _MATCAP_VIEW_CORRECT_ENABLE
+            float3 cameraPos =
+                #ifdef USING_STEREO_MATRICES
+                    (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
+                #else
+                    _WorldSpaceCameraPos;
+                #endif
             float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
-            float3 ws_view_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex.xyz);
+            float3 ws_view_dir = normalize(cameraPos.xyz - ws_vertex.xyz);
             float3 base = mul( UNITY_MATRIX_V, float4(ws_view_dir, 0) ).xyz * float3(-1, -1, 1) + float3(0, 0, 1);
             float3 detail = vs_normal.xyz * float3(-1, -1, 1);
             vs_normal = base * dot(base, detail) / base.z - detail;
@@ -111,7 +127,7 @@
     }
 
     inline float calcBrightness(float3 color) {
-        return color.r * 0.21 + color.g * 0.72 + color.b * 0.07;
+        return dot(color, BT709);
     }
 
     inline float3 OmniDirectional_ShadeSH9() {
@@ -155,26 +171,24 @@
 
     inline float calcLightPower(float4 ls_vertex) {
         // directional light
-        float light_intensity = calcBrightness(_LightColor0);
-        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+        float3 lightColor = _LightColor0;
         #if UNITY_SHOULD_SAMPLE_SH
             // ambient
-            float3 ambient = OmniDirectional_ShadeSH9();
+            lightColor += OmniDirectional_ShadeSH9();
             #ifdef VERTEXLIGHT_ON
                 // not important lights
-                ambient += OmniDirectional_Shade4PointLights(
+                lightColor += OmniDirectional_Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                     unity_LightColor[0].rgb,
                     unity_LightColor[1].rgb,
                     unity_LightColor[2].rgb,
                     unity_LightColor[3].rgb,
                     unity_4LightAtten0,
-                    ws_vertex
+                    mul(unity_ObjectToWorld, ls_vertex)
                 );
             #endif
-            light_intensity += calcBrightness(ambient);
         #endif
-        return light_intensity;
+        return calcBrightness(saturate(lightColor));
     }
 
     inline float calcEmissivePower(float3 ls_vertex) {
@@ -185,6 +199,23 @@
         #else
             return 0;
         #endif
+    }
+
+    float3 rgb2hsv(float3 c) {
+        // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+        float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
+        float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
+        float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
+        float d = q.x - min(q.w, q.y);
+        float e = 1.0e-10;
+        return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
+    }
+
+    float3 hsv2rgb(float3 c) {
+        // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+        float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
+        float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
+        return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
     }
 
     v2f vert(in appdata v) {
@@ -227,10 +258,25 @@
     }
 
     fixed4 frag(v2f i) : SV_Target {
-        float4 mainTex = tex2D(_MainTex, i.uv);
-        float4 color = float4( lerp(mainTex.rgb, _SolidColor.rgb, _SolidColor.a), 1 );
+        float4 color =
+        #ifdef _SOLID_COLOR
+            _Color;
+        #else
+            tex2D(_MainTex, i.uv);
+        #endif
 
-        float3 matcapVector;
+        // 色変換
+        #ifdef _CL_ENABLE
+            #ifdef _CL_MONOCHROME
+                color.r += color.g + color.b;
+                color.g = (color.r - 1) / 2;
+                color.b = (color.r - 1) / 2;
+            #endif
+            float3 hsv = rgb2hsv( saturate(color.rgb) );
+            hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
+            hsv.r = frac(hsv.r);
+            color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
+        #endif
 
         // BumpMap
         #ifdef _NM_ENABLE
@@ -242,17 +288,17 @@
             float diffuse = saturate((dot(ws_normal, i.lightDir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power));
             color.rgb *= diffuse; // Unlitなのでライトの色は考慮しない
             // Matcap計算
-            matcapVector = calcMatcapVector(i.ls_vertex, ws_normal);
+            float3 matcapVector = calcMatcapVector(i.ls_vertex, ws_normal);
         #else
             // NormalMap未使用時はvertで計算したMatcapVectorを使う
-            matcapVector = i.normal;
+            float3 matcapVector = i.normal;
         #endif
 
         // Highlight
         #ifdef _HL_ENABLE
             // Matcap highlight color
             float2 matcap_uv = normalize(matcapVector.xyz) * 0.5 * _HL_Range + 0.5;
-            float4 hl_color = tex2D(_HL_MatcapTex, matcap_uv);
+            float4 hl_color = tex2D(_HL_MatcapTex, saturate(matcap_uv) );
             color.rgb += (hl_color.rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, i.uv).rgb * _HL_Power;  // MatcapColor を加算(減算)合成
         #endif
 
@@ -278,7 +324,7 @@
 
         // Alpha
         #ifdef _AL_SOURCE_MAIN_TEX_ALPHA
-            color.a = mainTex.a * _AL_Power;
+            color.a = color.a * _AL_Power;
         #elif _AL_SOURCE_MASK_TEX_RED
             color.a = tex2D(_AL_MaskTex, i.uv).r * _AL_Power;
         #elif _AL_SOURCE_MASK_TEX_ALPHA
@@ -302,60 +348,16 @@
         return color;
     }
 
-    fixed4 frag_baseonly(v2f i) : SV_Target {
-        float4 mainTex = tex2D(_MainTex, i.uv);
-        float4 color = float4( lerp(mainTex.rgb, _SolidColor.rgb, _SolidColor.a), 1 );
-
-        // BumpMap
-        #ifdef _NM_ENABLE
-            // 法線計算
-            float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertexのworld回転行列
-            float3 ls_normal = UnpackNormal( tex2D(_BumpMap, i.uv) ); // 法線マップ参照
-            float3 ws_normal = normalize( mul(ls_normal, tangentTransform) ); // world内の法線を作成
-            // 光源とブレンド
-            float diffuse = saturate((dot(ws_normal, i.lightDir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power));
-            color.rgb *= diffuse; // Unlitなのでライトの色は考慮しない
-        #endif
-
-        // Anti-Glare
-        #ifndef _GL_LEVEL_OFF
-            color.rgb = saturate(color.rgb * i.lightPower);
-        #endif
-
-        // Alpha
-        #ifdef _AL_SOURCE_MAIN_TEX_ALPHA
-            color.a = mainTex.a * _AL_Power;
-        #elif _AL_SOURCE_MASK_TEX_RED
-            color.a = tex2D(_AL_MaskTex, i.uv).r * _AL_Power;
-        #elif _AL_SOURCE_MASK_TEX_ALPHA
-            color.a = tex2D(_AL_MaskTex, i.uv).a * _AL_Power;
-        #else
-            color.a = 1.0;
-        #endif
-
-        // EmissiveScroll
-        #ifdef _ES_ENABLE
-            float es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
-            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power);
-            color.a = max(color.a, _ES_Color.a * es_power);
-        #endif
-
-        color.a = saturate(color.a);
-
-        // fog
-        UNITY_APPLY_FOG(i.fogCoord, color);
-
-        return color;
-    }
-
-    fixed4 frag_cutoff(v2f i) : SV_Target {
+    fixed4 frag_cutout_upper(v2f i) : SV_Target {
         float4 color = frag(i);
         clip(color.a - _AL_CutOff);
         return color;
     }
 
-    fixed4 frag_baseonly_cutoff(v2f i) : SV_Target {
-        float4 color = frag_baseonly(i);
-        clip(color.a - _AL_CutOff);
+    fixed4 frag_cutout_lower(v2f i) : SV_Target {
+        float4 color = frag(i);
+        clip(_AL_CutOff - color.a);
         return color;
     }
+
+#endif

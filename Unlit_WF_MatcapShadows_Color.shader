@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_MatcapShadows_Simple" {
+Shader "UnlitWF/WF_MatcapShadows_Color" {
 
     /*
      * authors:
@@ -24,21 +24,12 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
     Properties {
         // 基本
         [Header(Base)]
-            _MainTex        ("Main Texture", 2D) = "white" {}
+        [HDR]
+            _Color          ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode       ("Cull Mode", int) = 2
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
-
-        // 色変換
-        [Header(Color Change)]
-        [Toggle(_CL_ENABLE)]
-            _CL_Enable      ("[CL] Enable", Float) = 0
-        [Toggle(_CL_MONOCHROME)]
-            _CL_Monochrome  ("[CL] monochrome", Float) = 0
-            _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
-            _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
-            _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
@@ -51,6 +42,17 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
+
+        // Overlay Texture
+        [Header(Overlay Texture)]
+        [Toggle(_OL_ENABLE)]
+            _OL_Enable      ("[OL] Enable", Float) = 0
+            _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
+        [KeywordEnum(ALPHA,ADD,MUL)]
+            _OL_BLENDTYPE   ("[OL] Blend Type", Float) = 0
+            _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
+            _OL_Scroll_U    ("[OL] U Scroll", Float) = 0
+            _OL_Scroll_V    ("[OL] V Scroll", Float) = 0
     }
 
     SubShader {
@@ -72,15 +74,16 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
             #pragma target 3.0
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _HL_ENABLE
+            #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
+            #define _SOLID_COLOR
             #include "WF_MatcapShadows.cginc"
 
             ENDCG

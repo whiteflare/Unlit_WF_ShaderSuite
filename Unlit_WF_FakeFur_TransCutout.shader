@@ -14,11 +14,11 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_FakeFur_TransCutoff" {
+Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2018/11/22 whiteflare,
+     *      ver:2018/11/25 whiteflare,
      */
 
     Properties {
@@ -35,15 +35,16 @@ Shader "UnlitWF/WF_FakeFur_TransCutoff" {
             _FurNoiseTex    ("Fur Noise Texture", 2D) = "white" {}
             _FurHeight      ("Fur Height", Float) = 0.1
             _FurShadowPower ("Fur ShadowPower", Range(0, 1)) = 0
+        [IntRange]
             _FurRepeat      ("Fur Repeat", Range(1, 8)) = 3
             _FurVector      ("Fur Static Vector", Vector) = (0, 0, 0, 0)
 
         [Header(Fur Wave Animation)]
         [Toggle(_WV_ENABLE)]
-            _WV_Enable      ("Enable", Float) = 0
-            _WaveSpeed      ("Wave Speed", Vector) = (0, 0, 0, 0)
-            _WaveScale      ("Wave Scale", Vector) = (0, 0, 0, 0)
-            _WavePosFactor  ("Position Factor", Vector) = (0, 0, 0, 0)
+            _WV_Enable      ("[WV] Enable", Float) = 0
+            _WaveSpeed      ("[WV] Wave Speed", Vector) = (0, 0, 0, 0)
+            _WaveScale      ("[WV] Wave Scale", Vector) = (0, 0, 0, 0)
+            _WavePosFactor  ("[WV] Position Factor", Vector) = (0, 0, 0, 0)
     }
 
     SubShader {
@@ -98,4 +99,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutoff" {
             ENDCG
         }
     }
+
+    CustomEditor "UnlitWF.ShaderCustomEditor"
 }

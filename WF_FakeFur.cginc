@@ -15,7 +15,8 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// WF_FakeFur.cginc
+#ifndef INC_UNLIT_WF_FAKEFUR
+#define INC_UNLIT_WF_FAKEFUR
 
     /*
      * authors:
@@ -189,9 +190,10 @@
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
         o.uv2 = TRANSFORM_TEX(v.uv2, _FurNoiseTex);
 
-        float3 tangent = v.tangent.xyz * v.tangent.w;
+        float3 tangent = v.tangent.xyz;
         float3 bitangent = cross(v.normal, tangent);
-        float3x3 tangentTransform = float3x3( normalize(tangent), normalize(bitangent), normalize(v.normal) );
+        float3x3 tangentTransform = float3x3(tangent, bitangent, o.normal);
+
         #ifdef _WV_ENABLE
             float3 ls_normal = _WaveScale.xyz * sin( _Time.y * _WaveSpeed - dot(v.vertex.xyz, _WavePosFactor.xyz) ) / 2;
             o.waving = mul(ls_normal + _FurVector.xyz, tangentTransform);
@@ -309,3 +311,5 @@
         }
         return color;
     }
+
+#endif
