@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2018/11/22 whiteflare,
+     *      ver:2018/11/29 whiteflare,
      */
 
     struct appdata {
@@ -69,7 +69,6 @@
 
     uniform sampler2D   _MainTex;
     uniform float4      _MainTex_ST;
-    uniform float4      _SolidColor;
     uniform float       _CutOffLevel;
 
     uniform sampler2D   _FurMaskTex;
@@ -85,7 +84,8 @@
     uniform float4      _WavePosFactor;
 
     inline float calcBrightness(float3 color) {
-        return color.r * 0.21 + color.g * 0.72 + color.b * 0.07;
+        static float3 BT709 = { 0.21, 0.72, 0.07 };
+        return dot(color, BT709);
     }
 
     inline float3 OmniDirectional_ShadeSH9() {
@@ -129,58 +129,24 @@
 
     inline float calcLightPower(float4 ls_vertex) {
         // directional light
-        float light_intensity = calcBrightness(_LightColor0);
-        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+        float3 lightColor = _LightColor0;
         #if UNITY_SHOULD_SAMPLE_SH
             // ambient
-            float3 ambient = OmniDirectional_ShadeSH9();
+            lightColor += OmniDirectional_ShadeSH9();
             #ifdef VERTEXLIGHT_ON
                 // not important lights
-                ambient += OmniDirectional_Shade4PointLights(
+                lightColor += OmniDirectional_Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                     unity_LightColor[0].rgb,
                     unity_LightColor[1].rgb,
                     unity_LightColor[2].rgb,
                     unity_LightColor[3].rgb,
                     unity_4LightAtten0,
-                    ws_vertex
+                    mul(unity_ObjectToWorld, ls_vertex)
                 );
             #endif
-            light_intensity += calcBrightness(ambient);
         #endif
-        return light_intensity;
-    }
-
-    v2f vert_base(appdata v) {
-        v2f o;
-        o.vertex = UnityObjectToClipPos(v.vertex);
-        o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-
-        #ifndef _GL_LEVEL_OFF
-            o.lightPower = saturate(calcLightPower(v.vertex) * 2
-                #ifdef _GL_LEVEL_BRIGHT
-                    + 0.2
-                #elif _GL_LEVEL_DARK
-                    + 0.03
-                #endif
-            );
-        #endif
-
-        UNITY_TRANSFER_FOG(o, o.vertex);
-        return o;
-    }
-
-    fixed4 frag_base(v2f i) : SV_Target {
-        float4 mainTex = tex2D(_MainTex, i.uv);
-        float4 color = float4( lerp(mainTex.rgb, _SolidColor.rgb, _SolidColor.a), 1 );
-
-        // Anti-Glare
-        #ifndef _GL_LEVEL_OFF
-            color.rgb = saturate(color.rgb * i.lightPower);
-        #endif
-
-        UNITY_APPLY_FOG(i.fogCoord, color);
-        return color;
+        return calcBrightness(saturate(lightColor));
     }
 
     v2g vert_fakefur(appdata_fur v) {
@@ -285,12 +251,15 @@
 
     fixed4 frag_fakefur(g2f i) : SV_Target {
         float4 maskTex = tex2D(_FurMaskTex, i.uv);
+        if (maskTex.r < 0.01) {
+        	discard;
+        }
         if (maskTex.r <= i.height) {
             discard;
         }
 
         float4 mainTex = tex2D(_MainTex, i.uv);
-        float4 color = float4( lerp(mainTex.rgb, _SolidColor.rgb, _SolidColor.a), 1 );
+        float4 color = float4( mainTex.rgb, 1 );
 
         // Anti-Glare
         #ifndef _GL_LEVEL_OFF

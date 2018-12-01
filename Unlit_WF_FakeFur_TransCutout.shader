@@ -18,17 +18,17 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2018/11/25 whiteflare,
+     *      ver:2018/11/29 whiteflare,
      */
 
     Properties {
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
-            _SolidColor     ("Solid Color", Color) = (0, 0, 0, 0)
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
             _CutOffLevel    ("Alpha CutOff Level", Range(0, 1)) = 0.5
 
+        // ファー設定
         [Header(Fur Settings)]
         [NoScaleOffset]
             _FurMaskTex     ("Fur Mask Texture", 2D) = "white" {}
@@ -39,6 +39,29 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _FurRepeat      ("Fur Repeat", Range(1, 8)) = 3
             _FurVector      ("Fur Static Vector", Vector) = (0, 0, 0, 0)
 
+        // 色変換
+        [Header(Color Change)]
+        [Toggle(_CL_ENABLE)]
+            _CL_Enable      ("[CL] Enable", Float) = 0
+        [Toggle(_CL_MONOCHROME)]
+            _CL_Monochrome  ("[CL] monochrome", Float) = 0
+            _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
+            _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
+            _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
+
+        // Matcapハイライト
+        [Header(HighLight and Shadow Matcap)]
+        [Toggle(_HL_ENABLE)]
+            _HL_Enable      ("[HL] Enable", Float) = 0
+        [NoScaleOffset]
+            _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "black" {}
+            _HL_MedianColor ("[HL] Median Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Range       ("[HL] Matcap Range (Tweak)", Range(0, 2)) = 1
+            _HL_Power       ("[HL] Power", Range(0, 2)) = 1
+        [NoScaleOffset]
+            _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
+
+        // ウェーブアニメーション
         [Header(Fur Wave Animation)]
         [Toggle(_WV_ENABLE)]
             _WV_Enable      ("[WV] Enable", Float) = 0
@@ -49,8 +72,8 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     SubShader {
         Tags {
-            "RenderType" = "TransparentCutout"
-            "Queue" = "AlphaTest"
+            "RenderType" = "Opaque"
+            "Queue" = "Geometry"
             "LightMode" = "ForwardBase"
         }
         LOD 100
@@ -60,20 +83,31 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
             CGPROGRAM
 
-            #pragma vertex vert_base
-            #pragma fragment frag_base
+            #pragma vertex vert
+            #pragma fragment frag
 
+            #pragma target 3.0
+
+            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
+            #pragma shader_feature _CL_ENABLE
+            #pragma shader_feature _CL_MONOCHROME
+            #pragma shader_feature _HL_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
-
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
-            #include "WF_FakeFur.cginc"
+            #include "WF_MatcapShadows.cginc"
 
             ENDCG
         }
+
+        Tags {
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest"
+            "LightMode" = "ForwardBase"
+        }
+        LOD 100
 
         Pass {
             Cull OFF
