@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
+Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
     /*
      * authors:
@@ -35,9 +35,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
         [NoScaleOffset]
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_CutOff      ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite      ("[AL] ZWrite", int) = 0
+            _AL_CutOff      ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
 
         // 色変換
         [Header(Color Change)]
@@ -62,7 +60,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
         [Toggle(_HL_ENABLE)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [NoScaleOffset]
-            _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "black" {}
+            _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor ("[HL] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Range       ("[HL] Matcap Range (Tweak)", Range(0, 2)) = 1
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
@@ -100,13 +98,11 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             "Queue" = "AlphaTest"
             "LightMode" = "ForwardBase"
             "IgnoreProjector" = "True"
-            "DisableBatching" = "True"
         }
         LOD 100
 
         Pass {
-            Cull OFF
-            Blend Off
+            Cull FRONT
 
             CGPROGRAM
 
@@ -120,7 +116,6 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             #pragma shader_feature _CL_ENABLE
             #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _OL_ENABLE
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
@@ -129,43 +124,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
-            #include "WF_MatcapShadows.cginc"
-
-            ENDCG
-        }
-
-        Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
-            "LightMode" = "ForwardBase"
-            "IgnoreProjector" = "True"
-            "DisableBatching" = "True"
-        }
-
-        Pass {
-            Cull FRONT
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag_cutout_lower
-
-            #pragma target 3.0
-
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
-            #pragma shader_feature _AL_SOURCE_MAIN_TEX_ALPHA _AL_SOURCE_MASK_TEX_RED _AL_SOURCE_MASK_TEX_ALPHA
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
-            #pragma shader_feature _ES_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
+            
             #include "WF_MatcapShadows.cginc"
 
             ENDCG
@@ -173,12 +132,11 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
         Pass {
             Cull BACK
-            Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutout_lower
+            #pragma fragment frag_cutout_upper
 
             #pragma target 3.0
 
