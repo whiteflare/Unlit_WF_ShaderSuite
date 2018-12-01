@@ -98,8 +98,6 @@
         uniform float       _ES_Speed;
     #endif
 
-    static float3 BT709 = { 0.21, 0.72, 0.07 };
-
     inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
         float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
 
@@ -127,6 +125,7 @@
     }
 
     inline float calcBrightness(float3 color) {
+        static float3 BT709 = { 0.21, 0.72, 0.07 };
         return dot(color, BT709);
     }
 
@@ -201,19 +200,19 @@
         #endif
     }
 
-    float3 rgb2hsv(float3 c) {
+    inline float3 rgb2hsv(float3 c) {
         // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
-        float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
+        static float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
+        static float e = 1.0e-10;
         float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
         float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
         float d = q.x - min(q.w, q.y);
-        float e = 1.0e-10;
         return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
     }
 
-    float3 hsv2rgb(float3 c) {
+    inline float3 hsv2rgb(float3 c) {
         // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
-        float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
+        static float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
         float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
         return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
     }
