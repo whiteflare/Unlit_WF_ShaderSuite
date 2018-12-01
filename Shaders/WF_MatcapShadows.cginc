@@ -24,7 +24,6 @@
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
-    #define _COLOR_ARRANGE_ENABLE
 
     struct appdata {
         float4 vertex       : POSITION;
@@ -115,7 +114,7 @@
             vs_normal = base * dot(base, detail) / base.z - detail;
         #endif
 
-        return vs_normal;
+        return normalize( vs_normal );
     }
 
     inline float3 calcLocalSpaceLightDir() {
@@ -256,7 +255,7 @@
         return o;
     }
 
-    fixed4 frag(v2f i) : SV_Target {
+    float4 frag(v2f i) : SV_Target {
         float4 color =
         #ifdef _SOLID_COLOR
             _Color;
@@ -295,8 +294,7 @@
 
         // Highlight
         #ifdef _HL_ENABLE
-            // Matcap highlight color
-            float2 matcap_uv = normalize(matcapVector.xyz) * 0.5 * _HL_Range + 0.5;
+            float2 matcap_uv = matcapVector.xyz * 0.5 * _HL_Range + 0.5;
             float4 hl_color = tex2D(_HL_MatcapTex, saturate(matcap_uv) );
             color.rgb += (hl_color.rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, i.uv).rgb * _HL_Power;  // MatcapColor を加算(減算)合成
         #endif

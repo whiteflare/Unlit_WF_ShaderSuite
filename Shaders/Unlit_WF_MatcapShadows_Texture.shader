@@ -53,7 +53,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
         [Toggle(_HL_ENABLE)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [NoScaleOffset]
-            _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "black" {}
+            _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor ("[HL] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Range       ("[HL] Matcap Range (Tweak)", Range(0, 2)) = 1
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
