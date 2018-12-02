@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2018/11/27 whiteflare,
+     *      ver:2018/12/02 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -295,8 +295,24 @@
         // Highlight
         #ifdef _HL_ENABLE
             float2 matcap_uv = matcapVector.xyz * 0.5 * _HL_Range + 0.5;
-            float4 hl_color = tex2D(_HL_MatcapTex, saturate(matcap_uv) );
-            color.rgb += (hl_color.rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, i.uv).rgb * _HL_Power;  // MatcapColor を加算(減算)合成
+            float3 blend_param = (tex2D(_HL_MatcapTex, saturate(matcap_uv) ).rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, i.uv).rgb * _HL_Power;
+            // 明るすぎ・暗すぎ防止の補正処理
+            #if defined(_HL_SOFT_SHADOW) || defined(_HL_SOFT_LIGHT)
+            {
+                float bb = (blend_param.r + blend_param.g + blend_param.b) / 3;
+                float bc = (color.r + color.g + color.b) / 3 - 0.5;
+                #ifdef _HL_SOFT_SHADOW
+                    // 暗いところに暗い影は落とさない
+                    blend_param *= bb < 0 && bc < 0 ? saturate( (bc + 0.5) * 2 ) : 1;
+                #endif
+                #ifdef _HL_SOFT_LIGHT
+                    // 明るいところに明るい光は差さない
+                    blend_param *= 0 < bb && 0 < bc ? saturate( 1 - (bc + 0.5) * 2 ) : 1;
+                #endif
+            }
+            #endif
+            // ブレンド
+            color.rgb = saturate(color.rgb + blend_param);
         #endif
 
         // Overlay

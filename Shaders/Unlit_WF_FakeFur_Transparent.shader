@@ -18,10 +18,11 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
     /*
      * authors:
-     *      ver:2018/11/29 whiteflare,
+     *      ver:2018/12/02 whiteflare,
      */
 
     Properties {
+        // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
@@ -59,6 +60,10 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
+        [Toggle(_HL_SOFT_SHADOW)]
+            _HL_SoftShadow  ("[HL] Soft Shadow Enable (expt.)", Float) = 1
+        [Toggle(_HL_SOFT_LIGHT)]
+            _HL_SoftLight   ("[HL] Soft Light Enable (expt.)", Float) = 0
 
         // ウェーブアニメーション
         [Header(Fur Wave Animation)]
@@ -91,6 +96,9 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma shader_feature _CL_ENABLE
             #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _HL_ENABLE
+            #pragma shader_feature _HL_SOFT_SHADOW
+            #pragma shader_feature _HL_SOFT_LIGHT
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
