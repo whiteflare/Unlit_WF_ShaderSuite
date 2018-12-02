@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
 
     /*
      * authors:
-     *      ver:2018/11/27 whiteflare,
+     *      ver:2018/12/02 whiteflare,
      */
 
     Properties {
@@ -59,6 +59,10 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
+        [Toggle(_HL_SOFT_SHADOW)]
+            _HL_SoftShadow  ("[HL] Soft Shadow Enable (expt.)", Float) = 1
+        [Toggle(_HL_SOFT_LIGHT)]
+            _HL_SoftLight   ("[HL] Soft Light Enable (expt.)", Float) = 0
 
         // Overlay Texture
         [Header(Overlay Texture)]
@@ -108,9 +112,12 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _HL_ENABLE
+            #pragma shader_feature _HL_SOFT_SHADOW
+            #pragma shader_feature _HL_SOFT_LIGHT
             #pragma shader_feature _OL_ENABLE
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 

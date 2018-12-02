@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
     /*
      * authors:
-     *      ver:2018/11/27 whiteflare,
+     *      ver:2018/12/02 whiteflare,
      */
 
     Properties {
@@ -51,6 +51,10 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
+        [Toggle(_HL_SOFT_SHADOW)]
+            _HL_SoftShadow  ("[HL] Soft Shadow Enable (expt.)", Float) = 1
+        [Toggle(_HL_SOFT_LIGHT)]
+            _HL_SoftLight   ("[HL] Soft Light Enable (expt.)", Float) = 0
     }
 
     SubShader {
@@ -75,6 +79,8 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
             #pragma shader_feature _CL_ENABLE
             #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _HL_ENABLE
+            #pragma shader_feature _HL_SOFT_SHADOW
+            #pragma shader_feature _HL_SOFT_LIGHT
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
