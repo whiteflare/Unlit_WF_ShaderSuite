@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2018/12/02 whiteflare,
+     *      ver:2018/12/08 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -344,6 +344,9 @@
             color.a = tex2D(_AL_MaskTex, i.uv).a * _AL_Power;
         #else
             color.a = 1.0;
+        #endif
+        #ifdef _AL_CustomValue
+            color.a *= _AL_CustomValue;
         #endif
 
         // EmissiveScroll
