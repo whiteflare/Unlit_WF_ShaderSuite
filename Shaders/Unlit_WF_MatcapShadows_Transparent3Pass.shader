@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2018/12/02 whiteflare,
+     *      ver:2018/12/09 whiteflare,
      */
 
     Properties {
@@ -37,7 +37,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
             _AL_CutOff      ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
         [Enum(OFF,0,ON,1)]
-            _AL_ZWrite      ("[AL] ZWrite", int) = 0
+            _AL_ZWrite      ("[AL] ZWrite", int) = 1
 
         // 色変換
         [Header(Color Change)]
