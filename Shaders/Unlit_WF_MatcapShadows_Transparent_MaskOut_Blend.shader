@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
     /*
      * authors:
-     *      ver:2018/12/09 whiteflare,
+     *      ver:2018/12/10 whiteflare,
      */
 
     Properties {
@@ -83,6 +83,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
         [Toggle(_OL_ENABLE)]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
+        [KeywordEnum(MAINTEX_UV,VIEW_XY)]
+            _OL_SCREEN      ("[OL] Screen Space", Float) = 0
         [KeywordEnum(ALPHA,ADD,MUL)]
             _OL_BLENDTYPE   ("[OL] Blend Type", Float) = 0
             _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
@@ -141,6 +143,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
 
@@ -175,6 +178,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             #pragma shader_feature _HL_SOFT_SHADOW
             #pragma shader_feature _HL_SOFT_LIGHT
             #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
 
@@ -212,6 +216,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
 
@@ -249,6 +254,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             #pragma shader_feature _HL_SOFT_SHADOW
             #pragma shader_feature _HL_SOFT_LIGHT
             #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
 
