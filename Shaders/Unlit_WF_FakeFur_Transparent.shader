@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
     /*
      * authors:
-     *      ver:2018/12/02 whiteflare,
+     *      ver:2018/12/12 whiteflare,
      */
 
     Properties {
@@ -75,14 +75,12 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
     }
 
     SubShader {
-        Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
-            "LightMode" = "ForwardBase"
-        }
-        LOD 100
-
         Pass {
+            Tags {
+                "RenderType" = "Opaque"
+                "Queue" = "Geometry"
+                "LightMode" = "ForwardBase"
+            }
             Cull OFF
 
             CGPROGRAM
@@ -109,14 +107,12 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             ENDCG
         }
 
-        Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
-            "LightMode" = "ForwardBase"
-        }
-        LOD 100
-
         Pass {
+            Tags {
+                "RenderType" = "Transparent"
+                "Queue" = "Transparent"
+                "LightMode" = "ForwardBase"
+            }
             Cull OFF
             ZWrite OFF
             Blend SrcAlpha OneMinusSrcAlpha

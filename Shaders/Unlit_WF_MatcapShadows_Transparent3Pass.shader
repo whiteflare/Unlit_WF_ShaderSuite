@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2018/12/10 whiteflare,
+     *      ver:2018/12/12 whiteflare,
      */
 
     Properties {
@@ -101,16 +101,16 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
     }
 
     SubShader {
-        Tags {
-            "RenderType" = "TransparentCutout"
-            "Queue" = "AlphaTest"
-            "LightMode" = "ForwardBase"
-            "IgnoreProjector" = "True"
-            "DisableBatching" = "True"
-        }
         LOD 100
 
         Pass {
+            Tags {
+                "RenderType" = "TransparentCutout"
+                "Queue" = "AlphaTest"
+                "LightMode" = "ForwardBase"
+                "IgnoreProjector" = "True"
+                "DisableBatching" = "True"
+            }
             Cull OFF
             Blend Off
 
@@ -144,15 +144,14 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             ENDCG
         }
 
-        Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
-            "LightMode" = "ForwardBase"
-            "IgnoreProjector" = "True"
-            "DisableBatching" = "True"
-        }
-
         Pass {
+            Tags {
+                "RenderType" = "Transparent"
+                "Queue" = "Transparent"
+                "LightMode" = "ForwardBase"
+                "IgnoreProjector" = "True"
+                "DisableBatching" = "True"
+            }
             Cull FRONT
             Blend SrcAlpha OneMinusSrcAlpha
 
@@ -184,6 +183,13 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
         }
 
         Pass {
+            Tags {
+                "RenderType" = "Transparent"
+                "Queue" = "Transparent"
+                "LightMode" = "ForwardBase"
+                "IgnoreProjector" = "True"
+                "DisableBatching" = "True"
+            }
             Cull BACK
             Blend SrcAlpha OneMinusSrcAlpha
 
