@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_MatcapShadows_Transparent" {
+Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
     /*
      * authors:
@@ -27,6 +27,12 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
             _MainTex        ("Main Texture", 2D) = "white" {}
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
+
+        // StencilMask
+        [Header(Stencil Mask)]
+        [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
+            _StencilMaskID  ("ID", int) = 8
+            _AL_StencilPower("Alpha Power", Range(0, 1)) = 0.5
 
         // Alpha
         [Header(Transparent Alpha)]
@@ -102,11 +108,22 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
     SubShader {
         Tags {
             "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "Queue" = "Transparent+1"
             "LightMode" = "ForwardBase"
             "IgnoreProjector" = "True"
         }
         LOD 100
+
+        Stencil {
+            Ref [_StencilMaskID]
+            ReadMask 15
+            Comp notEqual
+            /*
+             * StencilMaskIDとして使うのは下位4ビット。ForwardパスだけどDefferedの制約に合わせておいたほうが改造しやすいので。
+             * 書込側ではフラグを単純に立てるだけ。参照側では下位4ビットを読み込み比較する。
+             * 他shaderに介入されていた場合はステンシルテスト合格側に倒す。禿げるくらいなら全て描くほうが良いので。
+             */
+        }
 
         Pass {
             Cull FRONT
@@ -167,6 +184,85 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_MatcapShadows.cginc"
+
+            ENDCG
+        }
+
+        Stencil {
+            Ref [_StencilMaskID]
+            ReadMask 15
+            Comp equal
+        }
+
+        Pass {
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 3.0
+
+            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
+            #pragma shader_feature _AL_SOURCE_MAIN_TEX_ALPHA _AL_SOURCE_MASK_TEX_RED _AL_SOURCE_MASK_TEX_ALPHA
+            #pragma shader_feature _CL_ENABLE
+            #pragma shader_feature _CL_MONOCHROME
+            #pragma shader_feature _NM_ENABLE
+            #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
+            #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
+            #pragma shader_feature _ES_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            uniform float _AL_StencilPower;
+            #define _AL_CustomValue _AL_StencilPower
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_MatcapShadows.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Cull BACK
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 3.0
+
+            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
+            #pragma shader_feature _AL_SOURCE_MAIN_TEX_ALPHA _AL_SOURCE_MASK_TEX_RED _AL_SOURCE_MASK_TEX_ALPHA
+            #pragma shader_feature _CL_ENABLE
+            #pragma shader_feature _CL_MONOCHROME
+            #pragma shader_feature _NM_ENABLE
+            #pragma shader_feature _HL_ENABLE
+            #pragma shader_feature _HL_SOFT_SHADOW
+            #pragma shader_feature _HL_SOFT_LIGHT
+            #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
+            #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
+            #pragma shader_feature _ES_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            uniform float _AL_StencilPower;
+            #define _AL_CustomValue _AL_StencilPower
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
