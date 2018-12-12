@@ -376,7 +376,7 @@
 
         // EmissiveScroll
         #ifdef _ES_ENABLE
-            float es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
+            float3 es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
             color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power);
             color.a = max(color.a, _ES_Color.a * es_power);
         #endif
