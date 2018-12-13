@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2018/12/02 whiteflare,
+     *      ver:2018/12/13 whiteflare,
      */
 
     Properties {
@@ -78,6 +78,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
         [Toggle(_OL_ENABLE)]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
+        [KeywordEnum(MAINTEX_UV,VIEW_XY)]
+            _OL_SCREEN      ("[OL] Screen Space", Float) = 0
         [KeywordEnum(ALPHA,ADD,MUL)]
             _OL_BLENDTYPE   ("[OL] Blend Type", Float) = 0
             _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
@@ -100,16 +102,15 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
     SubShader {
         Tags {
-            "RenderType" = "TransparentCutout"
-            "Queue" = "AlphaTest"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
             "LightMode" = "ForwardBase"
-            "IgnoreProjector" = "True"
             "DisableBatching" = "True"
         }
-        LOD 100
 
         Pass {
             Cull OFF
+            ZWrite ON
             Blend Off
 
             CGPROGRAM
@@ -128,6 +129,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             #pragma shader_feature _HL_SOFT_SHADOW
             #pragma shader_feature _HL_SOFT_LIGHT
             #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
 
@@ -141,16 +143,9 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             ENDCG
         }
 
-        Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
-            "LightMode" = "ForwardBase"
-            "IgnoreProjector" = "True"
-            "DisableBatching" = "True"
-        }
-
         Pass {
             Cull FRONT
+            ZWrite OFF
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
@@ -166,6 +161,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
 
@@ -181,6 +177,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
         Pass {
             Cull BACK
+            ZWrite [_AL_ZWrite]
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
@@ -199,6 +196,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             #pragma shader_feature _HL_SOFT_SHADOW
             #pragma shader_feature _HL_SOFT_LIGHT
             #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
 

@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2018/12/02 whiteflare,
+     *      ver:2018/12/13 whiteflare,
      */
 
     Properties {
@@ -77,11 +77,11 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest"
             "LightMode" = "ForwardBase"
+            "DisableBatching" = "True"
         }
-        LOD 100
 
         Pass {
             Cull OFF
@@ -109,13 +109,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
             ENDCG
         }
-
-        Tags {
-            "RenderType" = "TransparentCutout"
-            "Queue" = "AlphaTest"
-            "LightMode" = "ForwardBase"
-        }
-        LOD 100
 
         Pass {
             Cull OFF

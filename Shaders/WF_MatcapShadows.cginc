@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2018/12/02 whiteflare,
+     *      ver:2018/12/10 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -45,7 +45,7 @@
             float3 lightDir     : TEXCOORD5;
         #endif
         #ifdef _OL_ENABLE
-            float2 overlay      : TEXCOORD6;
+            float4 vs_vertex    : TEXCOORD6;
         #endif
         #ifndef _GL_LEVEL_OFF
             float lightPower    : COLOR0;
@@ -189,32 +189,71 @@
         return calcBrightness(saturate(lightColor));
     }
 
-    inline float calcEmissivePower(float3 ls_vertex) {
-        #ifdef _ES_ENABLE
+    #ifdef _CL_ENABLE
+        inline float3 rgb2hsv(float3 c) {
+            // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+            static float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
+            static float e = 1.0e-10;
+            float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
+            float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
+            float d = q.x - min(q.w, q.y);
+            return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
+        }
+
+        inline float3 hsv2rgb(float3 c) {
+            // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+            static float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
+            float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
+            return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
+        }
+    #endif
+
+    #ifdef _OL_ENABLE
+        inline float4 computeNonStereoGrabScreenPos(float4 pos) {
+            // UnityCG.cginc にある ComputeGrabScreenPos の UNITY_SINGLE_PASS_STEREO を考慮しない版
+            #if UNITY_UV_STARTS_AT_TOP
+                float scale = -1.0;
+            #else
+                float scale = 1.0;
+            #endif
+            float4 o = pos * 0.5f;
+            o.xy = float2(o.x, o.y * scale) + o.w;
+            o.zw = pos.zw;
+            return o;
+        }
+        inline float2 computeOverlayTex(float4 vs_vertex, float2 uv) {
+            #ifdef _OL_SCREEN_VIEW_XY
+                 float4 screenPos = computeNonStereoGrabScreenPos(vs_vertex);
+                 float2 scr = screenPos.xy / screenPos.w;
+                 scr.y *= _ScreenParams.y / _ScreenParams.x;
+             #else
+                float2 scr = uv;
+             #endif
+             scr.x += frac(_OL_Scroll_U * _Time.x);
+             scr.y += frac(_OL_Scroll_V * _Time.x);
+             return TRANSFORM_TEX(scr, _OL_OverlayTex);
+        }
+        inline float3 blendOverlayColor(float3 color, float3 ov_color) {
+            #ifdef _OL_BLENDTYPE_ADD
+                // 加算
+                return color + ov_color * _OL_Power;
+            #elif _OL_BLENDTYPE_MUL
+                // 重み付き乗算
+                return color * lerp( float3(1, 1, 1), ov_color, _OL_Power);
+            #else
+                // ブレンド
+                return lerp(color, ov_color, _OL_Power);
+            #endif
+        }
+    #endif
+
+    #ifdef _ES_ENABLE
+        inline float calcEmissivePower(float3 ls_vertex) {
             float time = _Time.y * _ES_Speed - dot(ls_vertex, _ES_Direction.xyz);
             float es_power = sin( time ) + 0.5 + _ES_LevelOffset;
             return saturate( es_power * _ES_Sharpness );
-        #else
-            return 0;
-        #endif
-    }
-
-    inline float3 rgb2hsv(float3 c) {
-        // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
-        static float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
-        static float e = 1.0e-10;
-        float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
-        float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
-        float d = q.x - min(q.w, q.y);
-        return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
-    }
-
-    inline float3 hsv2rgb(float3 c) {
-        // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
-        static float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
-        float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
-        return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
-    }
+        }
+    #endif
 
     v2f vert(in appdata v) {
         v2f o;
@@ -233,12 +272,7 @@
         #endif
 
         #ifdef _OL_ENABLE
-            float4 screenPos = ComputeGrabScreenPos(o.vertex);
-            float2 scr = screenPos.xy / screenPos.w;
-            scr.y *= _ScreenParams.y / _ScreenParams.x;
-            scr.x += frac(_OL_Scroll_U * _Time.x);
-            scr.y += frac(_OL_Scroll_V * _Time.x);
-            o.overlay = TRANSFORM_TEX(scr, _OL_OverlayTex);
+            o.vs_vertex = o.vertex;
         #endif
 
         #ifndef _GL_LEVEL_OFF
@@ -317,17 +351,8 @@
 
         // Overlay
         #ifdef _OL_ENABLE
-            float4 ov_color = tex2D(_OL_OverlayTex, i.overlay);
-            #ifdef _OL_BLENDTYPE_ADD
-                // 加算
-                color.rgb += ov_color.rgb * _OL_Power;
-            #elif _OL_BLENDTYPE_MUL
-                // 重み付き乗算
-                color.rgb *= lerp( float3(1, 1, 1), ov_color.rgb, _OL_Power);
-            #else
-                // ブレンド
-                color.rgb = lerp(color.rgb, ov_color.rgb, _OL_Power);
-            #endif
+            float2 overlay = computeOverlayTex(i.vs_vertex, i.uv);
+            color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, overlay).rgb);
         #endif
 
         // Anti-Glare
@@ -345,10 +370,13 @@
         #else
             color.a = 1.0;
         #endif
+        #ifdef _AL_CustomValue
+            color.a *= _AL_CustomValue;
+        #endif
 
         // EmissiveScroll
         #ifdef _ES_ENABLE
-            float es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
+            float3 es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
             color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power);
             color.a = max(color.a, _ES_Color.a * es_power);
         #endif

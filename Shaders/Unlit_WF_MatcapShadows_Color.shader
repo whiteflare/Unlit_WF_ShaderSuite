@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Color" {
 
     /*
      * authors:
-     *      ver:2018/12/02 whiteflare,
+     *      ver:2018/12/13 whiteflare,
      */
 
     Properties {
@@ -65,7 +65,6 @@ Shader "UnlitWF/WF_MatcapShadows_Color" {
             "Queue" = "Geometry"
             "LightMode" = "ForwardBase"
         }
-        LOD 100
 
         Pass {
             Cull [_CullMode]
