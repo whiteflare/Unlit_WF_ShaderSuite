@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
     /*
      * authors:
-     *      ver:2018/12/10 whiteflare,
+     *      ver:2018/12/13 whiteflare,
      */
 
     Properties {
@@ -103,9 +103,8 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
             "LightMode" = "ForwardBase"
-            "IgnoreProjector" = "True"
+            "DisableBatching" = "True"
         }
-        LOD 100
 
         Pass {
             Cull FRONT

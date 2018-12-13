@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut" {
 
     /*
      * authors:
-     *      ver:2018/12/10 whiteflare,
+     *      ver:2018/12/13 whiteflare,
      */
 
     Properties {
@@ -109,9 +109,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+1"
             "LightMode" = "ForwardBase"
-            "IgnoreProjector" = "True"
+            "DisableBatching" = "True"
         }
-        LOD 100
 
         Stencil {
             Ref [_StencilMaskID]

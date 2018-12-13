@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2018/12/12 whiteflare,
+     *      ver:2018/12/13 whiteflare,
      */
 
     Properties {
@@ -37,7 +37,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
             _AL_CutOff      ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
         [Enum(OFF,0,ON,1)]
-            _AL_ZWrite      ("[AL] ZWrite", int) = 1
+            _AL_ZWrite      ("[AL] ZWrite", int) = 0
 
         // 色変換
         [Header(Color Change)]
@@ -101,17 +101,16 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
     }
 
     SubShader {
-        LOD 100
+        Tags {
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
+            "LightMode" = "ForwardBase"
+            "DisableBatching" = "True"
+        }
 
         Pass {
-            Tags {
-                "RenderType" = "TransparentCutout"
-                "Queue" = "AlphaTest"
-                "LightMode" = "ForwardBase"
-                "IgnoreProjector" = "True"
-                "DisableBatching" = "True"
-            }
             Cull OFF
+            ZWrite ON
             Blend Off
 
             CGPROGRAM
@@ -145,14 +144,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
         }
 
         Pass {
-            Tags {
-                "RenderType" = "Transparent"
-                "Queue" = "Transparent"
-                "LightMode" = "ForwardBase"
-                "IgnoreProjector" = "True"
-                "DisableBatching" = "True"
-            }
             Cull FRONT
+            ZWrite OFF
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
@@ -183,14 +176,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent3Pass" {
         }
 
         Pass {
-            Tags {
-                "RenderType" = "Transparent"
-                "Queue" = "Transparent"
-                "LightMode" = "ForwardBase"
-                "IgnoreProjector" = "True"
-                "DisableBatching" = "True"
-            }
             Cull BACK
+            ZWrite [_AL_ZWrite]
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM

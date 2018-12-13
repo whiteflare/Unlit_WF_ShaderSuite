@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
     /*
      * authors:
-     *      ver:2018/12/10 whiteflare,
+     *      ver:2018/12/13 whiteflare,
      */
 
     Properties {
@@ -36,7 +36,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
         [Enum(OFF,0,ON,1)]
-            _AL_ZWrite      ("[AL] ZWrite", int) = 1
+            _AL_ZWrite      ("[AL] ZWrite", int) = 0
 
         // 色変換
         [Header(Color Change)]
@@ -104,9 +104,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "LightMode" = "ForwardBase"
-            "IgnoreProjector" = "True"
+            "DisableBatching" = "True"
         }
-        LOD 100
 
         Pass {
             Cull FRONT
