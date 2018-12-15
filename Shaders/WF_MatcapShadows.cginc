@@ -20,10 +20,11 @@
 
     /*
      * authors:
-     *      ver:2018/12/10 whiteflare,
+     *      ver:2018/12/15 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
+    #define _MATCAP_ROTATE_CORRECT_ENABLE
 
     struct appdata {
         float4 vertex       : POSITION;
@@ -109,9 +110,19 @@
                 #endif
             float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
             float3 ws_view_dir = normalize(cameraPos.xyz - ws_vertex.xyz);
-            float3 base = mul( UNITY_MATRIX_V, float4(ws_view_dir, 0) ).xyz * float3(-1, -1, 1) + float3(0, 0, 1);
+            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
             float3 detail = vs_normal.xyz * float3(-1, -1, 1);
             vs_normal = base * dot(base, detail) / base.z - detail;
+        #endif
+
+        #ifdef _MATCAP_ROTATE_CORRECT_ENABLE
+            float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
+            if (any(vs_topdir)) {
+                vs_topdir = normalize(vs_topdir);
+                float top_angle = sign(vs_topdir.x) * acos( vs_topdir.y );
+                float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
+                vs_normal.xy = mul( vs_normal.xy, matrixRotate );
+            }
         #endif
 
         return normalize( vs_normal );
@@ -328,7 +339,7 @@
 
         // Highlight
         #ifdef _HL_ENABLE
-            float2 matcap_uv = matcapVector.xyz * 0.5 * _HL_Range + 0.5;
+            float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
             float3 blend_param = (tex2D(_HL_MatcapTex, saturate(matcap_uv) ).rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, i.uv).rgb * _HL_Power;
             // 明るすぎ・暗すぎ防止の補正処理
             #if defined(_HL_SOFT_SHADOW) || defined(_HL_SOFT_LIGHT)
