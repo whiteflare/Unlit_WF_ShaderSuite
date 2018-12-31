@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2018/11/29 whiteflare,
+     *      ver:2018/12/31 whiteflare,
      */
 
     struct appdata {
@@ -82,6 +82,12 @@
     uniform float4      _WaveSpeed;
     uniform float4      _WaveScale;
     uniform float4      _WavePosFactor;
+
+    #ifdef _CL_ENABLE
+        uniform float       _CL_DeltaH;
+        uniform float       _CL_DeltaS;
+        uniform float       _CL_DeltaV;
+    #endif
 
     inline float calcBrightness(float3 color) {
         static float3 BT709 = { 0.21, 0.72, 0.07 };
@@ -148,6 +154,25 @@
         #endif
         return calcBrightness(saturate(lightColor));
     }
+
+    #ifdef _CL_ENABLE
+        inline float3 rgb2hsv(float3 c) {
+            // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+            static float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
+            static float e = 1.0e-10;
+            float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
+            float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
+            float d = q.x - min(q.w, q.y);
+            return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
+        }
+
+        inline float3 hsv2rgb(float3 c) {
+            // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+            static float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
+            float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
+            return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
+        }
+    #endif
 
     v2g vert_fakefur(appdata_fur v) {
         v2g o;
@@ -260,6 +285,19 @@
 
         float4 mainTex = tex2D(_MainTex, i.uv);
         float4 color = float4( mainTex.rgb, 1 );
+
+        // 色変換
+        #ifdef _CL_ENABLE
+            #ifdef _CL_MONOCHROME
+                color.r += color.g + color.b;
+                color.g = (color.r - 1) / 2;
+                color.b = (color.r - 1) / 2;
+            #endif
+            float3 hsv = rgb2hsv( saturate(color.rgb) );
+            hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
+            hsv.r = frac(hsv.r);
+            color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
+        #endif
 
         // Anti-Glare
         #ifndef _GL_LEVEL_OFF
