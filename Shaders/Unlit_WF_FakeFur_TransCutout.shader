@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2018/12/13 whiteflare,
+     *      ver:2018/12/31 whiteflare,
      */
 
     Properties {
@@ -124,6 +124,8 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma multi_compile_fog
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
+            #pragma shader_feature _CL_ENABLE
+            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _WV_ENABLE
             #pragma shader_feature _FUR_QUALITY_FAST _FUR_QUALITY_NORMAL _FUR_QUALITY_DETAIL
 

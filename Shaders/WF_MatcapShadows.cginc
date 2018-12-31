@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2018/12/15 whiteflare,
+     *      ver:2018/12/31 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -119,7 +119,7 @@
             float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
             if (any(vs_topdir)) {
                 vs_topdir = normalize(vs_topdir);
-                float top_angle = sign(vs_topdir.x) * acos( vs_topdir.y );
+                float top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
                 float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
                 vs_normal.xy = mul( vs_normal.xy, matrixRotate );
             }
