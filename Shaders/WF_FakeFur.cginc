@@ -20,22 +20,8 @@
 
     /*
      * authors:
-     *      ver:2018/12/31 whiteflare,
+     *      ver:2019/01/14 whiteflare,
      */
-
-    struct appdata {
-        float4 vertex   : POSITION;
-        float2 uv       : TEXCOORD0;
-    };
-
-    struct v2f {
-        float4 vertex   : SV_POSITION;
-        float2 uv       : TEXCOORD0;
-        #ifndef _GL_LEVEL_OFF
-            float lightPower    : COLOR0;
-        #endif
-        UNITY_FOG_COORDS(2)
-    };
 
     struct appdata_fur {
         float4 vertex   : POSITION;
@@ -43,6 +29,7 @@
         float4 tangent  : TANGENT;
         float2 uv       : TEXCOORD0;
         float2 uv2      : TEXCOORD1;
+        UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2g {
@@ -54,6 +41,7 @@
         #ifndef _GL_LEVEL_OFF
             float lightPower    : COLOR1;
         #endif
+        UNITY_VERTEX_OUTPUT_STEREO
     };
 
     struct g2f {
@@ -65,28 +53,29 @@
             float lightPower    : COLOR1;
         #endif
         UNITY_FOG_COORDS(2)
+        UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    uniform sampler2D   _MainTex;
-    uniform float4      _MainTex_ST;
-    uniform float       _CutOffLevel;
+    sampler2D   _MainTex;
+    float4      _MainTex_ST;
+    float       _CutOffLevel;
 
-    uniform sampler2D   _FurMaskTex;
-    uniform sampler2D   _FurNoiseTex;
-    uniform float4      _FurNoiseTex_ST;
-    uniform float       _FurHeight;
-    uniform float       _FurShadowPower;
-    uniform uint        _FurRepeat;
-    uniform float4      _FurVector;
+    sampler2D   _FurMaskTex;
+    sampler2D   _FurNoiseTex;
+    float4      _FurNoiseTex_ST;
+    float       _FurHeight;
+    float       _FurShadowPower;
+    uint        _FurRepeat;
+    float4      _FurVector;
 
-    uniform float4      _WaveSpeed;
-    uniform float4      _WaveScale;
-    uniform float4      _WavePosFactor;
+    float4      _WaveSpeed;
+    float4      _WaveScale;
+    float4      _WavePosFactor;
 
     #ifdef _CL_ENABLE
-        uniform float       _CL_DeltaH;
-        uniform float       _CL_DeltaS;
-        uniform float       _CL_DeltaV;
+        float       _CL_DeltaH;
+        float       _CL_DeltaS;
+        float       _CL_DeltaV;
     #endif
 
     inline float calcBrightness(float3 color) {
@@ -176,6 +165,11 @@
 
     v2g vert_fakefur(appdata_fur v) {
         v2g o;
+
+        UNITY_SETUP_INSTANCE_ID(v);
+        UNITY_INITIALIZE_OUTPUT(v2g, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
         o.vertex = v.vertex;
         o.normal = v.normal;
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -208,6 +202,7 @@
     inline g2f initGeomOutput(v2g p) {
         g2f o;
         UNITY_INITIALIZE_OUTPUT(g2f, o);
+        UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(g2f, o);
         o.uv = p.uv;
         o.uv2 = p.uv2;
         #ifndef _GL_LEVEL_OFF
@@ -257,6 +252,8 @@
 
     [maxvertexcount(64)]
     void geom_fakefur(triangle v2g v[3], inout TriangleStream<g2f> triStream) {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
+
         float4 vb[3] = { v[0].vertex, v[1].vertex, v[2].vertex };
         float4 vu[3] = vb;
         {
@@ -275,9 +272,11 @@
     }
 
     fixed4 frag_fakefur(g2f i) : SV_Target {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
         float4 maskTex = tex2D(_FurMaskTex, i.uv);
         if (maskTex.r < 0.01) {
-        	discard;
+            discard;
         }
         if (maskTex.r <= i.height) {
             discard;
