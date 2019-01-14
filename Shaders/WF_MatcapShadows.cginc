@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2018/12/31 whiteflare,
+     *      ver:2019/01/14 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -33,6 +33,7 @@
         #ifdef _NM_ENABLE
             float4 tangent  : TANGENT;
         #endif
+        UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f {
@@ -52,50 +53,51 @@
             float lightPower    : COLOR0;
         #endif
         UNITY_FOG_COORDS(7)
+        UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    uniform sampler2D       _MainTex;
-    uniform float4          _MainTex_ST;
-    uniform float4          _Color;
+    sampler2D       _MainTex;
+    float4          _MainTex_ST;
+    float4          _Color;
 
-    uniform float           _AL_Power;
-    uniform sampler2D       _AL_MaskTex;
-    uniform float           _AL_CutOff;
+    float           _AL_Power;
+    sampler2D       _AL_MaskTex;
+    float           _AL_CutOff;
 
     #ifdef _CL_ENABLE
-        uniform float       _CL_DeltaH;
-        uniform float       _CL_DeltaS;
-        uniform float       _CL_DeltaV;
+        float       _CL_DeltaH;
+        float       _CL_DeltaS;
+        float       _CL_DeltaV;
     #endif
 
     #ifdef _NM_ENABLE
-        uniform sampler2D   _BumpMap;
-        uniform float       _NM_Power;
+        sampler2D   _BumpMap;
+        float       _NM_Power;
     #endif
 
     #ifdef _HL_ENABLE
-        uniform sampler2D   _HL_MatcapTex;
-        uniform float4      _HL_MedianColor;
-        uniform float       _HL_Range;
-        uniform float       _HL_Power;
-        uniform sampler2D   _HL_MaskTex;
+        sampler2D   _HL_MatcapTex;
+        float4      _HL_MedianColor;
+        float       _HL_Range;
+        float       _HL_Power;
+        sampler2D   _HL_MaskTex;
     #endif
 
     #ifdef _OL_ENABLE
-        uniform sampler2D   _OL_OverlayTex;
-        uniform float4      _OL_OverlayTex_ST;
-        uniform float       _OL_Power;
-        uniform float       _OL_Scroll_U;
-        uniform float       _OL_Scroll_V;
+        sampler2D   _OL_OverlayTex;
+        float4      _OL_OverlayTex_ST;
+        float       _OL_Power;
+        float       _OL_Scroll_U;
+        float       _OL_Scroll_V;
     #endif
 
     #ifdef _ES_ENABLE
-        uniform sampler2D   _ES_MaskTex;
-        uniform float4      _ES_Color;
-        uniform float4      _ES_Direction;
-        uniform float       _ES_LevelOffset;
-        uniform float       _ES_Sharpness;
-        uniform float       _ES_Speed;
+        sampler2D   _ES_MaskTex;
+        float4      _ES_Color;
+        float4      _ES_Direction;
+        float       _ES_LevelOffset;
+        float       _ES_Sharpness;
+        float       _ES_Speed;
     #endif
 
     inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
@@ -268,6 +270,11 @@
 
     v2f vert(in appdata v) {
         v2f o;
+
+        UNITY_SETUP_INSTANCE_ID(v);
+        UNITY_INITIALIZE_OUTPUT(v2f, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
         o.vertex = UnityObjectToClipPos(v.vertex);
         o.ls_vertex = v.vertex;
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -301,6 +308,8 @@
     }
 
     float4 frag(v2f i) : SV_Target {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
         float4 color =
         #ifdef _SOLID_COLOR
             _Color;
