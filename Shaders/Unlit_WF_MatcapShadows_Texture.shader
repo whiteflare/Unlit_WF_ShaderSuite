@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
 
     /*
      * authors:
-     *      ver:2018/12/13 whiteflare,
+     *      ver:2019/02/09 whiteflare,
      */
 
     Properties {
@@ -60,9 +60,9 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_HL_SOFT_SHADOW)]
-            _HL_SoftShadow  ("[HL] Soft Shadow Enable (expt.)", Float) = 1
+            _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
         [Toggle(_HL_SOFT_LIGHT)]
-            _HL_SoftLight   ("[HL] Soft Light Enable (expt.)", Float) = 0
+            _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
 
         // Overlay Texture
         [Header(Overlay Texture)]
@@ -85,10 +85,12 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
-            _ES_Direction   ("[ES] Direction", Vector) = (0, -2, 0, 0)
+        [KeywordEnum(SAWTOOTH_WAVE,SIN_WAVE,ALWAYS_ON)]
+            _ES_SHAPE       ("[ES] Wave Type", Float) = 0
+            _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
-            _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 2
-            _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 1
+            _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
     }
 
     SubShader {
@@ -119,6 +121,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
+            #pragma shader_feature _ES_SHAPE_SAWTOOTH_WAVE _ES_SHAPE_SIN_WAVE _ES_SHAPE_ALWAYS_ON
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

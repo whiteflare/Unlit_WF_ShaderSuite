@@ -62,9 +62,9 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_HL_SOFT_SHADOW)]
-            _HL_SoftShadow  ("[HL] Soft Shadow Enable (expt.)", Float) = 1
+            _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
         [Toggle(_HL_SOFT_LIGHT)]
-            _HL_SoftLight   ("[HL] Soft Light Enable (expt.)", Float) = 0
+            _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
 
         // ウェーブアニメーション
         [Header(Fur Wave Animation)]
