@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/01/14 whiteflare,
+     *      ver:2019/02/09 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -396,9 +396,11 @@
 
         // EmissiveScroll
         #ifdef _ES_ENABLE
-            float3 es_power = calcEmissivePower(i.ls_vertex) * tex2D(_ES_MaskTex, i.uv).rgb;
-            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power);
-            color.a = max(color.a, _ES_Color.a * es_power);
+            float es_power = calcEmissivePower(i.ls_vertex);
+            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power * tex2D(_ES_MaskTex, i.uv).rgb);
+            #ifdef _ES_ALPHASCROLL
+                color.a = max(color.a, _ES_Color.a * es_power);
+            #endif
         #endif
 
         color.a = saturate(color.a);

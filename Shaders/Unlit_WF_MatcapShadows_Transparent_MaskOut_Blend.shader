@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
     /*
      * authors:
-     *      ver:2018/12/13 whiteflare,
+     *      ver:2019/02/09 whiteflare,
      */
 
     Properties {
@@ -74,9 +74,9 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_HL_SOFT_SHADOW)]
-            _HL_SoftShadow  ("[HL] Soft Shadow Enable (expt.)", Float) = 1
+            _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
         [Toggle(_HL_SOFT_LIGHT)]
-            _HL_SoftLight   ("[HL] Soft Light Enable (expt.)", Float) = 0
+            _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
 
         // Overlay Texture
         [Header(Overlay Texture)]
@@ -99,6 +99,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
+        [Toggle(_ES_ALPHASCROLL)]
+            _ES_AlphaScroll ("[ES] Alpha mo Scroll", Float) = 0
             _ES_Direction   ("[ES] Direction", Vector) = (0, -2, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 2
@@ -145,6 +147,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
+            #pragma shader_feature _ES_ALPHASCROLL
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -180,6 +183,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
+            #pragma shader_feature _ES_ALPHASCROLL
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -218,6 +222,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
+            #pragma shader_feature _ES_ALPHASCROLL
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -256,6 +261,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
+            #pragma shader_feature _ES_ALPHASCROLL
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
