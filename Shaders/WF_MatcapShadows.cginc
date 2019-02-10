@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/02/09 whiteflare,
+     *      ver:2019/02/10 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -263,19 +263,25 @@
     #ifdef _ES_ENABLE
         inline float calcEmissivePower(float3 ls_vertex) {
             float time = _Time.y * _ES_Speed - dot(ls_vertex, _ES_Direction.xyz);
-            float es_power =
-                // 周期 2PI、値域 [-1, +1] の関数で光量を決める
-                #ifdef _ES_SHAPE_SIN_WAVE
-                    // 正弦波
-                    sin( time );
-                #elif _ES_SHAPE_SAWTOOTH_WAVE
-                    // のこぎり波
-                    1 - 2 * frac(time * UNITY_INV_TWO_PI);
-                #else
-                    // 定数
-                    1;
-                #endif
-            return saturate( es_power * _ES_Sharpness + _ES_LevelOffset);
+            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
+            #ifdef _ES_SHAPE_EXCITATION
+                // 励起波
+                float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
+                float es_power = 8 * v * (1 - v) - 1;
+                return saturate(es_power + _ES_LevelOffset);
+            #elif _ES_SHAPE_SAWTOOTH_WAVE
+                // のこぎり波
+                float es_power = 1 - 2 * frac(time * UNITY_INV_TWO_PI);
+                return saturate(es_power * _ES_Sharpness + _ES_LevelOffset);
+            #elif _ES_SHAPE_SIN_WAVE
+                // 正弦波
+	            float es_power = sin( time );
+                return saturate(es_power * _ES_Sharpness + _ES_LevelOffset);
+            #else
+                // 定数
+                float es_power = 1;
+                return saturate(es_power + _ES_LevelOffset);
+            #endif
         }
     #endif
 

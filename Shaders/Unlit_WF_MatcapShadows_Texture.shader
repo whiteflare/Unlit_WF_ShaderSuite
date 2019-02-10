@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
 
     /*
      * authors:
-     *      ver:2019/02/09 whiteflare,
+     *      ver:2019/02/10 whiteflare,
      */
 
     Properties {
@@ -85,7 +85,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
-        [KeywordEnum(SAWTOOTH_WAVE,SIN_WAVE,ALWAYS_ON)]
+        [KeywordEnum(EXCITATION,SAWTOOTH_WAVE,SIN_WAVE,ALWAYS_ON)]
             _ES_SHAPE       ("[ES] Wave Type", Float) = 0
             _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
@@ -121,7 +121,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
             #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
             #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
-            #pragma shader_feature _ES_SHAPE_SAWTOOTH_WAVE _ES_SHAPE_SIN_WAVE _ES_SHAPE_ALWAYS_ON
+            #pragma shader_feature _ES_SHAPE_EXCITATION _ES_SHAPE_SAWTOOTH_WAVE _ES_SHAPE_SIN_WAVE _ES_SHAPE_ALWAYS_ON
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
