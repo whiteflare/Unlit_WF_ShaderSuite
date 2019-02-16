@@ -14,41 +14,29 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_FakeFur_TransCutout" {
+Shader "UnlitWF/WF_MatcapShadows_ColorFade" {
 
     /*
      * authors:
-     *      ver:2018/12/31 whiteflare,
+     *      ver:2019/02/06 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
-            _MainTex        ("Main Texture", 2D) = "white" {}
+        [HDR]
+            _Color          ("Color", Color) = (1, 1, 1, 1)
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _CullMode       ("Cull Mode", int) = 2
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
-            _CutOffLevel    ("Alpha CutOff Level", Range(0, 1)) = 0.5
 
-        // ファー設定
-        [Header(Fur Settings)]
+        // Alpha
+        [Header(Transparent Alpha)]
         [NoScaleOffset]
-            _FurMaskTex     ("Fur Mask Texture", 2D) = "white" {}
-            _FurNoiseTex    ("Fur Noise Texture", 2D) = "white" {}
-            _FurHeight      ("Fur Height", Float) = 0.1
-            _FurShadowPower ("Fur ShadowPower", Range(0, 1)) = 0
-        [IntRange]
-            _FurRepeat      ("Fur Repeat", Range(1, 8)) = 3
-            _FurVector      ("Fur Static Vector", Vector) = (0, 0, 0, 0)
-
-        // 色変換
-        [Header(Color Change)]
-        [Toggle(_CL_ENABLE)]
-            _CL_Enable      ("[CL] Enable", Float) = 0
-        [Toggle(_CL_MONOCHROME)]
-            _CL_Monochrome  ("[CL] monochrome", Float) = 0
-            _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
-            _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
-            _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
+            _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWrite      ("[AL] ZWrite", int) = 0
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
@@ -66,25 +54,29 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [Toggle(_HL_SOFT_LIGHT)]
             _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
 
-        // ウェーブアニメーション
-        [Header(Fur Wave Animation)]
-        [Toggle(_WV_ENABLE)]
-            _WV_Enable      ("[WV] Enable", Float) = 0
-            _WaveSpeed      ("[WV] Wave Speed", Vector) = (0, 0, 0, 0)
-            _WaveScale      ("[WV] Wave Scale", Vector) = (0, 0, 0, 0)
-            _WavePosFactor  ("[WV] Position Factor", Vector) = (0, 0, 0, 0)
+        // Overlay Texture
+        [Header(Overlay Texture)]
+        [Toggle(_OL_ENABLE)]
+            _OL_Enable      ("[OL] Enable", Float) = 0
+            _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
+        [KeywordEnum(ALPHA,ADD,MUL)]
+            _OL_BLENDTYPE   ("[OL] Blend Type", Float) = 0
+            _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
+            _OL_Scroll_U    ("[OL] U Scroll", Float) = 0
+            _OL_Scroll_V    ("[OL] V Scroll", Float) = 0
     }
 
     SubShader {
         Tags {
-            "RenderType" = "TransparentCutout"
-            "Queue" = "AlphaTest"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
             "LightMode" = "ForwardBase"
-            "DisableBatching" = "True"
         }
 
         Pass {
-            Cull OFF
+            Cull [_CullMode]
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -94,44 +86,20 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma target 3.0
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _HL_SOFT_SHADOW
             #pragma shader_feature _HL_SOFT_LIGHT
+            #pragma shader_feature _OL_ENABLE
+            #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
+            #define _SOLID_COLOR
+            #define _AL_SOURCE_MAIN_TEX_ALPHA
             #include "WF_MatcapShadows.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_fakefur
-            #pragma geometry geom_fakefur
-            #pragma fragment frag_fakefur_cutoff
-
-            #pragma target 5.0
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
-            #pragma shader_feature _WV_ENABLE
-            #pragma shader_feature _FUR_QUALITY_FAST _FUR_QUALITY_NORMAL _FUR_QUALITY_DETAIL
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_FakeFur.cginc"
 
             ENDCG
         }
