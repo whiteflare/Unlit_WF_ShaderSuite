@@ -127,7 +127,7 @@
             o.normal = v.normal;
             o.tangent = v.tangent;
             o.bitangent = cross(o.normal, o.tangent);
-            o.lightDir = calcLocalSpaceLightDir();
+            o.lightDir = calcLocalSpaceLightDir(o.ls_vertex);
         #else
             // NormalMapを使用しないときは頂点側でMatcap計算してnormalに突っ込む
             o.normal = calcMatcapVector(v.vertex, v.normal);

@@ -26,15 +26,44 @@
     #define _MATCAP_VIEW_CORRECT_ENABLE
     #define _MATCAP_ROTATE_CORRECT_ENABLE
 
-    inline float3 calcLocalSpaceLightDir() {
-        float4 ws_light_pos = lerp( float4(0, 20, 0, 1), _WorldSpaceLightPos0, any(_WorldSpaceLightPos0.xyz) );
-        float4 ls_light_pos = mul(unity_WorldToObject, ws_light_pos);
-        return normalize(ls_light_pos.xyz);
-    }
+    static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
+    static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
     inline float calcBrightness(float3 color) {
-        static float3 BT709 = { 0.21, 0.72, 0.07 };
         return dot(color, BT709);
+    }
+
+    inline float3 calcPointLight1Pos() {
+        return float3(unity_4LightPosX0[0], unity_4LightPosY0[0], unity_4LightPosZ0[0]);
+    }
+
+    inline float3 calcPointLight1Color(float3 ws_pos) {
+        float3 ls_lightPos = calcPointLight1Pos() - ws_pos;
+        float lengthSq = dot(ls_lightPos, ls_lightPos);
+        float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
+        return unity_LightColor[0].rgb * atten;
+    }
+
+    inline float3 calcLocalSpaceLightDir(float3 ls_pos) {
+        float3 ws_pos = mul((float3x3) unity_ObjectToWorld, ls_pos);
+        float3 pointLight1Color = calcPointLight1Color(ws_pos);
+
+        float3 ws_lightDir;
+        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
+            // ディレクショナルよりポイントライトのほうが明るいならばそちらの方向を採用
+            ws_lightDir = calcPointLight1Pos() - ws_pos;
+
+        } else if (any(_WorldSpaceLightPos0.xyz)) {
+            // ディレクショナルライトが入っているならばそれを採用
+            ws_lightDir = _WorldSpaceLightPos0.xyz;
+
+        } else {
+            // 手頃なライトが無いのでワールドスペースの方向決め打ち
+            ws_lightDir = float3(1, 1, -1);
+        }
+
+        float3 ls_lightDir = mul((float3x3) unity_WorldToObject, ws_lightDir);
+        return normalize(ls_lightDir);
     }
 
     inline float3 OmniDirectional_ShadeSH9() {
@@ -133,7 +162,7 @@
 
     #ifndef _GL_LEVEL_OFF
         inline float calcAntiGlareLevel(float4 ls_vertex) {
-        	return saturate(calcLightPower(ls_vertex) * 2
+            return saturate(calcLightPower(ls_vertex) * 2
                 #ifdef _GL_LEVEL_BRIGHT
                     + 0.2
                 #elif _GL_LEVEL_DARK
@@ -156,37 +185,37 @@
     // Highlight and Shadow Matcap
     ////////////////////////////
 
+    inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
+        float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
+
+        #ifdef _MATCAP_VIEW_CORRECT_ENABLE
+            float3 cameraPos =
+                #ifdef USING_STEREO_MATRICES
+                    (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
+                #else
+                    _WorldSpaceCameraPos;
+                #endif
+            float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+            float3 ws_view_dir = normalize(cameraPos.xyz - ws_vertex.xyz);
+            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
+            float3 detail = vs_normal.xyz * float3(-1, -1, 1);
+            vs_normal = base * dot(base, detail) / base.z - detail;
+        #endif
+
+        #ifdef _MATCAP_ROTATE_CORRECT_ENABLE
+            float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
+            if (any(vs_topdir)) {
+                vs_topdir = normalize(vs_topdir);
+                float top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
+                float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
+                vs_normal.xy = mul( vs_normal.xy, matrixRotate );
+            }
+        #endif
+
+        return normalize( vs_normal );
+    }
+
     #ifdef _HL_ENABLE
-        inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
-            float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
-
-            #ifdef _MATCAP_VIEW_CORRECT_ENABLE
-                float3 cameraPos =
-                    #ifdef USING_STEREO_MATRICES
-                        (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
-                    #else
-                        _WorldSpaceCameraPos;
-                    #endif
-                float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
-                float3 ws_view_dir = normalize(cameraPos.xyz - ws_vertex.xyz);
-                float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
-                float3 detail = vs_normal.xyz * float3(-1, -1, 1);
-                vs_normal = base * dot(base, detail) / base.z - detail;
-            #endif
-
-            #ifdef _MATCAP_ROTATE_CORRECT_ENABLE
-                float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
-                if (any(vs_topdir)) {
-                    vs_topdir = normalize(vs_topdir);
-                    float top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
-                    float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
-                    vs_normal.xy = mul( vs_normal.xy, matrixRotate );
-                }
-            #endif
-
-            return normalize( vs_normal );
-        }
-
         sampler2D   _HL_MatcapTex;
         sampler2D   _HL_MaskTex;
         float4      _HL_MedianColor;
@@ -219,7 +248,6 @@
 
     #else
         // Dummy
-        #define calcMatcapVector(ls_vertex, ls_normal) ls_normal
         #define affectMatcapColor(matcapVector, mask_uv, color)
     #endif
 

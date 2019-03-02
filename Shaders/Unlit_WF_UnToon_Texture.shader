@@ -28,11 +28,46 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 0
 
+        // 色変換
+        [Header(Color Change)]
+        [Toggle(_CL_ENABLE)]
+            _CL_Enable      ("[CL] Enable", Float) = 0
+        [Toggle(_CL_MONOCHROME)]
+            _CL_Monochrome  ("[CL] monochrome", Float) = 0
+            _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
+            _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
+            _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
+
+        // 階調影
+        [Header(ToonShade)]
+        [Toggle(_TS_ENABLE)]
+            _TS_Enable      ("[SH] Enable", Float) = 0
+            _TS_1stColor    ("[SH] 1st Shadow Color", Color) = (0.5, 0.5, 0.5, 1)
+            _TS_2ndColor    ("[SH] 2nd Shadow Color", Color) = (0.3, 0.3, 0.3, 1)
+            _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.5
+            _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
+            _TS_Feather     ("[SH] Feather", Range(0, 0.1)) = 0.02
+        [NoScaleOffset]
+            _TS_LightMapTex ("[SH] Light Map Texture", 2D) = "black" {}
+
+        // リムライト
+        [Header(RimLight)]
+        [Toggle(_TR_ENABLE)]
+            _TR_Enable      ("[RM] Enable", Float) = 0
+            _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
+        [HideInInspector]
+            _TR_MedianColor ("[RM] Rim Median Color", Color) = (0.5, 0.5, 0.5, 1) // 基準色
+            _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
+            _TR_PowerSide   ("[RM] Power Side", Range(0, 0.5)) = 0.1
+            _TR_PowerBottom ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+        [NoScaleOffset]
+            _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
+
         // アウトライン
         [Header(Outline)]
         [Toggle(_TL_ENABLE)]
             _TL_Enable      ("[LI] Enable", Float) = 0
-            _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.5)
+            _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
             _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.1
         [NoScaleOffset]
             _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
@@ -59,75 +94,16 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma target 3.0
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
+            #pragma shader_feature _CL_ENABLE
+            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _TL_ENABLE
+            #pragma shader_feature _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
-            #include "WF_Common.cginc"
-            #include "WF_MatcapShadows.cginc"
-
-            float4      _TL_LineColor;
-            float       _TL_LineWidth;
-            sampler2D   _TL_MaskTex;
-            float       _TL_Z_Shift;
-
-            v2f vert_outline(appdata v) {
-                v2f o;
-
-                UNITY_SETUP_INSTANCE_ID(v);
-                UNITY_INITIALIZE_OUTPUT(v2f, o);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-
-                o.ls_vertex = v.vertex;
-                o.normal = v.normal;
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-
-                #ifdef _TL_ENABLE
-                    // マスクテクスチャ参照
-                    float mask = tex2Dlod(_TL_MaskTex, float4(o.uv.x, o.uv.y, 0, 0)).r;
-                    // 外側にシフトする
-                    o.ls_vertex.xyz += normalize( v.normal ).xyz * _TL_LineWidth * 0.01 * mask;
-                    // カメラ方向の z シフト量を計算
-                    float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * _TL_Z_Shift;
-                    if (unity_OrthoParams.w < 0.5) {
-                        // カメラが perspective のときは単にカメラ方向の逆にシフトする
-                        o.ls_vertex.xyz -= vecZShift;
-                        o.vertex = UnityObjectToClipPos( o.ls_vertex );
-                    } else {
-                        // カメラが orthographic のときはシフト後の z のみ採用する
-                        o.vertex = UnityObjectToClipPos( o.ls_vertex );
-                        o.ls_vertex.xyz -= vecZShift;
-                        o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
-                    }
-                #else
-                    o.vertex = UnityObjectToClipPos( o.ls_vertex );
-                #endif
-
-                SET_ANTIGLARE_LEVEL(v.vertex, o.lightPower);
-
-                UNITY_TRANSFER_FOG(o, o.vertex);
-                return o;
-            }
-
-            float4 frag_outline(v2f i) : SV_Target {
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-                #ifdef _TL_ENABLE
-                    // アウトライン側の色を計算
-                    float4 lineColor = _TL_LineColor;
-                    affectAntiGlare(i.lightPower, lineColor);
-                    UNITY_APPLY_FOG(i.fogCoord, lineColor);
-                    // ベース側の色を計算
-                    float4 baseColor = frag(i);
-                    // ブレンドして返却
-                    return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), 1);
-                #else
-                    // 無効のときはクリッピングする
-                    clip(-1);
-                    return float4(0, 0, 0, 0);
-                #endif
-            }
+            #include "WF_UnToon.cginc"
 
             ENDCG
         }
@@ -145,12 +121,16 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma target 3.0
 
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
+            #pragma shader_feature _CL_ENABLE
+            #pragma shader_feature _CL_MONOCHROME
+            #pragma shader_feature _TS_ENABLE
+            #pragma shader_feature _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
-            #include "WF_MatcapShadows.cginc"
+            #include "WF_UnToon.cginc"
 
             ENDCG
         }
