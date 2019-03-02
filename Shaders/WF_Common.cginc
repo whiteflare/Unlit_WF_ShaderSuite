@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/02/24 whiteflare,
+     *      ver:2019/03/02 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -132,11 +132,23 @@
     ////////////////////////////
 
     #ifndef _GL_LEVEL_OFF
-        inline void affectAntiGlare(float lightPower, inout float4 color) {
-            color.rgb = saturate(color.rgb * lightPower);
+        inline float calcAntiGlareLevel(float4 ls_vertex) {
+        	return saturate(calcLightPower(ls_vertex) * 2
+                #ifdef _GL_LEVEL_BRIGHT
+                    + 0.2
+                #elif _GL_LEVEL_DARK
+                    + 0.03
+                #endif
+            );
+        }
+        #define SET_ANTIGLARE_LEVEL(ls_vertex, out) out = calcAntiGlareLevel(ls_vertex)
+        inline void affectAntiGlare(float glLevel, inout float4 color) {
+            color.rgb = saturate(color.rgb * glLevel);
         }
     #else
         // Dummy
+        #define calcAntiGlareLevel(ls_vertex) 0
+        #define SET_ANTIGLARE_LEVEL(ls_vertex, out)
         #define affectAntiGlare(lightPower, color)
     #endif
 

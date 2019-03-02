@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/02/10 whiteflare,
+     *      ver:2019/03/02 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -137,15 +137,7 @@
             o.vs_vertex = o.vertex;
         #endif
 
-        #ifndef _GL_LEVEL_OFF
-            o.lightPower = saturate(calcLightPower(v.vertex) * 2
-                #ifdef _GL_LEVEL_BRIGHT
-                    + 0.2
-                #elif _GL_LEVEL_DARK
-                    + 0.03
-                #endif
-            );
-        #endif
+		SET_ANTIGLARE_LEVEL(v.vertex, o.lightPower);
 
         UNITY_TRANSFER_FOG(o, o.vertex);
         return o;
