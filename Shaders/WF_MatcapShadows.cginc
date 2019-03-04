@@ -159,18 +159,17 @@
         // BumpMap
         #ifdef _NM_ENABLE
             // 法線計算
-            float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertexのworld回転行列
-            float3 ls_normal = UnpackNormal( tex2D(_BumpMap, i.uv) ); // 法線マップ参照
-            float3 ws_normal = normalize( mul(ls_normal, tangentTransform) ); // world内の法線を作成
+            float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
+            float3 ls_normal = normalize( mul(UnpackNormal( tex2D(_BumpMap, i.uv) ), tangentTransform) ); // 法線マップ参照
             // 光源とブレンド
-            float diffuse = saturate((dot(ws_normal, i.lightDir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power));
+            float diffuse = saturate((dot(ls_normal, i.lightDir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power));
             color.rgb *= diffuse; // Unlitなのでライトの色は考慮しない
         #endif
 
         // Highlight
         float3 matcapVector =
             #ifdef _NM_ENABLE
-                calcMatcapVector(i.ls_vertex, ws_normal); // Matcap計算
+                calcMatcapVector(i.ls_vertex, ls_normal); // Matcap計算
             #else
                 i.normal; // NormalMap未使用時はvertで計算したMatcapVectorを使う
             #endif

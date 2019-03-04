@@ -34,7 +34,7 @@
     }
 
     inline float3 calcPointLight1Pos() {
-        return float3(unity_4LightPosX0[0], unity_4LightPosY0[0], unity_4LightPosZ0[0]);
+        return float3(unity_4LightPosX0.x, unity_4LightPosY0.x, unity_4LightPosZ0.x);
     }
 
     inline float3 calcPointLight1Color(float3 ws_pos) {
@@ -44,26 +44,38 @@
         return unity_LightColor[0].rgb * atten;
     }
 
-    inline float3 calcLocalSpaceLightDir(float3 ls_pos) {
-        float3 ws_pos = mul((float3x3) unity_ObjectToWorld, ls_pos);
-        float3 pointLight1Color = calcPointLight1Color(ws_pos);
-
+    inline float3 calcLocalSpaceLightDir(float4 ls_pos) {
         float3 ws_lightDir;
-        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
-            // ディレクショナルよりポイントライトのほうが明るいならばそちらの方向を採用
-            ws_lightDir = calcPointLight1Pos() - ws_pos;
-
-        } else if (any(_WorldSpaceLightPos0.xyz)) {
-            // ディレクショナルライトが入っているならばそれを採用
+        if (any(_WorldSpaceLightPos0.xyz)) {
+            // ディレクショナルライトがあるならばそれを使用
             ws_lightDir = _WorldSpaceLightPos0.xyz;
 
-        } else {
+        } else if (any(calcPointLight1Pos())) {
+            // ポイントライトがあるならそれを使用
+            ws_lightDir = calcPointLight1Pos() - mul(unity_ObjectToWorld, ls_pos).xyz;
+
+        } else  {
             // 手頃なライトが無いのでワールドスペースの方向決め打ち
             ws_lightDir = float3(1, 1, -1);
         }
+        return UnityWorldToObjectDir(ws_lightDir);
+    }
 
-        float3 ls_lightDir = mul((float3x3) unity_WorldToObject, ws_lightDir);
-        return normalize(ls_lightDir);
+    inline float3 calcLocalSpaceLightColor(float4 ls_pos) {
+        float3 ws_lightColor;
+        if (any(_WorldSpaceLightPos0.xyz)) {
+            // ディレクショナルライトがあるならばそれを使用
+            ws_lightColor = _LightColor0.rgb;
+
+        } else if (any(calcPointLight1Pos())) {
+            // ポイントライトがあるならそれを使用
+            ws_lightColor = calcPointLight1Color( mul(unity_ObjectToWorld, ls_pos).xyz ).rgb;
+
+        } else {
+            // 手頃なライトが無い
+            ws_lightColor = float3(0, 0, 0);
+        }
+        return ws_lightColor;
     }
 
     inline float3 OmniDirectional_ShadeSH9() {
@@ -127,6 +139,25 @@
         return calcBrightness(saturate(lightColor));
     }
 
+    inline float3 worldSpaceCameraPos() {
+        #ifdef USING_STEREO_MATRICES
+            return (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
+        #else
+            return _WorldSpaceCameraPos;
+        #endif
+    }
+
+    inline float3 worldSpaceViewDir(float4 ls_vertex) {
+        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+        return normalize(worldSpaceCameraPos() - ws_vertex.xyz);
+    }
+
+    inline float3 localSpaceViewDir(float4 ls_vertex) {
+        float4 ls_camera_pos = mul(unity_WorldToObject, float4(worldSpaceCameraPos(), 1));
+        return normalize(ls_camera_pos.xyz - ls_vertex.xyz);
+    }
+
+
     ////////////////////////////
     // Alpha Transparent
     ////////////////////////////
@@ -189,14 +220,7 @@
         float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
 
         #ifdef _MATCAP_VIEW_CORRECT_ENABLE
-            float3 cameraPos =
-                #ifdef USING_STEREO_MATRICES
-                    (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
-                #else
-                    _WorldSpaceCameraPos;
-                #endif
-            float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
-            float3 ws_view_dir = normalize(cameraPos.xyz - ws_vertex.xyz);
+            float3 ws_view_dir = worldSpaceViewDir(ls_vertex);
             float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
             float3 detail = vs_normal.xyz * float3(-1, -1, 1);
             vs_normal = base * dot(base, detail) / base.z - detail;

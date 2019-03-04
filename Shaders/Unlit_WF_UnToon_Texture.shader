@@ -25,8 +25,6 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
-        [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
-            _GL_LEVEL       ("Anti-Glare", Float) = 0
 
         // 色変換
         [Header(Color Change)]
@@ -38,6 +36,14 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
+        // 法線マップ
+        [Header(NormalMap)]
+        [Toggle(_NM_ENABLE)]
+            _NM_Enable      ("[NM] Enable", Float) = 0
+        [NoScaleOffset]
+            _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
+            _NM_Power       ("[NM] Shadow Power", Range(0, 1)) = 0.25
+
         // 階調影
         [Header(ToonShade)]
         [Toggle(_TS_ENABLE)]
@@ -47,21 +53,21 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.5
             _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
             _TS_Feather     ("[SH] Feather", Range(0, 0.1)) = 0.02
-        [NoScaleOffset]
-            _TS_LightMapTex ("[SH] Light Map Texture", 2D) = "black" {}
+        [Toggle(_TS_BOOSTLIGHT)]
+            _TS_BoostLight  ("[SH] Boost Light", Float) = 0
 
         // リムライト
         [Header(RimLight)]
         [Toggle(_TR_ENABLE)]
             _TR_Enable      ("[RM] Enable", Float) = 0
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [HideInInspector]
-            _TR_MedianColor ("[RM] Rim Median Color", Color) = (0.5, 0.5, 0.5, 1) // 基準色
             _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide   ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
         [NoScaleOffset]
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
+        [MaterialToggle]
+            _TR_InvMaskTex  ("[RM] Invert Mask Value", Float) = 0
 
         // アウトライン
         [Header(Outline)]
@@ -71,6 +77,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.1
         [NoScaleOffset]
             _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [MaterialToggle]
+            _TL_InvMaskTex  ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.1
     }
 
@@ -82,6 +90,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
+            // アウトライン
             Tags{ "LightMode" = "ForwardBase" }
 
             Cull OFF
@@ -109,6 +118,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
+            // メイン
             Tags{ "LightMode" = "ForwardBase" }
 
             Cull OFF
@@ -123,7 +133,9 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
             #pragma shader_feature _CL_ENABLE
             #pragma shader_feature _CL_MONOCHROME
+            #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _TS_ENABLE
+            #pragma shader_feature _TS_BOOSTLIGHT
             #pragma shader_feature _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -136,6 +148,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
+            // 影
             Tags{ "LightMode" = "ShadowCaster" }
 
             CGPROGRAM
