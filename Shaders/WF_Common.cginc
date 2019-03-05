@@ -44,38 +44,53 @@
         return unity_LightColor[0].rgb * atten;
     }
 
-    inline float3 calcLocalSpaceLightDir(float4 ls_pos) {
+    inline float4 calcLocalSpaceLightDir(float4 ls_pos) {
+        float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
+        float3 pointLight1Color = calcPointLight1Color(ws_pos);
+
         float3 ws_lightDir;
-        if (any(_WorldSpaceLightPos0.xyz)) {
-            // ディレクショナルライトがあるならばそれを使用
+        float lightType;
+        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
+            // ディレクショナルよりポイントライトのほうが明るいならばそちらの方向を採用
+            ws_lightDir = calcPointLight1Pos() - ws_pos;
+            lightType = -1;
+
+        } else if (any(_WorldSpaceLightPos0.xyz)) {
+            // ディレクショナルライトが入っているならばそれを採用
             ws_lightDir = _WorldSpaceLightPos0.xyz;
+            lightType = +1;
 
-        } else if (any(calcPointLight1Pos())) {
-            // ポイントライトがあるならそれを使用
-            ws_lightDir = calcPointLight1Pos() - mul(unity_ObjectToWorld, ls_pos).xyz;
-
-        } else  {
+        } else {
             // 手頃なライトが無いのでワールドスペースの方向決め打ち
             ws_lightDir = float3(1, 1, -1);
+            lightType = 0;
         }
-        return UnityWorldToObjectDir(ws_lightDir);
+        return float4( UnityWorldToObjectDir(ws_lightDir), lightType );
     }
 
-    inline float3 calcLocalSpaceLightColor(float4 ls_pos) {
-        float3 ws_lightColor;
-        if (any(_WorldSpaceLightPos0.xyz)) {
-            // ディレクショナルライトがあるならばそれを使用
-            ws_lightColor = _LightColor0.rgb;
+    inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
+        if (0.5 < lightType) {
+            return _LightColor0.rgb; // ディレクショナルライト
+        }
+        float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
+        float3 pointLight1Color = calcPointLight1Color(ws_pos);
+        if (lightType < -0.5) {
+            return pointLight1Color;
+        }
 
-        } else if (any(calcPointLight1Pos())) {
-            // ポイントライトがあるならそれを使用
-            ws_lightColor = calcPointLight1Color( mul(unity_ObjectToWorld, ls_pos).xyz ).rgb;
+        float3 ws_lightColor;
+        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
+            // ディレクショナルよりポイントライトのほうが明るいならばそちらの方向を採用
+            return pointLight1Color;
+
+        } else if (any(_WorldSpaceLightPos0.xyz)) {
+            // ディレクショナルライトが入っているならばそれを採用
+            return _LightColor0.rgb;
 
         } else {
             // 手頃なライトが無い
-            ws_lightColor = float3(0, 0, 0);
+            return float3(0, 0, 0);
         }
-        return ws_lightColor;
     }
 
     inline float3 OmniDirectional_ShadeSH9() {

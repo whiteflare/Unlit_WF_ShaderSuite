@@ -39,7 +39,7 @@
         float4 vertex           : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float4 ls_vertex        : TEXCOORD1;
-        float3 ls_light_dir     : TEXCOORD2;
+        float4 ls_light_dir     : TEXCOORD2;
         float3 ls_camera_dir    : TEXCOORD3;
         float  shadow_power     : COLOR0;
         float3 normal           : TEXCOORD4;
@@ -97,23 +97,23 @@
         o.vertex = UnityObjectToClipPos(v.vertex);
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
         o.ls_vertex = v.vertex;
-        o.ls_light_dir = calcLocalSpaceLightDir(o.ls_vertex) * float3(1, 0.4, 1); // 高さ方向のライト位置にはあまり影響されないように
+        o.ls_light_dir = calcLocalSpaceLightDir(o.ls_vertex) * float4(1, 0.5, 1, 1); // 高さ方向のライト位置にはあまり影響されないように
         o.ls_camera_dir = localSpaceViewDir(o.ls_vertex);
 
         // 影コントラスト
         {
-            float main = calcBrightness(calcLocalSpaceLightColor(o.ls_vertex));
-            float pt4 = calcBrightness(OmniDirectional_Shade4PointLights(
+            float main = saturate( calcBrightness(calcLocalSpaceLightColor(o.ls_vertex, o.ls_light_dir.w)) );
+            float pt4 = saturate( calcBrightness(OmniDirectional_Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                    unity_LightColor[0].rgb,
+                    0 < o.ls_light_dir.w ? unity_LightColor[0].rgb : float3(0, 0, 0),
                     unity_LightColor[1].rgb,
                     unity_LightColor[2].rgb,
                     unity_LightColor[3].rgb,
                     unity_4LightAtten0,
                     mul(unity_ObjectToWorld, o.ls_vertex)
-                ));
-            float ambient = calcBrightness(OmniDirectional_ShadeSH9());
-            o.shadow_power = saturate(abs( main - pt4 ) / max( main + pt4, 0.0001 ) + ambient * 0.2) * 0.5 + 0.5;
+                )) );
+            float ambient = saturate( calcBrightness(OmniDirectional_ShadeSH9()) );
+            o.shadow_power = min( saturate( abs(main - pt4) / max(main + pt4, 0.0001) ) * 0.5 + 0.5, saturate(1 - ambient * 0.5) );
         }
 
         o.normal = v.normal;
@@ -150,26 +150,26 @@
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
             ls_normal = normalize( mul(UnpackNormal( tex2D(_BumpMap, i.uv) ), tangentTransform) ); // 法線マップ参照
             // 陰影を付けるために若干の影を追加する
-            color.rgb *= saturate((dot(ls_normal, i.ls_light_dir) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power)); // ここではライトの色を考慮しない
+            color.rgb *= saturate((dot(ls_normal, i.ls_light_dir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power)); // ここではライトの色を考慮しない
         }
         #endif
 
         // matcapベクトル算出
         float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = dot(i.ls_light_dir, i.ls_camera_dir);
+        float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
 
         // 光源とブレンド
         #ifdef _TS_ENABLE
         {
             float brightness = 
             #ifdef _TS_BOOSTLIGHT
-                dot(ls_normal, i.ls_light_dir) * 0.25 + 0.75;
+                dot(ls_normal, i.ls_light_dir.xyz) * 0.25 + 0.75;
             #else
-                dot(ls_normal, i.ls_light_dir) * 0.5 + 0.5;
+                dot(ls_normal, i.ls_light_dir.xyz) * 0.5 + 0.5;
             #endif
             // ビュー相対位置シフト
-            brightness *= saturate( angle_light_camera * 2 + 2 );
+            brightness *= saturate(angle_light_camera * 2 + 2);
             // 色計算
             color.rgb = lerp(
                 lerp(
