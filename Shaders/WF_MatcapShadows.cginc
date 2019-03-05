@@ -137,7 +137,7 @@
             o.vs_vertex = o.vertex;
         #endif
 
-		SET_ANTIGLARE_LEVEL(v.vertex, o.lightPower);
+        SET_ANTIGLARE_LEVEL(v.vertex, o.lightPower);
 
         UNITY_TRANSFER_FOG(o, o.vertex);
         return o;

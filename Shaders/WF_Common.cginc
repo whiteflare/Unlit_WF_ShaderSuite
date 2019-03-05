@@ -222,7 +222,7 @@
         }
     #else
         // Dummy
-        #define calcAntiGlareLevel(ls_vertex) 0
+        #define calcAntiGlareLevel(ls_vertex) 1
         #define SET_ANTIGLARE_LEVEL(ls_vertex, out)
         #define affectAntiGlare(lightPower, color)
     #endif

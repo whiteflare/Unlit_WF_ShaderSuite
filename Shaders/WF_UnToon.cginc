@@ -42,6 +42,8 @@
         float4 ls_light_dir     : TEXCOORD2;
         float3 ls_camera_dir    : TEXCOORD3;
         float  shadow_power     : COLOR0;
+        float3 light_color      : COLOR1;
+        float3 light_power      : COLOR2;
         float3 normal           : TEXCOORD4;
         #ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD5;
@@ -55,6 +57,7 @@
     float4          _MainTex_ST;
     float4          _Color;
     float           _AL_CutOff;
+    float           _GL_BrendPower;
 
     #ifdef _NM_ENABLE
         sampler2D   _BumpMap;
@@ -101,9 +104,10 @@
         o.ls_camera_dir = localSpaceViewDir(o.ls_vertex);
 
         // 影コントラスト
+        float3 ambientColor = OmniDirectional_ShadeSH9();
         {
-            float main = saturate( calcBrightness(calcLocalSpaceLightColor(o.ls_vertex, o.ls_light_dir.w)) );
-            float pt4 = saturate( calcBrightness(OmniDirectional_Shade4PointLights(
+            float3 lightColorMain = calcLocalSpaceLightColor(o.ls_vertex, o.ls_light_dir.w);
+            float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                     0 < o.ls_light_dir.w ? unity_LightColor[0].rgb : float3(0, 0, 0),
                     unity_LightColor[1].rgb,
@@ -111,9 +115,27 @@
                     unity_LightColor[3].rgb,
                     unity_4LightAtten0,
                     mul(unity_ObjectToWorld, o.ls_vertex)
-                )) );
-            float ambient = saturate( calcBrightness(OmniDirectional_ShadeSH9()) );
-            o.shadow_power = min( saturate( abs(main - pt4) / max(main + pt4, 0.0001) ) * 0.5 + 0.5, saturate(1 - ambient * 0.5) );
+                );
+            float main = saturate(calcBrightness( lightColorMain ));
+            float sub4 = saturate(calcBrightness( lightColorSub4 ));
+            float ambient = saturate(calcBrightness( ambientColor ));
+            o.shadow_power = min( saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5, saturate(1 - ambient * 0.5) );
+        }
+        // ライトカラーブレンド
+        {
+            float3 lightColorMain = _LightColor0.rgb;
+            float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
+                    unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                    unity_LightColor[0].rgb,
+                    unity_LightColor[1].rgb,
+                    unity_LightColor[2].rgb,
+                    unity_LightColor[3].rgb,
+                    unity_4LightAtten0,
+                    mul(unity_ObjectToWorld, o.ls_vertex)
+                );
+            float3 color = max(lightColorMain + lightColorSub4 + ambientColor, float3(0.001, 0.001, 0.001));
+            color = saturate( color / calcBrightness(color) );
+            o.light_color = (color - 1) * _GL_BrendPower + 1;
         }
 
         o.normal = v.normal;
@@ -121,6 +143,8 @@
             o.tangent = v.tangent;
             o.bitangent = cross(o.normal, o.tangent);
         #endif
+
+        SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
 
         UNITY_TRANSFER_FOG(o, o.vertex);
         return o;
@@ -159,7 +183,7 @@
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
 
-        // 光源とブレンド
+        // 階調影
         #ifdef _TS_ENABLE
         {
             float brightness = 
@@ -184,7 +208,7 @@
         }
         #endif
 
-        // リムライト加算
+        // リムライト
         #ifdef _TR_ENABLE
         {
             // matcapベクトルからリムライト範囲を計算
@@ -198,6 +222,11 @@
                 smoothstep(1, 1.05, length(rim_uv)) );
         }
         #endif
+
+        // ライトカラーブレンド
+        color.rgb *= i.light_color.rgb;
+        // Anti-Glare
+        affectAntiGlare(i.light_power, color);
 
         // Alpha
         affectAlpha(i.uv, color);

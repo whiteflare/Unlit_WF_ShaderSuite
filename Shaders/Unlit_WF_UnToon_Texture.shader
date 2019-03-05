@@ -26,6 +26,12 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
 
+		// Litブレンド
+        [Header(Lit)]
+        [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
+            _GL_LEVEL       ("Anti-Glare", Float) = 2
+            _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
+
         // 色変換
         [Header(Color Change)]
         [Toggle(_CL_ENABLE)]
@@ -50,7 +56,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _TS_Enable      ("[SH] Enable", Float) = 0
             _TS_1stColor    ("[SH] 1st Shadow Color", Color) = (0.5, 0.5, 0.5, 1)
             _TS_2ndColor    ("[SH] 2nd Shadow Color", Color) = (0.3, 0.3, 0.3, 1)
-            _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.5
+            _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
             _TS_Feather     ("[SH] Feather", Range(0, 0.1)) = 0.02
         [Toggle(_TS_BOOSTLIGHT)]
