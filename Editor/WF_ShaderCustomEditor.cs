@@ -47,9 +47,6 @@ namespace UnlitWF
                         }
                     }
                 }
-                if ((prop.flags & MaterialProperty.PropFlags.HideInInspector) != MaterialProperty.PropFlags.None) {
-                    continue;
-                }
                 // 描画
                 materialEditor.ShaderProperty(prop, prop.displayName);
             }
