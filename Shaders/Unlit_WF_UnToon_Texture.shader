@@ -18,15 +18,17 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
     /*
      * authors:
-     *      ver:2019/03/02 whiteflare,
+     *      ver:2019/03/07 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _CullMode       ("Cull Mode", int) = 2
 
-		// Litブレンド
+        // Litブレンド
         [Header(Lit)]
         [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
             _GL_LEVEL       ("Anti-Glare", Float) = 2
@@ -59,8 +61,10 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
             _TS_Feather     ("[SH] Feather", Range(0, 0.1)) = 0.02
-        [Toggle(_TS_BOOSTLIGHT)]
-            _TS_BoostLight  ("[SH] Boost Light", Float) = 0
+        [NoScaleOffset]
+            _TS_MaskTex     ("[SH] BoostLight Mask Texture", 2D) = "black" {}
+        [MaterialToggle]
+            _TS_InvMaskVal  ("[SH] Invert Mask Value", Float) = 0
 
         // リムライト
         [Header(RimLight)]
@@ -73,19 +77,19 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [NoScaleOffset]
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [MaterialToggle]
-            _TR_InvMaskTex  ("[RM] Invert Mask Value", Float) = 0
+            _TR_InvMaskVal  ("[RM] Invert Mask Value", Float) = 0
 
         // アウトライン
         [Header(Outline)]
         [Toggle(_TL_ENABLE)]
             _TL_Enable      ("[LI] Enable", Float) = 0
             _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
-            _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.1
+            _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.05
         [NoScaleOffset]
             _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
         [MaterialToggle]
-            _TL_InvMaskTex  ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.1
+            _TL_InvMaskVal  ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
     }
 
     SubShader {
@@ -99,7 +103,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             // アウトライン
             Tags{ "LightMode" = "ForwardBase" }
 
-            Cull OFF
+            Cull [_CullMode]
 
             CGPROGRAM
 
@@ -127,7 +131,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             // メイン
             Tags{ "LightMode" = "ForwardBase" }
 
-            Cull OFF
+            Cull [_CullMode]
 
             CGPROGRAM
 
@@ -141,7 +145,6 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _TS_ENABLE
-            #pragma shader_feature _TS_BOOSTLIGHT
             #pragma shader_feature _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

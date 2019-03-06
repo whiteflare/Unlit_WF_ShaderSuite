@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/02 whiteflare,
+     *      ver:2019/03/07 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -49,7 +49,7 @@
             float3 tangent      : TEXCOORD5;
             float3 bitangent    : TEXCOORD6;
         #endif
-        UNITY_FOG_COORDS(7)
+        UNITY_FOG_COORDS(8)
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -70,6 +70,8 @@
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
         float       _TS_Feather;
+        sampler2D   _TS_MaskTex;
+        float       _TS_InvMaskVal;
     #endif
 
     #ifdef _TR_ENABLE
@@ -79,14 +81,14 @@
         float       _TR_PowerSide;
         float       _TR_PowerBottom;
         sampler2D   _TR_MaskTex;
-        float       _TR_InvMaskTex;
+        float       _TR_InvMaskVal;
     #endif
 
     #ifdef _TL_ENABLE
         float4      _TL_LineColor;
         float       _TL_LineWidth;
         sampler2D   _TL_MaskTex;
-        float       _TL_InvMaskTex;
+        float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
     #endif
 
@@ -186,12 +188,8 @@
         // 階調影
         #ifdef _TS_ENABLE
         {
-            float brightness = 
-            #ifdef _TS_BOOSTLIGHT
-                dot(ls_normal, i.ls_light_dir.xyz) * 0.25 + 0.75;
-            #else
-                dot(ls_normal, i.ls_light_dir.xyz) * 0.5 + 0.5;
-            #endif
+            float boostlight = 0.5 + 0.25 * MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal);
+            float brightness = dot(ls_normal, i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
             brightness *= saturate(angle_light_camera * 2 + 2);
             // 色計算
@@ -216,7 +214,7 @@
                 vs_normal.x * (_TR_PowerSide + 1),
                 vs_normal.y * ( (_TR_PowerTop + _TR_PowerBottom) / 2 + 1) + (_TR_PowerTop - _TR_PowerBottom) / 2 );
             // 順光の場合はリムライトを暗くする
-            float rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskTex).rgb;
+            float rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
             // 色計算
             color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
                 smoothstep(1, 1.05, length(rim_uv)) );
@@ -242,24 +240,19 @@
 
     // アウトライン用
     v2f vert_outline(appdata v) {
-        v2f o;
+        // 通常の vert を使う
+        v2f o = vert(v);
 
-        UNITY_SETUP_INSTANCE_ID(v);
-        UNITY_INITIALIZE_OUTPUT(v2f, o);
-        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-
-        o.ls_vertex = v.vertex;
-        o.normal = v.normal;
-        o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+        // SV_POSITION を上書き
 
         #ifdef _TL_ENABLE
             // マスクテクスチャ参照
-            float mask = MASK_VALUE_LOD(_TL_MaskTex, o.uv, _TL_InvMaskTex).r;
+            float mask = MASK_VALUE_LOD(_TL_MaskTex, o.uv, _TL_InvMaskVal).r;
             // 外側にシフトする
-            o.ls_vertex.xyz += normalize( v.normal ).xyz * _TL_LineWidth * 0.01 * mask;
+            o.ls_vertex.xyz += normalize( v.normal ).xyz * (_TL_LineWidth * 0.01) * mask;
             // カメラ方向の z シフト量を計算
             // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
-            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * _TL_Z_Shift;
+            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * (_TL_LineWidth + _TL_Z_Shift) * 0.01;
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向の逆にシフトする
                 o.ls_vertex.xyz -= vecZShift;
@@ -271,15 +264,13 @@
                 o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
             }
         #else
-            o.vertex = UnityObjectToClipPos( o.ls_vertex );
+            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         #endif
 
-        UNITY_TRANSFER_FOG(o, o.vertex);
         return o;
     }
 
     float4 frag_outline(v2f i) : SV_Target {
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
         #ifdef _TL_ENABLE
             // アウトライン側の色を計算
             float4 lineColor = _TL_LineColor;
