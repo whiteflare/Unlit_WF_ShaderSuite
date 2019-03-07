@@ -18,20 +18,20 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/02/10 whiteflare,
+     *      ver:2019/03/07 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
-        [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
-            _GL_LEVEL       ("Anti-Glare", Float) = 0
+        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
+            _GL_Level       ("Anti-Glare", Float) = 0
 
         // Alpha
         [Header(Transparent Alpha)]
-        [KeywordEnum(MAIN_TEX_ALPHA,MASK_TEX_RED,MASK_TEX_ALPHA)]
-            _AL_SOURCE      ("[AL] Alpha Source", Float) = 0
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source      ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
@@ -42,7 +42,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
         [Header(Color Change)]
         [Toggle(_CL_ENABLE)]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [Toggle(_CL_MONOCHROME)]
+        [MaterialToggle]
             _CL_Monochrome  ("[CL] monochrome", Float) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
@@ -77,10 +77,10 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
         [Toggle(_OL_ENABLE)]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
-        [KeywordEnum(MAINTEX_UV,VIEW_XY)]
-            _OL_SCREEN      ("[OL] Screen Space", Float) = 0
-        [KeywordEnum(ALPHA,ADD,MUL)]
-            _OL_BLENDTYPE   ("[OL] Blend Type", Float) = 0
+        [Enum(MAINTEX_UV,0,VIEW_XY,1)]
+            _OL_ScreenType  ("[OL] Screen Space", Float) = 0
+        [Enum(ALPHA,ADD,MUL)]
+            _OL_BlendType   ("[OL] Blend Type", Float) = 0
             _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_Scroll_U    ("[OL] U Scroll", Float) = 0
             _OL_Scroll_V    ("[OL] V Scroll", Float) = 0
@@ -93,9 +93,9 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
-        [KeywordEnum(EXCITATION,SAWTOOTH_WAVE,SIN_WAVE,ALWAYS_ON)]
-            _ES_SHAPE       ("[ES] Wave Type", Float) = 0
-        [Toggle(_ES_ALPHASCROLL)]
+        [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
+            _ES_Shape       ("[ES] Wave Type", Float) = 0
+        [MaterialToggle]
             _ES_AlphaScroll ("[ES] Alpha mo Scroll", Float) = 0
             _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
@@ -123,20 +123,15 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
-            #pragma shader_feature _AL_SOURCE_MAIN_TEX_ALPHA _AL_SOURCE_MASK_TEX_RED _AL_SOURCE_MASK_TEX_ALPHA
             #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
-            #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
-            #pragma shader_feature _ES_ALPHASCROLL
-            #pragma shader_feature _ES_SHAPE_EXCITATION _ES_SHAPE_SAWTOOTH_WAVE _ES_SHAPE_SIN_WAVE _ES_SHAPE_ALWAYS_ON
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+
+            #define _AL_ENABLE
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -157,23 +152,18 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
-            #pragma shader_feature _AL_SOURCE_MAIN_TEX_ALPHA _AL_SOURCE_MASK_TEX_RED _AL_SOURCE_MASK_TEX_ALPHA
             #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _HL_SOFT_SHADOW
             #pragma shader_feature _HL_SOFT_LIGHT
             #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _OL_SCREEN_MAINTEX_UV _OL_SCREEN_VIEW_XY
-            #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
             #pragma shader_feature _ES_ENABLE
-            #pragma shader_feature _ES_ALPHASCROLL
-            #pragma shader_feature _ES_SHAPE_EXCITATION _ES_SHAPE_SAWTOOTH_WAVE _ES_SHAPE_SIN_WAVE _ES_SHAPE_ALWAYS_ON
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+
+            #define _AL_ENABLE
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
