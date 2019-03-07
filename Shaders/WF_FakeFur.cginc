@@ -40,9 +40,7 @@
         float2 uv       : TEXCOORD0;
         float2 uv2      : TEXCOORD1;
         float3 waving   : TEXCOORD2;
-        #ifndef _GL_LEVEL_OFF
-            float lightPower    : COLOR1;
-        #endif
+        float lightPower        : COLOR0;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -51,9 +49,7 @@
         float2 uv       : TEXCOORD0;
         float2 uv2      : TEXCOORD1;
         float  height   : COLOR0;
-        #ifndef _GL_LEVEL_OFF
-            float lightPower    : COLOR1;
-        #endif
+        float lightPower    : COLOR1;
         UNITY_FOG_COORDS(2)
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -97,7 +93,7 @@
             o.waving = mul(_FurVector.xyz, tangentTransform);
         #endif
 
-		SET_ANTIGLARE_LEVEL(v.vertex, o.lightPower);
+        SET_ANTIGLARE_LEVEL(v.vertex, o.lightPower);
 
         return o;
     }
@@ -123,14 +119,12 @@
     inline v2g lerp_v2g(v2g x, v2g y, float div) {
         v2g o;
         UNITY_INITIALIZE_OUTPUT(v2g, o);
-        o.vertex    = lerp(x.vertex,    y.vertex,   div);
-        o.normal    = lerp(x.normal,    y.normal,   div);
-        o.uv        = lerp(x.uv,        y.uv,       div);
-        o.uv2       = lerp(x.uv2,       y.uv2,      div);
-        o.waving    = lerp(x.waving,    y.waving,   div);
-        #ifndef _GL_LEVEL_OFF
-            o.lightPower = lerp(x.lightPower, y.lightPower, div);
-        #endif
+        o.vertex        = lerp(x.vertex,    y.vertex,   div);
+        o.normal        = lerp(x.normal,    y.normal,   div);
+        o.uv            = lerp(x.uv,        y.uv,       div);
+        o.uv2           = lerp(x.uv2,       y.uv2,      div);
+        o.waving        = lerp(x.waving,    y.waving,   div);
+        o.lightPower    = lerp(x.lightPower, y.lightPower, div);
         return o;
     }
 

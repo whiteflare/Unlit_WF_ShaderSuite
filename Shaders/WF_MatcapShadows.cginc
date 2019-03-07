@@ -48,9 +48,7 @@
         #ifdef _OL_ENABLE
             float4 vs_vertex    : TEXCOORD6;
         #endif
-        #ifndef _GL_LEVEL_OFF
-            float lightPower    : COLOR0;
-        #endif
+        float lightPower        : COLOR0;
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -69,6 +67,8 @@
         sampler2D   _OL_OverlayTex;
         float4      _OL_OverlayTex_ST;
         float       _OL_Power;
+        int         _OL_ScreenType;
+        int         _OL_BlendType;
         float       _OL_Scroll_U;
         float       _OL_Scroll_V;
     #endif
@@ -87,28 +87,29 @@
             return o;
         }
         inline float2 computeOverlayTex(float4 vs_vertex, float2 uv) {
-            #ifdef _OL_SCREEN_VIEW_XY
+            float2 scr;
+            if (_OL_ScreenType == 1) {
                  float4 screenPos = computeNonStereoGrabScreenPos(vs_vertex);
-                 float2 scr = screenPos.xy / screenPos.w;
+                 scr = screenPos.xy / screenPos.w;
                  scr.y *= _ScreenParams.y / _ScreenParams.x;
-             #else
-                float2 scr = uv;
-             #endif
+             } else {
+                scr = uv;
+             }
              scr.x += frac(_OL_Scroll_U * _Time.x);
              scr.y += frac(_OL_Scroll_V * _Time.x);
              return TRANSFORM_TEX(scr, _OL_OverlayTex);
         }
         inline float3 blendOverlayColor(float3 color, float3 ov_color) {
-            #ifdef _OL_BLENDTYPE_ADD
+            if (_OL_BlendType == 1) {
                 // 加算
                 return color + ov_color * _OL_Power;
-            #elif _OL_BLENDTYPE_MUL
+            }
+            if (_OL_BlendType == 2) {
                 // 重み付き乗算
                 return color * lerp( float3(1, 1, 1), ov_color, _OL_Power);
-            #else
-                // ブレンド
-                return lerp(color, ov_color, _OL_Power);
-            #endif
+            }
+            // ブレンド
+            return lerp(color, ov_color, _OL_Power);
         }
     #endif
 

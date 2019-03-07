@@ -177,6 +177,7 @@
     // Alpha Transparent
     ////////////////////////////
 
+    int             _AL_Source;
     float           _AL_Power;
     sampler2D       _AL_MaskTex;
 
@@ -184,48 +185,36 @@
         #define _AL_CustomValue 1
     #endif
 
-    #ifdef _AL_SOURCE_MAIN_TEX_ALPHA
+    #ifdef _AL_ENABLE
         inline void affectAlpha(float2 uv, inout float4 color) {
-            color.a = color.a * _AL_Power * _AL_CustomValue;
-        }
-    #elif _AL_SOURCE_MASK_TEX_RED
-        inline void affectAlpha(float2 uv, inout float4 color) {
-            color.a = tex2D(_AL_MaskTex, uv).r * _AL_Power * _AL_CustomValue;
-        }
-    #elif _AL_SOURCE_MASK_TEX_ALPHA
-        inline void affectAlpha(float2 uv, inout float4 color) {
-            color.a = tex2D(_AL_MaskTex, uv).a * _AL_Power * _AL_CustomValue;
+            if (_AL_Source == 1) {
+                color.a = tex2D(_AL_MaskTex, uv).r * _AL_Power * _AL_CustomValue;
+            }
+            else if (_AL_Source == 2) {
+                color.a = tex2D(_AL_MaskTex, uv).a * _AL_Power * _AL_CustomValue;
+            }
+            else {
+                color.a = color.a * _AL_Power * _AL_CustomValue;
+            }
         }
     #else
-        inline void affectAlpha(float2 uv, inout float4 color) {
-            color.a = _AL_CustomValue;
-        }
+        #define affectAlpha(uv, color) color.a = 1.0
     #endif
 
     ////////////////////////////
     // Anti Glare
     ////////////////////////////
 
-    #ifndef _GL_LEVEL_OFF
-        inline float calcAntiGlareLevel(float4 ls_vertex) {
-            return saturate(calcLightPower(ls_vertex) * 2
-                #ifdef _GL_LEVEL_BRIGHT
-                    + 0.2
-                #elif _GL_LEVEL_DARK
-                    + 0.03
-                #endif
-            );
-        }
-        #define SET_ANTIGLARE_LEVEL(ls_vertex, out) out = calcAntiGlareLevel(ls_vertex)
-        inline void affectAntiGlare(float glLevel, inout float4 color) {
-            color.rgb = saturate(color.rgb * glLevel);
-        }
-    #else
-        // Dummy
-        #define calcAntiGlareLevel(ls_vertex) 1
-        #define SET_ANTIGLARE_LEVEL(ls_vertex, out)
-        #define affectAntiGlare(lightPower, color)
-    #endif
+    int             _GL_Level;
+
+    inline float calcAntiGlareLevel(float4 ls_vertex) {
+        return saturate(calcLightPower(ls_vertex) * 2 + (100 - _GL_Level) * 0.01);
+    }
+    #define SET_ANTIGLARE_LEVEL(ls_vertex, out) out = calcAntiGlareLevel(ls_vertex)
+
+    inline void affectAntiGlare(float glLevel, inout float4 color) {
+        color.rgb = saturate(color.rgb * glLevel);
+    }
 
     ////////////////////////////
     // Highlight and Shadow Matcap
@@ -315,13 +304,14 @@
         float       _CL_DeltaH;
         float       _CL_DeltaS;
         float       _CL_DeltaV;
+        int         _CL_Monochrome;
 
         inline void affectColorChange(inout float4 color) {
-            #ifdef _CL_MONOCHROME
+            if (_CL_Monochrome == 1) {
                 color.r += color.g + color.b;
                 color.g = (color.r - 1) / 2;
                 color.b = (color.r - 1) / 2;
-            #endif
+            }
             float3 hsv = rgb2hsv( saturate(color.rgb) );
             hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
             hsv.r = frac(hsv.r);
@@ -338,32 +328,37 @@
     ////////////////////////////
 
     #ifdef _ES_ENABLE
+        int         _ES_Shape;
         float4      _ES_Direction;
         float       _ES_LevelOffset;
         float       _ES_Sharpness;
         float       _ES_Speed;
+        int         _ES_AlphaScroll;
 
         inline float calcEmissivePower(float3 ls_vertex) {
             float time = _Time.y * _ES_Speed - dot(ls_vertex, _ES_Direction.xyz);
             // 周期 2PI、値域 [-1, +1] の関数で光量を決める
-            #ifdef _ES_SHAPE_EXCITATION
+            if (_ES_Shape == 0) {
                 // 励起波
                 float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
                 float es_power = 8 * v * (1 - v) - 1;
                 return saturate(es_power + _ES_LevelOffset);
-            #elif _ES_SHAPE_SAWTOOTH_WAVE
+            }
+            else if (_ES_Shape == 1) {
                 // のこぎり波
                 float es_power = 1 - 2 * frac(time * UNITY_INV_TWO_PI);
                 return saturate(es_power * _ES_Sharpness + _ES_LevelOffset);
-            #elif _ES_SHAPE_SIN_WAVE
+            }
+            else if (_ES_Shape == 2) {
                 // 正弦波
                 float es_power = sin( time );
                 return saturate(es_power * _ES_Sharpness + _ES_LevelOffset);
-            #else
+            }
+            else {
                 // 定数
                 float es_power = 1;
                 return saturate(es_power + _ES_LevelOffset);
-            #endif
+            }
         }
 
         sampler2D   _ES_MaskTex;
@@ -372,9 +367,9 @@
         inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
             float es_power = calcEmissivePower(ls_vertex);
             color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power * tex2D(_ES_MaskTex, mask_uv).rgb);
-            #ifdef _ES_ALPHASCROLL
+            if (_ES_AlphaScroll) {
                 color.a = max(color.a, _ES_Color.a * es_power);
-            #endif
+            }
         }
 
     #else
