@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Color" {
 
     /*
      * authors:
-     *      ver:2018/12/13 whiteflare,
+     *      ver:2019/03/07 whiteflare,
      */
 
     Properties {
@@ -28,8 +28,8 @@ Shader "UnlitWF/WF_MatcapShadows_Color" {
             _Color          ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode       ("Cull Mode", int) = 2
-        [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
-            _GL_LEVEL       ("Anti-Glare", Float) = 0
+        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
+            _GL_Level       ("Anti-Glare", Float) = 0
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
@@ -52,8 +52,8 @@ Shader "UnlitWF/WF_MatcapShadows_Color" {
         [Toggle(_OL_ENABLE)]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
-        [KeywordEnum(ALPHA,ADD,MUL)]
-            _OL_BLENDTYPE   ("[OL] Blend Type", Float) = 0
+        [Enum(ALPHA,ADD,MUL)]
+            _OL_BlendType   ("[OL] Blend Type", Float) = 0
             _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_Scroll_U    ("[OL] U Scroll", Float) = 0
             _OL_Scroll_V    ("[OL] V Scroll", Float) = 0
@@ -76,12 +76,10 @@ Shader "UnlitWF/WF_MatcapShadows_Color" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
             #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _HL_SOFT_SHADOW
             #pragma shader_feature _HL_SOFT_LIGHT
             #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _OL_BLENDTYPE_ALPHA _OL_BLENDTYPE_ADD _OL_BLENDTYPE_MUL
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

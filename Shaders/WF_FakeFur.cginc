@@ -20,8 +20,10 @@
 
     /*
      * authors:
-     *      ver:2019/01/14 whiteflare,
+     *      ver:2019/03/07 whiteflare,
      */
+
+    #include "WF_Common.cginc"
 
     struct appdata_fur {
         float4 vertex   : POSITION;
@@ -38,9 +40,7 @@
         float2 uv       : TEXCOORD0;
         float2 uv2      : TEXCOORD1;
         float3 waving   : TEXCOORD2;
-        #ifndef _GL_LEVEL_OFF
-            float lightPower    : COLOR1;
-        #endif
+        float lightPower        : COLOR0;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -49,9 +49,7 @@
         float2 uv       : TEXCOORD0;
         float2 uv2      : TEXCOORD1;
         float  height   : COLOR0;
-        #ifndef _GL_LEVEL_OFF
-            float lightPower    : COLOR1;
-        #endif
+        float lightPower    : COLOR1;
         UNITY_FOG_COORDS(2)
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -71,97 +69,6 @@
     float4      _WaveSpeed;
     float4      _WaveScale;
     float4      _WavePosFactor;
-
-    #ifdef _CL_ENABLE
-        float       _CL_DeltaH;
-        float       _CL_DeltaS;
-        float       _CL_DeltaV;
-    #endif
-
-    inline float calcBrightness(float3 color) {
-        static float3 BT709 = { 0.21, 0.72, 0.07 };
-        return dot(color, BT709);
-    }
-
-    inline float3 OmniDirectional_ShadeSH9() {
-        // UnityCG.cginc にある ShadeSH9 の等方向版
-        float3 col = 0;
-        col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
-        col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
-        col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
-        col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
-        col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
-        col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
-        return col;
-    }
-
-    inline float3 OmniDirectional_Shade4PointLights(
-        float4 lpX, float4 lpY, float4 lpZ,
-        float3 col0, float3 col1, float3 col2, float3 col3,
-        float4 lightAttenSq, float3 ws_pos) {
-        // UnityCG.cginc にある Shade4PointLights の等方向版
-
-        float4 toLightX = lpX - ws_pos.x;
-        float4 toLightY = lpY - ws_pos.y;
-        float4 toLightZ = lpZ - ws_pos.z;
-
-        float4 lengthSq
-            = toLightX * toLightX
-            + toLightY * toLightY
-            + toLightZ * toLightZ;
-        // ws_normal との内積は取らない。これによって反射光の強さではなく、頂点に当たるライトの強さが取れる。
-
-        // attenuation
-        float4 atten = 1.0 / (1.0 + lengthSq * lightAttenSq);
-
-        float3 col
-            = col0 * atten.x
-            + col1 * atten.y
-            + col2 * atten.z
-            + col3 * atten.w;
-        return col;
-    }
-
-    inline float calcLightPower(float4 ls_vertex) {
-        // directional light
-        float3 lightColor = _LightColor0;
-        #if UNITY_SHOULD_SAMPLE_SH
-            // ambient
-            lightColor += OmniDirectional_ShadeSH9();
-            #ifdef VERTEXLIGHT_ON
-                // not important lights
-                lightColor += OmniDirectional_Shade4PointLights(
-                    unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                    unity_LightColor[0].rgb,
-                    unity_LightColor[1].rgb,
-                    unity_LightColor[2].rgb,
-                    unity_LightColor[3].rgb,
-                    unity_4LightAtten0,
-                    mul(unity_ObjectToWorld, ls_vertex)
-                );
-            #endif
-        #endif
-        return calcBrightness(saturate(lightColor));
-    }
-
-    #ifdef _CL_ENABLE
-        inline float3 rgb2hsv(float3 c) {
-            // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
-            static float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
-            static float e = 1.0e-10;
-            float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
-            float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
-            float d = q.x - min(q.w, q.y);
-            return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
-        }
-
-        inline float3 hsv2rgb(float3 c) {
-            // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
-            static float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
-            float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
-            return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
-        }
-    #endif
 
     v2g vert_fakefur(appdata_fur v) {
         v2g o;
@@ -186,15 +93,7 @@
             o.waving = mul(_FurVector.xyz, tangentTransform);
         #endif
 
-        #ifndef _GL_LEVEL_OFF
-            o.lightPower = saturate(calcLightPower(v.vertex) * 2
-                #ifdef _GL_LEVEL_BRIGHT
-                    + 0.2
-                #elif _GL_LEVEL_DARK
-                    + 0.03
-                #endif
-            );
-        #endif
+        SET_ANTIGLARE_LEVEL(v.vertex, o.lightPower);
 
         return o;
     }
@@ -220,14 +119,12 @@
     inline v2g lerp_v2g(v2g x, v2g y, float div) {
         v2g o;
         UNITY_INITIALIZE_OUTPUT(v2g, o);
-        o.vertex    = lerp(x.vertex,    y.vertex,   div);
-        o.normal    = lerp(x.normal,    y.normal,   div);
-        o.uv        = lerp(x.uv,        y.uv,       div);
-        o.uv2       = lerp(x.uv2,       y.uv2,      div);
-        o.waving    = lerp(x.waving,    y.waving,   div);
-        #ifndef _GL_LEVEL_OFF
-            o.lightPower = lerp(x.lightPower, y.lightPower, div);
-        #endif
+        o.vertex        = lerp(x.vertex,    y.vertex,   div);
+        o.normal        = lerp(x.normal,    y.normal,   div);
+        o.uv            = lerp(x.uv,        y.uv,       div);
+        o.uv2           = lerp(x.uv2,       y.uv2,      div);
+        o.waving        = lerp(x.waving,    y.waving,   div);
+        o.lightPower    = lerp(x.lightPower, y.lightPower, div);
         return o;
     }
 
@@ -275,33 +172,18 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         float4 maskTex = tex2D(_FurMaskTex, i.uv);
-        if (maskTex.r < 0.01) {
-            discard;
-        }
-        if (maskTex.r <= i.height) {
+        if (maskTex.r < 0.01 || maskTex.r <= i.height) {
             discard;
         }
 
         float4 mainTex = tex2D(_MainTex, i.uv);
-        float4 color = float4( mainTex.rgb, 1 );
+        float4 color = float4(mainTex.rgb, 1);
 
         // 色変換
-        #ifdef _CL_ENABLE
-            #ifdef _CL_MONOCHROME
-                color.r += color.g + color.b;
-                color.g = (color.r - 1) / 2;
-                color.b = (color.r - 1) / 2;
-            #endif
-            float3 hsv = rgb2hsv( saturate(color.rgb) );
-            hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
-            hsv.r = frac(hsv.r);
-            color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
-        #endif
+        affectColorChange(color);
 
         // Anti-Glare
-        #ifndef _GL_LEVEL_OFF
-            color.rgb = saturate(color.rgb * i.lightPower);
-        #endif
+        affectAntiGlare(i.lightPower, color);
 
         float3 noise = tex2D(_FurNoiseTex, i.uv2).rgb;
         color = saturate( float4( color - (1 - noise) * _FurShadowPower, calcBrightness(noise) - pow(i.height, 3)) );

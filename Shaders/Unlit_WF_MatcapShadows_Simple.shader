@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
     /*
      * authors:
-     *      ver:2018/12/13 whiteflare,
+     *      ver:2019/03/07 whiteflare,
      */
 
     Properties {
@@ -27,14 +27,14 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
             _MainTex        ("Main Texture", 2D) = "white" {}
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode       ("Cull Mode", int) = 2
-        [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
-            _GL_LEVEL       ("Anti-Glare", Float) = 0
+        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
+            _GL_Level       ("Anti-Glare", Float) = 0
 
         // 色変換
         [Header(Color Change)]
         [Toggle(_CL_ENABLE)]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [Toggle(_CL_MONOCHROME)]
+        [MaterialToggle]
             _CL_Monochrome  ("[CL] monochrome", Float) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
@@ -74,9 +74,7 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
             #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _HL_SOFT_SHADOW
             #pragma shader_feature _HL_SOFT_LIGHT
