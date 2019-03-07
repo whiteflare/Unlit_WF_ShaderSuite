@@ -30,15 +30,15 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
         // Litブレンド
         [Header(Lit)]
-        [KeywordEnum(OFF,BRIGHT,DARK,BLACK)]
-            _GL_LEVEL       ("Anti-Glare", Float) = 2
+        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
+            _GL_Level       ("Anti-Glare", Float) = 0
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
 
         // 色変換
         [Header(Color Change)]
         [Toggle(_CL_ENABLE)]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [Toggle(_CL_MONOCHROME)]
+        [MaterialToggle]
             _CL_Monochrome  ("[CL] monochrome", Float) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
@@ -112,9 +112,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
             #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _TL_ENABLE
             #pragma shader_feature _TR_ENABLE
             #pragma multi_compile_fwdbase
@@ -140,9 +138,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _GL_LEVEL_OFF _GL_LEVEL_BRIGHT _GL_LEVEL_DARK _GL_LEVEL_BLACK
             #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _CL_MONOCHROME
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _TS_ENABLE
             #pragma shader_feature _TR_ENABLE

@@ -53,14 +53,14 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    sampler2D       _MainTex;
+    UNITY_DECLARE_TEX2D(_MainTex);
     float4          _MainTex_ST;
     float4          _Color;
     float           _AL_CutOff;
     float           _GL_BrendPower;
 
     #ifdef _NM_ENABLE
-        sampler2D   _BumpMap;
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_BumpMap);
         float       _NM_Power;
     #endif
 
@@ -70,7 +70,7 @@
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
         float       _TS_Feather;
-        sampler2D   _TS_MaskTex;
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_TS_MaskTex);
         float       _TS_InvMaskVal;
     #endif
 
@@ -80,7 +80,7 @@
         float       _TR_PowerTop;
         float       _TR_PowerSide;
         float       _TR_PowerBottom;
-        sampler2D   _TR_MaskTex;
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_TR_MaskTex);
         float       _TR_InvMaskVal;
     #endif
 
@@ -152,7 +152,7 @@
         return o;
     }
 
-    #define MASK_VALUE(tex, uv, inv)        saturate( inv < 0.5 ? tex2D(tex, uv).rgb : 1 - tex2D(tex, uv).rgb )
+    #define MASK_VALUE(tex, uv, inv)        saturate( inv < 0.5 ? UNITY_SAMPLE_TEX2D_SAMPLER(tex, _MainTex, uv).rgb : 1 - UNITY_SAMPLE_TEX2D_SAMPLER(tex, _MainTex, uv).rgb )
     #define MASK_VALUE_LOD(tex, uv, inv)    saturate( inv < 0.5 ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
 
     float4 frag(v2f i) : SV_Target {
@@ -162,7 +162,7 @@
         #ifdef _SOLID_COLOR
             _Color;
         #else
-            tex2D(_MainTex, i.uv);
+            UNITY_SAMPLE_TEX2D(_MainTex, i.uv);
         #endif
 
         // 色変換
@@ -174,7 +174,7 @@
         {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_normal = normalize( mul(UnpackNormal( tex2D(_BumpMap, i.uv) ), tangentTransform) ); // 法線マップ参照
+            ls_normal = normalize( mul(UnpackNormal( UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, i.uv) ), tangentTransform) ); // 法線マップ参照
             // 陰影を付けるために若干の影を追加する
             color.rgb *= saturate((dot(ls_normal, i.ls_light_dir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power)); // ここではライトの色を考慮しない
         }
