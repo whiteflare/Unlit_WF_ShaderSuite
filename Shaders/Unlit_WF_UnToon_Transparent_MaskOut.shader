@@ -81,11 +81,11 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
         [Header(ToonShade)]
         [Toggle(_TS_ENABLE)]
             _TS_Enable      ("[SH] Enable", Float) = 0
-            _TS_1stColor    ("[SH] 1st Shadow Color", Color) = (0.5, 0.5, 0.5, 1)
-            _TS_2ndColor    ("[SH] 2nd Shadow Color", Color) = (0.3, 0.3, 0.3, 1)
+            _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.5, 0.5, 0.5, 1)
+            _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.3, 0.3, 0.3, 1)
             _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
-            _TS_Feather     ("[SH] Feather", Range(0, 0.1)) = 0.02
+            _TS_ShadowLimit ("[SH] Shade Power Limit", Range(0, 1)) = 0.7
             _TS_BlendNormal ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex     ("[SH] BoostLight Mask Texture", 2D) = "black" {}
@@ -100,7 +100,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
-            _HL_MedianColor ("[HL] Median Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor ("[HL] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal ("[HL] Blend Normal", Range(0, 1)) = 0.1
         [HideInInspector]

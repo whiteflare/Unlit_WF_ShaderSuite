@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/09 whiteflare,
      */
 
     Properties {
@@ -52,19 +52,50 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
             _NM_Power       ("[NM] Shadow Power", Range(0, 1)) = 0.25
 
+        // メタリックマップ
+        [Header(Metalic)]
+        [Toggle(_MT_ENABLE)]
+            _MT_Enable      ("[MT] Enable", Float) = 0
+            _MT_Metalic     ("[MT] Metalic", Range(0, 1)) = 0.5
+            _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
+            _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
+        [NoScaleOffset]
+            _MT_MaskTex     ("[MT] Metalic Map Texture", 2D) = "white" {}
+        [MaterialToggle]
+            _MT_InvMaskVal  ("[MT] Invert Mask Value", Float) = 0
+
         // 階調影
         [Header(ToonShade)]
         [Toggle(_TS_ENABLE)]
             _TS_Enable      ("[SH] Enable", Float) = 0
-            _TS_1stColor    ("[SH] 1st Shadow Color", Color) = (0.5, 0.5, 0.5, 1)
-            _TS_2ndColor    ("[SH] 2nd Shadow Color", Color) = (0.3, 0.3, 0.3, 1)
+            _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.5, 0.5, 0.5, 1)
+            _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.3, 0.3, 0.3, 1)
             _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
-            _TS_Feather     ("[SH] Feather", Range(0, 0.1)) = 0.02
+            _TS_ShadowLimit ("[SH] Shade Power Limit", Range(0, 1)) = 0.7
+            _TS_BlendNormal ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex     ("[SH] BoostLight Mask Texture", 2D) = "black" {}
         [MaterialToggle]
             _TS_InvMaskVal  ("[SH] Invert Mask Value", Float) = 0
+
+        // Matcapハイライト
+        [Header(Light Matcap)]
+        [Toggle(_HL_ENABLE)]
+            _HL_Enable      ("[HL] Enable", Float) = 0
+        [NoScaleOffset]
+            _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
+            _HL_CapType     ("[HL] Matcap Type", Float) = 0
+            _HL_MatcapColor ("[HL] Median Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power       ("[HL] Power", Range(0, 2)) = 1
+            _HL_BlendNormal ("[HL] Blend Normal", Range(0, 1)) = 0.1
+        [HideInInspector]
+            _HL_Range       ("[HL] Matcap Range (Tweak)", Range(0, 2)) = 1
+        [NoScaleOffset]
+            _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
+        [MaterialToggle]
+            _HL_InvMaskVal  ("[HL] Invert Mask Value", Float) = 0
 
         // リムライト
         [Header(RimLight)]
@@ -100,8 +131,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
-            // アウトライン
-            Tags{ "LightMode" = "ForwardBase" }
+            Name "Outline"
+            Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
 
@@ -126,8 +157,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
-            // メイン
-            Tags{ "LightMode" = "ForwardBase" }
+            Name "Main"
+            Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
 
@@ -141,6 +172,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma shader_feature _CL_ENABLE
             #pragma shader_feature _NM_ENABLE
             #pragma shader_feature _TS_ENABLE
+            #pragma shader_feature _MT_ENABLE
+            #pragma shader_feature _HL_ENABLE
             #pragma shader_feature _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
