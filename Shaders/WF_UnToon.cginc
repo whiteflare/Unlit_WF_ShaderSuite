@@ -20,10 +20,25 @@
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/09 whiteflare,
      */
 
     #include "WF_Common.cginc"
+
+#if 0
+    #define DECL_MAIN_TEX2D(name)           UNITY_DECLARE_TEX2D(name)
+    #define DECL_SUB_TEX2D(name)            UNITY_DECLARE_TEX2D_NOSAMPLER(name)
+    #define PICK_MAIN_TEX2D(tex, uv)        UNITY_SAMPLE_TEX2D(tex, uv)
+    #define PICK_SUB_TEX2D(tex, name, uv)   UNITY_SAMPLE_TEX2D_SAMPLER(tex, name, uv)
+#else
+    #define DECL_MAIN_TEX2D(name)           sampler2D name
+    #define DECL_SUB_TEX2D(name)            sampler2D name
+    #define PICK_MAIN_TEX2D(tex, uv)        tex2D(tex, uv)
+    #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
+#endif
+
+    #define SAMPLE_MASK_VALUE(tex, uv, inv)        saturate( inv < 0.5 ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
+    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)    saturate( inv < 0.5 ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
 
     struct appdata {
         float4 vertex           : POSITION;
@@ -53,15 +68,23 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    UNITY_DECLARE_TEX2D(_MainTex);
+    DECL_MAIN_TEX2D(_MainTex);
     float4          _MainTex_ST;
     float4          _Color;
     float           _AL_CutOff;
     float           _GL_BrendPower;
 
     #ifdef _NM_ENABLE
-        UNITY_DECLARE_TEX2D_NOSAMPLER(_BumpMap);
+        DECL_SUB_TEX2D(_BumpMap);
         float       _NM_Power;
+    #endif
+
+    #ifdef _MT_ENABLE
+        float       _MT_Metalic;
+        float       _MT_Smoothness;
+        float       _MT_BlendNormal;
+        DECL_SUB_TEX2D(_MT_MaskTex);
+        float       _MT_InvMaskVal;
     #endif
 
     #ifdef _TS_ENABLE
@@ -69,18 +92,18 @@
         float4      _TS_2ndColor;
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
-        float       _TS_Feather;
-        UNITY_DECLARE_TEX2D_NOSAMPLER(_TS_MaskTex);
+        float       _TS_ShadowLimit;
+        float       _TS_BlendNormal;
+        DECL_SUB_TEX2D(_TS_MaskTex);
         float       _TS_InvMaskVal;
     #endif
 
     #ifdef _TR_ENABLE
         float4      _TR_Color;
-        float4      _TR_MedianColor;
         float       _TR_PowerTop;
         float       _TR_PowerSide;
         float       _TR_PowerBottom;
-        UNITY_DECLARE_TEX2D_NOSAMPLER(_TR_MaskTex);
+        DECL_SUB_TEX2D(_TR_MaskTex);
         float       _TR_InvMaskVal;
     #endif
 
@@ -90,6 +113,27 @@
         sampler2D   _TL_MaskTex;
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
+    #endif
+
+    #ifdef _HL_ENABLE
+        sampler2D   _HL_MatcapTex;
+        int         _HL_CapType;
+        float3      _HL_MatcapColor;
+        float       _HL_Range;
+        float       _HL_Power;
+        float       _HL_BlendNormal;
+        DECL_SUB_TEX2D(_HL_MaskTex);
+        float       _HL_InvMaskVal;
+
+        inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
+            float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
+            float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+            if (_HL_CapType == 0) {
+                matcap_color -= MEDIAN_GRAY;
+            }
+            float3 power = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb * _HL_Power;
+            color.rgb += (matcap_color + _HL_MatcapColor - MEDIAN_GRAY) * power;
+        }
     #endif
 
     v2f vert(in appdata v) {
@@ -107,6 +151,7 @@
 
         // 影コントラスト
         float3 ambientColor = OmniDirectional_ShadeSH9();
+        #ifdef _TS_ENABLE
         {
             float3 lightColorMain = calcLocalSpaceLightColor(o.ls_vertex, o.ls_light_dir.w);
             float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
@@ -122,7 +167,9 @@
             float sub4 = saturate(calcBrightness( lightColorSub4 ));
             float ambient = saturate(calcBrightness( ambientColor ));
             o.shadow_power = min( saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5, saturate(1 - ambient * 0.5) );
+            o.shadow_power = min( o.shadow_power, _TS_ShadowLimit * 0.5 + 0.5 );
         }
+        #endif
         // ライトカラーブレンド
         {
             float3 lightColorMain = _LightColor0.rgb;
@@ -152,9 +199,6 @@
         return o;
     }
 
-    #define MASK_VALUE(tex, uv, inv)        saturate( inv < 0.5 ? UNITY_SAMPLE_TEX2D_SAMPLER(tex, _MainTex, uv).rgb : 1 - UNITY_SAMPLE_TEX2D_SAMPLER(tex, _MainTex, uv).rgb )
-    #define MASK_VALUE_LOD(tex, uv, inv)    saturate( inv < 0.5 ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
-
     float4 frag(v2f i) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
@@ -162,7 +206,7 @@
         #ifdef _SOLID_COLOR
             _Color;
         #else
-            UNITY_SAMPLE_TEX2D(_MainTex, i.uv);
+            PICK_MAIN_TEX2D(_MainTex, i.uv);
         #endif
 
         // 色変換
@@ -170,26 +214,37 @@
 
         // BumpMap
         float3 ls_normal = i.normal;
+        float3 ls_bump_normal = i.normal;
         #ifdef _NM_ENABLE
         {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_normal = normalize( mul(UnpackNormal( UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, i.uv) ), tangentTransform) ); // 法線マップ参照
+            ls_bump_normal = normalize( mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform) ); // 法線マップ参照
             // 陰影を付けるために若干の影を追加する
-            color.rgb *= saturate((dot(ls_normal, i.ls_light_dir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power)); // ここではライトの色を考慮しない
+            color.rgb *= saturate((dot(ls_bump_normal, i.ls_light_dir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power)); // ここではライトの色を考慮しない
         }
         #endif
 
-        // matcapベクトル算出
+        // メタリック
+        #ifdef _MT_ENABLE
+        {
+            float power = _MT_Metalic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
+            float3 reflection = pickReflectionProbe(i.ls_vertex, lerp(ls_normal, ls_bump_normal, _MT_BlendNormal), (1 - _MT_Smoothness) * 10);
+            color.rgb = lerp(color.rgb, reflection.rgb, power);
+        }
+        #endif
+
+        // ビュー空間法線
         float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
+        float3 vs_bump_normal = calcMatcapVector(i.ls_vertex, ls_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
 
         // 階調影
         #ifdef _TS_ENABLE
         {
-            float boostlight = 0.5 + 0.25 * MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal);
-            float brightness = dot(ls_normal, i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
+            float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal);
+            float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
             brightness *= saturate(angle_light_camera * 2 + 2);
             // 色計算
@@ -199,22 +254,28 @@
                     color.rgb * lerp(float3(1, 1, 1), _TS_2ndColor.rgb, i.shadow_power),
                     // 影1
                     color.rgb * lerp(float3(1, 1, 1), _TS_1stColor.rgb, i.shadow_power),
-                    smoothstep(_TS_2ndBorder - max(0.0001, _TS_Feather), _TS_2ndBorder, brightness) ),
+                    smoothstep(_TS_2ndBorder - 0.001, _TS_2ndBorder, brightness) ),
                 // ベースカラー
                 color.rgb,
-                smoothstep(_TS_1stBorder, _TS_1stBorder + max(0.0001, _TS_Feather), brightness));
+                smoothstep(_TS_1stBorder, _TS_1stBorder + 0.001, brightness));
         }
+        #endif
+
+        // Highlight
+        #ifdef _HL_ENABLE
+            affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
         #endif
 
         // リムライト
         #ifdef _TR_ENABLE
         {
-            // matcapベクトルからリムライト範囲を計算
-            float2 rim_uv = float2(
-                vs_normal.x * (_TR_PowerSide + 1),
-                vs_normal.y * ( (_TR_PowerTop + _TR_PowerBottom) / 2 + 1) + (_TR_PowerTop - _TR_PowerBottom) / 2 );
+            // vs_normalからリムライト範囲を計算
+            float2 rim_uv = vs_normal.xy;
+            rim_uv.x *= _TR_PowerSide + 1;
+            rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
+            rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
             // 順光の場合はリムライトを暗くする
-            float rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
+            float rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
             // 色計算
             color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
                 smoothstep(1, 1.05, length(rim_uv)) );
@@ -238,7 +299,20 @@
         return color;
     }
 
+    float4 frag_cutout_upper(v2f i) : SV_Target {
+        float4 color = frag(i);
+        clip(color.a - _AL_CutOff);
+        return color;
+    }
+
+    float4 frag_cutout_lower(v2f i) : SV_Target {
+        float4 color = frag(i);
+        clip(_AL_CutOff - color.a);
+        return color;
+    }
+
     // アウトライン用
+
     v2f vert_outline(appdata v) {
         // 通常の vert を使う
         v2f o = vert(v);
@@ -247,7 +321,7 @@
 
         #ifdef _TL_ENABLE
             // マスクテクスチャ参照
-            float mask = MASK_VALUE_LOD(_TL_MaskTex, o.uv, _TL_InvMaskVal).r;
+            float mask = SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, o.uv, _TL_InvMaskVal).r;
             // 外側にシフトする
             o.ls_vertex.xyz += normalize( v.normal ).xyz * (_TL_LineWidth * 0.01) * mask;
             // カメラ方向の z シフト量を計算
@@ -286,15 +360,9 @@
         #endif
     }
 
-    fixed4 frag_cutout_upper(v2f i) : SV_Target {
-        float4 color = frag(i);
+    float4 frag_cutout_upper_outline(v2f i) : SV_Target {
+        float4 color = frag_outline(i);
         clip(color.a - _AL_CutOff);
-        return color;
-    }
-
-    fixed4 frag_cutout_lower(v2f i) : SV_Target {
-        float4 color = frag(i);
-        clip(_AL_CutOff - color.a);
         return color;
     }
 

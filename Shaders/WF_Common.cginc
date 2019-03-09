@@ -243,42 +243,6 @@
         return normalize( vs_normal );
     }
 
-    #ifdef _HL_ENABLE
-        sampler2D   _HL_MatcapTex;
-        sampler2D   _HL_MaskTex;
-        float4      _HL_MedianColor;
-        float       _HL_Range;
-        float       _HL_Power;
-
-        inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
-            float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
-            float3 blend_param = (tex2D(_HL_MatcapTex, saturate(matcap_uv) ).rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, mask_uv).rgb * _HL_Power;
-
-            // 明るすぎ・暗すぎ防止の補正処理
-            #if defined(_HL_SOFT_SHADOW) || defined(_HL_SOFT_LIGHT)
-            {
-                float bb = (blend_param.r + blend_param.g + blend_param.b) / 3;
-                float bc = (color.r + color.g + color.b) / 3 - 0.5;
-                #ifdef _HL_SOFT_SHADOW
-                    // 暗いところに暗い影は落とさない
-                    blend_param *= bb < 0 && bc < 0 ? saturate( (bc + 0.5) * 2 ) : 1;
-                #endif
-                #ifdef _HL_SOFT_LIGHT
-                    // 明るいところに明るい光は差さない
-                    blend_param *= 0 < bb && 0 < bc ? saturate( 1 - (bc + 0.5) * 2 ) : 1;
-                #endif
-            }
-            #endif
-
-            // ブレンド
-            color.rgb = saturate(color.rgb + blend_param);
-        }
-
-    #else
-        // Dummy
-        #define affectMatcapColor(matcapVector, mask_uv, color)
-    #endif
-
     ////////////////////////////
     // Color Change
     ////////////////////////////
@@ -376,5 +340,26 @@
         // Dummy
         #define affectEmissiveScroll(ls_vertex, mask_uv, color)
     #endif
+
+    ////////////////////////////
+    // ReflectionProbe Sampler
+    ////////////////////////////
+
+    inline float4 pickReflectionProbe(float4 ls_vertex, float3 ls_normal, float lod) {
+        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+        float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
+        float3 reflect_dir = reflect(-ws_camera_dir, UnityObjectToWorldNormal(ls_normal));
+
+        float3 dir0 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
+        float3 dir1 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube1_ProbePosition, unity_SpecCube1_BoxMin, unity_SpecCube1_BoxMax);
+
+        float4 color0 = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
+        float4 color1 = UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(unity_SpecCube1, unity_SpecCube0, dir1, lod);
+
+        color0.rgb = DecodeHDR(color0, unity_SpecCube0_HDR);
+        color1.rgb = DecodeHDR(color1, unity_SpecCube1_HDR);
+
+        return lerp(color1, color0, unity_SpecCube0_BoxMin.w);
+    }
 
 #endif
