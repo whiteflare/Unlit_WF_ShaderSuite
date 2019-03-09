@@ -26,11 +26,14 @@
     #include "WF_Common.cginc"
 
 #if 0
+    // サンプラー節約のための差し替えマクロ
+    // 節約にはなるけど最適化などで _MainTex のサンプリングが消えると途端に破綻する諸刃の剣
     #define DECL_MAIN_TEX2D(name)           UNITY_DECLARE_TEX2D(name)
     #define DECL_SUB_TEX2D(name)            UNITY_DECLARE_TEX2D_NOSAMPLER(name)
     #define PICK_MAIN_TEX2D(tex, uv)        UNITY_SAMPLE_TEX2D(tex, uv)
     #define PICK_SUB_TEX2D(tex, name, uv)   UNITY_SAMPLE_TEX2D_SAMPLER(tex, name, uv)
 #else
+    // 通常版
     #define DECL_MAIN_TEX2D(name)           sampler2D name
     #define DECL_SUB_TEX2D(name)            sampler2D name
     #define PICK_MAIN_TEX2D(tex, uv)        tex2D(tex, uv)
@@ -80,7 +83,7 @@
     #endif
 
     #ifdef _MT_ENABLE
-        float       _MT_Metalic;
+        float       _MT_Metallic;
         float       _MT_Smoothness;
         float       _MT_BlendNormal;
         DECL_SUB_TEX2D(_MT_MaskTex);
@@ -228,9 +231,9 @@
         // メタリック
         #ifdef _MT_ENABLE
         {
-            float power = _MT_Metalic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
+            float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
             float3 reflection = pickReflectionProbe(i.ls_vertex, lerp(ls_normal, ls_bump_normal, _MT_BlendNormal), (1 - _MT_Smoothness) * 10);
-            color.rgb = lerp(color.rgb, reflection.rgb, power);
+            color.rgb = lerp(color.rgb, color.rgb * reflection.rgb, power);
         }
         #endif
 

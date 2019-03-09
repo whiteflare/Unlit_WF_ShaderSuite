@@ -66,14 +66,14 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _NM_Power       ("[NM] Shadow Power", Range(0, 1)) = 0.25
 
         // メタリックマップ
-        [Header(Metalic)]
+        [Header(Metallic)]
         [Toggle(_MT_ENABLE)]
             _MT_Enable      ("[MT] Enable", Float) = 0
-            _MT_Metalic     ("[MT] Metalic", Range(0, 1)) = 0.5
+            _MT_Metallic     ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _MT_MaskTex     ("[MT] Metalic Map Texture", 2D) = "white" {}
+            _MT_MaskTex     ("[MT] Metallic Map Texture", 2D) = "white" {}
         [MaterialToggle]
             _MT_InvMaskVal  ("[MT] Invert Mask Value", Float) = 0
 
