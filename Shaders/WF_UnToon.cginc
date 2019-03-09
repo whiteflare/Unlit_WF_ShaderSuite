@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/09 whiteflare,
+     *      ver:2019/03/10 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -96,6 +96,7 @@
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
         float       _TS_ShadowLimit;
+        float       _TS_Feather;
         float       _TS_BlendNormal;
         DECL_SUB_TEX2D(_TS_MaskTex);
         float       _TS_InvMaskVal;
@@ -190,9 +191,9 @@
             o.light_color = (color - 1) * _GL_BrendPower + 1;
         }
 
-        o.normal = v.normal;
+        o.normal = normalize(v.normal);
         #ifdef _NM_ENABLE
-            o.tangent = v.tangent;
+            o.tangent = normalize(v.tangent);
             o.bitangent = cross(o.normal, o.tangent);
         #endif
 
@@ -243,6 +244,11 @@
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
 
+        // Highlight
+        #ifdef _HL_ENABLE
+            affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
+        #endif
+
         // 階調影
         #ifdef _TS_ENABLE
         {
@@ -257,16 +263,11 @@
                     color.rgb * lerp(float3(1, 1, 1), _TS_2ndColor.rgb, i.shadow_power),
                     // 影1
                     color.rgb * lerp(float3(1, 1, 1), _TS_1stColor.rgb, i.shadow_power),
-                    smoothstep(_TS_2ndBorder - 0.001, _TS_2ndBorder, brightness) ),
+                    smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
                 // ベースカラー
                 color.rgb,
-                smoothstep(_TS_1stBorder, _TS_1stBorder + 0.001, brightness));
+                smoothstep(_TS_1stBorder, _TS_1stBorder + max(_TS_Feather, 0.001), brightness));
         }
-        #endif
-
-        // Highlight
-        #ifdef _HL_ENABLE
-            affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
         #endif
 
         // リムライト
