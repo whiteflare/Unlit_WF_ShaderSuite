@@ -29,7 +29,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
         // Litブレンド
         [Header(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
-            _GL_Level       ("Anti-Glare", Float) = 0
+            _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
 
         // StencilMask
@@ -72,8 +72,10 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
+        [MaterialToggle]
+            _MT_Monochrome  ("[MT] Monochrome Reflection", Float) = 1
         [NoScaleOffset]
-            _MT_MaskTex     ("[MT] Metallic Map Texture", 2D) = "white" {}
+            _MT_MaskTex     ("[MT] MetallicMap Texture", 2D) = "white" {}
         [MaterialToggle]
             _MT_InvMaskVal  ("[MT] Invert Mask Value", Float) = 0
 
