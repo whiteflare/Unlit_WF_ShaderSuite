@@ -26,6 +26,10 @@
     #define _MATCAP_VIEW_CORRECT_ENABLE
     #define _MATCAP_ROTATE_CORRECT_ENABLE
 
+    #define TGL_ON(value)   (0.5 <= value)
+    #define TGL_OFF(value)  (value < 0.5)
+    #define TGL_01(value)   step(0.5, value)
+
     static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
@@ -69,12 +73,12 @@
     }
 
     inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
-        if (0.5 < lightType) {
+        if ( TGL_ON(lightType) ) {
             return _LightColor0.rgb; // ディレクショナルライト
         }
         float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
         float3 pointLight1Color = calcPointLight1Color(ws_pos);
-        if (lightType < -0.5) {
+        if ( TGL_ON(-lightType) ) {
             return pointLight1Color;
         }
 
@@ -268,10 +272,10 @@
         float       _CL_DeltaH;
         float       _CL_DeltaS;
         float       _CL_DeltaV;
-        int         _CL_Monochrome;
+        float       _CL_Monochrome;
 
         inline void affectColorChange(inout float4 color) {
-            if (_CL_Monochrome == 1) {
+            if (TGL_ON(_CL_Monochrome)) {
                 color.r += color.g + color.b;
                 color.g = (color.r - 1) / 2;
                 color.b = (color.r - 1) / 2;
@@ -297,7 +301,7 @@
         float       _ES_LevelOffset;
         float       _ES_Sharpness;
         float       _ES_Speed;
-        int         _ES_AlphaScroll;
+        float       _ES_AlphaScroll;
 
         inline float calcEmissivePower(float3 ls_vertex) {
             float time = _Time.y * _ES_Speed - dot(ls_vertex, _ES_Direction.xyz);
@@ -331,7 +335,7 @@
         inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
             float es_power = calcEmissivePower(ls_vertex);
             color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power * tex2D(_ES_MaskTex, mask_uv).rgb);
-            if (_ES_AlphaScroll) {
+            if (TGL_ON(_ES_AlphaScroll)) {
                 color.a = max(color.a, _ES_Color.a * es_power);
             }
         }

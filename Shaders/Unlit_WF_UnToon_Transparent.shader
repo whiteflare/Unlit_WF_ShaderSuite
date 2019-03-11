@@ -47,7 +47,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         [Toggle(_CL_ENABLE)]
             _CL_Enable      ("[CL] Enable", Float) = 0
         [PseudoToggle]
-            _CL_Monochrome  ("[CL] monochrome", Float) = 0
+            _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
@@ -68,11 +68,11 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [PseudoToggle]
-            _MT_Monochrome  ("[MT] Monochrome Reflection", Float) = 1
+            _MT_Monochrome  ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [NoScaleOffset]
             _MT_MaskTex     ("[MT] MetallicMap Texture", 2D) = "white" {}
         [PseudoToggle]
-            _MT_InvMaskVal  ("[MT] Invert Mask Value", Float) = 0
+            _MT_InvMaskVal  ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
         [Header(Light Matcap)]
@@ -90,7 +90,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
         [PseudoToggle]
-            _HL_InvMaskVal  ("[HL] Invert Mask Value", Float) = 0
+            _HL_InvMaskVal  ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [Header(ToonShade)]
@@ -106,7 +106,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         [NoScaleOffset]
             _TS_MaskTex     ("[SH] BoostLight Mask Texture", 2D) = "black" {}
         [PseudoToggle]
-            _TS_InvMaskVal  ("[SH] Invert Mask Value", Float) = 0
+            _TS_InvMaskVal  ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
         // リムライト
         [Header(RimLight)]
@@ -119,7 +119,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         [NoScaleOffset]
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [PseudoToggle]
-            _TR_InvMaskVal  ("[RM] Invert Mask Value", Float) = 0
+            _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
     }
 
     SubShader {

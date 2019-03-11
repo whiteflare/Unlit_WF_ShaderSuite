@@ -40,8 +40,8 @@
     #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
 #endif
 
-    #define SAMPLE_MASK_VALUE(tex, uv, inv)        saturate( inv < 0.5 ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
-    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)    saturate( inv < 0.5 ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
+    #define SAMPLE_MASK_VALUE(tex, uv, inv)        saturate( TGL_OFF(inv) ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
+    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)    saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
 
     struct appdata {
         float4 vertex           : POSITION;
@@ -86,9 +86,9 @@
         float       _MT_Metallic;
         float       _MT_Smoothness;
         float       _MT_BlendNormal;
-        int         _MT_Monochrome;
+        float       _MT_Monochrome;
         DECL_SUB_TEX2D(_MT_MaskTex);
-        int         _MT_InvMaskVal;
+        float       _MT_InvMaskVal;
     #endif
 
     #ifdef _TS_ENABLE
@@ -100,7 +100,7 @@
         float       _TS_Feather;
         float       _TS_BlendNormal;
         DECL_SUB_TEX2D(_TS_MaskTex);
-        int         _TS_InvMaskVal;
+        float       _TS_InvMaskVal;
     #endif
 
     #ifdef _TR_ENABLE
@@ -109,14 +109,14 @@
         float       _TR_PowerSide;
         float       _TR_PowerBottom;
         DECL_SUB_TEX2D(_TR_MaskTex);
-        int         _TR_InvMaskVal;
+        float       _TR_InvMaskVal;
     #endif
 
     #ifdef _TL_ENABLE
         float4      _TL_LineColor;
         float       _TL_LineWidth;
         sampler2D   _TL_MaskTex;
-        int         _TL_InvMaskVal;
+        float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
     #endif
 
@@ -128,7 +128,7 @@
         float       _HL_Power;
         float       _HL_BlendNormal;
         DECL_SUB_TEX2D(_HL_MaskTex);
-        int         _HL_InvMaskVal;
+        float       _HL_InvMaskVal;
 
         inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
             float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
@@ -235,7 +235,7 @@
         {
             float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
             float3 reflection = pickReflectionProbe(i.ls_vertex, lerp(ls_normal, ls_bump_normal, _MT_BlendNormal), (1 - _MT_Smoothness) * 10);
-            if (_MT_Monochrome == 1) {
+            if (TGL_ON(_MT_Monochrome)) {
                 reflection.rgb = calcBrightness(reflection);
             }
             color.rgb = lerp(color.rgb, color.rgb * reflection.rgb, power);
