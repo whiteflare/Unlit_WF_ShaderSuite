@@ -34,7 +34,7 @@ Shader "UnlitWF/WF_MatcapShadows_Texture" {
         [Header(Color Change)]
         [Toggle(_CL_ENABLE)]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [MaterialToggle]
+        [PseudoToggle]
             _CL_Monochrome  ("[CL] monochrome", Float) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0

@@ -47,7 +47,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut" {
         [Header(Color Change)]
         [Toggle(_CL_ENABLE)]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [MaterialToggle]
+        [PseudoToggle]
             _CL_Monochrome  ("[CL] monochrome", Float) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
@@ -100,7 +100,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut" {
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
             _ES_Shape       ("[ES] Wave Type", Float) = 0
-        [MaterialToggle]
+        [PseudoToggle]
             _ES_AlphaScroll ("[ES] Alpha mo Scroll", Float) = 0
             _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
