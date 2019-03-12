@@ -113,6 +113,21 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [ToggleNoKwd]
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
+        // EmissiveScroll
+        [Header(Emissive Scroll)]
+        [ToggleNoKwd]
+            _ES_Enable      ("[ES] Enable", Float) = 0
+        [HDR]
+            _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
+        [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
+            _ES_Shape       ("[ES] Wave Type", Float) = 0
+            _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
+            _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
         // アウトライン
         [Header(Outline)]
         [ToggleNoKwd]
@@ -178,6 +193,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #define _MT_ENABLE
             #define _HL_ENABLE
             #define _TR_ENABLE
+            #define _ES_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 

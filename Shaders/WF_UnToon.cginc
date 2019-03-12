@@ -314,6 +314,9 @@
         // Alpha
         affectAlpha(i.uv, color);
 
+        // EmissiveScroll
+        affectEmissiveScroll(i.ls_vertex, i.uv, color);
+
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
