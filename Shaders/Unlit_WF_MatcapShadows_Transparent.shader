@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/12 whiteflare,
      */
 
     Properties {
@@ -40,7 +40,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
         // 色変換
         [Header(Color Change)]
-        [Toggle(_CL_ENABLE)]
+        [ToggleNoKwd]
             _CL_Enable      ("[CL] Enable", Float) = 0
         [ToggleNoKwd]
             _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
@@ -50,7 +50,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
         // 法線マップ
         [Header(NormalMap)]
-        [Toggle(_NM_ENABLE)]
+        [ToggleNoKwd]
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
@@ -58,7 +58,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
-        [Toggle(_HL_ENABLE)]
+        [ToggleNoKwd]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -67,19 +67,19 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
-        [Toggle(_HL_SOFT_SHADOW)]
+        [ToggleNoKwd]
             _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
-        [Toggle(_HL_SOFT_LIGHT)]
+        [ToggleNoKwd]
             _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
 
         // Overlay Texture
         [Header(Overlay Texture)]
-        [Toggle(_OL_ENABLE)]
+        [ToggleNoKwd]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
         [Enum(MAINTEX_UV,0,VIEW_XY,1)]
             _OL_ScreenType  ("[OL] Screen Space", Float) = 0
-        [Enum(ALPHA,ADD,MUL)]
+        [Enum(ALPHA,0,ADD,1,MUL,2)]
             _OL_BlendType   ("[OL] Blend Type", Float) = 0
             _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_Scroll_U    ("[OL] U Scroll", Float) = 0
@@ -87,7 +87,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
         // EmissiveScroll
         [Header(Emissive Scroll)]
-        [Toggle(_ES_ENABLE)]
+        [ToggleNoKwd]
             _ES_Enable      ("[ES] Enable", Float) = 0
         [HDR]
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
@@ -123,10 +123,10 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _ES_ENABLE
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _ES_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -152,13 +152,11 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _HL_ENABLE
-            #pragma shader_feature _HL_SOFT_SHADOW
-            #pragma shader_feature _HL_SOFT_LIGHT
-            #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _ES_ENABLE
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _HL_ENABLE
+            #define _OL_ENABLE
+            #define _ES_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

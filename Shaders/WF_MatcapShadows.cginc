@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/12 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -58,6 +58,7 @@
     float4          _Color;
     float           _AL_CutOff;
 
+    float           _NM_Enable;
     #ifdef _NM_ENABLE
         sampler2D   _BumpMap;
         float       _NM_Power;
@@ -65,34 +66,37 @@
 
 
     #ifdef _HL_ENABLE
+        float       _HL_Enable;
         sampler2D   _HL_MatcapTex;
         sampler2D   _HL_MaskTex;
         float4      _HL_MedianColor;
         float       _HL_Range;
         float       _HL_Power;
+        float       _HL_SoftShadow;
+        float       _HL_SoftLight;
 
         inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
-            float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
-            float3 blend_param = (tex2D(_HL_MatcapTex, saturate(matcap_uv) ).rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, mask_uv).rgb * _HL_Power;
+            if (TGL_ON(_HL_Enable)) {
+                float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
+                float3 blend_param = (tex2D(_HL_MatcapTex, saturate(matcap_uv) ).rgb - _HL_MedianColor.rgb) * tex2D(_HL_MaskTex, mask_uv).rgb * _HL_Power;
 
-            // 明るすぎ・暗すぎ防止の補正処理
-            #if defined(_HL_SOFT_SHADOW) || defined(_HL_SOFT_LIGHT)
-            {
-                float bb = (blend_param.r + blend_param.g + blend_param.b) / 3;
-                float bc = (color.r + color.g + color.b) / 3 - 0.5;
-                #ifdef _HL_SOFT_SHADOW
-                    // 暗いところに暗い影は落とさない
-                    blend_param *= bb < 0 && bc < 0 ? saturate( (bc + 0.5) * 2 ) : 1;
-                #endif
-                #ifdef _HL_SOFT_LIGHT
-                    // 明るいところに明るい光は差さない
-                    blend_param *= 0 < bb && 0 < bc ? saturate( 1 - (bc + 0.5) * 2 ) : 1;
-                #endif
+                // 明るすぎ・暗すぎ防止の補正処理
+                if (TGL_ON(_HL_SoftShadow) || TGL_ON(_HL_SoftLight)) {
+                    float bb = (blend_param.r + blend_param.g + blend_param.b) / 3;
+                    float bc = (color.r + color.g + color.b) / 3 - 0.5;
+                    if (TGL_ON(_HL_SoftShadow)) {
+                        // 暗いところに暗い影は落とさない
+                        blend_param *= bb < 0 && bc < 0 ? saturate( (bc + 0.5) * 2 ) : 1;
+                    }
+                    if (TGL_ON(_HL_SoftLight)) {
+                        // 明るいところに明るい光は差さない
+                        blend_param *= 0 < bb && 0 < bc ? saturate( 1 - (bc + 0.5) * 2 ) : 1;
+                    }
+                }
+
+                // ブレンド
+                color.rgb = saturate(color.rgb + blend_param);
             }
-            #endif
-
-            // ブレンド
-            color.rgb = saturate(color.rgb + blend_param);
         }
 
     #else
@@ -101,6 +105,7 @@
     #endif
 
     #ifdef _OL_ENABLE
+        float       _OL_Enable;
         sampler2D   _OL_OverlayTex;
         float4      _OL_OverlayTex_ST;
         float       _OL_Power;
@@ -159,15 +164,17 @@
         o.ls_vertex = v.vertex;
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
-        #ifdef _NM_ENABLE
+        if (TGL_ON(_NM_Enable)) {
             o.normal = v.normal;
-            o.tangent = v.tangent;
-            o.bitangent = cross(o.normal, o.tangent);
-            o.lightDir = calcLocalSpaceLightDir(o.ls_vertex);
-        #else
+            #ifdef _NM_ENABLE
+                o.tangent = v.tangent;
+                o.bitangent = cross(o.normal, o.tangent);
+                o.lightDir = calcLocalSpaceLightDir(o.ls_vertex);
+            #endif
+        } else {
             // NormalMapを使用しないときは頂点側でMatcap計算してnormalに突っ込む
             o.normal = calcMatcapVector(v.vertex, v.normal);
-        #endif
+        }
 
         #ifdef _OL_ENABLE
             o.vs_vertex = o.vertex;
@@ -193,28 +200,31 @@
         affectColorChange(color);
 
         // BumpMap
+        float3 ls_normal = i.normal;
         #ifdef _NM_ENABLE
+        if (TGL_ON(_NM_Enable)) {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            float3 ls_normal = normalize( mul(UnpackNormal( tex2D(_BumpMap, i.uv) ), tangentTransform) ); // 法線マップ参照
+            ls_normal = normalize( mul(UnpackNormal( tex2D(_BumpMap, i.uv) ), tangentTransform) ); // 法線マップ参照
             // 光源とブレンド
             float diffuse = saturate((dot(ls_normal, i.lightDir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power));
             color.rgb *= diffuse; // Unlitなのでライトの色は考慮しない
+        }
         #endif
 
         // Highlight
         float3 matcapVector =
-            #ifdef _NM_ENABLE
-                calcMatcapVector(i.ls_vertex, ls_normal); // Matcap計算
-            #else
-                i.normal; // NormalMap未使用時はvertで計算したMatcapVectorを使う
-            #endif
+            TGL_ON(_NM_Enable) ?
+                calcMatcapVector(i.ls_vertex, ls_normal) // Matcap計算
+                : i.normal; // NormalMap未使用時はvertで計算したMatcapVectorを使う
         affectMatcapColor(matcapVector, i.uv, color);
 
         // Overlay
         #ifdef _OL_ENABLE
+        if (TGL_ON(_OL_Enable)) {
             float2 overlay = computeOverlayTex(i.vs_vertex, i.uv);
             color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, overlay).rgb);
+        }
         #endif
 
         // Anti-Glare

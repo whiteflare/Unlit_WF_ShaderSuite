@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/12 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -181,15 +181,15 @@
     // Alpha Transparent
     ////////////////////////////
 
-    int             _AL_Source;
-    float           _AL_Power;
-    sampler2D       _AL_MaskTex;
-
-    #ifndef _AL_CustomValue
-        #define _AL_CustomValue 1
-    #endif
-
     #ifdef _AL_ENABLE
+        int             _AL_Source;
+        float           _AL_Power;
+        sampler2D       _AL_MaskTex;
+
+        #ifndef _AL_CustomValue
+            #define _AL_CustomValue 1
+        #endif
+
         inline void affectAlpha(float2 uv, inout float4 color) {
             if (_AL_Source == 1) {
                 color.a = tex2D(_AL_MaskTex, uv).r * _AL_Power * _AL_CustomValue;
@@ -269,21 +269,24 @@
             return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
         }
 
+        float       _CL_Enable;
         float       _CL_DeltaH;
         float       _CL_DeltaS;
         float       _CL_DeltaV;
         float       _CL_Monochrome;
 
         inline void affectColorChange(inout float4 color) {
-            if (TGL_ON(_CL_Monochrome)) {
-                color.r += color.g + color.b;
-                color.g = (color.r - 1) / 2;
-                color.b = (color.r - 1) / 2;
+            if (TGL_ON(_CL_Enable)) {
+                if (TGL_ON(_CL_Monochrome)) {
+                    color.r += color.g + color.b;
+                    color.g = (color.r - 1) / 2;
+                    color.b = (color.r - 1) / 2;
+                }
+                float3 hsv = rgb2hsv( saturate(color.rgb) );
+                hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
+                hsv.r = frac(hsv.r);
+                color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
             }
-            float3 hsv = rgb2hsv( saturate(color.rgb) );
-            hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
-            hsv.r = frac(hsv.r);
-            color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
         }
 
     #else
@@ -296,6 +299,7 @@
     ////////////////////////////
 
     #ifdef _ES_ENABLE
+        float       _ES_Enable;
         int         _ES_Shape;
         float4      _ES_Direction;
         float       _ES_LevelOffset;
@@ -333,10 +337,12 @@
         float4      _ES_Color;
 
         inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
-            float es_power = calcEmissivePower(ls_vertex);
-            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power * tex2D(_ES_MaskTex, mask_uv).rgb);
-            if (TGL_ON(_ES_AlphaScroll)) {
-                color.a = max(color.a, _ES_Color.a * es_power);
+            if (TGL_ON(_ES_Enable)) {
+                float es_power = calcEmissivePower(ls_vertex);
+                color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power * tex2D(_ES_MaskTex, mask_uv).rgb);
+                if (TGL_ON(_ES_AlphaScroll)) {
+                    color.a = max(color.a, _ES_Color.a * es_power);
+                }
             }
         }
 

@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/10 whiteflare,
+     *      ver:2019/03/12 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -78,11 +78,13 @@
     float           _GL_BrendPower;
 
     #ifdef _NM_ENABLE
+        float       _NM_Enable;
         DECL_SUB_TEX2D(_BumpMap);
         float       _NM_Power;
     #endif
 
     #ifdef _MT_ENABLE
+        float       _MT_Enable;
         float       _MT_Metallic;
         float       _MT_Smoothness;
         float       _MT_BlendNormal;
@@ -92,6 +94,7 @@
     #endif
 
     #ifdef _TS_ENABLE
+        float       _TS_Enable;
         float4      _TS_1stColor;
         float4      _TS_2ndColor;
         float       _TS_1stBorder;
@@ -104,6 +107,7 @@
     #endif
 
     #ifdef _TR_ENABLE
+        float       _TR_Enable;
         float4      _TR_Color;
         float       _TR_PowerTop;
         float       _TR_PowerSide;
@@ -113,6 +117,7 @@
     #endif
 
     #ifdef _TL_ENABLE
+        float       _TL_Enable;
         float4      _TL_LineColor;
         float       _TL_LineWidth;
         sampler2D   _TL_MaskTex;
@@ -121,6 +126,7 @@
     #endif
 
     #ifdef _HL_ENABLE
+        float       _HL_Enable;
         sampler2D   _HL_MatcapTex;
         int         _HL_CapType;
         float3      _HL_MatcapColor;
@@ -131,14 +137,21 @@
         float       _HL_InvMaskVal;
 
         inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
-            float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
-            float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
-            if (_HL_CapType == 0) {
-                matcap_color -= MEDIAN_GRAY;
+            if (TGL_ON(_HL_Enable)) {
+                float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
+                float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+                if (_HL_CapType == 0) {
+                    matcap_color -= MEDIAN_GRAY;
+                }
+                float3 power = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb * _HL_Power;
+                color.rgb += (matcap_color + _HL_MatcapColor - MEDIAN_GRAY) * power;
             }
-            float3 power = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb * _HL_Power;
-            color.rgb += (matcap_color + _HL_MatcapColor - MEDIAN_GRAY) * power;
         }
+    
+    #else
+
+        #define affectMatcapColor(matcapVector, mask_uv, color)
+
     #endif
 
     v2f vert(in appdata v) {
@@ -154,10 +167,11 @@
         o.ls_light_dir = calcLocalSpaceLightDir(o.ls_vertex) * float4(1, 0.5, 1, 1); // 高さ方向のライト位置にはあまり影響されないように
         o.ls_camera_dir = localSpaceViewDir(o.ls_vertex);
 
-        // 影コントラスト
         float3 ambientColor = OmniDirectional_ShadeSH9();
+
+        // 影コントラスト
         #ifdef _TS_ENABLE
-        {
+        if (TGL_ON(_TS_Enable)) {
             float3 lightColorMain = calcLocalSpaceLightColor(o.ls_vertex, o.ls_light_dir.w);
             float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
@@ -175,6 +189,7 @@
             o.shadow_power = min( o.shadow_power, _TS_ShadowLimit * 0.5 + 0.5 );
         }
         #endif
+
         // ライトカラーブレンド
         {
             float3 lightColorMain = _LightColor0.rgb;
@@ -194,8 +209,10 @@
 
         o.normal = normalize(v.normal);
         #ifdef _NM_ENABLE
+        if (TGL_ON(_NM_Enable)) {
             o.tangent = normalize(v.tangent);
             o.bitangent = cross(o.normal, o.tangent);
+        }
         #endif
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
@@ -220,8 +237,9 @@
         // BumpMap
         float3 ls_normal = i.normal;
         float3 ls_bump_normal = i.normal;
+
         #ifdef _NM_ENABLE
-        {
+        if (TGL_ON(_NM_Enable)) {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
             ls_bump_normal = normalize( mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform) ); // 法線マップ参照
@@ -232,7 +250,7 @@
 
         // メタリック
         #ifdef _MT_ENABLE
-        {
+        if (TGL_ON(_MT_Enable)) {
             float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
             float3 reflection = pickReflectionProbe(i.ls_vertex, lerp(ls_normal, ls_bump_normal, _MT_BlendNormal), (1 - _MT_Smoothness) * 10);
             if (TGL_ON(_MT_Monochrome)) {
@@ -249,13 +267,11 @@
         float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
 
         // Highlight
-        #ifdef _HL_ENABLE
-            affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
-        #endif
+        affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
 
         // 階調影
         #ifdef _TS_ENABLE
-        {
+        if (TGL_ON(_TS_Enable)) {
             float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal);
             float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
@@ -276,7 +292,7 @@
 
         // リムライト
         #ifdef _TR_ENABLE
-        {
+        if (TGL_ON(_TR_Enable)) {
             // vs_normalからリムライト範囲を計算
             float2 rim_uv = vs_normal.xy;
             rim_uv.x *= _TR_PowerSide + 1;
@@ -328,6 +344,7 @@
         // SV_POSITION を上書き
 
         #ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
             // マスクテクスチャ参照
             float mask = SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, o.uv, _TL_InvMaskVal).r;
             // 外側にシフトする
@@ -345,6 +362,9 @@
                 o.ls_vertex.xyz -= vecZShift;
                 o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
             }
+        } else {
+            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+        }
         #else
             o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         #endif
@@ -354,6 +374,7 @@
 
     float4 frag_outline(v2f i) : SV_Target {
         #ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
             // アウトライン側の色を計算
             float4 lineColor = _TL_LineColor;
             UNITY_APPLY_FOG(i.fogCoord, lineColor);
@@ -361,6 +382,11 @@
             float4 baseColor = frag(i);
             // ブレンドして返却
             return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), 1);
+        } else {
+            // 無効のときはクリッピングする
+            clip(-1);
+            return float4(0, 0, 0, 0);
+        }
         #else
             // 無効のときはクリッピングする
             clip(-1);

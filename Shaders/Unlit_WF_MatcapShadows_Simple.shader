@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/12 whiteflare,
      */
 
     Properties {
@@ -32,7 +32,7 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
         // 色変換
         [Header(Color Change)]
-        [Toggle(_CL_ENABLE)]
+        [ToggleNoKwd]
             _CL_Enable      ("[CL] Enable", Float) = 0
         [ToggleNoKwd]
             _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
@@ -42,7 +42,7 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
-        [Toggle(_HL_ENABLE)]
+        [ToggleNoKwd]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -51,9 +51,9 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
-        [Toggle(_HL_SOFT_SHADOW)]
+        [ToggleNoKwd]
             _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
-        [Toggle(_HL_SOFT_LIGHT)]
+        [ToggleNoKwd]
             _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
     }
 
@@ -74,10 +74,8 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _HL_ENABLE
-            #pragma shader_feature _HL_SOFT_SHADOW
-            #pragma shader_feature _HL_SOFT_LIGHT
+            #define _CL_ENABLE
+            #define _HL_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

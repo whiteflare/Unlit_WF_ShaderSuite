@@ -20,35 +20,35 @@
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/12 whiteflare,
      */
 
     #include "WF_Common.cginc"
 
     struct appdata_fur {
-        float4 vertex   : POSITION;
-        float3 normal   : NORMAL;
-        float4 tangent  : TANGENT;
-        float2 uv       : TEXCOORD0;
-        float2 uv2      : TEXCOORD1;
+        float4 vertex       : POSITION;
+        float3 normal       : NORMAL;
+        float4 tangent      : TANGENT;
+        float2 uv           : TEXCOORD0;
+        float2 uv2          : TEXCOORD1;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2g {
-        float4 vertex   : POSITION;
-        float3 normal   : NORMAL;
-        float2 uv       : TEXCOORD0;
-        float2 uv2      : TEXCOORD1;
-        float3 waving   : TEXCOORD2;
-        float lightPower        : COLOR0;
+        float4 vertex       : POSITION;
+        float3 normal       : NORMAL;
+        float2 uv           : TEXCOORD0;
+        float2 uv2          : TEXCOORD1;
+        float3 waving       : TEXCOORD2;
+        float lightPower    : COLOR0;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
     struct g2f {
-        float4 vertex   : SV_POSITION;
-        float2 uv       : TEXCOORD0;
-        float2 uv2      : TEXCOORD1;
-        float  height   : COLOR0;
+        float4 vertex       : SV_POSITION;
+        float2 uv           : TEXCOORD0;
+        float2 uv2          : TEXCOORD1;
+        float  height       : COLOR0;
         float lightPower    : COLOR1;
         UNITY_FOG_COORDS(2)
         UNITY_VERTEX_OUTPUT_STEREO
@@ -66,6 +66,7 @@
     uint        _FurRepeat;
     float4      _FurVector;
 
+    float       _WV_Enable;
     float4      _WaveSpeed;
     float4      _WaveScale;
     float4      _WavePosFactor;
@@ -86,12 +87,12 @@
         float3 bitangent = cross(v.normal, tangent);
         float3x3 tangentTransform = float3x3(tangent, bitangent, o.normal);
 
-        #ifdef _WV_ENABLE
+        if (TGL_ON(_WV_Enable)) {
             float3 ls_normal = _WaveScale.xyz * sin( _Time.y * _WaveSpeed - dot(v.vertex.xyz, _WavePosFactor.xyz) ) / 2;
             o.waving = mul(ls_normal + _FurVector.xyz, tangentTransform);
-        #else
+        } else {
             o.waving = mul(_FurVector.xyz, tangentTransform);
-        #endif
+        }
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.lightPower);
 
@@ -104,9 +105,7 @@
         UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(g2f, o);
         o.uv = p.uv;
         o.uv2 = p.uv2;
-        #ifndef _GL_LEVEL_OFF
-            o.lightPower = p.lightPower;
-        #endif
+        o.lightPower = p.lightPower;
         return o;
     }
 
