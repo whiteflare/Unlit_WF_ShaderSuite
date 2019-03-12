@@ -58,7 +58,7 @@ namespace UnlitWF
         }
     }
 
-    internal class MaterialPseudoToggleDrawer : MaterialPropertyDrawer
+    internal class MaterialToggleNoKwdDrawer : MaterialPropertyDrawer
     {
         public override void OnGUI(Rect position, MaterialProperty property, GUIContent label, MaterialEditor materialEditor) {
             if (property.type != MaterialProperty.PropType.Float && property.type != MaterialProperty.PropType.Range) {
