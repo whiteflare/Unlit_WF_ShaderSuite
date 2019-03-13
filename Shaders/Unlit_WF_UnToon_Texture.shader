@@ -61,6 +61,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [ToggleNoKwd]
             _MT_Monochrome  ("[MT] Monochrome Reflection", Range(0, 1)) = 1
+        [ToggleNoKwd]
+            _MT_Specular    ("[MT] Specular", Range(0, 1)) = 0
         [NoScaleOffset]
             _MT_MaskTex     ("[MT] MetallicMap Texture", 2D) = "white" {}
         [ToggleNoKwd]

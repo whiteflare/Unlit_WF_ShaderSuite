@@ -87,10 +87,55 @@
         float       _MT_Enable;
         float       _MT_Metallic;
         float       _MT_Smoothness;
+        float       _MT_Specular;
         float       _MT_BlendNormal;
         float       _MT_Monochrome;
         DECL_SUB_TEX2D(_MT_MaskTex);
         float       _MT_InvMaskVal;
+
+        inline float3 calcNdotH(float3 normal, float3 view, float3 light) {
+            float3 h = (view + light) / length(view + light);
+            return max(0, dot(normal, h));
+        }
+
+        inline float3 pickSpecular(float4 ls_vertex, float3 ls_normal, float smoothness) {
+            float3 specular = float3(0, 0, 0);
+            float ppp = pow(2, smoothness * 8 + 2);
+
+            float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+            float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
+            float3 ws_camera_dir = normalize(worldSpaceCameraPos() - ws_vertex.xyz);
+
+            // メインライト
+            {
+                float3 ws_light_dir = _WorldSpaceLightPos0.xyz;
+                float NdotH = calcNdotH(ws_normal, ws_camera_dir, ws_light_dir);
+                specular += saturate( _LightColor0.rgb * pow(NdotH, ppp) );
+            }
+            // ポイント4ライト
+            {
+                float4 toLightX = unity_4LightPosX0 - ws_vertex.x;
+                float4 toLightY = unity_4LightPosY0 - ws_vertex.y;
+                float4 toLightZ = unity_4LightPosZ0 - ws_vertex.z;
+
+                float4 lengthSq = toLightX * toLightX + toLightY * toLightY + toLightZ * toLightZ;
+                float4 corr = rsqrt( max(lengthSq, 0.000001) );
+
+                float4 NdotH;
+                NdotH.x = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.x, toLightY.x, toLightZ.x));
+                NdotH.y = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.y, toLightY.y, toLightZ.y));
+                NdotH.z = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.z, toLightY.z, toLightZ.z));
+                NdotH.w = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.w, toLightY.w, toLightZ.w));
+                float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0) * corr * pow(NdotH, ppp);
+
+                specular += saturate( unity_LightColor[0].rgb * atten.x );
+                specular += saturate( unity_LightColor[1].rgb * atten.y );
+                specular += saturate( unity_LightColor[2].rgb * atten.z );
+                specular += saturate( unity_LightColor[3].rgb * atten.w );
+            }
+            return specular;
+        }
+
     #endif
 
     #ifdef _TS_ENABLE
@@ -251,12 +296,21 @@
         // メタリック
         #ifdef _MT_ENABLE
         if (TGL_ON(_MT_Enable)) {
+            float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
             float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
-            float3 reflection = pickReflectionProbe(i.ls_vertex, lerp(ls_normal, ls_bump_normal, _MT_BlendNormal), (1 - _MT_Smoothness) * 10);
-            if (TGL_ON(_MT_Monochrome)) {
-                reflection.rgb = calcBrightness(reflection);
+            if (0.01 < power) {
+                // リフレクション
+                float3 reflection = pickReflectionProbe(i.ls_vertex, ls_metal_normal, (1 - _MT_Smoothness) * 10);
+                if (TGL_ON(_MT_Monochrome)) {
+                    reflection = calcBrightness(reflection);
+                }
+                // スペキュラ
+                float3 specular = float3(0, 0, 0);
+                if (TGL_ON(_MT_Specular)) {
+                    specular = pickSpecular(i.ls_vertex, ls_metal_normal, _MT_Smoothness);
+                }
+                color.rgb = lerp(color.rgb, color.rgb * reflection.rgb + specular.rgb, power);
             }
-            color.rgb = lerp(color.rgb, color.rgb * reflection.rgb, power);
         }
         #endif
 
