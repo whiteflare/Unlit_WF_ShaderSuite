@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
+Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
 
     /*
      * authors:
@@ -33,11 +33,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
         [ToggleNoKwd]
             _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
-
-        // StencilMask
-        [Header(Stencil Mask)]
-        [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
-            _StencilMaskID  ("ID", int) = 8
 
         // Alpha
         [Header(Transparent Alpha)]
@@ -128,7 +123,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
         [NoScaleOffset]
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [ToggleNoKwd]
-            _TR_InvMaskVal  ("[RM] Invert Mask Value", Float) = 0
+            _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
         [Header(Emissive Scroll)]
@@ -146,6 +141,18 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
+        // アウトライン
+        [Header(Outline)]
+        [ToggleNoKwd]
+            _TL_Enable      ("[LI] Enable", Float) = 0
+            _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
+            _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.05
+        [NoScaleOffset]
+            _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [ToggleNoKwd]
+            _TL_InvMaskVal  ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
     }
 
     SubShader {
@@ -155,11 +162,59 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             "DisableBatching" = "True"
         }
 
-        Stencil {
-            Ref [_StencilMaskID]
-            WriteMask [_StencilMaskID]
-            Comp ALWAYS
-            Pass replace
+        GrabPass { "_UnToonTransparentOutlineCanceller" }
+
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert_outline
+            #pragma fragment frag_outline
+
+            #pragma target 3.0
+
+            #define _CL_ENABLE
+            #define _AL_ENABLE
+            #define _TL_ENABLE
+            #define _TR_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "OUTLINE_CANCELLER"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
+
+            CGPROGRAM
+
+            #pragma vertex vert_outline_canceller
+            #pragma fragment frag_outline_canceller
+
+            #pragma target 3.0
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
         }
 
         UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_BACK"

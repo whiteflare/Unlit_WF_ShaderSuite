@@ -179,7 +179,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
-            Name "Main"
+            Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
@@ -209,7 +209,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
-            Name "ShadowCaster"
+            Name "SHADOWCASTER"
             Tags{ "LightMode" = "ShadowCaster" }
 
             CGPROGRAM

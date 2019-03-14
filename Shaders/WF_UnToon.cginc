@@ -438,7 +438,7 @@
             // ベース側の色を計算
             float4 baseColor = frag(i);
             // ブレンドして返却
-            return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), 1);
+            return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), baseColor.a);
         } else {
             // 無効のときはクリッピングする
             clip(-1);
@@ -456,5 +456,25 @@
         clip(color.a - _AL_CutOff);
         return color;
     }
+
+    sampler2D _UnToonTransparentOutlineCanceller;
+
+    struct v2f_canceller {
+        float4      vertex  : SV_POSITION;
+        float4      uv_grab : TEXCOORD0;
+    };
+
+    v2f_canceller vert_outline_canceller(appdata v) {
+        v2f_canceller o;
+        o.vertex = UnityObjectToClipPos(v.vertex);
+        o.uv_grab = o.vertex;
+        o.uv_grab.xy = ComputeGrabScreenPos(o.vertex);
+        return o;
+    }
+
+    float4 frag_outline_canceller(v2f_canceller i) : SV_Target {
+        return tex2Dproj(_UnToonTransparentOutlineCanceller, UNITY_PROJ_COORD(i.uv_grab));
+    }
+
 
 #endif

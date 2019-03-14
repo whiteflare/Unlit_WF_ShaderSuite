@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
+Shader "UnlitWF/WF_UnToon_Transparent_Outline_Mask" {
 
     /*
      * authors:
@@ -146,6 +146,18 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
+        // アウトライン
+        [Header(Outline)]
+        [ToggleNoKwd]
+            _TL_Enable      ("[LI] Enable", Float) = 0
+            _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
+            _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.05
+        [NoScaleOffset]
+            _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [ToggleNoKwd]
+            _TL_InvMaskVal  ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
     }
 
     SubShader {
@@ -154,6 +166,10 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             "Queue" = "Transparent"
             "DisableBatching" = "True"
         }
+
+        GrabPass { "_UnToonTransparentOutlineCanceller" }
+        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE"
+        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE_CANCELLER"
 
         Stencil {
             Ref [_StencilMaskID]

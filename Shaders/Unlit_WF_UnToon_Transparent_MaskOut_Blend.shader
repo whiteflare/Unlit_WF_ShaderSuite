@@ -156,6 +156,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             "DisableBatching" = "True"
         }
 
+        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+
         Stencil {
             Ref [_StencilMaskID]
             ReadMask 15
@@ -167,72 +169,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
              */
         }
 
-        Pass {
-            Name "Main_Back"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull FRONT
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #pragma target 3.0
-
-            #define _CL_ENABLE
-            #define _NM_ENABLE
-            #define _TS_ENABLE
-            #define _MT_ENABLE
-            #define _TR_ENABLE
-            #define _ES_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-
-            #define _AL_ENABLE
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "Main_Front"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull BACK
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #pragma target 3.0
-
-            #define _CL_ENABLE
-            #define _NM_ENABLE
-            #define _TS_ENABLE
-            #define _MT_ENABLE
-            #define _HL_ENABLE
-            #define _TR_ENABLE
-            #define _ES_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-
-            #define _AL_ENABLE
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_BACK"
+        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_FRONT"
 
         Stencil {
             Ref [_StencilMaskID]
@@ -312,8 +250,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
             ENDCG
         }
-
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

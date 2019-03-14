@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
+Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
 
     /*
      * authors:
@@ -38,6 +38,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
         [Header(Stencil Mask)]
         [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
             _StencilMaskID  ("ID", int) = 8
+            _AL_StencilPower("Alpha Power", Range(0, 1)) = 0.5
 
         // Alpha
         [Header(Transparent Alpha)]
@@ -128,7 +129,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
         [NoScaleOffset]
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [ToggleNoKwd]
-            _TR_InvMaskVal  ("[RM] Invert Mask Value", Float) = 0
+            _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
         [Header(Emissive Scroll)]
@@ -146,25 +147,124 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
+        // アウトライン
+        [Header(Outline)]
+        [ToggleNoKwd]
+            _TL_Enable      ("[LI] Enable", Float) = 0
+            _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
+            _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.05
+        [NoScaleOffset]
+            _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [ToggleNoKwd]
+            _TL_InvMaskVal  ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
     }
 
     SubShader {
         Tags {
             "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "Queue" = "Transparent+1"
             "DisableBatching" = "True"
         }
 
+        GrabPass { "_UnToonTransparentOutlineCanceller" }
+        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE"
+        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE_CANCELLER"
+        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+
         Stencil {
             Ref [_StencilMaskID]
-            WriteMask [_StencilMaskID]
-            Comp ALWAYS
-            Pass replace
+            ReadMask 15
+            Comp notEqual
+            /*
+             * StencilMaskIDとして使うのは下位4ビット。ForwardパスだけどDefferedの制約に合わせておいたほうが改造しやすいので。
+             * 書込側ではフラグを単純に立てるだけ。参照側では下位4ビットを読み込み比較する。
+             * 他shaderに介入されていた場合はステンシルテスト合格側に倒す。禿げるくらいなら全て描くほうが良いので。
+             */
         }
 
         UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_FRONT"
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+
+        Stencil {
+            Ref [_StencilMaskID]
+            ReadMask 15
+            Comp equal
+        }
+
+        Pass {
+            Name "Main_Back"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 3.0
+
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _TS_ENABLE
+            #define _MT_ENABLE
+            #define _TR_ENABLE
+            #define _ES_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            #define _AL_ENABLE
+
+            uniform float _AL_StencilPower;
+            #define _AL_CustomValue _AL_StencilPower
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "Main_Front"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull BACK
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 3.0
+
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _TS_ENABLE
+            #define _MT_ENABLE
+            #define _HL_ENABLE
+            #define _TR_ENABLE
+            #define _ES_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            #define _AL_ENABLE
+
+            uniform float _AL_StencilPower;
+            #define _AL_CustomValue _AL_StencilPower
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

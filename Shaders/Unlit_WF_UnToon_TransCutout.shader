@@ -140,6 +140,18 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
+        // アウトライン
+        [Header(Outline)]
+        [ToggleNoKwd]
+            _TL_Enable      ("[LI] Enable", Float) = 0
+            _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
+            _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.05
+        [NoScaleOffset]
+            _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [ToggleNoKwd]
+            _TL_InvMaskVal  ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
     }
 
     SubShader {
@@ -150,7 +162,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         }
 
         Pass {
-            Name "Outline"
+            Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull OFF
@@ -164,6 +176,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
             #define _CL_ENABLE
             #define _TL_ENABLE
+            #define _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
@@ -175,7 +188,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         }
 
         Pass {
-            Name "Main_Back"
+            Name "MAIN_BACK"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
@@ -206,7 +219,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         }
 
         Pass {
-            Name "Main_Front"
+            Name "MAIN_FRONT"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull BACK

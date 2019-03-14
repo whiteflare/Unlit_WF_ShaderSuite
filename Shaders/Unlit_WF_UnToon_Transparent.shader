@@ -151,7 +151,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         }
 
         Pass {
-            Name "Main_Back"
+            Name "MAIN_BACK"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
@@ -184,7 +184,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         }
 
         Pass {
-            Name "Main_Front"
+            Name "MAIN_FRONT"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull BACK
