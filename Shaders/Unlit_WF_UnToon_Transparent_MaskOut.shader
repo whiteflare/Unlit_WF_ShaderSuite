@@ -26,11 +26,13 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
 
-        // Litブレンド
+        // Lit
         [Header(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
+        [ToggleNoKwd]
+            _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
 
         // StencilMask
         [Header(Stencil Mask)]
@@ -230,6 +232,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
             ENDCG
         }
+
+        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

@@ -28,11 +28,13 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode       ("Cull Mode", int) = 2
 
-        // Litブレンド
+        // Lit
         [Header(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
+        [ToggleNoKwd]
+            _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
 
         // 色変換
         [Header(Color Change)]
@@ -207,30 +209,42 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
-            // 影
+            Name "ShadowCaster"
             Tags{ "LightMode" = "ShadowCaster" }
 
             CGPROGRAM
 
-            #pragma vertex vert
-            #pragma fragment frag
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
 
             #pragma multi_compile_shadowcaster
 
             #include "UnityCG.cginc"
 
-            struct v2f {
+            struct v2f_shadow {
                 V2F_SHADOW_CASTER;
             };
 
-            v2f vert(appdata_base v) {
-                v2f o;
+            float _GL_CastShadow;
+
+            v2f_shadow vert_shadow(appdata_base v) {
+                v2f_shadow o;
                 TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+                if (_GL_CastShadow < 0.5) {
+                    // 無効化
+                    o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
+                }
                 return o;
             }
 
-            float4 frag(v2f i) : SV_Target {
-                SHADOW_CASTER_FRAGMENT(i)
+            float4 frag_shadow(v2f_shadow i) : SV_Target {
+                if (_GL_CastShadow < 0.5) {
+                    // 無効化
+                    clip(-1);
+                    return float4(0, 0, 0, 0);
+                } else {
+                    SHADOW_CASTER_FRAGMENT(i)
+                }
             }
 
             ENDCG
