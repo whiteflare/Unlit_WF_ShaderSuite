@@ -33,6 +33,10 @@
     static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
+    inline float3 SafeNormalizeVec3(float3 in_vec) {
+        return in_vec * rsqrt( max(0.001, dot(in_vec, in_vec)) );
+    }
+
     inline float calcBrightness(float3 color) {
         return dot(color, BT709);
     }

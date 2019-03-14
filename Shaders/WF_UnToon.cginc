@@ -209,7 +209,7 @@
         o.vertex = UnityObjectToClipPos(v.vertex);
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
         o.ls_vertex = v.vertex;
-        o.ls_light_dir = calcLocalSpaceLightDir(o.ls_vertex) * float4(1, 0.5, 1, 1); // 高さ方向のライト位置にはあまり影響されないように
+        o.ls_light_dir = calcLocalSpaceLightDir(o.ls_vertex);
         o.ls_camera_dir = localSpaceViewDir(o.ls_vertex);
 
         float3 ambientColor = OmniDirectional_ShadeSH9();
@@ -317,8 +317,6 @@
         // ビュー空間法線
         float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
         float3 vs_bump_normal = calcMatcapVector(i.ls_vertex, ls_bump_normal);
-        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
 
         // Highlight
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
@@ -326,10 +324,12 @@
         // 階調影
         #ifdef _TS_ENABLE
         if (TGL_ON(_TS_Enable)) {
+            // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
+            float angle_light_camera = dot( SafeNormalizeVec3( i.ls_light_dir.xyz * float3(1, 0.1, 1) ), i.ls_camera_dir );
             float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal);
             float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
-            brightness *= saturate(angle_light_camera * 2 + 2);
+            brightness *= smoothstep(-1, -0.9, angle_light_camera);
             // 色計算
             color.rgb = lerp(
                 lerp(
@@ -347,6 +347,8 @@
         // リムライト
         #ifdef _TR_ENABLE
         if (TGL_ON(_TR_Enable)) {
+            // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
+            float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
             // vs_normalからリムライト範囲を計算
             float2 rim_uv = vs_normal.xy;
             rim_uv.x *= _TR_PowerSide + 1;
