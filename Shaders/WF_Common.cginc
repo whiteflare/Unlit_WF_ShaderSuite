@@ -342,10 +342,10 @@
 
         inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
-                float es_power = calcEmissivePower(ls_vertex);
-                color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power * tex2D(_ES_MaskTex, mask_uv).rgb);
+                float4 es_power = calcEmissivePower(ls_vertex) * tex2D(_ES_MaskTex, mask_uv);
+                color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power.rgb);
                 if (TGL_ON(_ES_AlphaScroll)) {
-                    color.a = max(color.a, _ES_Color.a * es_power);
+                    color.a = max(color.a, _ES_Color.a * es_power.a);
                 }
             }
         }
