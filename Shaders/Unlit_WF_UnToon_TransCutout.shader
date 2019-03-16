@@ -250,7 +250,24 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+        Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            CGPROGRAM
+
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow_cutout
+
+            #define _AL_ENABLE
+
+            #pragma multi_compile_shadowcaster
+
+            #include "UnityCG.cginc"
+            #include "WF_UnToon_ShadowCaster.cginc"
+
+            ENDCG
+        }
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

@@ -156,7 +156,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
 
         Stencil {
             Ref [_StencilMaskID]

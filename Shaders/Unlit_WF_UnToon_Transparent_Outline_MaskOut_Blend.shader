@@ -171,7 +171,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
         GrabPass { "_UnToonTransparentOutlineCanceller" }
         UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE"
         UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE_CANCELLER"
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
 
         Stencil {
             Ref [_StencilMaskID]

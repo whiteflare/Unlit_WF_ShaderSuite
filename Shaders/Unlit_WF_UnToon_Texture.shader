@@ -220,32 +220,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma multi_compile_shadowcaster
 
             #include "UnityCG.cginc"
-
-            struct v2f_shadow {
-                V2F_SHADOW_CASTER;
-            };
-
-            float _GL_CastShadow;
-
-            v2f_shadow vert_shadow(appdata_base v) {
-                v2f_shadow o;
-                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-                if (_GL_CastShadow < 0.5) {
-                    // 無効化
-                    o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
-                }
-                return o;
-            }
-
-            float4 frag_shadow(v2f_shadow i) : SV_Target {
-                if (_GL_CastShadow < 0.5) {
-                    // 無効化
-                    clip(-1);
-                    return float4(0, 0, 0, 0);
-                } else {
-                    SHADOW_CASTER_FRAGMENT(i)
-                }
-            }
+            #include "WF_UnToon_ShadowCaster.cginc"
 
             ENDCG
         }

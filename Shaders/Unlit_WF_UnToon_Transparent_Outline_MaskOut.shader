@@ -184,7 +184,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut" {
 
         UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_FRONT"
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
