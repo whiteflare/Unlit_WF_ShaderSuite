@@ -326,7 +326,7 @@
         if (TGL_ON(_TS_Enable)) {
             // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
             float angle_light_camera = dot( SafeNormalizeVec3( i.ls_light_dir.xyz * float3(1, 0.1, 1) ), i.ls_camera_dir );
-            float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal);
+            float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal).r;
             float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
             brightness *= smoothstep(-1, -0.9, angle_light_camera);
@@ -355,7 +355,7 @@
             rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
             rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
             // 順光の場合はリムライトを暗くする
-            float rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
+            float3 rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
             // 色計算
             color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
                 smoothstep(1, 1.05, length(rim_uv)) );
