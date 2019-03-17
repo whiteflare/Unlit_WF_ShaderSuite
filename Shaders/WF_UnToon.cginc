@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018 whiteflare.
+ *  Copyright 2018-2019 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/10 whiteflare,
+     *      ver:2019/03/17 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -40,8 +40,8 @@
     #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
 #endif
 
-    #define SAMPLE_MASK_VALUE(tex, uv, inv)        saturate( inv < 0.5 ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
-    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)    saturate( inv < 0.5 ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
+    #define SAMPLE_MASK_VALUE(tex, uv, inv)        saturate( TGL_OFF(inv) ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
+    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)    saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
 
     struct appdata {
         float4 vertex           : POSITION;
@@ -78,20 +78,68 @@
     float           _GL_BrendPower;
 
     #ifdef _NM_ENABLE
+        float       _NM_Enable;
         DECL_SUB_TEX2D(_BumpMap);
         float       _NM_Power;
     #endif
 
     #ifdef _MT_ENABLE
+        float       _MT_Enable;
         float       _MT_Metallic;
         float       _MT_Smoothness;
+        float       _MT_Specular;
         float       _MT_BlendNormal;
-        int         _MT_Monochrome;
+        float       _MT_Monochrome;
         DECL_SUB_TEX2D(_MT_MaskTex);
-        int         _MT_InvMaskVal;
+        float       _MT_InvMaskVal;
+
+        inline float3 calcNdotH(float3 normal, float3 view, float3 light) {
+            float3 h = (view + light) / length(view + light);
+            return max(0, dot(normal, h));
+        }
+
+        inline float3 pickSpecular(float4 ls_vertex, float3 ls_normal, float smoothness) {
+            float3 specular = float3(0, 0, 0);
+            float ppp = pow(2, smoothness * 8 + 2);
+
+            float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+            float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
+            float3 ws_camera_dir = normalize(worldSpaceCameraPos() - ws_vertex.xyz);
+
+            // メインライト
+            {
+                float3 ws_light_dir = _WorldSpaceLightPos0.xyz;
+                float NdotH = calcNdotH(ws_normal, ws_camera_dir, ws_light_dir);
+                specular += saturate( _LightColor0.rgb * pow(NdotH, ppp) );
+            }
+            // ポイント4ライト
+            {
+                float4 toLightX = unity_4LightPosX0 - ws_vertex.x;
+                float4 toLightY = unity_4LightPosY0 - ws_vertex.y;
+                float4 toLightZ = unity_4LightPosZ0 - ws_vertex.z;
+
+                float4 lengthSq = toLightX * toLightX + toLightY * toLightY + toLightZ * toLightZ;
+                float4 corr = rsqrt( max(lengthSq, 0.000001) );
+
+                float4 NdotH;
+                NdotH.x = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.x, toLightY.x, toLightZ.x));
+                NdotH.y = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.y, toLightY.y, toLightZ.y));
+                NdotH.z = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.z, toLightY.z, toLightZ.z));
+                NdotH.w = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.w, toLightY.w, toLightZ.w));
+                float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0) * corr * pow(NdotH, ppp);
+
+                specular += saturate( unity_LightColor[0].rgb * atten.x );
+                specular += saturate( unity_LightColor[1].rgb * atten.y );
+                specular += saturate( unity_LightColor[2].rgb * atten.z );
+                specular += saturate( unity_LightColor[3].rgb * atten.w );
+            }
+            return specular;
+        }
+
     #endif
 
     #ifdef _TS_ENABLE
+        float       _TS_Enable;
         float4      _TS_1stColor;
         float4      _TS_2ndColor;
         float       _TS_1stBorder;
@@ -100,27 +148,30 @@
         float       _TS_Feather;
         float       _TS_BlendNormal;
         DECL_SUB_TEX2D(_TS_MaskTex);
-        int         _TS_InvMaskVal;
+        float       _TS_InvMaskVal;
     #endif
 
     #ifdef _TR_ENABLE
+        float       _TR_Enable;
         float4      _TR_Color;
         float       _TR_PowerTop;
         float       _TR_PowerSide;
         float       _TR_PowerBottom;
         DECL_SUB_TEX2D(_TR_MaskTex);
-        int         _TR_InvMaskVal;
+        float       _TR_InvMaskVal;
     #endif
 
     #ifdef _TL_ENABLE
+        float       _TL_Enable;
         float4      _TL_LineColor;
         float       _TL_LineWidth;
         sampler2D   _TL_MaskTex;
-        int         _TL_InvMaskVal;
+        float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
     #endif
 
     #ifdef _HL_ENABLE
+        float       _HL_Enable;
         sampler2D   _HL_MatcapTex;
         int         _HL_CapType;
         float3      _HL_MatcapColor;
@@ -128,17 +179,24 @@
         float       _HL_Power;
         float       _HL_BlendNormal;
         DECL_SUB_TEX2D(_HL_MaskTex);
-        int         _HL_InvMaskVal;
+        float       _HL_InvMaskVal;
 
         inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
-            float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
-            float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
-            if (_HL_CapType == 0) {
-                matcap_color -= MEDIAN_GRAY;
+            if (TGL_ON(_HL_Enable)) {
+                float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
+                float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+                if (_HL_CapType == 0) {
+                    matcap_color -= MEDIAN_GRAY;
+                }
+                float3 power = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb * _HL_Power;
+                color.rgb += (matcap_color + _HL_MatcapColor - MEDIAN_GRAY) * power;
             }
-            float3 power = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb * _HL_Power;
-            color.rgb += (matcap_color + _HL_MatcapColor - MEDIAN_GRAY) * power;
         }
+    
+    #else
+
+        #define affectMatcapColor(matcapVector, mask_uv, color)
+
     #endif
 
     v2f vert(in appdata v) {
@@ -151,13 +209,14 @@
         o.vertex = UnityObjectToClipPos(v.vertex);
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
         o.ls_vertex = v.vertex;
-        o.ls_light_dir = calcLocalSpaceLightDir(o.ls_vertex) * float4(1, 0.5, 1, 1); // 高さ方向のライト位置にはあまり影響されないように
+        o.ls_light_dir = calcLocalSpaceLightDir(o.ls_vertex);
         o.ls_camera_dir = localSpaceViewDir(o.ls_vertex);
 
-        // 影コントラスト
         float3 ambientColor = OmniDirectional_ShadeSH9();
+
+        // 影コントラスト
         #ifdef _TS_ENABLE
-        {
+        if (TGL_ON(_TS_Enable)) {
             float3 lightColorMain = calcLocalSpaceLightColor(o.ls_vertex, o.ls_light_dir.w);
             float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
@@ -175,6 +234,7 @@
             o.shadow_power = min( o.shadow_power, _TS_ShadowLimit * 0.5 + 0.5 );
         }
         #endif
+
         // ライトカラーブレンド
         {
             float3 lightColorMain = _LightColor0.rgb;
@@ -194,8 +254,10 @@
 
         o.normal = normalize(v.normal);
         #ifdef _NM_ENABLE
+        if (TGL_ON(_NM_Enable)) {
             o.tangent = normalize(v.tangent);
             o.bitangent = cross(o.normal, o.tangent);
+        }
         #endif
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
@@ -220,8 +282,9 @@
         // BumpMap
         float3 ls_normal = i.normal;
         float3 ls_bump_normal = i.normal;
+
         #ifdef _NM_ENABLE
-        {
+        if (TGL_ON(_NM_Enable)) {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
             ls_bump_normal = normalize( mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform) ); // 法線マップ参照
@@ -232,34 +295,41 @@
 
         // メタリック
         #ifdef _MT_ENABLE
-        {
+        if (TGL_ON(_MT_Enable)) {
+            float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
             float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
-            float3 reflection = pickReflectionProbe(i.ls_vertex, lerp(ls_normal, ls_bump_normal, _MT_BlendNormal), (1 - _MT_Smoothness) * 10);
-            if (_MT_Monochrome == 1) {
-                reflection.rgb = calcBrightness(reflection);
+            if (0.01 < power) {
+                // リフレクション
+                float3 reflection = pickReflectionProbe(i.ls_vertex, ls_metal_normal, (1 - _MT_Smoothness) * 10);
+                if (TGL_ON(_MT_Monochrome)) {
+                    reflection = calcBrightness(reflection);
+                }
+                // スペキュラ
+                float3 specular = float3(0, 0, 0);
+                if (TGL_ON(_MT_Specular)) {
+                    specular = pickSpecular(i.ls_vertex, ls_metal_normal, _MT_Smoothness);
+                }
+                color.rgb = lerp(color.rgb, color.rgb * reflection.rgb + specular.rgb, power);
             }
-            color.rgb = lerp(color.rgb, color.rgb * reflection.rgb, power);
         }
         #endif
 
         // ビュー空間法線
         float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
         float3 vs_bump_normal = calcMatcapVector(i.ls_vertex, ls_bump_normal);
-        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
 
         // Highlight
-        #ifdef _HL_ENABLE
-            affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
-        #endif
+        affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
 
         // 階調影
         #ifdef _TS_ENABLE
-        {
-            float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal);
+        if (TGL_ON(_TS_Enable)) {
+            // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
+            float angle_light_camera = dot( SafeNormalizeVec3( i.ls_light_dir.xyz * float3(1, 0.1, 1) ), i.ls_camera_dir );
+            float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal).r;
             float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
-            brightness *= saturate(angle_light_camera * 2 + 2);
+            brightness *= smoothstep(-1, -0.9, angle_light_camera);
             // 色計算
             color.rgb = lerp(
                 lerp(
@@ -276,14 +346,16 @@
 
         // リムライト
         #ifdef _TR_ENABLE
-        {
+        if (TGL_ON(_TR_Enable)) {
+            // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
+            float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
             // vs_normalからリムライト範囲を計算
             float2 rim_uv = vs_normal.xy;
             rim_uv.x *= _TR_PowerSide + 1;
             rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
             rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
             // 順光の場合はリムライトを暗くする
-            float rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
+            float3 rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
             // 色計算
             color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
                 smoothstep(1, 1.05, length(rim_uv)) );
@@ -297,6 +369,9 @@
 
         // Alpha
         affectAlpha(i.uv, color);
+
+        // EmissiveScroll
+        affectEmissiveScroll(i.ls_vertex, i.uv, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
@@ -328,6 +403,7 @@
         // SV_POSITION を上書き
 
         #ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
             // マスクテクスチャ参照
             float mask = SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, o.uv, _TL_InvMaskVal).r;
             // 外側にシフトする
@@ -345,6 +421,9 @@
                 o.ls_vertex.xyz -= vecZShift;
                 o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
             }
+        } else {
+            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+        }
         #else
             o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         #endif
@@ -354,13 +433,19 @@
 
     float4 frag_outline(v2f i) : SV_Target {
         #ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
             // アウトライン側の色を計算
             float4 lineColor = _TL_LineColor;
             UNITY_APPLY_FOG(i.fogCoord, lineColor);
             // ベース側の色を計算
             float4 baseColor = frag(i);
             // ブレンドして返却
-            return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), 1);
+            return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), baseColor.a);
+        } else {
+            // 無効のときはクリッピングする
+            clip(-1);
+            return float4(0, 0, 0, 0);
+        }
         #else
             // 無効のときはクリッピングする
             clip(-1);
@@ -373,5 +458,25 @@
         clip(color.a - _AL_CutOff);
         return color;
     }
+
+    sampler2D _UnToonTransparentOutlineCanceller;
+
+    struct v2f_canceller {
+        float4      vertex  : SV_POSITION;
+        float4      uv_grab : TEXCOORD0;
+    };
+
+    v2f_canceller vert_outline_canceller(appdata v) {
+        v2f_canceller o;
+        o.vertex = UnityObjectToClipPos(v.vertex);
+        o.uv_grab = o.vertex;
+        o.uv_grab.xy = ComputeGrabScreenPos(o.vertex);
+        return o;
+    }
+
+    float4 frag_outline_canceller(v2f_canceller i) : SV_Target {
+        return tex2Dproj(_UnToonTransparentOutlineCanceller, UNITY_PROJ_COORD(i.uv_grab));
+    }
+
 
 #endif

@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018 whiteflare.
+ *  Copyright 2018-2019 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/03/10 whiteflare,
+     *      ver:2019/03/17 whiteflare,
      */
 
     Properties {
@@ -26,11 +26,13 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
 
-        // Litブレンド
+        // Lit
         [Header(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
+        [ToggleNoKwd]
+            _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
 
         // Alpha
         [Header(Transparent Alpha)]
@@ -44,17 +46,17 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
         // 色変換
         [Header(Color Change)]
-        [Toggle(_CL_ENABLE)]
+        [ToggleNoKwd]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [MaterialToggle]
-            _CL_Monochrome  ("[CL] monochrome", Float) = 0
+        [ToggleNoKwd]
+            _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // 法線マップ
         [Header(NormalMap)]
-        [Toggle(_NM_ENABLE)]
+        [ToggleNoKwd]
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
@@ -62,21 +64,23 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
         // メタリックマップ
         [Header(Metallic)]
-        [Toggle(_MT_ENABLE)]
+        [ToggleNoKwd]
             _MT_Enable      ("[MT] Enable", Float) = 0
             _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
-        [MaterialToggle]
-            _MT_Monochrome  ("[MT] Monochrome Reflection", Float) = 1
+        [ToggleNoKwd]
+            _MT_Monochrome  ("[MT] Monochrome Reflection", Range(0, 1)) = 1
+        [ToggleNoKwd]
+            _MT_Specular    ("[MT] Specular", Range(0, 1)) = 0
         [NoScaleOffset]
             _MT_MaskTex     ("[MT] MetallicMap Texture", 2D) = "white" {}
-        [MaterialToggle]
-            _MT_InvMaskVal  ("[MT] Invert Mask Value", Float) = 0
+        [ToggleNoKwd]
+            _MT_InvMaskVal  ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
         [Header(Light Matcap)]
-        [Toggle(_HL_ENABLE)]
+        [ToggleNoKwd]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
@@ -89,12 +93,12 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _HL_Range       ("[HL] Matcap Range (Tweak)", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
-        [MaterialToggle]
-            _HL_InvMaskVal  ("[HL] Invert Mask Value", Float) = 0
+        [ToggleNoKwd]
+            _HL_InvMaskVal  ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [Header(ToonShade)]
-        [Toggle(_TS_ENABLE)]
+        [ToggleNoKwd]
             _TS_Enable      ("[SH] Enable", Float) = 0
             _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.5, 0.5, 0.5, 1)
             _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.3, 0.3, 0.3, 1)
@@ -105,12 +109,12 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _TS_BlendNormal ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex     ("[SH] BoostLight Mask Texture", 2D) = "black" {}
-        [MaterialToggle]
-            _TS_InvMaskVal  ("[SH] Invert Mask Value", Float) = 0
+        [ToggleNoKwd]
+            _TS_InvMaskVal  ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
         // リムライト
         [Header(RimLight)]
-        [Toggle(_TR_ENABLE)]
+        [ToggleNoKwd]
             _TR_Enable      ("[RM] Enable", Float) = 0
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
             _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
@@ -118,8 +122,25 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _TR_PowerBottom ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
         [NoScaleOffset]
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
-        [MaterialToggle]
-            _TR_InvMaskVal  ("[RM] Invert Mask Value", Float) = 0
+        [ToggleNoKwd]
+            _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
+
+        // EmissiveScroll
+        [Header(Emissive Scroll)]
+        [ToggleNoKwd]
+            _ES_Enable      ("[ES] Enable", Float) = 0
+        [HDR]
+            _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
+        [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
+            _ES_Shape       ("[ES] Wave Type", Float) = 0
+        [ToggleNoKwd]
+            _ES_AlphaScroll ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
+            _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
+            _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
     }
 
     SubShader {
@@ -130,7 +151,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         }
 
         Pass {
-            Name "Main_Back"
+            Name "MAIN_BACK"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
@@ -144,11 +165,12 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _TS_ENABLE
-            #pragma shader_feature _MT_ENABLE
-            #pragma shader_feature _TR_ENABLE
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _TS_ENABLE
+            #define _MT_ENABLE
+            #define _TR_ENABLE
+            #define _ES_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
@@ -162,7 +184,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         }
 
         Pass {
-            Name "Main_Front"
+            Name "MAIN_FRONT"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull BACK
@@ -176,12 +198,13 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _TS_ENABLE
-            #pragma shader_feature _MT_ENABLE
-            #pragma shader_feature _HL_ENABLE
-            #pragma shader_feature _TR_ENABLE
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _TS_ENABLE
+            #define _MT_ENABLE
+            #define _HL_ENABLE
+            #define _TR_ENABLE
+            #define _ES_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
@@ -190,6 +213,25 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            CGPROGRAM
+
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
+
+            #define _AL_ENABLE
+
+            #pragma multi_compile_shadowcaster
+
+            #include "UnityCG.cginc"
+            #include "WF_UnToon_ShadowCaster.cginc"
 
             ENDCG
         }

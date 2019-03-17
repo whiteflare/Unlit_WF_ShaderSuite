@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018 whiteflare.
+ *  Copyright 2018-2019 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/17 whiteflare,
      */
 
     Properties {
@@ -32,17 +32,17 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
         // 色変換
         [Header(Color Change)]
-        [Toggle(_CL_ENABLE)]
+        [ToggleNoKwd]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [MaterialToggle]
-            _CL_Monochrome  ("[CL] monochrome", Float) = 0
+        [ToggleNoKwd]
+            _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
-        [Toggle(_HL_ENABLE)]
+        [ToggleNoKwd]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -51,9 +51,9 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
-        [Toggle(_HL_SOFT_SHADOW)]
+        [ToggleNoKwd]
             _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
-        [Toggle(_HL_SOFT_LIGHT)]
+        [ToggleNoKwd]
             _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
     }
 
@@ -74,10 +74,8 @@ Shader "UnlitWF/WF_MatcapShadows_Simple" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _HL_ENABLE
-            #pragma shader_feature _HL_SOFT_SHADOW
-            #pragma shader_feature _HL_SOFT_LIGHT
+            #define _CL_ENABLE
+            #define _HL_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

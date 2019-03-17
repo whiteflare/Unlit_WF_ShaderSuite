@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018 whiteflare.
+ *  Copyright 2018-2019 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -20,14 +20,22 @@
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/17 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
     #define _MATCAP_ROTATE_CORRECT_ENABLE
 
+    #define TGL_ON(value)   (0.5 <= value)
+    #define TGL_OFF(value)  (value < 0.5)
+    #define TGL_01(value)   step(0.5, value)
+
     static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
+
+    inline float3 SafeNormalizeVec3(float3 in_vec) {
+        return in_vec * rsqrt( max(0.001, dot(in_vec, in_vec)) );
+    }
 
     inline float calcBrightness(float3 color) {
         return dot(color, BT709);
@@ -69,12 +77,12 @@
     }
 
     inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
-        if (0.5 < lightType) {
+        if ( TGL_ON(lightType) ) {
             return _LightColor0.rgb; // ディレクショナルライト
         }
         float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
         float3 pointLight1Color = calcPointLight1Color(ws_pos);
-        if (lightType < -0.5) {
+        if ( TGL_ON(-lightType) ) {
             return pointLight1Color;
         }
 
@@ -177,15 +185,15 @@
     // Alpha Transparent
     ////////////////////////////
 
-    int             _AL_Source;
-    float           _AL_Power;
-    sampler2D       _AL_MaskTex;
-
-    #ifndef _AL_CustomValue
-        #define _AL_CustomValue 1
-    #endif
-
     #ifdef _AL_ENABLE
+        int             _AL_Source;
+        float           _AL_Power;
+        sampler2D       _AL_MaskTex;
+
+        #ifndef _AL_CustomValue
+            #define _AL_CustomValue 1
+        #endif
+
         inline void affectAlpha(float2 uv, inout float4 color) {
             if (_AL_Source == 1) {
                 color.a = tex2D(_AL_MaskTex, uv).r * _AL_Power * _AL_CustomValue;
@@ -265,21 +273,24 @@
             return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
         }
 
+        float       _CL_Enable;
         float       _CL_DeltaH;
         float       _CL_DeltaS;
         float       _CL_DeltaV;
-        int         _CL_Monochrome;
+        float       _CL_Monochrome;
 
         inline void affectColorChange(inout float4 color) {
-            if (_CL_Monochrome == 1) {
-                color.r += color.g + color.b;
-                color.g = (color.r - 1) / 2;
-                color.b = (color.r - 1) / 2;
+            if (TGL_ON(_CL_Enable)) {
+                if (TGL_ON(_CL_Monochrome)) {
+                    color.r += color.g + color.b;
+                    color.g = (color.r - 1) / 2;
+                    color.b = (color.r - 1) / 2;
+                }
+                float3 hsv = rgb2hsv( saturate(color.rgb) );
+                hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
+                hsv.r = frac(hsv.r);
+                color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
             }
-            float3 hsv = rgb2hsv( saturate(color.rgb) );
-            hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
-            hsv.r = frac(hsv.r);
-            color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
         }
 
     #else
@@ -292,12 +303,13 @@
     ////////////////////////////
 
     #ifdef _ES_ENABLE
+        float       _ES_Enable;
         int         _ES_Shape;
         float4      _ES_Direction;
         float       _ES_LevelOffset;
         float       _ES_Sharpness;
         float       _ES_Speed;
-        int         _ES_AlphaScroll;
+        float       _ES_AlphaScroll;
 
         inline float calcEmissivePower(float3 ls_vertex) {
             float time = _Time.y * _ES_Speed - dot(ls_vertex, _ES_Direction.xyz);
@@ -329,10 +341,12 @@
         float4      _ES_Color;
 
         inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
-            float es_power = calcEmissivePower(ls_vertex);
-            color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power * tex2D(_ES_MaskTex, mask_uv).rgb);
-            if (_ES_AlphaScroll) {
-                color.a = max(color.a, _ES_Color.a * es_power);
+            if (TGL_ON(_ES_Enable)) {
+                float4 es_power = calcEmissivePower(ls_vertex) * tex2D(_ES_MaskTex, mask_uv);
+                color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power.rgb);
+                if (TGL_ON(_ES_AlphaScroll)) {
+                    color.a = max(color.a, _ES_Color.a * es_power.a);
+                }
             }
         }
 

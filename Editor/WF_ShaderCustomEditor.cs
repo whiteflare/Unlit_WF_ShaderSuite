@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018 whiteflare.
+ *  Copyright 2018-2019 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,9 +17,11 @@
 
 #if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace UnlitWF
 {
@@ -36,7 +38,7 @@ namespace UnlitWF
                     string label = mm.Groups["label"].Value.ToUpper();
                     if (mm.Groups["name"].Value.ToLower() == "enable") {
                         // Enable チェックボックスなら有効無効をリストに追加
-                        if ((int) prop.floatValue == 0) {
+                        if ((int)prop.floatValue == 0) {
                             disable.Add(label);
                         }
                     }
@@ -52,6 +54,26 @@ namespace UnlitWF
                 }
                 // 描画
                 materialEditor.ShaderProperty(prop, prop.displayName);
+            }
+        }
+    }
+
+    internal class MaterialToggleNoKwdDrawer : MaterialPropertyDrawer
+    {
+        public override void OnGUI(Rect position, MaterialProperty property, GUIContent label, MaterialEditor materialEditor) {
+            if (property.type != MaterialProperty.PropType.Float && property.type != MaterialProperty.PropType.Range) {
+                return;
+            }
+            // [Toggle] はキーワードを生成してしまうため、キーワードを生成しない版の偽トグルを使う
+            // Unity最新版では [ToggleUI] という名前で使えるらしい……
+            EditorGUI.BeginChangeCheck();
+            bool value = (Math.Abs(property.floatValue) > 0.001f);
+            EditorGUI.showMixedValue = property.hasMixedValue;
+            value = EditorGUI.Toggle(position, label, value);
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck()) {
+                // Debug.Log("set value: " + property + " = " + value);
+                property.floatValue = value ? 1.0f : 0.0f;
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018 whiteflare.
+ *  Copyright 2018-2019 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
     /*
      * authors:
-     *      ver:2019/03/07 whiteflare,
+     *      ver:2019/03/17 whiteflare,
      */
 
     Properties {
@@ -46,17 +46,17 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
         // 色変換
         [Header(Color Change)]
-        [Toggle(_CL_ENABLE)]
+        [ToggleNoKwd]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [MaterialToggle]
-            _CL_Monochrome  ("[CL] monochrome", Float) = 0
+        [ToggleNoKwd]
+            _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // 法線マップ
         [Header(NormalMap)]
-        [Toggle(_NM_ENABLE)]
+        [ToggleNoKwd]
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
@@ -64,7 +64,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
-        [Toggle(_HL_ENABLE)]
+        [ToggleNoKwd]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -73,19 +73,19 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
-        [Toggle(_HL_SOFT_SHADOW)]
+        [ToggleNoKwd]
             _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
-        [Toggle(_HL_SOFT_LIGHT)]
+        [ToggleNoKwd]
             _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
 
         // Overlay Texture
         [Header(Overlay Texture)]
-        [Toggle(_OL_ENABLE)]
+        [ToggleNoKwd]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
         [Enum(MAINTEX_UV,0,VIEW_XY,1)]
             _OL_ScreenType  ("[OL] Screen Space", Float) = 0
-        [Enum(ALPHA,ADD,MUL)]
+        [Enum(ALPHA,0,ADD,1,MUL,2)]
             _OL_BlendType   ("[OL] Blend Type", Float) = 0
             _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_Scroll_U    ("[OL] U Scroll", Float) = 0
@@ -93,7 +93,7 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
         // EmissiveScroll
         [Header(Emissive Scroll)]
-        [Toggle(_ES_ENABLE)]
+        [ToggleNoKwd]
             _ES_Enable      ("[ES] Enable", Float) = 0
         [HDR]
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
@@ -101,8 +101,8 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
             _ES_Shape       ("[ES] Wave Type", Float) = 0
-        [MaterialToggle]
-            _ES_AlphaScroll ("[ES] Alpha mo Scroll", Float) = 0
+        [ToggleNoKwd]
+            _ES_AlphaScroll ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
@@ -140,10 +140,10 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _ES_ENABLE
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _ES_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -169,13 +169,11 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _HL_ENABLE
-            #pragma shader_feature _HL_SOFT_SHADOW
-            #pragma shader_feature _HL_SOFT_LIGHT
-            #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _ES_ENABLE
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _HL_ENABLE
+            #define _OL_ENABLE
+            #define _ES_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -207,10 +205,10 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _ES_ENABLE
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _ES_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -239,13 +237,11 @@ Shader "UnlitWF/WF_MatcapShadows_Transparent_MaskOut_Blend" {
 
             #pragma target 3.0
 
-            #pragma shader_feature _CL_ENABLE
-            #pragma shader_feature _NM_ENABLE
-            #pragma shader_feature _HL_ENABLE
-            #pragma shader_feature _HL_SOFT_SHADOW
-            #pragma shader_feature _HL_SOFT_LIGHT
-            #pragma shader_feature _OL_ENABLE
-            #pragma shader_feature _ES_ENABLE
+            #define _CL_ENABLE
+            #define _NM_ENABLE
+            #define _HL_ENABLE
+            #define _OL_ENABLE
+            #define _ES_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
