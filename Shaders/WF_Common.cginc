@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/17 whiteflare,
+     *      ver:2019/03/18 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -33,8 +33,20 @@
     static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
+    inline float2 SafeNormalizeVec2(float2 in_vec) {
+        float lenSq = dot(in_vec, in_vec);
+        if (lenSq < 0.0001) {
+            return float2(0, 0);
+        }
+        return in_vec * rsqrt(lenSq);
+    }
+
     inline float3 SafeNormalizeVec3(float3 in_vec) {
-        return in_vec * rsqrt( max(0.001, dot(in_vec, in_vec)) );
+        float lenSq = dot(in_vec, in_vec);
+        if (lenSq < 0.0001) {
+            return float3(0, 0, 0);
+        }
+        return in_vec * rsqrt(lenSq);
     }
 
     inline float calcBrightness(float3 color) {
