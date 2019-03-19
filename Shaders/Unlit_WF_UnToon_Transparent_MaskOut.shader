@@ -31,7 +31,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
-        [ToggleNoKwd]
+        [Toggle(_)]
             _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
 
         // StencilMask
@@ -51,9 +51,9 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
         // 色変換
         [Header(Color Change)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [ToggleNoKwd]
+        [Toggle(_)]
             _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
@@ -61,7 +61,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
         // 法線マップ
         [Header(NormalMap)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
@@ -69,23 +69,23 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
         // メタリックマップ
         [Header(Metallic)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _MT_Enable      ("[MT] Enable", Float) = 0
             _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
-        [ToggleNoKwd]
+        [Toggle(_)]
             _MT_Monochrome  ("[MT] Monochrome Reflection", Range(0, 1)) = 1
-        [ToggleNoKwd]
+        [Toggle(_)]
             _MT_Specular    ("[MT] Specular", Range(0, 1)) = 0
         [NoScaleOffset]
             _MT_MaskTex     ("[MT] MetallicMap Texture", 2D) = "white" {}
-        [ToggleNoKwd]
+        [Toggle(_)]
             _MT_InvMaskVal  ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
         [Header(Light Matcap)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
@@ -98,12 +98,12 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _HL_Range       ("[HL] Matcap Range (Tweak)", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
-        [ToggleNoKwd]
+        [Toggle(_)]
             _HL_InvMaskVal  ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [Header(ToonShade)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _TS_Enable      ("[SH] Enable", Float) = 0
             _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.5, 0.5, 0.5, 1)
             _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.3, 0.3, 0.3, 1)
@@ -114,12 +114,12 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _TS_BlendNormal ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex     ("[SH] BoostLight Mask Texture", 2D) = "black" {}
-        [ToggleNoKwd]
+        [Toggle(_)]
             _TS_InvMaskVal  ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
         // リムライト
         [Header(RimLight)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _TR_Enable      ("[RM] Enable", Float) = 0
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
             _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
@@ -127,12 +127,12 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _TR_PowerBottom ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
         [NoScaleOffset]
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
-        [ToggleNoKwd]
+        [Toggle(_)]
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
         [Header(Emissive Scroll)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _ES_Enable      ("[ES] Enable", Float) = 0
         [HDR]
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
@@ -140,7 +140,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
             _ES_Shape       ("[ES] Wave Type", Float) = 0
-        [ToggleNoKwd]
+        [Toggle(_)]
             _ES_AlphaScroll ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
