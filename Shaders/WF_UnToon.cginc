@@ -256,10 +256,8 @@
 
         o.normal = normalize(v.normal);
         #ifdef _NM_ENABLE
-        if (TGL_ON(_NM_Enable)) {
-            o.tangent = normalize(v.tangent);
+            o.tangent = UnityWorldToObjectDir(v.tangent);
             o.bitangent = cross(o.normal, o.tangent);
-        }
         #endif
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
@@ -289,9 +287,10 @@
         if (TGL_ON(_NM_Enable)) {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_bump_normal = normalize( mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform) ); // 法線マップ参照
-            // 陰影を付けるために若干の影を追加する
-            color.rgb *= saturate((dot(ls_bump_normal, i.ls_light_dir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power)); // ここではライトの色を考慮しない
+            ls_bump_normal = mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform); // 法線マップ参照
+            // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
+            // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
+            color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;
         }
         #endif
 
