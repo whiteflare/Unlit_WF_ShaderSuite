@@ -259,7 +259,7 @@
         o.normal = normalize(v.normal.xyz);
         #ifdef _NM_ENABLE
             o.tangent = normalize(v.tangent.xyz);
-            o.bitangent = cross(o.normal, o.tangent);
+            o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
         #endif
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
