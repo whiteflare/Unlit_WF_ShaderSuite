@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/18 whiteflare,
+     *      ver:2019/03/23 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE

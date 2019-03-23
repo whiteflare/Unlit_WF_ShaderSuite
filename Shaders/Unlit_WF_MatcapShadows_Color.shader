@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_Color" {
 
     /*
      * authors:
-     *      ver:2019/03/17 whiteflare,
+     *      ver:2019/03/23 whiteflare,
      */
 
     Properties {
