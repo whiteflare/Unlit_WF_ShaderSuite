@@ -254,9 +254,9 @@
             o.light_color = (color - 1) * _GL_BrendPower + 1;
         }
 
-        o.normal = normalize(v.normal);
+        o.normal = normalize(v.normal.xyz);
         #ifdef _NM_ENABLE
-            o.tangent = UnityWorldToObjectDir(v.tangent);
+            o.tangent = normalize(v.tangent.xyz);
             o.bitangent = cross(o.normal, o.tangent);
         #endif
 
