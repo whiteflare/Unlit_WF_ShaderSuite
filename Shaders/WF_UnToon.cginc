@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/18 whiteflare,
+     *      ver:2019/03/23 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -59,15 +59,17 @@
         float4 ls_vertex        : TEXCOORD1;
         float4 ls_light_dir     : TEXCOORD2;
         float3 ls_camera_dir    : TEXCOORD3;
-        float  shadow_power     : COLOR0;
-        float3 light_color      : COLOR1;
-        float3 light_power      : COLOR2;
+        float3 light_color      : COLOR0;
+        float3 light_power      : COLOR1;
+        #ifdef _TS_ENABLE
+            float  shadow_power : COLOR2;
+        #endif
         float3 normal           : TEXCOORD4;
         #ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD5;
             float3 bitangent    : TEXCOORD6;
         #endif
-        UNITY_FOG_COORDS(8)
+        UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
