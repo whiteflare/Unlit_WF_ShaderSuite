@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/17 whiteflare,
+     *      ver:2019/03/23 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -59,15 +59,17 @@
         float4 ls_vertex        : TEXCOORD1;
         float4 ls_light_dir     : TEXCOORD2;
         float3 ls_camera_dir    : TEXCOORD3;
-        float  shadow_power     : COLOR0;
-        float3 light_color      : COLOR1;
-        float3 light_power      : COLOR2;
+        float3 light_color      : COLOR0;
+        float3 light_power      : COLOR1;
+        #ifdef _TS_ENABLE
+            float  shadow_power : COLOR2;
+        #endif
         float3 normal           : TEXCOORD4;
         #ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD5;
             float3 bitangent    : TEXCOORD6;
         #endif
-        UNITY_FOG_COORDS(8)
+        UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -230,7 +232,9 @@
             float main = saturate(calcBrightness( lightColorMain ));
             float sub4 = saturate(calcBrightness( lightColorSub4 ));
             float ambient = saturate(calcBrightness( ambientColor ));
-            o.shadow_power = min( saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5, saturate(1 - ambient * 0.5) );
+            o.shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
+            o.shadow_power = min( o.shadow_power, 1 - smoothstep(0.8, 1, abs(o.ls_light_dir.y)) * 0.5 );
+            o.shadow_power = min( o.shadow_power, 1 - saturate(ambient) * 0.5 );
             o.shadow_power = min( o.shadow_power, _TS_ShadowLimit * 0.5 + 0.5 );
         }
         #endif
@@ -252,12 +256,10 @@
             o.light_color = (color - 1) * _GL_BrendPower + 1;
         }
 
-        o.normal = normalize(v.normal);
+        o.normal = normalize(v.normal.xyz);
         #ifdef _NM_ENABLE
-        if (TGL_ON(_NM_Enable)) {
-            o.tangent = normalize(v.tangent);
-            o.bitangent = cross(o.normal, o.tangent);
-        }
+            o.tangent = normalize(v.tangent.xyz);
+            o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
         #endif
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
@@ -287,9 +289,10 @@
         if (TGL_ON(_NM_Enable)) {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_bump_normal = normalize( mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform) ); // 法線マップ参照
-            // 陰影を付けるために若干の影を追加する
-            color.rgb *= saturate((dot(ls_bump_normal, i.ls_light_dir.xyz) / 2 + 0.5) * _NM_Power + (1.0 - _NM_Power)); // ここではライトの色を考慮しない
+            ls_bump_normal = mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform); // 法線マップ参照
+            // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
+            // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
+            color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;
         }
         #endif
 
@@ -321,11 +324,13 @@
         // Highlight
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
 
+        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
+        float angle_light_camera = dot( SafeNormalizeVec2(i.ls_light_dir.xz), SafeNormalizeVec2(i.ls_camera_dir.xz) )
+            * (1 - smoothstep(0.9, 1, i.ls_light_dir.y)) * (1 - smoothstep(0.9, 1, i.ls_camera_dir.y));
+
         // 階調影
         #ifdef _TS_ENABLE
         if (TGL_ON(_TS_Enable)) {
-            // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-            float angle_light_camera = dot( SafeNormalizeVec3( i.ls_light_dir.xyz * float3(1, 0.1, 1) ), i.ls_camera_dir );
             float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal).r;
             float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
@@ -347,8 +352,6 @@
         // リムライト
         #ifdef _TR_ENABLE
         if (TGL_ON(_TR_Enable)) {
-            // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-            float angle_light_camera = dot(i.ls_light_dir.xyz, i.ls_camera_dir);
             // vs_normalからリムライト範囲を計算
             float2 rim_uv = vs_normal.xy;
             rim_uv.x *= _TR_PowerSide + 1;

@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_ColorFade" {
 
     /*
      * authors:
-     *      ver:2019/03/17 whiteflare,
+     *      ver:2019/03/23 whiteflare,
      */
 
     Properties {
@@ -43,7 +43,7 @@ Shader "UnlitWF/WF_MatcapShadows_ColorFade" {
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -52,14 +52,14 @@ Shader "UnlitWF/WF_MatcapShadows_ColorFade" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
-        [ToggleNoKwd]
+        [Toggle(_)]
             _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
-        [ToggleNoKwd]
+        [Toggle(_)]
             _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
 
         // Overlay Texture
         [Header(Overlay Texture)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
         [Enum(ALPHA,0,ADD,1,MUL,2)]

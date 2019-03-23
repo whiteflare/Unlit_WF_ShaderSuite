@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/03/17 whiteflare,
+     *      ver:2019/03/23 whiteflare,
      */
 
     Properties {
@@ -39,9 +39,9 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
         // 色変換
         [Header(Color Change)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _CL_Enable      ("[CL] Enable", Float) = 0
-        [ToggleNoKwd]
+        [Toggle(_)]
             _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
             _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
             _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
@@ -49,7 +49,7 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
         // 法線マップ
         [Header(NormalMap)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
@@ -57,7 +57,7 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
         // Matcapハイライト
         [Header(HighLight and Shadow Matcap)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -66,14 +66,14 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
-        [ToggleNoKwd]
+        [Toggle(_)]
             _HL_SoftShadow  ("[HL] Soft Shadow Enable", Float) = 1
-        [ToggleNoKwd]
+        [Toggle(_)]
             _HL_SoftLight   ("[HL] Soft Light Enable", Float) = 0
 
         // Overlay Texture
         [Header(Overlay Texture)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
         [Enum(MAINTEX_UV,0,VIEW_XY,1)]
@@ -86,7 +86,7 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
 
         // EmissiveScroll
         [Header(Emissive Scroll)]
-        [ToggleNoKwd]
+        [Toggle(_)]
             _ES_Enable      ("[ES] Enable", Float) = 0
         [HDR]
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
@@ -94,7 +94,7 @@ Shader "UnlitWF/WF_MatcapShadows_TransCutout" {
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
             _ES_Shape       ("[ES] Wave Type", Float) = 0
-        [ToggleNoKwd]
+        [Toggle(_)]
             _ES_AlphaScroll ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
