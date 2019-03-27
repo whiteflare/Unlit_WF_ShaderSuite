@@ -180,6 +180,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
+            #define _AL_ENABLE
+
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
