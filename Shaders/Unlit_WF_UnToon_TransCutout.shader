@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/03/23 whiteflare,
+     *      ver:2019/03/27 whiteflare,
      */
 
     Properties {
@@ -99,11 +99,11 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         [Header(ToonShade)]
         [Toggle(_)]
             _TS_Enable      ("[SH] Enable", Float) = 0
-            _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.5, 0.5, 0.5, 1)
-            _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.3, 0.3, 0.3, 1)
+            _TS_BaseColor   ("[SH] Base Color", Color) = (1, 1, 1, 1)
+            _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
+            _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
             _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
-            _TS_ShadowLimit ("[SH] Shade Power Limit", Range(0, 1)) = 0.5
             _TS_Feather     ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]

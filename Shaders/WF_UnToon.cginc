@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/23 whiteflare,
+     *      ver:2019/03/27 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -42,6 +42,7 @@
 
     #define SAMPLE_MASK_VALUE(tex, uv, inv)        saturate( TGL_OFF(inv) ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)    saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
+    #define NON_ZERO_VEC3(v)                        max(v, float3(0.00390625, 0.00390625, 0.00390625))
 
     struct appdata {
         float4 vertex           : POSITION;
@@ -142,11 +143,11 @@
 
     #ifdef _TS_ENABLE
         float       _TS_Enable;
+        float4      _TS_BaseColor;
         float4      _TS_1stColor;
         float4      _TS_2ndColor;
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
-        float       _TS_ShadowLimit;
         float       _TS_Feather;
         float       _TS_BlendNormal;
         DECL_SUB_TEX2D(_TS_MaskTex);
@@ -235,7 +236,6 @@
             o.shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
             o.shadow_power = min( o.shadow_power, 1 - smoothstep(0.8, 1, abs(o.ls_light_dir.y)) * 0.5 );
             o.shadow_power = min( o.shadow_power, 1 - saturate(ambient) * 0.5 );
-            o.shadow_power = min( o.shadow_power, _TS_ShadowLimit * 0.5 + 0.5 );
         }
         #endif
 
@@ -339,9 +339,9 @@
             color.rgb = lerp(
                 lerp(
                     // 影2
-                    color.rgb * lerp(float3(1, 1, 1), _TS_2ndColor.rgb, i.shadow_power),
+                    color.rgb * lerp(float3(1, 1, 1), _TS_2ndColor.rgb / NON_ZERO_VEC3(_TS_BaseColor.rgb), i.shadow_power),
                     // 影1
-                    color.rgb * lerp(float3(1, 1, 1), _TS_1stColor.rgb, i.shadow_power),
+                    color.rgb * lerp(float3(1, 1, 1), _TS_1stColor.rgb / NON_ZERO_VEC3(_TS_BaseColor.rgb), i.shadow_power),
                     smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
                 // ベースカラー
                 color.rgb,
