@@ -20,12 +20,12 @@
 
     /*
      * authors:
-     *      ver:2019/03/23 whiteflare,
+     *      ver:2019/03/30 whiteflare,
      */
 
     #include "WF_Common.cginc"
 
-#if 0
+#if 1
     // サンプラー節約のための差し替えマクロ
     // 節約にはなるけど最適化などで _MainTex のサンプリングが消えると途端に破綻する諸刃の剣
     #define DECL_MAIN_TEX2D(name)           UNITY_DECLARE_TEX2D(name)
@@ -40,8 +40,9 @@
     #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
 #endif
 
-    #define SAMPLE_MASK_VALUE(tex, uv, inv)        saturate( TGL_OFF(inv) ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
-    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)    saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
+    #define SAMPLE_MASK_VALUE(tex, uv, inv)         saturate( TGL_OFF(inv) ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
+    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
+    #define NON_ZERO_VEC3(v)                        max(v, float3(0.00390625, 0.00390625, 0.00390625))
 
     struct appdata {
         float4 vertex           : POSITION;
@@ -142,11 +143,16 @@
 
     #ifdef _TS_ENABLE
         float       _TS_Enable;
+        float4      _TS_BaseColor;
+        DECL_SUB_TEX2D(_TS_BaseTex);
         float4      _TS_1stColor;
+        DECL_SUB_TEX2D(_TS_1stTex);
         float4      _TS_2ndColor;
+        DECL_SUB_TEX2D(_TS_2ndTex);
+        float       _TS_1stPower;
+        float       _TS_2ndPower;
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
-        float       _TS_ShadowLimit;
         float       _TS_Feather;
         float       _TS_BlendNormal;
         DECL_SUB_TEX2D(_TS_MaskTex);
@@ -167,14 +173,14 @@
         float       _TL_Enable;
         float4      _TL_LineColor;
         float       _TL_LineWidth;
-        sampler2D   _TL_MaskTex;
+        sampler2D   _TL_MaskTex;    // vert内で取得するので独自のサンプラーを使う
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
     #endif
 
     #ifdef _HL_ENABLE
         float       _HL_Enable;
-        sampler2D   _HL_MatcapTex;
+        sampler2D   _HL_MatcapTex;  // MainTexと大きく構造が異なるので独自のサンプラーを使う
         int         _HL_CapType;
         float3      _HL_MatcapColor;
         float       _HL_Range;
@@ -235,7 +241,6 @@
             o.shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
             o.shadow_power = min( o.shadow_power, 1 - smoothstep(0.8, 1, abs(o.ls_light_dir.y)) * 0.5 );
             o.shadow_power = min( o.shadow_power, 1 - saturate(ambient) * 0.5 );
-            o.shadow_power = min( o.shadow_power, _TS_ShadowLimit * 0.5 + 0.5 );
         }
         #endif
 
@@ -271,12 +276,8 @@
     float4 frag(v2f i) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        float4 color =
-        #ifdef _SOLID_COLOR
-            _Color;
-        #else
-            PICK_MAIN_TEX2D(_MainTex, i.uv);
-        #endif
+        // メイン
+        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv);
 
         // 色変換
         affectColorChange(color);
@@ -335,17 +336,17 @@
             float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
             brightness *= smoothstep(-1, -0.9, angle_light_camera);
+            // 影色計算
+            float3 base_color = NON_ZERO_VEC3(_TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv));
+            float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv) / base_color;
+            float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv) / base_color;
+            shadow_color_1st = lerp(float3(1, 1, 1), shadow_color_1st, i.shadow_power * _TS_1stPower);
+            shadow_color_2nd = lerp(float3(1, 1, 1), shadow_color_2nd, i.shadow_power * _TS_2ndPower);
             // 色計算
-            color.rgb = lerp(
-                lerp(
-                    // 影2
-                    color.rgb * lerp(float3(1, 1, 1), _TS_2ndColor.rgb, i.shadow_power),
-                    // 影1
-                    color.rgb * lerp(float3(1, 1, 1), _TS_1stColor.rgb, i.shadow_power),
-                    smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
-                // ベースカラー
-                color.rgb,
-                smoothstep(_TS_1stBorder, _TS_1stBorder + max(_TS_Feather, 0.001), brightness));
+            color.rgb *= saturate(lerp(
+                lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
+                float3(1, 1, 1),
+                smoothstep(_TS_1stBorder, _TS_1stBorder + max(_TS_Feather, 0.001), brightness)));
         }
         #endif
 
