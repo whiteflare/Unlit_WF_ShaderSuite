@@ -158,18 +158,16 @@
         #if UNITY_SHOULD_SAMPLE_SH
             // ambient
             lightColor += OmniDirectional_ShadeSH9();
-            #ifdef VERTEXLIGHT_ON
-                // not important lights
-                lightColor += OmniDirectional_Shade4PointLights(
-                    unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                    unity_LightColor[0].rgb,
-                    unity_LightColor[1].rgb,
-                    unity_LightColor[2].rgb,
-                    unity_LightColor[3].rgb,
-                    unity_4LightAtten0,
-                    mul(unity_ObjectToWorld, ls_vertex)
-                );
-            #endif
+            // not important lights
+            lightColor += OmniDirectional_Shade4PointLights(
+                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                unity_LightColor[0].rgb,
+                unity_LightColor[1].rgb,
+                unity_LightColor[2].rgb,
+                unity_LightColor[3].rgb,
+                unity_4LightAtten0,
+                mul(unity_ObjectToWorld, ls_vertex)
+            );
         #endif
         return calcBrightness(saturate(lightColor));
     }
