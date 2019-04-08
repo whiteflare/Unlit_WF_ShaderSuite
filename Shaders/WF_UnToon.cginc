@@ -447,12 +447,12 @@
             return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), baseColor.a);
         } else {
             // 無効のときはクリッピングする
-            clip(-1);
+            discard;
             return float4(0, 0, 0, 0);
         }
         #else
             // 無効のときはクリッピングする
-            clip(-1);
+            discard;
             return float4(0, 0, 0, 0);
         #endif
     }
@@ -482,5 +482,66 @@
         return tex2Dproj(_UnToonTransparentOutlineCanceller, UNITY_PROJ_COORD(i.uv_grab));
     }
 
+    // EmissiveScroll専用パス
+
+    v2f vert_emissiveScroll(appdata v) {
+        // 通常の vert を使う
+        v2f o = vert(v);
+
+        // SV_POSITION を上書き
+
+        #ifdef _ES_ENABLE
+        if (TGL_ON(_ES_Enable)) {
+
+            // カメラ方向の z シフト量を計算
+            // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
+            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * 0.1; // 10cm固定量だけ近づける
+            if (unity_OrthoParams.w < 0.5) {
+                // カメラが perspective のときは単にカメラ方向にシフトする
+                o.ls_vertex.xyz += vecZShift;
+                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+            } else {
+                // カメラが orthographic のときはシフト後の z のみ採用する
+                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                o.ls_vertex.xyz += vecZShift;
+                o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
+            }
+
+        } else {
+            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+        }
+        #else
+            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+        #endif
+
+        return o;
+    }
+
+    float4 frag_emissiveScroll(v2f i) : SV_Target {
+        float4 color = float4(0, 0, 0, 0);
+
+        #ifdef _ES_ENABLE
+        if (TGL_ON(_ES_Enable)) {
+
+            // EmissiveScroll
+            affectEmissiveScroll(i.ls_vertex, i.uv, color);
+
+            // Alpha は 0-1 にクランプ
+            color.a = saturate(color.a);
+            if (color.a < 0.1) {
+                discard;
+            }
+
+        } else {
+            // 無効のときはクリッピングする
+            discard;
+        }
+        #else
+            // 無効のときはクリッピングする
+            discard;
+        #endif
+
+        return color;
+    }
 
 #endif
