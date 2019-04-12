@@ -277,7 +277,7 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         // メイン
-        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv);
+        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
 
         // 色変換
         affectColorChange(color);

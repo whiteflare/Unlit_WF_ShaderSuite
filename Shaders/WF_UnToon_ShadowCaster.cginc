@@ -31,6 +31,7 @@
     float           _GL_CastShadow;
     sampler2D       _MainTex;
     float4          _MainTex_ST;
+    float4          _Color;
     float           _AL_CutOff;
 
     #ifdef _AL_ENABLE
@@ -80,7 +81,7 @@
 
         // アルファ計算
         #ifdef _AL_ENABLE
-            float4 color = tex2D(_MainTex, i.uv);
+            float4 color = tex2D(_MainTex, i.uv) * _Color;
             affectAlpha(i.uv, color);
             if (color.a < _AL_CutOff) {
                 discard;
