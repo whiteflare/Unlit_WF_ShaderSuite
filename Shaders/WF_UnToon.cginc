@@ -484,6 +484,8 @@
 
     // EmissiveScroll専用パス
 
+    float _ES_Z_Shift;
+
     v2f vert_emissiveScroll(appdata v) {
         // 通常の vert を使う
         v2f o = vert(v);
@@ -495,7 +497,7 @@
 
             // カメラ方向の z シフト量を計算
             // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
-            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * 0.1; // 10cm固定量だけ近づける
+            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * _ES_Z_Shift; // 指定の量だけ近づける
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向にシフトする
                 o.ls_vertex.xyz += vecZShift;
