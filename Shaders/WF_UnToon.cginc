@@ -277,7 +277,7 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         // メイン
-        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv);
+        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
 
         // 色変換
         affectColorChange(color);
@@ -447,12 +447,12 @@
             return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), baseColor.a);
         } else {
             // 無効のときはクリッピングする
-            clip(-1);
+            discard;
             return float4(0, 0, 0, 0);
         }
         #else
             // 無効のときはクリッピングする
-            clip(-1);
+            discard;
             return float4(0, 0, 0, 0);
         #endif
     }
@@ -482,5 +482,69 @@
         return tex2Dproj(_UnToonTransparentOutlineCanceller, UNITY_PROJ_COORD(i.uv_grab));
     }
 
+    // EmissiveScroll専用パス
+
+    float _ES_Z_Shift;
+
+    v2f vert_emissiveScroll(appdata v) {
+        // 通常の vert を使う
+        v2f o = vert(v);
+
+        // SV_POSITION を上書き
+
+        #ifdef _ES_ENABLE
+        if (TGL_ON(_ES_Enable)) {
+
+            // カメラ方向の z シフト量を計算
+            float3 ls_camera_dir = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos.xyz, 1)).xyz - o.ls_vertex.xyz;
+            // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
+            float3 vecZShift = normalize( ls_camera_dir ) * min( _ES_Z_Shift, length( ls_camera_dir ) * 0.5 );  // 指定の量だけ近づける。ただしカメラとの距離の 1/2 を超えない
+            if (unity_OrthoParams.w < 0.5) {
+                // カメラが perspective のときは単にカメラ方向にシフトする
+                o.ls_vertex.xyz += vecZShift;
+                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+            } else {
+                // カメラが orthographic のときはシフト後の z のみ採用する
+                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                o.ls_vertex.xyz += vecZShift;
+                o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
+            }
+
+        } else {
+            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+        }
+        #else
+            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+        #endif
+
+        return o;
+    }
+
+    float4 frag_emissiveScroll(v2f i) : SV_Target {
+        float4 color = float4(0, 0, 0, 0);
+
+        #ifdef _ES_ENABLE
+        if (TGL_ON(_ES_Enable)) {
+
+            // EmissiveScroll
+            affectEmissiveScroll(i.ls_vertex, i.uv, color);
+
+            // Alpha は 0-1 にクランプ
+            color.a = saturate(color.a);
+            if (color.a < 0.1) {
+                discard;
+            }
+
+        } else {
+            // 無効のときはクリッピングする
+            discard;
+        }
+        #else
+            // 無効のときはクリッピングする
+            discard;
+        #endif
+
+        return color;
+    }
 
 #endif

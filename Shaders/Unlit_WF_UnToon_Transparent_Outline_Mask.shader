@@ -18,13 +18,14 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_Mask" {
 
     /*
      * authors:
-     *      ver:2019/03/30 whiteflare,
+     *      ver:2019/04/13 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
+            _Color          ("Color", Color) = (1, 1, 1, 1)
 
         // Lit
         [Header(Lit)]

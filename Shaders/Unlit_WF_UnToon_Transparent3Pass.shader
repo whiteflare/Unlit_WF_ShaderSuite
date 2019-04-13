@@ -18,13 +18,14 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2019/03/30 whiteflare,
+     *      ver:2019/04/13 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
+            _Color          ("Color", Color) = (1, 1, 1, 1)
 
         // Lit
         [Header(Lit)]
@@ -144,12 +145,13 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
             _ES_Shape       ("[ES] Wave Type", Float) = 0
-        [Toggle(_)]
-            _ES_AlphaScroll ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _ES_CullMode    ("[ES] Cull Mode", int) = 2
+            _ES_Z_Shift     ("[ES] Z-shift", Range(0, 1)) = 0.5
     }
 
     SubShader {
@@ -180,7 +182,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _MT_ENABLE
             #define _HL_ENABLE
             #define _TR_ENABLE
-            #define _ES_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
@@ -213,7 +214,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _TS_ENABLE
             #define _MT_ENABLE
             #define _TR_ENABLE
-            #define _ES_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
@@ -247,7 +247,36 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _MT_ENABLE
             #define _HL_ENABLE
             #define _TR_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            #define _AL_ENABLE
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "EMISSIVE_SCROLL"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull [_ES_CullMode]
+            ZWrite ON
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert_emissiveScroll
+            #pragma fragment frag_emissiveScroll
+
+            #pragma target 3.0
+
             #define _ES_ENABLE
+            #define _ES_FORCE_ALPHASCROLL
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 

@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/23 whiteflare,
+     *      ver:2019/04/08 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -32,6 +32,8 @@
 
     static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
+
+    #define MAX3(r, g, b)   max(r, max(g, b) )
 
     inline float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
@@ -158,18 +160,16 @@
         #if UNITY_SHOULD_SAMPLE_SH
             // ambient
             lightColor += OmniDirectional_ShadeSH9();
-            #ifdef VERTEXLIGHT_ON
-                // not important lights
-                lightColor += OmniDirectional_Shade4PointLights(
-                    unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                    unity_LightColor[0].rgb,
-                    unity_LightColor[1].rgb,
-                    unity_LightColor[2].rgb,
-                    unity_LightColor[3].rgb,
-                    unity_4LightAtten0,
-                    mul(unity_ObjectToWorld, ls_vertex)
-                );
-            #endif
+            // not important lights
+            lightColor += OmniDirectional_Shade4PointLights(
+                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                unity_LightColor[0].rgb,
+                unity_LightColor[1].rgb,
+                unity_LightColor[2].rgb,
+                unity_LightColor[3].rgb,
+                unity_4LightAtten0,
+                mul(unity_ObjectToWorld, ls_vertex)
+            );
         #endif
         return calcBrightness(saturate(lightColor));
     }
@@ -354,11 +354,20 @@
 
         inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
-                float4 es_power = calcEmissivePower(ls_vertex) * tex2D(_ES_MaskTex, mask_uv);
-                color.rgb = max(0, color.rgb + _ES_Color.rgb * es_power.rgb);
-                if (TGL_ON(_ES_AlphaScroll)) {
-                    color.a = max(color.a, _ES_Color.a * es_power.a);
-                }
+                float es_power = calcEmissivePower(ls_vertex);
+                float3 es_color = tex2D(_ES_MaskTex, mask_uv).rgb;
+
+                color.rgb = lerp(color.rgb,
+                    color.rgb * (1 - es_power) + es_power * _ES_Color.rgb * es_color.rgb,
+                    MAX3(es_color.r, es_color.g, es_color.b) );
+
+                #ifdef _ES_FORCE_ALPHASCROLL
+                    color.a = max(color.a, es_power * MAX3(es_color.r, es_color.g, es_color.b));
+                #else
+                    if (TGL_ON(_ES_AlphaScroll)) {
+                        color.a = max(color.a, es_power * MAX3(es_color.r, es_color.g, es_color.b));
+                    }
+                #endif
             }
         }
 
