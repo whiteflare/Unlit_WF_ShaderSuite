@@ -496,8 +496,9 @@
         if (TGL_ON(_ES_Enable)) {
 
             // カメラ方向の z シフト量を計算
+            float3 ls_camera_dir = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos.xyz, 1)).xyz - o.ls_vertex.xyz;
             // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
-            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * _ES_Z_Shift; // 指定の量だけ近づける
+            float3 vecZShift = normalize( ls_camera_dir ) * min( _ES_Z_Shift, length( ls_camera_dir ) * 0.5 );  // 指定の量だけ近づける。ただしカメラとの距離の 1/2 を超えない
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向にシフトする
                 o.ls_vertex.xyz += vecZShift;
