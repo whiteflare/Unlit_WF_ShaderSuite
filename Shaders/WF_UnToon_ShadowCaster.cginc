@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/04/13 whiteflare,
+     *      ver:2019/04/22 whiteflare,
      */
 
     struct v2f_shadow {
@@ -83,22 +83,21 @@
         #ifdef _AL_ENABLE
             float4 color = tex2D(_MainTex, i.uv) * _Color;
             affectAlpha(i.uv, color);
-            if (color.a < _AL_CutOff) {
-                discard;
-                return float4(0, 0, 0, 0);
-            }
+            #ifdef _AL_CUTOFF_ENABLE
+                if (color.a < _AL_CutOff) {
+                    discard;
+                    return float4(0, 0, 0, 0);
+                }
+            #else
+                if (color.a < 0.75) {
+                    discard;
+                    return float4(0, 0, 0, 0);
+                }
+            #endif
         #endif
 
         // ShadowCaster
         return frag_shadow_caster(i);
-    }
-
-    float4 frag_shadow_cutout(v2f_shadow i) : SV_Target {
-        float4 color = frag_shadow(i);
-        if (color.a < _AL_CutOff) {
-            discard;
-        }
-        return color;
     }
 
 #endif

@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2019/04/13 whiteflare,
+     *      ver:2019/04/22 whiteflare,
      */
 
     Properties {
@@ -299,6 +299,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma fragment frag_shadow
 
             #define _AL_ENABLE
+            #define _AL_CUTOFF_ENABLE
 
             #pragma multi_compile_shadowcaster
 
