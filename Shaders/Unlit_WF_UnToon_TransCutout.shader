@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/04/13 whiteflare,
+     *      ver:2019/04/22 whiteflare,
      */
 
     Properties {
@@ -268,9 +268,10 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert_shadow
-            #pragma fragment frag_shadow_cutout
+            #pragma fragment frag_shadow
 
             #define _AL_ENABLE
+            #define _AL_CUTOFF_ENABLE
 
             #pragma multi_compile_shadowcaster
 
