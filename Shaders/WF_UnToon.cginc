@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/03/30 whiteflare,
+     *      ver:2019/04/29 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -180,24 +180,25 @@
 
     #ifdef _HL_ENABLE
         float       _HL_Enable;
-        sampler2D   _HL_MatcapTex;  // MainTexと大きく構造が異なるので独自のサンプラーを使う
         int         _HL_CapType;
+        sampler2D   _HL_MatcapTex;  // MainTexと大きく構造が異なるので独自のサンプラーを使う
         float3      _HL_MatcapColor;
-        float       _HL_Range;
         float       _HL_Power;
         float       _HL_BlendNormal;
         DECL_SUB_TEX2D(_HL_MaskTex);
         float       _HL_InvMaskVal;
 
+        #define _HL_Range 1
+
         inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_HL_Enable)) {
                 float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
                 float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
-                if (_HL_CapType == 0) {
-                    matcap_color -= MEDIAN_GRAY;
-                }
+                float3 median_color = _HL_CapType == 0 ? MEDIAN_GRAY : float3(0, 0, 0);
+                float3 lightcap_color = saturate( (matcap_color - median_color) * _HL_MatcapColor * 2 );
+                float3 shadecap_color = saturate( (median_color - matcap_color) * (1 - _HL_MatcapColor) * 2 );
                 float3 power = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb * _HL_Power;
-                color.rgb += (matcap_color + _HL_MatcapColor - MEDIAN_GRAY) * power;
+                color.rgb += (lightcap_color - shadecap_color) * power;
             }
         }
     
