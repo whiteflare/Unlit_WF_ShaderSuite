@@ -197,8 +197,8 @@
                 float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
                 // maskcolor 決定
                 float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb;
-                float3 lightcap_power = matcap_mask * (_HL_MatcapColor * 2);    // _HL_MatcapColorは灰色を基準とするので2倍する
-                float3 shadecap_power = 1 - lightcap_power;
+                float3 lightcap_power = saturate(matcap_mask * _HL_MatcapColor * 2);    // _HL_MatcapColorは灰色を基準とするので2倍する
+                float3 shadecap_power = (1 - lightcap_power) * MAX3(matcap_mask.r, matcap_mask.g, matcap_mask.b);
                 // 合成
                 float3 median_color = _HL_CapType == 0 ? MEDIAN_GRAY : float3(0, 0, 0);
                 float3 lightcap_color = saturate( (matcap_color - median_color) * lightcap_power );
