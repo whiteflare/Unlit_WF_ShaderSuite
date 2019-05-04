@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/04/29 whiteflare,
+     *      ver:2019/05/04 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -332,8 +332,10 @@
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
 
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = dot( SafeNormalizeVec2(i.ls_light_dir.xz), SafeNormalizeVec2(i.ls_camera_dir.xz) )
-            * (1 - smoothstep(0.9, 1, i.ls_light_dir.y)) * (1 - smoothstep(0.9, 1, i.ls_camera_dir.y));
+        float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
+        float3 ws_camera_dir = UnityObjectToWorldDir(i.ls_camera_dir);
+        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
+            * (1 - smoothstep(0.9, 1, ws_light_dir.y)) * (1 - smoothstep(0.9, 1, ws_camera_dir.y));
 
         // 階調影
         #ifdef _TS_ENABLE
