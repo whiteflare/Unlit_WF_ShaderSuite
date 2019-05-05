@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/05/04 whiteflare,
+     *      ver:2019/05/05 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -83,6 +83,7 @@
     #ifdef _NM_ENABLE
         float       _NM_Enable;
         DECL_SUB_TEX2D(_BumpMap);
+        float       _BumpScale;
         float       _NM_Power;
     #endif
 
@@ -296,7 +297,7 @@
         if (TGL_ON(_NM_Enable)) {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_bump_normal = mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform); // 法線マップ参照
+            ls_bump_normal = mul( UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale ), tangentTransform); // 法線マップ参照
             // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
             // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
             color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;

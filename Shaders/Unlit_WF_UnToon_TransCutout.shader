@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/04/22 whiteflare,
+     *      ver:2019/05/05 whiteflare,
      */
 
     Properties {
@@ -60,6 +60,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
+            _BumpScale      ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power       ("[NM] Shadow Power", Range(0, 1)) = 0.25
 
         // メタリックマップ
