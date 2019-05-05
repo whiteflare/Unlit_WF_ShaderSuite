@@ -181,7 +181,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert_outline
-            #pragma fragment frag_cutout_upper_outline
+            #pragma fragment frag_cutout_upper
 
             #pragma target 3.0
 

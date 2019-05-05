@@ -392,6 +392,14 @@
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
+        // Outline
+        #ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
+            // アウトライン色をベースと合成
+            color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+        }
+        #endif
+
         // fog
         UNITY_APPLY_FOG(i.fogCoord, color);
 
@@ -447,39 +455,7 @@
         return o;
     }
 
-    float4 frag_outline(v2f i) : SV_Target {
-        #ifdef _TL_ENABLE
-        if (TGL_ON(_TL_Enable)) {
-            // アウトライン側の色を計算
-            float4 lineColor = _TL_LineColor;
-            UNITY_APPLY_FOG(i.fogCoord, lineColor);
-            // ベース側の色を計算
-            float4 baseColor = frag(i);
-            // ブレンドして返却
-            return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), baseColor.a);
-        } else {
-            // 無効のときはクリッピングする
-            discard;
-            return float4(0, 0, 0, 0);
-        }
-        #else
-            // 無効のときはクリッピングする
-            discard;
-            return float4(0, 0, 0, 0);
-        #endif
-    }
-
-    float4 frag_cutout_upper_outline(v2f i) : SV_Target {
-        float4 color = frag_outline(i);
-        clip(color.a - _AL_CutOff);
-        return color;
-    }
-
-    float4 frag_cutout_lower_outline(v2f i) : SV_Target {
-        float4 color = frag_outline(i);
-        clip(_AL_CutOff - color.a);
-        return color;
-    }
+    // アウトラインキャンセラパス
 
     sampler2D _UnToonTransparentOutlineCanceller;
 

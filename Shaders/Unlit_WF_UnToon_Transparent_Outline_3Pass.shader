@@ -188,7 +188,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
             CGPROGRAM
 
             #pragma vertex vert_outline
-            #pragma fragment frag_cutout_upper_outline
+            #pragma fragment frag_cutout_upper
 
             #pragma target 3.0
 
@@ -217,7 +217,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
             CGPROGRAM
 
             #pragma vertex vert_outline
-            #pragma fragment frag_cutout_lower_outline
+            #pragma fragment frag_cutout_lower
 
             #pragma target 3.0
 
@@ -246,7 +246,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
             CGPROGRAM
 
             #pragma vertex vert_outline
-            #pragma fragment frag_cutout_lower_outline
+            #pragma fragment frag_cutout_lower
 
             #pragma target 3.0
 

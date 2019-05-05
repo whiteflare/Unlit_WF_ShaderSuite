@@ -186,7 +186,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
             CGPROGRAM
 
             #pragma vertex vert_outline
-            #pragma fragment frag_outline
+            #pragma fragment frag
 
             #pragma target 3.0
 
