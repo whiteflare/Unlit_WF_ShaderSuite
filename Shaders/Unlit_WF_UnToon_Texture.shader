@@ -63,6 +63,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
+            _MT_BlendType   ("[MT] Blend Type (MUL/ADD)", Range(0, 1)) = 0
         [Toggle(_)]
             _MT_Monochrome  ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [Toggle(_)]

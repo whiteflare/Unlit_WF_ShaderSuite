@@ -93,6 +93,7 @@
         float       _MT_Smoothness;
         float       _MT_Specular;
         float       _MT_BlendNormal;
+        float       _MT_BlendType;
         float       _MT_Monochrome;
         DECL_SUB_TEX2D(_MT_MaskTex);
         float       _MT_InvMaskVal;
@@ -320,7 +321,9 @@
                 if (TGL_ON(_MT_Specular)) {
                     specular = pickSpecular(i.ls_vertex, ls_metal_normal, _MT_Smoothness);
                 }
-                color.rgb = lerp(color.rgb, color.rgb * reflection.rgb + specular.rgb, power);
+                color.rgb = lerp(color.rgb,
+                    lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb,
+                    power);
             }
         }
         #endif
