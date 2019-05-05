@@ -475,6 +475,12 @@
         return color;
     }
 
+    float4 frag_cutout_lower_outline(v2f i) : SV_Target {
+        float4 color = frag_outline(i);
+        clip(_AL_CutOff - color.a);
+        return color;
+    }
+
     sampler2D _UnToonTransparentOutlineCanceller;
 
     struct v2f_canceller {
