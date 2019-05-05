@@ -203,12 +203,12 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma target 3.0
 
             #define _CL_ENABLE
-            #define _NM_ENABLE
-            #define _TS_ENABLE
-            #define _MT_ENABLE
-            #define _HL_ENABLE
-            #define _TR_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 

@@ -190,8 +190,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
 
             #pragma target 3.0
 
-            #define _CL_ENABLE
             #define _AL_ENABLE
+            #define _CL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase
