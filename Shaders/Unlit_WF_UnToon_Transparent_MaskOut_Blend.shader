@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
     /*
      * authors:
-     *      ver:2019/05/05 whiteflare,
+     *      ver:2019/05/13 whiteflare,
      */
 
     Properties {
@@ -167,27 +167,9 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
-
-        Stencil {
-            Ref [_StencilMaskID]
-            ReadMask 15
-            Comp notEqual
-            /*
-             * StencilMaskIDとして使うのは下位4ビット。ForwardパスだけどDefferedの制約に合わせておいたほうが改造しやすいので。
-             * 書込側ではフラグを単純に立てるだけ。参照側では下位4ビットを読み込み比較する。
-             * 他shaderに介入されていた場合はステンシルテスト合格側に倒す。禿げるくらいなら全て描くほうが良いので。
-             */
-        }
-
-        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_BACK"
-        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_FRONT"
-
-        Stencil {
-            Ref [_StencilMaskID]
-            ReadMask 15
-            Comp equal
-        }
+        UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"
+        UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_FRONT"
 
         Pass {
             Name "Main_Back"
@@ -196,6 +178,12 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             Cull FRONT
             ZWrite OFF
             Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp equal
+            }
 
             CGPROGRAM
 
@@ -231,6 +219,12 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             Cull BACK
             ZWrite [_AL_ZWrite]
             Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp equal
+            }
 
             CGPROGRAM
 

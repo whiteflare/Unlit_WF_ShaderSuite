@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut" {
 
     /*
      * authors:
-     *      ver:2019/05/05 whiteflare,
+     *      ver:2019/05/13 whiteflare,
      */
 
     Properties {
@@ -179,22 +179,45 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut" {
         }
 
         GrabPass { "_UnToonTransparentOutlineCanceller" }
-        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE"
-        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE_CANCELLER"
 
-        Stencil {
-            Ref [_StencilMaskID]
-            ReadMask 15
-            Comp notEqual
-            /*
-             * StencilMaskIDとして使うのは下位4ビット。ForwardパスだけどDefferedの制約に合わせておいたほうが改造しやすいので。
-             * 書込側ではフラグを単純に立てるだけ。参照側では下位4ビットを読み込み比較する。
-             * 他shaderに介入されていた場合はステンシルテスト合格側に倒す。禿げるくらいなら全て描くほうが良いので。
-             */
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert_outline
+            #pragma fragment frag
+
+            #pragma target 3.0
+
+            #define _AL_ENABLE
+            #define _CL_ENABLE
+            #define _TL_ENABLE
+            #define _TR_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_BACK"
-        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_FRONT"
+        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE_CANCELLER"
+        UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"
+        UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_FRONT"
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 

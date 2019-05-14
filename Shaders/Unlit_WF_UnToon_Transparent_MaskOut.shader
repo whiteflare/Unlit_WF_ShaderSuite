@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
     /*
      * authors:
-     *      ver:2019/05/05 whiteflare,
+     *      ver:2019/05/13 whiteflare,
      */
 
     Properties {
@@ -166,19 +166,84 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             "DisableBatching" = "True"
         }
 
-        Stencil {
-            Ref [_StencilMaskID]
-            ReadMask 15
-            Comp notEqual
-            /*
-             * StencilMaskIDとして使うのは下位4ビット。ForwardパスだけどDefferedの制約に合わせておいたほうが改造しやすいので。
-             * 書込側ではフラグを単純に立てるだけ。参照側では下位4ビットを読み込み比較する。
-             * 他shaderに介入されていた場合はステンシルテスト合格側に倒す。禿げるくらいなら全て描くほうが良いので。
-             */
+        Pass {
+            Name "MAIN_BACK"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 3.0
+
+            #define _AL_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_BACK"
-        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_FRONT"
+        Pass {
+            Name "MAIN_FRONT"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull BACK
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 3.0
+
+            #define _AL_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
