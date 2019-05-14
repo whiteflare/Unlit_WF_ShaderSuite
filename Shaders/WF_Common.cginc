@@ -60,7 +60,11 @@
     }
 
     inline float3 calcPointLight1Color(float3 ws_pos) {
-        float3 ls_lightPos = calcPointLight1Pos() - ws_pos;
+        float3 ws_lightPos = calcPointLight1Pos();
+        if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
+            return float3(0, 0, 0); // XYZすべて0はポイントライト未設定と判定する
+        }
+        float3 ls_lightPos = ws_lightPos - ws_pos;
         float lengthSq = dot(ls_lightPos, ls_lightPos);
         float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
         return unity_LightColor[0].rgb * atten;
@@ -97,7 +101,7 @@
         float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
         float3 pointLight1Color = calcPointLight1Color(ws_pos);
         if ( TGL_ON(-lightType) ) {
-            return pointLight1Color;
+            return pointLight1Color; // ポイントライト
         }
 
         float3 ws_lightColor;
@@ -118,12 +122,14 @@
     inline float3 OmniDirectional_ShadeSH9() {
         // UnityCG.cginc にある ShadeSH9 の等方向版
         float3 col = 0;
-        col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
-        col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
-        col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
-        col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
-        col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
-        col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
+        #if UNITY_SHOULD_SAMPLE_SH
+            col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
+            col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
+            col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
+            col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
+            col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
+            col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
+        #endif
         return col;
     }
 
