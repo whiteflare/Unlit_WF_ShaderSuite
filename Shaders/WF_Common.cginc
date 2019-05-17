@@ -31,6 +31,7 @@
     #define TGL_01(value)   step(0.5, value)
 
     static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
+    static const float3 BT601 = { 0.299, 0.587, 0.114 };
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
@@ -52,7 +53,7 @@
     }
 
     inline float calcBrightness(float3 color) {
-        return dot(color, BT709);
+        return dot(color, BT601);
     }
 
     inline float3 calcPointLight1Pos() {
