@@ -378,6 +378,14 @@
         }
         #endif
 
+        // Outline
+        #ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
+            // アウトライン色をベースと合成
+            color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+        }
+        #endif
+
         // ライトカラーブレンド
         color.rgb *= i.light_color.rgb;
         // Anti-Glare
@@ -391,14 +399,6 @@
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
-
-        // Outline
-        #ifdef _TL_ENABLE
-        if (TGL_ON(_TL_Enable)) {
-            // アウトライン色をベースと合成
-            color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
-        }
-        #endif
 
         // fog
         UNITY_APPLY_FOG(i.fogCoord, color);
