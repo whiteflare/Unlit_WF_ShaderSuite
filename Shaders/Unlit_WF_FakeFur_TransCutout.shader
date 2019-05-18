@@ -25,6 +25,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
+        [HDR]
             _Color          ("Color", Color) = (1, 1, 1, 1)
             _CutOffLevel    ("Alpha CutOff Level", Range(0, 1)) = 0.5
 

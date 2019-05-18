@@ -25,6 +25,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
+        [HDR]
             _Color          ("Color", Color) = (1, 1, 1, 1)
 
         // Lit
