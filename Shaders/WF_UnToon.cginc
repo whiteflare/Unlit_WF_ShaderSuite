@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/05/04 whiteflare,
+     *      ver:2019/05/18 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -83,6 +83,7 @@
     #ifdef _NM_ENABLE
         float       _NM_Enable;
         DECL_SUB_TEX2D(_BumpMap);
+        float       _BumpScale;
         float       _NM_Power;
     #endif
 
@@ -92,6 +93,7 @@
         float       _MT_Smoothness;
         float       _MT_Specular;
         float       _MT_BlendNormal;
+        float       _MT_BlendType;
         float       _MT_Monochrome;
         DECL_SUB_TEX2D(_MT_MaskTex);
         float       _MT_InvMaskVal;
@@ -296,7 +298,7 @@
         if (TGL_ON(_NM_Enable)) {
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_bump_normal = mul(UnpackNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv) ), tangentTransform); // 法線マップ参照
+            ls_bump_normal = mul( UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale ), tangentTransform); // 法線マップ参照
             // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
             // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
             color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;
@@ -319,7 +321,9 @@
                 if (TGL_ON(_MT_Specular)) {
                     specular = pickSpecular(i.ls_vertex, ls_metal_normal, _MT_Smoothness);
                 }
-                color.rgb = lerp(color.rgb, color.rgb * reflection.rgb + specular.rgb, power);
+                color.rgb = lerp(color.rgb,
+                    lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb,
+                    power);
             }
         }
         #endif
@@ -371,6 +375,14 @@
             // 色計算
             color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
                 smoothstep(1, 1.05, length(rim_uv)) );
+        }
+        #endif
+
+        // Outline
+        #ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
+            // アウトライン色をベースと合成
+            color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
         }
         #endif
 
@@ -443,33 +455,7 @@
         return o;
     }
 
-    float4 frag_outline(v2f i) : SV_Target {
-        #ifdef _TL_ENABLE
-        if (TGL_ON(_TL_Enable)) {
-            // アウトライン側の色を計算
-            float4 lineColor = _TL_LineColor;
-            UNITY_APPLY_FOG(i.fogCoord, lineColor);
-            // ベース側の色を計算
-            float4 baseColor = frag(i);
-            // ブレンドして返却
-            return float4( lerp(baseColor.rgb, lineColor.rgb, lineColor.a), baseColor.a);
-        } else {
-            // 無効のときはクリッピングする
-            discard;
-            return float4(0, 0, 0, 0);
-        }
-        #else
-            // 無効のときはクリッピングする
-            discard;
-            return float4(0, 0, 0, 0);
-        #endif
-    }
-
-    float4 frag_cutout_upper_outline(v2f i) : SV_Target {
-        float4 color = frag_outline(i);
-        clip(color.a - _AL_CutOff);
-        return color;
-    }
+    // アウトラインキャンセラパス
 
     sampler2D _UnToonTransparentOutlineCanceller;
 

@@ -18,13 +18,14 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/04/13 whiteflare,
+     *      ver:2019/05/18 whiteflare,
      */
 
     Properties {
         // 基本
         [Header(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
+        [HDR]
             _Color          ("Color", Color) = (1, 1, 1, 1)
 
         // Lit
@@ -61,6 +62,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
+            _BumpScale      ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power       ("[NM] Shadow Power", Range(0, 1)) = 0.25
 
         // メタリックマップ
@@ -70,6 +72,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
+            _MT_BlendType   ("[MT] Blend Type (MUL/ADD)", Range(0, 1)) = 0
         [Toggle(_)]
             _MT_Monochrome  ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [Toggle(_)]
@@ -174,16 +177,15 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #pragma target 3.0
 
+            #define _AL_ENABLE
             #define _CL_ENABLE
-            #define _NM_ENABLE
-            #define _TS_ENABLE
-            #define _MT_ENABLE
-            #define _TR_ENABLE
             #define _ES_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
-
-            #define _AL_ENABLE
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -207,17 +209,17 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #pragma target 3.0
 
+            #define _AL_ENABLE
             #define _CL_ENABLE
-            #define _NM_ENABLE
-            #define _TS_ENABLE
-            #define _MT_ENABLE
-            #define _HL_ENABLE
-            #define _TR_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
-            #define _AL_ENABLE
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -236,7 +238,6 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma fragment frag_shadow
 
             #define _AL_ENABLE
-
             #pragma multi_compile_shadowcaster
 
             #include "UnityCG.cginc"

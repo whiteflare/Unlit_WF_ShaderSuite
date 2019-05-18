@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/04/08 whiteflare,
+     *      ver:2019/05/18 whiteflare
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -31,6 +31,7 @@
     #define TGL_01(value)   step(0.5, value)
 
     static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
+    static const float3 BT601 = { 0.299, 0.587, 0.114 };
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
@@ -52,7 +53,7 @@
     }
 
     inline float calcBrightness(float3 color) {
-        return dot(color, BT709);
+        return dot(color, BT601);
     }
 
     inline float3 calcPointLight1Pos() {
@@ -60,7 +61,11 @@
     }
 
     inline float3 calcPointLight1Color(float3 ws_pos) {
-        float3 ls_lightPos = calcPointLight1Pos() - ws_pos;
+        float3 ws_lightPos = calcPointLight1Pos();
+        if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
+            return float3(0, 0, 0); // XYZすべて0はポイントライト未設定と判定する
+        }
+        float3 ls_lightPos = ws_lightPos - ws_pos;
         float lengthSq = dot(ls_lightPos, ls_lightPos);
         float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
         return unity_LightColor[0].rgb * atten;
@@ -97,7 +102,7 @@
         float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
         float3 pointLight1Color = calcPointLight1Color(ws_pos);
         if ( TGL_ON(-lightType) ) {
-            return pointLight1Color;
+            return pointLight1Color; // ポイントライト
         }
 
         float3 ws_lightColor;
@@ -118,12 +123,14 @@
     inline float3 OmniDirectional_ShadeSH9() {
         // UnityCG.cginc にある ShadeSH9 の等方向版
         float3 col = 0;
-        col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
-        col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
-        col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
-        col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
-        col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
-        col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
+        #if UNITY_SHOULD_SAMPLE_SH
+            col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
+            col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
+            col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
+            col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
+            col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
+            col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
+        #endif
         return col;
     }
 
