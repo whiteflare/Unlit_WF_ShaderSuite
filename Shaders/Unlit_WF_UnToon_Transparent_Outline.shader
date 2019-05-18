@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
 
     /*
      * authors:
-     *      ver:2019/05/05 whiteflare,
+     *      ver:2019/05/18 whiteflare,
      */
 
     Properties {
