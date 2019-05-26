@@ -150,8 +150,7 @@
         DECL_SUB_TEX2D(_TS_1stTex);
         float4      _TS_2ndColor;
         DECL_SUB_TEX2D(_TS_2ndTex);
-        float       _TS_1stPower;
-        float       _TS_2ndPower;
+        float       _TS_Power;
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
         float       _TS_Feather;
@@ -347,11 +346,11 @@
             // ビュー相対位置シフト
             brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
             // 影色計算
-            float3 base_color = NON_ZERO_VEC3(_TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv));
-            float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv) / base_color;
-            float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv) / base_color;
-            shadow_color_1st = lerp(float3(1, 1, 1), shadow_color_1st, i.shadow_power * _TS_1stPower);
-            shadow_color_2nd = lerp(float3(1, 1, 1), shadow_color_2nd, i.shadow_power * _TS_2ndPower);
+            float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv).rgb );
+            float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv).rgb / base_color.rgb;
+            float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv).rgb / base_color.rgb;
+            shadow_color_1st = lerp(float3(1, 1, 1), shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
+            shadow_color_2nd = lerp(float3(1, 1, 1), shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
             // 色計算
             color.rgb *= saturate(lerp(
                 lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
