@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/05/18 whiteflare,
+     *      ver:2019/05/26 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -38,13 +38,12 @@
         float2 uv               : TEXCOORD0;
         float4 ls_vertex        : TEXCOORD1;
         float4 ls_light_dir     : TEXCOORD2;
-        float3 ls_camera_dir    : TEXCOORD3;
         float3 light_color      : COLOR0;
         float3 light_power      : COLOR1;
         #ifdef _TS_ENABLE
             float  shadow_power : COLOR2;
         #endif
-        float3 normal           : TEXCOORD4;
+        float3 normal           : TEXCOORD3;
         float2 uv2              : TEXCOORD7;
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -54,13 +53,12 @@
         float2 uv               : TEXCOORD0;
         float4 ls_vertex        : TEXCOORD1;
         float4 ls_light_dir     : TEXCOORD2;
-        float3 ls_camera_dir    : TEXCOORD3;
         float3 light_color      : COLOR0;
         float3 light_power      : COLOR1;
         #ifdef _TS_ENABLE
             float  shadow_power : COLOR2;
         #endif
-        float3 normal           : TEXCOORD4;
+        float3 normal           : TEXCOORD3;
         float2 uv2              : TEXCOORD7;
         float height            : COLOR3;
         UNITY_FOG_COORDS(2)
@@ -87,8 +85,7 @@
 // ここから UnToon と同じ
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
         o.ls_vertex = v.vertex;
-        o.ls_light_dir = calcLocalSpaceLightDir(o.ls_vertex);
-        o.ls_camera_dir = localSpaceViewDir(o.ls_vertex);
+        o.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, v.vertex.w) );
 
         float3 ambientColor = OmniDirectional_ShadeSH9();
 
@@ -148,7 +145,6 @@
         o.uv                = p.uv;
         o.ls_vertex         = p.ls_vertex;
         o.ls_light_dir      = p.ls_light_dir;
-        o.ls_camera_dir     = p.ls_camera_dir;
         o.light_color       = p.light_color;
         o.light_power       = p.light_power;
         #ifdef _TS_ENABLE
@@ -172,7 +168,6 @@
         o.uv                = lerp(x.uv,            y.uv,               div);
         o.ls_vertex         = lerp(x.ls_vertex,     y.ls_vertex,        div);
         o.ls_light_dir      = lerp(x.ls_light_dir,  y.ls_light_dir,     div);
-        o.ls_camera_dir     = lerp(x.ls_camera_dir, y.ls_camera_dir,    div);
         o.light_color       = lerp(x.light_color,   y.light_color,      div);
         o.light_power       = lerp(x.light_power,   y.light_power,      div);
         #ifdef _TS_ENABLE
@@ -247,7 +242,7 @@
 
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
-        float3 ws_camera_dir = UnityObjectToWorldDir(i.ls_camera_dir);
+        float3 ws_camera_dir = worldSpaceViewDir( float4(0, 0, 0, i.ls_vertex.w) );
         float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
             * (1 - smoothstep(0.9, 1, ws_light_dir.y)) * (1 - smoothstep(0.9, 1, ws_camera_dir.y));
 
@@ -257,7 +252,7 @@
             float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal).r;
             float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
             // ビュー相対位置シフト
-            brightness *= smoothstep(-1, -0.9, angle_light_camera);
+            brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
             // 影色計算
             float3 base_color = NON_ZERO_VEC3(_TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv));
             float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv) / base_color;
