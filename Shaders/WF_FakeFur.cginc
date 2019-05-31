@@ -28,7 +28,6 @@
     struct appdata_fur {
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
         float3 normal           : NORMAL;
         float4 tangent          : TANGENT;
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -133,7 +132,7 @@
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
 // ここまで UnToon と同じ
 
-        o.uv2 = TRANSFORM_TEX(v.uv2, _FurNoiseTex);
+        o.uv2 = TRANSFORM_TEX(v.uv, _FurNoiseTex);
 
         return o;
     }
