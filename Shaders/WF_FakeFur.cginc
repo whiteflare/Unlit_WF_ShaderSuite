@@ -61,7 +61,7 @@
         float3 normal           : TEXCOORD3;
         float2 uv2              : TEXCOORD7;
         float height            : COLOR3;
-        UNITY_FOG_COORDS(2)
+        UNITY_FOG_COORDS(8)
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
