@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/05/18 whiteflare
+     *      ver:2019/05/26 whiteflare
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -191,12 +191,12 @@
 
     inline float3 worldSpaceViewDir(float4 ls_vertex) {
         float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
-        return normalize(worldSpaceCameraPos() - ws_vertex.xyz);
+        return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex.xyz);
     }
 
     inline float3 localSpaceViewDir(float4 ls_vertex) {
         float4 ls_camera_pos = mul(unity_WorldToObject, float4(worldSpaceCameraPos(), 1));
-        return normalize(ls_camera_pos.xyz - ls_vertex.xyz);
+        return SafeNormalizeVec3(ls_camera_pos.xyz - ls_vertex.xyz);
     }
 
 

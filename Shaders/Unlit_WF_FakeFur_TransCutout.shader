@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/05/18 whiteflare,
+     *      ver:2019/05/26 whiteflare,
      */
 
     Properties {
@@ -88,8 +88,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
         [NoScaleOffset]
             _TS_2ndTex      ("[SH] 2nd Shade Texture", 2D) = "white" {}
-            _TS_1stPower    ("[SH] 1st Shade Power", Range(0, 2)) = 1
-            _TS_2ndPower    ("[SH] 2nd Shade Power", Range(0, 2)) = 1
+            _TS_Power       ("[SH] Shade Power", Range(0, 2)) = 1
             _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
             _TS_Feather     ("[SH] Feather", Range(0, 0.2)) = 0.05
