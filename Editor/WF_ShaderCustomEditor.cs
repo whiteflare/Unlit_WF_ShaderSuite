@@ -28,6 +28,8 @@ namespace UnlitWF
     public class ShaderCustomEditor : ShaderGUI
     {
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
+            materialEditor.SetDefaultGUIWidths();
+
             // 現在無効なラベルを保持するリスト
             var disable = new List<string>();
             // プロパティを順に描画
@@ -55,6 +57,13 @@ namespace UnlitWF
                 // 描画
                 materialEditor.ShaderProperty(prop, prop.displayName);
             }
+
+            //EditorGUILayout.Space();
+            //EditorGUILayout.Space();
+            //GUILayout.Label("Advanced Options", EditorStyles.boldLabel);
+            //materialEditor.RenderQueueField();
+            //materialEditor.EnableInstancingField();
+            //materialEditor.DoubleSidedGIField();
         }
     }
 
