@@ -67,8 +67,9 @@
         #ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD4;
             float3 bitangent    : TEXCOORD5;
+            float2 uv_dtl       : TEXCOORD6;
         #endif
-        UNITY_FOG_COORDS(6)
+        UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
         // SV_POSITION は vert の out パラメタで設定するのでv2fには含めない
     };
@@ -81,9 +82,17 @@
 
     #ifdef _NM_ENABLE
         float       _NM_Enable;
+        // 1st NormalMap
         DECL_SUB_TEX2D(_BumpMap);
         float       _BumpScale;
         float       _NM_Power;
+        // 2nd NormalMap
+        float       _NM_2ndType;
+        DECL_MAIN_TEX2D(_NM_2ndBumpMap);
+        float4      _NM_2ndBumpMap_ST;
+        float       _NM_2ndScale;
+        DECL_SUB_TEX2D(_NM_2ndMaskTex);
+        float       _NM_InvMaskVal;
     #endif
 
     #ifdef _MT_ENABLE
@@ -271,6 +280,7 @@
         #ifdef _NM_ENABLE
             o.tangent = normalize(v.tangent.xyz);
             o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
+            o.uv_dtl = TRANSFORM_TEX(v.uv, _NM_2ndBumpMap);
         #endif
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
@@ -294,9 +304,24 @@
 
         #ifdef _NM_ENABLE
         if (TGL_ON(_NM_Enable)) {
+            // 1st NormalMap
+            float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale );
+
+            // 2nd NormalMap
+            if (_NM_2ndType == 1) { // BLEND
+                float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
+                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_NM_2ndBumpMap, i.uv_dtl), _NM_2ndScale);
+                normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
+            }
+            else if (_NM_2ndType == 2) { // SWITCH
+                float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
+                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_NM_2ndBumpMap, i.uv_dtl), _NM_2ndScale);
+                normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
+            }
+
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_bump_normal = mul( UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale ), tangentTransform); // 法線マップ参照
+            ls_bump_normal = mul( normalTangent, tangentTransform);
             // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
             // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
             color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;

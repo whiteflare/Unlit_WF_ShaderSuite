@@ -69,6 +69,15 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut" {
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
             _BumpScale      ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power       ("[NM] Shadow Power", Range(0, 1)) = 0.25
+        [Space(20)]
+        [Enum(OFF,0,BLEND,1,SWITCH,2)]
+            _NM_2ndType     ("[NM] 2nd Normal Blend", Float) = 0
+            _NM_2ndBumpMap  ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
+            _NM_2ndScale    ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
+        [NoScaleOffset]
+            _NM_2ndMaskTex  ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _NM_InvMaskVal  ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // メタリックマップ
         [Header(Metallic)]
