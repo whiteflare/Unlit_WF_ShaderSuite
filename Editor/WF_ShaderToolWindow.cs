@@ -31,14 +31,14 @@ namespace UnlitWF
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
-            GetWindow<ShaderToolWindow>(true, "UnlitWF/Material Tools", true);
+            GetWindow<ShaderToolWindow>("UnlitWF/Material Tools");
         }
 
         [MenuItem("CONTEXT/Material/Open UnlitWF.Material Tools")]
         private static void OpenWindowFromContext(MenuCommand cmd) {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
-            GetWindow<ShaderToolWindow>(true, "UnlitWF/Material Tools", true);
+            GetWindow<ShaderToolWindow>("UnlitWF/Material Tools");
         }
 
         private static readonly List<Material> arguments = new List<Material>();
