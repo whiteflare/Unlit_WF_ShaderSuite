@@ -55,7 +55,6 @@
     };
 
     struct v2f {
-        float4 vertex           : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float4 ls_vertex        : TEXCOORD1;
         float4 ls_light_dir     : TEXCOORD2;
@@ -71,6 +70,7 @@
         #endif
         UNITY_FOG_COORDS(6)
         UNITY_VERTEX_OUTPUT_STEREO
+        // SV_POSITION は vert の out パラメタで設定するのでv2fには含めない
     };
 
     DECL_MAIN_TEX2D(_MainTex);
@@ -213,14 +213,15 @@
 
     #endif
 
-    v2f vert(in appdata v) {
+    v2f vert(in appdata v, out float4 vertex : SV_POSITION) {
         v2f o;
 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.vertex = UnityObjectToClipPos(v.vertex);
+        vertex = UnityObjectToClipPos(v.vertex);
+
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
         o.ls_vertex = v.vertex;
         o.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, v.vertex.w) );
@@ -274,7 +275,7 @@
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
 
-        UNITY_TRANSFER_FOG(o, o.vertex);
+        UNITY_TRANSFER_FOG(o, vertex);
         return o;
     }
 
@@ -417,9 +418,9 @@
 
     // アウトライン用
 
-    v2f vert_outline(appdata v) {
+    v2f vert_outline(appdata v, out float4 vertex : SV_POSITION) {
         // 通常の vert を使う
-        v2f o = vert(v);
+        v2f o = vert(v, vertex);
 
         // SV_POSITION を上書き
 
@@ -435,18 +436,18 @@
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向の逆にシフトする
                 o.ls_vertex.xyz -= vecZShift;
-                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                vertex = UnityObjectToClipPos( o.ls_vertex );
             } else {
                 // カメラが orthographic のときはシフト後の z のみ採用する
-                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                vertex = UnityObjectToClipPos( o.ls_vertex );
                 o.ls_vertex.xyz -= vecZShift;
-                o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
+                vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
             }
         } else {
-            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         }
         #else
-            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         #endif
 
         return o;
@@ -477,9 +478,9 @@
 
     float _ES_Z_Shift;
 
-    v2f vert_emissiveScroll(appdata v) {
+    v2f vert_emissiveScroll(appdata v, out float4 vertex : SV_POSITION) {
         // 通常の vert を使う
-        v2f o = vert(v);
+        v2f o = vert(v, vertex);
 
         // SV_POSITION を上書き
 
@@ -493,19 +494,19 @@
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向にシフトする
                 o.ls_vertex.xyz += vecZShift;
-                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                vertex = UnityObjectToClipPos( o.ls_vertex );
             } else {
                 // カメラが orthographic のときはシフト後の z のみ採用する
-                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                vertex = UnityObjectToClipPos( o.ls_vertex );
                 o.ls_vertex.xyz += vecZShift;
-                o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
+                vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
             }
 
         } else {
-            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         }
         #else
-            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         #endif
 
         return o;
