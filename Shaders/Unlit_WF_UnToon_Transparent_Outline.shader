@@ -67,8 +67,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
         [Space(20)]
         [Enum(OFF,0,BLEND,1,SWITCH,2)]
             _NM_2ndType     ("[NM] 2nd Normal Blend", Float) = 0
-            _NM_2ndBumpMap  ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
-            _NM_2ndScale    ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
+            _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
+            _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
             _NM_2ndMaskTex  ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
         [Toggle(_)]

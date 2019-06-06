@@ -88,9 +88,9 @@
         float       _NM_Power;
         // 2nd NormalMap
         float       _NM_2ndType;
-        DECL_MAIN_TEX2D(_NM_2ndBumpMap);
-        float4      _NM_2ndBumpMap_ST;
-        float       _NM_2ndScale;
+        DECL_MAIN_TEX2D(_DetailNormalMap);
+        float4      _DetailNormalMap_ST;
+        float       _DetailNormalMapScale;
         DECL_SUB_TEX2D(_NM_2ndMaskTex);
         float       _NM_InvMaskVal;
     #endif
@@ -280,7 +280,7 @@
         #ifdef _NM_ENABLE
             o.tangent = normalize(v.tangent.xyz);
             o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
-            o.uv_dtl = TRANSFORM_TEX(v.uv, _NM_2ndBumpMap);
+            o.uv_dtl = TRANSFORM_TEX(v.uv, _DetailNormalMap);
         #endif
 
         SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
@@ -310,12 +310,12 @@
             // 2nd NormalMap
             if (_NM_2ndType == 1) { // BLEND
                 float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
-                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_NM_2ndBumpMap, i.uv_dtl), _NM_2ndScale);
+                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
                 normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
             }
             else if (_NM_2ndType == 2) { // SWITCH
                 float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
-                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_NM_2ndBumpMap, i.uv_dtl), _NM_2ndScale);
+                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
                 normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
             }
 
