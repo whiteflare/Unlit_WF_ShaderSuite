@@ -105,6 +105,9 @@
         float       _MT_Monochrome;
         DECL_SUB_TEX2D(_MT_MaskTex);
         float       _MT_InvMaskVal;
+        int         _MT_CubemapType;
+        samplerCUBE _MT_Cubemap;
+        float4      _MT_Cubemap_HDR;
 
         inline float3 calcNdotH(float3 normal, float3 view, float3 light) {
             float3 h = (view + light) / length(view + light);
@@ -335,7 +338,21 @@
             float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
             if (0.01 < power) {
                 // リフレクション
-                float3 reflection = pickReflectionProbe(i.ls_vertex, ls_metal_normal, (1 - _MT_Smoothness) * 10);
+                float metal_lod = (1 - _MT_Smoothness) * 10;
+                float3 reflection;
+                if (_MT_CubemapType == 1) { // ADDITION
+                    reflection
+                        = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod)
+                        + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
+                }
+                else if (_MT_CubemapType == 2) {    // ONLY_SECOND_MAP
+                    reflection
+                        = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
+                }
+                else {  // OFF
+                    reflection
+                        = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod);
+                }
                 if (TGL_ON(_MT_Monochrome)) {
                     reflection = calcBrightness(reflection);
                 }

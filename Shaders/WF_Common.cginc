@@ -404,4 +404,13 @@
         return lerp(color1, color0, unity_SpecCube0_BoxMin.w);
     }
 
+    inline float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float4 ls_vertex, float3 ls_normal, float lod) {
+        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+        float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
+        float3 reflect_dir = reflect(-ws_camera_dir, UnityObjectToWorldNormal(ls_normal));
+
+        float4 color = texCUBElod(cubemap, float4(reflect_dir, lod) );
+        return DecodeHDR(color, cubemap_HDR);
+    }
+
 #endif
