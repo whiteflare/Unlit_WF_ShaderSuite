@@ -123,14 +123,12 @@
     inline float3 OmniDirectional_ShadeSH9() {
         // UnityCG.cginc にある ShadeSH9 の等方向版
         float3 col = 0;
-        #if UNITY_SHOULD_SAMPLE_SH
-            col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
-            col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
-            col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
-            col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
-            col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
-            col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
-        #endif
+        col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
+        col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
+        col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
+        col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
+        col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
+        col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
         return col;
     }
 
@@ -139,6 +137,10 @@
         float3 col0, float3 col1, float3 col2, float3 col3,
         float4 lightAttenSq, float3 ws_pos) {
         // UnityCG.cginc にある Shade4PointLights の等方向版
+
+        if ( !any(float3(lpX.x, lpY.x, lpZ.x)) ) {
+            col0.rgb = 0;
+        }
 
         float4 toLightX = lpX - ws_pos.x;
         float4 toLightY = lpY - ws_pos.y;
@@ -164,20 +166,18 @@
     inline float calcLightPower(float4 ls_vertex) {
         // directional light
         float3 lightColor = _LightColor0;
-        #if UNITY_SHOULD_SAMPLE_SH
-            // ambient
-            lightColor += OmniDirectional_ShadeSH9();
-            // not important lights
-            lightColor += OmniDirectional_Shade4PointLights(
-                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                unity_LightColor[0].rgb,
-                unity_LightColor[1].rgb,
-                unity_LightColor[2].rgb,
-                unity_LightColor[3].rgb,
-                unity_4LightAtten0,
-                mul(unity_ObjectToWorld, ls_vertex)
-            );
-        #endif
+        // ambient
+        lightColor += OmniDirectional_ShadeSH9();
+        // not important lights
+        lightColor += OmniDirectional_Shade4PointLights(
+            unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+            unity_LightColor[0].rgb,
+            unity_LightColor[1].rgb,
+            unity_LightColor[2].rgb,
+            unity_LightColor[3].rgb,
+            unity_4LightAtten0,
+            mul(unity_ObjectToWorld, ls_vertex)
+        );
         return calcBrightness(saturate(lightColor));
     }
 
