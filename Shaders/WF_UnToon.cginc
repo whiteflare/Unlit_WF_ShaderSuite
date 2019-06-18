@@ -25,6 +25,9 @@
 
     #include "WF_Common.cginc"
 
+    #define WF_SAMPLE_TEX2D_LOD(tex, coord, lod)                        tex.SampleLevel(sampler##tex,coord, lod)
+    #define WF_SAMPLE_TEX2D_SAMPLER_LOD(tex, samplertex, coord, lod)    tex.SampleLevel(sampler##samplertex, coord, lod)
+
 #if 1
     // サンプラー節約のための差し替えマクロ
     // 節約にはなるけど最適化などで _MainTex のサンプリングが消えると途端に破綻する諸刃の剣
@@ -44,9 +47,16 @@
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
     #define NON_ZERO_VEC3(v)                        max(v, float3(0.00390625, 0.00390625, 0.00390625))
 
+    #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
+        #define _LMAP_ENABLE
+    #endif
+
     struct appdata {
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
+        #ifdef _LMAP_ENABLE
+            float2 uv_lmap      : TEXCOORD1;
+        #endif
         float3 normal           : NORMAL;
         #ifdef _NM_ENABLE
             float4 tangent      : TANGENT;
@@ -59,9 +69,8 @@
         float4 ls_vertex        : TEXCOORD1;
         float4 ls_light_dir     : TEXCOORD2;
         float3 light_color      : COLOR0;
-        float3 light_power      : COLOR1;
         #ifdef _TS_ENABLE
-            float shadow_power  : COLOR2;
+            float shadow_power  : COLOR1;
         #endif
         float3 normal           : TEXCOORD3;
         #ifdef _NM_ENABLE
@@ -225,6 +234,38 @@
 
     #endif
 
+    float3 pickLightmapLod(float2 uv_lmap, float3 ls_normal) {
+        float3 color = float3(0, 0, 0);
+        float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
+        #ifdef LIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_Lightmap, uv, 0);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
+            #ifdef DIRLIGHTMAP_COMBINED
+                fixed4 dir_tex = WF_SAMPLE_TEX2D_SAMPLER_LOD(unity_LightmapInd, unity_Lightmap, uv, 0);
+                color += DecodeDirectionalLightmap(lmap_color, dir_tex, ws_normal);
+            #else
+                color += lmap_color;
+            #endif
+        }
+        #endif
+        #ifdef DYNAMICLIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
+            float3 lmap_color = DecodeRealtimeLightmap (lmap_tex);
+            #ifdef DIRLIGHTMAP_COMBINED
+                half4 dir_tex = WF_SAMPLE_TEX2D_SAMPLER_LOD(unity_DynamicDirectionality, unity_DynamicLightmap, uv, 0);
+                color += DecodeDirectionalLightmap(lmap_color, dir_tex, ws_normal);
+            #else
+                color += lmap_color;
+            #endif
+        }
+        #endif
+        return color;
+    }
+
     v2f vert(in appdata v, out float4 vertex : SV_POSITION) {
         v2f o;
 
@@ -238,7 +279,19 @@
         o.ls_vertex = v.vertex;
         o.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, v.vertex.w) );
 
-        float3 ambientColor = OmniDirectional_ShadeSH9();
+        o.normal = normalize(v.normal.xyz);
+        #ifdef _NM_ENABLE
+            o.tangent = normalize(v.tangent.xyz);
+            o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
+            o.uv_dtl = TRANSFORM_TEX(v.uv, _DetailNormalMap);
+        #endif
+
+        float3 ambientColor =
+            #ifdef _LMAP_ENABLE
+                pickLightmapLod(v.uv_lmap, o.normal);
+            #else
+                OmniDirectional_ShadeSH9();
+            #endif
 
         // 影コントラスト
         #ifdef _TS_ENABLE
@@ -262,7 +315,7 @@
         }
         #endif
 
-        // ライトカラーブレンド
+        // Anti-Glare とライト色ブレンドを同時に計算
         {
             float3 lightColorMain = _LightColor0.rgb;
             float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
@@ -274,19 +327,11 @@
                     unity_4LightAtten0,
                     mul(unity_ObjectToWorld, o.ls_vertex)
                 );
-            float3 color = max(lightColorMain + lightColorSub4 + ambientColor, float3(0.001, 0.001, 0.001));
-            color = saturate( color / calcBrightness(color) );
-            o.light_color = (color - 1) * _GL_BrendPower + 1;
+            float3 color = lightColorMain + lightColorSub4 + ambientColor;
+            float power = calcBrightness(color);
+            o.light_color = (saturate( color / max(0.001, power) ) - 1) * _GL_BrendPower + 1;
+            o.light_color *= saturate( power * 2 + (100 - _GL_Level) * 0.01 );
         }
-
-        o.normal = normalize(v.normal.xyz);
-        #ifdef _NM_ENABLE
-            o.tangent = normalize(v.tangent.xyz);
-            o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
-            o.uv_dtl = TRANSFORM_TEX(v.uv, _DetailNormalMap);
-        #endif
-
-        SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
 
         UNITY_TRANSFER_FOG(o, vertex);
         return o;
@@ -426,10 +471,8 @@
         }
         #endif
 
-        // ライトカラーブレンド
-        color.rgb *= i.light_color.rgb;
-        // Anti-Glare
-        affectAntiGlare(i.light_power, color);
+        // Anti-Glare とライト色ブレンドを同時に計算
+        color.rgb *= i.light_color;
 
         // Alpha
         affectAlpha(i.uv, color);
