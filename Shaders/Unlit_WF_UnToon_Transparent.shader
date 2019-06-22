@@ -201,6 +201,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -234,7 +235,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
-
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -254,6 +255,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #define _AL_ENABLE
             #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "WF_UnToon_ShadowCaster.cginc"

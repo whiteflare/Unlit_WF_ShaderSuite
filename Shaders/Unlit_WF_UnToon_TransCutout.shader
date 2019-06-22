@@ -207,6 +207,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -237,6 +238,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -268,6 +270,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -288,6 +291,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #define _AL_ENABLE
             #define _AL_CUTOFF_ENABLE
             #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "WF_UnToon_ShadowCaster.cginc"

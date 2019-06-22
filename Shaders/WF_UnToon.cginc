@@ -79,6 +79,7 @@
             float2 uv_dtl       : TEXCOORD6;
         #endif
         UNITY_FOG_COORDS(7)
+        UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
         // SV_POSITION は vert の out パラメタで設定するのでv2fには含めない
     };
@@ -333,11 +334,13 @@
             o.light_color *= saturate( power * 2 + (100 - _GL_Level) * 0.01 );
         }
 
+        UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_TRANSFER_FOG(o, vertex);
         return o;
     }
 
     float4 frag(v2f i) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         // メイン

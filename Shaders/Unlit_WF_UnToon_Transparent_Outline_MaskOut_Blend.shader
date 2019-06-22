@@ -225,6 +225,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower
@@ -272,6 +273,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower
@@ -314,6 +316,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower

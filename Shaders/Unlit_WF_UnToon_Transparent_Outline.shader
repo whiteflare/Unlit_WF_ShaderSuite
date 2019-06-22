@@ -212,6 +212,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -236,6 +237,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"

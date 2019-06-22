@@ -58,11 +58,11 @@ namespace UnlitWF
                 materialEditor.ShaderProperty(prop, prop.displayName);
             }
 
-            //EditorGUILayout.Space();
-            //EditorGUILayout.Space();
-            //GUILayout.Label("Advanced Options", EditorStyles.boldLabel);
-            //materialEditor.RenderQueueField();
-            //materialEditor.EnableInstancingField();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            GUILayout.Label("Advanced Options", EditorStyles.boldLabel);
+            materialEditor.RenderQueueField();
+            materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
         }
     }
