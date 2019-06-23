@@ -199,6 +199,9 @@
         return SafeNormalizeVec3(ls_camera_pos.xyz - ls_vertex.xyz);
     }
 
+    inline bool isInMirror() {
+        return unity_CameraProjection[2][0] != 0.0f || unity_CameraProjection[2][1] != 0.0f;
+    }
 
     ////////////////////////////
     // Alpha Transparent

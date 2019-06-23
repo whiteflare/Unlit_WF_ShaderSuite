@@ -428,6 +428,11 @@
         float3 ws_camera_dir = worldSpaceViewDir( float4(0, 0, 0, i.ls_vertex.w) );
         float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
             * (1 - smoothstep(0.9, 1, ws_light_dir.y)) * (1 - smoothstep(0.9, 1, ws_camera_dir.y));
+        #ifdef USING_STEREO_MATRICES
+            if (isInMirror()) {
+                angle_light_camera = 0; // 両目かつ鏡の中のときは、視差問題が生じないように強制的に 0 にする
+            }
+        #endif
 
         // 階調影
         #ifdef _TS_ENABLE
