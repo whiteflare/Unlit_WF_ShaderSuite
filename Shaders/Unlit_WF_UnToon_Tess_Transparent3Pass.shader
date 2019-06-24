@@ -305,8 +305,10 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
             #pragma vertex vert_emissiveScroll
             #pragma fragment frag_emissiveScroll
+            #pragma hull hull
+            #pragma domain domain
 
-            #pragma target 3.0
+            #pragma target 5.0
 
             #define _AL_ENABLE
             #define _ES_ENABLE
