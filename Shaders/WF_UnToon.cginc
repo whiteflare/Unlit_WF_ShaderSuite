@@ -20,10 +20,13 @@
 
     /*
      * authors:
-     *      ver:2019/05/26 whiteflare,
+     *      ver:2019/06/26 whiteflare,
      */
 
     #include "WF_Common.cginc"
+
+    #define WF_SAMPLE_TEX2D_LOD(tex, coord, lod)                        tex.SampleLevel(sampler##tex,coord, lod)
+    #define WF_SAMPLE_TEX2D_SAMPLER_LOD(tex, samplertex, coord, lod)    tex.SampleLevel(sampler##samplertex, coord, lod)
 
 #if 1
     // サンプラー節約のための差し替えマクロ
@@ -44,9 +47,16 @@
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
     #define NON_ZERO_VEC3(v)                        max(v, float3(0.00390625, 0.00390625, 0.00390625))
 
+    #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
+        #define _LMAP_ENABLE
+    #endif
+
     struct appdata {
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
+        #ifdef _LMAP_ENABLE
+            float2 uv_lmap      : TEXCOORD1;
+        #endif
         float3 normal           : NORMAL;
         #ifdef _NM_ENABLE
             float4 tangent      : TANGENT;
@@ -55,22 +65,23 @@
     };
 
     struct v2f {
-        float4 vertex           : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float4 ls_vertex        : TEXCOORD1;
         float4 ls_light_dir     : TEXCOORD2;
         float3 light_color      : COLOR0;
-        float3 light_power      : COLOR1;
         #ifdef _TS_ENABLE
-            float shadow_power  : COLOR2;
+            float shadow_power  : COLOR1;
         #endif
         float3 normal           : TEXCOORD3;
         #ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD4;
             float3 bitangent    : TEXCOORD5;
+            float2 uv_dtl       : TEXCOORD6;
         #endif
-        UNITY_FOG_COORDS(6)
+        UNITY_FOG_COORDS(7)
+        UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
+        // SV_POSITION は vert の out パラメタで設定するのでv2fには含めない
     };
 
     DECL_MAIN_TEX2D(_MainTex);
@@ -81,9 +92,17 @@
 
     #ifdef _NM_ENABLE
         float       _NM_Enable;
+        // 1st NormalMap
         DECL_SUB_TEX2D(_BumpMap);
         float       _BumpScale;
         float       _NM_Power;
+        // 2nd NormalMap
+        float       _NM_2ndType;
+        DECL_MAIN_TEX2D(_DetailNormalMap);
+        float4      _DetailNormalMap_ST;
+        float       _DetailNormalMapScale;
+        DECL_SUB_TEX2D(_NM_2ndMaskTex);
+        float       _NM_InvMaskVal;
     #endif
 
     #ifdef _MT_ENABLE
@@ -96,6 +115,9 @@
         float       _MT_Monochrome;
         DECL_SUB_TEX2D(_MT_MaskTex);
         float       _MT_InvMaskVal;
+        int         _MT_CubemapType;
+        samplerCUBE _MT_Cubemap;
+        float4      _MT_Cubemap_HDR;
 
         inline float3 calcNdotH(float3 normal, float3 view, float3 light) {
             float3 h = (view + light) / length(view + light);
@@ -213,19 +235,64 @@
 
     #endif
 
-    v2f vert(in appdata v) {
+    float3 pickLightmapLod(float2 uv_lmap, float3 ls_normal) {
+        float3 color = float3(0, 0, 0);
+        float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
+        #ifdef LIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_Lightmap, uv, 0);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
+            #ifdef DIRLIGHTMAP_COMBINED
+                fixed4 dir_tex = WF_SAMPLE_TEX2D_SAMPLER_LOD(unity_LightmapInd, unity_Lightmap, uv, 0);
+                color += DecodeDirectionalLightmap(lmap_color, dir_tex, ws_normal);
+            #else
+                color += lmap_color;
+            #endif
+        }
+        #endif
+        #ifdef DYNAMICLIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
+            float3 lmap_color = DecodeRealtimeLightmap (lmap_tex);
+            #ifdef DIRLIGHTMAP_COMBINED
+                half4 dir_tex = WF_SAMPLE_TEX2D_SAMPLER_LOD(unity_DynamicDirectionality, unity_DynamicLightmap, uv, 0);
+                color += DecodeDirectionalLightmap(lmap_color, dir_tex, ws_normal);
+            #else
+                color += lmap_color;
+            #endif
+        }
+        #endif
+        return color;
+    }
+
+    v2f vert(in appdata v, out float4 vertex : SV_POSITION) {
         v2f o;
 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.vertex = UnityObjectToClipPos(v.vertex);
+        vertex = UnityObjectToClipPos(v.vertex);
+
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
         o.ls_vertex = v.vertex;
         o.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, v.vertex.w) );
 
-        float3 ambientColor = OmniDirectional_ShadeSH9();
+        o.normal = normalize(v.normal.xyz);
+        #ifdef _NM_ENABLE
+            o.tangent = normalize(v.tangent.xyz);
+            o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
+            o.uv_dtl = TRANSFORM_TEX(v.uv, _DetailNormalMap);
+        #endif
+
+        float3 ambientColor =
+            #ifdef _LMAP_ENABLE
+                pickLightmapLod(v.uv_lmap, o.normal);
+            #else
+                OmniDirectional_ShadeSH9();
+            #endif
 
         // 影コントラスト
         #ifdef _TS_ENABLE
@@ -249,7 +316,7 @@
         }
         #endif
 
-        // ライトカラーブレンド
+        // Anti-Glare とライト色ブレンドを同時に計算
         {
             float3 lightColorMain = _LightColor0.rgb;
             float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
@@ -261,24 +328,19 @@
                     unity_4LightAtten0,
                     mul(unity_ObjectToWorld, o.ls_vertex)
                 );
-            float3 color = max(lightColorMain + lightColorSub4 + ambientColor, float3(0.001, 0.001, 0.001));
-            color = saturate( color / calcBrightness(color) );
-            o.light_color = (color - 1) * _GL_BrendPower + 1;
+            float3 color = lightColorMain + lightColorSub4 + ambientColor;
+            float power = calcBrightness(color);
+            o.light_color = (saturate( color / max(0.001, power) ) - 1) * _GL_BrendPower + 1;
+            o.light_color *= saturate( power * 2 + (100 - _GL_Level) * 0.01 );
         }
 
-        o.normal = normalize(v.normal.xyz);
-        #ifdef _NM_ENABLE
-            o.tangent = normalize(v.tangent.xyz);
-            o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
-        #endif
-
-        SET_ANTIGLARE_LEVEL(v.vertex, o.light_power);
-
-        UNITY_TRANSFER_FOG(o, o.vertex);
+        UNITY_TRANSFER_INSTANCE_ID(v, o);
+        UNITY_TRANSFER_FOG(o, vertex);
         return o;
     }
 
     float4 frag(v2f i) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         // メイン
@@ -293,9 +355,24 @@
 
         #ifdef _NM_ENABLE
         if (TGL_ON(_NM_Enable)) {
+            // 1st NormalMap
+            float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale );
+
+            // 2nd NormalMap
+            if (_NM_2ndType == 1) { // BLEND
+                float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
+                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
+                normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
+            }
+            else if (_NM_2ndType == 2) { // SWITCH
+                float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
+                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
+                normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
+            }
+
             // 法線計算
             float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_bump_normal = mul( UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale ), tangentTransform); // 法線マップ参照
+            ls_bump_normal = mul( normalTangent, tangentTransform);
             // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
             // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
             color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;
@@ -309,7 +386,21 @@
             float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
             if (0.01 < power) {
                 // リフレクション
-                float3 reflection = pickReflectionProbe(i.ls_vertex, ls_metal_normal, (1 - _MT_Smoothness) * 10);
+                float metal_lod = (1 - _MT_Smoothness) * 10;
+                float3 reflection;
+                if (_MT_CubemapType == 1) { // ADDITION
+                    reflection
+                        = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod)
+                        + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
+                }
+                else if (_MT_CubemapType == 2) {    // ONLY_SECOND_MAP
+                    reflection
+                        = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
+                }
+                else {  // OFF
+                    reflection
+                        = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod);
+                }
                 if (TGL_ON(_MT_Monochrome)) {
                     reflection = calcBrightness(reflection);
                 }
@@ -337,6 +428,11 @@
         float3 ws_camera_dir = worldSpaceViewDir( float4(0, 0, 0, i.ls_vertex.w) );
         float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
             * (1 - smoothstep(0.9, 1, ws_light_dir.y)) * (1 - smoothstep(0.9, 1, ws_camera_dir.y));
+        #ifdef USING_STEREO_MATRICES
+            if (isInMirror()) {
+                angle_light_camera = 0; // 両目かつ鏡の中のときは、視差問題が生じないように強制的に 0 にする
+            }
+        #endif
 
         // 階調影
         #ifdef _TS_ENABLE
@@ -383,10 +479,8 @@
         }
         #endif
 
-        // ライトカラーブレンド
-        color.rgb *= i.light_color.rgb;
-        // Anti-Glare
-        affectAntiGlare(i.light_power, color);
+        // Anti-Glare とライト色ブレンドを同時に計算
+        color.rgb *= i.light_color;
 
         // Alpha
         affectAlpha(i.uv, color);
@@ -417,9 +511,9 @@
 
     // アウトライン用
 
-    v2f vert_outline(appdata v) {
+    v2f vert_outline(appdata v, out float4 vertex : SV_POSITION) {
         // 通常の vert を使う
-        v2f o = vert(v);
+        v2f o = vert(v, vertex);
 
         // SV_POSITION を上書き
 
@@ -435,18 +529,18 @@
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向の逆にシフトする
                 o.ls_vertex.xyz -= vecZShift;
-                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                vertex = UnityObjectToClipPos( o.ls_vertex );
             } else {
                 // カメラが orthographic のときはシフト後の z のみ採用する
-                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                vertex = UnityObjectToClipPos( o.ls_vertex );
                 o.ls_vertex.xyz -= vecZShift;
-                o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
+                vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
             }
         } else {
-            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         }
         #else
-            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         #endif
 
         return o;
@@ -477,9 +571,9 @@
 
     float _ES_Z_Shift;
 
-    v2f vert_emissiveScroll(appdata v) {
+    v2f vert_emissiveScroll(appdata v, out float4 vertex : SV_POSITION) {
         // 通常の vert を使う
-        v2f o = vert(v);
+        v2f o = vert(v, vertex);
 
         // SV_POSITION を上書き
 
@@ -493,19 +587,19 @@
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向にシフトする
                 o.ls_vertex.xyz += vecZShift;
-                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                vertex = UnityObjectToClipPos( o.ls_vertex );
             } else {
                 // カメラが orthographic のときはシフト後の z のみ採用する
-                o.vertex = UnityObjectToClipPos( o.ls_vertex );
+                vertex = UnityObjectToClipPos( o.ls_vertex );
                 o.ls_vertex.xyz += vecZShift;
-                o.vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
+                vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
             }
 
         } else {
-            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         }
         #else
-            o.vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         #endif
 
         return o;

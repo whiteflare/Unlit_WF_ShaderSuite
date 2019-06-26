@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
 
     /*
      * authors:
-     *      ver:2019/05/26 whiteflare,
+     *      ver:2019/06/26 whiteflare,
      */
 
     Properties {
@@ -71,14 +71,24 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             _BumpScale      ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power       ("[NM] Shadow Power", Range(0, 1)) = 0.25
 
+        [Header(NormalMap Secondary)]
+        [Enum(OFF,0,BLEND,1,SWITCH,2)]
+            _NM_2ndType     ("[NM] 2nd Normal Blend", Float) = 0
+            _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
+            _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
+        [NoScaleOffset]
+            _NM_2ndMaskTex  ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _NM_InvMaskVal  ("[NM] Invert Mask Value", Range(0, 1)) = 0
+
         // メタリックマップ
         [Header(Metallic)]
         [Toggle(_)]
             _MT_Enable      ("[MT] Enable", Float) = 0
             _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
+            _MT_BlendType   ("[MT] Brightness", Range(0, 1)) = 0
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0.1
-            _MT_BlendType   ("[MT] Blend Type (MUL/ADD)", Range(0, 1)) = 0
         [Toggle(_)]
             _MT_Monochrome  ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [Toggle(_)]
@@ -87,6 +97,12 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             _MT_MaskTex     ("[MT] MetallicMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal  ("[MT] Invert Mask Value", Range(0, 1)) = 0
+
+        [Header(Metallic Secondary)]
+        [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
+            _MT_CubemapType ("[MT] 2nd CubeMap Blend", Float) = 0
+        [NoScaleOffset]
+            _MT_Cubemap     ("[MT] 2nd CubeMap", Cube) = "" {}
 
         // Matcapハイライト
         [Header(Light Matcap)]
@@ -209,6 +225,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower
@@ -256,6 +273,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower
@@ -298,6 +316,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower
