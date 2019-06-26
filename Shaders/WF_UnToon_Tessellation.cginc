@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  The MIT License
  *
  *  Copyright 2018-2019 whiteflare.
@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/05/26 whiteflare,
+     *      ver:2019/06/26 whiteflare,
      */
 
     #include "WF_UnToon.cginc"

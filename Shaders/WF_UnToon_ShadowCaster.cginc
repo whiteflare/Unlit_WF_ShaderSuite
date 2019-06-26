@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/04/22 whiteflare,
+     *      ver:2019/06/26 whiteflare,
      */
 
     struct v2f_shadow {

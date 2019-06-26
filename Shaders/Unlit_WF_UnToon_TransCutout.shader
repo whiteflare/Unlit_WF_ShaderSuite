@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/05/26 whiteflare,
+     *      ver:2019/06/26 whiteflare,
      */
 
     Properties {

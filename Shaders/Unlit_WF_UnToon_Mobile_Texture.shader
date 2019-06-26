@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Texture" {
 
     /*
      * authors:
-     *      ver:2019/05/26 whiteflare,
+     *      ver:2019/06/26 whiteflare,
      */
 
     Properties {
