@@ -51,6 +51,10 @@
         #define _LMAP_ENABLE
     #endif
 
+    ////////////////////////////
+    // main structure
+    ////////////////////////////
+
     struct appdata {
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
@@ -90,6 +94,10 @@
     float           _AL_CutOff;
     float           _GL_BrendPower;
 
+    ////////////////////////////
+    // Normal Map
+    ////////////////////////////
+
     #ifdef _NM_ENABLE
         float       _NM_Enable;
         // 1st NormalMap
@@ -103,7 +111,43 @@
         float       _DetailNormalMapScale;
         DECL_SUB_TEX2D(_NM_2ndMaskTex);
         float       _NM_InvMaskVal;
+
+        inline void affectBumpNormal(v2f i, out float3 ls_bump_normal, inout float4 color) {
+            float3 ls_normal = i.normal;
+            if (TGL_ON(_NM_Enable)) {
+                // 1st NormalMap
+                float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale );
+
+                // 2nd NormalMap
+                if (_NM_2ndType == 1) { // BLEND
+                    float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
+                    float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
+                    normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
+                }
+                else if (_NM_2ndType == 2) { // SWITCH
+                    float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
+                    float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
+                    normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
+                }
+
+                // 法線計算
+                float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
+                ls_bump_normal = mul( normalTangent, tangentTransform);
+                // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
+                // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
+                color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;
+            }
+            else {
+                ls_bump_normal = ls_normal;
+            }
+        }
+    #else
+        #define affectBumpNormal(i, ls_bump_normal, color)  ls_bump_normal = i.normal
     #endif
+
+    ////////////////////////////
+    // Metallic
+    ////////////////////////////
 
     #ifdef _MT_ENABLE
         float       _MT_Enable;
@@ -162,43 +206,48 @@
             return specular;
         }
 
+        inline void affectMetallic(v2f i, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
+            if (TGL_ON(_MT_Enable)) {
+                float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
+                float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
+                if (0.01 < power) {
+                    // リフレクション
+                    float metal_lod = (1 - _MT_Smoothness) * 10;
+                    float3 reflection;
+                    if (_MT_CubemapType == 1) { // ADDITION
+                        reflection
+                            = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod)
+                            + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
+                    }
+                    else if (_MT_CubemapType == 2) {    // ONLY_SECOND_MAP
+                        reflection
+                            = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
+                    }
+                    else {  // OFF
+                        reflection
+                            = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod);
+                    }
+                    if (TGL_ON(_MT_Monochrome)) {
+                        reflection = calcBrightness(reflection);
+                    }
+                    // スペキュラ
+                    float3 specular = float3(0, 0, 0);
+                    if (TGL_ON(_MT_Specular)) {
+                        specular = pickSpecular(i.ls_vertex, ls_metal_normal, _MT_Smoothness);
+                    }
+                    color.rgb = lerp(color.rgb,
+                        lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb,
+                        power);
+                }
+            }
+        }
+    #else
+        #define affectMetallic(i, ls_normal, ls_bump_normal, color)
     #endif
 
-    #ifdef _TS_ENABLE
-        float       _TS_Enable;
-        float4      _TS_BaseColor;
-        DECL_SUB_TEX2D(_TS_BaseTex);
-        float4      _TS_1stColor;
-        DECL_SUB_TEX2D(_TS_1stTex);
-        float4      _TS_2ndColor;
-        DECL_SUB_TEX2D(_TS_2ndTex);
-        float       _TS_Power;
-        float       _TS_1stBorder;
-        float       _TS_2ndBorder;
-        float       _TS_Feather;
-        float       _TS_BlendNormal;
-        DECL_SUB_TEX2D(_TS_MaskTex);
-        float       _TS_InvMaskVal;
-    #endif
-
-    #ifdef _TR_ENABLE
-        float       _TR_Enable;
-        float4      _TR_Color;
-        float       _TR_PowerTop;
-        float       _TR_PowerSide;
-        float       _TR_PowerBottom;
-        DECL_SUB_TEX2D(_TR_MaskTex);
-        float       _TR_InvMaskVal;
-    #endif
-
-    #ifdef _TL_ENABLE
-        float       _TL_Enable;
-        float4      _TL_LineColor;
-        float       _TL_LineWidth;
-        sampler2D   _TL_MaskTex;    // vert内で取得するので独自のサンプラーを使う
-        float       _TL_InvMaskVal;
-        float       _TL_Z_Shift;
-    #endif
+    ////////////////////////////
+    // Light Matcap
+    ////////////////////////////
 
     #ifdef _HL_ENABLE
         float       _HL_Enable;
@@ -228,14 +277,153 @@
                 color.rgb += (lightcap_color - shadecap_color) * _HL_Power;
             }
         }
-    
     #else
-
         #define affectMatcapColor(matcapVector, mask_uv, color)
-
     #endif
 
-    float3 pickLightmapLod(float2 uv_lmap, float3 ls_normal) {
+    ////////////////////////////
+    // ToonShade
+    ////////////////////////////
+
+    #ifdef _TS_ENABLE
+        float       _TS_Enable;
+        float4      _TS_BaseColor;
+        DECL_SUB_TEX2D(_TS_BaseTex);
+        float4      _TS_1stColor;
+        DECL_SUB_TEX2D(_TS_1stTex);
+        float4      _TS_2ndColor;
+        DECL_SUB_TEX2D(_TS_2ndTex);
+        float       _TS_Power;
+        float       _TS_1stBorder;
+        float       _TS_2ndBorder;
+        float       _TS_Feather;
+        float       _TS_BlendNormal;
+        DECL_SUB_TEX2D(_TS_MaskTex);
+        float       _TS_InvMaskVal;
+
+        inline void calcToonShadeContrast(float4 ls_vertex, float4 ls_light_dir, float3 ambientColor, out float shadow_power) {
+            if (TGL_ON(_TS_Enable)) {
+                float3 lightColorMain = calcLocalSpaceLightColor(ls_vertex, ls_light_dir.w);
+                float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
+                        unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                        0 < ls_light_dir.w ? unity_LightColor[0].rgb : float3(0, 0, 0),
+                        unity_LightColor[1].rgb,
+                        unity_LightColor[2].rgb,
+                        unity_LightColor[3].rgb,
+                        unity_4LightAtten0,
+                        mul(unity_ObjectToWorld, ls_vertex)
+                    );
+                float main = saturate(calcBrightness( lightColorMain ));
+                float sub4 = saturate(calcBrightness( lightColorSub4 ));
+                float ambient = saturate(calcBrightness( ambientColor ));
+                shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
+                shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ls_light_dir.y)) * 0.5 );
+                shadow_power = min( shadow_power, 1 - saturate(ambient) * 0.5 );
+            } else {
+                shadow_power = 0;
+            }
+        }
+
+        inline void affectToonShade(v2f i, float3 ls_normal, float3 ls_bump_normal, float angle_light_camera, inout float4 color) {
+            if (TGL_ON(_TS_Enable)) {
+                float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal).r;
+                float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
+                // ビュー相対位置シフト
+                brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
+                // 影色計算
+                float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv).rgb );
+                float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv).rgb / base_color.rgb;
+                float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv).rgb / base_color.rgb;
+                shadow_color_1st = lerp(float3(1, 1, 1), shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
+                shadow_color_2nd = lerp(float3(1, 1, 1), shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
+                // 色計算
+                color.rgb *= saturate(lerp(
+                    lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
+                    float3(1, 1, 1),
+                    smoothstep(_TS_1stBorder, _TS_1stBorder + max(_TS_Feather, 0.001), brightness)));
+            }
+        }
+    #else
+        #define calcToonShadeContrast(ls_vertex, ls_light_dir, ambientColor, shadow_power)
+        #define affectToonShade(i, ls_normal, ls_bump_normal, angle_light_camera, color)
+    #endif
+
+    ////////////////////////////
+    // Rim Light
+    ////////////////////////////
+
+    #ifdef _TR_ENABLE
+        float       _TR_Enable;
+        float4      _TR_Color;
+        float       _TR_PowerTop;
+        float       _TR_PowerSide;
+        float       _TR_PowerBottom;
+        DECL_SUB_TEX2D(_TR_MaskTex);
+        float       _TR_InvMaskVal;
+
+        inline void affectRimLight(v2f i, float3 vs_normal, float angle_light_camera, inout float4 color) {
+            if (TGL_ON(_TR_Enable)) {
+                // vs_normalからリムライト範囲を計算
+                float2 rim_uv = vs_normal.xy;
+                rim_uv.x *= _TR_PowerSide + 1;
+                rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
+                rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
+                // 順光の場合はリムライトを暗くする
+                float3 rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
+                // 色計算
+                color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
+                    smoothstep(1, 1.05, length(rim_uv)) );
+            }
+        }
+    #else
+        #define affectRimLight(i, vs_normal, angle_light_camera, color)
+    #endif
+
+    ////////////////////////////
+    // Outline
+    ////////////////////////////
+
+    #ifdef _TL_ENABLE
+        float       _TL_Enable;
+        float4      _TL_LineColor;
+        float       _TL_LineWidth;
+        sampler2D   _TL_MaskTex;    // vert内で取得するので独自のサンプラーを使う
+        float       _TL_InvMaskVal;
+        float       _TL_Z_Shift;
+
+        inline void affectOutline(inout float4 color) {
+            if (TGL_ON(_TL_Enable)) {
+                // アウトライン色をベースと合成
+                color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+            }
+        }
+    #else
+        #define affectOutline(color)
+    #endif
+
+    ////////////////////////////
+    // common function
+    ////////////////////////////
+
+    inline float3 calcLightColorVertex(float4 ls_vertex, float3 ambientColor) {
+        float3 lightColorMain = _LightColor0.rgb;
+        float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
+                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                unity_LightColor[0].rgb,
+                unity_LightColor[1].rgb,
+                unity_LightColor[2].rgb,
+                unity_LightColor[3].rgb,
+                unity_4LightAtten0,
+                mul(unity_ObjectToWorld, ls_vertex)
+            );
+        float3 color = lightColorMain + lightColorSub4 + ambientColor;
+        float power = calcBrightness(color);
+        float3 light_color = (saturate( color / max(0.001, power) ) - 1) * _GL_BrendPower + 1;
+        light_color *= saturate( power * 2 + (100 - _GL_Level) * 0.01 );
+        return light_color;
+    }
+
+    inline float3 pickLightmapLod(float2 uv_lmap, float3 ls_normal) {
         float3 color = float3(0, 0, 0);
         float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
         #ifdef LIGHTMAP_ON
@@ -267,6 +455,30 @@
         return color;
     }
 
+    inline float calcAngleLightCamera(v2f i) {
+        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
+        float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
+        float3 ws_camera_dir = worldSpaceViewDir( float4(0, 0, 0, i.ls_vertex.w) );
+        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
+            * (1 - smoothstep(0.9, 1, ws_light_dir.y)) * (1 - smoothstep(0.9, 1, ws_camera_dir.y));
+        #ifdef USING_STEREO_MATRICES
+            if (isInMirror()) {
+                angle_light_camera = 0; // 両目かつ鏡の中のときは、視差問題が生じないように強制的に 0 にする
+            }
+        #endif
+        return angle_light_camera;
+    }
+
+    #ifdef _LMAP_ENABLE
+        #define WF_GET_AMBIENT  pickLightmapLod(v.uv_lmap, o.normal)
+    #else
+        #define WF_GET_AMBIENT  OmniDirectional_ShadeSH9()
+    #endif
+
+    ////////////////////////////
+    // vertex&fragment shader
+    ////////////////////////////
+
     v2f vert(in appdata v, out float4 vertex : SV_POSITION) {
         v2f o;
 
@@ -287,52 +499,12 @@
             o.uv_dtl = TRANSFORM_TEX(v.uv, _DetailNormalMap);
         #endif
 
-        float3 ambientColor =
-            #ifdef _LMAP_ENABLE
-                pickLightmapLod(v.uv_lmap, o.normal);
-            #else
-                OmniDirectional_ShadeSH9();
-            #endif
-
+        // 環境光取得
+        float3 ambientColor = WF_GET_AMBIENT;
         // 影コントラスト
-        #ifdef _TS_ENABLE
-        if (TGL_ON(_TS_Enable)) {
-            float3 lightColorMain = calcLocalSpaceLightColor(o.ls_vertex, o.ls_light_dir.w);
-            float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
-                    unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                    0 < o.ls_light_dir.w ? unity_LightColor[0].rgb : float3(0, 0, 0),
-                    unity_LightColor[1].rgb,
-                    unity_LightColor[2].rgb,
-                    unity_LightColor[3].rgb,
-                    unity_4LightAtten0,
-                    mul(unity_ObjectToWorld, o.ls_vertex)
-                );
-            float main = saturate(calcBrightness( lightColorMain ));
-            float sub4 = saturate(calcBrightness( lightColorSub4 ));
-            float ambient = saturate(calcBrightness( ambientColor ));
-            o.shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
-            o.shadow_power = min( o.shadow_power, 1 - smoothstep(0.8, 1, abs(o.ls_light_dir.y)) * 0.5 );
-            o.shadow_power = min( o.shadow_power, 1 - saturate(ambient) * 0.5 );
-        }
-        #endif
-
+        calcToonShadeContrast(o.ls_vertex, o.ls_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
-        {
-            float3 lightColorMain = _LightColor0.rgb;
-            float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
-                    unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                    unity_LightColor[0].rgb,
-                    unity_LightColor[1].rgb,
-                    unity_LightColor[2].rgb,
-                    unity_LightColor[3].rgb,
-                    unity_4LightAtten0,
-                    mul(unity_ObjectToWorld, o.ls_vertex)
-                );
-            float3 color = lightColorMain + lightColorSub4 + ambientColor;
-            float power = calcBrightness(color);
-            o.light_color = (saturate( color / max(0.001, power) ) - 1) * _GL_BrendPower + 1;
-            o.light_color *= saturate( power * 2 + (100 - _GL_Level) * 0.01 );
-        }
+        o.light_color = calcLightColorVertex(o.ls_vertex, ambientColor);
 
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_TRANSFER_FOG(o, vertex);
@@ -348,143 +520,33 @@
 
         // 色変換
         affectColorChange(color);
-
         // BumpMap
         float3 ls_normal = i.normal;
-        float3 ls_bump_normal = i.normal;
-
-        #ifdef _NM_ENABLE
-        if (TGL_ON(_NM_Enable)) {
-            // 1st NormalMap
-            float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale );
-
-            // 2nd NormalMap
-            if (_NM_2ndType == 1) { // BLEND
-                float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
-                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
-                normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
-            }
-            else if (_NM_2ndType == 2) { // SWITCH
-                float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
-                float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
-                normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
-            }
-
-            // 法線計算
-            float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-            ls_bump_normal = mul( normalTangent, tangentTransform);
-            // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
-            // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
-            color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;
-        }
-        #endif
-
-        // メタリック
-        #ifdef _MT_ENABLE
-        if (TGL_ON(_MT_Enable)) {
-            float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
-            float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
-            if (0.01 < power) {
-                // リフレクション
-                float metal_lod = (1 - _MT_Smoothness) * 10;
-                float3 reflection;
-                if (_MT_CubemapType == 1) { // ADDITION
-                    reflection
-                        = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod)
-                        + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
-                }
-                else if (_MT_CubemapType == 2) {    // ONLY_SECOND_MAP
-                    reflection
-                        = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
-                }
-                else {  // OFF
-                    reflection
-                        = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod);
-                }
-                if (TGL_ON(_MT_Monochrome)) {
-                    reflection = calcBrightness(reflection);
-                }
-                // スペキュラ
-                float3 specular = float3(0, 0, 0);
-                if (TGL_ON(_MT_Specular)) {
-                    specular = pickSpecular(i.ls_vertex, ls_metal_normal, _MT_Smoothness);
-                }
-                color.rgb = lerp(color.rgb,
-                    lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb,
-                    power);
-            }
-        }
-        #endif
+        float3 ls_bump_normal;
+        affectBumpNormal(i, ls_bump_normal, color);
 
         // ビュー空間法線
         float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
         float3 vs_bump_normal = calcMatcapVector(i.ls_vertex, ls_bump_normal);
+        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
+        float angle_light_camera = calcAngleLightCamera(i);
 
+        // メタリック
+        affectMetallic(i, ls_normal, ls_bump_normal, color);
         // Highlight
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
-
-        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
-        float3 ws_camera_dir = worldSpaceViewDir( float4(0, 0, 0, i.ls_vertex.w) );
-        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
-            * (1 - smoothstep(0.9, 1, ws_light_dir.y)) * (1 - smoothstep(0.9, 1, ws_camera_dir.y));
-        #ifdef USING_STEREO_MATRICES
-            if (isInMirror()) {
-                angle_light_camera = 0; // 両目かつ鏡の中のときは、視差問題が生じないように強制的に 0 にする
-            }
-        #endif
-
         // 階調影
-        #ifdef _TS_ENABLE
-        if (TGL_ON(_TS_Enable)) {
-            float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal).r;
-            float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
-            // ビュー相対位置シフト
-            brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
-            // 影色計算
-            float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv).rgb );
-            float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv).rgb / base_color.rgb;
-            float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv).rgb / base_color.rgb;
-            shadow_color_1st = lerp(float3(1, 1, 1), shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
-            shadow_color_2nd = lerp(float3(1, 1, 1), shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
-            // 色計算
-            color.rgb *= saturate(lerp(
-                lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
-                float3(1, 1, 1),
-                smoothstep(_TS_1stBorder, _TS_1stBorder + max(_TS_Feather, 0.001), brightness)));
-        }
-        #endif
-
+        affectToonShade(i, ls_normal, ls_bump_normal, angle_light_camera, color);
         // リムライト
-        #ifdef _TR_ENABLE
-        if (TGL_ON(_TR_Enable)) {
-            // vs_normalからリムライト範囲を計算
-            float2 rim_uv = vs_normal.xy;
-            rim_uv.x *= _TR_PowerSide + 1;
-            rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
-            rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
-            // 順光の場合はリムライトを暗くする
-            float3 rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
-            // 色計算
-            color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
-                smoothstep(1, 1.05, length(rim_uv)) );
-        }
-        #endif
-
+        affectRimLight(i, vs_normal, angle_light_camera, color);
         // Outline
-        #ifdef _TL_ENABLE
-        if (TGL_ON(_TL_Enable)) {
-            // アウトライン色をベースと合成
-            color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
-        }
-        #endif
+        affectOutline(color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
         // Alpha
         affectAlpha(i.uv, color);
-
         // EmissiveScroll
         affectEmissiveScroll(i.ls_vertex, i.uv, color);
 
@@ -496,6 +558,10 @@
 
         return color;
     }
+
+    ////////////////////////////
+    // カットアウト用 fragment shader
+    ////////////////////////////
 
     float4 frag_cutout_upper(v2f i) : SV_Target {
         float4 color = frag(i);
@@ -509,14 +575,15 @@
         return color;
     }
 
-    // アウトライン用
+    ////////////////////////////
+    // アウトライン用 vertex&fragment shader
+    ////////////////////////////
 
     v2f vert_outline(appdata v, out float4 vertex : SV_POSITION) {
         // 通常の vert を使う
         v2f o = vert(v, vertex);
 
         // SV_POSITION を上書き
-
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
             // マスクテクスチャ参照
@@ -539,14 +606,14 @@
         } else {
             vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         }
-        #else
-            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
         #endif
 
         return o;
     }
 
-    // アウトラインキャンセラパス
+    ////////////////////////////
+    // アウトラインキャンセラ用 vertex&fragment shader
+    ////////////////////////////
 
     sampler2D _UnToonTransparentOutlineCanceller;
 
@@ -567,7 +634,9 @@
         return tex2Dproj(_UnToonTransparentOutlineCanceller, UNITY_PROJ_COORD(i.uv_grab));
     }
 
-    // EmissiveScroll専用パス
+    ////////////////////////////
+    // EmissiveScroll専用パス用 vertex&fragment shader
+    ////////////////////////////
 
     float _ES_Z_Shift;
 
