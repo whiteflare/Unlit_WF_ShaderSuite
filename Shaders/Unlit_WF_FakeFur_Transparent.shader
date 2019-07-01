@@ -45,6 +45,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _FurShadowPower ("Fur ShadowPower", Range(0, 1)) = 0
         [IntRange]
             _FurRepeat      ("Fur Repeat", Range(1, 8)) = 3
+            _FurVector      ("Fur Static Vector", Vector) = (0, 0, 0, 0)
 
         // 色変換
         [Header(Color Change)]
@@ -156,7 +157,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma fragment frag_fakefur
 
             #define _CL_ENABLE
-            #define _HL_ENABLE
             #define _TS_ENABLE
 
             #pragma target 5.0

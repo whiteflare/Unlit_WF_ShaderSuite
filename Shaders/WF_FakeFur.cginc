@@ -29,6 +29,7 @@
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
         float3 normal           : NORMAL;
+        float4 tangent          : TANGENT;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
@@ -38,6 +39,7 @@
         float3 normal           : TEXCOORD2;
         UNITY_VERTEX_OUTPUT_STEREO
         float2 uv2              : TEXCOORD3;
+        float3 waving           : TEXCOORD4;
     };
 
     struct g2f {
@@ -71,6 +73,11 @@
         o.ls_vertex = v.vertex;
         o.normal = normalize(v.normal.xyz);
         o.uv2 = TRANSFORM_TEX(v.uv, _FurNoiseTex);
+
+        float3 tangent = normalize(v.tangent.xyz);
+        float3 bitangent = cross(o.normal, tangent) * v.tangent.w;
+        float3x3 tangentTransform = float3x3(tangent, bitangent, o.normal);
+        o.waving = mul(_FurVector.xyz, tangentTransform);
 
         return o;
     }
@@ -107,7 +114,7 @@
         float4 vu[3] = vb;
         {
             for (uint i = 0; i < 3; i++) {
-                vu[i].xyz += v[i].normal.xyz * _FurHeight;
+                vu[i].xyz += (v[i].normal.xyz + v[i].waving.xyz) * _FurHeight;
             }
         }
         {
@@ -129,7 +136,7 @@
         float4 vu[3] = vb;
         {
             for (uint i = 0; i < 3; i++) {
-                vu[i].xyz += v[i].normal.xyz * _FurHeight;
+                vu[i].xyz += (v[i].normal.xyz + v[i].waving.xyz) * _FurHeight;
             }
         }
         {
@@ -163,20 +170,11 @@
 
         // 色変換
         affectColorChange(color);
-        // BumpMap
-        float3 ls_normal = i.normal;
-        float3 ls_bump_normal = i.normal;
 
-        // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
-        float3 vs_bump_normal = calcMatcapVector(i.ls_vertex, ls_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
-
-        // Highlight
-        affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
         // 階調影
-        affectToonShade(i, ls_normal, ls_bump_normal, angle_light_camera, color);
+        affectToonShade(i, i.normal, i.normal, angle_light_camera, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
