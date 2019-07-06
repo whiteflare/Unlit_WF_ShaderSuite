@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/06/26 whiteflare,
+     *      ver:2019/07/06 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -211,24 +211,47 @@
         int             _AL_Source;
         float           _AL_Power;
         sampler2D       _AL_MaskTex;
+        float           _AL_Fresnel;
 
         #ifndef _AL_CustomValue
             #define _AL_CustomValue 1
         #endif
 
-        inline void affectAlpha(float2 uv, inout float4 color) {
+        inline float pickAlpha(float2 uv, float power, float alpha) {
             if (_AL_Source == 1) {
-                color.a = tex2D(_AL_MaskTex, uv).r * _AL_Power * _AL_CustomValue;
+                return tex2D(_AL_MaskTex, uv).r * power;
             }
             else if (_AL_Source == 2) {
-                color.a = tex2D(_AL_MaskTex, uv).a * _AL_Power * _AL_CustomValue;
+                return tex2D(_AL_MaskTex, uv).a * power;
             }
             else {
-                color.a = color.a * _AL_Power * _AL_CustomValue;
+                return alpha * power;
             }
         }
+
+        inline void affectAlpha(float2 uv, inout float4 color) {
+            float orig = color.a;
+
+            // ベースアルファ
+            color.a = pickAlpha(uv, _AL_Power * _AL_CustomValue, orig);
+        }
+
+        inline void affectAlphaWithFresnel(float2 uv, float3 normal, float3 viewdir, inout float4 color) {
+            float orig = color.a;
+
+            // ベースアルファ
+            color.a = pickAlpha(uv, _AL_Power * _AL_CustomValue, orig);
+
+            #ifdef _AL_FRESNEL_ENABLE
+                // フレネルアルファ
+                float maxValue = pickAlpha(uv, max(_AL_Power, _AL_Fresnel) * _AL_CustomValue, orig);
+                float fa = 1 - abs( dot( SafeNormalizeVec3(normal), SafeNormalizeVec3(viewdir) ) );
+                color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
+            #endif
+        }
     #else
-        #define affectAlpha(uv, color) color.a = 1.0
+        #define affectAlpha(uv, color)                              color.a = 1.0
+        #define affectAlphaWithFresnel(uv, normal, viewdir, color)  color.a = 1.0
     #endif
 
     ////////////////////////////

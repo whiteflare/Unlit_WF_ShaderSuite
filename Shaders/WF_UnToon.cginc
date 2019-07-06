@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/06/26 whiteflare,
+     *      ver:2019/07/06 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -544,7 +544,7 @@
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlpha(i.uv, color);
+        affectAlphaWithFresnel(i.uv, ls_normal, localSpaceViewDir(i.ls_vertex), color);
         // EmissiveScroll
         affectEmissiveScroll(i.ls_vertex, i.uv, color);
 

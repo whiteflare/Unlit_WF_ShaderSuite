@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/06/26 whiteflare,
+     *      ver:2019/07/06 whiteflare,
      */
 
     Properties {
@@ -45,6 +45,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Transparent" {
         [NoScaleOffset]
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
+            _AL_Fresnel     ("[AL] Fresnel Power", Range(0, 2)) = 0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite      ("[AL] ZWrite", int) = 0
 
@@ -142,6 +143,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Transparent" {
             #pragma target 3.0
 
             #define _AL_ENABLE
+            #define _AL_FRESNEL_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
             #define _TR_ENABLE
