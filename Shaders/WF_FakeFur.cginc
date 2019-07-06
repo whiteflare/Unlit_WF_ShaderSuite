@@ -106,6 +106,7 @@
         o.ls_vertex         = lerp(x.ls_vertex,     y.ls_vertex,        div);
         o.normal            = lerp(x.normal,        y.normal,           div);
         o.uv2               = lerp(x.uv2,           y.uv2,              div);
+        o.waving            = lerp(x.waving,        y.waving,           div);
         return o;
     }
 
@@ -132,20 +133,11 @@
     void geom_fakefur(triangle v2g v[3], inout TriangleStream<g2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
-        float4 vb[3] = { v[0].ls_vertex, v[1].ls_vertex, v[2].ls_vertex };
-        float4 vu[3] = vb;
-        {
-            for (uint i = 0; i < 3; i++) {
-                vu[i].xyz += (v[i].normal.xyz + v[i].waving.xyz) * _FurHeight;
-            }
-        }
-        {
-            v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
-            for (uint i = 0; i < _FurRepeat; i++) {
-                float rate = i / (float) _FurRepeat;
-                v2g v2[3] = { lerp_v2g(v[0], c, rate), lerp_v2g(v[1], c, rate), lerp_v2g(v[2], c, rate) };
-                fakefur(v2, triStream);
-            }
+        v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
+        for (uint i = 0; i < _FurRepeat; i++) {
+            float rate = i / (float) _FurRepeat;
+            v2g v2[3] = { lerp_v2g(v[0], c, rate), lerp_v2g(v[1], c, rate), lerp_v2g(v[2], c, rate) };
+            fakefur(v2, triStream);
         }
     }
 
