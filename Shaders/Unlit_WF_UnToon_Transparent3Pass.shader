@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2019/06/26 whiteflare,
+     *      ver:2019/07/13 whiteflare,
      */
 
     Properties {
@@ -43,6 +43,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         [NoScaleOffset]
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
+            _AL_Fresnel     ("[AL] Fresnel Power", Range(0, 2)) = 0
             _AL_CutOff      ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite      ("[AL] ZWrite", int) = 0
@@ -195,6 +196,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma target 3.0
 
             #define _AL_ENABLE
+            #define _AL_FRESNEL_ENABLE
             #define _CL_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
@@ -228,6 +230,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma target 3.0
 
             #define _AL_ENABLE
+            #define _AL_FRESNEL_ENABLE
             #define _CL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
@@ -260,6 +263,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma target 3.0
 
             #define _AL_ENABLE
+            #define _AL_FRESNEL_ENABLE
             #define _CL_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE

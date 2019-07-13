@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/06/26 whiteflare,
+     *      ver:2019/07/13 whiteflare,
      */
 
     Properties {
@@ -35,8 +35,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_TransCutout" {
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
-        [Toggle(_)]
-            _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
 
         // Alpha
         [Header(Transparent Alpha)]

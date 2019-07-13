@@ -56,6 +56,15 @@ namespace UnlitWF
                 }
                 // 描画
                 materialEditor.ShaderProperty(prop, prop.displayName);
+
+                if (prop.name == "_TS_BaseTex") {
+                    Rect position = EditorGUILayout.GetControlRect(true, 24);
+                    Rect fieldpos = EditorGUI.PrefixLabel(position, new GUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
+                    fieldpos.height = 20;
+                    if (GUI.Button(fieldpos, "APPLY")) {
+                        SuggestShadowColor(materialEditor.targets);
+                    }
+                }
             }
 
             EditorGUILayout.Space();
@@ -64,6 +73,42 @@ namespace UnlitWF
             materialEditor.RenderQueueField();
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
+        }
+
+        private void SuggestShadowColor(object[] targets) {
+            foreach (object obj in targets) {
+                Material m = obj as Material;
+                if (m == null) {
+                    continue;
+                }
+                Undo.RecordObject(m, "shade color change");
+                // ベース色を取得
+                Color baseColor = m.GetColor("_TS_BaseColor");
+                float hur, sat, val;
+                Color.RGBToHSV(baseColor, out hur, out sat, out val);
+                // 影1
+                Color shade1Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f);
+                m.SetColor("_TS_1stColor", shade1Color);
+                // 影2
+                Color shade2Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f);
+                m.SetColor("_TS_2ndColor", shade2Color);
+            }
+        }
+
+        private static float ShiftHur(float hur, float sat, float mul) {
+            if (sat < 0.05f) {
+                return 4 / 6f;
+            }
+            // R = 0/6f, G = 2/6f, B = 4/6f
+            float[] COLOR = { 0 / 6f, 2 / 6f, 4 / 6f, 6 / 6f };
+            // Y = 1/6f, C = 3/6f, M = 5/6f
+            float[] LIMIT = { 1 / 6f, 3 / 6f, 5 / 6f, 10000 };
+            for (int i = 0; i < COLOR.Length; i++) {
+                if (hur < LIMIT[i]) {
+                    return (hur - COLOR[i]) * mul + COLOR[i];
+                }
+            }
+            return hur;
         }
     }
 

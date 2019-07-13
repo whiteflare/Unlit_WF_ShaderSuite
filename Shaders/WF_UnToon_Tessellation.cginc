@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/06/26 whiteflare,
+     *      ver:2019/07/13 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -36,7 +36,7 @@
 
     float       _TessFactor;
     float       _Smoothing;
-    sampler2D   _DispMap;	// vert内で取得するので独自のサンプラーを使う
+    sampler2D   _DispMap;   // vert内で取得するので独自のサンプラーを使う
     float       _DispMapScale;
     float       _DispMapLevel;
 
@@ -82,9 +82,9 @@
         }
         o.ls_vertex.xyz += MUL_BARY(phg, xyz) * _Smoothing / 2.0;
 
-		// Displacement HeightMap
-	    float disp = SAMPLE_MASK_VALUE_LOD(_DispMap, float4(o.uv, 0, 0), 0).r * _DispMapScale - _DispMapLevel;
-    	o.ls_vertex.xyz += o.normal * disp * 0.01;
+        // Displacement HeightMap
+        float disp = SAMPLE_MASK_VALUE_LOD(_DispMap, float4(o.uv, 0, 0), 0).r * _DispMapScale - _DispMapLevel;
+        o.ls_vertex.xyz += o.normal * disp * 0.01;
 
         #undef MUL_BARY
 
