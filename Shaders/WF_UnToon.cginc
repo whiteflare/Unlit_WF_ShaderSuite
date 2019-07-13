@@ -45,7 +45,9 @@
 
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         saturate( TGL_OFF(inv) ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
-    #define NON_ZERO_VEC3(v)                        max(v, float3(0.00390625, 0.00390625, 0.00390625))
+    #define NZF                                     0.00390625
+    #define NON_ZERO_FLOAT(v)                       max(v, NZF)
+    #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
 
     #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
         #define _LMAP_ENABLE
@@ -418,7 +420,7 @@
             );
         float3 color = lightColorMain + lightColorSub4 + ambientColor;
         float power = calcBrightness(color);
-        float3 light_color = (saturate( color / max(0.001, power) ) - 1) * _GL_BrendPower + 1;
+        float3 light_color = (saturate( NON_ZERO_VEC3(color) / NON_ZERO_FLOAT(power) ) - 1) * _GL_BrendPower + 1;
         light_color *= saturate( power * 2 + (100 - _GL_Level) * 0.01 );
         return light_color;
     }
