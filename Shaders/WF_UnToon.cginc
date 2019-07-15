@@ -45,9 +45,12 @@
 
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         saturate( TGL_OFF(inv) ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
+
     #define NZF                                     0.00390625
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)
     #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
+    #define ZERO_VEC3                               float3(0, 0, 0)
+    #define ONE_VEC3                                float3(1, 1, 1)
 
     #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
         #define _LMAP_ENABLE
@@ -82,7 +85,6 @@
         #ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD4;
             float3 bitangent    : TEXCOORD5;
-            float2 uv_dtl       : TEXCOORD6;
         #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -114,27 +116,30 @@
         DECL_SUB_TEX2D(_NM_2ndMaskTex);
         float       _NM_InvMaskVal;
 
-        inline void affectBumpNormal(v2f i, out float3 ls_bump_normal, inout float4 color) {
+        inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ls_bump_normal, inout float4 color) {
             float3 ls_normal = i.normal;
             if (TGL_ON(_NM_Enable)) {
                 // 1st NormalMap
-                float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, i.uv), _BumpScale );
+                float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, uv_main), _BumpScale );
+
+                float2 uv_dtl = TRANSFORM_TEX(i.uv, _DetailNormalMap);
 
                 // 2nd NormalMap
                 if (_NM_2ndType == 1) { // BLEND
-                    float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
-                    float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
+                    float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv_main, _NM_InvMaskVal);
+                    float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv_dtl), _DetailNormalMapScale);
                     normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
                 }
                 else if (_NM_2ndType == 2) { // SWITCH
-                    float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, i.uv, _NM_InvMaskVal);
-                    float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, i.uv_dtl), _DetailNormalMapScale);
+                    float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv_main, _NM_InvMaskVal);
+                    float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv_dtl), _DetailNormalMapScale);
                     normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
                 }
 
                 // 法線計算
                 float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
                 ls_bump_normal = mul( normalTangent, tangentTransform);
+
                 // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
                 // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
                 color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;
@@ -144,7 +149,7 @@
             }
         }
     #else
-        #define affectBumpNormal(i, ls_bump_normal, color)  ls_bump_normal = i.normal
+        #define affectBumpNormal(i, uv_main, ls_bump_normal, color)  ls_bump_normal = i.normal
     #endif
 
     ////////////////////////////
@@ -171,7 +176,7 @@
         }
 
         inline float3 pickSpecular(float4 ls_vertex, float3 ls_normal, float smoothness) {
-            float3 specular = float3(0, 0, 0);
+            float3 specular = ZERO_VEC3;
             float ppp = pow(2, smoothness * 8 + 2);
 
             float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
@@ -233,7 +238,7 @@
                         reflection = calcBrightness(reflection);
                     }
                     // スペキュラ
-                    float3 specular = float3(0, 0, 0);
+                    float3 specular = ZERO_VEC3;
                     if (TGL_ON(_MT_Specular)) {
                         specular = pickSpecular(i.ls_vertex, ls_metal_normal, _MT_Smoothness);
                     }
@@ -273,7 +278,7 @@
                 float3 lightcap_power = saturate(matcap_mask * _HL_MatcapColor * 2);    // _HL_MatcapColorは灰色を基準とするので2倍する
                 float3 shadecap_power = (1 - lightcap_power) * MAX3(matcap_mask.r, matcap_mask.g, matcap_mask.b);
                 // 合成
-                float3 median_color = _HL_CapType == 0 ? MEDIAN_GRAY : float3(0, 0, 0);
+                float3 median_color = _HL_CapType == 0 ? MEDIAN_GRAY : ZERO_VEC3;
                 float3 lightcap_color = saturate( (matcap_color - median_color) * lightcap_power );
                 float3 shadecap_color = saturate( (median_color - matcap_color) * shadecap_power );
                 color.rgb += (lightcap_color - shadecap_color) * _HL_Power;
@@ -308,7 +313,7 @@
                 float3 lightColorMain = calcLocalSpaceLightColor(ls_vertex, ls_light_dir.w);
                 float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
                         unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                        0 < ls_light_dir.w ? unity_LightColor[0].rgb : float3(0, 0, 0),
+                        0 < ls_light_dir.w ? unity_LightColor[0].rgb : ZERO_VEC3,
                         unity_LightColor[1].rgb,
                         unity_LightColor[2].rgb,
                         unity_LightColor[3].rgb,
@@ -336,12 +341,12 @@
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv).rgb );
                 float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv).rgb / base_color.rgb;
                 float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv).rgb / base_color.rgb;
-                shadow_color_1st = lerp(float3(1, 1, 1), shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
-                shadow_color_2nd = lerp(float3(1, 1, 1), shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
+                shadow_color_1st = lerp(ONE_VEC3, shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
+                shadow_color_2nd = lerp(ONE_VEC3, shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
                 // 色計算
                 color.rgb *= saturate(lerp(
                     lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
-                    float3(1, 1, 1),
+                    ONE_VEC3,
                     smoothstep(_TS_1stBorder, _TS_1stBorder + max(_TS_Feather, 0.001), brightness)));
             }
         }
@@ -379,6 +384,47 @@
         }
     #else
         #define affectRimLight(i, vs_normal, angle_light_camera, color)
+    #endif
+
+    ////////////////////////////
+    // ScreenTone Texture
+    ////////////////////////////
+
+    #ifdef _OL_ENABLE
+        float       _OL_Enable;
+        sampler2D   _OL_OverlayTex;
+        float4      _OL_OverlayTex_ST;
+        int         _OL_BlendType;
+        float       _OL_Power;
+        DECL_SUB_TEX2D(_OL_MaskTex);
+        float       _OL_InvMaskVal;
+
+        inline float2 computeOverlayTex(float4 ls_vertex) {
+            float4 screenPos = ComputeNonStereoScreenPos( UnityObjectToClipPos(ls_vertex) );
+            float2 scr = screenPos.xy / screenPos.w;
+            scr.y *= _ScreenParams.y / _ScreenParams.x;
+            return TRANSFORM_TEX(scr, _OL_OverlayTex);
+        }
+
+        inline float3 blendOverlayColor(float3 color, float3 ov_color, float3 power) {
+            if (_OL_BlendType == 1) {
+                return color + ov_color * power;    // 加算
+            }
+            if (_OL_BlendType == 2) {
+                return color * lerp( ONE_VEC3, ov_color, power);    // 重み付き乗算
+            }
+            return lerp(color, ov_color, power);    // ブレンド
+        }
+
+        inline void affectOverlayTexture(float4 ls_vertex, float2 uv_main, inout float4 color) {
+            if (TGL_ON(_OL_Enable)) {
+                float2 uv_overlay = computeOverlayTex(ls_vertex);
+                float3 power = _OL_Power * SAMPLE_MASK_VALUE(_OL_MaskTex, uv_main, _OL_InvMaskVal).rgb;
+                color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay).rgb, power);
+            }
+        }
+    #else
+        #define affectOverlayTexture(ls_vertex, uv_main, color)
     #endif
 
     ////////////////////////////
@@ -426,7 +472,7 @@
     }
 
     inline float3 pickLightmapLod(float2 uv_lmap, float3 ls_normal) {
-        float3 color = float3(0, 0, 0);
+        float3 color = ZERO_VEC3;
         float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
         #ifdef LIGHTMAP_ON
         {
@@ -488,7 +534,7 @@
 
         vertex = UnityObjectToClipPos(v.vertex);
 
-        o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+        o.uv = v.uv;
         o.ls_vertex = v.vertex;
         o.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, v.vertex.w) );
 
@@ -496,7 +542,6 @@
         #ifdef _NM_ENABLE
             o.tangent = normalize(v.tangent.xyz);
             o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
-            o.uv_dtl = TRANSFORM_TEX(v.uv, _DetailNormalMap);
         #endif
 
         // 環境光取得
@@ -515,15 +560,17 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
+        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+
         // メイン
-        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
+        float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
 
         // 色変換
         affectColorChange(color);
         // BumpMap
         float3 ls_normal = i.normal;
         float3 ls_bump_normal;
-        affectBumpNormal(i, ls_bump_normal, color);
+        affectBumpNormal(i, uv_main, ls_bump_normal, color);
 
         // ビュー空間法線
         float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
@@ -534,11 +581,13 @@
         // メタリック
         affectMetallic(i, ls_normal, ls_bump_normal, color);
         // Highlight
-        affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), i.uv, color);
+        affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), uv_main, color);
         // 階調影
         affectToonShade(i, ls_normal, ls_bump_normal, angle_light_camera, color);
         // リムライト
         affectRimLight(i, vs_normal, angle_light_camera, color);
+        // ScreenTone
+        affectOverlayTexture(i.ls_vertex, uv_main, color);
         // Outline
         affectOutline(color);
 
@@ -546,9 +595,9 @@
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlphaWithFresnel(i.uv, ls_normal, localSpaceViewDir(i.ls_vertex), color);
+        affectAlphaWithFresnel(uv_main, ls_normal, localSpaceViewDir(i.ls_vertex), color);
         // EmissiveScroll
-        affectEmissiveScroll(i.ls_vertex, i.uv, color);
+        affectEmissiveScroll(i.ls_vertex, uv_main, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
@@ -587,7 +636,8 @@
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
             // マスクテクスチャ参照
-            float mask = SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, o.uv, _TL_InvMaskVal).r;
+            float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
+            float mask = SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv_main, _TL_InvMaskVal).r;
             // 外側にシフトする
             o.ls_vertex.xyz += normalize( v.normal ).xyz * (_TL_LineWidth * 0.01) * mask;
             // カメラ方向の z シフト量を計算
@@ -604,7 +654,7 @@
                 vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
             }
         } else {
-            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( ZERO_VEC3 );
         }
         #endif
 
@@ -665,10 +715,10 @@
             }
 
         } else {
-            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( ZERO_VEC3 );
         }
         #else
-            vertex = UnityObjectToClipPos( float3(0, 0, 0) );
+            vertex = UnityObjectToClipPos( ZERO_VEC3 );
         #endif
 
         return o;
@@ -681,7 +731,8 @@
         if (TGL_ON(_ES_Enable)) {
 
             // EmissiveScroll
-            affectEmissiveScroll(i.ls_vertex, i.uv, color);
+            float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+            affectEmissiveScroll(i.ls_vertex, uv_main, color);
 
             // Alpha は 0-1 にクランプ
             color.a = saturate(color.a);

@@ -72,13 +72,15 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
+        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+
         // メイン
-        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
+        float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
 
         // BumpMap
         float3 ls_normal = i.normal;
         float3 ls_bump_normal;
-        affectBumpNormal(i, ls_bump_normal, color);
+        affectBumpNormal(i, uv_main, ls_bump_normal, color);
 
         // ビュー空間法線
         float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
