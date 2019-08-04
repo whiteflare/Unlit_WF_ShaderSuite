@@ -18,7 +18,7 @@ Shader "UnlitWF/MatcapShadows/WF_MatcapShadows_ColorFade" {
 
     /*
      * authors:
-     *      ver:2019/03/23 whiteflare,
+     *      ver:2019/08/04 whiteflare,
      */
 
     Properties {
@@ -38,7 +38,7 @@ Shader "UnlitWF/MatcapShadows/WF_MatcapShadows_ColorFade" {
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite      ("[AL] ZWrite", int) = 0
         [HideInInspector]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+        [FixFloat(0.0)]
             _AL_Source      ("[AL] Alpha Source", Float) = 0
 
         // Matcapハイライト
