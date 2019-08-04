@@ -30,33 +30,50 @@ namespace UnlitWF
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
             materialEditor.SetDefaultGUIWidths();
 
+            Material mat = materialEditor.target as Material;
+            if (mat != null) {
+                var rect = EditorGUILayout.GetControlRect();
+                rect.y += 2;
+                GUI.Label(rect, "Current Shader", EditorStyles.boldLabel);
+                GUILayout.Label(new Regex(@".*/").Replace(mat.shader.name, ""));
+            }
+
             // 現在無効なラベルを保持するリスト
             var disable = new List<string>();
             // プロパティを順に描画
             foreach (var prop in properties) {
                 // ラベル付き displayName を、ラベルと名称に分割
-                var mm = Regex.Match(prop.displayName, @"^\[(?<label>[A-Z]+)\]\s+(?<name>.+)$");
-                if (mm.Success) {
-                    string label = mm.Groups["label"].Value.ToUpper();
-                    if (mm.Groups["name"].Value.ToLower() == "enable") {
-                        // Enable チェックボックスなら有効無効をリストに追加
-                        if ((int)prop.floatValue == 0) {
-                            disable.Add(label);
-                        }
-                    }
-                    else {
-                        // それ以外の要素は disable に入っているならばスキップする
-                        if (disable.Contains(label)) {
-                            continue;
-                        }
+                string label = WFCommonUtility.GetPropertyLabel(prop);
+                string name = WFCommonUtility.GetPropertyName(prop);
+
+                // ラベルが指定されていてdisableに入っているならばスキップ(ただしenable以外)
+                if (disable.Contains(label)) {
+                    if (name != "enable") {
+                        continue;
                     }
                 }
-                if ((prop.flags & MaterialProperty.PropFlags.HideInInspector) != MaterialProperty.PropFlags.None) {
-                    continue;
-                }
+
+                // HideInInspectorをこのタイミングで除外するとFix*Drawerが動作しないのでそのまま通す
+                // 非表示はFix*Drawerが担当
+                // Fix*Drawerと一緒にHideInInspectorを付けておけば、このcsが無い環境でも非表示のまま変わらないはず
+                // if ((prop.flags & MaterialProperty.PropFlags.HideInInspector) != MaterialProperty.PropFlags.None) {
+                //     continue;
+                // }
+
                 // 描画
                 materialEditor.ShaderProperty(prop, prop.displayName);
 
+                // ラベルが指定されていてenableならば有効無効をリストに追加
+                // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
+                if (label != null && name == "enable") {
+                    if ((int)prop.floatValue == 0) {
+                        disable.Add(label);
+                    } else {
+                        disable.Remove(label);
+                    }
+                }
+
+                // _TS_BaseTexだったならばボタンを追加する
                 if (prop.name == "_TS_BaseTex") {
                     Rect position = EditorGUILayout.GetControlRect(true, 24);
                     Rect fieldpos = EditorGUI.PrefixLabel(position, new GUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
@@ -112,23 +129,67 @@ namespace UnlitWF
         }
     }
 
-    internal class MaterialToggleNoKwdDrawer : MaterialPropertyDrawer
+    static class WFCommonUtility
     {
-        public override void OnGUI(Rect position, MaterialProperty property, GUIContent label, MaterialEditor materialEditor) {
-            if (property.type != MaterialProperty.PropType.Float && property.type != MaterialProperty.PropType.Range) {
-                return;
-            }
-            // [Toggle] はキーワードを生成してしまうため、キーワードを生成しない版の偽トグルを使う
-            // Unity最新版では [ToggleUI] という名前で使えるらしい……
-            EditorGUI.BeginChangeCheck();
-            bool value = (Math.Abs(property.floatValue) > 0.001f);
-            EditorGUI.showMixedValue = property.hasMixedValue;
-            value = EditorGUI.Toggle(position, label, value);
-            EditorGUI.showMixedValue = false;
-            if (EditorGUI.EndChangeCheck()) {
-                // Debug.Log("set value: " + property + " = " + value);
-                property.floatValue = value ? 1.0f : 0.0f;
-            }
+        private static readonly Regex PAT_PROP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
+
+        public static string GetPropertyLabel(string displayName) {
+            var mm = PAT_PROP_NAME.Match(displayName);
+            return mm.Success ? mm.Groups["label"].Value.ToUpper() : null;
+        }
+
+        public static string GetPropertyLabel(SerializedProperty p) {
+            return GetPropertyLabel(p.displayName);
+        }
+
+        public static string GetPropertyLabel(MaterialProperty p) {
+            return GetPropertyLabel(p.displayName);
+        }
+
+        public static string GetPropertyName(string displayName) {
+            var mm = PAT_PROP_NAME.Match(displayName);
+            return mm.Success ? mm.Groups["name"].Value.ToLower() : null;
+        }
+
+        public static string GetPropertyName(SerializedProperty p) {
+            return GetPropertyName(p.displayName);
+        }
+
+        public static string GetPropertyName(MaterialProperty p) {
+            return GetPropertyName(p.displayName);
+        }
+    }
+
+    internal class MaterialFixFloatDrawer : MaterialPropertyDrawer
+    {
+        public readonly float value;
+
+        public MaterialFixFloatDrawer() {
+            this.value = 0;
+        }
+
+        public MaterialFixFloatDrawer(float value) {
+            this.value = value;
+        }
+
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return 0;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+            prop.floatValue = this.value;
+        }
+    }
+
+    internal class MaterialFixNoTextureDrawer : MaterialPropertyDrawer
+    {
+
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return 0;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+            prop.textureValue = null;
         }
     }
 }

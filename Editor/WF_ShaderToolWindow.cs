@@ -69,7 +69,8 @@ namespace UnlitWF
                 materials = new List<Material> {
                     null
                 };
-            } else {
+            }
+            else {
                 materials = new List<Material>(arguments);
             }
         }
@@ -205,7 +206,7 @@ namespace UnlitWF
         private void CopyProperties(SerializedProperty src, SerializedProperty dst, List<string> prefix) {
             var dst_list = ToPropertyList(dst);
             foreach (var src_prop in ToPropertyList(src)) {
-                if (prefix.Exists(src_prop.name.StartsWith)) {
+                if (prefix.Contains(WFCommonUtility.GetPropertyLabel(src_prop.property))) {
                     var dst_prop = dst_list.Find(p => p.name == src_prop.name);
                     if (dst_prop != null) {
                         src_prop.CopyTo(dst_prop);
@@ -218,22 +219,22 @@ namespace UnlitWF
 
             var prefix = new List<string>();
             if (copy_colorchg) {
-                prefix.Add("_CL_");
+                prefix.Add("CL");
             }
             if (copy_metallic) {
-                prefix.Add("_MT_");
+                prefix.Add("MT");
             }
             if (copy_matcaps) {
-                prefix.Add("_HL_");
+                prefix.Add("HL");
             }
             if (copy_shadows) {
-                prefix.Add("_TS_");
+                prefix.Add("TS");
             }
             if (copy_rimlight) {
-                prefix.Add("_TR_");
+                prefix.Add("TR");
             }
             if (copy_outlines) {
-                prefix.Add("_TL_");
+                prefix.Add("TL");
             }
 
             var src = materials[0];
@@ -309,14 +310,15 @@ namespace UnlitWF
                 {
                     var prop = saved.FindPropertyRelative("m_Floats");
                     foreach (var p in ToPropertyList(prop)) {
-                        var mm = Regex.Match(p.name, @"\A(_[A-Z]+_)Enable\z");
-                        if (mm.Success && p.value.floatValue == 0) {
-                            delPrefix.Add(mm.Groups[1].Value);
+                        var label = WFCommonUtility.GetPropertyLabel(p.property);
+                        var name = WFCommonUtility.GetPropertyName(p.property);
+                        if (label != null && name == "enable" && p.value.floatValue == 0) {
+                            delPrefix.Add(label);
                         }
                     }
                 }
                 // プレフィックスに合致する設定値を消去
-                Predicate<ShaderPropertyView> predPrefix = p => delPrefix.Exists(p.name.StartsWith);
+                Predicate<ShaderPropertyView> predPrefix = p => delPrefix.Contains(WFCommonUtility.GetPropertyLabel(p.property));
                 DeleteProperties(saved.FindPropertyRelative("m_Colors"), predPrefix);
                 DeleteProperties(saved.FindPropertyRelative("m_TexEnvs"), predPrefix);
                 DeleteProperties(saved.FindPropertyRelative("m_Floats"), predPrefix);
