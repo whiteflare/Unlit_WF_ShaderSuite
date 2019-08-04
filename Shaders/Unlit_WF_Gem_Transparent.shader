@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/07/14 whiteflare,
+     *      ver:2019/08/04 whiteflare,
      */
 
     Properties {
@@ -36,35 +36,47 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
         // Alpha
         [Header(Transparent Alpha)]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
-            _AL_Source      ("[AL] Alpha Source", Float) = 0
-        [NoScaleOffset]
+        [FixNoTexture]
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 0.8
             _AL_Fresnel     ("[AL] Fresnel Power", Range(0, 2)) = 1
 
-        // メタリックマップ
-        [Header(Metallic)]
-        [Toggle(_)]
-            _MT_Enable      ("[MT] Enable", Float) = 1
-            _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 1
-            _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 1
-            _MT_BlendType   ("[MT] Brightness", Range(0, 1)) = 0.2
-            _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0
-        [Toggle(_)]
-            _MT_Monochrome  ("[MT] Monochrome Reflection", Range(0, 1)) = 1
-        [Toggle(_)]
-            _MT_Specular    ("[MT] Specular", Range(0, 1)) = 0
+        // Gem
+        [Header(Gem Reflection)]
         [NoScaleOffset]
-            _MT_MaskTex     ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MT_Cubemap     ("[GM] CubeMap", Cube) = "" {}
+            _MT_BlendType   ("[GM] Brightness", Range(0, 1)) = 0.2
         [Toggle(_)]
-            _MT_InvMaskVal  ("[MT] Invert Mask Value", Range(0, 1)) = 0
+            _MT_Monochrome  ("[GM] Monochrome Reflection", Range(0, 1)) = 1
 
-        [Header(Metallic Secondary)]
-        [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
-            _MT_CubemapType ("[MT] 2nd CubeMap Blend", Float) = 0
-        [NoScaleOffset]
-            _MT_Cubemap     ("[MT] 2nd CubeMap", Cube) = "" {}
+        // hidden parameter
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _AL_Source      ("[AL] Alpha Source", Float) = 0
+        [HideInInspector]
+        [FixFloat(1.0)]
+            _MT_Enable      ("[MT] Enable", Float) = 1
+        [HideInInspector]
+        [FixFloat(1.0)]
+            _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 1
+        [HideInInspector]
+        [FixFloat(1.0)]
+            _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 1
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _MT_Specular    ("[GM] Specular", Range(0, 1)) = 0
+        [HideInInspector]
+        [FixFloat(2.0)]
+            _MT_CubemapType ("[MT] 2nd CubeMap Blend", Float) = 2
+        [HideInInspector]
+        [FixNoTexture]
+            _MT_MaskTex     ("[MT] MetallicMap Texture", 2D) = "white" {}
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _MT_InvMaskVal  ("[MT] Invert Mask Value", Range(0, 1)) = 0
     }
 
     SubShader {
@@ -108,7 +120,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull BACK
-            ZWrite ON
+            ZWrite OFF
             Blend SrcAlpha One
 
             CGPROGRAM
