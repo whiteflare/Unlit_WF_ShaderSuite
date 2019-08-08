@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
 
     /*
      * authors:
-     *      ver:2019/07/13 whiteflare,
+     *      ver:2019/08/04 whiteflare,
      */
 
     Properties {
@@ -111,8 +111,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
             _HL_MatcapColor ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power       ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal ("[HL] Blend Normal", Range(0, 1)) = 0.1
-        [HideInInspector]
-            _HL_Range       ("[HL] Matcap Range (Tweak)", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -153,6 +151,19 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
+
+        // Overlay Texture
+        [Header(ScreenTone Texture)]
+        [Toggle(_)]
+            _OL_Enable      ("[OL] Enable", Float) = 0
+            _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
+        [Enum(ALPHA,0,ADD,1,MUL,2)]
+            _OL_BlendType   ("[OL] Blend Type", Float) = 0
+            _OL_Power       ("[OL] Blend Power", Range(0, 1)) = 1
+        [NoScaleOffset]
+            _OL_MaskTex     ("[OL] ScreenTone Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _OL_InvMaskVal  ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
         [Header(Emissive Scroll)]
