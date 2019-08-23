@@ -67,7 +67,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _MT_BlendNormal ("[MT] Blend Normal", Range(0, 1)) = 0
         [HideInInspector]
         [FixFloat(0.0)]
-            _MT_Specular    ("[GM] Specular", Range(0, 1)) = 0
+            _MT_Specular    ("[MT] Specular", Range(0, 1)) = 0
         [HideInInspector]
         [FixFloat(2.0)]
             _MT_CubemapType ("[MT] 2nd CubeMap Blend", Float) = 2
