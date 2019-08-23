@@ -115,6 +115,7 @@
         float       _DetailNormalMapScale;
         DECL_SUB_TEX2D(_NM_2ndMaskTex);
         float       _NM_InvMaskVal;
+        float       _NM_FlipTangent;
 
         inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ls_bump_normal, inout float4 color) {
             float3 ls_normal = i.normal;
@@ -546,8 +547,13 @@
 
         o.normal = normalize(v.normal.xyz);
         #ifdef _NM_ENABLE
-            o.tangent = normalize(v.tangent.xyz);
-            o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
+            if (TGL_OFF(_NM_FlipTangent)) {
+                o.tangent = normalize(v.tangent.xyz);
+                o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
+            } else {
+                o.tangent = normalize(v.tangent.xyz) * v.tangent.w;
+                o.bitangent = cross(o.normal, o.tangent);
+            }
         #endif
 
         // 環境光取得
