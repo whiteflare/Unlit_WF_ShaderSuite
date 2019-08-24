@@ -547,11 +547,12 @@
 
         o.normal = normalize(v.normal.xyz);
         #ifdef _NM_ENABLE
+        	float tan_sign = step(0, v.tangent.w) * 2 - 1;
             if (TGL_OFF(_NM_FlipTangent)) {
                 o.tangent = normalize(v.tangent.xyz);
-                o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
+                o.bitangent = cross(o.normal, o.tangent) * tan_sign;
             } else {
-                o.tangent = normalize(v.tangent.xyz) * v.tangent.w;
+                o.tangent = normalize(v.tangent.xyz) * tan_sign;
                 o.bitangent = cross(o.normal, o.tangent);
             }
         #endif
