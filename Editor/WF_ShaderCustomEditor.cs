@@ -43,14 +43,12 @@ namespace UnlitWF
             // プロパティを順に描画
             foreach (var prop in properties) {
                 // ラベル付き displayName を、ラベルと名称に分割
-                string label = WFCommonUtility.GetPropertyLabel(prop);
-                string name = WFCommonUtility.GetPropertyName(prop);
+                string label, name, disp;
+                WFCommonUtility.FormatDispName(prop.displayName, out label, out name, out disp);
 
                 // ラベルが指定されていてdisableに入っているならばスキップ(ただしenable以外)
-                if (disable.Contains(label)) {
-                    if (name != "enable") {
-                        continue;
-                    }
+                if (label != null && disable.Contains(label) && !WFCommonUtility.IsEnableToggle(label, name)) {
+                    continue;
                 }
 
                 // HideInInspectorをこのタイミングで除外するとFix*Drawerが動作しないのでそのまま通す
@@ -61,14 +59,15 @@ namespace UnlitWF
                 // }
 
                 // 描画
-                materialEditor.ShaderProperty(prop, prop.displayName);
+                materialEditor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName));
 
                 // ラベルが指定されていてenableならば有効無効をリストに追加
                 // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
-                if (label != null && name == "enable") {
+                if (WFCommonUtility.IsEnableToggle(label, name)) {
                     if ((int)prop.floatValue == 0) {
                         disable.Add(label);
-                    } else {
+                    }
+                    else {
                         disable.Remove(label);
                     }
                 }
@@ -76,7 +75,7 @@ namespace UnlitWF
                 // _TS_BaseTexだったならばボタンを追加する
                 if (prop.name == "_TS_BaseTex") {
                     Rect position = EditorGUILayout.GetControlRect(true, 24);
-                    Rect fieldpos = EditorGUI.PrefixLabel(position, new GUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
+                    Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
                     fieldpos.height = 20;
                     if (GUI.Button(fieldpos, "APPLY")) {
                         SuggestShadowColor(materialEditor.targets);
@@ -90,6 +89,7 @@ namespace UnlitWF
             materialEditor.RenderQueueField();
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
+            WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
         }
 
         private void SuggestShadowColor(object[] targets) {
@@ -126,37 +126,6 @@ namespace UnlitWF
                 }
             }
             return hur;
-        }
-    }
-
-    static class WFCommonUtility
-    {
-        private static readonly Regex PAT_PROP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
-
-        public static string GetPropertyLabel(string displayName) {
-            var mm = PAT_PROP_NAME.Match(displayName);
-            return mm.Success ? mm.Groups["label"].Value.ToUpper() : null;
-        }
-
-        public static string GetPropertyLabel(SerializedProperty p) {
-            return GetPropertyLabel(p.displayName);
-        }
-
-        public static string GetPropertyLabel(MaterialProperty p) {
-            return GetPropertyLabel(p.displayName);
-        }
-
-        public static string GetPropertyName(string displayName) {
-            var mm = PAT_PROP_NAME.Match(displayName);
-            return mm.Success ? mm.Groups["name"].Value.ToLower() : null;
-        }
-
-        public static string GetPropertyName(SerializedProperty p) {
-            return GetPropertyName(p.displayName);
-        }
-
-        public static string GetPropertyName(MaterialProperty p) {
-            return GetPropertyName(p.displayName);
         }
     }
 

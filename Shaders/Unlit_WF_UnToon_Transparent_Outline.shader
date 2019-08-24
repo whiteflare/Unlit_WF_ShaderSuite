@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
 
     /*
      * authors:
-     *      ver:2019/08/04 whiteflare,
+     *      ver:2019/08/24 whiteflare,
      */
 
     Properties {
@@ -65,6 +65,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline" {
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
             _BumpScale      ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power       ("[NM] Shadow Power", Range(0, 1)) = 0.25
+        [Toggle(_)]
+            _NM_FlipTangent ("[NM] Flip Tangent", Float) = 0
 
         [Header(NormalMap Secondary)]
         [Enum(OFF,0,BLEND,1,SWITCH,2)]

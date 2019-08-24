@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/07/13 whiteflare,
+     *      ver:2019/08/24 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -115,6 +115,7 @@
         float       _DetailNormalMapScale;
         DECL_SUB_TEX2D(_NM_2ndMaskTex);
         float       _NM_InvMaskVal;
+        float       _NM_FlipTangent;
 
         inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ls_bump_normal, inout float4 color) {
             float3 ls_normal = i.normal;
@@ -503,12 +504,18 @@
         return color;
     }
 
+    inline float3 worldSpaceViewDir2() {
+        float4 ws_vertex = mul(unity_ObjectToWorld, float4(0, 0, 0, 0));
+        ws_vertex.y = round(ws_vertex.y / 16) * 16;
+        return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex.xyz);
+    }
+
     inline float calcAngleLightCamera(v2f i) {
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
-        float3 ws_camera_dir = worldSpaceViewDir( float4(0, 0, 0, i.ls_vertex.w) );
+        float3 ws_camera_dir = worldSpaceViewDir2();
         float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
-            * (1 - smoothstep(0.9, 1, ws_light_dir.y)) * (1 - smoothstep(0.9, 1, ws_camera_dir.y));
+            * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * (1 - smoothstep(0.9, 1, abs(ws_camera_dir.y)));
         if (isInMirror()) {
             angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
         }
@@ -540,8 +547,14 @@
 
         o.normal = normalize(v.normal.xyz);
         #ifdef _NM_ENABLE
-            o.tangent = normalize(v.tangent.xyz);
-            o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
+            float tan_sign = step(0, v.tangent.w) * 2 - 1;
+            if (TGL_OFF(_NM_FlipTangent)) {
+                o.tangent = normalize(v.tangent.xyz);
+                o.bitangent = cross(o.normal, o.tangent) * tan_sign;
+            } else {
+                o.tangent = normalize(v.tangent.xyz) * tan_sign;
+                o.bitangent = cross(o.normal, o.tangent);
+            }
         #endif
 
         // 環境光取得

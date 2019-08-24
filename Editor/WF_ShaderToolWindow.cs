@@ -206,7 +206,9 @@ namespace UnlitWF
         private void CopyProperties(SerializedProperty src, SerializedProperty dst, List<string> prefix) {
             var dst_list = ToPropertyList(dst);
             foreach (var src_prop in ToPropertyList(src)) {
-                if (prefix.Contains(WFCommonUtility.GetPropertyLabel(src_prop.property))) {
+                string label, name;
+                WFCommonUtility.FormatPropName(src_prop.name, out label, out name);
+                if (label != null && prefix.Contains(label)) {
                     var dst_prop = dst_list.Find(p => p.name == src_prop.name);
                     if (dst_prop != null) {
                         src_prop.CopyTo(dst_prop);
@@ -310,15 +312,19 @@ namespace UnlitWF
                 {
                     var prop = saved.FindPropertyRelative("m_Floats");
                     foreach (var p in ToPropertyList(prop)) {
-                        var label = WFCommonUtility.GetPropertyLabel(p.property);
-                        var name = WFCommonUtility.GetPropertyName(p.property);
-                        if (label != null && name == "enable" && p.value.floatValue == 0) {
+                        string label, name;
+                        WFCommonUtility.FormatPropName(p.name, out label, out name);
+                        if (label != null && name.ToLower() == "enable" && p.value.floatValue == 0) {
                             delPrefix.Add(label);
                         }
                     }
                 }
                 // プレフィックスに合致する設定値を消去
-                Predicate<ShaderPropertyView> predPrefix = p => delPrefix.Contains(WFCommonUtility.GetPropertyLabel(p.property));
+                Predicate<ShaderPropertyView> predPrefix = p => {
+                    string label, name;
+                    WFCommonUtility.FormatPropName(p.name, out label, out name);
+                    return label != null && delPrefix.Contains(label);
+                };
                 DeleteProperties(saved.FindPropertyRelative("m_Colors"), predPrefix);
                 DeleteProperties(saved.FindPropertyRelative("m_TexEnvs"), predPrefix);
                 DeleteProperties(saved.FindPropertyRelative("m_Floats"), predPrefix);
