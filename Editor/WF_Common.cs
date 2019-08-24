@@ -28,7 +28,7 @@ namespace UnlitWF
     internal static class WFCommonUtility
     {
         private static readonly Regex PAT_DISP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
-        private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+)(?<suffix>(?:_\d+)?)$");
+        private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+?)(?<suffix>(?:_\d+)?)$");
 
         public static bool FormatDispName(string text, out string label, out string name, out string dispName) {
             var mm = PAT_DISP_NAME.Match(text ?? "");
