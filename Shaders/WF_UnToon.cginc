@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/07/13 whiteflare,
+     *      ver:2019/08/24 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -547,7 +547,7 @@
 
         o.normal = normalize(v.normal.xyz);
         #ifdef _NM_ENABLE
-        	float tan_sign = step(0, v.tangent.w) * 2 - 1;
+            float tan_sign = step(0, v.tangent.w) * 2 - 1;
             if (TGL_OFF(_NM_FlipTangent)) {
                 o.tangent = normalize(v.tangent.xyz);
                 o.bitangent = cross(o.normal, o.tangent) * tan_sign;
