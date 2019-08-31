@@ -504,18 +504,12 @@
         return color;
     }
 
-    inline float3 worldSpaceViewDir2() {
-        float4 ws_vertex = mul(unity_ObjectToWorld, float4(0, 0, 0, 0));
-        ws_vertex.y = round(ws_vertex.y / 16) * 16;
-        return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex.xyz);
-    }
-
     inline float calcAngleLightCamera(v2f i) {
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
-        float3 ws_camera_dir = worldSpaceViewDir2();
-        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
-            * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * (1 - smoothstep(0.9, 1, abs(ws_camera_dir.y)));
+        float2 xz_camera_pos = worldSpaceCameraPos().xz - mul(unity_ObjectToWorld, float4(0, 0, 0, i.ls_vertex.w)).xz;
+        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
+            * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         if (isInMirror()) {
             angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
         }
