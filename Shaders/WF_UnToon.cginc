@@ -401,10 +401,14 @@
         float       _OL_InvMaskVal;
 
         inline float2 computeOverlayTex(float4 ls_vertex) {
-            float4 screenPos = ComputeNonStereoScreenPos( UnityObjectToClipPos(ls_vertex) );
-            float2 scr = screenPos.xy / screenPos.w;
-            scr.y *= _ScreenParams.y / _ScreenParams.x;
-            return TRANSFORM_TEX(scr, _OL_OverlayTex);
+            float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+            float3 ws_view_dir = normalize( ws_vertex - _WorldSpaceCameraPos.xyz );
+
+            float lon = atan2( ws_view_dir.z, ws_view_dir.x );  // -PI ~ +PI
+            float lat = acos( ws_view_dir.y );                  // -PI ~ +PI
+            float2 uv = float2(-lon, -lat) * UNITY_INV_TWO_PI + 0.5;
+
+            return TRANSFORM_TEX(uv, _OL_OverlayTex);
         }
 
         inline float3 blendOverlayColor(float3 color, float3 ov_color, float3 power) {
