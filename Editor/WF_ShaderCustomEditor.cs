@@ -59,7 +59,22 @@ namespace UnlitWF
                 // }
 
                 // 描画
-                materialEditor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName));
+                GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
+                if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
+                    MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties);
+                    if (propTex != null) {
+                        materialEditor.TexturePropertySingleLine(guiContent, propTex, prop);
+                    }
+                    else {
+                        materialEditor.ShaderProperty(prop, guiContent);
+                    }
+                }
+                else if (COLOR_TEX_COBINATION.ContainsValue(prop.name)) {
+                    // nop
+                }
+                else {
+                    materialEditor.ShaderProperty(prop, guiContent);
+                }
 
                 // ラベルが指定されていてenableならば有効無効をリストに追加
                 // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
@@ -127,6 +142,13 @@ namespace UnlitWF
             }
             return hur;
         }
+
+        private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
+            { "_TS_BaseColor", "_TS_BaseTex" },
+            { "_TS_1stColor", "_TS_1stTex" },
+            { "_TS_2ndColor", "_TS_2ndTex" },
+            { "_ES_Color", "_ES_MaskTex" },
+        };
     }
 
     internal class MaterialFixFloatDrawer : MaterialPropertyDrawer
