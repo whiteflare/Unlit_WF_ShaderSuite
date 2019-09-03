@@ -35,6 +35,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_TransCutout" {
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode       ("Sun Source", Float) = 0
+            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude  ("Custom Sun Altitude", Range(0, 90)) = 45
 
         // Alpha
         [Header(Transparent Alpha)]
