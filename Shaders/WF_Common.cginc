@@ -247,23 +247,22 @@
         float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
 
         uint mode = _GL_LightMode;
-        if (mode == 0) {
+        if (mode == LIT_MODE_AUTO) {
             mode = calcAutoSelectMainLight(ws_pos);
         }
-        switch (mode) {
-            case LIT_MODE_ONLY_DIR_LIT:
-                return float4( UnityWorldToObjectDir( _WorldSpaceLightPos0.xyz ), +1 );
-
-            case LIT_MODE_ONLY_POINT_LIT:
-                return float4( UnityWorldToObjectDir( calcPointLight1Pos() - ws_pos ), -1 );
-
-            case LIT_MODE_CUSTOM_WORLDSPACE:
-            default:
-                return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
-
-            case LIT_MODE_CUSTOM_LOCALSPACE:
-                return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude), 0 );
+        if (mode == LIT_MODE_ONLY_DIR_LIT) {
+            return float4( UnityWorldToObjectDir( _WorldSpaceLightPos0.xyz ), +1 );
+		}
+		if (mode == LIT_MODE_ONLY_POINT_LIT) {
+            return float4( UnityWorldToObjectDir( calcPointLight1Pos() - ws_pos ), -1 );
+		}
+		if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
+            return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
+		}
+		if (mode == LIT_MODE_CUSTOM_LOCALSPACE) {
+            return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude), 0 );
         }
+        return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
     }
 
     inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
