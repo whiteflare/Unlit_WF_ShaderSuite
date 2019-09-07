@@ -51,6 +51,16 @@ namespace UnlitWF
                     continue;
                 }
 
+                // _TS_1stColorの直前にボタンを追加する
+                if (prop.name == "_TS_1stColor") {
+                    Rect position = EditorGUILayout.GetControlRect(true, 24);
+                    Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
+                    fieldpos.height = 20;
+                    if (GUI.Button(fieldpos, "APPLY")) {
+                        SuggestShadowColor(materialEditor.targets);
+                    }
+                }
+
                 // HideInInspectorをこのタイミングで除外するとFix*Drawerが動作しないのでそのまま通す
                 // 非表示はFix*Drawerが担当
                 // Fix*Drawerと一緒にHideInInspectorを付けておけば、このcsが無い環境でも非表示のまま変わらないはず
@@ -61,7 +71,7 @@ namespace UnlitWF
                 // 描画
                 GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
                 if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
-                    MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties);
+                    MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties, false);
                     if (propTex != null) {
                         materialEditor.TexturePropertySingleLine(guiContent, propTex, prop);
                     }
@@ -84,16 +94,6 @@ namespace UnlitWF
                     }
                     else {
                         disable.Remove(label);
-                    }
-                }
-
-                // _TS_BaseTexだったならばボタンを追加する
-                if (prop.name == "_TS_BaseTex") {
-                    Rect position = EditorGUILayout.GetControlRect(true, 24);
-                    Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
-                    fieldpos.height = 20;
-                    if (GUI.Button(fieldpos, "APPLY")) {
-                        SuggestShadowColor(materialEditor.targets);
                     }
                 }
             }
