@@ -35,10 +35,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
-            _GL_LightMode       ("Sun Source", Float) = 0
-            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
-            _GL_CustomAltitude  ("Custom Sun Altitude", Range(0, 90)) = 45
 
         // Alpha
         [Header(Transparent Alpha)]
@@ -206,6 +202,26 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         [Toggle(_)]
             _TL_InvMaskVal  ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
+
+        // Ambient Occlusion
+        [Header(Ambient Occlusion)]
+        [Toggle(_)]
+            _AO_Enable      ("[AO] Enable", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap   ("[AO] Occlusion Map", 2D) = "white" {}
+        [PowerSlider(2)]
+            _AO_MinValue    ("[AO] Clamp Min", Range(0, 5)) = 0
+        [PowerSlider(2)]
+            _AO_MaxValue    ("[AO] Clamp Max", Range(0, 5)) = 1
+            _AO_Power       ("[AO] Power", Range(0, 1)) = 0.5
+
+        [Header(Lit Advance)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode       ("Sun Source", Float) = 0
+            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude  ("Custom Sun Altitude", Range(-90, 90)) = 45
+        [Toggle(_)]
+            _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
     }
 
     SubShader {
@@ -261,6 +277,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma target 5.0
 
             #define _AL_ENABLE
+            #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _MT_ENABLE
@@ -294,6 +311,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma target 5.0
 
             #define _AL_ENABLE
+            #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE

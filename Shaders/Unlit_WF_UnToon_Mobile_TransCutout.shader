@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_Mobile/WF_UnToon_TransCutout" {
+Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
     /*
      * authors:
@@ -35,10 +35,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_TransCutout" {
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
-            _GL_LightMode       ("Sun Source", Float) = 0
-            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
-            _GL_CustomAltitude  ("Custom Sun Altitude", Range(0, 90)) = 45
 
         // Alpha
         [Header(Transparent Alpha)]
@@ -70,14 +66,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_TransCutout" {
         [Toggle(_)]
             _TS_Enable      ("[SH] Enable", Float) = 0
             _TS_BaseColor   ("[SH] Base Color", Color) = (1, 1, 1, 1)
-        [NoScaleOffset]
-            _TS_BaseTex     ("[SH] Base Shade Texture", 2D) = "white" {}
             _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
-        [NoScaleOffset]
-            _TS_1stTex      ("[SH] 1st Shade Texture", 2D) = "white" {}
             _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
-        [NoScaleOffset]
-            _TS_2ndTex      ("[SH] 2nd Shade Texture", 2D) = "white" {}
             _TS_Power       ("[SH] Shade Power", Range(0, 2)) = 1
             _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
@@ -101,22 +91,23 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_TransCutout" {
         [Toggle(_)]
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
-        // EmissiveScroll
-        [Header(Emissive Scroll)]
+        // Ambient Occlusion
+        [Header(Ambient Occlusion)]
         [Toggle(_)]
-            _ES_Enable      ("[ES] Enable", Float) = 0
-        [HDR]
-            _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
-        [NoScaleOffset]
-            _ES_MaskTex     ("[ES] Mask Texture", 2D) = "white" {}
-        [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
-            _ES_Shape       ("[ES] Wave Type", Float) = 0
+            _AO_Enable      ("[AO] Enable", Float) = 0
+        [PowerSlider(2)]
+            _AO_MinValue    ("[AO] Clamp Min", Range(0, 5)) = 0
+        [PowerSlider(2)]
+            _AO_MaxValue    ("[AO] Clamp Max", Range(0, 5)) = 1
+            _AO_Power       ("[AO] Power", Range(0, 1)) = 0.5
+
+        [Header(Lit Advance)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode       ("Sun Source", Float) = 0
+            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude  ("Custom Sun Altitude", Range(-90, 90)) = 45
         [Toggle(_)]
-            _ES_AlphaScroll ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
-            _ES_Direction   ("[ES] Direction", Vector) = (0, -10, 0, 0)
-            _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
-            _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
-            _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
+            _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
     }
 
     SubShader {
@@ -138,8 +129,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_TransCutout" {
 
             #pragma target 3.0
 
-            #define _AL_ENABLE
-            #define _ES_ENABLE
+            #define _WF_MOBILE
+
+            #define _AO_ENABLE
             #define _HL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE

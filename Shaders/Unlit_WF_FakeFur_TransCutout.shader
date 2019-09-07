@@ -36,10 +36,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
-            _GL_LightMode       ("Sun Source", Float) = 0
-            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
-            _GL_CustomAltitude  ("Custom Sun Altitude", Range(0, 90)) = 45
 
         // ファー設定
         [Header(Fur Settings)]
@@ -113,17 +109,27 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
+
+        [Header(Lit Advance)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode       ("Sun Source", Float) = 0
+            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude  ("Custom Sun Altitude", Range(-90, 90)) = 45
+        [Toggle(_)]
+            _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
     }
 
     SubShader {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
-            "LightMode" = "ForwardBase"
             "DisableBatching" = "True"
         }
 
         Pass {
+            Name "MAIN"
+            Tags { "LightMode" = "ForwardBase" }
+
             Cull OFF
 
             CGPROGRAM
@@ -137,7 +143,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #define _HL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
-
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
@@ -149,6 +154,9 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         }
 
         Pass {
+            Name "FUR"
+            Tags { "LightMode" = "ForwardBase" }
+
             Cull OFF
 
             CGPROGRAM
@@ -168,6 +176,25 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
             #include "WF_FakeFur.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            CGPROGRAM
+
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
+
+            #define _AL_ENABLE
+            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+
+            #include "UnityCG.cginc"
+            #include "WF_UnToon_ShadowCaster.cginc"
 
             ENDCG
         }
