@@ -216,7 +216,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_FRONT"
 
@@ -307,6 +306,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
             ENDCG
         }
+
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

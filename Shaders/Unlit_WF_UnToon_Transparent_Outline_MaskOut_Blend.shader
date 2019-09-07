@@ -230,48 +230,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
 
         GrabPass { "_UnToonTransparentOutlineCanceller" }
         UsePass "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut/OUTLINE"
-
-        Pass {
-            Name "OUTLINE"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull OFF
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            Stencil {
-                Ref [_StencilMaskID]
-                ReadMask 15
-                Comp equal
-            }
-
-            CGPROGRAM
-
-            #pragma vertex vert_outline
-            #pragma fragment frag
-
-            #pragma target 3.0
-
-            #define _AL_ENABLE
-            #define _CL_ENABLE
-            #define _TL_ENABLE
-            #define _TR_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            uniform float _AL_StencilPower;
-            #define _AL_CustomValue _AL_StencilPower
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
         UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE_CANCELLER"
-        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
 
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_FRONT"
@@ -363,6 +322,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
 
             ENDCG
         }
+
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

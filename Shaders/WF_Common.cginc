@@ -252,14 +252,14 @@
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
             return float4( UnityWorldToObjectDir( _WorldSpaceLightPos0.xyz ), +1 );
-		}
-		if (mode == LIT_MODE_ONLY_POINT_LIT) {
+        }
+        if (mode == LIT_MODE_ONLY_POINT_LIT) {
             return float4( UnityWorldToObjectDir( calcPointLight1Pos() - ws_pos ), -1 );
-		}
-		if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
+        }
+        if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
             return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
-		}
-		if (mode == LIT_MODE_CUSTOM_LOCALSPACE) {
+        }
+        if (mode == LIT_MODE_CUSTOM_LOCALSPACE) {
             return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude), 0 );
         }
         return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );

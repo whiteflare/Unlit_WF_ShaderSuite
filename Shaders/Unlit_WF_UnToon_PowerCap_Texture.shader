@@ -260,23 +260,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
             ENDCG
         }
 
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-
-            #include "UnityCG.cginc"
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

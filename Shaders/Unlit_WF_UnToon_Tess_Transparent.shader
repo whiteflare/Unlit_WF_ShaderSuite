@@ -297,24 +297,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             ENDCG
         }
 
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #define _AL_ENABLE
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-
-            #include "UnityCG.cginc"
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
