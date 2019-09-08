@@ -73,7 +73,14 @@
 
         o.ls_vertex     = MUL_BARY(i, ls_vertex);
         o.uv            = MUL_BARY(i, uv);
+        #ifdef _LMAP_ENABLE
+            o.uv_lmap   = MUL_BARY(i, uv_lmap);
+        #endif
         o.normal        = normalize( MUL_BARY(i, normal) );
+        #ifdef _NM_ENABLE
+            o.tangent   = normalize( MUL_BARY(i, tangent) );
+            o.bitangent = normalize( MUL_BARY(i, bitangent) );
+        #endif
 
         // Phong Tessellation
         float3 phg[3];
