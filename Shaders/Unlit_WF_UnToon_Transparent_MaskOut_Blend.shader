@@ -50,7 +50,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
         [Enum(OFF,0,ON,1)]
-            _AL_ZWrite      ("[AL] ZWrite", int) = 0
+            _AL_ZWrite      ("[AL] ZWrite", int) = 1
 
         // 色変換
         [Header(Color Change)]
@@ -199,6 +199,10 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
         [PowerSlider(2)]
             _AO_MaxValue    ("[AO] Clamp Max", Range(0, 5)) = 1
             _AO_Power       ("[AO] Power", Range(0, 1)) = 0.5
+        [NoScaleOffset]
+            _AO_MaskTex     ("[AO] Occlusion Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_InvMaskVal  ("[AO] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]

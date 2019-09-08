@@ -152,21 +152,28 @@
     }
 
     inline float3 calcLightColorVertex(float4 ls_vertex, float3 ambientColor) {
-        float3 lightColorMain = _LightColor0.rgb;
-        float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
-                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                unity_LightColor[0].rgb,
-                unity_LightColor[1].rgb,
-                unity_LightColor[2].rgb,
-                unity_LightColor[3].rgb,
-                unity_4LightAtten0,
-                mul(unity_ObjectToWorld, ls_vertex)
-            );
-        float3 color = lightColorMain + lightColorSub4 + ambientColor;
-        float power = calcBrightness(color);
-        float3 light_color = (saturate( NON_ZERO_VEC3(color) / NON_ZERO_FLOAT(power) ) - 1) * _GL_BrendPower + 1;
-        light_color *= saturate( power * 2 + (100 - _GL_Level) * 0.01 );
-        return light_color;
+        // 動的ライト色はライトマップが無効の場合のみ取得
+        #ifndef _LMAP_ENABLE
+            float3 lightColorMain = _LightColor0.rgb;
+            float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
+                    unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                    unity_LightColor[0].rgb,
+                    unity_LightColor[1].rgb,
+                    unity_LightColor[2].rgb,
+                    unity_LightColor[3].rgb,
+                    unity_4LightAtten0,
+                    mul(unity_ObjectToWorld, ls_vertex)
+                );
+        #else
+            float3 lightColorMain = ZERO_VEC3;
+            float3 lightColorSub4 = ZERO_VEC3;
+        #endif
+        float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
+        float power = AVE3(color.r, color.g, color.b);                      // 明度
+        color = lerp( power.xxx, color, _GL_BrendPower);                    // 色の混合
+        color = saturate( color / AVE3(color.r, color.g, color.b) );        // 正規化
+        color = color * saturate( power * 2 + (100 - _GL_Level) * 0.01 );   // アンチグレア
+        return color;
     }
 
     inline float calcAngleLightCamera(v2f i) {
@@ -183,16 +190,6 @@
         }
         return angle_light_camera;
     }
-
-    #ifdef _LMAP_ENABLE
-        #if defined(_AO_ENABLE)
-            #define WF_GET_AMBIENT  TGL_ON(_AO_Enable) ? float3(0.8, 0.8, 0.8) : pickLightmapLod(v.uv_lmap)
-        #else
-            #define WF_GET_AMBIENT  pickLightmapLod(v.uv_lmap)
-        #endif
-    #else
-        #define WF_GET_AMBIENT  OmniDirectional_ShadeSH9()
-    #endif
 
     ////////////////////////////
     // Normal Map
@@ -573,8 +570,10 @@
         float       _AO_MinValue;
         float       _AO_MaxValue;
         float       _AO_Power;
+        DECL_SUB_TEX2D(_AO_MaskTex);
+        float       _AO_InvMaskVal;
 
-        inline void affectOcclusion(v2f i, inout float4 color) {
+        inline void affectOcclusion(v2f i, float2 uv_main, inout float4 color) {
             if (TGL_ON(_AO_Enable)) {
                 float3 occlusion = float3(1, 1, 1);
 #ifndef _WF_MOBILE
@@ -583,14 +582,32 @@
                 #ifdef _LMAP_ENABLE
                     occlusion *= pickLightmap(i.uv_lmap);
                 #endif
+                occlusion = lerp( AVE3(occlusion.r, occlusion.g, occlusion.b).xxx, occlusion, _GL_BrendPower); // 色の混合
                 occlusion = clamp(occlusion, _AO_MinValue, _AO_MaxValue);
-                occlusion = (occlusion - 1) * _AO_Power + 1;
+                float power = saturate(_AO_Power * SAMPLE_MASK_VALUE(_AO_MaskTex, uv_main, _AO_InvMaskVal).r);
+                occlusion = (occlusion - 1) * power + 1;
                 color.rgb *= occlusion;
             }
         }
     #else
-        #define affectOcclusion(i, color)
+        #define affectOcclusion(i, uv_main, color)
     #endif
+
+    inline float3 calcAmbientColorVertex(appdata v) {
+        // ライトマップもしくは環境光を取得
+        #ifdef _LMAP_ENABLE
+            float3 color = pickLightmapLod(v.uv_lmap);
+            #if defined(_AO_ENABLE)
+            if (TGL_ON(_AO_Enable)) {
+                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので明るさだけ取得する
+                return AVE3(color.r, color.g, color.b).xxx;
+            }
+            #endif
+            return color;
+        #else
+            return OmniDirectional_ShadeSH9();
+        #endif
+    }
 
     ////////////////////////////
     // vertex&fragment shader
@@ -625,7 +642,7 @@
         #endif
 
         // 環境光取得
-        float3 ambientColor = WF_GET_AMBIENT;
+        float3 ambientColor = calcAmbientColorVertex(v);
         // 影コントラスト
         calcToonShadeContrast(o.ls_vertex, o.ls_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
@@ -673,13 +690,13 @@
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
+        // Ambient Occlusion
+        affectOcclusion(i, uv_main, color);
 
         // Alpha
         affectAlphaWithFresnel(uv_main, ls_normal, localSpaceViewDir(i.ls_vertex), color);
         // EmissiveScroll
         affectEmissiveScroll(i.ls_vertex, uv_main, color);
-        // Ambient Occlusion
-        affectOcclusion(i, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
