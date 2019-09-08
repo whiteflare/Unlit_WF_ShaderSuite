@@ -105,6 +105,15 @@ namespace UnlitWF
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
+
+            // DebugView の NONE ならばキーワードを削除する
+            foreach(object t in materialEditor.targets) {
+                Material mm = t as Material;
+                if (mm == null || Array.IndexOf(mm.shaderKeywords, "_WF_DEBUGVIEW_NONE") < 0) {
+                    continue;
+                }
+                mm.DisableKeyword("_WF_DEBUGVIEW_NONE");
+            }
         }
 
         private void SuggestShadowColor(object[] targets) {
