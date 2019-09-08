@@ -561,15 +561,14 @@
 #ifndef _WF_MOBILE
         DECL_SUB_TEX2D(_OcclusionMap);
 #endif
-        float       _AO_MinValue;
-        float       _AO_MaxValue;
-        float       _AO_Power;
+        float       _AO_Contrast;
+        float       _AO_Brightness;
         DECL_SUB_TEX2D(_AO_MaskTex);
         float       _AO_InvMaskVal;
 
         inline void affectOcclusion(v2f i, float2 uv_main, inout float4 color) {
             if (TGL_ON(_AO_Enable)) {
-                float3 occlusion = float3(1, 1, 1);
+                float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
                 occlusion *= SAMPLE_MASK_VALUE(_OcclusionMap, i.uv, 0).rgb;
 #endif
@@ -577,10 +576,8 @@
                     occlusion *= pickLightmap(i.uv_lmap);
                 #endif
                 occlusion = lerp( AVE3(occlusion.r, occlusion.g, occlusion.b).xxx, occlusion, _GL_BrendPower); // 色の混合
-                occlusion = clamp(occlusion, _AO_MinValue, _AO_MaxValue);
-                float power = saturate(_AO_Power * SAMPLE_MASK_VALUE(_AO_MaskTex, uv_main, _AO_InvMaskVal).r);
-                occlusion = (occlusion - 1) * power + 1;
-                color.rgb *= occlusion;
+                occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
+                color.rgb *= max(ZERO_VEC3, occlusion.rgb);
             }
         }
     #else

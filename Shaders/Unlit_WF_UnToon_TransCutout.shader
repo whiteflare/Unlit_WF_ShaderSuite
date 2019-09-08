@@ -199,11 +199,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _AO_Enable      ("[AO] Enable", Float) = 0
         [NoScaleOffset]
             _OcclusionMap   ("[AO] Occlusion Map", 2D) = "white" {}
-        [PowerSlider(2)]
-            _AO_MinValue    ("[AO] Clamp Min", Range(0, 5)) = 0
-        [PowerSlider(2)]
-            _AO_MaxValue    ("[AO] Clamp Max", Range(0, 5)) = 1
-            _AO_Power       ("[AO] Power", Range(0, 1)) = 0.5
+            _AO_Contrast    ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness  ("[AO] Brightness", Range(-1, 1)) = 0
         [NoScaleOffset]
             _AO_MaskTex     ("[AO] Occlusion Mask Texture", 2D) = "white" {}
         [Toggle(_)]
