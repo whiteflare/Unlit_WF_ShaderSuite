@@ -152,22 +152,16 @@
     }
 
     inline float3 calcLightColorVertex(float4 ls_vertex, float3 ambientColor) {
-        // 動的ライト色はライトマップが無効の場合のみ取得
-        #ifndef _LMAP_ENABLE
-            float3 lightColorMain = _LightColor0.rgb;
-            float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
-                    unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                    unity_LightColor[0].rgb,
-                    unity_LightColor[1].rgb,
-                    unity_LightColor[2].rgb,
-                    unity_LightColor[3].rgb,
-                    unity_4LightAtten0,
-                    mul(unity_ObjectToWorld, ls_vertex)
-                );
-        #else
-            float3 lightColorMain = ZERO_VEC3;
-            float3 lightColorSub4 = ZERO_VEC3;
-        #endif
+        float3 lightColorMain = _LightColor0.rgb;
+        float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
+                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                unity_LightColor[0].rgb,
+                unity_LightColor[1].rgb,
+                unity_LightColor[2].rgb,
+                unity_LightColor[3].rgb,
+                unity_4LightAtten0,
+                mul(unity_ObjectToWorld, ls_vertex)
+            );
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
         float power = AVE3(color.r, color.g, color.b);                      // 明度
         color = lerp( power.xxx, color, _GL_BrendPower);                    // 色の混合
