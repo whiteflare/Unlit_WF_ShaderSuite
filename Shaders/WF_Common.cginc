@@ -35,7 +35,7 @@
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
-    #define AVE3(r, g, b)	((r + g + b) / 3)
+    #define AVE3(r, g, b)   ((r + g + b) / 3)
 
     inline float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
@@ -169,36 +169,34 @@
             #define _AL_CustomValue 1
         #endif
 
-        inline float pickAlpha(float2 uv, float power, float alpha) {
+        inline float pickAlpha(float2 uv, float alpha) {
             if (_AL_Source == 1) {
-                return tex2D(_AL_MaskTex, uv).r * power;
+                return tex2D(_AL_MaskTex, uv).r;
             }
             else if (_AL_Source == 2) {
-                return tex2D(_AL_MaskTex, uv).a * power;
+                return tex2D(_AL_MaskTex, uv).a;
             }
             else {
-                return alpha * power;
+                return alpha;
             }
         }
 
         inline void affectAlpha(float2 uv, inout float4 color) {
-            float orig = color.a;
-
-            // ベースアルファ
-            color.a = pickAlpha(uv, _AL_Power * _AL_CustomValue, orig);
+            float baseAlpha = pickAlpha(uv, color.a) * _AL_Power * _AL_CustomValue;
+            color.a = baseAlpha;
         }
 
         inline void affectAlphaWithFresnel(float2 uv, float3 normal, float3 viewdir, inout float4 color) {
-            float orig = color.a;
+            float baseAlpha = pickAlpha(uv, color.a) * _AL_Power * _AL_CustomValue;
 
-            // ベースアルファ
-            color.a = pickAlpha(uv, _AL_Power * _AL_CustomValue, orig);
-
-            #ifdef _AL_FRESNEL_ENABLE
+            #ifndef _AL_FRESNEL_ENABLE
+                // ベースアルファ
+                color.a = baseAlpha;
+            #else
                 // フレネルアルファ
-                float maxValue = pickAlpha(uv, max(_AL_Power, _AL_Fresnel) * _AL_CustomValue, orig);
+                float maxValue = max( pickAlpha(uv, color.a) * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
                 float fa = 1 - abs( dot( SafeNormalizeVec3(normal), SafeNormalizeVec3(viewdir) ) );
-                color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
+                color.a = lerp( baseAlpha, maxValue, fa * fa * fa * fa );
             #endif
         }
     #else
