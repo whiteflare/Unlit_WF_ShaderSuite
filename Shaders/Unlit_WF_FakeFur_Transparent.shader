@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/08/04 whiteflare,
+     *      ver:2019/09/14 whiteflare,
      */
 
     Properties {

@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
     /*
      * authors:
-     *      ver:2019/08/24 whiteflare,
+     *      ver:2019/09/14 whiteflare,
      */
 
     Properties {
