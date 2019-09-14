@@ -237,7 +237,7 @@
     }
 
     inline float3 calcHorizontalCoordSystem(float azimuth, float alt) {
-        azimuth = radians(azimuth);
+        azimuth = radians(azimuth + 90);
         alt = radians(alt);
         return normalize( float3(cos(azimuth) * cos(alt), sin(alt), -sin(azimuth) * cos(alt)) );
     }
@@ -265,17 +265,12 @@
     }
 
     inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
-        if ( TGL_ON(lightType) ) {
-            return _LightColor0.rgb; // ディレクショナルライト
-        }
-
         if ( TGL_ON(-lightType) ) {
             float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
             float3 pointLight1Color = calcPointLight1Color(ws_pos);
             return pointLight1Color; // ポイントライト
         }
-
-        return float3(0, 0, 0);
+        return _LightColor0.rgb; // ディレクショナルライト
     }
 
     inline float calcAntiGlareLevel(float4 ls_vertex) {
