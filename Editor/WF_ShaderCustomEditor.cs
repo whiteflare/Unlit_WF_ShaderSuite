@@ -51,6 +51,16 @@ namespace UnlitWF
                     continue;
                 }
 
+                // _TS_1stColorの直前にボタンを追加する
+                if (prop.name == "_TS_1stColor") {
+                    Rect position = EditorGUILayout.GetControlRect(true, 24);
+                    Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
+                    fieldpos.height = 20;
+                    if (GUI.Button(fieldpos, "APPLY")) {
+                        SuggestShadowColor(materialEditor.targets);
+                    }
+                }
+
                 // HideInInspectorをこのタイミングで除外するとFix*Drawerが動作しないのでそのまま通す
                 // 非表示はFix*Drawerが担当
                 // Fix*Drawerと一緒にHideInInspectorを付けておけば、このcsが無い環境でも非表示のまま変わらないはず
@@ -59,7 +69,22 @@ namespace UnlitWF
                 // }
 
                 // 描画
-                materialEditor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName));
+                GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
+                if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
+                    MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties, false);
+                    if (propTex != null) {
+                        materialEditor.TexturePropertySingleLine(guiContent, propTex, prop);
+                    }
+                    else {
+                        materialEditor.ShaderProperty(prop, guiContent);
+                    }
+                }
+                else if (COLOR_TEX_COBINATION.ContainsValue(prop.name)) {
+                    // nop
+                }
+                else {
+                    materialEditor.ShaderProperty(prop, guiContent);
+                }
 
                 // ラベルが指定されていてenableならば有効無効をリストに追加
                 // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
@@ -71,16 +96,6 @@ namespace UnlitWF
                         disable.Remove(label);
                     }
                 }
-
-                // _TS_BaseTexだったならばボタンを追加する
-                if (prop.name == "_TS_BaseTex") {
-                    Rect position = EditorGUILayout.GetControlRect(true, 24);
-                    Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
-                    fieldpos.height = 20;
-                    if (GUI.Button(fieldpos, "APPLY")) {
-                        SuggestShadowColor(materialEditor.targets);
-                    }
-                }
             }
 
             EditorGUILayout.Space();
@@ -90,6 +105,15 @@ namespace UnlitWF
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
+
+            // DebugView の NONE ならばキーワードを削除する
+            foreach(object t in materialEditor.targets) {
+                Material mm = t as Material;
+                if (mm == null || Array.IndexOf(mm.shaderKeywords, "_WF_DEBUGVIEW_NONE") < 0) {
+                    continue;
+                }
+                mm.DisableKeyword("_WF_DEBUGVIEW_NONE");
+            }
         }
 
         private void SuggestShadowColor(object[] targets) {
@@ -127,6 +151,13 @@ namespace UnlitWF
             }
             return hur;
         }
+
+        private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
+            { "_TS_BaseColor", "_TS_BaseTex" },
+            { "_TS_1stColor", "_TS_1stTex" },
+            { "_TS_2ndColor", "_TS_2ndTex" },
+            { "_ES_Color", "_ES_MaskTex" },
+        };
     }
 
     internal class MaterialFixFloatDrawer : MaterialPropertyDrawer

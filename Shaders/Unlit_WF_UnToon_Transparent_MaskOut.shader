@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
     /*
      * authors:
-     *      ver:2019/08/24 whiteflare,
+     *      ver:2019/09/14 whiteflare,
      */
 
     Properties {
@@ -49,7 +49,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 1.0
         [Enum(OFF,0,ON,1)]
-            _AL_ZWrite      ("[AL] ZWrite", int) = 0
+            _AL_ZWrite      ("[AL] ZWrite", int) = 1
 
         // 色変換
         [Header(Color Change)]
@@ -186,6 +186,31 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _ES_LevelOffset ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
+        // Ambient Occlusion
+        [Header(Ambient Occlusion)]
+        [Toggle(_)]
+            _AO_Enable      ("[AO] Enable", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap   ("[AO] Occlusion Map", 2D) = "white" {}
+            _AO_Contrast    ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness  ("[AO] Brightness", Range(-1, 1)) = 0
+        [NoScaleOffset]
+            _AO_MaskTex     ("[AO] Occlusion Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_InvMaskVal  ("[AO] Invert Mask Value", Range(0, 1)) = 0
+
+        [Header(Lit Advance)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode       ("Sun Source", Float) = 0
+            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude  ("Custom Sun Altitude", Range(-90, 90)) = 45
+        [Toggle(_)]
+            _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
+
+        [Header(DebugMode)]
+        [KeywordEnum(NONE,MAGENTA,CLIP,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
+            _WF_DebugView       ("Debug View", Float) = 0
     }
 
     SubShader {
@@ -217,6 +242,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             #pragma target 3.0
 
             #define _AL_ENABLE
+            #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _MT_ENABLE
@@ -226,6 +252,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -256,6 +284,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             #pragma target 3.0
 
             #define _AL_ENABLE
+            #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
@@ -267,6 +296,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"

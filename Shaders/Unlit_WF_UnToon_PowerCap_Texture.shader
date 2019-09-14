@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
 
     /*
      * authors:
-     *      ver:2019/08/24 whiteflare,
+     *      ver:2019/09/14 whiteflare,
      */
 
     Properties {
@@ -216,6 +216,18 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
+
+        [Header(Lit Advance)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode       ("Sun Source", Float) = 0
+            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude  ("Custom Sun Altitude", Range(-90, 90)) = 45
+        [Toggle(_)]
+            _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
+
+        [Header(DebugMode)]
+        [KeywordEnum(NONE,MAGENTA,CLIP,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
+            _WF_DebugView       ("Debug View", Float) = 0
     }
 
     SubShader {
@@ -245,6 +257,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
+
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
             #include "WF_UnToon_PowerCap.cginc"
@@ -252,23 +266,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
             ENDCG
         }
 
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-
-            #include "UnityCG.cginc"
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

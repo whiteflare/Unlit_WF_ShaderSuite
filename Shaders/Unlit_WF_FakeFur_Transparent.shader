@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/08/04 whiteflare,
+     *      ver:2019/09/14 whiteflare,
      */
 
     Properties {
@@ -108,17 +108,27 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
+
+        [Header(Lit Advance)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode       ("Sun Source", Float) = 0
+            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude  ("Custom Sun Altitude", Range(-90, 90)) = 45
+        [Toggle(_)]
+            _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
     }
 
     SubShader {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "LightMode" = "ForwardBase"
             "DisableBatching" = "True"
         }
 
         Pass {
+            Name "MAIN"
+            Tags { "LightMode" = "ForwardBase" }
+
             Cull OFF
 
             CGPROGRAM
@@ -132,7 +142,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #define _HL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
-
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
@@ -144,6 +153,9 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         }
 
         Pass {
+            Name "FUR"
+            Tags { "LightMode" = "ForwardBase" }
+
             Cull OFF
             ZWrite OFF
             Blend SrcAlpha OneMinusSrcAlpha
@@ -168,6 +180,8 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
             ENDCG
         }
+
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

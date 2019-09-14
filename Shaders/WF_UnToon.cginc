@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/08/24 whiteflare,
+     *      ver:2019/09/14 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -55,6 +55,9 @@
     #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
         #define _LMAP_ENABLE
     #endif
+    #if defined(_WF_MOBILE) && !defined(_LMAP_ENABLE)
+        #undef _AO_ENABLE
+    #endif
 
     ////////////////////////////
     // main structure
@@ -86,6 +89,9 @@
             float3 tangent      : TEXCOORD4;
             float3 bitangent    : TEXCOORD5;
         #endif
+        #ifdef _LMAP_ENABLE
+            float2 uv_lmap      : TEXCOORD6;
+        #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
@@ -97,6 +103,87 @@
     float4          _Color;
     float           _AL_CutOff;
     float           _GL_BrendPower;
+    float           _GL_DisableBackLit;
+
+    ////////////////////////////
+    // common function
+    ////////////////////////////
+
+    inline float3 pickLightmap(float2 uv_lmap) {
+        float3 color = ZERO_VEC3;
+        #ifdef LIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            float4 lmap_tex = UNITY_SAMPLE_TEX2D(unity_Lightmap, uv);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        #ifdef DYNAMICLIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+            float4 lmap_tex = UNITY_SAMPLE_TEX2D(unity_DynamicLightmap, uv);
+            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        return color;
+    }
+
+    inline float3 pickLightmapLod(float2 uv_lmap) {
+        float3 color = ZERO_VEC3;
+        #ifdef LIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_Lightmap, uv, 0);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        #ifdef DYNAMICLIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
+            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        return color;
+    }
+
+    inline float3 calcLightColorVertex(float4 ls_vertex, float3 ambientColor) {
+        float3 lightColorMain = _LightColor0.rgb;
+        float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
+                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                unity_LightColor[0].rgb,
+                unity_LightColor[1].rgb,
+                unity_LightColor[2].rgb,
+                unity_LightColor[3].rgb,
+                unity_4LightAtten0,
+                mul(unity_ObjectToWorld, ls_vertex)
+            );
+        float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
+        float power = AVE3(color.r, color.g, color.b);                      // 明度
+        color = lerp( power.xxx, color, _GL_BrendPower);                    // 色の混合
+        color = saturate( color / AVE3(color.r, color.g, color.b) );        // 正規化
+        color = color * saturate( power * 2 + (100 - _GL_Level) * 0.01 );   // アンチグレア
+        return color;
+    }
+
+    inline float calcAngleLightCamera(v2f i) {
+        if (TGL_ON(_GL_DisableBackLit)) {
+            return 0;
+        }
+        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
+        float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
+        float2 xz_camera_pos = worldSpaceCameraPos().xz - mul(unity_ObjectToWorld, float4(0, 0, 0, i.ls_vertex.w)).xz;
+        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
+            * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
+        if (isInMirror()) {
+            angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
+        }
+        return angle_light_camera;
+    }
 
     ////////////////////////////
     // Normal Map
@@ -108,6 +195,8 @@
         DECL_SUB_TEX2D(_BumpMap);
         float       _BumpScale;
         float       _NM_Power;
+        float       _NM_FlipTangent;
+#ifndef _WF_MOBILE
         // 2nd NormalMap
         float       _NM_2ndType;
         DECL_MAIN_TEX2D(_DetailNormalMap);
@@ -115,7 +204,7 @@
         float       _DetailNormalMapScale;
         DECL_SUB_TEX2D(_NM_2ndMaskTex);
         float       _NM_InvMaskVal;
-        float       _NM_FlipTangent;
+#endif
 
         inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ls_bump_normal, inout float4 color) {
             float3 ls_normal = i.normal;
@@ -123,9 +212,9 @@
                 // 1st NormalMap
                 float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, uv_main), _BumpScale );
 
-                float2 uv_dtl = TRANSFORM_TEX(i.uv, _DetailNormalMap);
-
+#ifndef _WF_MOBILE
                 // 2nd NormalMap
+                float2 uv_dtl = TRANSFORM_TEX(i.uv, _DetailNormalMap);
                 if (_NM_2ndType == 1) { // BLEND
                     float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv_main, _NM_InvMaskVal);
                     float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv_dtl), _DetailNormalMapScale);
@@ -136,6 +225,7 @@
                     float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv_dtl), _DetailNormalMapScale);
                     normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
                 }
+#endif
 
                 // 法線計算
                 float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
@@ -296,11 +386,13 @@
     #ifdef _TS_ENABLE
         float       _TS_Enable;
         float4      _TS_BaseColor;
-        DECL_SUB_TEX2D(_TS_BaseTex);
         float4      _TS_1stColor;
-        DECL_SUB_TEX2D(_TS_1stTex);
         float4      _TS_2ndColor;
+#ifndef _WF_MOBILE
+        DECL_SUB_TEX2D(_TS_BaseTex);
+        DECL_SUB_TEX2D(_TS_1stTex);
         DECL_SUB_TEX2D(_TS_2ndTex);
+#endif
         float       _TS_Power;
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
@@ -339,9 +431,15 @@
                 // ビュー相対位置シフト
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
                 // 影色計算
+#ifndef _WF_MOBILE
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv).rgb );
                 float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv).rgb / base_color.rgb;
                 float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv).rgb / base_color.rgb;
+#else
+                float3 base_color = base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb );
+                float3 shadow_color_1st = _TS_1stColor.rgb / base_color.rgb;
+                float3 shadow_color_2nd = _TS_2ndColor.rgb / base_color.rgb;
+#endif
                 shadow_color_1st = lerp(ONE_VEC3, shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
                 shadow_color_2nd = lerp(ONE_VEC3, shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
                 // 色計算
@@ -401,10 +499,14 @@
         float       _OL_InvMaskVal;
 
         inline float2 computeOverlayTex(float4 ls_vertex) {
-            float4 screenPos = ComputeNonStereoScreenPos( UnityObjectToClipPos(ls_vertex) );
-            float2 scr = screenPos.xy / screenPos.w;
-            scr.y *= _ScreenParams.y / _ScreenParams.x;
-            return TRANSFORM_TEX(scr, _OL_OverlayTex);
+            float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+            float3 ws_view_dir = normalize( ws_vertex - _WorldSpaceCameraPos.xyz );
+
+            float lon = atan2( ws_view_dir.z, ws_view_dir.x );  // -PI ~ +PI
+            float lat = acos( ws_view_dir.y );                  // -PI ~ +PI
+            float2 uv = float2(-lon, -lat) * UNITY_INV_TWO_PI + 0.5;
+
+            return TRANSFORM_TEX(uv, _OL_OverlayTex);
         }
 
         inline float3 blendOverlayColor(float3 color, float3 ov_color, float3 power) {
@@ -451,82 +553,52 @@
     #endif
 
     ////////////////////////////
-    // common function
+    // Ambient Occlusion
     ////////////////////////////
 
-    inline float3 calcLightColorVertex(float4 ls_vertex, float3 ambientColor) {
-        float3 lightColorMain = _LightColor0.rgb;
-        float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
-                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                unity_LightColor[0].rgb,
-                unity_LightColor[1].rgb,
-                unity_LightColor[2].rgb,
-                unity_LightColor[3].rgb,
-                unity_4LightAtten0,
-                mul(unity_ObjectToWorld, ls_vertex)
-            );
-        float3 color = lightColorMain + lightColorSub4 + ambientColor;
-        float power = calcBrightness(color);
-        float3 light_color = (saturate( NON_ZERO_VEC3(color) / NON_ZERO_FLOAT(power) ) - 1) * _GL_BrendPower + 1;
-        light_color *= saturate( power * 2 + (100 - _GL_Level) * 0.01 );
-        return light_color;
-    }
+    #ifdef _AO_ENABLE
+        float       _AO_Enable;
+#ifndef _WF_MOBILE
+        DECL_SUB_TEX2D(_OcclusionMap);
+#endif
+        float       _AO_Contrast;
+        float       _AO_Brightness;
+        DECL_SUB_TEX2D(_AO_MaskTex);
+        float       _AO_InvMaskVal;
 
-    inline float3 pickLightmapLod(float2 uv_lmap, float3 ls_normal) {
-        float3 color = ZERO_VEC3;
-        float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
-        #ifdef LIGHTMAP_ON
-        {
-            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_Lightmap, uv, 0);
-            float3 lmap_color = DecodeLightmap(lmap_tex);
-            #ifdef DIRLIGHTMAP_COMBINED
-                fixed4 dir_tex = WF_SAMPLE_TEX2D_SAMPLER_LOD(unity_LightmapInd, unity_Lightmap, uv, 0);
-                color += DecodeDirectionalLightmap(lmap_color, dir_tex, ws_normal);
-            #else
-                color += lmap_color;
-            #endif
+        inline void affectOcclusion(v2f i, float2 uv_main, inout float4 color) {
+            if (TGL_ON(_AO_Enable)) {
+                float3 occlusion = ONE_VEC3;
+#ifndef _WF_MOBILE
+                occlusion *= SAMPLE_MASK_VALUE(_OcclusionMap, i.uv, 0).rgb;
+#endif
+                #ifdef _LMAP_ENABLE
+                    occlusion *= pickLightmap(i.uv_lmap);
+                #endif
+                occlusion = lerp( AVE3(occlusion.r, occlusion.g, occlusion.b).xxx, occlusion, _GL_BrendPower); // 色の混合
+                occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
+                color.rgb *= max(ZERO_VEC3, occlusion.rgb);
+            }
         }
-        #endif
-        #ifdef DYNAMICLIGHTMAP_ON
-        {
-            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
-            float3 lmap_color = DecodeRealtimeLightmap (lmap_tex);
-            #ifdef DIRLIGHTMAP_COMBINED
-                half4 dir_tex = WF_SAMPLE_TEX2D_SAMPLER_LOD(unity_DynamicDirectionality, unity_DynamicLightmap, uv, 0);
-                color += DecodeDirectionalLightmap(lmap_color, dir_tex, ws_normal);
-            #else
-                color += lmap_color;
-            #endif
-        }
-        #endif
-        return color;
-    }
-
-    inline float3 worldSpaceViewDir2() {
-        float4 ws_vertex = mul(unity_ObjectToWorld, float4(0, 0, 0, 0));
-        ws_vertex.y = round(ws_vertex.y / 16) * 16;
-        return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex.xyz);
-    }
-
-    inline float calcAngleLightCamera(v2f i) {
-        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
-        float3 ws_camera_dir = worldSpaceViewDir2();
-        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(ws_camera_dir.xz) )
-            * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * (1 - smoothstep(0.9, 1, abs(ws_camera_dir.y)));
-        if (isInMirror()) {
-            angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
-        }
-        return angle_light_camera;
-    }
-
-    #ifdef _LMAP_ENABLE
-        #define WF_GET_AMBIENT  pickLightmapLod(v.uv_lmap, o.normal)
     #else
-        #define WF_GET_AMBIENT  OmniDirectional_ShadeSH9()
+        #define affectOcclusion(i, uv_main, color)
     #endif
+
+    inline float3 calcAmbientColorVertex(appdata v) {
+        // ライトマップもしくは環境光を取得
+        #ifdef _LMAP_ENABLE
+            float3 color = pickLightmapLod(v.uv_lmap);
+            #if defined(_AO_ENABLE)
+            if (TGL_ON(_AO_Enable)) {
+                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので明るさだけ取得する
+                return AVE3(color.r, color.g, color.b).xxx;
+            }
+            #endif
+            return color;
+        #else
+            return OmniDirectional_ShadeSH9();
+        #endif
+    }
 
     ////////////////////////////
     // vertex&fragment shader
@@ -544,6 +616,9 @@
         o.uv = v.uv;
         o.ls_vertex = v.vertex;
         o.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, v.vertex.w) );
+        #ifdef _LMAP_ENABLE
+            o.uv_lmap = v.uv_lmap;
+        #endif
 
         o.normal = normalize(v.normal.xyz);
         #ifdef _NM_ENABLE
@@ -558,7 +633,7 @@
         #endif
 
         // 環境光取得
-        float3 ambientColor = WF_GET_AMBIENT;
+        float3 ambientColor = calcAmbientColorVertex(v);
         // 影コントラスト
         calcToonShadeContrast(o.ls_vertex, o.ls_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
@@ -606,6 +681,8 @@
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
+        // Ambient Occlusion
+        affectOcclusion(i, uv_main, color);
 
         // Alpha
         affectAlphaWithFresnel(uv_main, ls_normal, localSpaceViewDir(i.ls_vertex), color);
@@ -617,6 +694,33 @@
 
         // fog
         UNITY_APPLY_FOG(i.fogCoord, color);
+
+        // デバッグビュー
+#ifdef _WF_DEBUGVIEW_MAGENTA
+        color.rgb /= 256;
+        color.rb += 1;
+#elif _WF_DEBUGVIEW_CLIP
+        discard;
+#elif _WF_DEBUGVIEW_NORMAL
+        color.rgb /= 256;
+        color.rgb += ls_normal.rgb / 2 + 0.5;
+#elif _WF_DEBUGVIEW_TANGENT
+        color.rgb /= 256;
+        #ifdef _NM_ENABLE
+            color.rgb += i.tangent.rgb / 2 + 0.5;
+        #endif
+#elif _WF_DEBUGVIEW_BUMPED_NORMAL
+        color.rgb /= 256;
+        color.rgb += ls_bump_normal.rgb / 2 + 0.5;
+#elif _WF_DEBUGVIEW_LIGHT_COLOR
+        color.rgb /= 256;
+        color.rgb += i.light_color.rgb;
+#elif _WF_DEBUGVIEW_LIGHT_MAP
+        color.rgb /= 256;
+        #ifdef _LMAP_ENABLE
+            color.rgb += pickLightmap(i.uv_lmap).rgb;
+        #endif
+#endif
 
         return color;
     }

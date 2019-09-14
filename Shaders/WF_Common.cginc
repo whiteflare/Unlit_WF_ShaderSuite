@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/07/13 whiteflare,
+     *      ver:2019/09/14 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -35,6 +35,7 @@
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
+    #define AVE3(r, g, b)   ((r + g + b) / 3)
 
     inline float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
@@ -69,55 +70,6 @@
         float lengthSq = dot(ls_lightPos, ls_lightPos);
         float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
         return unity_LightColor[0].rgb * atten;
-    }
-
-    inline float4 calcLocalSpaceLightDir(float4 ls_pos) {
-        float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
-        float3 pointLight1Color = calcPointLight1Color(ws_pos);
-
-        float3 ws_lightDir;
-        float lightType;
-        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
-            // ディレクショナルよりポイントライトのほうが明るいならばそちらの方向を採用
-            ws_lightDir = calcPointLight1Pos() - ws_pos;
-            lightType = -1;
-
-        } else if (any(_WorldSpaceLightPos0.xyz)) {
-            // ディレクショナルライトが入っているならばそれを採用
-            ws_lightDir = _WorldSpaceLightPos0.xyz;
-            lightType = +1;
-
-        } else {
-            // 手頃なライトが無いのでワールドスペースの方向決め打ち
-            ws_lightDir = float3(1, 1, -1);
-            lightType = 0;
-        }
-        return float4( UnityWorldToObjectDir(ws_lightDir), lightType );
-    }
-
-    inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
-        if ( TGL_ON(lightType) ) {
-            return _LightColor0.rgb; // ディレクショナルライト
-        }
-        float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
-        float3 pointLight1Color = calcPointLight1Color(ws_pos);
-        if ( TGL_ON(-lightType) ) {
-            return pointLight1Color; // ポイントライト
-        }
-
-        float3 ws_lightColor;
-        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
-            // ディレクショナルよりポイントライトのほうが明るいならばそちらの方向を採用
-            return pointLight1Color;
-
-        } else if (any(_WorldSpaceLightPos0.xyz)) {
-            // ディレクショナルライトが入っているならばそれを採用
-            return _LightColor0.rgb;
-
-        } else {
-            // 手頃なライトが無い
-            return float3(0, 0, 0);
-        }
     }
 
     inline float3 OmniDirectional_ShadeSH9() {
@@ -217,36 +169,34 @@
             #define _AL_CustomValue 1
         #endif
 
-        inline float pickAlpha(float2 uv, float power, float alpha) {
+        inline float pickAlpha(float2 uv, float alpha) {
             if (_AL_Source == 1) {
-                return tex2D(_AL_MaskTex, uv).r * power;
+                return tex2D(_AL_MaskTex, uv).r;
             }
             else if (_AL_Source == 2) {
-                return tex2D(_AL_MaskTex, uv).a * power;
+                return tex2D(_AL_MaskTex, uv).a;
             }
             else {
-                return alpha * power;
+                return alpha;
             }
         }
 
         inline void affectAlpha(float2 uv, inout float4 color) {
-            float orig = color.a;
-
-            // ベースアルファ
-            color.a = pickAlpha(uv, _AL_Power * _AL_CustomValue, orig);
+            float baseAlpha = pickAlpha(uv, color.a) * _AL_Power * _AL_CustomValue;
+            color.a = baseAlpha;
         }
 
         inline void affectAlphaWithFresnel(float2 uv, float3 normal, float3 viewdir, inout float4 color) {
-            float orig = color.a;
+            float baseAlpha = pickAlpha(uv, color.a) * _AL_Power * _AL_CustomValue;
 
-            // ベースアルファ
-            color.a = pickAlpha(uv, _AL_Power * _AL_CustomValue, orig);
-
-            #ifdef _AL_FRESNEL_ENABLE
+            #ifndef _AL_FRESNEL_ENABLE
+                // ベースアルファ
+                color.a = baseAlpha;
+            #else
                 // フレネルアルファ
-                float maxValue = pickAlpha(uv, max(_AL_Power, _AL_Fresnel) * _AL_CustomValue, orig);
+                float maxValue = max( pickAlpha(uv, color.a) * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
                 float fa = 1 - abs( dot( SafeNormalizeVec3(normal), SafeNormalizeVec3(viewdir) ) );
-                color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
+                color.a = lerp( baseAlpha, maxValue, fa * fa * fa * fa );
             #endif
         }
     #else
@@ -255,10 +205,73 @@
     #endif
 
     ////////////////////////////
-    // Anti Glare
+    // Anti Glare & Light Configuration
     ////////////////////////////
 
+    #define LIT_MODE_AUTO               0
+    #define LIT_MODE_ONLY_DIR_LIT       1
+    #define LIT_MODE_ONLY_POINT_LIT     2
+    #define LIT_MODE_CUSTOM_WORLDSPACE  3
+    #define LIT_MODE_CUSTOM_LOCALSPACE  4
+
     int             _GL_Level;
+    uint            _GL_LightMode;
+    float           _GL_CustomAzimuth;
+    float           _GL_CustomAltitude;
+
+    inline uint calcAutoSelectMainLight(float3 ws_pos) {
+        float3 pointLight1Color = calcPointLight1Color(ws_pos);
+
+        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
+            // ディレクショナルよりポイントライトのほうが明るいならばそちらを採用
+            return LIT_MODE_ONLY_POINT_LIT;
+
+        } else if (any(_WorldSpaceLightPos0.xyz)) {
+            // ディレクショナルライトが入っているならばそれを採用
+            return LIT_MODE_ONLY_DIR_LIT;
+
+        } else {
+            // 手頃なライトが無いのでワールドスペースの方向決め打ち
+            return LIT_MODE_CUSTOM_WORLDSPACE;
+        }
+    }
+
+    inline float3 calcHorizontalCoordSystem(float azimuth, float alt) {
+        azimuth = radians(azimuth + 90);
+        alt = radians(alt);
+        return normalize( float3(cos(azimuth) * cos(alt), sin(alt), -sin(azimuth) * cos(alt)) );
+    }
+
+    inline float4 calcLocalSpaceLightDir(float4 ls_pos) {
+        float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
+
+        uint mode = _GL_LightMode;
+        if (mode == LIT_MODE_AUTO) {
+            mode = calcAutoSelectMainLight(ws_pos);
+        }
+        if (mode == LIT_MODE_ONLY_DIR_LIT) {
+            return float4( UnityWorldToObjectDir( _WorldSpaceLightPos0.xyz ), +1 );
+        }
+        if (mode == LIT_MODE_ONLY_POINT_LIT) {
+            return float4( UnityWorldToObjectDir( calcPointLight1Pos() - ws_pos ), -1 );
+        }
+        if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
+            return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
+        }
+        if (mode == LIT_MODE_CUSTOM_LOCALSPACE) {
+            return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude), 0 );
+        }
+        return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
+    }
+
+    inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
+        if ( TGL_ON(-lightType) ) {
+            float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
+            float3 pointLight1Color = calcPointLight1Color(ws_pos);
+            return pointLight1Color; // ポイントライト
+        }
+        return _LightColor0.rgb; // ディレクショナルライト
+    }
 
     inline float calcAntiGlareLevel(float4 ls_vertex) {
         return saturate(calcLightPower(ls_vertex) * 2 + (100 - _GL_Level) * 0.01);

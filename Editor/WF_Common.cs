@@ -160,6 +160,18 @@ namespace UnlitWF
             { "[LI] Line Width", "[LI] 線の太さ" },
             { "[LI] Outline Mask Texture", "[LI] マスクテクスチャ" },
             { "[LI] Z-shift (tweak)", "[LI] Z方向の調整" },
+            // Ambient Occlusion
+            { "[AO] Occlusion Map", "[AO] オクルージョンマップ" },
+            { "[AO] Contrast", "[AO] コントラスト" },
+            { "[AO] Brightness", "[AO] 明るさ" },
+            { "[AO] Occlusion Mask Texture", "[AO] マスクテクスチャ" },
+            // Lit Advance
+            { "Sun Source", "太陽光のモード" },
+            { "Custom Sun Azimuth", "カスタム太陽の方角" },
+            { "Custom Sun Altitude", "カスタム太陽の高度" },
+            { "Disable BackLit", "逆光補正しない" },
+            // DebugMode
+            { "Debug View", "デバッグ表示" },
             // Gem Reflection
             { "[GM] CubeMap", "[GM] キューブマップ" },
             { "[GM] Brightness", "[GM] 明るさ" },
