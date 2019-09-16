@@ -97,6 +97,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         // リムライト
         [WFHeaderToggle(RimLight)]
             _TR_Enable      ("[RM] Enable", Float) = 0
+        [HDR]
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
             _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide   ("[RM] Power Side", Range(0, 0.5)) = 0.1
