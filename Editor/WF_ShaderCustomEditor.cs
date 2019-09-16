@@ -98,16 +98,14 @@ namespace UnlitWF
                 }
             }
 
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
-            GUILayout.Label("Advanced Options", EditorStyles.boldLabel);
+            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Advanced Options", null);
             materialEditor.RenderQueueField();
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
 
             // DebugView の NONE ならばキーワードを削除する
-            foreach(object t in materialEditor.targets) {
+            foreach (object t in materialEditor.targets) {
                 Material mm = t as Material;
                 if (mm == null || Array.IndexOf(mm.shaderKeywords, "_WF_DEBUGVIEW_NONE") < 0) {
                     continue;
@@ -158,6 +156,74 @@ namespace UnlitWF
             { "_TS_2ndColor", "_TS_2ndTex" },
             { "_ES_Color", "_ES_MaskTex" },
         };
+
+        public static void DrawShurikenStyleHeader(Rect position, string text, MaterialProperty prop) {
+            // SurikenStyleHeader
+            var style = new GUIStyle("ShurikenModuleTitle");
+            style.font = EditorStyles.boldLabel.font;
+            style.fixedHeight = 20;
+            style.contentOffset = new Vector2(20, -2);
+            // Draw
+            position.y += 8;
+            position = EditorGUI.IndentedRect(position);
+            GUI.Box(position, text, style);
+
+            if (prop != null) {
+                // Toggle
+                Rect r = EditorGUILayout.GetControlRect(true, 0, EditorStyles.layerMaskField);
+                r.y -= 21;
+                r.height = MaterialEditor.GetDefaultPropertyHeight(prop);
+
+                bool value = 0.001f < Math.Abs(prop.floatValue);
+                EditorGUI.showMixedValue = prop.hasMixedValue;
+                EditorGUI.BeginChangeCheck();
+                value = EditorGUI.Toggle(r, " ", value);
+                if (EditorGUI.EndChangeCheck()) {
+                    prop.floatValue = value ? 1.0f : 0.0f;
+                }
+                EditorGUI.showMixedValue = false;
+
+                // ▼
+                var toggleRect = new Rect(position.x + 4f, position.y + 2f, 13f, 13f);
+                if (Event.current.type == EventType.Repaint) {
+                    EditorStyles.foldout.Draw(toggleRect, false, false, value, false);
+                }
+            }
+        }
+    }
+
+    internal class MaterialWFHeaderDecorator : MaterialPropertyDrawer
+    {
+        public readonly string text;
+
+        public MaterialWFHeaderDecorator(string text) {
+            this.text = text;
+        }
+
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return 32;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
+            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, null);
+        }
+    }
+
+    internal class MaterialWFHeaderToggleDrawer : MaterialPropertyDrawer
+    {
+        public readonly string text;
+
+        public MaterialWFHeaderToggleDrawer(string text) {
+            this.text = text;
+        }
+
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return 28;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
+            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, prop);
+        }
     }
 
     internal class MaterialFixFloatDrawer : MaterialPropertyDrawer

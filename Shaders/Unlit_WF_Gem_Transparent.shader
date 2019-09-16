@@ -23,26 +23,26 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     Properties {
         // 基本
-        [Header(Base)]
+        [WFHeader(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color          ("Color", Color) = (1, 1, 1, 1)
 
         // Lit
-        [Header(Lit)]
+        [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
 
         // Alpha
-        [Header(Transparent Alpha)]
+        [WFHeader(Transparent Alpha)]
         [FixNoTexture]
             _AL_MaskTex     ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power       ("[AL] Power", Range(0, 2)) = 0.8
             _AL_Fresnel     ("[AL] Fresnel Power", Range(0, 2)) = 1
 
         // Gem
-        [Header(Gem Reflection)]
+        [WFHeader(Gem Reflection)]
         [NoScaleOffset]
             _MT_Cubemap     ("[GM] CubeMap", Cube) = "" {}
             _MT_BlendType   ("[GM] Brightness", Range(0, 1)) = 0.2

@@ -23,7 +23,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
 
     Properties {
         // 基本
-        [Header(Base)]
+        [WFHeader(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color          ("Color", Color) = (1, 1, 1, 1)
@@ -31,14 +31,13 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
             _CullMode       ("Cull Mode", int) = 2
 
         // Lit
-        [Header(Lit)]
+        [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
 
         // 法線マップ
-        [Header(NormalMap)]
-        [Toggle(_)]
+        [WFHeaderToggle(NormalMap)]
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
@@ -48,8 +47,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
             _NM_FlipTangent ("[NM] Flip Tangent", Float) = 0
 
         // Matcapハイライト
-        [Header(Light Matcap)]
-        [Toggle(_)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
@@ -64,8 +62,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
             _HL_InvMaskVal  ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
-        [Header(ToonShade)]
-        [Toggle(_)]
+        [WFHeaderToggle(ToonShade)]
             _TS_Enable      ("[SH] Enable", Float) = 0
             _TS_BaseColor   ("[SH] Base Color", Color) = (1, 1, 1, 1)
             _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
@@ -81,8 +78,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
             _TS_InvMaskVal  ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
         // リムライト
-        [Header(RimLight)]
-        [Toggle(_)]
+        [WFHeaderToggle(RimLight)]
             _TR_Enable      ("[RM] Enable", Float) = 0
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
             _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
@@ -94,8 +90,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // Ambient Occlusion
-        [Header(Ambient Occlusion)]
-        [Toggle(_)]
+        [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable      ("[AO] Enable", Float) = 0
             _AO_Contrast    ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness  ("[AO] Brightness", Range(-1, 1)) = 0
@@ -104,7 +99,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         [Toggle(_)]
             _AO_InvMaskVal  ("[AO] Invert Mask Value", Range(0, 1)) = 0
 
-        [Header(Lit Advance)]
+        [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
             _GL_LightMode       ("Sun Source", Float) = 0
             _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
@@ -112,7 +107,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         [Toggle(_)]
             _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
 
-        [Header(DebugMode)]
+        [WFHeader(DebugMode)]
         [KeywordEnum(NONE,MAGENTA,CLIP,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
             _WF_DebugView       ("Debug View", Float) = 0
     }
