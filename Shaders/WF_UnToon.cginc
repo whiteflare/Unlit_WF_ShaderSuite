@@ -601,6 +601,38 @@
     }
 
     ////////////////////////////
+    // Debug View
+    ////////////////////////////
+
+    #ifdef _WF_DEBUGVIEW_MAGENTA
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rb += 1
+    #elif _WF_DEBUGVIEW_CLIP
+        #define WF_AFFECT_DEBUGVIEW     discard
+    #elif _WF_DEBUGVIEW_POSITION
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += saturate( abs(i.ls_vertex.xyz) )
+    #elif _WF_DEBUGVIEW_NORMAL
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += ls_normal.rgb / 2 + 0.5
+    #elif _WF_DEBUGVIEW_TANGENT
+        #ifdef _NM_ENABLE
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.tangent.rgb / 2 + 0.5
+        #else
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
+        #endif
+    #elif _WF_DEBUGVIEW_BUMPED_NORMAL
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += ls_bump_normal.rgb / 2 + 0.5
+    #elif _WF_DEBUGVIEW_LIGHT_COLOR
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.light_color.rgb
+    #elif _WF_DEBUGVIEW_LIGHT_MAP
+        #ifdef _LMAP_ENABLE
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += pickLightmap(i.uv_lmap).rgb
+        #else
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
+        #endif
+    #else
+        #define WF_AFFECT_DEBUGVIEW
+    #endif
+
+    ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
 
@@ -696,31 +728,7 @@
         UNITY_APPLY_FOG(i.fogCoord, color);
 
         // デバッグビュー
-#ifdef _WF_DEBUGVIEW_MAGENTA
-        color.rgb /= 256;
-        color.rb += 1;
-#elif _WF_DEBUGVIEW_CLIP
-        discard;
-#elif _WF_DEBUGVIEW_NORMAL
-        color.rgb /= 256;
-        color.rgb += ls_normal.rgb / 2 + 0.5;
-#elif _WF_DEBUGVIEW_TANGENT
-        color.rgb /= 256;
-        #ifdef _NM_ENABLE
-            color.rgb += i.tangent.rgb / 2 + 0.5;
-        #endif
-#elif _WF_DEBUGVIEW_BUMPED_NORMAL
-        color.rgb /= 256;
-        color.rgb += ls_bump_normal.rgb / 2 + 0.5;
-#elif _WF_DEBUGVIEW_LIGHT_COLOR
-        color.rgb /= 256;
-        color.rgb += i.light_color.rgb;
-#elif _WF_DEBUGVIEW_LIGHT_MAP
-        color.rgb /= 256;
-        #ifdef _LMAP_ENABLE
-            color.rgb += pickLightmap(i.uv_lmap).rgb;
-        #endif
-#endif
+        WF_AFFECT_DEBUGVIEW;
 
         return color;
     }

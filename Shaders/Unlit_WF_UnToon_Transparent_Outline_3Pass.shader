@@ -210,7 +210,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
             _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
 
         [WFHeader(DebugMode)]
-        [KeywordEnum(NONE,MAGENTA,CLIP,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
+        [KeywordEnum(NONE,MAGENTA,CLIP,POSITION,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
             _WF_DebugView       ("Debug View", Float) = 0
     }
 

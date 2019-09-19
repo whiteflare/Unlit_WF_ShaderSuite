@@ -49,8 +49,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _DispMapLevel   ("HeightMap Level", Range(0, 1)) = 0
 
         // 色変換
-        [WFHeader(Color Change)]
-        [Toggle(_)]
+        [WFHeaderToggle(Color Change)]
             _CL_Enable      ("[CL] Enable", Float) = 0
         [Toggle(_)]
             _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
@@ -59,8 +58,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // 法線マップ
-        [WFHeader(NormalMap)]
-        [Toggle(_)]
+        [WFHeaderToggle(NormalMap)]
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
@@ -80,8 +78,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _NM_InvMaskVal  ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // メタリックマップ
-        [WFHeader(Metallic)]
-        [Toggle(_)]
+        [WFHeaderToggle(Metallic)]
             _MT_Enable      ("[MT] Enable", Float) = 0
             _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
@@ -103,8 +100,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _MT_Cubemap     ("[MT] 2nd CubeMap", Cube) = "" {}
 
         // Matcapハイライト
-        [WFHeader(Light Matcap)]
-        [Toggle(_)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
@@ -119,8 +115,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _HL_InvMaskVal  ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
-        [WFHeader(ToonShade)]
-        [Toggle(_)]
+        [WFHeaderToggle(ToonShade)]
             _TS_Enable      ("[SH] Enable", Float) = 0
             _TS_BaseColor   ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
@@ -142,8 +137,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _TS_InvMaskVal  ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
         // リムライト
-        [WFHeader(RimLight)]
-        [Toggle(_)]
+        [WFHeaderToggle(RimLight)]
             _TR_Enable      ("[RM] Enable", Float) = 0
         [HDR]
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
@@ -156,8 +150,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // Overlay Texture
-        [WFHeader(ScreenTone Texture)]
-        [Toggle(_)]
+        [WFHeaderToggle(ScreenTone Texture)]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
         [Enum(ALPHA,0,ADD,1,MUL,2)]
@@ -169,8 +162,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _OL_InvMaskVal  ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
-        [WFHeader(Emissive Scroll)]
-        [Toggle(_)]
+        [WFHeaderToggle(Emissive Scroll)]
             _ES_Enable      ("[ES] Enable", Float) = 0
         [HDR]
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
@@ -184,8 +176,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         // アウトライン
-        [WFHeader(Outline)]
-        [Toggle(_)]
+        [WFHeaderToggle(Outline)]
             _TL_Enable      ("[LI] Enable", Float) = 0
             _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
             _TL_LineWidth   ("[LI] Line Width", Range(0, 0.5)) = 0.05
@@ -196,8 +187,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
 
         // Ambient Occlusion
-        [WFHeader(Ambient Occlusion)]
-        [Toggle(_)]
+        [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable      ("[AO] Enable", Float) = 0
         [NoScaleOffset]
             _OcclusionMap   ("[AO] Occlusion Map", 2D) = "white" {}
@@ -217,7 +207,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
 
         [WFHeader(DebugMode)]
-        [KeywordEnum(NONE,MAGENTA,CLIP,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
+        [KeywordEnum(NONE,MAGENTA,CLIP,POSITION,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
             _WF_DebugView       ("Debug View", Float) = 0
     }
 
@@ -250,7 +240,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -287,7 +277,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
