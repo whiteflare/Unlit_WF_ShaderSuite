@@ -82,6 +82,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
             _TR_Enable      ("[RM] Enable", Float) = 0
         [HDR]
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
+        [Enum(ADD,0,ALPHA,1)]
+            _TR_BlendType   ("[RM] Blend Type", Float) = 0
             _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide   ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom ("[RM] Power Bottom", Range(0, 0.5)) = 0.1

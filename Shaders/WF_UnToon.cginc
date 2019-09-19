@@ -461,6 +461,7 @@
     #ifdef _TR_ENABLE
         float       _TR_Enable;
         float4      _TR_Color;
+        float       _TR_BlendType;
         float       _TR_PowerTop;
         float       _TR_PowerSide;
         float       _TR_PowerBottom;
@@ -475,10 +476,10 @@
                 rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
                 rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
                 // 順光の場合はリムライトを暗くする
-                float3 rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
+                float3 rimPower = saturate(0.8 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
                 // 色計算
-                color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
-                    smoothstep(1, 1.05, length(rim_uv)) );
+                float3 rimColor = _TR_Color.rgb - (TGL_OFF(_TR_BlendType) ? MEDIAN_GRAY : color.rgb);
+                color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, smoothstep(1, 1.05, length(rim_uv)) );
             }
         }
     #else
