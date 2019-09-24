@@ -559,6 +559,7 @@
 
     #ifdef _AO_ENABLE
         float       _AO_Enable;
+        float       _AO_UseLightMap;
 #ifndef _WF_MOBILE
         DECL_SUB_TEX2D(_OcclusionMap);
 #endif
@@ -574,7 +575,9 @@
                 occlusion *= SAMPLE_MASK_VALUE(_OcclusionMap, i.uv, 0).rgb;
 #endif
                 #ifdef _LMAP_ENABLE
+                if (TGL_ON(_AO_UseLightMap)) {
                     occlusion *= pickLightmap(i.uv_lmap);
+                }
                 #endif
                 occlusion = lerp( AVE3(occlusion.r, occlusion.g, occlusion.b).xxx, occlusion, _GL_BrendPower); // 色の混合
                 occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;

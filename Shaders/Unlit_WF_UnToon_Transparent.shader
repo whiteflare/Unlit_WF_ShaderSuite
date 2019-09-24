@@ -183,6 +183,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _AO_Enable      ("[AO] Enable", Float) = 0
         [NoScaleOffset]
             _OcclusionMap   ("[AO] Occlusion Map", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseLightMap ("[AO] Use LightMap", Float) = 1
             _AO_Contrast    ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness  ("[AO] Brightness", Range(-1, 1)) = 0
         [NoScaleOffset]
