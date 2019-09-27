@@ -539,18 +539,23 @@
         float       _TL_Enable;
         float4      _TL_LineColor;
         float       _TL_LineWidth;
-        sampler2D   _TL_MaskTex;    // vert内で取得するので独自のサンプラーを使う
+        DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
 
-        inline void affectOutline(inout float4 color) {
+        inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
-                // アウトライン色をベースと合成
-                color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+                float mask = SAMPLE_MASK_VALUE(_TL_MaskTex, uv_main, _TL_InvMaskVal).r;
+                if (mask < 0.1) {
+                    discard;
+                } else {
+                    // アウトライン色をベースと合成
+                    color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+                }
             }
         }
     #else
-        #define affectOutline(color)
+        #define affectOutline(uv_main, color)
     #endif
 
     ////////////////////////////
@@ -713,7 +718,7 @@
         // ScreenTone
         affectOverlayTexture(i.ls_vertex, uv_main, color);
         // Outline
-        affectOutline(color);
+        affectOutline(uv_main, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
@@ -764,14 +769,11 @@
         // SV_POSITION を上書き
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
-            // マスクテクスチャ参照
-            float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
-            float mask = SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv_main, _TL_InvMaskVal).r;
             // 外側にシフトする
-            o.ls_vertex.xyz += normalize( v.normal ).xyz * (_TL_LineWidth * 0.01) * mask;
+            o.ls_vertex.xyz += normalize( v.normal ).xyz * (_TL_LineWidth * 0.01);
             // カメラ方向の z シフト量を計算
             // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
-            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * (_TL_LineWidth + _TL_Z_Shift) * 0.01;
+            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * _TL_Z_Shift;
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向の逆にシフトする
                 o.ls_vertex.xyz -= vecZShift;

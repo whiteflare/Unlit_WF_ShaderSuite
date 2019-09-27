@@ -192,7 +192,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
             _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal  ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
+            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
