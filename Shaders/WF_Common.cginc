@@ -242,6 +242,14 @@
         return normalize( float3(cos(azimuth) * cos(alt), sin(alt), -sin(azimuth) * cos(alt)) );
     }
 
+    inline float3 calcPointLight1Dir(float3 ws_pos) {
+        ws_pos = calcPointLight1Pos() - ws_pos;
+        if (dot(ws_pos, ws_pos) < 0.1) {
+            ws_pos = float3(0, 1, 0);
+        }
+        return UnityWorldToObjectDir( ws_pos );
+    }
+
     inline float4 calcLocalSpaceLightDir(float4 ls_pos) {
         float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
 
@@ -253,7 +261,7 @@
             return float4( UnityWorldToObjectDir( _WorldSpaceLightPos0.xyz ), +1 );
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
-            return float4( UnityWorldToObjectDir( calcPointLight1Pos() - ws_pos ), -1 );
+            return float4( calcPointLight1Dir(ws_pos) , -1 );
         }
         if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
             return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );

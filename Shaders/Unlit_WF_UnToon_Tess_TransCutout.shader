@@ -23,13 +23,13 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
 
     Properties {
         // 基本
-        [Header(Base)]
+        [WFHeader(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color          ("Color", Color) = (1, 1, 1, 1)
 
         // Lit
-        [Header(Lit)]
+        [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
@@ -37,7 +37,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
 
         // Alpha
-        [Header(Transparent Alpha)]
+        [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
             _AL_Source      ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
@@ -46,7 +46,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _AL_CutOff      ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
 
         // Tessellation
-        [Header(Tessellation)]
+        [WFHeader(Tessellation)]
         [IntRange]
             _TessFactor     ("Tessellation", Range(1, 16)) = 4
             _Smoothing      ("Smoothing", Range(0, 2)) = 1.0
@@ -56,8 +56,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _DispMapLevel   ("HeightMap Level", Range(0, 1)) = 0
 
         // 色変換
-        [Header(Color Change)]
-        [Toggle(_)]
+        [WFHeaderToggle(Color Change)]
             _CL_Enable      ("[CL] Enable", Float) = 0
         [Toggle(_)]
             _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
@@ -66,8 +65,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // 法線マップ
-        [Header(NormalMap)]
-        [Toggle(_)]
+        [WFHeaderToggle(NormalMap)]
             _NM_Enable      ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap        ("[NM] NormalMap Texture", 2D) = "bump" {}
@@ -87,8 +85,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _NM_InvMaskVal  ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // メタリックマップ
-        [Header(Metallic)]
-        [Toggle(_)]
+        [WFHeaderToggle(Metallic)]
             _MT_Enable      ("[MT] Enable", Float) = 0
             _MT_Metallic    ("[MT] Metallic", Range(0, 1)) = 0.5
             _MT_Smoothness  ("[MT] Smoothness", Range(0, 1)) = 0.5
@@ -110,8 +107,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _MT_Cubemap     ("[MT] 2nd CubeMap", Cube) = "" {}
 
         // Matcapハイライト
-        [Header(Light Matcap)]
-        [Toggle(_)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
@@ -126,8 +122,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _HL_InvMaskVal  ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
-        [Header(ToonShade)]
-        [Toggle(_)]
+        [WFHeaderToggle(ToonShade)]
             _TS_Enable      ("[SH] Enable", Float) = 0
             _TS_BaseColor   ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
@@ -149,10 +144,12 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _TS_InvMaskVal  ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
         // リムライト
-        [Header(RimLight)]
-        [Toggle(_)]
+        [WFHeaderToggle(RimLight)]
             _TR_Enable      ("[RM] Enable", Float) = 0
+        [HDR]
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
+        [Enum(ADD,0,ALPHA,1)]
+            _TR_BlendType   ("[RM] Blend Type", Float) = 0
             _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide   ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
@@ -162,8 +159,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // Overlay Texture
-        [Header(ScreenTone Texture)]
-        [Toggle(_)]
+        [WFHeaderToggle(ScreenTone Texture)]
             _OL_Enable      ("[OL] Enable", Float) = 0
             _OL_OverlayTex  ("[OL] Texture", 2D) = "white" {}
         [Enum(ALPHA,0,ADD,1,MUL,2)]
@@ -175,8 +171,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _OL_InvMaskVal  ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
-        [Header(Emissive Scroll)]
-        [Toggle(_)]
+        [WFHeaderToggle(Emissive Scroll)]
             _ES_Enable      ("[ES] Enable", Float) = 0
         [HDR]
             _ES_Color       ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
@@ -192,7 +187,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         // アウトライン
-        [Header(Outline)]
+        [WFHeader(Outline)]
         [Toggle(_)]
             _TL_Enable      ("[LI] Enable", Float) = 0
             _TL_LineColor   ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
@@ -201,14 +196,15 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _TL_MaskTex     ("[LI] Outline Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal  ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(0, 1)) = 0.5
+            _TL_Z_Shift     ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
         // Ambient Occlusion
-        [Header(Ambient Occlusion)]
-        [Toggle(_)]
+        [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable      ("[AO] Enable", Float) = 0
         [NoScaleOffset]
             _OcclusionMap   ("[AO] Occlusion Map", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseLightMap ("[AO] Use LightMap", Float) = 1
             _AO_Contrast    ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness  ("[AO] Brightness", Range(-1, 1)) = 0
         [NoScaleOffset]
@@ -216,7 +212,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         [Toggle(_)]
             _AO_InvMaskVal  ("[AO] Invert Mask Value", Range(0, 1)) = 0
 
-        [Header(Lit Advance)]
+        [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
             _GL_LightMode       ("Sun Source", Float) = 0
             _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
@@ -224,8 +220,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         [Toggle(_)]
             _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
 
-        [Header(DebugMode)]
-        [KeywordEnum(NONE,MAGENTA,CLIP,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
+        [WFHeader(DebugMode)]
+        [KeywordEnum(NONE,MAGENTA,CLIP,POSITION,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
             _WF_DebugView       ("Debug View", Float) = 0
     }
 
@@ -240,7 +236,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull OFF
+            Cull FRONT
 
             CGPROGRAM
 
@@ -259,7 +255,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -295,7 +291,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -333,7 +329,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"

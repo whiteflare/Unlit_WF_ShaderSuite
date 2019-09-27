@@ -461,6 +461,7 @@
     #ifdef _TR_ENABLE
         float       _TR_Enable;
         float4      _TR_Color;
+        float       _TR_BlendType;
         float       _TR_PowerTop;
         float       _TR_PowerSide;
         float       _TR_PowerBottom;
@@ -475,10 +476,10 @@
                 rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
                 rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
                 // 順光の場合はリムライトを暗くする
-                float3 rimPower = saturate(1 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
+                float3 rimPower = saturate(0.8 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
                 // 色計算
-                color.rgb = lerp(color.rgb, color.rgb + (_TR_Color.rgb - MEDIAN_GRAY) * rimPower,
-                    smoothstep(1, 1.05, length(rim_uv)) );
+                float3 rimColor = _TR_Color.rgb - (TGL_OFF(_TR_BlendType) ? MEDIAN_GRAY : color.rgb);
+                color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, smoothstep(1, 1.05, length(rim_uv)) );
             }
         }
     #else
@@ -538,18 +539,23 @@
         float       _TL_Enable;
         float4      _TL_LineColor;
         float       _TL_LineWidth;
-        sampler2D   _TL_MaskTex;    // vert内で取得するので独自のサンプラーを使う
+        DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
 
-        inline void affectOutline(inout float4 color) {
+        inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
-                // アウトライン色をベースと合成
-                color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+                float mask = SAMPLE_MASK_VALUE(_TL_MaskTex, uv_main, _TL_InvMaskVal).r;
+                if (mask < 0.1) {
+                    discard;
+                } else {
+                    // アウトライン色をベースと合成
+                    color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+                }
             }
         }
     #else
-        #define affectOutline(color)
+        #define affectOutline(uv_main, color)
     #endif
 
     ////////////////////////////
@@ -558,6 +564,7 @@
 
     #ifdef _AO_ENABLE
         float       _AO_Enable;
+        float       _AO_UseLightMap;
 #ifndef _WF_MOBILE
         DECL_SUB_TEX2D(_OcclusionMap);
 #endif
@@ -573,7 +580,9 @@
                 occlusion *= SAMPLE_MASK_VALUE(_OcclusionMap, i.uv, 0).rgb;
 #endif
                 #ifdef _LMAP_ENABLE
+                if (TGL_ON(_AO_UseLightMap)) {
                     occlusion *= pickLightmap(i.uv_lmap);
+                }
                 #endif
                 occlusion = lerp( AVE3(occlusion.r, occlusion.g, occlusion.b).xxx, occlusion, _GL_BrendPower); // 色の混合
                 occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
@@ -599,6 +608,38 @@
             return OmniDirectional_ShadeSH9();
         #endif
     }
+
+    ////////////////////////////
+    // Debug View
+    ////////////////////////////
+
+    #ifdef _WF_DEBUGVIEW_MAGENTA
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rb += 1
+    #elif _WF_DEBUGVIEW_CLIP
+        #define WF_AFFECT_DEBUGVIEW     discard
+    #elif _WF_DEBUGVIEW_POSITION
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += saturate( abs(i.ls_vertex.xyz) )
+    #elif _WF_DEBUGVIEW_NORMAL
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += ls_normal.rgb / 2 + 0.5
+    #elif _WF_DEBUGVIEW_TANGENT
+        #ifdef _NM_ENABLE
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.tangent.rgb / 2 + 0.5
+        #else
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
+        #endif
+    #elif _WF_DEBUGVIEW_BUMPED_NORMAL
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += ls_bump_normal.rgb / 2 + 0.5
+    #elif _WF_DEBUGVIEW_LIGHT_COLOR
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.light_color.rgb
+    #elif _WF_DEBUGVIEW_LIGHT_MAP
+        #ifdef _LMAP_ENABLE
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += pickLightmap(i.uv_lmap).rgb
+        #else
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
+        #endif
+    #else
+        #define WF_AFFECT_DEBUGVIEW
+    #endif
 
     ////////////////////////////
     // vertex&fragment shader
@@ -677,7 +718,7 @@
         // ScreenTone
         affectOverlayTexture(i.ls_vertex, uv_main, color);
         // Outline
-        affectOutline(color);
+        affectOutline(uv_main, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
@@ -696,31 +737,7 @@
         UNITY_APPLY_FOG(i.fogCoord, color);
 
         // デバッグビュー
-#ifdef _WF_DEBUGVIEW_MAGENTA
-        color.rgb /= 256;
-        color.rb += 1;
-#elif _WF_DEBUGVIEW_CLIP
-        discard;
-#elif _WF_DEBUGVIEW_NORMAL
-        color.rgb /= 256;
-        color.rgb += ls_normal.rgb / 2 + 0.5;
-#elif _WF_DEBUGVIEW_TANGENT
-        color.rgb /= 256;
-        #ifdef _NM_ENABLE
-            color.rgb += i.tangent.rgb / 2 + 0.5;
-        #endif
-#elif _WF_DEBUGVIEW_BUMPED_NORMAL
-        color.rgb /= 256;
-        color.rgb += ls_bump_normal.rgb / 2 + 0.5;
-#elif _WF_DEBUGVIEW_LIGHT_COLOR
-        color.rgb /= 256;
-        color.rgb += i.light_color.rgb;
-#elif _WF_DEBUGVIEW_LIGHT_MAP
-        color.rgb /= 256;
-        #ifdef _LMAP_ENABLE
-            color.rgb += pickLightmap(i.uv_lmap).rgb;
-        #endif
-#endif
+        WF_AFFECT_DEBUGVIEW;
 
         return color;
     }
@@ -752,14 +769,11 @@
         // SV_POSITION を上書き
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
-            // マスクテクスチャ参照
-            float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
-            float mask = SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv_main, _TL_InvMaskVal).r;
             // 外側にシフトする
-            o.ls_vertex.xyz += normalize( v.normal ).xyz * (_TL_LineWidth * 0.01) * mask;
+            o.ls_vertex.xyz += normalize( v.normal ).xyz * (_TL_LineWidth * 0.01);
             // カメラ方向の z シフト量を計算
             // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
-            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * (_TL_LineWidth + _TL_Z_Shift) * 0.01;
+            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * _TL_Z_Shift;
             if (unity_OrthoParams.w < 0.5) {
                 // カメラが perspective のときは単にカメラ方向の逆にシフトする
                 o.ls_vertex.xyz -= vecZShift;

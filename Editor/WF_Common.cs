@@ -162,6 +162,7 @@ namespace UnlitWF
             { "[LI] Z-shift (tweak)", "[LI] Z方向の調整" },
             // Ambient Occlusion
             { "[AO] Occlusion Map", "[AO] オクルージョンマップ" },
+            { "[AO] Use LightMap", "[AO] ライトマップも使用する" },
             { "[AO] Contrast", "[AO] コントラスト" },
             { "[AO] Brightness", "[AO] 明るさ" },
             { "[AO] Occlusion Mask Texture", "[AO] マスクテクスチャ" },

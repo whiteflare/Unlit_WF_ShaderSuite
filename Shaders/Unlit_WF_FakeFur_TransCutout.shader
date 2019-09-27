@@ -23,14 +23,14 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     Properties {
         // 基本
-        [Header(Base)]
+        [WFHeader(Base)]
             _MainTex        ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color          ("Color", Color) = (1, 1, 1, 1)
             _CutOffLevel    ("Alpha CutOff Level", Range(0, 1)) = 0.5
 
         // Lit
-        [Header(Lit)]
+        [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level       ("Anti-Glare", Float) = 97
             _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
@@ -38,7 +38,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
 
         // ファー設定
-        [Header(Fur Settings)]
+        [WFHeader(Fur Settings)]
         [NoScaleOffset]
             _FurMaskTex     ("Fur Mask Texture", 2D) = "white" {}
             _FurNoiseTex    ("Fur Noise Texture", 2D) = "white" {}
@@ -49,8 +49,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _FurVector      ("Fur Static Vector", Vector) = (0, 0, 0, 0)
 
         // 色変換
-        [Header(Color Change)]
-        [Toggle(_)]
+        [WFHeaderToggle(Color Change)]
             _CL_Enable      ("[CL] Enable", Float) = 0
         [Toggle(_)]
             _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
@@ -59,8 +58,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
 
         // Matcapハイライト
-        [Header(Light Matcap)]
-        [Toggle(_)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable      ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
@@ -75,8 +73,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _HL_InvMaskVal  ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
-        [Header(ToonShade)]
-        [Toggle(_)]
+        [WFHeaderToggle(ToonShade)]
             _TS_Enable      ("[SH] Enable", Float) = 0
             _TS_BaseColor   ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
@@ -98,10 +95,12 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _TS_InvMaskVal  ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
         // リムライト
-        [Header(RimLight)]
-        [Toggle(_)]
+        [WFHeaderToggle(RimLight)]
             _TR_Enable      ("[RM] Enable", Float) = 0
+        [HDR]
             _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
+        [Enum(ADD,0,ALPHA,1)]
+            _TR_BlendType   ("[RM] Blend Type", Float) = 0
             _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide   ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
@@ -110,7 +109,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [Toggle(_)]
             _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
-        [Header(Lit Advance)]
+        [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
             _GL_LightMode       ("Sun Source", Float) = 0
             _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
