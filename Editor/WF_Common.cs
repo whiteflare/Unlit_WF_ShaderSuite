@@ -136,6 +136,7 @@ namespace UnlitWF
             { "[SH] Shade Color Suggest", "[SH] 影色を自動設定する" },
             // RimLight
             { "[RM] Rim Color", "[RM] リムライト色" },
+            { "[RM] Blend Type", "[RM] 混合タイプ" },
             { "[RM] Power Top", "[RM] 強度(上)" },
             { "[RM] Power Side", "[RM] 強度(横)" },
             { "[RM] Power Bottom", "[RM] 強度(下)" },
