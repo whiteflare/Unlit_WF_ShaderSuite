@@ -635,7 +635,7 @@
         #ifdef _LMAP_ENABLE
             #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += pickLightmap(i.uv_lmap).rgb
         #else
-            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
+            #define WF_AFFECT_DEBUGVIEW     discard
         #endif
     #else
         #define WF_AFFECT_DEBUGVIEW
