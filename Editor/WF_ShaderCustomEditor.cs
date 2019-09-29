@@ -171,7 +171,7 @@ namespace UnlitWF
             if (prop != null) {
                 // Toggle
                 Rect r = EditorGUILayout.GetControlRect(true, 0, EditorStyles.layerMaskField);
-                r.y -= 21;
+                r.y -= 25;
                 r.height = MaterialEditor.GetDefaultPropertyHeight(prop);
 
                 bool value = 0.001f < Math.Abs(prop.floatValue);
@@ -218,7 +218,7 @@ namespace UnlitWF
         }
 
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
-            return 28;
+            return 32;
         }
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
