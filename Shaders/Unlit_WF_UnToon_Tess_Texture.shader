@@ -233,7 +233,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             #pragma vertex vert_outline
             #pragma fragment frag
             #pragma hull hull
-            #pragma domain domain
+            #pragma domain domain_outline
 
             #pragma target 5.0
 
