@@ -240,7 +240,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
 
             CGPROGRAM
 
-            #pragma vertex vert_outline
+            #pragma vertex vert
             #pragma fragment frag_cutout_upper
             #pragma hull hull
             #pragma domain domain_outline

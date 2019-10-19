@@ -108,26 +108,18 @@
     [domain("tri")]
     v2f domain_outline(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
         v2f o = domainCore(hsConst, i, bary);
-        #ifdef _TL_ENABLE
-        if (TGL_ON(_TL_Enable)) {
-            vs_vertex = UnityObjectToClipPos(o.ls_vertex.xyz);
-        } else {
-            vs_vertex = UnityObjectToClipPos( ZERO_VEC3 );
-        }
-        #endif
+        // SV_POSITION を上書き
+        shiftOutlineVertex(o, vs_vertex);
+
         return o;
     }
 
     [domain("tri")]
     v2f domain_emissiveScroll(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
         v2f o = domainCore(hsConst, i, bary);
-        #ifdef _ES_ENABLE
-        if (TGL_ON(_ES_Enable)) {
-            vs_vertex = UnityObjectToClipPos(o.ls_vertex.xyz);
-        } else {
-            vs_vertex = UnityObjectToClipPos( ZERO_VEC3 );
-        }
-        #endif
+        // SV_POSITION を上書き
+        shiftEmissiveScrollVertex(o, vs_vertex);
+
         return o;
     }
 
