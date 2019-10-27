@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/09/14 whiteflare,
+     *      ver:2019/10/27 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -63,8 +63,7 @@
         return o;
     }
 
-    [domain("tri")]
-    v2f domain(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+    v2f domainCore(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary) {
         v2f o = i[0];
         UNITY_SETUP_INSTANCE_ID(o);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(o);
@@ -90,12 +89,36 @@
         o.ls_vertex.xyz += MUL_BARY(phg, xyz) * _Smoothing / 2.0;
 
         // Displacement HeightMap
-        float disp = SAMPLE_MASK_VALUE_LOD(_DispMap, float4(o.uv, 0, 0), 0).r * _DispMapScale - _DispMapLevel;
+        float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
+        float disp = SAMPLE_MASK_VALUE_LOD(_DispMap, float4(uv_main, 0, 0), 0).r * _DispMapScale - _DispMapLevel;
         o.ls_vertex.xyz += o.normal * disp * 0.01;
 
         #undef MUL_BARY
 
+        return o;
+    }
+
+    [domain("tri")]
+    v2f domain(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+        v2f o = domainCore(hsConst, i, bary);
         vs_vertex = UnityObjectToClipPos(o.ls_vertex.xyz);
+        return o;
+    }
+
+    [domain("tri")]
+    v2f domain_outline(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+        v2f o = domainCore(hsConst, i, bary);
+        // SV_POSITION を上書き
+        shiftOutlineVertex(o, vs_vertex);
+
+        return o;
+    }
+
+    [domain("tri")]
+    v2f domain_emissiveScroll(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+        v2f o = domainCore(hsConst, i, bary);
+        // SV_POSITION を上書き
+        shiftEmissiveScrollVertex(o, vs_vertex);
 
         return o;
     }

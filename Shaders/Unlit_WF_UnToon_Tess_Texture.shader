@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
 
     /*
      * authors:
-     *      ver:2019/09/14 whiteflare,
+     *      ver:2019/10/27 whiteflare,
      */
 
     Properties {
@@ -230,10 +230,10 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
 
             CGPROGRAM
 
-            #pragma vertex vert_outline
+            #pragma vertex vert
             #pragma fragment frag
             #pragma hull hull
-            #pragma domain domain
+            #pragma domain domain_outline
 
             #pragma target 5.0
 
