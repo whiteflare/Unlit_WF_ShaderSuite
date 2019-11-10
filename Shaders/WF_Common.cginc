@@ -416,10 +416,10 @@
                     MAX3(es_color.r, es_color.g, es_color.b) );
 
                 #ifdef _ES_FORCE_ALPHASCROLL
-                    color.a = max(color.a, es_power * MAX3(es_color.r, es_color.g, es_color.b));
+                    color.a = max(color.a, es_power * _ES_Color.a * MAX3(es_color.r, es_color.g, es_color.b));
                 #else
                     if (TGL_ON(_ES_AlphaScroll)) {
-                        color.a = max(color.a, es_power * MAX3(es_color.r, es_color.g, es_color.b));
+                        color.a = max(color.a, es_power * _ES_Color.a * MAX3(es_color.r, es_color.g, es_color.b));
                     }
                 #endif
             }

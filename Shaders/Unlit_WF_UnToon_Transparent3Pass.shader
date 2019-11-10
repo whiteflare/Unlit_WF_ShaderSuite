@@ -177,8 +177,8 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _ES_CullMode    ("[ES] Cull Mode", int) = 2
-            _ES_Z_Shift     ("[ES] Z-shift", Range(0, 1)) = 0.5
+            _ES_CullMode    ("[ES] Cull Mode", int) = 0
+            _ES_Z_Shift     ("[ES] Z-shift", Range(0, 1)) = 0.05
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -331,7 +331,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_ES_CullMode]
-            ZWrite ON
+            ZWrite OFF
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
