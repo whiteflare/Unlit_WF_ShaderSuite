@@ -746,13 +746,13 @@
     // カットアウト用 fragment shader
     ////////////////////////////
 
-    float4 frag_cutout_upper(v2f i) : SV_Target {
+    float4 frag_cutout_upper(v2f i) : SV_Target { // Cutout閾値よりも上側を描画
         float4 color = frag(i);
         clip(color.a - _AL_CutOff);
         return color;
     }
 
-    float4 frag_cutout_lower(v2f i) : SV_Target {
+    float4 frag_cutout_lower(v2f i) : SV_Target { // Cutout閾値よりも下側を描画
         float4 color = frag(i);
         clip(_AL_CutOff - color.a);
         return color;
@@ -872,9 +872,6 @@
 
             // Alpha は 0-1 にクランプ
             color.a = saturate(color.a);
-            if (color.a < 0.1) {
-                discard;
-            }
 
         } else {
             // 無効のときはクリッピングする

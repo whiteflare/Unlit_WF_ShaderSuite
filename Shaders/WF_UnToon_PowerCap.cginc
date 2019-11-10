@@ -120,4 +120,16 @@
         return color;
     }
 
+    float4 frag_powercap_cutout_upper(v2f i) : SV_Target { // Cutout閾値よりも上側を描画
+        float4 color = frag_powercap(i);
+        clip(color.a - _AL_CutOff);
+        return color;
+    }
+
+    float4 frag_powercap_cutout_lower(v2f i) : SV_Target { // Cutout閾値よりも下側を描画
+        float4 color = frag_powercap(i);
+        clip(_AL_CutOff - color.a);
+        return color;
+    }
+
 #endif
