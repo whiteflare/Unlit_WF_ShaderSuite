@@ -416,13 +416,13 @@
 
                 color.rgb = lerp(color.rgb,
                     color.rgb * (1 - es_power) + es_power * _ES_Color.rgb * es_color.rgb,
-                    MAX3(es_color.r, es_color.g, es_color.b) );
+                    MAX_RGB(es_color) );
 
                 #ifdef _ES_FORCE_ALPHASCROLL
-                    color.a = max(color.a, es_power * _ES_Color.a * MAX3(es_color.r, es_color.g, es_color.b));
+                    color.a = max(color.a, es_power * _ES_Color.a * MAX_RGB(es_color));
                 #else
                     if (TGL_ON(_ES_AlphaScroll)) {
-                        color.a = max(color.a, es_power * _ES_Color.a * MAX3(es_color.r, es_color.g, es_color.b));
+                        color.a = max(color.a, es_power * _ES_Color.a * MAX_RGB(es_color));
                     }
                 #endif
             }

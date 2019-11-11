@@ -163,9 +163,9 @@
                 mul(unity_ObjectToWorld, ls_vertex)
             );
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
-        float power = AVE3(color.r, color.g, color.b);                      // 明度
+        float power = AVE_RGB(color);                                       // 明度
         color = lerp( power.xxx, color, _GL_BrendPower);                    // 色の混合
-        color = saturate( color / AVE3(color.r, color.g, color.b) );        // 正規化
+        color = saturate( color / AVE_RGB(color) );                         // 正規化
         color = color * saturate( power * 2 + (100 - _GL_Level) * 0.01 );   // アンチグレア
         return color;
     }
@@ -592,7 +592,7 @@
                     occlusion *= pickLightmap(i.uv_lmap);
                 }
                 #endif
-                occlusion = lerp( AVE3(occlusion.r, occlusion.g, occlusion.b).xxx, occlusion, _GL_BrendPower); // 色の混合
+                occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BrendPower); // 色の混合
                 occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
                 color.rgb *= max(ZERO_VEC3, occlusion.rgb);
             }
@@ -608,7 +608,7 @@
             #if defined(_AO_ENABLE)
             if (TGL_ON(_AO_Enable)) {
                 // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので明るさだけ取得する
-                return AVE3(color.r, color.g, color.b).xxx;
+                return AVE_RGB(color).xxx;
             }
             #endif
             return color;
