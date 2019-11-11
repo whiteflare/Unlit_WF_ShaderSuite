@@ -36,6 +36,9 @@
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
     #define AVE3(r, g, b)   ((r + g + b) / 3)
+    #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
+    #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
+
 
     inline float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);

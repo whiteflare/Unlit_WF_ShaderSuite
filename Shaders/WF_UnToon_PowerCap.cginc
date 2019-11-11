@@ -30,27 +30,32 @@
     // Light Matcap Power
     ////////////////////////////
 
-    #define WF_POWERCAP_DECL(id)                                                                                        \
-        float       _HL_Enable_##id;                                                                                    \
-        int         _HL_CapType_##id;                                                                                   \
-        sampler2D   _HL_MatcapTex_##id;                                                                                 \
-        float3      _HL_MatcapColor_##id;                                                                               \
-        float       _HL_Power_##id;                                                                                     \
-        float       _HL_BlendNormal_##id;                                                                               \
-        DECL_SUB_TEX2D(_HL_MaskTex_##id);                                                                               \
-        float       _HL_InvMaskVal_##id;                                                                                \
-        void affectMatcapColor_##id(float2 matcapVector, float2 mask_uv, inout float4 color) {                          \
-            if (TGL_ON(_HL_Enable_##id)) {                                                                              \
-                float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;                                                         \
-                float3 matcap_color = tex2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                               \
-                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, mask_uv, _HL_InvMaskVal_##id).rgb;             \
-                float3 lightcap_power = saturate(matcap_mask * _HL_MatcapColor_##id * 2);                               \
-                float3 shadecap_power = (1 - lightcap_power) * MAX3(matcap_mask.r, matcap_mask.g, matcap_mask.b);       \
-                float3 median_color = _HL_CapType_##id == 0 ? MEDIAN_GRAY : float3(0, 0, 0);                            \
-                float3 lightcap_color = saturate( (matcap_color - median_color) * lightcap_power );                     \
-                float3 shadecap_color = saturate( (median_color - matcap_color) * shadecap_power );                     \
-                color.rgb += (lightcap_color - shadecap_color) * _HL_Power_##id;                                        \
-            }                                                                                                           \
+    #define WF_POWERCAP_DECL(id)                                                                                                    \
+        float       _HL_Enable_##id;                                                                                                \
+        int         _HL_CapType_##id;                                                                                               \
+        sampler2D   _HL_MatcapTex_##id;                                                                                             \
+        float3      _HL_MatcapColor_##id;                                                                                           \
+        float       _HL_Power_##id;                                                                                                 \
+        float       _HL_BlendNormal_##id;                                                                                           \
+        DECL_SUB_TEX2D(_HL_MaskTex_##id);                                                                                           \
+        float       _HL_InvMaskVal_##id;                                                                                            \
+        void affectMatcapColor_##id(float2 matcapVector, float2 mask_uv, inout float4 color) {                                      \
+            if (TGL_ON(_HL_Enable_##id)) {                                                                                          \
+                float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;                                                                     \
+                float3 matcap_color = tex2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                           \
+                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, mask_uv, _HL_InvMaskVal_##id).rgb;                         \
+                float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor_##id) * 2);                       \
+                if (_HL_CapType_##id == 1) {                                                                                        \
+                    color.rgb += matcap_color * lightcap_power * _HL_Power_##id;                                                    \
+                } else if(_HL_CapType_##id == 2) {                                                                                  \
+                    color.rgb *= ONE_VEC3 + (matcap_color * lightcap_power - ONE_VEC3) * _HL_Power_##id * MAX_RGB(matcap_mask);     \
+                } else {                                                                                                            \
+                    float3 shadecap_power = (1 - lightcap_power) * MAX_RGB(matcap_mask);                                            \
+                    float3 lightcap_color = saturate( (matcap_color - MEDIAN_GRAY) * lightcap_power );                              \
+                    float3 shadecap_color = saturate( (MEDIAN_GRAY - matcap_color) * shadecap_power );                              \
+                    color.rgb += (lightcap_color - shadecap_color) * _HL_Power_##id;                                                \
+                }                                                                                                                   \
+            }                                                                                                                       \
         }
 
     #define WF_POWERCAP_AFFECT(id)  affectMatcapColor_##id(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal_##id), i.uv, color)
