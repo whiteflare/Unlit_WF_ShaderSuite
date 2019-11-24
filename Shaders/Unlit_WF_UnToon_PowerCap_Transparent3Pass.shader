@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2019/11/10 whiteflare,
+     *      ver:2019/11/24 whiteflare,
      */
 
     Properties {

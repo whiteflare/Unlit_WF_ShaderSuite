@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/10/27 whiteflare,
+     *      ver:2019/11/24 whiteflare,
      */
 
     Properties {
