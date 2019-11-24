@@ -364,18 +364,18 @@
                 float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
                 // マスク参照
                 float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb;
-                // 強度の決定
-                float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2); // _HL_MatcapColorは灰色を基準とするので2倍する
-
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
+                    float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2);
                     color.rgb += matcap_color * lightcap_power * _HL_Power;
                 } else if(_HL_CapType == 2) {
                     // 乗算合成
+                    float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2);
                     color.rgb *= ONE_VEC3 + (matcap_color * lightcap_power - ONE_VEC3) * _HL_Power * MAX_RGB(matcap_mask);
                 } else {
                     // 中間色合成
+                    float3 lightcap_power = saturate(matcap_mask * _HL_MatcapColor * 2);
                     float3 shadecap_power = (1 - lightcap_power) * MAX_RGB(matcap_mask);
                     float3 lightcap_color = saturate( (matcap_color - MEDIAN_GRAY) * lightcap_power );
                     float3 shadecap_color = saturate( (MEDIAN_GRAY - matcap_color) * shadecap_power );
