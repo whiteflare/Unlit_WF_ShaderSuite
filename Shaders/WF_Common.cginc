@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/09/14 whiteflare,
+     *      ver:2019/11/24 whiteflare,
      */
 
     #define _MATCAP_VIEW_CORRECT_ENABLE
@@ -36,6 +36,9 @@
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
     #define AVE3(r, g, b)   ((r + g + b) / 3)
+    #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
+    #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
+
 
     inline float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
@@ -413,13 +416,13 @@
 
                 color.rgb = lerp(color.rgb,
                     color.rgb * (1 - es_power) + es_power * _ES_Color.rgb * es_color.rgb,
-                    MAX3(es_color.r, es_color.g, es_color.b) );
+                    MAX_RGB(es_color) );
 
                 #ifdef _ES_FORCE_ALPHASCROLL
-                    color.a = max(color.a, es_power * MAX3(es_color.r, es_color.g, es_color.b));
+                    color.a = max(color.a, es_power * _ES_Color.a * MAX_RGB(es_color));
                 #else
                     if (TGL_ON(_ES_AlphaScroll)) {
-                        color.a = max(color.a, es_power * MAX3(es_color.r, es_color.g, es_color.b));
+                        color.a = max(color.a, es_power * _ES_Color.a * MAX_RGB(es_color));
                     }
                 #endif
             }

@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
 
     /*
      * authors:
-     *      ver:2019/09/14 whiteflare,
+     *      ver:2019/11/24 whiteflare,
      */
 
     Properties {
@@ -49,7 +49,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable      ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}

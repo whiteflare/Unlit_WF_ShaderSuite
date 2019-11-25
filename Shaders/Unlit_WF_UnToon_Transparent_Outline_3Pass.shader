@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
 
     /*
      * authors:
-     *      ver:2019/09/14 whiteflare,
+     *      ver:2019/11/24 whiteflare,
      */
 
     Properties {
@@ -102,7 +102,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable      ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -177,8 +177,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _ES_CullMode    ("[ES] Cull Mode", int) = 2
-            _ES_Z_Shift     ("[ES] Z-shift", Range(0, 1)) = 0.5
+            _ES_CullMode    ("[ES] Cull Mode", int) = 0
+            _ES_Z_Shift     ("[ES] Z-shift", Range(0, 1)) = 0.05
 
         // アウトライン
         [WFHeaderToggle(Outline)]

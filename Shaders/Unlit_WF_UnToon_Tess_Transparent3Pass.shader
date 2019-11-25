@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2019/10/27 whiteflare,
+     *      ver:2019/11/24 whiteflare,
      */
 
     Properties {
@@ -112,7 +112,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable      ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1)]
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType     ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -187,8 +187,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _ES_Sharpness   ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed       ("[ES] ScrollSpeed", Range(0, 8)) = 2
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _ES_CullMode    ("[ES] Cull Mode", int) = 2
-            _ES_Z_Shift     ("[ES] Z-shift", Range(0, 1)) = 0.5
+            _ES_CullMode    ("[ES] Cull Mode", int) = 0
+            _ES_Z_Shift     ("[ES] Z-shift", Range(0, 1)) = 0.05
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -342,38 +342,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             ENDCG
         }
 
-        Pass {
-            Name "EMISSIVE_SCROLL"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull [_ES_CullMode]
-            ZWrite ON
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag_emissiveScroll
-            #pragma hull hull
-            #pragma domain domain_emissiveScroll
-
-            #pragma target 5.0
-
-            #define _AL_ENABLE
-            #define _ES_ENABLE
-            #define _ES_FORCE_ALPHASCROLL
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon_Tessellation.cginc"
-
-            ENDCG
-        }
-
-        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/EMISSIVE_SCROLL"
+        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

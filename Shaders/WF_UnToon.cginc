@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/10/27 whiteflare,
+     *      ver:2019/11/24 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -163,9 +163,9 @@
                 mul(unity_ObjectToWorld, ls_vertex)
             );
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
-        float power = AVE3(color.r, color.g, color.b);                      // 明度
+        float power = AVE_RGB(color);                                       // 明度
         color = lerp( power.xxx, color, _GL_BrendPower);                    // 色の混合
-        color = saturate( color / AVE3(color.r, color.g, color.b) );        // 正規化
+        color = saturate( color / AVE_RGB(color) );                         // 正規化
         color = color * saturate( power * 2 + (100 - _GL_Level) * 0.01 );   // アンチグレア
         return color;
     }
@@ -357,22 +357,30 @@
         DECL_SUB_TEX2D(_HL_MaskTex);
         float       _HL_InvMaskVal;
 
-        #define _HL_Range 1
-
         inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_HL_Enable)) {
                 // matcap サンプリング
-                float2 matcap_uv = matcapVector.xy * 0.5 * _HL_Range + 0.5;
+                float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
                 float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
-                // maskcolor 決定
+                // マスク参照
                 float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb;
-                float3 lightcap_power = saturate(matcap_mask * _HL_MatcapColor * 2);    // _HL_MatcapColorは灰色を基準とするので2倍する
-                float3 shadecap_power = (1 - lightcap_power) * MAX3(matcap_mask.r, matcap_mask.g, matcap_mask.b);
-                // 合成
-                float3 median_color = _HL_CapType == 0 ? MEDIAN_GRAY : ZERO_VEC3;
-                float3 lightcap_color = saturate( (matcap_color - median_color) * lightcap_power );
-                float3 shadecap_color = saturate( (median_color - matcap_color) * shadecap_power );
-                color.rgb += (lightcap_color - shadecap_color) * _HL_Power;
+                // 色合成
+                if (_HL_CapType == 1) {
+                    // 加算合成
+                    float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2);
+                    color.rgb += matcap_color * lightcap_power * _HL_Power;
+                } else if(_HL_CapType == 2) {
+                    // 乗算合成
+                    float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2);
+                    color.rgb *= ONE_VEC3 + (matcap_color * lightcap_power - ONE_VEC3) * _HL_Power * MAX_RGB(matcap_mask);
+                } else {
+                    // 中間色合成
+                    float3 lightcap_power = saturate(matcap_mask * _HL_MatcapColor * 2);
+                    float3 shadecap_power = (1 - lightcap_power) * MAX_RGB(matcap_mask);
+                    float3 lightcap_color = saturate( (matcap_color - MEDIAN_GRAY) * lightcap_power );
+                    float3 shadecap_color = saturate( (MEDIAN_GRAY - matcap_color) * shadecap_power );
+                    color.rgb += (lightcap_color - shadecap_color) * _HL_Power;
+                }
             }
         }
     #else
@@ -584,7 +592,7 @@
                     occlusion *= pickLightmap(i.uv_lmap);
                 }
                 #endif
-                occlusion = lerp( AVE3(occlusion.r, occlusion.g, occlusion.b).xxx, occlusion, _GL_BrendPower); // 色の混合
+                occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BrendPower); // 色の混合
                 occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
                 color.rgb *= max(ZERO_VEC3, occlusion.rgb);
             }
@@ -600,7 +608,7 @@
             #if defined(_AO_ENABLE)
             if (TGL_ON(_AO_Enable)) {
                 // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので明るさだけ取得する
-                return AVE3(color.r, color.g, color.b).xxx;
+                return AVE_RGB(color).xxx;
             }
             #endif
             return color;
@@ -746,13 +754,13 @@
     // カットアウト用 fragment shader
     ////////////////////////////
 
-    float4 frag_cutout_upper(v2f i) : SV_Target {
+    float4 frag_cutout_upper(v2f i) : SV_Target { // Cutout閾値よりも上側を描画
         float4 color = frag(i);
         clip(color.a - _AL_CutOff);
         return color;
     }
 
-    float4 frag_cutout_lower(v2f i) : SV_Target {
+    float4 frag_cutout_lower(v2f i) : SV_Target { // Cutout閾値よりも下側を描画
         float4 color = frag(i);
         clip(_AL_CutOff - color.a);
         return color;
@@ -872,9 +880,6 @@
 
             // Alpha は 0-1 にクランプ
             color.a = saturate(color.a);
-            if (color.a < 0.1) {
-                discard;
-            }
 
         } else {
             // 無効のときはクリッピングする
