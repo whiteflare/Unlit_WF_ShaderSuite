@@ -296,19 +296,128 @@
     ////////////////////////////
     // Highlight and Shadow Matcap
     ////////////////////////////
+    float3 ScaleOf(in float3x3 mat){
+    return float3(length(mat._m00_m10_m20),length(mat._m01_m11_m21),length(mat._m02_m12_m22));
+}
+float3 ScaleOf(in float4x4 mat){
+    return ScaleOf((float3x3)mat);
+}
+float3 PositionOf(in float4x4 mat){
+    return mat._m03_m13_m23;
+}
+float3x3 RotationOf(float3x3 mat,float3 scale){
+    mat._m00_m10_m20 /= scale.x;
+    mat._m01_m11_m21 /= scale.y;
+    mat._m02_m12_m22 /= scale.z;
+    return mat;
 
+}
+float3x3 RotationOf(float4x4 mat,float3 scale){
+    return RotationOf((float3x3)mat,scale);
+}
+float4x4 BuildMatrix(in float3x3 mat,in float3 offset)
+    {
+            return float4x4(
+                float4(mat[0],offset.x),
+                float4(mat[1],offset.y),
+                float4(mat[2],offset.z),
+                float4(0,0,0,1)
+                );
+    }
+float3x3 Columns(float3 column0,float3 column1,float3 column2){
+        float3x3 ret;
+            ret._m00_m10_m20 = column0;
+            ret._m01_m11_m21 = column1;
+            ret._m02_m12_m22 = column2;
+            return ret;
+    }
+    float4x4 Columns(float4 column0,float4 column1,float4 column2,float4 column3){
+        float4x4 ret;
+        ret._m00_m10_m20_m30 = column0;
+        ret._m01_m11_m21_m31 = column1;
+        ret._m02_m12_m22_m32 = column2;
+        ret._m03_m13_m23_m33 = column3;
+        return ret;
+    }
+
+    //upはnormalizedDirectionに対して並行でない限り問題ないです。また、正規化の必要もありません。
+        void InternalLookAt(in float3 normalizedDirection,in float3 up,out float3 xAxis,out float3 yAxis)
+        {
+            xAxis = normalize(cross(up,normalizedDirection));
+            yAxis = cross(normalizedDirection,xAxis);
+        }
+        //upはnormalizedDirectionに対して並行でない限り問題ないです。また、正規化の必要もありません。
+        float3x3 LookAt(in float3 normalizedDirection,in float3 up){
+        float3 xAxis,yAxis;
+        InternalLookAt(normalizedDirection,up,xAxis,yAxis);
+        return Columns(xAxis,yAxis,normalizedDirection);
+        }
+        //upはnormalizedDirectionに対して並行でない限り問題ないです。また、正規化の必要もありません。
+        float3x3 InverseLookAt(in float3 normalizedDirection,in float3 up){
+        float3 xAxis,yAxis;
+        InternalLookAt(normalizedDirection,up,xAxis,yAxis);
+        return float3x3(xAxis,yAxis,normalizedDirection);
+        }
+        //回転行列の平均を求めます。Slerp(a,b,0.5)より遥かに高速です。
+        float3x3 RMatrixAverage(in float3x3 a,in float3x3 b){
+            //OpenGLは列優先メモリレイアウトなのでこのままでOK
+            #if SHADER_TARGET_GLSL
+            
+            float3 iy = (a._m01_m11_m21 + b._m01_m11_m21)*0.5;//回転行列の軸ベクトルは当然正規化済み 
+            float3 iz = normalize((a._m02_m12_m22 + b._m02_m12_m22)*0.5);//回転行列の軸ベクトルは当然正規化済み 
+            return LookAt(iz,iy);
+            #else
+            //DirectXは行優先のメモリレイアウトなので、できれば行ベースで計算したい・・・
+            //ところで回転行列って直交行列ですね？
+            //回転行列の0,1,2列=この行列で回転をした後のX,Y,Z軸ベクトル
+            //回転行列の0,1,2行=回転行列の転置行列の0,1,2列
+            //                =回転行列の逆行列の0,1,2列
+            //                =逆回転の回転行列の0,1,2列
+            //                =この行列の逆回転の行列で回転をしたあとのX,Y,Z軸ベクトル
+            //ということで、この関数の中では終始逆回転、かつ転置した状態として取り扱ってるのでこの計算の結果は正しいです。
+            float3 iy = (a[1] + b[1])*0.5;//回転行列の軸ベクトルは当然正規化済み 
+            float3 iz = normalize((a[2] + b[2])*0.5);//回転行列の軸ベクトルは当然正規化済み 
+            return InverseLookAt(iz,iy);
+        #endif
+            
+        }
+        //移動、回転行列の平均を求めます。InterpolateTRMatrix(a,b,0.5)より遥かに高速です。
+        float4x4 TRMatrixAverage(in float4x4 a,in float4x4 b){
+            return BuildMatrix(RMatrixAverage((float3x3)a,(float3x3)b),(PositionOf(a)+PositionOf(b))*0.5);
+        }
+       #if USING_STEREO_MATRICES
+       #define WorldSpaceFaceRotation RMatrixAverage((float3x3)unity_StereoCameraToWorld[0],(float3x3)unity_StereoCameraToWorld[1])
+       #define FaceToWorld TRMatrixAverage(unity_StereoCameraToWorld[0],unity_StereoCameraToWorld[1])
+       #else
+       #define WorldSpaceFaceRotation ((float3x3)unity_CameraToWorld)
+       #define FaceToWorld unity_CameraToWorld
+       #endif
     inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
-        float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
-
+        //float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
+        //float3 vs_normal = mul(mul(float4(ls_normal, 1),unity_WorldToObject),UNITY_MATRIX_I_V);
+        float3 vs_normal = mul(mul(float4(ls_normal, 1),unity_WorldToObject),FaceToWorld);
         #ifdef _MATCAP_VIEW_CORRECT_ENABLE
             float3 ws_view_dir = worldSpaceViewDir(ls_vertex);
-            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
-            float3 detail = vs_normal.xyz * float3(-1, -1, 1);
-            vs_normal = base * dot(base, detail) / base.z - detail;
+            //float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
+            //float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
+            //float3 base = mul(FaceSpaceWorldRotation,ws_view_dir) * float3(-1,-1,-1) + float3(0,0,1);
+            //回転行列は直交行列なので転置すると逆行列=逆回転行列になる
+            float3 base = mul( ws_view_dir,WorldSpaceFaceRotation ) - float3(0, 0, 1);
+            float3 detail = vs_normal.xyz;
+            vs_normal = base * dot(base, detail) / base.z + detail;
         #endif
 
         #ifdef _MATCAP_ROTATE_CORRECT_ENABLE
-            float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
+            //float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
+            //float2 vs_topdir = mul( (float3x3)unity_WorldToCamera, float3(0, 1, 0) ).xy;
+            //float2 vs_topdir = mul( float3(0, 1, 0),(float3x3)unity_CameraToWorld).xy;
+            //float2 vs_topdir = mul( float3(0, 1, 0),WorldSpaceFaceRotation).xy;
+            //回転行列の列は軸ベクトルを示している。
+            // vs_topdirは言わばFaceSpaceWorldRotationのY軸ベクトル。=FaceSpaceWorldRotation._m01_m11_m21
+            //直交行列の転置行列は逆行列のため、直交行列である回転行列の転置行列は逆回転行列。
+            //FaceSpaceWorldRotation=transpose(WorldSpaceFaceRotation)
+            //FaceSpaceWorldRotation._m01_m11_m21=transpose(WorldSpaceFaceRotation)._m01_m11_m21=WorldSpaceFaceRotation[1]
+            float2 vs_topdir = WorldSpaceFaceRotation[1].xy;
             if (any(vs_topdir)) {
                 vs_topdir = normalize(vs_topdir);
                 float top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
