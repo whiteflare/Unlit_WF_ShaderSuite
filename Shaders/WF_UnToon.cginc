@@ -770,24 +770,29 @@
     // アウトライン用 vertex&fragment shader
     ////////////////////////////
 
+    void shiftDepthVertex(inout v2f o, float width, out float4 vertex) {
+        float3 ws_vertex = mul(unity_ObjectToWorld, float4(o.ls_vertex.xyz, 1)); // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
+        float3 ws_camera_dir = _WorldSpaceCameraPos.xyz - ws_vertex.xyz; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
+        // カメラ方向の z シフト量を加算
+        float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
+
+        if (unity_OrthoParams.w < 0.5) {
+            // カメラが perspective のときは単にカメラ方向にシフトする
+            vertex = UnityWorldToClipPos( ws_vertex + zShiftVec );
+        } else {
+            // カメラが orthographic のときはシフト後の z のみ採用する
+            vertex = UnityWorldToClipPos( ws_vertex );
+            vertex.z = UnityWorldToClipPos( ws_vertex + zShiftVec ).z;
+        }
+    }
+
     void shiftOutlineVertex(inout v2f o, out float4 vertex) {
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
             // 外側にシフトする
             o.ls_vertex.xyz += o.normal.xyz * (_TL_LineWidth * 0.01);
-            // カメラ方向の z シフト量を計算
-            // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
-            float3 vecZShift = normalize( ObjSpaceViewDir(o.ls_vertex) ) * _TL_Z_Shift;
-            if (unity_OrthoParams.w < 0.5) {
-                // カメラが perspective のときは単にカメラ方向の逆にシフトする
-                o.ls_vertex.xyz -= vecZShift;
-                vertex = UnityObjectToClipPos( o.ls_vertex );
-            } else {
-                // カメラが orthographic のときはシフト後の z のみ採用する
-                vertex = UnityObjectToClipPos( o.ls_vertex );
-                o.ls_vertex.xyz -= vecZShift;
-                vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
-            }
+            // Zシフト
+            shiftDepthVertex(o, -_TL_Z_Shift, vertex);
         } else {
             vertex = UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -837,20 +842,7 @@
     void shiftEmissiveScrollVertex(inout v2f o, out float4 vertex) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
-            // カメラ方向の z シフト量を計算
-            float3 ls_camera_dir = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos.xyz, 1)).xyz - o.ls_vertex.xyz;
-            // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
-            float3 vecZShift = normalize( ls_camera_dir ) * min( _ES_Z_Shift, length( ls_camera_dir ) * 0.5 );  // 指定の量だけ近づける。ただしカメラとの距離の 1/2 を超えない
-            if (unity_OrthoParams.w < 0.5) {
-                // カメラが perspective のときは単にカメラ方向にシフトする
-                o.ls_vertex.xyz += vecZShift;
-                vertex = UnityObjectToClipPos( o.ls_vertex );
-            } else {
-                // カメラが orthographic のときはシフト後の z のみ採用する
-                vertex = UnityObjectToClipPos( o.ls_vertex );
-                o.ls_vertex.xyz += vecZShift;
-                vertex.z = UnityObjectToClipPos( o.ls_vertex ).z;
-            }
+            shiftDepthVertex(o, _ES_Z_Shift, vertex);
         } else {
             vertex = UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -892,5 +884,21 @@
 
         return color;
     }
+
+    ////////////////////////////
+    // ZOffset 付き vertex shader
+    ////////////////////////////
+
+    float _AL_Z_Offset;
+
+    v2f vert_with_zoffset(appdata v, out float4 vertex : SV_POSITION) {
+        // 通常の vert を使う
+        v2f o = vert(v, vertex);
+        // SV_POSITION を上書き
+        shiftDepthVertex(o, _AL_Z_Offset, vertex);
+
+        return o;
+    }
+
 
 #endif
