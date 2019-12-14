@@ -24,97 +24,97 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
     Properties {
         // 基本
         [WFHeader(Base)]
-            _MainTex        ("Main Texture", 2D) = "white" {}
+            _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
-            _Color          ("Color", Color) = (1, 1, 1, 1)
+            _Color                  ("Color", Color) = (1, 1, 1, 1)
 
         // Lit
         [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
-            _GL_Level       ("Anti-Glare", Float) = 97
-            _GL_BrendPower  ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_Level               ("Anti-Glare", Float) = 97
+            _GL_BrendPower          ("Blend Light Color", Range(0, 1)) = 0.8
         [Toggle(_)]
-            _GL_CastShadow  ("Cast Shadows", Range(0, 1)) = 1
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         // ファー設定
         [WFHeader(Fur Settings)]
         [NoScaleOffset]
-            _FurMaskTex     ("Fur Mask Texture", 2D) = "white" {}
-            _FurNoiseTex    ("Fur Noise Texture", 2D) = "white" {}
-            _FurHeight      ("Fur Height", Range(0, 0.1)) = 0.05
-            _FurShadowPower ("Fur ShadowPower", Range(0, 1)) = 0
+            _FurMaskTex             ("Fur Mask Texture", 2D) = "white" {}
+            _FurNoiseTex            ("Fur Noise Texture", 2D) = "white" {}
+            _FurHeight              ("Fur Height", Range(0, 0.1)) = 0.05
+            _FurShadowPower         ("Fur ShadowPower", Range(0, 1)) = 0
         [IntRange]
-            _FurRepeat      ("Fur Repeat", Range(1, 8)) = 3
-            _FurVector      ("Fur Static Vector", Vector) = (0, 0, 0, 0)
+            _FurRepeat              ("Fur Repeat", Range(1, 8)) = 3
+            _FurVector              ("Fur Static Vector", Vector) = (0, 0, 0, 0)
 
         // 色変換
         [WFHeaderToggle(Color Change)]
-            _CL_Enable      ("[CL] Enable", Float) = 0
+            _CL_Enable              ("[CL] Enable", Float) = 0
         [Toggle(_)]
-            _CL_Monochrome  ("[CL] monochrome", Range(0, 1)) = 0
-            _CL_DeltaH      ("[CL] Hur", Range(0, 1)) = 0
-            _CL_DeltaS      ("[CL] Saturation", Range(-1, 1)) = 0
-            _CL_DeltaV      ("[CL] Brightness", Range(-1, 1)) = 0
+            _CL_Monochrome          ("[CL] monochrome", Range(0, 1)) = 0
+            _CL_DeltaH              ("[CL] Hur", Range(0, 1)) = 0
+            _CL_DeltaS              ("[CL] Saturation", Range(-1, 1)) = 0
+            _CL_DeltaV              ("[CL] Brightness", Range(-1, 1)) = 0
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
-            _HL_Enable      ("[HL] Enable", Float) = 0
+            _HL_Enable              ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType     ("[HL] Matcap Type", Float) = 0
+            _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
-            _HL_MatcapTex   ("[HL] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power       ("[HL] Power", Range(0, 2)) = 1
-            _HL_BlendNormal ("[HL] Blend Normal", Range(0, 1)) = 0.1
+            _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
+            _HL_MatcapColor         ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power               ("[HL] Power", Range(0, 2)) = 1
+            _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _HL_MaskTex     ("[HL] Mask Texture", 2D) = "white" {}
+            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
-            _HL_InvMaskVal  ("[HL] Invert Mask Value", Range(0, 1)) = 0
+            _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
-            _TS_Enable      ("[SH] Enable", Float) = 0
-            _TS_BaseColor   ("[SH] Base Color", Color) = (1, 1, 1, 1)
+            _TS_Enable              ("[SH] Enable", Float) = 0
+            _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _TS_BaseTex     ("[SH] Base Shade Texture", 2D) = "white" {}
-            _TS_1stColor    ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
+            _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
+            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
         [NoScaleOffset]
-            _TS_1stTex      ("[SH] 1st Shade Texture", 2D) = "white" {}
-            _TS_2ndColor    ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
+            _TS_1stTex              ("[SH] 1st Shade Texture", 2D) = "white" {}
+            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
         [NoScaleOffset]
-            _TS_2ndTex      ("[SH] 2nd Shade Texture", 2D) = "white" {}
-            _TS_Power       ("[SH] Shade Power", Range(0, 2)) = 1
-            _TS_1stBorder   ("[SH] 1st Border", Range(0, 1)) = 0.4
-            _TS_2ndBorder   ("[SH] 2nd Border", Range(0, 1)) = 0.2
-            _TS_Feather     ("[SH] Feather", Range(0, 0.2)) = 0.05
-            _TS_BlendNormal ("[SH] Blend Normal", Range(0, 1)) = 0.1
+            _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
+            _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
+            _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
+            _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
+            _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
+            _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex     ("[SH] BoostLight Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] BoostLight Mask Texture", 2D) = "black" {}
         [Toggle(_)]
-            _TS_InvMaskVal  ("[SH] Invert Mask Value", Range(0, 1)) = 0
+            _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
         // リムライト
         [WFHeaderToggle(RimLight)]
-            _TR_Enable      ("[RM] Enable", Float) = 0
+            _TR_Enable              ("[RM] Enable", Float) = 0
         [HDR]
-            _TR_Color       ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
+            _TR_Color               ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
         [Enum(ADD,0,ALPHA,1)]
-            _TR_BlendType   ("[RM] Blend Type", Float) = 0
-            _TR_PowerTop    ("[RM] Power Top", Range(0, 0.5)) = 0.1
-            _TR_PowerSide   ("[RM] Power Side", Range(0, 0.5)) = 0.1
-            _TR_PowerBottom ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+            _TR_BlendType           ("[RM] Blend Type", Float) = 0
+            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
+            _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
+            _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
         [NoScaleOffset]
-            _TR_MaskTex     ("[RM] RimLight Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [Toggle(_)]
-            _TR_InvMaskVal  ("[RM] Invert Mask Value", Range(0, 1)) = 0
+            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
-            _GL_LightMode       ("Sun Source", Float) = 0
-            _GL_CustomAzimuth   ("Custom Sun Azimuth", Range(0, 360)) = 0
-            _GL_CustomAltitude  ("Custom Sun Altitude", Range(-90, 90)) = 45
+            _GL_LightMode           ("Sun Source", Float) = 0
+            _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [Toggle(_)]
-            _GL_DisableBackLit  ("Disable BackLit", Range(0, 1)) = 0
+            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
     }
 
     SubShader {
