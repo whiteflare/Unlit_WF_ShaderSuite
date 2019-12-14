@@ -251,57 +251,45 @@
         float       _MT_Enable;
         float       _MT_Metallic;
         float       _MT_Smoothness;
-        float       _MT_Specular;
         float       _MT_BlendNormal;
         float       _MT_BlendType;
         float       _MT_Monochrome;
+        float       _MT_Specular;
+        float       _MT_Smoothness2;
         DECL_SUB_TEX2D(_MT_MaskTex);
         float       _MT_InvMaskVal;
         int         _MT_CubemapType;
         samplerCUBE _MT_Cubemap;
         float4      _MT_Cubemap_HDR;
 
-        inline float3 calcNdotH(float3 normal, float3 view, float3 light) {
-            float3 h = (view + light) / length(view + light);
-            return max(0, dot(normal, h));
+        inline float3 pickReflection(float4 ls_vertex, float3 ls_metal_normal) {
+            float metal_lod = (1 - _MT_Smoothness) * 10;
+            if (_MT_CubemapType == 1) {
+                // ADDITION
+                return pickReflectionProbe(ls_vertex, ls_metal_normal, metal_lod)
+                    + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ls_vertex, ls_metal_normal, metal_lod);
+            }
+            if (_MT_CubemapType == 2) {
+                // ONLY_SECOND_MAP
+                return pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ls_vertex, ls_metal_normal, metal_lod);
+            }
+            // OFF
+            return pickReflectionProbe(ls_vertex, ls_metal_normal, metal_lod);
         }
 
-        inline float3 pickSpecular(float4 ls_vertex, float3 ls_normal, float smoothness) {
-            float3 specular = ZERO_VEC3;
-            float ppp = pow(2, smoothness * 8 + 2);
+        inline float3 pickSpecular(float4 ls_vertex, float3 ls_metal_normal, float4 ls_light_dir, float3 spec_color, float smoothness) {
+            float roughness         = (1 - smoothness) * (1 - smoothness);
 
-            float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
-            float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
-            float3 ws_camera_dir = normalize(worldSpaceCameraPos() - ws_vertex.xyz);
+            float4 ws_vertex        = mul(unity_ObjectToWorld, ls_vertex);
+            float3 ws_normal        = UnityObjectToWorldNormal(ls_metal_normal);
+            float3 ws_camera_dir    = worldSpaceViewDir(ls_vertex);
 
-            // メインライト
-            {
-                float3 ws_light_dir = _WorldSpaceLightPos0.xyz;
-                float NdotH = calcNdotH(ws_normal, ws_camera_dir, ws_light_dir);
-                specular += saturate( _LightColor0.rgb * pow(NdotH, ppp) );
-            }
-            // ポイント4ライト
-            {
-                float4 toLightX = unity_4LightPosX0 - ws_vertex.x;
-                float4 toLightY = unity_4LightPosY0 - ws_vertex.y;
-                float4 toLightZ = unity_4LightPosZ0 - ws_vertex.z;
+            float3 ws_light_dir     = UnityObjectToWorldNormal(ls_light_dir);
+            float3 halfVL           = normalize(ws_camera_dir + ws_light_dir);
+            float NdotH             = max(0, dot( ws_normal, halfVL ));
+            float3 specular         = spec_color * GGXTerm(NdotH, roughness);
 
-                float4 lengthSq = toLightX * toLightX + toLightY * toLightY + toLightZ * toLightZ;
-                float4 corr = rsqrt( max(lengthSq, 0.000001) );
-
-                float4 NdotH;
-                NdotH.x = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.x, toLightY.x, toLightZ.x));
-                NdotH.y = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.y, toLightY.y, toLightZ.y));
-                NdotH.z = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.z, toLightY.z, toLightZ.z));
-                NdotH.w = calcNdotH(ws_normal, ws_camera_dir, float3(toLightX.w, toLightY.w, toLightZ.w));
-                float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0) * corr * pow(NdotH, ppp);
-
-                specular += saturate( unity_LightColor[0].rgb * atten.x );
-                specular += saturate( unity_LightColor[1].rgb * atten.y );
-                specular += saturate( unity_LightColor[2].rgb * atten.z );
-                specular += saturate( unity_LightColor[3].rgb * atten.w );
-            }
-            return specular;
+            return max(ZERO_VEC3, specular);
         }
 
         inline void affectMetallic(v2f i, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
@@ -310,32 +298,19 @@
                 float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
                 if (0.01 < power) {
                     // リフレクション
-                    float metal_lod = (1 - _MT_Smoothness) * 10;
-                    float3 reflection;
-                    if (_MT_CubemapType == 1) { // ADDITION
-                        reflection
-                            = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod)
-                            + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
-                    }
-                    else if (_MT_CubemapType == 2) {    // ONLY_SECOND_MAP
-                        reflection
-                            = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, i.ls_vertex, ls_metal_normal, metal_lod);
-                    }
-                    else {  // OFF
-                        reflection
-                            = pickReflectionProbe(i.ls_vertex, ls_metal_normal, metal_lod);
-                    }
+                    float3 reflection = pickReflection(i.ls_vertex, ls_metal_normal);
                     if (TGL_ON(_MT_Monochrome)) {
                         reflection = calcBrightness(reflection);
                     }
+
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
-                    if (TGL_ON(_MT_Specular)) {
-                        specular = pickSpecular(i.ls_vertex, ls_metal_normal, _MT_Smoothness);
+                    if (0.01 < _MT_Specular) {
+                        specular = pickSpecular(i.ls_vertex, ls_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, _MT_Smoothness2);
                     }
-                    color.rgb = lerp(color.rgb,
-                        lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb,
-                        power);
+
+                    // 合成
+                    color.rgb = lerp(color.rgb, lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb * _MT_Specular, power);
                 }
             }
         }
@@ -770,8 +745,8 @@
     // アウトライン用 vertex&fragment shader
     ////////////////////////////
 
-    void shiftDepthVertex(inout v2f o, float width, out float4 vertex) {
-        float3 ws_vertex = mul(unity_ObjectToWorld, float4(o.ls_vertex.xyz, 1)); // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
+    void shiftDepthVertex(float4 ls_vertex, float width, out float4 vertex) {
+        float3 ws_vertex = mul(unity_ObjectToWorld, float4(ls_vertex.xyz, 1)); // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
         float3 ws_camera_dir = _WorldSpaceCameraPos.xyz - ws_vertex.xyz; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
         // カメラ方向の z シフト量を加算
         float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
@@ -792,7 +767,7 @@
             // 外側にシフトする
             o.ls_vertex.xyz += o.normal.xyz * (_TL_LineWidth * 0.01);
             // Zシフト
-            shiftDepthVertex(o, -_TL_Z_Shift, vertex);
+            shiftDepthVertex(o.ls_vertex, -_TL_Z_Shift, vertex);
         } else {
             vertex = UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -842,7 +817,7 @@
     void shiftEmissiveScrollVertex(inout v2f o, out float4 vertex) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
-            shiftDepthVertex(o, _ES_Z_Shift, vertex);
+            shiftDepthVertex(o.ls_vertex, _ES_Z_Shift, vertex);
         } else {
             vertex = UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -895,7 +870,7 @@
         // 通常の vert を使う
         v2f o = vert(v, vertex);
         // SV_POSITION を上書き
-        shiftDepthVertex(o, _AL_Z_Offset, vertex);
+        shiftDepthVertex(o.ls_vertex, _AL_Z_Offset, vertex);
 
         return o;
     }
