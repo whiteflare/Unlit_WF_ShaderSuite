@@ -40,6 +40,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power               ("[AL] Power", Range(0, 2)) = 0.8
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // Gem
         [WFHeader(Gem Reflection)]
@@ -91,7 +93,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
-            ZWrite OFF
+            ZWrite [_AL_ZWrite]
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
@@ -120,7 +122,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull BACK
-            ZWrite OFF
+            ZWrite [_AL_ZWrite]
             Blend SrcAlpha One
 
             CGPROGRAM
