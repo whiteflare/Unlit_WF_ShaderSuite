@@ -384,13 +384,14 @@
     #if USING_STEREO_MATRICES
        #define WorldSpaceFaceRotation   RMatrixAverage((float3x3)unity_StereoCameraToWorld[0], (float3x3)unity_StereoCameraToWorld[1])
        #define FaceToWorld              TRMatrixAverage(unity_StereoCameraToWorld[0], unity_StereoCameraToWorld[1])
+       
     #else
        #define WorldSpaceFaceRotation   ((float3x3)unity_CameraToWorld)
        #define FaceToWorld              unity_CameraToWorld
     #endif
-
+#define ForwardLookingEyeTransform   BuildMatrix(WorldSpaceFaceRotation,_WorldSpaceCameraPos)
     inline float3 calcMatcapVector(float4 ls_vertex, float3 ls_normal) {
-        float3 vs_normal = mul(mul(float4(ls_normal, 1), unity_WorldToObject), FaceToWorld);
+        float3 vs_normal = mul(mul(float4(ls_normal, 1), unity_WorldToObject), ForwardLookingEyeTransform);
 
         #ifdef _MATCAP_VIEW_CORRECT_ENABLE
             float3 ws_view_dir = worldSpaceViewDir(ls_vertex);
