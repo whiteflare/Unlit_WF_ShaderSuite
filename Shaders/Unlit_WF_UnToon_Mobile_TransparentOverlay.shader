@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
     /*
      * authors:
-     *      ver:2019/12/04 whiteflare,
+     *      ver:2019/12/22 whiteflare,
      */
 
     Properties {

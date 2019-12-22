@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2019/11/24 whiteflare,
+     *      ver:2019/12/22 whiteflare,
      */
 
     Properties {
