@@ -270,6 +270,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
