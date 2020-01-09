@@ -43,8 +43,9 @@
     #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
 #endif
 
-    #define SAMPLE_MASK_VALUE(tex, uv, inv)         saturate( TGL_OFF(inv) ? PICK_SUB_TEX2D(tex, _MainTex, uv).rgb : 1 - PICK_SUB_TEX2D(tex, _MainTex, uv).rgb )
-    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     saturate( TGL_OFF(inv) ? tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb : 1 - tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)).rgb )
+    #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : float4(1 - rgba.rgb, rgba.a) )
+    #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
+    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)), inv )
 
     #define NZF                                     0.00390625
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)
@@ -262,8 +263,8 @@
         samplerCUBE _MT_Cubemap;
         float4      _MT_Cubemap_HDR;
 
-        inline float3 pickReflection(float4 ls_vertex, float3 ls_metal_normal) {
-            float metal_lod = (1 - _MT_Smoothness) * 10;
+        inline float3 pickReflection(float4 ls_vertex, float3 ls_metal_normal, float smoothness) {
+            float metal_lod = (1 - smoothness) * 10;
             if (_MT_CubemapType == 1) {
                 // ADDITION
                 return pickReflectionProbe(ls_vertex, ls_metal_normal, metal_lod)
@@ -295,10 +296,11 @@
         inline void affectMetallic(v2f i, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
                 float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
-                float power = _MT_Metallic * SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal);
-                if (0.01 < power) {
+                float2 metallicSmoothness = SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal).ra;
+                float metallic = _MT_Metallic * metallicSmoothness.x;
+                if (0.01 < metallic) {
                     // リフレクション
-                    float3 reflection = pickReflection(i.ls_vertex, ls_metal_normal);
+                    float3 reflection = pickReflection(i.ls_vertex, ls_metal_normal, metallicSmoothness.y * _MT_Smoothness);
                     if (TGL_ON(_MT_Monochrome)) {
                         reflection = calcBrightness(reflection);
                     }
@@ -306,11 +308,14 @@
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(i.ls_vertex, ls_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, _MT_Smoothness2);
+                        specular = pickSpecular(i.ls_vertex, ls_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_Smoothness2);
                     }
 
                     // 合成
-                    color.rgb = lerp(color.rgb, lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb * _MT_Specular, power);
+                    color.rgb = lerp(
+                        color.rgb,
+                        lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb * _MT_Specular,
+                        metallic);
                 }
             }
         }
