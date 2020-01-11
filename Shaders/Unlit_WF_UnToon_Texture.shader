@@ -300,5 +300,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
     }
 
+    FallBack "Unlit/Texture"
+
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

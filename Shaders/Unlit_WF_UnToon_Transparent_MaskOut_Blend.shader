@@ -317,5 +317,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
+	FallBack "Unlit/Transparent"
+
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

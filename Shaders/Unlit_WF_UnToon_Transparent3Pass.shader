@@ -360,5 +360,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
     }
 
+	FallBack "Unlit/Transparent"
+
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
