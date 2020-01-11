@@ -173,12 +173,15 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [WFHeaderToggle(Outline)]
             _TL_Enable              ("[LI] Enable", Float) = 0
             _TL_LineColor           ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+        [Enum(NORMAL,0,POSITION,1)]
+            _TL_Type                ("[LI] Method", Float) = 0
+            _TL_ZeroPos             ("[LI] Zero Position", Vector) = (0, 0, 0, 0)
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]

@@ -530,6 +530,8 @@
         DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
+        int         _TL_Type;
+        float3      _TL_ZeroPos;
 
         inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
@@ -769,8 +771,11 @@
     void shiftOutlineVertex(inout v2f o, out float4 vertex) {
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
+
             // 外側にシフトする
-            o.ls_vertex.xyz += o.normal.xyz * (_TL_LineWidth * 0.01);
+            float3 outside = _TL_Type == 0 ? o.normal.xyz : SafeNormalizeVec3(o.ls_vertex.xyz - _TL_ZeroPos);
+            o.ls_vertex.xyz += outside * (_TL_LineWidth * 0.01);
+
             // Zシフト
             shiftDepthVertex(o.ls_vertex, -_TL_Z_Shift, vertex);
         } else {
