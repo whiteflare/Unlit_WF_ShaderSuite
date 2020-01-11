@@ -178,17 +178,6 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
-        // アウトライン
-        [WFHeaderToggle(Outline)]
-            _TL_Enable              ("[LI] Enable", Float) = 0
-            _TL_LineColor           ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
-        [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
-
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
@@ -221,36 +210,6 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
-        }
-
-        Pass {
-            Name "OUTLINE"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull FRONT
-
-            CGPROGRAM
-
-            #pragma vertex vert_outline
-            #pragma fragment frag_cutout_upper
-
-            #pragma target 3.0
-
-            #define _AL_ENABLE
-            #define _CL_ENABLE
-            #define _TL_ENABLE
-            #define _TR_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
-
-            ENDCG
         }
 
         Pass {

@@ -78,6 +78,7 @@
     };
 
     struct v2f {
+        float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float4 ls_vertex        : TEXCOORD1;
         float4 ls_light_dir     : TEXCOORD2;
@@ -96,7 +97,6 @@
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
-        // SV_POSITION は vert の out パラメタで設定するのでv2fには含めない
     };
 
     DECL_MAIN_TEX2D(_MainTex);
@@ -527,11 +527,10 @@
         float       _TL_Enable;
         float4      _TL_LineColor;
         float       _TL_LineWidth;
+        int         _TL_LineType;
         DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
-        int         _TL_Type;
-        float3      _TL_ZeroPos;
 
         inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
@@ -635,15 +634,14 @@
     // vertex&fragment shader
     ////////////////////////////
 
-    v2f vert(in appdata v, out float4 vertex : SV_POSITION) {
+    v2f vert(in appdata v) {
         v2f o;
 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        vertex = UnityObjectToClipPos(v.vertex);
-
+        o.vs_vertex = UnityObjectToClipPos(v.vertex);
         o.uv = v.uv;
         o.ls_vertex = v.vertex;
         o.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, v.vertex.w) );
@@ -671,7 +669,7 @@
         o.light_color = calcLightColorVertex(o.ls_vertex, ambientColor);
 
         UNITY_TRANSFER_INSTANCE_ID(v, o);
-        UNITY_TRANSFER_FOG(o, vertex);
+        UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
     }
 
@@ -752,12 +750,13 @@
     // アウトライン用 vertex&fragment shader
     ////////////////////////////
 
-    void shiftDepthVertex(float4 ls_vertex, float width, out float4 vertex) {
+    float4 shiftDepthVertex(float4 ls_vertex, float width) {
         float3 ws_vertex = mul(unity_ObjectToWorld, float4(ls_vertex.xyz, 1)); // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
         float3 ws_camera_dir = _WorldSpaceCameraPos.xyz - ws_vertex.xyz; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
         // カメラ方向の z シフト量を加算
         float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
 
+        float4 vertex;
         if (unity_OrthoParams.w < 0.5) {
             // カメラが perspective のときは単にカメラ方向にシフトする
             vertex = UnityWorldToClipPos( ws_vertex + zShiftVec );
@@ -766,33 +765,80 @@
             vertex = UnityWorldToClipPos( ws_vertex );
             vertex.z = UnityWorldToClipPos( ws_vertex + zShiftVec ).z;
         }
+        return vertex;
     }
 
-    void shiftOutlineVertex(inout v2f o, out float4 vertex) {
+    float4 shiftOutlineVertex(inout v2f o, float width) {
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
-
             // 外側にシフトする
-            float3 outside = _TL_Type == 0 ? o.normal.xyz : SafeNormalizeVec3(o.ls_vertex.xyz - _TL_ZeroPos);
-            o.ls_vertex.xyz += outside * (_TL_LineWidth * 0.01);
-
+            o.ls_vertex.xyz += o.normal.xyz * (width * 0.01);
             // Zシフト
-            shiftDepthVertex(o.ls_vertex, -_TL_Z_Shift, vertex);
+            return shiftDepthVertex(o.ls_vertex, -_TL_Z_Shift);
         } else {
-            vertex = UnityObjectToClipPos( ZERO_VEC3 );
+            return UnityObjectToClipPos( ZERO_VEC3 );
         }
         #else
-            vertex = UnityObjectToClipPos( ZERO_VEC3 );
+            return UnityObjectToClipPos( ZERO_VEC3 );
         #endif
     }
 
-    v2f vert_outline(appdata v, out float4 vertex : SV_POSITION) {
+    float4 shiftOutlineVertex(inout v2f o) {
+        #ifdef _TL_ENABLE
+            return shiftOutlineVertex(o, _TL_LineWidth);
+        #else
+            return UnityObjectToClipPos( ZERO_VEC3 );
+        #endif
+    }
+
+    // vertex シェーダでアウトラインメッシュを張るタイプ。NORMALのみサポートする。
+    v2f vert_outline(appdata v) {
         // 通常の vert を使う
-        v2f o = vert(v, vertex);
+        v2f o = vert(v);
         // SV_POSITION を上書き
-        shiftOutlineVertex(o, vertex);
+        o.vs_vertex = shiftOutlineVertex(o);
 
         return o;
+    }
+
+    // geometry シェーダでアウトラインメッシュを張るタイプ。NORMALとEDGEをどちらもサポートする。
+    [maxvertexcount(10)]
+    void geom_outline(triangle v2f v[3], inout TriangleStream<v2f> triStream) {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
+
+        #ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
+            float width = _TL_LineWidth;
+
+            // NORMAL
+            v2f p0 = v[0];
+            v2f p1 = v[1];
+            v2f p2 = v[2];
+            p0.vs_vertex = shiftOutlineVertex(p0, width);
+            p1.vs_vertex = shiftOutlineVertex(p1, width);
+            p2.vs_vertex = shiftOutlineVertex(p2, width);
+            triStream.Append(p0);
+            triStream.Append(p1);
+            triStream.Append(p2);
+
+            // EDGE
+            if (TGL_ON(_TL_LineType)) {
+                v2f n0 = v[0];
+                v2f n1 = v[1];
+                v2f n2 = v[2];
+                n0.vs_vertex = shiftOutlineVertex(n0, -width);
+                n1.vs_vertex = shiftOutlineVertex(n1, -width);
+                n2.vs_vertex = shiftOutlineVertex(n2, -width);
+                triStream.Append(n2);
+                triStream.Append(p0);
+                triStream.Append(n0);
+                triStream.Append(p1);
+                triStream.Append(n1);
+                triStream.Append(p2);
+                triStream.Append(n2);
+            }
+        }
+        #endif
     }
 
     ////////////////////////////
@@ -824,23 +870,23 @@
 
     float _ES_Z_Shift;
 
-    void shiftEmissiveScrollVertex(inout v2f o, out float4 vertex) {
+    float4 shiftEmissiveScrollVertex(inout v2f o) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
-            shiftDepthVertex(o.ls_vertex, _ES_Z_Shift, vertex);
+            return shiftDepthVertex(o.ls_vertex, _ES_Z_Shift);
         } else {
-            vertex = UnityObjectToClipPos( ZERO_VEC3 );
+            return UnityObjectToClipPos( ZERO_VEC3 );
         }
         #else
-            vertex = UnityObjectToClipPos( ZERO_VEC3 );
+            return UnityObjectToClipPos( ZERO_VEC3 );
         #endif
     }
 
-    v2f vert_emissiveScroll(appdata v, out float4 vertex : SV_POSITION) {
+    v2f vert_emissiveScroll(appdata v) {
         // 通常の vert を使う
-        v2f o = vert(v, vertex);
+        v2f o = vert(v);
         // SV_POSITION を上書き
-        shiftEmissiveScrollVertex(o, vertex);
+        o.vs_vertex = shiftEmissiveScrollVertex(o);
 
         return o;
     }
@@ -876,11 +922,11 @@
 
     float _AL_Z_Offset;
 
-    v2f vert_with_zoffset(appdata v, out float4 vertex : SV_POSITION) {
+    v2f vert_with_zoffset(appdata v) {
         // 通常の vert を使う
-        v2f o = vert(v, vertex);
+        v2f o = vert(v);
         // SV_POSITION を上書き
-        shiftDepthVertex(o.ls_vertex, _AL_Z_Offset, vertex);
+        o.vs_vertex = shiftDepthVertex(o.ls_vertex, _AL_Z_Offset);
 
         return o;
     }

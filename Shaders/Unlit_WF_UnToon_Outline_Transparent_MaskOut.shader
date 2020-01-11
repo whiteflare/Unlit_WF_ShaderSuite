@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
+Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
 
     /*
      * authors:
@@ -36,6 +36,11 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
         [Toggle(_)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
+        // StencilMask
+        [WFHeader(Stencil Mask)]
+        [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
+            _StencilMaskID          ("ID", int) = 8
+
         // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
@@ -43,10 +48,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-            _AL_CutOff              ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
         [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
+            _AL_ZWrite              ("[AL] ZWrite", int) = 1
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -174,19 +177,20 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
             _ES_MaskTex             ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 0
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-        [Enum(OFF,0,FRONT,1,BACK,2)]
-            _ES_CullMode            ("[ES] Cull Mode", int) = 0
-            _ES_Z_Shift             ("[ES] Z-shift", Range(0, 1)) = 0.05
 
         // アウトライン
         [WFHeaderToggle(Outline)]
             _TL_Enable              ("[LI] Enable", Float) = 0
             _TL_LineColor           ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
+        [Enum(NORMAL,0,EDGE,1)]
+            _TL_LineType            ("[LI] Line Type", Float) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -223,19 +227,55 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_3Pass" {
     SubShader {
         Tags {
             "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "Queue" = "Transparent+1"
             "DisableBatching" = "True"
         }
 
         GrabPass { "_UnToonTransparentOutlineCanceller" }
-        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE"
-        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE_CANCELLER"
 
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_OPAQUE"
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_BACK"
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_FRONT"
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/EMISSIVE_SCROLL"
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/SHADOWCASTER"
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma geometry geom_outline
+            #pragma fragment frag
+
+            #pragma target 4.0
+
+            #define _AL_ENABLE
+            #define _CL_ENABLE
+            #define _TL_ENABLE
+            #define _TR_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
+
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
+        UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"
+        UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_FRONT"
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"

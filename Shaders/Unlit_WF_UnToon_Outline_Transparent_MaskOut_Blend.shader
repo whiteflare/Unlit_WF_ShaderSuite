@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
+Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
 
     /*
      * authors:
@@ -189,7 +189,9 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
         [WFHeaderToggle(Outline)]
             _TL_Enable              ("[LI] Enable", Float) = 0
             _TL_LineColor           ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
+        [Enum(NORMAL,0,EDGE,1)]
+            _TL_LineType            ("[LI] Line Type", Float) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -231,8 +233,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut_Blend" {
         }
 
         GrabPass { "_UnToonTransparentOutlineCanceller" }
-        UsePass "UnlitWF/WF_UnToon_Transparent_Outline_MaskOut/OUTLINE"
-        UsePass "UnlitWF/WF_UnToon_Transparent_Outline/OUTLINE_CANCELLER"
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut/OUTLINE"
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
 
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_FRONT"

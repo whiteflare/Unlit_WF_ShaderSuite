@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_UnToon_Texture" {
+Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
     /*
      * authors:
@@ -27,8 +27,6 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
-        [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 2
 
         // Lit
         [WFHeader(Lit)]
@@ -37,6 +35,17 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _GL_BrendPower          ("Blend Light Color", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
+
+        // Alpha
+        [WFHeader(Transparent Alpha)]
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
+        [NoScaleOffset]
+            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
+            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -164,10 +173,25 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _ES_MaskTex             ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 0
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
+        // アウトライン
+        [WFHeaderToggle(Outline)]
+            _TL_Enable              ("[LI] Enable", Float) = 0
+            _TL_LineColor           ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
+        [Enum(NORMAL,0,EDGE,1)]
+            _TL_LineType            ("[LI] Line Type", Float) = 0
+        [NoScaleOffset]
+            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -198,33 +222,33 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
             "DisableBatching" = "True"
         }
 
+        GrabPass { "_UnToonTransparentOutlineCanceller" }
+
         Pass {
-            Name "MAIN"
+            Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull [_CullMode]
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
 
             #pragma vertex vert
+            #pragma geometry geom_outline
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
-            #define _AO_ENABLE
+            #define _AL_ENABLE
             #define _CL_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
+            #define _TL_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -239,25 +263,34 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         }
 
         Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
+            Name "OUTLINE_CANCELLER"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
 
             CGPROGRAM
 
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
+            #pragma vertex vert_outline_canceller
+            #pragma fragment frag_outline_canceller
 
-            #pragma multi_compile_shadowcaster
+            #pragma target 3.0
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
-            #include "WF_UnToon_ShadowCaster.cginc"
+            #include "Lighting.cginc"
+            #include "WF_UnToon.cginc"
 
             ENDCG
         }
-    }
 
-    FallBack "Unlit/Texture"
+        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_BACK"
+        UsePass "UnlitWF/WF_UnToon_Transparent/MAIN_FRONT"
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
+    }
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -99,26 +99,26 @@
     }
 
     [domain("tri")]
-    v2f domain(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+    v2f domain(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
         v2f o = domainCore(hsConst, i, bary);
-        vs_vertex = UnityObjectToClipPos(o.ls_vertex.xyz);
+        o.vs_vertex = UnityObjectToClipPos(o.ls_vertex.xyz);
         return o;
     }
 
     [domain("tri")]
-    v2f domain_outline(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+    v2f domain_outline(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
         v2f o = domainCore(hsConst, i, bary);
         // SV_POSITION を上書き
-        shiftOutlineVertex(o, vs_vertex);
+        o.vs_vertex = shiftOutlineVertex(o);
 
         return o;
     }
 
     [domain("tri")]
-    v2f domain_emissiveScroll(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+    v2f domain_emissiveScroll(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
         v2f o = domainCore(hsConst, i, bary);
         // SV_POSITION を上書き
-        shiftEmissiveScrollVertex(o, vs_vertex);
+        o.vs_vertex = shiftEmissiveScrollVertex(o);
 
         return o;
     }
