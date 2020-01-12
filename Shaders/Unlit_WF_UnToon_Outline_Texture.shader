@@ -246,58 +246,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture" {
             ENDCG
         }
 
-        Pass {
-            Name "MAIN"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull [_CullMode]
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #pragma target 3.0
-
-            #define _AO_ENABLE
-            #define _CL_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-
-            #include "UnityCG.cginc"
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Texture/MAIN"
+        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
     }
 
     FallBack "Unlit/Texture"

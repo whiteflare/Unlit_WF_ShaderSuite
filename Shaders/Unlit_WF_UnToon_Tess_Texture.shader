@@ -295,5 +295,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
         UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
     }
 
+    FallBack "Unlit/Texture"
+
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -261,5 +261,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
         UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
     }
 
+    FallBack "Unlit/Texture"
+
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

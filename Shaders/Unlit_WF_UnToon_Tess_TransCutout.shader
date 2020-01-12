@@ -344,5 +344,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
     }
 
+    FallBack "Unlit/TransparentCutout"
+
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -157,5 +157,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         }
     }
 
+    FallBack "Unlit/Texture"
+
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
