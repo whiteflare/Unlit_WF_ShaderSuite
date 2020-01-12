@@ -768,13 +768,13 @@
         return vertex;
     }
 
-    float4 shiftOutlineVertex(inout v2f o, float width) {
+    float4 shiftOutlineVertex(inout v2f o, float width, float shift) {
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
             // 外側にシフトする
-            o.ls_vertex.xyz += o.normal.xyz * (width * 0.01);
+            o.ls_vertex.xyz += o.normal.xyz * (width);
             // Zシフト
-            return shiftDepthVertex(o.ls_vertex, -_TL_Z_Shift);
+            return shiftDepthVertex(o.ls_vertex, shift);
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -785,7 +785,7 @@
 
     float4 shiftOutlineVertex(inout v2f o) {
         #ifdef _TL_ENABLE
-            return shiftOutlineVertex(o, _TL_LineWidth);
+            return shiftOutlineVertex(o, _TL_LineWidth * 0.01, -_TL_Z_Shift);
         #else
             return UnityObjectToClipPos( ZERO_VEC3 );
         #endif
@@ -808,15 +808,16 @@
 
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
-            float width = _TL_LineWidth;
+            float width = _TL_LineWidth * 0.01;
+            float shift = -_TL_Z_Shift - (TGL_ON(_TL_LineType) ? width * 10 : 0);
 
             // NORMAL
             v2f p0 = v[0];
             v2f p1 = v[1];
             v2f p2 = v[2];
-            p0.vs_vertex = shiftOutlineVertex(p0, width);
-            p1.vs_vertex = shiftOutlineVertex(p1, width);
-            p2.vs_vertex = shiftOutlineVertex(p2, width);
+            p0.vs_vertex = shiftOutlineVertex(p0, width, shift);
+            p1.vs_vertex = shiftOutlineVertex(p1, width, shift);
+            p2.vs_vertex = shiftOutlineVertex(p2, width, shift);
             triStream.Append(p0);
             triStream.Append(p1);
             triStream.Append(p2);
@@ -826,9 +827,9 @@
                 v2f n0 = v[0];
                 v2f n1 = v[1];
                 v2f n2 = v[2];
-                n0.vs_vertex = shiftOutlineVertex(n0, -width);
-                n1.vs_vertex = shiftOutlineVertex(n1, -width);
-                n2.vs_vertex = shiftOutlineVertex(n2, -width);
+                n0.vs_vertex = shiftOutlineVertex(n0, -width, shift);
+                n1.vs_vertex = shiftOutlineVertex(n1, -width, shift);
+                n2.vs_vertex = shiftOutlineVertex(n2, -width, shift);
                 triStream.Append(n2);
                 triStream.Append(p0);
                 triStream.Append(n0);
