@@ -112,7 +112,7 @@ namespace UnlitWF
             { "[MT] Brightness", "[MT] 明るさ" },
             { "[MT] Monochrome Reflection", "[MT] モノクロ反射" },
             { "[MT] Specular", "[MT] スペキュラ反射" },
-            { "[MT] MetallicMap Texture", "[MT] メタリックマップ" },
+            { "[MT] MetallicMap Texture", "[MT] MetallicSmoothnessマップ" },
             { "[MT] 2nd CubeMap Blend", "[MT] キューブマップ混合タイプ" },
             { "[MT] 2nd CubeMap", "[MT] キューブマップ" },
             // Light Matcap
@@ -155,12 +155,13 @@ namespace UnlitWF
             { "[ES] Sharpness", "[ES] 鋭さ" },
             { "[ES] ScrollSpeed", "[ES] スピード" },
             { "[ES] Cull Mode", "[ES] カリングモード" },
-            { "[ES] Z-shift", "[ES] Z方向の調整" },
+            { "[ES] Z-shift", "[ES] カメラに近づける" },
             // Outline
             { "[LI] Line Color", "[LI] 線の色" },
             { "[LI] Line Width", "[LI] 線の太さ" },
+            { "[LI] Line Type", "[LI] 線の種類" },
             { "[LI] Outline Mask Texture", "[LI] マスクテクスチャ" },
-            { "[LI] Z-shift (tweak)", "[LI] Z方向の調整" },
+            { "[LI] Z-shift (tweak)", "[LI] カメラから遠ざける" },
             // Ambient Occlusion
             { "[AO] Occlusion Map", "[AO] オクルージョンマップ" },
             { "[AO] Use LightMap", "[AO] ライトマップも使用する" },
