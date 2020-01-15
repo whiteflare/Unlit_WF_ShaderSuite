@@ -348,7 +348,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         }
     }
 
-    FallBack "Unlit/TransparentCutout"
+    FallBack "Unlit/Transparent Cutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
