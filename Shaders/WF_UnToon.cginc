@@ -102,7 +102,6 @@
     DECL_MAIN_TEX2D(_MainTex);
     float4          _MainTex_ST;
     float4          _Color;
-    float           _AL_CutOff;
     float           _GL_BrendPower;
     float           _GL_DisableBackLit;
 
@@ -727,22 +726,6 @@
         // デバッグビュー
         WF_AFFECT_DEBUGVIEW;
 
-        return color;
-    }
-
-    ////////////////////////////
-    // カットアウト用 fragment shader
-    ////////////////////////////
-
-    float4 frag_cutout_upper(v2f i) : SV_Target { // Cutout閾値よりも上側を描画
-        float4 color = frag(i);
-        clip(color.a - _AL_CutOff);
-        return color;
-    }
-
-    float4 frag_cutout_lower(v2f i) : SV_Target { // Cutout閾値よりも下側を描画
-        float4 color = frag(i);
-        clip(_AL_CutOff - color.a);
         return color;
     }
 

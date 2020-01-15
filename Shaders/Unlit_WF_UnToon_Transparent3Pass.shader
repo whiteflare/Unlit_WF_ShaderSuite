@@ -42,9 +42,9 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+            _AL_CutOff              ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-            _AL_CutOff              ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
@@ -227,12 +227,13 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutout_upper
+            #pragma fragment frag
 
             #pragma target 3.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+            #define _AL_CUTOUT_UPPER
             #define _AO_ENABLE
             #define _CL_ENABLE
             #define _HL_ENABLE
@@ -265,12 +266,13 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutout_lower
+            #pragma fragment frag
 
             #pragma target 3.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+            #define _AL_CUTOUT_LOWER
             #define _AO_ENABLE
             #define _CL_ENABLE
             #define _MT_ENABLE
@@ -301,12 +303,13 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutout_lower
+            #pragma fragment frag
 
             #pragma target 3.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+            #define _AL_CUTOUT_LOWER
             #define _AO_ENABLE
             #define _CL_ENABLE
             #define _HL_ENABLE

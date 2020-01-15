@@ -162,6 +162,8 @@
     // Alpha Transparent
     ////////////////////////////
 
+    float           _AL_CutOff;
+
     #ifdef _AL_ENABLE
         int             _AL_Source;
         float           _AL_Power;
@@ -185,12 +187,57 @@
         }
 
         inline void affectAlpha(float2 uv, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a) * _AL_Power * _AL_CustomValue;
+            float baseAlpha = pickAlpha(uv, color.a);
+
+            #if defined(_AL_CUTOUT)
+                if (baseAlpha < _AL_CutOff) {
+                    discard;
+                } else {
+                    color.a = 1.0;
+                }
+            #elif defined(_AL_CUTOUT_UPPER)
+                if (baseAlpha < _AL_CutOff) {
+                    discard;
+                } else {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                }
+            #elif defined(_AL_CUTOUT_LOWER)
+                if (baseAlpha < _AL_CutOff) {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                } else {
+                    discard;
+                }
+            #else
+                baseAlpha *= _AL_Power * _AL_CustomValue;
+            #endif
+
             color.a = baseAlpha;
         }
 
         inline void affectAlphaWithFresnel(float2 uv, float3 normal, float3 viewdir, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a) * _AL_Power * _AL_CustomValue;
+            float baseAlpha = pickAlpha(uv, color.a);
+
+            #if defined(_AL_CUTOUT)
+                if (baseAlpha < _AL_CutOff) {
+                    discard;
+                } else {
+                    color.a = 1.0;
+                }
+            #elif defined(_AL_CUTOUT_UPPER)
+                if (baseAlpha < _AL_CutOff) {
+                    discard;
+                } else {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                }
+            #elif defined(_AL_CUTOUT_LOWER)
+                if (baseAlpha < _AL_CutOff) {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                } else {
+                    discard;
+                }
+            #else
+                baseAlpha *= _AL_Power * _AL_CustomValue;
+            #endif
 
             #ifndef _AL_FRESNEL_ENABLE
                 // ベースアルファ

@@ -42,7 +42,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_CutOff              ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
 
         // 色変換
@@ -235,11 +234,12 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
 
             #pragma vertex vert
             #pragma geometry geom_outline
-            #pragma fragment frag_cutout_upper
+            #pragma fragment frag
 
             #pragma target 4.0
 
             #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _CL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
@@ -256,96 +256,9 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             ENDCG
         }
 
-        Pass {
-            Name "MAIN_BACK"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull FRONT
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag_cutout_upper
-
-            #pragma target 3.0
-
-            #define _AL_ENABLE
-            #define _AO_ENABLE
-            #define _CL_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "MAIN_FRONT"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull BACK
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag_cutout_upper
-
-            #pragma target 3.0
-
-            #define _AL_ENABLE
-            #define _AO_ENABLE
-            #define _CL_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #define _AL_ENABLE
-            #define _AL_CUTOFF_ENABLE
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-
-            #include "UnityCG.cginc"
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_TransCutout/MAIN_BACK"
+        UsePass "UnlitWF/WF_UnToon_TransCutout/MAIN_FRONT"
+        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
     }
 
     FallBack "Unlit/Transparent Cutout"

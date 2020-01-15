@@ -42,7 +42,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_CutOff              ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
 
         // Matcapハイライト
@@ -131,13 +130,14 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutout_upper
+            #pragma fragment frag
 
             #pragma target 3.0
 
             #define _WF_MOBILE
 
             #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _AO_ENABLE
             #define _HL_ENABLE
             #define _TR_ENABLE
