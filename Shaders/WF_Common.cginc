@@ -78,13 +78,14 @@
     inline float3 OmniDirectional_ShadeSH9() {
         // UnityCG.cginc にある ShadeSH9 の等方向版
         float3 col = 0;
-        col = max(col, ShadeSH9( float4(+1, +0, +0, 1) ));
-        col = max(col, ShadeSH9( float4(+0, +1, +0, 1) ));
-        col = max(col, ShadeSH9( float4(+0, +0, +1, 1) ));
-        col = max(col, ShadeSH9( float4(-1, -0, -0, 1) ));
-        col = max(col, ShadeSH9( float4(-0, -1, -0, 1) ));
-        col = max(col, ShadeSH9( float4(-0, -0, -1, 1) ));
-        return col;
+        col += ShadeSH9( float4(+1, 0, 0, 1) );
+        col += ShadeSH9( float4(-1, 0, 0, 1) );
+        col += ShadeSH9( float4(0, 0, +1, 1) );
+        col += ShadeSH9( float4(0, 0, -1, 1) );
+        col /= 4;
+        col += ShadeSH9( float4(0, +1, 0, 1) );
+        col += ShadeSH9( float4(0, -1, 0, 1) );
+        return col / 3;
     }
 
     inline float3 OmniDirectional_Shade4PointLights(
