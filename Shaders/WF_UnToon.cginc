@@ -258,12 +258,15 @@
         float       _MT_Smoothness2;
         DECL_SUB_TEX2D(_MT_MaskTex);
         float       _MT_InvMaskVal;
+#ifndef _WF_MOBILE
         int         _MT_CubemapType;
         samplerCUBE _MT_Cubemap;
         float4      _MT_Cubemap_HDR;
+#endif
 
         inline float3 pickReflection(float4 ls_vertex, float3 ls_metal_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
+#ifndef _WF_MOBILE
             if (_MT_CubemapType == 1) {
                 // ADDITION
                 return pickReflectionProbe(ls_vertex, ls_metal_normal, metal_lod)
@@ -273,6 +276,7 @@
                 // ONLY_SECOND_MAP
                 return pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ls_vertex, ls_metal_normal, metal_lod);
             }
+#endif
             // OFF
             return pickReflectionProbe(ls_vertex, ls_metal_normal, metal_lod);
         }
