@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Metallic" {
+Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic" {
 
     /*
      * authors:
@@ -28,13 +28,24 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Metallic" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 2
+            _CullMode               ("Cull Mode", int) = 0
 
         // Lit
         [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level               ("Anti-Glare", Float) = 97
             _GL_BrendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+
+        // Alpha
+        [WFHeader(Transparent Alpha)]
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
+        [NoScaleOffset]
+            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
+            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -103,8 +114,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Metallic" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
         }
 
         Pass {
@@ -112,6 +123,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Metallic" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -122,6 +135,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Metallic" {
 
             #define _WF_MOBILE
 
+            #define _AL_ENABLE
+            #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
@@ -140,7 +155,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Metallic" {
         UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture/META"
     }
 
-    FallBack "Unlit/Texture"
+    FallBack "Unlit/Transparent"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
