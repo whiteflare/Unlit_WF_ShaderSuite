@@ -244,8 +244,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
             #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -281,8 +279,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
             #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -320,8 +316,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
             #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -349,8 +343,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG

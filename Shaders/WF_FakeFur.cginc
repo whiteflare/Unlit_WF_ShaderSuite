@@ -23,7 +23,7 @@
      *      ver:2019/07/13 whiteflare,
      */
 
-    #include "WF_Common.cginc"
+    #include "WF_UnToon.cginc"
 
     struct appdata_fur {
         float4 vertex           : POSITION;

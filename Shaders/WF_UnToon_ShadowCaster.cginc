@@ -23,6 +23,8 @@
      *      ver:2019/06/26 whiteflare,
      */
 
+    #include "UnityCG.cginc"
+
     struct v2f_shadow {
         V2F_SHADOW_CASTER;
         float2 uv : TEXCOORD1;

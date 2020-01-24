@@ -145,8 +145,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -171,9 +169,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
             #include "WF_FakeFur.cginc"
 
             ENDCG

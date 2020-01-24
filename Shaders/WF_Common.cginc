@@ -23,6 +23,9 @@
      *      ver:2019/11/24 whiteflare,
      */
 
+    #include "UnityCG.cginc"
+    #include "Lighting.cginc"
+
     #define _MATCAP_VIEW_CORRECT_ENABLE
     #define _MATCAP_ROTATE_CORRECT_ENABLE
 
@@ -39,6 +42,33 @@
     #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
     #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
 
+    #define WF_SAMPLE_TEX2D_LOD(tex, coord, lod)                        tex.SampleLevel(sampler##tex,coord, lod)
+    #define WF_SAMPLE_TEX2D_SAMPLER_LOD(tex, samplertex, coord, lod)    tex.SampleLevel(sampler##samplertex, coord, lod)
+
+#if 1
+    // サンプラー節約のための差し替えマクロ
+    // 節約にはなるけど最適化などで _MainTex のサンプリングが消えると途端に破綻する諸刃の剣
+    #define DECL_MAIN_TEX2D(name)           UNITY_DECLARE_TEX2D(name)
+    #define DECL_SUB_TEX2D(name)            UNITY_DECLARE_TEX2D_NOSAMPLER(name)
+    #define PICK_MAIN_TEX2D(tex, uv)        UNITY_SAMPLE_TEX2D(tex, uv)
+    #define PICK_SUB_TEX2D(tex, name, uv)   UNITY_SAMPLE_TEX2D_SAMPLER(tex, name, uv)
+#else
+    // 通常版
+    #define DECL_MAIN_TEX2D(name)           sampler2D name
+    #define DECL_SUB_TEX2D(name)            sampler2D name
+    #define PICK_MAIN_TEX2D(tex, uv)        tex2D(tex, uv)
+    #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
+#endif
+
+    #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : float4(1 - rgba.rgb, rgba.a) )
+    #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
+    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)), inv )
+
+    #define NZF                                     0.00390625
+    #define NON_ZERO_FLOAT(v)                       max(v, NZF)
+    #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
+    #define ZERO_VEC3                               float3(0, 0, 0)
+    #define ONE_VEC3                                float3(1, 1, 1)
 
     inline float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
@@ -159,6 +189,48 @@
         return unity_CameraProjection[2][0] != 0.0f || unity_CameraProjection[2][1] != 0.0f;
     }
 
+    inline float3 pickLightmap(float2 uv_lmap) {
+        float3 color = ZERO_VEC3;
+        #ifdef LIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            float4 lmap_tex = UNITY_SAMPLE_TEX2D(unity_Lightmap, uv);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        #ifdef DYNAMICLIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+            float4 lmap_tex = UNITY_SAMPLE_TEX2D(unity_DynamicLightmap, uv);
+            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        return color;
+    }
+
+    inline float3 pickLightmapLod(float2 uv_lmap) {
+        float3 color = ZERO_VEC3;
+        #ifdef LIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_Lightmap, uv, 0);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        #ifdef DYNAMICLIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
+            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        return color;
+    }
+
     ////////////////////////////
     // Alpha Transparent
     ////////////////////////////
@@ -254,92 +326,6 @@
         #define affectAlpha(uv, color)                              color.a = 1.0
         #define affectAlphaWithFresnel(uv, normal, viewdir, color)  color.a = 1.0
     #endif
-
-    ////////////////////////////
-    // Anti Glare & Light Configuration
-    ////////////////////////////
-
-    #define LIT_MODE_AUTO               0
-    #define LIT_MODE_ONLY_DIR_LIT       1
-    #define LIT_MODE_ONLY_POINT_LIT     2
-    #define LIT_MODE_CUSTOM_WORLDSPACE  3
-    #define LIT_MODE_CUSTOM_LOCALSPACE  4
-
-    int             _GL_Level;
-    uint            _GL_LightMode;
-    float           _GL_CustomAzimuth;
-    float           _GL_CustomAltitude;
-
-    inline uint calcAutoSelectMainLight(float3 ws_pos) {
-        float3 pointLight1Color = calcPointLight1Color(ws_pos);
-
-        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
-            // ディレクショナルよりポイントライトのほうが明るいならばそちらを採用
-            return LIT_MODE_ONLY_POINT_LIT;
-
-        } else if (any(_WorldSpaceLightPos0.xyz)) {
-            // ディレクショナルライトが入っているならばそれを採用
-            return LIT_MODE_ONLY_DIR_LIT;
-
-        } else {
-            // 手頃なライトが無いのでワールドスペースの方向決め打ち
-            return LIT_MODE_CUSTOM_WORLDSPACE;
-        }
-    }
-
-    inline float3 calcHorizontalCoordSystem(float azimuth, float alt) {
-        azimuth = radians(azimuth + 90);
-        alt = radians(alt);
-        return normalize( float3(cos(azimuth) * cos(alt), sin(alt), -sin(azimuth) * cos(alt)) );
-    }
-
-    inline float3 calcPointLight1Dir(float3 ws_pos) {
-        ws_pos = calcPointLight1Pos() - ws_pos;
-        if (dot(ws_pos, ws_pos) < 0.1) {
-            ws_pos = float3(0, 1, 0);
-        }
-        return UnityWorldToObjectDir( ws_pos );
-    }
-
-    inline float4 calcLocalSpaceLightDir(float4 ls_pos) {
-        float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
-
-        uint mode = _GL_LightMode;
-        if (mode == LIT_MODE_AUTO) {
-            mode = calcAutoSelectMainLight(ws_pos);
-        }
-        if (mode == LIT_MODE_ONLY_DIR_LIT) {
-            return float4( UnityWorldToObjectDir( _WorldSpaceLightPos0.xyz ), +1 );
-        }
-        if (mode == LIT_MODE_ONLY_POINT_LIT) {
-            return float4( calcPointLight1Dir(ws_pos) , -1 );
-        }
-        if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
-            return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
-        }
-        if (mode == LIT_MODE_CUSTOM_LOCALSPACE) {
-            return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude), 0 );
-        }
-        return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
-    }
-
-    inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
-        if ( TGL_ON(-lightType) ) {
-            float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
-            float3 pointLight1Color = calcPointLight1Color(ws_pos);
-            return pointLight1Color; // ポイントライト
-        }
-        return _LightColor0.rgb; // ディレクショナルライト
-    }
-
-    inline float calcAntiGlareLevel(float4 ls_vertex) {
-        return saturate(calcLightPower(ls_vertex) * 2 + (100 - _GL_Level) * 0.01);
-    }
-    #define SET_ANTIGLARE_LEVEL(ls_vertex, out) out = calcAntiGlareLevel(ls_vertex)
-
-    inline void affectAntiGlare(float glLevel, inout float4 color) {
-        color.rgb = saturate(color.rgb * glLevel);
-    }
 
     ////////////////////////////
     // Highlight and Shadow Matcap

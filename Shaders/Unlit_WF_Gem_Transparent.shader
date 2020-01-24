@@ -110,8 +110,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -139,8 +137,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG

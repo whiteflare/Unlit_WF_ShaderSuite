@@ -256,8 +256,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -303,8 +301,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG

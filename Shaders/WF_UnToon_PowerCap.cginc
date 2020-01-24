@@ -23,7 +23,6 @@
      *      ver:2019/11/24 whiteflare,
      */
 
-    #include "WF_Common.cginc"
     #include "WF_UnToon.cginc"
 
     ////////////////////////////
