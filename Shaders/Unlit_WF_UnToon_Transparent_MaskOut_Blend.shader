@@ -212,7 +212,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+1"
-            "DisableBatching" = "True"
         }
 
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"

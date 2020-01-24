@@ -196,7 +196,6 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
-            "DisableBatching" = "True"
         }
 
         Pass {

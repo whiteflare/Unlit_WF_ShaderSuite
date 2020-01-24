@@ -85,7 +85,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "DisableBatching" = "True"
         }
 
         Pass {

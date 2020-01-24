@@ -207,7 +207,6 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "DisableBatching" = "True"
         }
 
         Pass {

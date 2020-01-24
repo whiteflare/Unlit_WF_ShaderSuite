@@ -204,7 +204,6 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
-            "DisableBatching" = "True"
         }
 
         Pass {
