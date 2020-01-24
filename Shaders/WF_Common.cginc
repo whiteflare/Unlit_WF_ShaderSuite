@@ -70,6 +70,10 @@
     #define ZERO_VEC3                               float3(0, 0, 0)
     #define ONE_VEC3                                float3(1, 1, 1)
 
+    #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
+        #define _LMAP_ENABLE
+    #endif
+
     inline float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
         if (lenSq < 0.0001) {

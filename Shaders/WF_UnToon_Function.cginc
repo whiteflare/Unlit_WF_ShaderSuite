@@ -23,11 +23,6 @@
      *      ver:2019/11/24 whiteflare,
      */
 
-    #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
-        #define _LMAP_ENABLE
-    #endif
-
-
     ////////////////////////////
     // Anti Glare & Light Configuration
     ////////////////////////////
