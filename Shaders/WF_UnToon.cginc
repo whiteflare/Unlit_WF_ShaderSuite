@@ -56,9 +56,6 @@
     #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
         #define _LMAP_ENABLE
     #endif
-    #if defined(_WF_MOBILE) && !defined(_LMAP_ENABLE)
-        #undef _AO_ENABLE
-    #endif
 
     ////////////////////////////
     // main structure
