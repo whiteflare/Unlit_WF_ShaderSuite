@@ -120,6 +120,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
             ENDCG
         }
+
+        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture/META"
     }
 
     FallBack "Unlit/Transparent"

@@ -248,6 +248,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture" {
 
         UsePass "UnlitWF/WF_UnToon_Texture/MAIN"
         UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Texture"

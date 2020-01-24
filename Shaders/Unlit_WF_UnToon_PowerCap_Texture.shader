@@ -259,6 +259,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
         }
 
         UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Texture"

@@ -276,6 +276,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_FRONT"
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Transparent"

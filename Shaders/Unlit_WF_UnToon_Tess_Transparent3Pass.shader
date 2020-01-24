@@ -349,6 +349,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/EMISSIVE_SCROLL"
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Transparent"

@@ -255,6 +255,24 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
             ENDCG
         }
+
+        Pass {
+            Name "META"
+            Tags { "LightMode" = "Meta" }
+
+            Cull Off
+
+            CGPROGRAM
+
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta
+
+            #pragma shader_feature EDITOR_VISUALIZATION
+
+            #include "WF_UnToon_Meta.cginc"
+
+            ENDCG
+        }
     }
 
     FallBack "Unlit/Texture"

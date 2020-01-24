@@ -303,6 +303,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
             ENDCG
         }
+
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Transparent Cutout"

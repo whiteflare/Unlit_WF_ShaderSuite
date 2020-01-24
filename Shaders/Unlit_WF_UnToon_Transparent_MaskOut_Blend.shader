@@ -315,6 +315,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
         }
 
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Transparent"

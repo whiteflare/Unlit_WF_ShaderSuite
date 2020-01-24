@@ -293,6 +293,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
         }
 
         UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Texture"

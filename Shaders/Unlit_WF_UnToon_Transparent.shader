@@ -308,6 +308,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             ENDCG
         }
+
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Transparent"

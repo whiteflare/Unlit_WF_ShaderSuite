@@ -142,6 +142,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Metallic" {
 
             ENDCG
         }
+
+        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture/META"
     }
 
     FallBack "Unlit/Texture"

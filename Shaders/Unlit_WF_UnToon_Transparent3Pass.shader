@@ -361,6 +361,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         }
 
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
     FallBack "Unlit/Transparent"
