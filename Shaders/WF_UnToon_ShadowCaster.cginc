@@ -96,13 +96,13 @@
         // アルファ計算
         #ifdef _AL_ENABLE
             float4 color = tex2D(_MainTex, i.uv) * _Color;
-            affectAlpha(i.uv, color);
             #ifdef _AL_CUTOUT
                 if (color.a < _AL_CutOff) {
                     discard;
                     return float4(0, 0, 0, 0);
                 }
             #else
+                affectAlpha(i.uv, color);
                 if (color.a < 0.75) {
                     discard;
                     return float4(0, 0, 0, 0);
