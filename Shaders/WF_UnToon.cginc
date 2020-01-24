@@ -562,8 +562,6 @@
 #endif
         float       _AO_Contrast;
         float       _AO_Brightness;
-        DECL_SUB_TEX2D(_AO_MaskTex);
-        float       _AO_InvMaskVal;
 
         inline void affectOcclusion(v2f i, float2 uv_main, inout float4 color) {
             if (TGL_ON(_AO_Enable)) {

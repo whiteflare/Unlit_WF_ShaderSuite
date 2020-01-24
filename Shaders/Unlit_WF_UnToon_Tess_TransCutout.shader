@@ -208,10 +208,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
-        [NoScaleOffset]
-            _AO_MaskTex             ("[AO] Occlusion Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _AO_InvMaskVal          ("[AO] Invert Mask Value", Range(0, 1)) = 0
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
