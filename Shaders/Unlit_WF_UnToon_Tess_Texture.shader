@@ -169,7 +169,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
-            _EmissionColor          ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
+            _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,1)]

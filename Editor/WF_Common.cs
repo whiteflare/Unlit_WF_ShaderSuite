@@ -226,7 +226,8 @@ namespace UnlitWF
             { "[OL] Blend Power", "[OL] 混合の強度" },
             { "[OL] ScreenTone Mask Texture", "[OL] マスクテクスチャ" },
             // EmissiveScroll
-            { "[ES] Emissive Color", "[ES] Emissive色" },
+            { "[ES] Emission", "[ES] Emission" },
+            { "[ES] Blend Type", "[ES] 混合タイプ" },
             { "[ES] Mask Texture", "[ES] マスクテクスチャ" },
             { "[ES] Wave Type", "[ES] 波形" },
             { "[ES] Direction", "[ES] 方向" },

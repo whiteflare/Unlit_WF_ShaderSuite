@@ -422,8 +422,9 @@
         float       _ES_Speed;
         float       _ES_AlphaScroll;
 
-        inline float calcEmissiveWaving(float3 ls_vertex) {
-            float time = _Time.y * _ES_Speed - dot(ls_vertex, _ES_Direction.xyz);
+        inline float calcEmissiveWaving(float4 ls_vertex) {
+	        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+            float time = _Time.y * _ES_Speed - dot(ws_vertex, _ES_Direction.xyz);
             // 周期 2PI、値域 [-1, +1] の関数で光量を決める
             if (_ES_Shape == 0) {
                 // 励起波
