@@ -169,14 +169,18 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
-        [WFHeaderToggle(Emissive Scroll)]
+        [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
-            _ES_Color               ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
+            _EmissionColor               ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _ES_MaskTex             ("[ES] Mask Texture", 2D) = "white" {}
-        [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
-            _ES_Shape               ("[ES] Wave Type", Float) = 0
+            _EmissionMap             ("[ES] Mask Texture", 2D) = "white" {}
+        [Enum(ADD,0,ALPHA,1)]
+        	_ES_BlendType			("[ES] Blend Type", Float) = 0
+
+        [Header(Emissive Scroll)]
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
+            _ES_Shape               ("[ES] Wave Type", Float) = 3
         [Toggle(_)]
             _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)

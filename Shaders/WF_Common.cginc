@@ -411,6 +411,10 @@
 
     #ifdef _ES_ENABLE
         float       _ES_Enable;
+        sampler2D   _EmissionMap;
+        float4      _EmissionColor;
+        float       _ES_BlendType;
+
         int         _ES_Shape;
         float4      _ES_Direction;
         float       _ES_LevelOffset;
@@ -418,49 +422,48 @@
         float       _ES_Speed;
         float       _ES_AlphaScroll;
 
-        inline float calcEmissivePower(float3 ls_vertex) {
+        inline float calcEmissiveWaving(float3 ls_vertex) {
             float time = _Time.y * _ES_Speed - dot(ls_vertex, _ES_Direction.xyz);
             // 周期 2PI、値域 [-1, +1] の関数で光量を決める
             if (_ES_Shape == 0) {
                 // 励起波
                 float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
-                float es_power = 8 * v * (1 - v) - 1;
-                return saturate(es_power + _ES_LevelOffset);
+                float waving = 8 * v * (1 - v) - 1;
+                return saturate(waving + _ES_LevelOffset);
             }
             else if (_ES_Shape == 1) {
                 // のこぎり波
-                float es_power = 1 - 2 * frac(time * UNITY_INV_TWO_PI);
-                return saturate(es_power * _ES_Sharpness + _ES_LevelOffset);
+                float waving = 1 - 2 * frac(time * UNITY_INV_TWO_PI);
+                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
             }
             else if (_ES_Shape == 2) {
                 // 正弦波
-                float es_power = sin( time );
-                return saturate(es_power * _ES_Sharpness + _ES_LevelOffset);
+                float waving = sin( time );
+                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
             }
             else {
                 // 定数
-                float es_power = 1;
-                return saturate(es_power + _ES_LevelOffset);
+                float waving = 1;
+                return saturate(waving + _ES_LevelOffset);
             }
         }
 
-        sampler2D   _ES_MaskTex;
-        float4      _ES_Color;
-
         inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
-                float es_power = calcEmissivePower(ls_vertex);
-                float3 es_color = tex2D(_ES_MaskTex, mask_uv).rgb;
+                float waving    = calcEmissiveWaving(ls_vertex);
+                float3 es_mask  = tex2D(_EmissionMap, mask_uv).rgb;
+                float es_power  = MAX_RGB(es_mask);
+                float3 es_color = _EmissionColor.rgb * es_mask.rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
 
                 color.rgb = lerp(color.rgb,
-                    color.rgb * (1 - es_power) + es_power * _ES_Color.rgb * es_color.rgb,
-                    MAX_RGB(es_color) );
+                    lerp(color.rgb, es_color, waving),
+                    es_power);
 
                 #ifdef _ES_FORCE_ALPHASCROLL
-                    color.a = max(color.a, es_power * _ES_Color.a * MAX_RGB(es_color));
+                    color.a = max(color.a, waving * _EmissionColor.a * es_power);
                 #else
                     if (TGL_ON(_ES_AlphaScroll)) {
-                        color.a = max(color.a, es_power * _ES_Color.a * MAX_RGB(es_color));
+                        color.a = max(color.a, waving * _EmissionColor.a * es_power);
                     }
                 #endif
             }

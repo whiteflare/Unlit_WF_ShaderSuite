@@ -36,6 +36,8 @@ namespace UnlitWF
             { "_MT_BlendType", "_MT_Brightness" },
             { "_MT_Smoothness", "_MT_ReflSmooth" },
             { "_MT_Smoothness2", "_MT_SpecSmooth" },
+            { "_ES_MaskTex", "_EmissionMap" },
+            { "_ES_Color", "_EmissionColor" },
         };
 
         /// <summary>
@@ -46,6 +48,7 @@ namespace UnlitWF
             { "_TS_1stColor", "_TS_1stTex" },
             { "_TS_2ndColor", "_TS_2ndTex" },
             { "_ES_Color", "_ES_MaskTex" },
+            { "_EmissionColor", "_EmissionMap" },
         };
 
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
