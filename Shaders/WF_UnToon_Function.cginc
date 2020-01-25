@@ -429,10 +429,10 @@
             return max(ZERO_VEC3, specular);
         }
 
-        inline void affectMetallic(v2f i, float3 ws_vertex, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
+        inline void affectMetallic(v2f i, float3 ws_vertex, float2 uv_main, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
                 float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
-                float2 metallicSmoothness = SAMPLE_MASK_VALUE(_MetallicGlossMap, i.uv, _MT_InvMaskVal).ra;
+                float2 metallicSmoothness = SAMPLE_MASK_VALUE(_MetallicGlossMap, uv_main, _MT_InvMaskVal).ra;
                 float metallic = _MT_Metallic * metallicSmoothness.x;
                 if (0.01 < metallic) {
                     // リフレクション
@@ -456,7 +456,7 @@
             }
         }
     #else
-        #define affectMetallic(i, ws_vertex, ls_normal, ls_bump_normal, color)
+        #define affectMetallic(i, ws_vertex, uv_main, ls_normal, ls_bump_normal, color)
     #endif
 
     ////////////////////////////
@@ -473,13 +473,13 @@
         DECL_SUB_TEX2D(_HL_MaskTex);
         float       _HL_InvMaskVal;
 
-        inline void affectMatcapColor(float2 matcapVector, float2 mask_uv, inout float4 color) {
+        inline void affectMatcapColor(float2 matcapVector, float2 uv_main, inout float4 color) {
             if (TGL_ON(_HL_Enable)) {
                 // matcap サンプリング
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
                 float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
                 // マスク参照
-                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex, mask_uv, _HL_InvMaskVal).rgb;
+                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex, uv_main, _HL_InvMaskVal).rgb;
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
@@ -500,7 +500,7 @@
             }
         }
     #else
-        #define affectMatcapColor(matcapVector, mask_uv, color)
+        #define affectMatcapColor(matcapVector, uv_main, color)
     #endif
 
     ////////////////////////////
@@ -548,9 +548,9 @@
             }
         }
 
-        inline void affectToonShade(v2f i, float3 ls_normal, float3 ls_bump_normal, float angle_light_camera, inout float4 color) {
+        inline void affectToonShade(v2f i, float2 uv_main, float3 ls_normal, float3 ls_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
-                float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, i.uv, _TS_InvMaskVal).r;
+                float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, uv_main, _TS_InvMaskVal).r;
                 float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
                 // ビュー相対位置シフト
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
@@ -575,7 +575,7 @@
         }
     #else
         #define calcToonShadeContrast(ws_vertex, ls_light_dir, ambientColor, shadow_power)
-        #define affectToonShade(i, ls_normal, ls_bump_normal, angle_light_camera, color)
+        #define affectToonShade(i, uv_main, ls_normal, ls_bump_normal, angle_light_camera, color)
     #endif
 
     ////////////////////////////
@@ -592,7 +592,7 @@
         DECL_SUB_TEX2D(_TR_MaskTex);
         float       _TR_InvMaskVal;
 
-        inline void affectRimLight(v2f i, float3 vs_normal, float angle_light_camera, inout float4 color) {
+        inline void affectRimLight(v2f i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TR_Enable)) {
                 // vs_normalからリムライト範囲を計算
                 float2 rim_uv = vs_normal.xy;
@@ -600,14 +600,14 @@
                 rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
                 rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
                 // 順光の場合はリムライトを暗くする
-                float3 rimPower = saturate(0.8 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, i.uv, _TR_InvMaskVal).rgb;
+                float3 rimPower = saturate(0.8 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, uv_main, _TR_InvMaskVal).rgb;
                 // 色計算
                 float3 rimColor = _TR_Color.rgb - (TGL_OFF(_TR_BlendType) ? MEDIAN_GRAY : color.rgb);
                 color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, smoothstep(1, 1.05, length(rim_uv)) );
             }
         }
     #else
-        #define affectRimLight(i, vs_normal, angle_light_camera, color)
+        #define affectRimLight(i, uv_main, vs_normal, angle_light_camera, color)
     #endif
 
     ////////////////////////////
@@ -699,7 +699,7 @@
             if (TGL_ON(_AO_Enable)) {
                 float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
-                occlusion *= SAMPLE_MASK_VALUE(_OcclusionMap, i.uv, 0).rgb;
+                occlusion *= SAMPLE_MASK_VALUE(_OcclusionMap, uv_main, 0).rgb;
 #endif
                 #ifdef _LMAP_ENABLE
                 if (TGL_ON(_AO_UseLightMap)) {

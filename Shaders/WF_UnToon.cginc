@@ -143,13 +143,13 @@
         float angle_light_camera = calcAngleLightCamera(i);
 
         // メタリック
-        affectMetallic(i, ws_vertex, ls_normal, ls_bump_normal, color);
+        affectMetallic(i, ws_vertex, uv_main, ls_normal, ls_bump_normal, color);
         // Highlight
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), uv_main, color);
         // 階調影
-        affectToonShade(i, ls_normal, ls_bump_normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, ls_normal, ls_bump_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, vs_normal, angle_light_camera, color);
+        affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
         // ScreenTone
         affectOverlayTexture(ws_vertex, uv_main, color);
         // Outline

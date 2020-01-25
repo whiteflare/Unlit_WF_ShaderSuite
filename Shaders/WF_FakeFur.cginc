@@ -160,7 +160,8 @@
         i.light_color = calcLightColorVertex(ws_vertex, ambientColor);
 
         // メイン
-        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
+        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
 
         // 色変換
         affectColorChange(color);
@@ -168,17 +169,17 @@
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
         // 階調影
-        affectToonShade(i, i.normal, i.normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlpha(i.uv, color);
+        affectAlpha(uv_main, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
-        float4 maskTex = tex2D(_FurMaskTex, i.uv);
+        float4 maskTex = tex2D(_FurMaskTex, uv_main);
         if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
             discard;
         }
