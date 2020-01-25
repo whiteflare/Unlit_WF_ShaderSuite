@@ -47,7 +47,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [WFHeader(Gem Reflection)]
         [NoScaleOffset]
             _MT_Cubemap             ("[GM] CubeMap", Cube) = "" {}
-            _MT_Brightness           ("[GM] Brightness", Range(0, 1)) = 0.2
+            _MT_Brightness          ("[GM] Brightness", Range(0, 1)) = 0.2
         [Toggle(_)]
             _MT_Monochrome          ("[GM] Monochrome Reflection", Range(0, 1)) = 1
 
@@ -75,7 +75,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 2
         [HideInInspector]
         [FixNoTexture]
-            _MetallicGlossMap             ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MetallicGlossMap       ("[MT] MetallicMap Texture", 2D) = "white" {}
         [HideInInspector]
         [FixFloat(0.0)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0

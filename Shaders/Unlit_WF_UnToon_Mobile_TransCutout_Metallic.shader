@@ -42,7 +42,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-            _Cutoff              	("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -59,18 +59,18 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic" {
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
             _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.95
-            _MT_Brightness           ("[MT] Brightness", Range(0, 1)) = 0.2
+            _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [Toggle(_)]
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [NoScaleOffset]
-            _MetallicGlossMap             ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MetallicGlossMap       ("[MT] MetallicMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
-            _MT_SpecSmooth         ("[MT] Smoothness", Range(0, 1)) = 0.8
+            _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
 
         // 階調影
         [WFHeaderToggle(ToonShade)]

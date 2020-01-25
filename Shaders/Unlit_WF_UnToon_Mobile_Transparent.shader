@@ -97,11 +97,11 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
-            _EmissionColor               ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
+            _EmissionColor          ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _EmissionMap             ("[ES] Mask Texture", 2D) = "white" {}
+            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,1)]
-        	_ES_BlendType			("[ES] Blend Type", Float) = 0
+            _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]

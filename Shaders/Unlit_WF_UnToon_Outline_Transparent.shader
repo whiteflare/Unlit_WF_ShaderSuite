@@ -81,18 +81,18 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
             _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.95
-            _MT_Brightness           ("[MT] Brightness", Range(0, 1)) = 0.2
+            _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [Toggle(_)]
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [NoScaleOffset]
-            _MetallicGlossMap             ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MetallicGlossMap       ("[MT] MetallicMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
-            _MT_SpecSmooth         ("[MT] Smoothness", Range(0, 1)) = 0.8
+            _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
 
         [Header(Metallic Secondary)]
         [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
@@ -168,11 +168,11 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
-            _EmissionColor               ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
+            _EmissionColor          ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _EmissionMap             ("[ES] Mask Texture", 2D) = "white" {}
+            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,1)]
-        	_ES_BlendType			("[ES] Blend Type", Float) = 0
+            _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
