@@ -27,15 +27,34 @@ namespace UnlitWF
 {
     public class ShaderCustomEditor : ShaderGUI
     {
+        /// <summary>
+        /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
+        /// </summary>
+        private readonly Dictionary<string, string> MIGRATION_PROP_RENAME = new Dictionary<string, string>() {
+        };
+
+        /// <summary>
+        /// テクスチャとカラーを1行で表示するやつのプロパティ名辞書
+        /// </summary>
+        private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
+            { "_TS_BaseColor", "_TS_BaseTex" },
+            { "_TS_1stColor", "_TS_1stTex" },
+            { "_TS_2ndColor", "_TS_2ndTex" },
+            { "_ES_Color", "_ES_MaskTex" },
+        };
+
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
             materialEditor.SetDefaultGUIWidths();
 
             Material mat = materialEditor.target as Material;
             if (mat != null) {
+                // シェーダ名の表示
                 var rect = EditorGUILayout.GetControlRect();
                 rect.y += 2;
                 GUI.Label(rect, "Current Shader", EditorStyles.boldLabel);
                 GUILayout.Label(new Regex(@".*/").Replace(mat.shader.name, ""));
+                // マイグレーションHelpBox
+                MigrationHelpBox(materialEditor, mat);
             }
 
             // 現在無効なラベルを保持するリスト
@@ -114,6 +133,34 @@ namespace UnlitWF
             }
         }
 
+        private void MigrationHelpBox(MaterialEditor materialEditor, Material mat) {
+            var so = new SerializedObject(mat);
+            so.Update();
+            var props = ShaderPropertyView.ToPropertyList(so);
+
+            var oldPropList = new List<ShaderPropertyView>();
+            foreach (var prop in props) {
+                if (MIGRATION_PROP_RENAME.ContainsKey(prop.name)) {
+                    oldPropList.Add(prop);
+                }
+            }
+            if (oldPropList.Count <= 0) {
+                return;
+            }
+            var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
+                "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
+                "This Material may have been created in an older version. Convert to new version?";
+            if (materialEditor.HelpBoxWithButton(
+                                new GUIContent(tex),
+                                new GUIContent("Fix Now"))) {
+                foreach (var prop in oldPropList) {
+                    prop.Rename(MIGRATION_PROP_RENAME[prop.name]);
+                }
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(mat);
+            }
+        }
+
         private void SuggestShadowColor(object[] targets) {
             foreach (object obj in targets) {
                 Material m = obj as Material;
@@ -149,13 +196,6 @@ namespace UnlitWF
             }
             return hur;
         }
-
-        private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
-            { "_TS_BaseColor", "_TS_BaseTex" },
-            { "_TS_1stColor", "_TS_1stTex" },
-            { "_TS_2ndColor", "_TS_2ndTex" },
-            { "_ES_Color", "_ES_MaskTex" },
-        };
 
         public static void DrawShurikenStyleHeader(Rect position, string text, MaterialProperty prop) {
             // SurikenStyleHeader

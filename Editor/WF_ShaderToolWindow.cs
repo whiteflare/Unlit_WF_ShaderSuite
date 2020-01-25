@@ -204,8 +204,8 @@ namespace UnlitWF
         #region コピー系
 
         private void CopyProperties(SerializedProperty src, SerializedProperty dst, List<string> prefix) {
-            var dst_list = ToPropertyList(dst);
-            foreach (var src_prop in ToPropertyList(src)) {
+            var dst_list = ShaderPropertyView.ToPropertyList(dst);
+            foreach (var src_prop in ShaderPropertyView.ToPropertyList(src)) {
                 string label, name;
                 WFCommonUtility.FormatPropName(src_prop.name, out label, out name);
                 if (label != null && prefix.Contains(label)) {
@@ -273,7 +273,7 @@ namespace UnlitWF
 
         private void DeleteProperties(SerializedProperty prop, Predicate<ShaderPropertyView> pred) {
             var delNames = new List<string>();
-            var list = ToPropertyList(prop);
+            var list = ShaderPropertyView.ToPropertyList(prop);
             for (int i = list.Count - 1; 0 <= i; i--) {
                 if (pred(list[i])) {    // 条件に合致したら削除
                     delNames.Add(list[i].name);
@@ -311,7 +311,7 @@ namespace UnlitWF
                 var delPrefix = new List<string>();
                 {
                     var prop = saved.FindPropertyRelative("m_Floats");
-                    foreach (var p in ToPropertyList(prop)) {
+                    foreach (var p in ShaderPropertyView.ToPropertyList(prop)) {
                         string label, name;
                         WFCommonUtility.FormatPropName(p.name, out label, out name);
                         if (label != null && name.ToLower() == "enable" && p.value.floatValue == 0) {
@@ -381,68 +381,6 @@ namespace UnlitWF
         }
 
         #endregion
-
-        public static List<ShaderPropertyView> ToPropertyList(SerializedProperty prop) {
-            var list = new List<ShaderPropertyView>();
-            for (int i = 0; i < prop.arraySize; i++) {
-                list.Add(new ShaderPropertyView(prop.GetArrayElementAtIndex(i)));
-            }
-            return list;
-        }
-
-        public class ShaderPropertyView
-        {
-            public readonly SerializedProperty property;
-
-            public ShaderPropertyView(SerializedProperty property) {
-                this.property = property;
-            }
-
-            public String name { get { return property.FindPropertyRelative("first").stringValue; } }
-
-            public SerializedProperty value { get { return property.FindPropertyRelative("second"); } }
-
-            public void CopyTo(ShaderPropertyView other) {
-                var src_value = this.value;
-                var dst_value = other.value;
-                switch (src_value.propertyType) {
-                    case SerializedPropertyType.Float:
-                        dst_value.floatValue = src_value.floatValue;
-                        break;
-                    case SerializedPropertyType.Color:
-                        dst_value.colorValue = src_value.colorValue;
-                        break;
-                    case SerializedPropertyType.ObjectReference:
-                        dst_value.objectReferenceValue = src_value.objectReferenceValue;
-                        break;
-
-                    case SerializedPropertyType.Integer:
-                        dst_value.intValue = src_value.intValue;
-                        break;
-                    case SerializedPropertyType.Boolean:
-                        dst_value.boolValue = src_value.boolValue;
-                        break;
-                    case SerializedPropertyType.Enum:
-                        dst_value.enumValueIndex = src_value.enumValueIndex;
-                        break;
-                    case SerializedPropertyType.Vector2:
-                        dst_value.vector2Value = src_value.vector2Value;
-                        break;
-                    case SerializedPropertyType.Vector3:
-                        dst_value.vector3Value = src_value.vector3Value;
-                        break;
-                    case SerializedPropertyType.Vector4:
-                        dst_value.vector4Value = src_value.vector4Value;
-                        break;
-                    case SerializedPropertyType.Vector2Int:
-                        dst_value.vector2IntValue = src_value.vector2IntValue;
-                        break;
-                    case SerializedPropertyType.Vector3Int:
-                        dst_value.vector3IntValue = src_value.vector3IntValue;
-                        break;
-                }
-            }
-        }
     }
 }
 
