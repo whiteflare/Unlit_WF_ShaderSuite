@@ -42,7 +42,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-            _AL_CutOff              ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+            _Cutoff              	("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
 
         // 色変換
         [WFHeaderToggle(Color Change)]

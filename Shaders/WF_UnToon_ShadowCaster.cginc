@@ -36,7 +36,7 @@
     sampler2D       _MainTex;
     float4          _MainTex_ST;
     float4          _Color;
-    float           _AL_CutOff;
+    float           _Cutoff;
 
     #ifdef _AL_ENABLE
         int             _AL_Source;
@@ -97,7 +97,7 @@
         #ifdef _AL_ENABLE
             float4 color = tex2D(_MainTex, i.uv) * _Color;
             #ifdef _AL_CUTOUT
-                if (color.a < _AL_CutOff) {
+                if (color.a < _Cutoff) {
                     discard;
                     return float4(0, 0, 0, 0);
                 }

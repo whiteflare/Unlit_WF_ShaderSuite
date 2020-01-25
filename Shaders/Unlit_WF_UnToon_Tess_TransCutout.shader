@@ -42,7 +42,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-            _AL_CutOff              ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+            _Cutoff              	("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
 
         // Tessellation
         [WFHeader(Tessellation)]

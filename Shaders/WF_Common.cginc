@@ -239,7 +239,7 @@
     // Alpha Transparent
     ////////////////////////////
 
-    float           _AL_CutOff;
+    float           _Cutoff;
 
     #ifdef _AL_ENABLE
         int             _AL_Source;
@@ -267,19 +267,19 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _AL_CutOff) {
+                if (baseAlpha < _Cutoff) {
                     discard;
                 } else {
                     color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _AL_CutOff) {
+                if (baseAlpha < _Cutoff) {
                     discard;
                 } else {
                     baseAlpha *= _AL_Power * _AL_CustomValue;
                 }
             #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _AL_CutOff) {
+                if (baseAlpha < _Cutoff) {
                     baseAlpha *= _AL_Power * _AL_CustomValue;
                 } else {
                     discard;
@@ -295,19 +295,19 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _AL_CutOff) {
+                if (baseAlpha < _Cutoff) {
                     discard;
                 } else {
                     color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _AL_CutOff) {
+                if (baseAlpha < _Cutoff) {
                     discard;
                 } else {
                     baseAlpha *= _AL_Power * _AL_CustomValue;
                 }
             #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _AL_CutOff) {
+                if (baseAlpha < _Cutoff) {
                     baseAlpha *= _AL_Power * _AL_CustomValue;
                 } else {
                     discard;

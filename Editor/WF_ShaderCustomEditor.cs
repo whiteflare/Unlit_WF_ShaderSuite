@@ -31,6 +31,7 @@ namespace UnlitWF
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
         private readonly Dictionary<string, string> MIGRATION_PROP_RENAME = new Dictionary<string, string>() {
+            { "_AL_CutOff", "_Cutoff" }
         };
 
         /// <summary>
@@ -134,6 +135,11 @@ namespace UnlitWF
         }
 
         private void MigrationHelpBox(MaterialEditor materialEditor, Material mat) {
+            if (mat.shader.name.Contains("MatcapShadows")) {
+                // MatcapShadowsは古いので対象にしない
+                return;
+            }
+
             var so = new SerializedObject(mat);
             so.Update();
             var props = ShaderPropertyView.ToPropertyList(so);
