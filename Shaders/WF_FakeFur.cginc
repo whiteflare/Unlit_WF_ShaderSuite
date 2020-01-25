@@ -148,7 +148,7 @@
         i.uv = gi.uv;
         i.ls_vertex = gi.ls_vertex;
         i.normal = gi.normal;
-        i.ls_light_dir = calcLocalSpaceLightDir( mul(unity_ObjectToWorld, float4(0, 0, 0, gi.ls_vertex.w)) );
+        i.ls_light_dir = calcLocalSpaceLightDir(gi.ls_vertex);
 
         float4 ws_vertex = mul(unity_ObjectToWorld, i.ls_vertex);
 

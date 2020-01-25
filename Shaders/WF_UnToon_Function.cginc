@@ -153,7 +153,13 @@
         }
     }
 
-    inline float4 calcLocalSpaceLightDir(float3 ws_vertex) {
+    inline float4 calcWorldSpaceBasePos(float4 ls_vertex) {
+        // この実装は Batching で問題となる、ので問題となる実装を 1 箇所に集約
+        return mul(unity_ObjectToWorld, float4(0, 0, 0, ls_vertex.w));
+    }
+
+    inline float4 calcLocalSpaceLightDir(float4 ls_vertex) {
+        float3 ws_vertex = calcWorldSpaceBasePos(ls_vertex);
         uint mode = _GL_LightMode;
         if (mode == LIT_MODE_AUTO) {
             mode = calcAutoSelectMainLight(ws_vertex);
@@ -213,8 +219,7 @@
         }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
-        float3 ws_zero_position = mul(unity_ObjectToWorld, float4(0, 0, 0, i.ls_vertex.w));
-        float2 xz_camera_pos = worldSpaceCameraPos().xz - ws_zero_position.xz;
+        float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(i.ls_vertex).xz;
         float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
             * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         return angle_light_camera;

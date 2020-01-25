@@ -90,7 +90,7 @@
         o.vs_vertex = UnityWorldToClipPos(ws_vertex);
         o.uv = v.uv;
         o.ls_vertex = v.vertex;
-        o.ls_light_dir = calcLocalSpaceLightDir( mul(unity_ObjectToWorld, float4(0, 0, 0, v.vertex.w)) );
+        o.ls_light_dir = calcLocalSpaceLightDir(v.vertex);
         #ifdef _LMAP_ENABLE
             o.uv_lmap = v.uv_lmap;
         #endif
@@ -305,7 +305,7 @@
     float4 shiftEmissiveScrollVertex(inout v2f o) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
-            float3 ws_vertex = mul(unity_ObjectToWorld, float4(o.ls_vertex.xyz, 1));
+            float3 ws_vertex = mul(unity_ObjectToWorld, o.ls_vertex);
             return shiftDepthVertex(ws_vertex, _ES_Z_Shift);
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
@@ -360,7 +360,7 @@
         // 通常の vert を使う
         v2f o = vert(v);
         // SV_POSITION を上書き
-        float3 ws_vertex = mul(unity_ObjectToWorld, float4(o.ls_vertex.xyz, 1));
+        float3 ws_vertex = mul(unity_ObjectToWorld, o.ls_vertex);
         o.vs_vertex = shiftDepthVertex(ws_vertex, _AL_Z_Offset);
 
         return o;
