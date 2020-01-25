@@ -32,7 +32,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BrendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
 
         // Alpha
         [WFHeader(Transparent Alpha)]

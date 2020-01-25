@@ -38,6 +38,7 @@ namespace UnlitWF
             { "_MT_Smoothness2", "_MT_SpecSmooth" },
             { "_ES_MaskTex", "_EmissionMap" },
             { "_ES_Color", "_EmissionColor" },
+            { "_GL_BrendPower", "_GL_BlendPower" },
         };
 
         /// <summary>

@@ -34,7 +34,7 @@
     #define LIT_MODE_CUSTOM_LOCALSPACE  4
 
     int             _GL_Level;
-    float           _GL_BrendPower;
+    float           _GL_BlendPower;
     uint            _GL_LightMode;
     float           _GL_CustomAzimuth;
     float           _GL_CustomAltitude;
@@ -124,7 +124,7 @@
             );
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
         float power = AVE_RGB(color);                                       // 明度
-        color = lerp( power.xxx, color, _GL_BrendPower);                    // 色の混合
+        color = lerp( power.xxx, color, _GL_BlendPower);                    // 色の混合
         color = saturate( color / AVE_RGB(color) );                         // 正規化
         color = color * saturate( power * 2 + (100 - _GL_Level) * 0.01 );   // アンチグレア
         return color;
@@ -534,7 +534,7 @@
                     occlusion *= pickLightmap(i.uv_lmap);
                 }
                 #endif
-                occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BrendPower); // 色の混合
+                occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BlendPower); // 色の混合
                 occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
                 color.rgb *= max(ZERO_VEC3, occlusion.rgb);
             }
