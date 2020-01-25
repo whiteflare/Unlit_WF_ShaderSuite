@@ -81,19 +81,19 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
         [WFHeaderToggle(Metallic)]
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
-            _MT_Smoothness          ("[MT] Smoothness", Range(0, 1)) = 0.95
-            _MT_BlendType           ("[MT] Brightness", Range(0, 1)) = 0.2
+            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.95
+            _MT_Brightness           ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [Toggle(_)]
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [NoScaleOffset]
-            _MT_MaskTex             ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MetallicGlossMap             ("[MT] MetallicMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
-            _MT_Smoothness2         ("[MT] Smoothness", Range(0, 1)) = 0.8
+            _MT_SpecSmooth         ("[MT] Smoothness", Range(0, 1)) = 0.8
 
         [Header(Metallic Secondary)]
         [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]

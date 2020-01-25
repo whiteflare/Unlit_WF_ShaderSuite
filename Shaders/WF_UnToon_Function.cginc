@@ -210,13 +210,13 @@
     #ifdef _MT_ENABLE
         float       _MT_Enable;
         float       _MT_Metallic;
-        float       _MT_Smoothness;
+        float       _MT_ReflSmooth;
         float       _MT_BlendNormal;
-        float       _MT_BlendType;
+        float       _MT_Brightness;
         float       _MT_Monochrome;
         float       _MT_Specular;
-        float       _MT_Smoothness2;
-        DECL_SUB_TEX2D(_MT_MaskTex);
+        float       _MT_SpecSmooth;
+        DECL_SUB_TEX2D(_MetallicGlossMap);
         float       _MT_InvMaskVal;
 #ifndef _WF_MOBILE
         int         _MT_CubemapType;
@@ -259,11 +259,11 @@
         inline void affectMetallic(v2f i, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
                 float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
-                float2 metallicSmoothness = SAMPLE_MASK_VALUE(_MT_MaskTex, i.uv, _MT_InvMaskVal).ra;
+                float2 metallicSmoothness = SAMPLE_MASK_VALUE(_MetallicGlossMap, i.uv, _MT_InvMaskVal).ra;
                 float metallic = _MT_Metallic * metallicSmoothness.x;
                 if (0.01 < metallic) {
                     // リフレクション
-                    float3 reflection = pickReflection(i.ls_vertex, ls_metal_normal, metallicSmoothness.y * _MT_Smoothness);
+                    float3 reflection = pickReflection(i.ls_vertex, ls_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
                     if (TGL_ON(_MT_Monochrome)) {
                         reflection = calcBrightness(reflection);
                     }
@@ -271,13 +271,13 @@
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(i.ls_vertex, ls_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_Smoothness2);
+                        specular = pickSpecular(i.ls_vertex, ls_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
                     }
 
                     // 合成
                     color.rgb = lerp(
                         color.rgb,
-                        lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_BlendType) + specular.rgb * _MT_Specular,
+                        lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_Brightness) + specular.rgb * _MT_Specular,
                         metallic);
                 }
             }

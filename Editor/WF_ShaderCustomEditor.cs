@@ -31,7 +31,11 @@ namespace UnlitWF
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
         private readonly Dictionary<string, string> MIGRATION_PROP_RENAME = new Dictionary<string, string>() {
-            { "_AL_CutOff", "_Cutoff" }
+            { "_AL_CutOff", "_Cutoff" },
+            { "_MT_MaskTex", "_MetallicGlossMap" },
+            { "_MT_BlendType", "_MT_Brightness" },
+            { "_MT_Smoothness", "_MT_ReflSmooth" },
+            { "_MT_Smoothness2", "_MT_SpecSmooth" },
         };
 
         /// <summary>
@@ -91,6 +95,7 @@ namespace UnlitWF
                 // 描画
                 GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
                 if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
+                    // テクスチャとカラーを1行で表示するものにマッチした場合
                     MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties, false);
                     if (propTex != null) {
                         materialEditor.TexturePropertySingleLine(guiContent, propTex, prop);
