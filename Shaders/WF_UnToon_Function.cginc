@@ -79,7 +79,7 @@
             color.a = baseAlpha;
         }
 
-        inline void affectAlphaWithFresnel(float2 uv, float3 normal, float3 viewdir, inout float4 color) {
+        inline void affectAlphaWithFresnel(float2 uv, float3 ls_normal, float3 ls_viewdir, inout float4 color) {
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
@@ -110,13 +110,13 @@
             #else
                 // フレネルアルファ
                 float maxValue = max( pickAlpha(uv, color.a) * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
-                float fa = 1 - abs( dot( SafeNormalizeVec3(normal), SafeNormalizeVec3(viewdir) ) );
+                float fa = 1 - abs( dot( SafeNormalizeVec3(ls_normal), SafeNormalizeVec3(ls_viewdir) ) );
                 color.a = lerp( baseAlpha, maxValue, fa * fa * fa * fa );
             #endif
         }
     #else
-        #define affectAlpha(uv, color)                              color.a = 1.0
-        #define affectAlphaWithFresnel(uv, normal, viewdir, color)  color.a = 1.0
+        #define affectAlpha(uv, color)                                      color.a = 1.0
+        #define affectAlphaWithFresnel(uv, ls_normal, ls_viewdir, color)    color.a = 1.0
     #endif
 
     ////////////////////////////
@@ -153,9 +153,7 @@
         }
     }
 
-    inline float4 calcLocalSpaceLightDir(float4 ls_vertex) {
-        float3 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
-
+    inline float4 calcLocalSpaceLightDir(float3 ws_vertex) {
         uint mode = _GL_LightMode;
         if (mode == LIT_MODE_AUTO) {
             mode = calcAutoSelectMainLight(ws_vertex);
@@ -175,25 +173,19 @@
         return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
     }
 
-    inline float3 calcLocalSpaceLightColor(float4 ls_vertex, float lightType) {
+    inline float3 calcLocalSpaceLightColor(float3 ws_vertex, float lightType) {
         if ( TGL_ON(-lightType) ) {
-            float3 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
             float3 pointLight1Color = calcPointLight1Color(ws_vertex);
             return pointLight1Color; // ポイントライト
         }
         return _LightColor0.rgb; // ディレクショナルライト
     }
 
-    inline float calcAntiGlareLevel(float4 ls_vertex) {
-        return saturate(calcLightPower(ls_vertex) * 2 + (100 - _GL_Level) * 0.01);
-    }
-    #define SET_ANTIGLARE_LEVEL(ls_vertex, out) out = calcAntiGlareLevel(ls_vertex)
-
     inline void affectAntiGlare(float glLevel, inout float4 color) {
         color.rgb = saturate(color.rgb * glLevel);
     }
 
-    inline float3 calcLightColorVertex(float4 ls_vertex, float3 ambientColor) {
+    inline float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
         float3 lightColorMain = _LightColor0.rgb;
         float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
                 unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
@@ -202,7 +194,7 @@
                 unity_LightColor[2].rgb,
                 unity_LightColor[3].rgb,
                 unity_4LightAtten0,
-                mul(unity_ObjectToWorld, ls_vertex)
+                ws_vertex
             );
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
         float power = AVE_RGB(color);                                       // 明度
@@ -216,14 +208,15 @@
         if (TGL_ON(_GL_DisableBackLit)) {
             return 0;
         }
+        if (isInMirror()) {
+            return 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
+        }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
-        float2 xz_camera_pos = worldSpaceCameraPos().xz - mul(unity_ObjectToWorld, float4(0, 0, 0, i.ls_vertex.w)).xz;
+        float3 ws_zero_position = mul(unity_ObjectToWorld, float4(0, 0, 0, i.ls_vertex.w));
+        float2 xz_camera_pos = worldSpaceCameraPos().xz - ws_zero_position.xz;
         float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
             * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
-        if (isInMirror()) {
-            angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
-        }
         return angle_light_camera;
     }
 
@@ -274,8 +267,7 @@
         float       _ES_Speed;
         float       _ES_AlphaScroll;
 
-        inline float calcEmissiveWaving(float4 ls_vertex) {
-	        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+        inline float calcEmissiveWaving(float3 ws_vertex) {
             float time = _Time.y * _ES_Speed - dot(ws_vertex, _ES_Direction.xyz);
             // 周期 2PI、値域 [-1, +1] の関数で光量を決める
             if (_ES_Shape == 0) {
@@ -301,9 +293,9 @@
             }
         }
 
-        inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
+        inline void affectEmissiveScroll(float3 ws_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
-                float waving    = calcEmissiveWaving(ls_vertex);
+                float waving    = calcEmissiveWaving(ws_vertex);
                 float3 es_mask  = tex2D(_EmissionMap, mask_uv).rgb;
                 float es_power  = MAX_RGB(es_mask);
                 float3 es_color = _EmissionColor.rgb * es_mask.rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
@@ -324,7 +316,7 @@
 
     #else
         // Dummy
-        #define affectEmissiveScroll(ls_vertex, mask_uv, color)
+        #define affectEmissiveScroll(ws_vertex, mask_uv, color)
     #endif
 
     ////////////////////////////
@@ -406,29 +398,28 @@
         float4      _MT_Cubemap_HDR;
 #endif
 
-        inline float3 pickReflection(float4 ls_vertex, float3 ls_metal_normal, float smoothness) {
+        inline float3 pickReflection(float3 ws_vertex, float3 ls_metal_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
 #ifndef _WF_MOBILE
             if (_MT_CubemapType == 1) {
                 // ADDITION
-                return pickReflectionProbe(ls_vertex, ls_metal_normal, metal_lod)
-                    + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ls_vertex, ls_metal_normal, metal_lod);
+                return pickReflectionProbe(ws_vertex, ls_metal_normal, metal_lod)
+                    + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ls_metal_normal, metal_lod);
             }
             if (_MT_CubemapType == 2) {
                 // ONLY_SECOND_MAP
-                return pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ls_vertex, ls_metal_normal, metal_lod);
+                return pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ls_metal_normal, metal_lod);
             }
 #endif
             // OFF
-            return pickReflectionProbe(ls_vertex, ls_metal_normal, metal_lod);
+            return pickReflectionProbe(ws_vertex, ls_metal_normal, metal_lod);
         }
 
-        inline float3 pickSpecular(float4 ls_vertex, float3 ls_metal_normal, float4 ls_light_dir, float3 spec_color, float smoothness) {
+        inline float3 pickSpecular(float3 ws_vertex, float3 ls_metal_normal, float4 ls_light_dir, float3 spec_color, float smoothness) {
             float roughness         = (1 - smoothness) * (1 - smoothness);
 
-            float4 ws_vertex        = mul(unity_ObjectToWorld, ls_vertex);
             float3 ws_normal        = UnityObjectToWorldNormal(ls_metal_normal);
-            float3 ws_camera_dir    = worldSpaceViewDir(ls_vertex);
+            float3 ws_camera_dir    = worldSpaceViewDir(ws_vertex);
 
             float3 ws_light_dir     = UnityObjectToWorldNormal(ls_light_dir);
             float3 halfVL           = normalize(ws_camera_dir + ws_light_dir);
@@ -438,14 +429,14 @@
             return max(ZERO_VEC3, specular);
         }
 
-        inline void affectMetallic(v2f i, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
+        inline void affectMetallic(v2f i, float3 ws_vertex, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
                 float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
                 float2 metallicSmoothness = SAMPLE_MASK_VALUE(_MetallicGlossMap, i.uv, _MT_InvMaskVal).ra;
                 float metallic = _MT_Metallic * metallicSmoothness.x;
                 if (0.01 < metallic) {
                     // リフレクション
-                    float3 reflection = pickReflection(i.ls_vertex, ls_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
+                    float3 reflection = pickReflection(ws_vertex, ls_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
                     if (TGL_ON(_MT_Monochrome)) {
                         reflection = calcBrightness(reflection);
                     }
@@ -453,7 +444,7 @@
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(i.ls_vertex, ls_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
+                        specular = pickSpecular(ws_vertex, ls_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
                     }
 
                     // 合成
@@ -465,7 +456,7 @@
             }
         }
     #else
-        #define affectMetallic(i, ls_normal, ls_bump_normal, color)
+        #define affectMetallic(i, ws_vertex, ls_normal, ls_bump_normal, color)
     #endif
 
     ////////////////////////////
@@ -534,9 +525,9 @@
         DECL_SUB_TEX2D(_TS_MaskTex);
         float       _TS_InvMaskVal;
 
-        inline void calcToonShadeContrast(float4 ls_vertex, float4 ls_light_dir, float3 ambientColor, out float shadow_power) {
+        inline void calcToonShadeContrast(float3 ws_vertex, float4 ls_light_dir, float3 ambientColor, out float shadow_power) {
             if (TGL_ON(_TS_Enable)) {
-                float3 lightColorMain = calcLocalSpaceLightColor(ls_vertex, ls_light_dir.w);
+                float3 lightColorMain = calcLocalSpaceLightColor(ws_vertex, ls_light_dir.w);
                 float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
                         unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                         0 < ls_light_dir.w ? unity_LightColor[0].rgb : ZERO_VEC3,
@@ -544,7 +535,7 @@
                         unity_LightColor[2].rgb,
                         unity_LightColor[3].rgb,
                         unity_4LightAtten0,
-                        mul(unity_ObjectToWorld, ls_vertex)
+                        ws_vertex
                     );
                 float main = saturate(calcBrightness( lightColorMain ));
                 float sub4 = saturate(calcBrightness( lightColorSub4 ));
@@ -583,7 +574,7 @@
             }
         }
     #else
-        #define calcToonShadeContrast(ls_vertex, ls_light_dir, ambientColor, shadow_power)
+        #define calcToonShadeContrast(ws_vertex, ls_light_dir, ambientColor, shadow_power)
         #define affectToonShade(i, ls_normal, ls_bump_normal, angle_light_camera, color)
     #endif
 
@@ -632,8 +623,7 @@
         DECL_SUB_TEX2D(_OL_MaskTex);
         float       _OL_InvMaskVal;
 
-        inline float2 computeOverlayTex(float4 ls_vertex) {
-            float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+        inline float2 computeOverlayTex(float3 ws_vertex) {
             float3 ws_view_dir = normalize( ws_vertex - _WorldSpaceCameraPos.xyz );
 
             float lon = atan2( ws_view_dir.z, ws_view_dir.x );  // -PI ~ +PI
@@ -653,15 +643,15 @@
             return lerp(color, ov_color, power);    // ブレンド
         }
 
-        inline void affectOverlayTexture(float4 ls_vertex, float2 uv_main, inout float4 color) {
+        inline void affectOverlayTexture(float3 ws_vertex, float2 uv_main, inout float4 color) {
             if (TGL_ON(_OL_Enable)) {
-                float2 uv_overlay = computeOverlayTex(ls_vertex);
+                float2 uv_overlay = computeOverlayTex(ws_vertex);
                 float3 power = _OL_Power * SAMPLE_MASK_VALUE(_OL_MaskTex, uv_main, _OL_InvMaskVal).rgb;
                 color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay).rgb, power);
             }
         }
     #else
-        #define affectOverlayTexture(ls_vertex, uv_main, color)
+        #define affectOverlayTexture(ws_vertex, uv_main, color)
     #endif
 
     ////////////////////////////

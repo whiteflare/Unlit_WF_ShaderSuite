@@ -162,24 +162,6 @@
         return col;
     }
 
-    inline float calcLightPower(float4 ls_vertex) {
-        // directional light
-        float3 lightColor = _LightColor0;
-        // ambient
-        lightColor += OmniDirectional_ShadeSH9();
-        // not important lights
-        lightColor += OmniDirectional_Shade4PointLights(
-            unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-            unity_LightColor[0].rgb,
-            unity_LightColor[1].rgb,
-            unity_LightColor[2].rgb,
-            unity_LightColor[3].rgb,
-            unity_4LightAtten0,
-            mul(unity_ObjectToWorld, ls_vertex)
-        );
-        return calcBrightness(saturate(lightColor));
-    }
-
     inline float3 calcPointLight1Dir(float3 ws_vertex) {
         ws_vertex = calcPointLight1Pos() - ws_vertex;
         if (dot(ws_vertex, ws_vertex) < 0.1) {
@@ -206,14 +188,12 @@
         #endif
     }
 
-    inline float3 worldSpaceViewDir(float4 ls_vertex) {
-        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
-        return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex.xyz);
+    inline float3 worldSpaceViewDir(float3 ws_vertex) {
+        return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex);
     }
 
-    inline float3 localSpaceViewDir(float4 ls_vertex) {
-        float4 ls_camera_pos = mul(unity_WorldToObject, float4(worldSpaceCameraPos(), 1));
-        return SafeNormalizeVec3(ls_camera_pos.xyz - ls_vertex.xyz);
+    inline float3 localSpaceViewDir(float3 ws_vertex) {
+        return UnityWorldToObjectDir(worldSpaceCameraPos() - ws_vertex);
     }
 
     inline bool isInMirror() {
@@ -224,11 +204,11 @@
     // Matcap
     ////////////////////////////
 
-    inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
+    inline float3 calcMatcapVector(in float3 ws_vertex, in float3 ls_normal) {
         float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
 
         #ifdef _MATCAP_VIEW_CORRECT_ENABLE
-            float3 ws_view_dir = worldSpaceViewDir(ls_vertex);
+            float3 ws_view_dir = worldSpaceViewDir(ws_vertex);
             float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
             float3 detail = vs_normal.xyz * float3(-1, -1, 1);
             vs_normal = base * dot(base, detail) / base.z - detail;
@@ -318,8 +298,7 @@
     // ReflectionProbe Sampler
     ////////////////////////////
 
-    inline float4 pickReflectionProbe(float4 ls_vertex, float3 ls_normal, float lod) {
-        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+    inline float4 pickReflectionProbe(float3 ws_vertex, float3 ls_normal, float lod) {
         float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
         float3 reflect_dir = reflect(-ws_camera_dir, UnityObjectToWorldNormal(ls_normal));
 
@@ -335,8 +314,7 @@
         return lerp(color1, color0, unity_SpecCube0_BoxMin.w);
     }
 
-    inline float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float4 ls_vertex, float3 ls_normal, float lod) {
-        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+    inline float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ls_normal, float lod) {
         float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
         float3 reflect_dir = reflect(-ws_camera_dir, UnityObjectToWorldNormal(ls_normal));
 

@@ -85,10 +85,12 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.vs_vertex = UnityObjectToClipPos(v.vertex);
+        float4 ws_vertex = mul(unity_ObjectToWorld, v.vertex);
+
+        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
         o.uv = v.uv;
         o.ls_vertex = v.vertex;
-        o.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, v.vertex.w) );
+        o.ls_light_dir = calcLocalSpaceLightDir( mul(unity_ObjectToWorld, float4(0, 0, 0, v.vertex.w)) );
         #ifdef _LMAP_ENABLE
             o.uv_lmap = v.uv_lmap;
         #endif
@@ -108,9 +110,9 @@
         // 環境光取得
         float3 ambientColor = calcAmbientColorVertex(v);
         // 影コントラスト
-        calcToonShadeContrast(o.ls_vertex, o.ls_light_dir, ambientColor, o.shadow_power);
+        calcToonShadeContrast(ws_vertex, o.ls_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
-        o.light_color = calcLightColorVertex(o.ls_vertex, ambientColor);
+        o.light_color = calcLightColorVertex(ws_vertex, ambientColor);
 
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
@@ -122,6 +124,7 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        float4 ws_vertex = mul(unity_ObjectToWorld, i.ls_vertex);
 
         // メイン
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
@@ -134,13 +137,13 @@
         affectBumpNormal(i, uv_main, ls_bump_normal, color);
 
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
-        float3 vs_bump_normal = calcMatcapVector(i.ls_vertex, ls_bump_normal);
+        float3 vs_normal = calcMatcapVector(ws_vertex, ls_normal);
+        float3 vs_bump_normal = calcMatcapVector(ws_vertex, ls_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
         // メタリック
-        affectMetallic(i, ls_normal, ls_bump_normal, color);
+        affectMetallic(i, ws_vertex, ls_normal, ls_bump_normal, color);
         // Highlight
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), uv_main, color);
         // 階調影
@@ -148,7 +151,7 @@
         // リムライト
         affectRimLight(i, vs_normal, angle_light_camera, color);
         // ScreenTone
-        affectOverlayTexture(i.ls_vertex, uv_main, color);
+        affectOverlayTexture(ws_vertex, uv_main, color);
         // Outline
         affectOutline(uv_main, color);
 
@@ -158,9 +161,9 @@
         affectOcclusion(i, uv_main, color);
 
         // Alpha
-        affectAlphaWithFresnel(uv_main, ls_normal, localSpaceViewDir(i.ls_vertex), color);
+        affectAlphaWithFresnel(uv_main, ls_normal, localSpaceViewDir(ws_vertex), color);
         // EmissiveScroll
-        affectEmissiveScroll(i.ls_vertex, uv_main, color);
+        affectEmissiveScroll(ws_vertex, uv_main, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
@@ -178,8 +181,7 @@
     // アウトライン用 vertex&fragment shader
     ////////////////////////////
 
-    float4 shiftDepthVertex(float4 ls_vertex, float width) {
-        float3 ws_vertex = mul(unity_ObjectToWorld, float4(ls_vertex.xyz, 1)); // ここは view space の計算が必要なので ObjSpaceViewDir を直に使用する
+    float4 shiftDepthVertex(float3 ws_vertex, float width) {
         float3 ws_camera_dir = _WorldSpaceCameraPos.xyz - ws_vertex.xyz; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
         // カメラ方向の z シフト量を加算
         float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
@@ -202,7 +204,8 @@
             // 外側にシフトする
             o.ls_vertex.xyz += o.normal.xyz * (width);
             // Zシフト
-            return shiftDepthVertex(o.ls_vertex, shift);
+            float3 ws_vertex = mul(unity_ObjectToWorld, float4(o.ls_vertex.xyz, 1));
+            return shiftDepthVertex(ws_vertex, shift);
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -302,7 +305,8 @@
     float4 shiftEmissiveScrollVertex(inout v2f o) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
-            return shiftDepthVertex(o.ls_vertex, _ES_Z_Shift);
+            float3 ws_vertex = mul(unity_ObjectToWorld, float4(o.ls_vertex.xyz, 1));
+            return shiftDepthVertex(ws_vertex, _ES_Z_Shift);
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -328,7 +332,8 @@
 
             // EmissiveScroll
             float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-            affectEmissiveScroll(i.ls_vertex, uv_main, color);
+            float4 ws_vertex = mul(unity_ObjectToWorld, i.ls_vertex);
+            affectEmissiveScroll(ws_vertex, uv_main, color);
 
             // Alpha は 0-1 にクランプ
             color.a = saturate(color.a);
@@ -355,7 +360,8 @@
         // 通常の vert を使う
         v2f o = vert(v);
         // SV_POSITION を上書き
-        o.vs_vertex = shiftDepthVertex(o.ls_vertex, _AL_Z_Offset);
+        float3 ws_vertex = mul(unity_ObjectToWorld, float4(o.ls_vertex.xyz, 1));
+        o.vs_vertex = shiftDepthVertex(ws_vertex, _AL_Z_Offset);
 
         return o;
     }
