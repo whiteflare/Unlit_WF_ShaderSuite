@@ -24,6 +24,102 @@
      */
 
     ////////////////////////////
+    // Alpha Transparent
+    ////////////////////////////
+
+    float           _Cutoff;
+
+    #ifdef _AL_ENABLE
+        int             _AL_Source;
+        float           _AL_Power;
+        sampler2D       _AL_MaskTex;
+        float           _AL_Fresnel;
+
+        #ifndef _AL_CustomValue
+            #define _AL_CustomValue 1
+        #endif
+
+        inline float pickAlpha(float2 uv, float alpha) {
+            if (_AL_Source == 1) {
+                return tex2D(_AL_MaskTex, uv).r;
+            }
+            else if (_AL_Source == 2) {
+                return tex2D(_AL_MaskTex, uv).a;
+            }
+            else {
+                return alpha;
+            }
+        }
+
+        inline void affectAlpha(float2 uv, inout float4 color) {
+            float baseAlpha = pickAlpha(uv, color.a);
+
+            #if defined(_AL_CUTOUT)
+                if (baseAlpha < _Cutoff) {
+                    discard;
+                } else {
+                    color.a = 1.0;
+                }
+            #elif defined(_AL_CUTOUT_UPPER)
+                if (baseAlpha < _Cutoff) {
+                    discard;
+                } else {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                }
+            #elif defined(_AL_CUTOUT_LOWER)
+                if (baseAlpha < _Cutoff) {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                } else {
+                    discard;
+                }
+            #else
+                baseAlpha *= _AL_Power * _AL_CustomValue;
+            #endif
+
+            color.a = baseAlpha;
+        }
+
+        inline void affectAlphaWithFresnel(float2 uv, float3 normal, float3 viewdir, inout float4 color) {
+            float baseAlpha = pickAlpha(uv, color.a);
+
+            #if defined(_AL_CUTOUT)
+                if (baseAlpha < _Cutoff) {
+                    discard;
+                } else {
+                    color.a = 1.0;
+                }
+            #elif defined(_AL_CUTOUT_UPPER)
+                if (baseAlpha < _Cutoff) {
+                    discard;
+                } else {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                }
+            #elif defined(_AL_CUTOUT_LOWER)
+                if (baseAlpha < _Cutoff) {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                } else {
+                    discard;
+                }
+            #else
+                baseAlpha *= _AL_Power * _AL_CustomValue;
+            #endif
+
+            #ifndef _AL_FRESNEL_ENABLE
+                // ベースアルファ
+                color.a = baseAlpha;
+            #else
+                // フレネルアルファ
+                float maxValue = max( pickAlpha(uv, color.a) * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
+                float fa = 1 - abs( dot( SafeNormalizeVec3(normal), SafeNormalizeVec3(viewdir) ) );
+                color.a = lerp( baseAlpha, maxValue, fa * fa * fa * fa );
+            #endif
+        }
+    #else
+        #define affectAlpha(uv, color)                              color.a = 1.0
+        #define affectAlphaWithFresnel(uv, normal, viewdir, color)  color.a = 1.0
+    #endif
+
+    ////////////////////////////
     // Anti Glare & Light Configuration
     ////////////////////////////
 
@@ -40,8 +136,8 @@
     float           _GL_CustomAltitude;
     float           _GL_DisableBackLit;
 
-    inline uint calcAutoSelectMainLight(float3 ws_pos) {
-        float3 pointLight1Color = calcPointLight1Color(ws_pos);
+    inline uint calcAutoSelectMainLight(float3 ws_vertex) {
+        float3 pointLight1Color = calcPointLight1Color(ws_vertex);
 
         if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
             // ディレクショナルよりポイントライトのほうが明るいならばそちらを採用
@@ -57,32 +153,18 @@
         }
     }
 
-    inline float3 calcHorizontalCoordSystem(float azimuth, float alt) {
-        azimuth = radians(azimuth + 90);
-        alt = radians(alt);
-        return normalize( float3(cos(azimuth) * cos(alt), sin(alt), -sin(azimuth) * cos(alt)) );
-    }
-
-    inline float3 calcPointLight1Dir(float3 ws_pos) {
-        ws_pos = calcPointLight1Pos() - ws_pos;
-        if (dot(ws_pos, ws_pos) < 0.1) {
-            ws_pos = float3(0, 1, 0);
-        }
-        return UnityWorldToObjectDir( ws_pos );
-    }
-
-    inline float4 calcLocalSpaceLightDir(float4 ls_pos) {
-        float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
+    inline float4 calcLocalSpaceLightDir(float4 ls_vertex) {
+        float3 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
 
         uint mode = _GL_LightMode;
         if (mode == LIT_MODE_AUTO) {
-            mode = calcAutoSelectMainLight(ws_pos);
+            mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
             return float4( UnityWorldToObjectDir( _WorldSpaceLightPos0.xyz ), +1 );
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
-            return float4( calcPointLight1Dir(ws_pos) , -1 );
+            return float4( calcPointLight1Dir(ws_vertex) , -1 );
         }
         if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
             return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
@@ -93,10 +175,10 @@
         return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
     }
 
-    inline float3 calcLocalSpaceLightColor(float4 ls_pos, float lightType) {
+    inline float3 calcLocalSpaceLightColor(float4 ls_vertex, float lightType) {
         if ( TGL_ON(-lightType) ) {
-            float3 ws_pos = mul(unity_ObjectToWorld, ls_pos);
-            float3 pointLight1Color = calcPointLight1Color(ws_pos);
+            float3 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+            float3 pointLight1Color = calcPointLight1Color(ws_vertex);
             return pointLight1Color; // ポイントライト
         }
         return _LightColor0.rgb; // ディレクショナルライト
@@ -144,6 +226,106 @@
         }
         return angle_light_camera;
     }
+
+    ////////////////////////////
+    // Color Change
+    ////////////////////////////
+
+    #ifdef _CL_ENABLE
+        float       _CL_Enable;
+        float       _CL_DeltaH;
+        float       _CL_DeltaS;
+        float       _CL_DeltaV;
+        float       _CL_Monochrome;
+
+        inline void affectColorChange(inout float4 color) {
+            if (TGL_ON(_CL_Enable)) {
+                if (TGL_ON(_CL_Monochrome)) {
+                    color.r += color.g + color.b;
+                    color.g = (color.r - 1) / 2;
+                    color.b = (color.r - 1) / 2;
+                }
+                float3 hsv = rgb2hsv( saturate(color.rgb) );
+                hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
+                hsv.r = frac(hsv.r);
+                color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
+            }
+        }
+
+    #else
+        // Dummy
+        #define affectColorChange(color)
+    #endif
+
+    ////////////////////////////
+    // Emissive Scroll
+    ////////////////////////////
+
+    #ifdef _ES_ENABLE
+        float       _ES_Enable;
+        sampler2D   _EmissionMap;
+        float4      _EmissionColor;
+        float       _ES_BlendType;
+
+        int         _ES_Shape;
+        float4      _ES_Direction;
+        float       _ES_LevelOffset;
+        float       _ES_Sharpness;
+        float       _ES_Speed;
+        float       _ES_AlphaScroll;
+
+        inline float calcEmissiveWaving(float4 ls_vertex) {
+	        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
+            float time = _Time.y * _ES_Speed - dot(ws_vertex, _ES_Direction.xyz);
+            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
+            if (_ES_Shape == 0) {
+                // 励起波
+                float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
+                float waving = 8 * v * (1 - v) - 1;
+                return saturate(waving + _ES_LevelOffset);
+            }
+            else if (_ES_Shape == 1) {
+                // のこぎり波
+                float waving = 1 - 2 * frac(time * UNITY_INV_TWO_PI);
+                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
+            }
+            else if (_ES_Shape == 2) {
+                // 正弦波
+                float waving = sin( time );
+                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
+            }
+            else {
+                // 定数
+                float waving = 1;
+                return saturate(waving + _ES_LevelOffset);
+            }
+        }
+
+        inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
+            if (TGL_ON(_ES_Enable)) {
+                float waving    = calcEmissiveWaving(ls_vertex);
+                float3 es_mask  = tex2D(_EmissionMap, mask_uv).rgb;
+                float es_power  = MAX_RGB(es_mask);
+                float3 es_color = _EmissionColor.rgb * es_mask.rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
+
+                color.rgb = lerp(color.rgb,
+                    lerp(color.rgb, es_color, waving),
+                    es_power);
+
+                #ifdef _ES_FORCE_ALPHASCROLL
+                    color.a = max(color.a, waving * _EmissionColor.a * es_power);
+                #else
+                    if (TGL_ON(_ES_AlphaScroll)) {
+                        color.a = max(color.a, waving * _EmissionColor.a * es_power);
+                    }
+                #endif
+            }
+        }
+
+    #else
+        // Dummy
+        #define affectEmissiveScroll(ls_vertex, mask_uv, color)
+    #endif
 
     ////////////////////////////
     // Normal Map

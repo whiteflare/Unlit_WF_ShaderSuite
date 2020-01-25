@@ -29,13 +29,15 @@
     #define _MATCAP_VIEW_CORRECT_ENABLE
     #define _MATCAP_ROTATE_CORRECT_ENABLE
 
+    ////////////////////////////
+    // Common Utility
+    ////////////////////////////
+
     #define TGL_ON(value)   (0.5 <= value)
     #define TGL_OFF(value)  (value < 0.5)
     #define TGL_01(value)   step(0.5, value)
 
     static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
-    static const float3 BT601 = { 0.299, 0.587, 0.114 };
-    static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
     #define AVE3(r, g, b)   ((r + g + b) / 3)
@@ -90,6 +92,13 @@
         return in_vec * rsqrt(lenSq);
     }
 
+    ////////////////////////////
+    // Lighting
+    ////////////////////////////
+
+    static const float3 BT601 = { 0.299, 0.587, 0.114 };
+    static const float3 BT709 = { 0.21, 0.72, 0.07 };
+
     inline float calcBrightness(float3 color) {
         return dot(color, BT601);
     }
@@ -98,12 +107,12 @@
         return float3(unity_4LightPosX0.x, unity_4LightPosY0.x, unity_4LightPosZ0.x);
     }
 
-    inline float3 calcPointLight1Color(float3 ws_pos) {
+    inline float3 calcPointLight1Color(float3 ws_vertex) {
         float3 ws_lightPos = calcPointLight1Pos();
         if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
             return float3(0, 0, 0); // XYZすべて0はポイントライト未設定と判定する
         }
-        float3 ls_lightPos = ws_lightPos - ws_pos;
+        float3 ls_lightPos = ws_lightPos - ws_vertex;
         float lengthSq = dot(ls_lightPos, ls_lightPos);
         float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
         return unity_LightColor[0].rgb * atten;
@@ -125,16 +134,16 @@
     inline float3 OmniDirectional_Shade4PointLights(
         float4 lpX, float4 lpY, float4 lpZ,
         float3 col0, float3 col1, float3 col2, float3 col3,
-        float4 lightAttenSq, float3 ws_pos) {
+        float4 lightAttenSq, float3 ws_vertex) {
         // UnityCG.cginc にある Shade4PointLights の等方向版
 
         if ( !any(float3(lpX.x, lpY.x, lpZ.x)) ) {
             col0.rgb = 0;
         }
 
-        float4 toLightX = lpX - ws_pos.x;
-        float4 toLightY = lpY - ws_pos.y;
-        float4 toLightZ = lpZ - ws_pos.z;
+        float4 toLightX = lpX - ws_vertex.x;
+        float4 toLightY = lpY - ws_vertex.y;
+        float4 toLightZ = lpZ - ws_vertex.z;
 
         float4 lengthSq
             = toLightX * toLightX
@@ -171,6 +180,24 @@
         return calcBrightness(saturate(lightColor));
     }
 
+    inline float3 calcPointLight1Dir(float3 ws_vertex) {
+        ws_vertex = calcPointLight1Pos() - ws_vertex;
+        if (dot(ws_vertex, ws_vertex) < 0.1) {
+            ws_vertex = float3(0, 1, 0);
+        }
+        return UnityWorldToObjectDir( ws_vertex );
+    }
+
+    inline float3 calcHorizontalCoordSystem(float azimuth, float alt) {
+        azimuth = radians(azimuth + 90);
+        alt = radians(alt);
+        return normalize( float3(cos(azimuth) * cos(alt), sin(alt), -sin(azimuth) * cos(alt)) );
+    }
+
+    ////////////////////////////
+    // Camera management
+    ////////////////////////////
+
     inline float3 worldSpaceCameraPos() {
         #ifdef USING_STEREO_MATRICES
             return (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
@@ -192,6 +219,58 @@
     inline bool isInMirror() {
         return unity_CameraProjection[2][0] != 0.0f || unity_CameraProjection[2][1] != 0.0f;
     }
+
+    ////////////////////////////
+    // Matcap
+    ////////////////////////////
+
+    inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
+        float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
+
+        #ifdef _MATCAP_VIEW_CORRECT_ENABLE
+            float3 ws_view_dir = worldSpaceViewDir(ls_vertex);
+            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
+            float3 detail = vs_normal.xyz * float3(-1, -1, 1);
+            vs_normal = base * dot(base, detail) / base.z - detail;
+        #endif
+
+        #ifdef _MATCAP_ROTATE_CORRECT_ENABLE
+            float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
+            if (any(vs_topdir)) {
+                vs_topdir = normalize(vs_topdir);
+                float top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
+                float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
+                vs_normal.xy = mul( vs_normal.xy, matrixRotate );
+            }
+        #endif
+
+        return normalize( vs_normal );
+    }
+
+    ////////////////////////////
+    // RGB-HSV convert
+    ////////////////////////////
+
+    inline float3 rgb2hsv(float3 c) {
+        // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+        static float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
+        static float e = 1.0e-10;
+        float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
+        float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
+        float d = q.x - min(q.w, q.y);
+        return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
+    }
+
+    inline float3 hsv2rgb(float3 c) {
+        // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
+        static float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
+        float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
+        return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
+    }
+
+    ////////////////////////////
+    // Lightmap Sampler
+    ////////////////////////////
 
     inline float3 pickLightmap(float2 uv_lmap) {
         float3 color = ZERO_VEC3;
@@ -234,246 +313,6 @@
         #endif
         return color;
     }
-
-    ////////////////////////////
-    // Alpha Transparent
-    ////////////////////////////
-
-    float           _Cutoff;
-
-    #ifdef _AL_ENABLE
-        int             _AL_Source;
-        float           _AL_Power;
-        sampler2D       _AL_MaskTex;
-        float           _AL_Fresnel;
-
-        #ifndef _AL_CustomValue
-            #define _AL_CustomValue 1
-        #endif
-
-        inline float pickAlpha(float2 uv, float alpha) {
-            if (_AL_Source == 1) {
-                return tex2D(_AL_MaskTex, uv).r;
-            }
-            else if (_AL_Source == 2) {
-                return tex2D(_AL_MaskTex, uv).a;
-            }
-            else {
-                return alpha;
-            }
-        }
-
-        inline void affectAlpha(float2 uv, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a);
-
-            #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
-                    discard;
-                } else {
-                    color.a = 1.0;
-                }
-            #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _Cutoff) {
-                    discard;
-                } else {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                }
-            #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _Cutoff) {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                } else {
-                    discard;
-                }
-            #else
-                baseAlpha *= _AL_Power * _AL_CustomValue;
-            #endif
-
-            color.a = baseAlpha;
-        }
-
-        inline void affectAlphaWithFresnel(float2 uv, float3 normal, float3 viewdir, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a);
-
-            #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
-                    discard;
-                } else {
-                    color.a = 1.0;
-                }
-            #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _Cutoff) {
-                    discard;
-                } else {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                }
-            #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _Cutoff) {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                } else {
-                    discard;
-                }
-            #else
-                baseAlpha *= _AL_Power * _AL_CustomValue;
-            #endif
-
-            #ifndef _AL_FRESNEL_ENABLE
-                // ベースアルファ
-                color.a = baseAlpha;
-            #else
-                // フレネルアルファ
-                float maxValue = max( pickAlpha(uv, color.a) * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
-                float fa = 1 - abs( dot( SafeNormalizeVec3(normal), SafeNormalizeVec3(viewdir) ) );
-                color.a = lerp( baseAlpha, maxValue, fa * fa * fa * fa );
-            #endif
-        }
-    #else
-        #define affectAlpha(uv, color)                              color.a = 1.0
-        #define affectAlphaWithFresnel(uv, normal, viewdir, color)  color.a = 1.0
-    #endif
-
-    ////////////////////////////
-    // Highlight and Shadow Matcap
-    ////////////////////////////
-
-    inline float3 calcMatcapVector(in float4 ls_vertex, in float3 ls_normal) {
-        float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
-
-        #ifdef _MATCAP_VIEW_CORRECT_ENABLE
-            float3 ws_view_dir = worldSpaceViewDir(ls_vertex);
-            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
-            float3 detail = vs_normal.xyz * float3(-1, -1, 1);
-            vs_normal = base * dot(base, detail) / base.z - detail;
-        #endif
-
-        #ifdef _MATCAP_ROTATE_CORRECT_ENABLE
-            float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
-            if (any(vs_topdir)) {
-                vs_topdir = normalize(vs_topdir);
-                float top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
-                float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
-                vs_normal.xy = mul( vs_normal.xy, matrixRotate );
-            }
-        #endif
-
-        return normalize( vs_normal );
-    }
-
-    ////////////////////////////
-    // Color Change
-    ////////////////////////////
-
-    #ifdef _CL_ENABLE
-        inline float3 rgb2hsv(float3 c) {
-            // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
-            static float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
-            static float e = 1.0e-10;
-            float4 p = lerp( float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g) );
-            float4 q = lerp( float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r) );
-            float d = q.x - min(q.w, q.y);
-            return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
-        }
-
-        inline float3 hsv2rgb(float3 c) {
-            // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
-            static float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
-            float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
-            return c.z * lerp( k.xxx, saturate(p - k.xxx), c.y );
-        }
-
-        float       _CL_Enable;
-        float       _CL_DeltaH;
-        float       _CL_DeltaS;
-        float       _CL_DeltaV;
-        float       _CL_Monochrome;
-
-        inline void affectColorChange(inout float4 color) {
-            if (TGL_ON(_CL_Enable)) {
-                if (TGL_ON(_CL_Monochrome)) {
-                    color.r += color.g + color.b;
-                    color.g = (color.r - 1) / 2;
-                    color.b = (color.r - 1) / 2;
-                }
-                float3 hsv = rgb2hsv( saturate(color.rgb) );
-                hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
-                hsv.r = frac(hsv.r);
-                color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
-            }
-        }
-
-    #else
-        // Dummy
-        #define affectColorChange(color)
-    #endif
-
-    ////////////////////////////
-    // Emissive Scroll
-    ////////////////////////////
-
-    #ifdef _ES_ENABLE
-        float       _ES_Enable;
-        sampler2D   _EmissionMap;
-        float4      _EmissionColor;
-        float       _ES_BlendType;
-
-        int         _ES_Shape;
-        float4      _ES_Direction;
-        float       _ES_LevelOffset;
-        float       _ES_Sharpness;
-        float       _ES_Speed;
-        float       _ES_AlphaScroll;
-
-        inline float calcEmissiveWaving(float4 ls_vertex) {
-	        float4 ws_vertex = mul(unity_ObjectToWorld, ls_vertex);
-            float time = _Time.y * _ES_Speed - dot(ws_vertex, _ES_Direction.xyz);
-            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
-            if (_ES_Shape == 0) {
-                // 励起波
-                float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
-                float waving = 8 * v * (1 - v) - 1;
-                return saturate(waving + _ES_LevelOffset);
-            }
-            else if (_ES_Shape == 1) {
-                // のこぎり波
-                float waving = 1 - 2 * frac(time * UNITY_INV_TWO_PI);
-                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
-            }
-            else if (_ES_Shape == 2) {
-                // 正弦波
-                float waving = sin( time );
-                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
-            }
-            else {
-                // 定数
-                float waving = 1;
-                return saturate(waving + _ES_LevelOffset);
-            }
-        }
-
-        inline void affectEmissiveScroll(float4 ls_vertex, float2 mask_uv, inout float4 color) {
-            if (TGL_ON(_ES_Enable)) {
-                float waving    = calcEmissiveWaving(ls_vertex);
-                float3 es_mask  = tex2D(_EmissionMap, mask_uv).rgb;
-                float es_power  = MAX_RGB(es_mask);
-                float3 es_color = _EmissionColor.rgb * es_mask.rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
-
-                color.rgb = lerp(color.rgb,
-                    lerp(color.rgb, es_color, waving),
-                    es_power);
-
-                #ifdef _ES_FORCE_ALPHASCROLL
-                    color.a = max(color.a, waving * _EmissionColor.a * es_power);
-                #else
-                    if (TGL_ON(_ES_AlphaScroll)) {
-                        color.a = max(color.a, waving * _EmissionColor.a * es_power);
-                    }
-                #endif
-            }
-        }
-
-    #else
-        // Dummy
-        #define affectEmissiveScroll(ls_vertex, mask_uv, color)
-    #endif
 
     ////////////////////////////
     // ReflectionProbe Sampler
