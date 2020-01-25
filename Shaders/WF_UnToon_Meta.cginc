@@ -26,6 +26,8 @@
     #include "UnityCG.cginc"
     #include "UnityMetaPass.cginc"
 
+	#define ZERO_VEC3	float3(0, 0, 0)
+
 	struct appdata {
 	    float4 vertex   		: POSITION;
 	    float2 uv0      		: TEXCOORD0;
@@ -45,6 +47,11 @@
 	sampler2D		_MainTex;
     float4          _MainTex_ST;
     float4          _Color;
+
+    float       	_ES_Enable;
+    sampler2D   	_EmissionMap;
+    float4      	_EmissionColor;
+    float       	_ES_BlendType;
 
 	v2f_meta vert_meta(appdata v) {
 	    v2f_meta o;
@@ -70,11 +77,12 @@
 	    UnityMetaInput o;
 	    UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
-		float4 color = _Color * tex2D(_MainTex, i.uv);
+		float4 color	= _Color * tex2D(_MainTex, i.uv);
+		float3 emission	= _EmissionColor.rgb * tex2D(_EmissionMap, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
 
 	    o.Albedo			= color.rgb * color.a;
 	    o.SpecularColor		= o.Albedo.rgb;
-	    o.Emission			= max(float3(0, 0, 0), o.Albedo.rgb - 1);
+	    o.Emission			= emission * _ES_Enable;
 
 		#ifdef EDITOR_VISUALIZATION
 		    o.VizUV			= i.vizUV;
