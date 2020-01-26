@@ -79,19 +79,18 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-        float4 ws_vertex = mul(unity_ObjectToWorld, i.ls_vertex);
 
         // メイン
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
 
         // BumpMap
-        float3 ws_normal = UnityObjectToWorldNormal(i.normal);
+        float3 ws_normal = i.normal;
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(ws_vertex, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_vertex, ws_bump_normal);
+        float3 vs_normal = calcMatcapVector(i.ws_vertex, ws_normal);
+        float3 vs_bump_normal = calcMatcapVector(i.ws_vertex, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
@@ -114,7 +113,7 @@
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlphaWithFresnel(i.uv, ws_normal, worldSpaceViewDir(ws_vertex), color);
+        affectAlphaWithFresnel(i.uv, ws_normal, worldSpaceViewDir(i.ws_vertex), color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

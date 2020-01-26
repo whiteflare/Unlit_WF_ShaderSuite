@@ -146,18 +146,17 @@
 
         v2f i = (v2f) 0;
         i.uv = gi.uv;
-        i.ls_vertex = gi.ls_vertex;
-        i.normal = gi.normal;
+        i.ws_vertex = mul(unity_ObjectToWorld, gi.ls_vertex);
+        i.normal = UnityObjectToWorldNormal(gi.normal);
 
-        float4 ws_vertex = mul(unity_ObjectToWorld, i.ls_vertex);
-        i.ws_light_dir = calcWorldSpaceLightDir(i.ls_vertex);
+        i.ws_light_dir = calcWorldSpaceLightDir(gi.ls_vertex);
 
         // 環境光取得
         float3 ambientColor = OmniDirectional_ShadeSH9();
         // 影コントラスト
-        calcToonShadeContrast(ws_vertex, i.ws_light_dir, ambientColor, i.shadow_power);
+        calcToonShadeContrast(i.ws_vertex, i.ws_light_dir, ambientColor, i.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
-        i.light_color = calcLightColorVertex(ws_vertex, ambientColor);
+        i.light_color = calcLightColorVertex(i.ws_vertex, ambientColor);
 
         // メイン
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
@@ -166,12 +165,10 @@
         // 色変換
         affectColorChange(color);
 
-        float3 ws_normal = UnityObjectToWorldNormal(i.normal);
-
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
         // 階調影
-        affectToonShade(i, uv_main, ws_normal, ws_normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;

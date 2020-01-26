@@ -218,7 +218,7 @@
             return 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
         }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(i.ls_vertex).xz;
+        float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(float4(0, 0, 0, 1)).xz;
         float angle_light_camera = dot( SafeNormalizeVec2(i.ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
             * (1 - smoothstep(0.9, 1, abs(i.ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         return angle_light_camera;
@@ -345,7 +345,6 @@
 #endif
 
         inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
-            float3 ws_normal = UnityObjectToWorldNormal(i.normal);
             if (TGL_ON(_NM_Enable)) {
                 // 1st NormalMap
                 float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, uv_main), _BumpScale );
@@ -366,21 +365,19 @@
 #endif
 
                 // 法線計算
-                float3 ws_tangent = UnityObjectToWorldNormal(i.tangent);
-                float3 ws_bitangent = UnityObjectToWorldNormal(i.bitangent);
-                float3x3 tangentTransform = float3x3(ws_tangent, ws_bitangent, ws_normal); // vertex周辺のworld法線空間
+                float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のworld法線空間
                 float3 ws_bump_normal = mul( normalTangent, tangentTransform);
 
                 // NormalMap は陰影として描画する
                 // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を加算することで明暗を付ける
-                color.rgb += (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(ws_normal, i.ws_light_dir.xyz)) * _NM_Power;
+                color.rgb += (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(i.normal, i.ws_light_dir.xyz)) * _NM_Power;
             }
             else {
-                ws_bump_normal = ws_normal;
+                ws_bump_normal = i.normal;
             }
         }
     #else
-        #define affectBumpNormal(i, uv_main, ws_bump_normal, color)  ws_bump_normal = UnityObjectToWorldNormal(i.normal)
+        #define affectBumpNormal(i, uv_main, ws_bump_normal, color)  ws_bump_normal = i.normal
     #endif
 
     ////////////////////////////
@@ -745,17 +742,17 @@
     #elif _WF_DEBUGVIEW_CLIP
         #define WF_AFFECT_DEBUGVIEW     discard
     #elif _WF_DEBUGVIEW_POSITION
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += saturate( abs(i.ls_vertex.xyz) )
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += saturate( abs(mul(unity_WorldToObject, i.ws_vertex) ) )
     #elif _WF_DEBUGVIEW_NORMAL
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectNormal(ws_normal).rgb / 2 + 0.5
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(ws_normal).rgb / 2 + 0.5
     #elif _WF_DEBUGVIEW_TANGENT
         #ifdef _NM_ENABLE
-            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.tangent.rgb / 2 + 0.5
+            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(i.tangent.rgb) / 2 + 0.5
         #else
             #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
         #endif
     #elif _WF_DEBUGVIEW_BUMPED_NORMAL
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectNormal(ws_bump_normal).rgb / 2 + 0.5
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(ws_bump_normal).rgb / 2 + 0.5
     #elif _WF_DEBUGVIEW_LIGHT_COLOR
         #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.light_color.rgb
     #elif _WF_DEBUGVIEW_LIGHT_MAP

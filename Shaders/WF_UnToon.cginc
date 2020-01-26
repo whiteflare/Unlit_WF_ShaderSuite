@@ -45,16 +45,16 @@
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
-        float4 ls_vertex        : TEXCOORD1;
+        float3 ws_vertex        : TEXCOORD1;
         float4 ws_light_dir     : TEXCOORD2;
         float3 light_color      : COLOR0;
         #ifdef _TS_ENABLE
             float shadow_power  : COLOR1;
         #endif
-        float3 normal           : TEXCOORD3;
+        float3 normal           : TEXCOORD3;    // world space
         #ifdef _NM_ENABLE
-            float3 tangent      : TEXCOORD4;
-            float3 bitangent    : TEXCOORD5;
+            float3 tangent      : TEXCOORD4;    // world space
+            float3 bitangent    : TEXCOORD5;    // world space
         #endif
         #ifdef _LMAP_ENABLE
             float2 uv_lmap      : TEXCOORD6;
@@ -85,24 +85,22 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        float4 ws_vertex = mul(unity_ObjectToWorld, v.vertex);
-
-        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
+        o.ws_vertex = mul(unity_ObjectToWorld, v.vertex).xyz;
+        o.vs_vertex = UnityWorldToClipPos(o.ws_vertex);
         o.uv = v.uv;
-        o.ls_vertex = v.vertex;
         o.ws_light_dir = calcWorldSpaceLightDir(v.vertex);
         #ifdef _LMAP_ENABLE
             o.uv_lmap = v.uv_lmap;
         #endif
 
-        o.normal = normalize(v.normal.xyz);
+        o.normal = UnityObjectToWorldNormal(v.normal.xyz);
         #ifdef _NM_ENABLE
             float tan_sign = step(0, v.tangent.w) * 2 - 1;
             if (TGL_OFF(_NM_FlipTangent)) {
-                o.tangent = normalize(v.tangent.xyz);
+                o.tangent = UnityObjectToWorldNormal(v.tangent.xyz);
                 o.bitangent = cross(o.normal, o.tangent) * tan_sign;
             } else {
-                o.tangent = normalize(v.tangent.xyz) * tan_sign;
+                o.tangent = UnityObjectToWorldNormal(v.tangent.xyz) * tan_sign;
                 o.bitangent = cross(o.normal, o.tangent);
             }
         #endif
@@ -110,9 +108,9 @@
         // 環境光取得
         float3 ambientColor = calcAmbientColorVertex(v);
         // 影コントラスト
-        calcToonShadeContrast(ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
+        calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
-        o.light_color = calcLightColorVertex(ws_vertex, ambientColor);
+        o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
@@ -124,7 +122,6 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-        float4 ws_vertex = mul(unity_ObjectToWorld, i.ls_vertex);
 
         // メイン
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
@@ -132,20 +129,18 @@
         // 色変換
         affectColorChange(color);
         // BumpMap
-        float3 ls_normal = i.normal;
-
-        float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
+        float3 ws_normal = i.normal;
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(ws_vertex, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_vertex, ws_bump_normal);
+        float3 vs_normal = calcMatcapVector(i.ws_vertex, ws_normal);
+        float3 vs_bump_normal = calcMatcapVector(i.ws_vertex, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
         // メタリック
-        affectMetallic(i, ws_vertex, uv_main, ws_normal, ws_bump_normal, color);
+        affectMetallic(i, i.ws_vertex, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), uv_main, color);
         // 階調影
@@ -153,7 +148,7 @@
         // リムライト
         affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
         // ScreenTone
-        affectOverlayTexture(ws_vertex, uv_main, color);
+        affectOverlayTexture(i.ws_vertex, uv_main, color);
         // Outline
         affectOutline(uv_main, color);
 
@@ -163,9 +158,9 @@
         affectOcclusion(i, uv_main, color);
 
         // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, worldSpaceViewDir(ws_vertex), color);
+        affectAlphaWithFresnel(uv_main, ws_normal, worldSpaceViewDir(i.ws_vertex), color);
         // EmissiveScroll
-        affectEmissiveScroll(ws_vertex, uv_main, color);
+        affectEmissiveScroll(i.ws_vertex, uv_main, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
@@ -204,12 +199,9 @@
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
             // 外側にシフトする
-            float3 ws_normal = UnityObjectToWorldNormal(o.normal);
-            float4 ws_vertex = mul(unity_ObjectToWorld, o.ls_vertex);
-            ws_vertex.xyz += ws_normal * width;
-            o.ls_vertex.xyz = mul(unity_WorldToObject, ws_vertex);
+            o.ws_vertex.xyz += o.normal * width;
             // Zシフト
-            return shiftDepthVertex(ws_vertex, shift);
+            return shiftDepthVertex(o.ws_vertex, shift);
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -309,8 +301,7 @@
     float4 shiftEmissiveScrollVertex(inout v2f o) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
-            float3 ws_vertex = mul(unity_ObjectToWorld, o.ls_vertex);
-            return shiftDepthVertex(ws_vertex, _ES_Z_Shift);
+            return shiftDepthVertex(o.ws_vertex, _ES_Z_Shift);
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
         }
@@ -336,8 +327,7 @@
 
             // EmissiveScroll
             float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-            float4 ws_vertex = mul(unity_ObjectToWorld, i.ls_vertex);
-            affectEmissiveScroll(ws_vertex, uv_main, color);
+            affectEmissiveScroll(i.ws_vertex, uv_main, color);
 
             // Alpha は 0-1 にクランプ
             color.a = saturate(color.a);
@@ -364,8 +354,7 @@
         // 通常の vert を使う
         v2f o = vert(v);
         // SV_POSITION を上書き
-        float3 ws_vertex = mul(unity_ObjectToWorld, o.ls_vertex);
-        o.vs_vertex = shiftDepthVertex(ws_vertex, _AL_Z_Offset);
+        o.vs_vertex = shiftDepthVertex(o.ws_vertex, _AL_Z_Offset);
 
         return o;
     }
