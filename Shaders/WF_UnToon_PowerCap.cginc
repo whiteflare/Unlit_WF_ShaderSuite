@@ -85,9 +85,7 @@
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
 
         // BumpMap
-        float3 ls_normal = i.normal;
-
-        float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
+        float3 ws_normal = UnityObjectToWorldNormal(i.normal);
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 

@@ -204,9 +204,11 @@
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
             // 外側にシフトする
-            o.ls_vertex.xyz += o.normal.xyz * (width);
+            float3 ws_normal = UnityObjectToWorldNormal(o.normal);
+            float4 ws_vertex = mul(unity_ObjectToWorld, o.ls_vertex);
+            ws_vertex.xyz += ws_normal * width;
+            o.ls_vertex.xyz = mul(unity_WorldToObject, ws_vertex);
             // Zシフト
-            float3 ws_vertex = mul(unity_ObjectToWorld, float4(o.ls_vertex.xyz, 1));
             return shiftDepthVertex(ws_vertex, shift);
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
