@@ -141,6 +141,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _AL_ENABLE
             #define _AL_CUTOUT
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
             #define _HL_ENABLE
             #define _TR_ENABLE

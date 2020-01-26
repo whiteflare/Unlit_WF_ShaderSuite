@@ -78,11 +78,12 @@
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
         float4 color    = _Color * tex2D(_MainTex, i.uv);
-        float3 emission = _EmissionColor.rgb * tex2D(_EmissionMap, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
 
-        o.Albedo            = color.rgb * color.a;
-        o.SpecularColor     = o.Albedo.rgb;
-        o.Emission          = emission * _ES_Enable;
+        o.Albedo        = color.rgb * color.a;
+        o.SpecularColor = o.Albedo.rgb;
+
+        float3 emission = _EmissionColor.rgb * tex2D(_EmissionMap, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
+        o.Emission      = emission * _ES_Enable;
 
         #ifdef EDITOR_VISUALIZATION
             o.VizUV         = i.vizUV;

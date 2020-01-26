@@ -129,6 +129,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic" {
             #define _WF_MOBILE
 
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE

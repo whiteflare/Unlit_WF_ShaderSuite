@@ -139,6 +139,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic" {
             #define _AL_ENABLE
             #define _AL_CUTOUT
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
