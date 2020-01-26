@@ -264,6 +264,9 @@
         float4      _EmissionColor;
         float       _ES_BlendType;
 
+    #ifdef _ES_SIMPLE_ENABLE
+        #define calcEmissiveWaving(ws_vertex)   (1)
+    #else
         int         _ES_Shape;
         float4      _ES_Direction;
         float       _ES_LevelOffset;
@@ -296,6 +299,7 @@
                 return saturate(waving + _ES_LevelOffset);
             }
         }
+    #endif
 
         inline void affectEmissiveScroll(float3 ws_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
@@ -308,12 +312,14 @@
                     lerp(color.rgb, es_color, waving),
                     es_power);
 
-                #ifdef _ES_FORCE_ALPHASCROLL
-                    color.a = max(color.a, waving * _EmissionColor.a * es_power);
-                #else
-                    if (TGL_ON(_ES_AlphaScroll)) {
+                #ifndef _ES_SIMPLE_ENABLE
+                    #ifdef _ES_FORCE_ALPHASCROLL
                         color.a = max(color.a, waving * _EmissionColor.a * es_power);
-                    }
+                    #else
+                        if (TGL_ON(_ES_AlphaScroll)) {
+                            color.a = max(color.a, waving * _EmissionColor.a * es_power);
+                        }
+                    #endif
                 #endif
             }
         }

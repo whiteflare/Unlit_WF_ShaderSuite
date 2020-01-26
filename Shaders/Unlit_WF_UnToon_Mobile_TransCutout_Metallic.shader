@@ -88,6 +88,16 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic" {
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
+        // Emission
+        [WFHeaderToggle(Emission)]
+            _ES_Enable              ("[ES] Enable", Float) = 0
+        [HDR]
+            _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
+        [Enum(ADD,0,ALPHA,1)]
+            _ES_BlendType           ("[ES] Blend Type", Float) = 0
+
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
@@ -133,6 +143,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic" {
             #define _AL_ENABLE
             #define _AL_CUTOUT
             #define _AO_ENABLE
+            #define _ES_SIMPLE_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _TS_ENABLE
