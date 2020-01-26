@@ -67,7 +67,7 @@ namespace UnlitWF
             }
 
             // 現在無効なラベルを保持するリスト
-            var disable = new List<string>();
+            var disable = new HashSet<string>();
             // プロパティを順に描画
             foreach (var prop in properties) {
                 // ラベル付き displayName を、ラベルと名称に分割

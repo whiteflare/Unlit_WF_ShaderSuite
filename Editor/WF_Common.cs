@@ -46,6 +46,13 @@ namespace UnlitWF
             }
         }
 
+        /// <summary>
+        /// プロパティ名の文字列から、Prefix+Suffixと名前を分割する。
+        /// </summary>
+        /// <param name="text">プロパティ名</param>
+        /// <param name="label">Prefix+Suffix</param>
+        /// <param name="name">名前</param>
+        /// <returns></returns>
         public static bool FormatPropName(string text, out string label, out string name) {
             var mm = PAT_PROP_NAME.Match(text ?? "");
             if (mm.Success) {
@@ -69,20 +76,33 @@ namespace UnlitWF
     {
         public readonly Material material;
         public readonly SerializedObject serialObject;
+        public readonly SerializedProperty parent;
         public readonly SerializedProperty property;
+        public readonly String name;
+        public readonly SerializedProperty value;
 
-        public ShaderPropertyView(Material material, SerializedObject serialObject, SerializedProperty property) {
+        public ShaderPropertyView(Material material, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property) {
             this.material = material;
             this.serialObject = serialObject;
+            this.parent = parent;
             this.property = property;
+
+            SerializedProperty first = property.FindPropertyRelative("first");
+            this.name = first != null ? first.stringValue : "no_name";
+            this.value = property.FindPropertyRelative("second");
         }
-
-        public String name { get { return property.FindPropertyRelative("first").stringValue; } }
-
-        public SerializedProperty value { get { return property.FindPropertyRelative("second"); } }
 
         public void Rename(string newName) {
             property.FindPropertyRelative("first").stringValue = newName;
+        }
+
+        public void Remove() {
+            var props = ToPropertyList(material, serialObject, parent);
+            for(int i = props.Count - 1; 0 <= i; i--) {
+                if (props[i].name == this.name) {
+                    parent.DeleteArrayElementAtIndex(i);
+                }
+            }
         }
 
         public void CopyTo(ShaderPropertyView other) {
@@ -126,9 +146,14 @@ namespace UnlitWF
             }
         }
 
-        public static HashSet<SerializedObject> GetUniqueSerialObject(List<ShaderPropertyView> props) {
+        public static void AllApplyPropertyChange(IEnumerable<ShaderPropertyView> props) {
+            foreach(var so in GetUniqueSerialObject(props)) {
+                so.ApplyModifiedProperties();
+            }
+        }
+
+        public static HashSet<SerializedObject> GetUniqueSerialObject(IEnumerable<ShaderPropertyView> props) {
             var ret = new HashSet<SerializedObject>();
-            // 名称を全て変更
             foreach (var prop in props) {
                 if (prop != null && prop.serialObject != null) {
                     ret.Add(prop.serialObject);
@@ -137,9 +162,8 @@ namespace UnlitWF
             return ret;
         }
 
-        public static HashSet<Material> GetUniqueMaterials(List<ShaderPropertyView> props) {
+        public static HashSet<Material> GetUniqueMaterials(IEnumerable<ShaderPropertyView> props) {
             var ret = new HashSet<Material>();
-            // 名称を全て変更
             foreach (var prop in props) {
                 if (prop != null && prop.material != null) {
                     ret.Add(prop.material);
@@ -148,12 +172,20 @@ namespace UnlitWF
             return ret;
         }
 
-        public static List<ShaderPropertyView> ToPropertyList(List<Material> matlist) {
+        public static List<ShaderPropertyView> ToPropertyList(IEnumerable<Material> matlist) {
             var list = new List<ShaderPropertyView>();
             foreach (Material mat in matlist) {
                 list.AddRange(ToPropertyList(mat));
             }
             return list;
+        }
+
+        public static Dictionary<string, ShaderPropertyView> ToPropertyMap(Material mat) {
+            var ret = new Dictionary<string, ShaderPropertyView>();
+            foreach (var prop in ToPropertyList(mat)) {
+                ret[prop.name] = prop;
+            }
+            return ret;
         }
 
         public static List<ShaderPropertyView> ToPropertyList(Material mat) {
@@ -177,7 +209,7 @@ namespace UnlitWF
             var list = new List<ShaderPropertyView>();
             if (prop != null) {
                 for (int i = 0; i < prop.arraySize; i++) {
-                    list.Add(new ShaderPropertyView(material, so, prop.GetArrayElementAtIndex(i)));
+                    list.Add(new ShaderPropertyView(material, so, prop, prop.GetArrayElementAtIndex(i)));
                 }
             }
             return list;
