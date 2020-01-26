@@ -120,9 +120,6 @@
         // fog
         UNITY_APPLY_FOG(i.fogCoord, color);
 
-        // デバッグビュー
-        WF_AFFECT_DEBUGVIEW;
-
         return color;
     }
 

@@ -216,10 +216,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [Toggle(_)]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-
-        [WFHeader(DebugMode)]
-        [KeywordEnum(NONE,MAGENTA,CLIP,POSITION,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
-            _WF_DebugView           ("Debug View", Float) = 0
     }
 
     SubShader {

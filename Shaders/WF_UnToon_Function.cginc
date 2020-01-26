@@ -743,32 +743,32 @@
     // Debug View
     ////////////////////////////
 
-    #ifdef _WF_DEBUGVIEW_MAGENTA
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rb += 1
-    #elif _WF_DEBUGVIEW_CLIP
-        #define WF_AFFECT_DEBUGVIEW     discard
-    #elif _WF_DEBUGVIEW_POSITION
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += saturate( abs(mul(unity_WorldToObject, i.ws_vertex) ) )
-    #elif _WF_DEBUGVIEW_NORMAL
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(ws_normal).rgb / 2 + 0.5
-    #elif _WF_DEBUGVIEW_TANGENT
-        #ifdef _NM_ENABLE
-            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(i.tangent.rgb) / 2 + 0.5
-        #else
-            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
-        #endif
-    #elif _WF_DEBUGVIEW_BUMPED_NORMAL
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(ws_bump_normal).rgb / 2 + 0.5
-    #elif _WF_DEBUGVIEW_LIGHT_COLOR
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.light_color.rgb
-    #elif _WF_DEBUGVIEW_LIGHT_MAP
-        #ifdef _LMAP_ENABLE
-            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += pickLightmap(i.uv_lmap).rgb
-        #else
-            #define WF_AFFECT_DEBUGVIEW     discard
-        #endif
-    #else
-        #define WF_AFFECT_DEBUGVIEW
-    #endif
+//    #ifdef _WF_DEBUGVIEW_MAGENTA
+//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rb += 1
+//    #elif _WF_DEBUGVIEW_CLIP
+//        #define WF_AFFECT_DEBUGVIEW     discard
+//    #elif _WF_DEBUGVIEW_POSITION
+//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += saturate( abs(mul(unity_WorldToObject, i.ws_vertex) ) )
+//    #elif _WF_DEBUGVIEW_NORMAL
+//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(ws_normal).rgb / 2 + 0.5
+//    #elif _WF_DEBUGVIEW_TANGENT
+//        #ifdef _NM_ENABLE
+//            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(i.tangent.rgb) / 2 + 0.5
+//        #else
+//            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
+//        #endif
+//    #elif _WF_DEBUGVIEW_BUMPED_NORMAL
+//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(ws_bump_normal).rgb / 2 + 0.5
+//    #elif _WF_DEBUGVIEW_LIGHT_COLOR
+//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.light_color.rgb
+//    #elif _WF_DEBUGVIEW_LIGHT_MAP
+//        #ifdef _LMAP_ENABLE
+//            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += pickLightmap(i.uv_lmap).rgb
+//        #else
+//            #define WF_AFFECT_DEBUGVIEW     discard
+//        #endif
+//    #else
+//        #define WF_AFFECT_DEBUGVIEW
+//    #endif
 
 #endif
