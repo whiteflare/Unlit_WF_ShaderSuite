@@ -139,8 +139,8 @@
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(ws_vertex, ls_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_vertex, UnityWorldToObjectDir(ws_bump_normal));
+        float3 vs_normal = calcMatcapVector(ws_vertex, ws_normal);
+        float3 vs_bump_normal = calcMatcapVector(ws_vertex, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 

@@ -204,8 +204,8 @@
     // Matcap
     ////////////////////////////
 
-    inline float3 calcMatcapVector(in float3 ws_vertex, in float3 ls_normal) {
-        float3 vs_normal = mul(UNITY_MATRIX_IT_MV, float4(ls_normal, 1)).xyz;
+    inline float3 calcMatcapVector(in float3 ws_vertex, in float3 ws_normal) {
+        float3 vs_normal = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
 
         #ifdef _MATCAP_VIEW_CORRECT_ENABLE
             float3 ws_view_dir = worldSpaceViewDir(ws_vertex);
