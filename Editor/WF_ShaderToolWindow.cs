@@ -204,8 +204,8 @@ namespace UnlitWF
         #region コピー系
 
         private void CopyProperties(SerializedProperty src, SerializedProperty dst, List<string> prefix) {
-            var dst_list = ShaderPropertyView.ToPropertyList(dst);
-            foreach (var src_prop in ShaderPropertyView.ToPropertyList(src)) {
+            var dst_list = ShaderPropertyView.ToPropertyList(null, null, dst);
+            foreach (var src_prop in ShaderPropertyView.ToPropertyList(null, null, src)) {
                 string label, name;
                 WFCommonUtility.FormatPropName(src_prop.name, out label, out name);
                 if (label != null && prefix.Contains(label)) {
@@ -273,7 +273,7 @@ namespace UnlitWF
 
         private void DeleteProperties(SerializedProperty prop, Predicate<ShaderPropertyView> pred) {
             var delNames = new List<string>();
-            var list = ShaderPropertyView.ToPropertyList(prop);
+            var list = ShaderPropertyView.ToPropertyList(null, null, prop);
             for (int i = list.Count - 1; 0 <= i; i--) {
                 if (pred(list[i])) {    // 条件に合致したら削除
                     delNames.Add(list[i].name);
@@ -311,7 +311,7 @@ namespace UnlitWF
                 var delPrefix = new List<string>();
                 {
                     var prop = saved.FindPropertyRelative("m_Floats");
-                    foreach (var p in ShaderPropertyView.ToPropertyList(prop)) {
+                    foreach (var p in ShaderPropertyView.ToPropertyList(null, null, prop)) {
                         string label, name;
                         WFCommonUtility.FormatPropName(p.name, out label, out name);
                         if (label != null && name.ToLower() == "enable" && p.value.floatValue == 0) {

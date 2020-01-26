@@ -63,7 +63,7 @@ namespace UnlitWF
                 GUI.Label(rect, "Current Shader", EditorStyles.boldLabel);
                 GUILayout.Label(new Regex(@".*/").Replace(mat.shader.name, ""));
                 // マイグレーションHelpBox
-                MigrationHelpBox(materialEditor, mat);
+                MigrationHelpBox(materialEditor);
             }
 
             // 現在無効なラベルを保持するリスト
@@ -143,15 +143,25 @@ namespace UnlitWF
             }
         }
 
-        private void MigrationHelpBox(MaterialEditor materialEditor, Material mat) {
-            if (mat.shader.name.Contains("MatcapShadows")) {
-                // MatcapShadowsは古いので対象にしない
+        private void MigrationHelpBox(MaterialEditor materialEditor) {
+            // 操作対象のマテリアル
+            var matlist = new List<Material>();
+            foreach (var obj in materialEditor.targets) {
+                var mat = obj as Material;
+                if (mat == null) {
+                    continue;
+                }
+                if (mat.shader.name.Contains("MatcapShadows")) {
+                    // MatcapShadowsは古いので対象にしない
+                    continue;
+                }
+                matlist.Add(mat);
+            }
+            if (matlist.Count == 0) {
                 return;
             }
 
-            var so = new SerializedObject(mat);
-            so.Update();
-            var props = ShaderPropertyView.ToPropertyList(so);
+            var props = ShaderPropertyView.ToPropertyList(matlist);
 
             var oldPropList = new List<ShaderPropertyView>();
             foreach (var prop in props) {
@@ -162,17 +172,21 @@ namespace UnlitWF
             if (oldPropList.Count <= 0) {
                 return;
             }
+
             var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
                 "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
                 "This Material may have been created in an older version. Convert to new version?";
             if (materialEditor.HelpBoxWithButton(
                                 new GUIContent(tex),
                                 new GUIContent("Fix Now"))) {
+                // 名称を全て変更
                 foreach (var prop in oldPropList) {
                     prop.Rename(MIGRATION_PROP_RENAME[prop.name]);
                 }
-                so.ApplyModifiedProperties();
-                EditorUtility.SetDirty(mat);
+                // 保存
+                foreach(var so in ShaderPropertyView.GetUniqueSerialObject(oldPropList)) {
+                    so.ApplyModifiedProperties();
+                }
             }
         }
 
