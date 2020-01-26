@@ -166,10 +166,12 @@
         // 色変換
         affectColorChange(color);
 
+        float3 ws_normal = UnityObjectToWorldNormal(i.normal);
+
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
         // 階調影
-        affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, ws_normal, ws_normal, angle_light_camera, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;

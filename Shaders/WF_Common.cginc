@@ -298,9 +298,9 @@
     // ReflectionProbe Sampler
     ////////////////////////////
 
-    inline float4 pickReflectionProbe(float3 ws_vertex, float3 ls_normal, float lod) {
+    inline float4 pickReflectionProbe(float3 ws_vertex, float3 ws_normal, float lod) {
         float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
-        float3 reflect_dir = reflect(-ws_camera_dir, UnityObjectToWorldNormal(ls_normal));
+        float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float3 dir0 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
         float3 dir1 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube1_ProbePosition, unity_SpecCube1_BoxMin, unity_SpecCube1_BoxMax);
@@ -314,9 +314,9 @@
         return lerp(color1, color0, unity_SpecCube0_BoxMin.w);
     }
 
-    inline float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ls_normal, float lod) {
+    inline float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ws_normal, float lod) {
         float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
-        float3 reflect_dir = reflect(-ws_camera_dir, UnityObjectToWorldNormal(ls_normal));
+        float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float4 color = texCUBElod(cubemap, float4(reflect_dir, lod) );
         return DecodeHDR(color, cubemap_HDR);

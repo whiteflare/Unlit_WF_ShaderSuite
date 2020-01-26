@@ -133,21 +133,23 @@
         affectColorChange(color);
         // BumpMap
         float3 ls_normal = i.normal;
-        float3 ls_bump_normal;
-        affectBumpNormal(i, uv_main, ls_bump_normal, color);
+
+        float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
+        float3 ws_bump_normal;
+        affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
         // ビュー空間法線
         float3 vs_normal = calcMatcapVector(ws_vertex, ls_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_vertex, ls_bump_normal);
+        float3 vs_bump_normal = calcMatcapVector(ws_vertex, UnityWorldToObjectDir(ws_bump_normal));
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
         // メタリック
-        affectMetallic(i, ws_vertex, uv_main, ls_normal, ls_bump_normal, color);
+        affectMetallic(i, ws_vertex, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), uv_main, color);
         // 階調影
-        affectToonShade(i, uv_main, ls_normal, ls_bump_normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
         affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
         // ScreenTone
@@ -161,7 +163,7 @@
         affectOcclusion(i, uv_main, color);
 
         // Alpha
-        affectAlphaWithFresnel(uv_main, ls_normal, localSpaceViewDir(ws_vertex), color);
+        affectAlphaWithFresnel(uv_main, ws_normal, worldSpaceViewDir(ws_vertex), color);
         // EmissiveScroll
         affectEmissiveScroll(ws_vertex, uv_main, color);
 

@@ -86,12 +86,14 @@
 
         // BumpMap
         float3 ls_normal = i.normal;
-        float3 ls_bump_normal;
-        affectBumpNormal(i, uv_main, ls_bump_normal, color);
+
+        float3 ws_normal = UnityObjectToWorldNormal(ls_normal);
+        float3 ws_bump_normal;
+        affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
         // ビュー空間法線
         float3 vs_normal = calcMatcapVector(ws_vertex, ls_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_vertex, ls_bump_normal);
+        float3 vs_bump_normal = calcMatcapVector(ws_vertex, UnityWorldToObjectDir(ws_bump_normal));
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
@@ -106,7 +108,7 @@
         WF_POWERCAP_AFFECT(8);
 
         // 階調影
-        affectToonShade(i, uv_main, ls_normal, ls_bump_normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
         affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
 
@@ -114,7 +116,7 @@
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlphaWithFresnel(i.uv, ls_normal, localSpaceViewDir(ws_vertex), color);
+        affectAlphaWithFresnel(i.uv, ws_normal, worldSpaceViewDir(ws_vertex), color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

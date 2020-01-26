@@ -79,7 +79,7 @@
             color.a = baseAlpha;
         }
 
-        inline void affectAlphaWithFresnel(float2 uv, float3 ls_normal, float3 ls_viewdir, inout float4 color) {
+        inline void affectAlphaWithFresnel(float2 uv, float3 ws_normal, float3 ws_viewdir, inout float4 color) {
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
@@ -110,13 +110,13 @@
             #else
                 // フレネルアルファ
                 float maxValue = max( pickAlpha(uv, color.a) * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
-                float fa = 1 - abs( dot( SafeNormalizeVec3(ls_normal), SafeNormalizeVec3(ls_viewdir) ) );
+                float fa = 1 - abs( dot( ws_normal, ws_viewdir ) );
                 color.a = lerp( baseAlpha, maxValue, fa * fa * fa * fa );
             #endif
         }
     #else
         #define affectAlpha(uv, color)                                      color.a = 1.0
-        #define affectAlphaWithFresnel(uv, ls_normal, ls_viewdir, color)    color.a = 1.0
+        #define affectAlphaWithFresnel(uv, ws_normal, ws_viewdir, color)    color.a = 1.0
     #endif
 
     ////////////////////////////
@@ -345,8 +345,8 @@
         float       _NM_InvMaskVal;
 #endif
 
-        inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ls_bump_normal, inout float4 color) {
-            float3 ls_normal = i.normal;
+        inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
+            float3 ws_normal = UnityObjectToWorldNormal(i.normal);
             if (TGL_ON(_NM_Enable)) {
                 // 1st NormalMap
                 float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, uv_main), _BumpScale );
@@ -367,19 +367,22 @@
 #endif
 
                 // 法線計算
-                float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のlocal法線空間
-                ls_bump_normal = mul( normalTangent, tangentTransform);
+                float3 ws_tangent = UnityObjectToWorldNormal(i.tangent);
+                float3 ws_bitangent = UnityObjectToWorldNormal(i.bitangent);
+                float3x3 tangentTransform = float3x3(ws_tangent, ws_bitangent, ws_normal); // vertex周辺のworld法線空間
+                float3 ws_bump_normal = mul( normalTangent, tangentTransform);
 
-                // NormalMap は陰影として描画する(ls_bump_normal自体は後でも使う)
-                // 影側を暗くしすぎないために、ls_normal と ls_bump_normal の差を加算することで明暗を付ける
-                color.rgb += (dot(ls_bump_normal, i.ls_light_dir.xyz) - dot(ls_normal, i.ls_light_dir.xyz)) * _NM_Power;
+                // NormalMap は陰影として描画する
+                // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を加算することで明暗を付ける
+                float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir);
+                color.rgb += (dot(ws_bump_normal, ws_light_dir) - dot(ws_normal, ws_light_dir)) * _NM_Power;
             }
             else {
-                ls_bump_normal = ls_normal;
+                ws_bump_normal = ws_normal;
             }
         }
     #else
-        #define affectBumpNormal(i, uv_main, ls_bump_normal, color)  ls_bump_normal = i.normal
+        #define affectBumpNormal(i, uv_main, ws_bump_normal, color)  ws_bump_normal = UnityObjectToWorldNormal(i.normal)
     #endif
 
     ////////////////////////////
@@ -403,27 +406,26 @@
         float4      _MT_Cubemap_HDR;
 #endif
 
-        inline float3 pickReflection(float3 ws_vertex, float3 ls_metal_normal, float smoothness) {
+        inline float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
 #ifndef _WF_MOBILE
             if (_MT_CubemapType == 1) {
                 // ADDITION
-                return pickReflectionProbe(ws_vertex, ls_metal_normal, metal_lod)
-                    + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ls_metal_normal, metal_lod);
+                return pickReflectionProbe(ws_vertex, ws_normal, metal_lod)
+                    + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
             }
             if (_MT_CubemapType == 2) {
                 // ONLY_SECOND_MAP
-                return pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ls_metal_normal, metal_lod);
+                return pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
             }
 #endif
             // OFF
-            return pickReflectionProbe(ws_vertex, ls_metal_normal, metal_lod);
+            return pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
         }
 
-        inline float3 pickSpecular(float3 ws_vertex, float3 ls_metal_normal, float4 ls_light_dir, float3 spec_color, float smoothness) {
+        inline float3 pickSpecular(float3 ws_vertex, float3 ws_normal, float4 ls_light_dir, float3 spec_color, float smoothness) {
             float roughness         = (1 - smoothness) * (1 - smoothness);
 
-            float3 ws_normal        = UnityObjectToWorldNormal(ls_metal_normal);
             float3 ws_camera_dir    = worldSpaceViewDir(ws_vertex);
 
             float3 ws_light_dir     = UnityObjectToWorldNormal(ls_light_dir);
@@ -434,14 +436,14 @@
             return max(ZERO_VEC3, specular);
         }
 
-        inline void affectMetallic(v2f i, float3 ws_vertex, float2 uv_main, float3 ls_normal, float3 ls_bump_normal, inout float4 color) {
+        inline void affectMetallic(v2f i, float3 ws_vertex, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
-                float3 ls_metal_normal = lerp(ls_normal, ls_bump_normal, _MT_BlendNormal);
+                float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
                 float2 metallicSmoothness = SAMPLE_MASK_VALUE(_MetallicGlossMap, uv_main, _MT_InvMaskVal).ra;
                 float metallic = _MT_Metallic * metallicSmoothness.x;
                 if (0.01 < metallic) {
                     // リフレクション
-                    float3 reflection = pickReflection(ws_vertex, ls_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
+                    float3 reflection = pickReflection(ws_vertex, ws_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
                     if (TGL_ON(_MT_Monochrome)) {
                         reflection = calcBrightness(reflection);
                     }
@@ -449,7 +451,7 @@
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(ws_vertex, ls_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
+                        specular = pickSpecular(ws_vertex, ws_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
                     }
 
                     // 合成
@@ -461,7 +463,7 @@
             }
         }
     #else
-        #define affectMetallic(i, ws_vertex, uv_main, ls_normal, ls_bump_normal, color)
+        #define affectMetallic(i, ws_vertex, uv_main, ws_normal, ws_bump_normal, color)
     #endif
 
     ////////////////////////////
@@ -553,10 +555,12 @@
             }
         }
 
-        inline void affectToonShade(v2f i, float2 uv_main, float3 ls_normal, float3 ls_bump_normal, float angle_light_camera, inout float4 color) {
+        inline void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
                 float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, uv_main, _TS_InvMaskVal).r;
-                float brightness = dot(lerp(ls_normal, ls_bump_normal, _TS_BlendNormal), i.ls_light_dir.xyz) * (1 - boostlight) + boostlight;
+                float3 ws_shade_normal = normalize(lerp(ws_normal, ws_bump_normal, _TS_BlendNormal));
+                float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir.xyz);
+                float brightness = dot(ws_shade_normal, ws_light_dir) * (1 - boostlight) + boostlight;
                 // ビュー相対位置シフト
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
                 // 影色計算
@@ -580,7 +584,7 @@
         }
     #else
         #define calcToonShadeContrast(ws_vertex, ls_light_dir, ambientColor, shadow_power)
-        #define affectToonShade(i, uv_main, ls_normal, ls_bump_normal, angle_light_camera, color)
+        #define affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color)
     #endif
 
     ////////////////////////////
@@ -747,7 +751,7 @@
     #elif _WF_DEBUGVIEW_POSITION
         #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += saturate( abs(i.ls_vertex.xyz) )
     #elif _WF_DEBUGVIEW_NORMAL
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += ls_normal.rgb / 2 + 0.5
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectNormal(ws_normal).rgb / 2 + 0.5
     #elif _WF_DEBUGVIEW_TANGENT
         #ifdef _NM_ENABLE
             #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.tangent.rgb / 2 + 0.5
@@ -755,7 +759,7 @@
             #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
         #endif
     #elif _WF_DEBUGVIEW_BUMPED_NORMAL
-        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += ls_bump_normal.rgb / 2 + 0.5
+        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectNormal(ws_bump_normal).rgb / 2 + 0.5
     #elif _WF_DEBUGVIEW_LIGHT_COLOR
         #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.light_color.rgb
     #elif _WF_DEBUGVIEW_LIGHT_MAP
