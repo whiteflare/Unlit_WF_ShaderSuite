@@ -148,14 +148,14 @@
         i.uv = gi.uv;
         i.ls_vertex = gi.ls_vertex;
         i.normal = gi.normal;
-        i.ls_light_dir = calcLocalSpaceLightDir(gi.ls_vertex);
 
         float4 ws_vertex = mul(unity_ObjectToWorld, i.ls_vertex);
+        i.ws_light_dir = calcWorldSpaceLightDir(i.ls_vertex);
 
         // 環境光取得
         float3 ambientColor = OmniDirectional_ShadeSH9();
         // 影コントラスト
-        calcToonShadeContrast(ws_vertex, i.ls_light_dir, ambientColor, i.shadow_power);
+        calcToonShadeContrast(ws_vertex, i.ws_light_dir, ambientColor, i.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
         i.light_color = calcLightColorVertex(ws_vertex, ambientColor);
 

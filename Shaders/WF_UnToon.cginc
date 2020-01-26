@@ -46,7 +46,7 @@
         float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float4 ls_vertex        : TEXCOORD1;
-        float4 ls_light_dir     : TEXCOORD2;
+        float4 ws_light_dir     : TEXCOORD2;
         float3 light_color      : COLOR0;
         #ifdef _TS_ENABLE
             float shadow_power  : COLOR1;
@@ -90,7 +90,7 @@
         o.vs_vertex = UnityWorldToClipPos(ws_vertex);
         o.uv = v.uv;
         o.ls_vertex = v.vertex;
-        o.ls_light_dir = calcLocalSpaceLightDir(v.vertex);
+        o.ws_light_dir = calcWorldSpaceLightDir(v.vertex);
         #ifdef _LMAP_ENABLE
             o.uv_lmap = v.uv_lmap;
         #endif
@@ -110,7 +110,7 @@
         // 環境光取得
         float3 ambientColor = calcAmbientColorVertex(v);
         // 影コントラスト
-        calcToonShadeContrast(ws_vertex, o.ls_light_dir, ambientColor, o.shadow_power);
+        calcToonShadeContrast(ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
         o.light_color = calcLightColorVertex(ws_vertex, ambientColor);
 

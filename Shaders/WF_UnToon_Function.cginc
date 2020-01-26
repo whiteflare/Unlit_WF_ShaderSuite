@@ -158,28 +158,28 @@
         return mul(unity_ObjectToWorld, float4(0, 0, 0, ls_vertex.w));
     }
 
-    inline float4 calcLocalSpaceLightDir(float4 ls_vertex) {
+    inline float4 calcWorldSpaceLightDir(float4 ls_vertex) {
         float3 ws_vertex = calcWorldSpaceBasePos(ls_vertex);
         uint mode = _GL_LightMode;
         if (mode == LIT_MODE_AUTO) {
             mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
-            return float4( UnityWorldToObjectDir( _WorldSpaceLightPos0.xyz ), +1 );
+            return float4( _WorldSpaceLightPos0.xyz , +1 );
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
-            return float4( calcPointLight1Dir(ws_vertex) , -1 );
+            return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
         }
         if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
-            return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
+            return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
         }
         if (mode == LIT_MODE_CUSTOM_LOCALSPACE) {
-            return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude), 0 );
+            return float4( UnityObjectToWorldDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)) , 0 );
         }
-        return float4( UnityWorldToObjectDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)), 0 );
+        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
     }
 
-    inline float3 calcLocalSpaceLightColor(float3 ws_vertex, float lightType) {
+    inline float3 calcWorldSpaceLightColor(float3 ws_vertex, float lightType) {
         if ( TGL_ON(-lightType) ) {
             float3 pointLight1Color = calcPointLight1Color(ws_vertex);
             return pointLight1Color; // ポイントライト
@@ -218,10 +218,9 @@
             return 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
         }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir); // ワールド座標系にてangle_light_cameraを計算する(モデル回転には依存しない)
         float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(i.ls_vertex).xz;
-        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
-            * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
+        float angle_light_camera = dot( SafeNormalizeVec2(i.ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
+            * (1 - smoothstep(0.9, 1, abs(i.ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         return angle_light_camera;
     }
 
@@ -374,8 +373,7 @@
 
                 // NormalMap は陰影として描画する
                 // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を加算することで明暗を付ける
-                float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir);
-                color.rgb += (dot(ws_bump_normal, ws_light_dir) - dot(ws_normal, ws_light_dir)) * _NM_Power;
+                color.rgb += (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(ws_normal, i.ws_light_dir.xyz)) * _NM_Power;
             }
             else {
                 ws_bump_normal = ws_normal;
@@ -423,12 +421,11 @@
             return pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
         }
 
-        inline float3 pickSpecular(float3 ws_vertex, float3 ws_normal, float4 ls_light_dir, float3 spec_color, float smoothness) {
+        inline float3 pickSpecular(float3 ws_vertex, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
             float roughness         = (1 - smoothness) * (1 - smoothness);
 
             float3 ws_camera_dir    = worldSpaceViewDir(ws_vertex);
 
-            float3 ws_light_dir     = UnityObjectToWorldNormal(ls_light_dir);
             float3 halfVL           = normalize(ws_camera_dir + ws_light_dir);
             float NdotH             = max(0, dot( ws_normal, halfVL ));
             float3 specular         = spec_color * GGXTerm(NdotH, roughness);
@@ -451,7 +448,7 @@
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(ws_vertex, ws_metal_normal, i.ls_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
+                        specular = pickSpecular(ws_vertex, ws_metal_normal, i.ws_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
                     }
 
                     // 合成
@@ -532,12 +529,12 @@
         DECL_SUB_TEX2D(_TS_MaskTex);
         float       _TS_InvMaskVal;
 
-        inline void calcToonShadeContrast(float3 ws_vertex, float4 ls_light_dir, float3 ambientColor, out float shadow_power) {
+        inline void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
             if (TGL_ON(_TS_Enable)) {
-                float3 lightColorMain = calcLocalSpaceLightColor(ws_vertex, ls_light_dir.w);
+                float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
                 float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
                         unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                        0 < ls_light_dir.w ? unity_LightColor[0].rgb : ZERO_VEC3,
+                        0 < ws_light_dir.w ? unity_LightColor[0].rgb : ZERO_VEC3,
                         unity_LightColor[1].rgb,
                         unity_LightColor[2].rgb,
                         unity_LightColor[3].rgb,
@@ -548,7 +545,7 @@
                 float sub4 = saturate(calcBrightness( lightColorSub4 ));
                 float ambient = saturate(calcBrightness( ambientColor ));
                 shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
-                shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ls_light_dir.y)) * 0.5 );
+                shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
                 shadow_power = min( shadow_power, 1 - saturate(ambient) * 0.5 );
             } else {
                 shadow_power = 0;
@@ -559,8 +556,7 @@
             if (TGL_ON(_TS_Enable)) {
                 float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, uv_main, _TS_InvMaskVal).r;
                 float3 ws_shade_normal = normalize(lerp(ws_normal, ws_bump_normal, _TS_BlendNormal));
-                float3 ws_light_dir = UnityObjectToWorldDir(i.ls_light_dir.xyz);
-                float brightness = dot(ws_shade_normal, ws_light_dir) * (1 - boostlight) + boostlight;
+                float brightness = dot(ws_shade_normal, i.ws_light_dir.xyz) * (1 - boostlight) + boostlight;
                 // ビュー相対位置シフト
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
                 // 影色計算
@@ -583,7 +579,7 @@
             }
         }
     #else
-        #define calcToonShadeContrast(ws_vertex, ls_light_dir, ambientColor, shadow_power)
+        #define calcToonShadeContrast(ws_vertex, ws_light_dir, ambientColor, shadow_power)
         #define affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color)
     #endif
 

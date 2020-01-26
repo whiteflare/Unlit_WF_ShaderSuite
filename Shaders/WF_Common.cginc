@@ -162,6 +162,14 @@
         return col;
     }
 
+    inline float3 calcPointLight1WorldDir(float3 ws_vertex) {
+        ws_vertex = calcPointLight1Pos() - ws_vertex;
+        if (dot(ws_vertex, ws_vertex) < 0.1) {
+            ws_vertex = float3(0, 1, 0);
+        }
+        return SafeNormalizeVec3( ws_vertex );
+    }
+
     inline float3 calcPointLight1Dir(float3 ws_vertex) {
         ws_vertex = calcPointLight1Pos() - ws_vertex;
         if (dot(ws_vertex, ws_vertex) < 0.1) {
