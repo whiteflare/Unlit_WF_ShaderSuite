@@ -28,20 +28,6 @@ namespace UnlitWF
     public class ShaderCustomEditor : ShaderGUI
     {
         /// <summary>
-        /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
-        /// </summary>
-        private readonly Dictionary<string, string> MIGRATION_PROP_RENAME = new Dictionary<string, string>() {
-            { "_AL_CutOff", "_Cutoff" },
-            { "_MT_MaskTex", "_MetallicGlossMap" },
-            { "_MT_BlendType", "_MT_Brightness" },
-            { "_MT_Smoothness", "_MT_ReflSmooth" },
-            { "_MT_Smoothness2", "_MT_SpecSmooth" },
-            { "_ES_MaskTex", "_EmissionMap" },
-            { "_ES_Color", "_EmissionColor" },
-            { "_GL_BrendPower", "_GL_BlendPower" },
-        };
-
-        /// <summary>
         /// テクスチャとカラーを1行で表示するやつのプロパティ名辞書
         /// </summary>
         private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
@@ -144,48 +130,17 @@ namespace UnlitWF
         }
 
         private void MigrationHelpBox(MaterialEditor materialEditor) {
-            // 操作対象のマテリアル
-            var matlist = new List<Material>();
-            foreach (var obj in materialEditor.targets) {
-                var mat = obj as Material;
-                if (mat == null) {
-                    continue;
-                }
-                if (mat.shader.name.Contains("MatcapShadows")) {
-                    // MatcapShadowsは古いので対象にしない
-                    continue;
-                }
-                matlist.Add(mat);
-            }
-            if (matlist.Count == 0) {
-                return;
-            }
+            var editor = new WFMaterialEditUtility();
 
-            var props = ShaderPropertyView.ToPropertyList(matlist);
-
-            var oldPropList = new List<ShaderPropertyView>();
-            foreach (var prop in props) {
-                if (MIGRATION_PROP_RENAME.ContainsKey(prop.name)) {
-                    oldPropList.Add(prop);
-                }
-            }
-            if (oldPropList.Count <= 0) {
-                return;
-            }
-
-            var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
-                "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
-                "This Material may have been created in an older version. Convert to new version?";
-            if (materialEditor.HelpBoxWithButton(
-                                new GUIContent(tex),
-                                new GUIContent("Fix Now"))) {
-                // 名称を全て変更
-                foreach (var prop in oldPropList) {
-                    prop.Rename(MIGRATION_PROP_RENAME[prop.name]);
-                }
-                // 保存
-                foreach(var so in ShaderPropertyView.GetUniqueSerialObject(oldPropList)) {
-                    so.ApplyModifiedProperties();
+            if (editor.ExistsOldNameProperty(materialEditor.targets)) {
+                var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
+                    "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
+                    "This Material may have been created in an older version. Convert to new version?";
+                if (materialEditor.HelpBoxWithButton(
+                                    new GUIContent(tex),
+                                    new GUIContent("Fix Now"))) {
+                    // 名称を全て変更
+                    editor.RenameOldNameProperties(materialEditor.targets);
                 }
             }
         }

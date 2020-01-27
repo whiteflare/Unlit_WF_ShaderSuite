@@ -67,6 +67,31 @@ namespace UnlitWF
             }
         }
 
+        /// <summary>
+        /// プレフィックス名のついてない特殊なプロパティ名の対応辞書
+        /// </summary>
+        private static readonly Dictionary<string, string> SPECIAL_PROP_NAME = new Dictionary<string, string>() {
+            { "_Cutoff", "AL" },
+            { "_BumpMap", "NM" },
+            { "_BumpScale", "NM" },
+            { "_DetailNormalMap", "NM" },
+            { "_DetailNormalMapScale", "NM" },
+            { "_MetallicGlossMap", "MT" },
+            { "_EmissionColor", "ES" },
+            { "_EmissionMap", "ES" },
+            { "_OcclusionMap", "AO" },
+        };
+
+        public static string GetPrefixFromPropName(string prop_name) {
+            string label;
+            if (SPECIAL_PROP_NAME.TryGetValue(prop_name, out label)) {
+                return label;
+            }
+            string name;
+            WFCommonUtility.FormatPropName(prop_name, out label, out name);
+            return label;
+        }
+
         public static bool IsEnableToggle(string label, string name) {
             return label != null && name.ToLower() == "enable";
         }
@@ -98,7 +123,7 @@ namespace UnlitWF
 
         public void Remove() {
             var props = ToPropertyList(material, serialObject, parent);
-            for(int i = props.Count - 1; 0 <= i; i--) {
+            for (int i = props.Count - 1; 0 <= i; i--) {
                 if (props[i].name == this.name) {
                     parent.DeleteArrayElementAtIndex(i);
                 }
@@ -106,6 +131,13 @@ namespace UnlitWF
         }
 
         public void CopyTo(ShaderPropertyView other) {
+            // テクスチャだけなんか SerializedProperty から見えないので Material からセットする
+            if (parent.name == "m_TexEnvs") {
+                other.material.SetTexture(other.name, material.GetTexture(name));
+                other.material.SetTextureOffset(other.name, material.GetTextureOffset(name));
+                other.material.SetTextureScale(other.name, material.GetTextureScale(name));
+                return;
+            }
             var src_value = this.value;
             var dst_value = other.value;
             switch (src_value.propertyType) {
@@ -147,7 +179,7 @@ namespace UnlitWF
         }
 
         public static void AllApplyPropertyChange(IEnumerable<ShaderPropertyView> props) {
-            foreach(var so in GetUniqueSerialObject(props)) {
+            foreach (var so in GetUniqueSerialObject(props)) {
                 so.ApplyModifiedProperties();
             }
         }
