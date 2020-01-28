@@ -315,7 +315,7 @@ namespace UnlitWF
             { "[SH] 1st Border", "[SH] 1影の境界位置" },
             { "[SH] 2nd Border", "[SH] 2影の境界位置" },
             { "[SH] Feather", "[SH] 境界のぼかし強度" },
-            { "[SH] BoostLight Mask Texture", "[SH] ブーストライトマスク" },
+            { "[SH] Anti-Shadow Mask Texture", "[SH] アンチシャドウマスク" },
             { "[SH] Shade Color Suggest", "[SH] 影色を自動設定する" },
             // RimLight
             { "[RM] Rim Color", "[RM] リムライト色" },
