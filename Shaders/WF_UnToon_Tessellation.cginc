@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/10/27 whiteflare,
+     *      ver:2020/02/01 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
