@@ -20,10 +20,10 @@
 
     /*
      * authors:
-     *      ver:2019/07/13 whiteflare,
+     *      ver:2020/02/01 whiteflare,
      */
 
-    #include "WF_Common.cginc"
+    #include "WF_UnToon.cginc"
 
     struct appdata_fur {
         float4 vertex           : POSITION;
@@ -146,19 +146,21 @@
 
         v2f i = (v2f) 0;
         i.uv = gi.uv;
-        i.ls_vertex = gi.ls_vertex;
-        i.normal = gi.normal;
-        i.ls_light_dir = calcLocalSpaceLightDir( float4(0, 0, 0, i.ls_vertex.w) );
+        i.ws_vertex = mul(unity_ObjectToWorld, gi.ls_vertex);
+        i.normal = UnityObjectToWorldNormal(gi.normal);
+
+        i.ws_light_dir = calcWorldSpaceLightDir(gi.ls_vertex);
 
         // 環境光取得
         float3 ambientColor = OmniDirectional_ShadeSH9();
         // 影コントラスト
-        calcToonShadeContrast(i.ls_vertex, i.ls_light_dir, ambientColor, i.shadow_power);
+        calcToonShadeContrast(i.ws_vertex, i.ws_light_dir, ambientColor, i.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
-        i.light_color = calcLightColorVertex(i.ls_vertex, ambientColor);
+        i.light_color = calcLightColorVertex(i.ws_vertex, ambientColor);
 
         // メイン
-        float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
+        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
 
         // 色変換
         affectColorChange(color);
@@ -166,17 +168,17 @@
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
         // 階調影
-        affectToonShade(i, i.normal, i.normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlpha(i.uv, color);
+        affectAlpha(uv_main, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
-        float4 maskTex = tex2D(_FurMaskTex, i.uv);
+        float4 maskTex = tex2D(_FurMaskTex, uv_main);
         if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
             discard;
         }

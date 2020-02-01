@@ -27,19 +27,33 @@ namespace UnlitWF
 {
     public class ShaderCustomEditor : ShaderGUI
     {
+        /// <summary>
+        /// テクスチャとカラーを1行で表示するやつのプロパティ名辞書
+        /// </summary>
+        private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
+            { "_TS_BaseColor", "_TS_BaseTex" },
+            { "_TS_1stColor", "_TS_1stTex" },
+            { "_TS_2ndColor", "_TS_2ndTex" },
+            { "_ES_Color", "_ES_MaskTex" },
+            { "_EmissionColor", "_EmissionMap" },
+        };
+
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
             materialEditor.SetDefaultGUIWidths();
 
             Material mat = materialEditor.target as Material;
             if (mat != null) {
+                // シェーダ名の表示
                 var rect = EditorGUILayout.GetControlRect();
                 rect.y += 2;
                 GUI.Label(rect, "Current Shader", EditorStyles.boldLabel);
                 GUILayout.Label(new Regex(@".*/").Replace(mat.shader.name, ""));
+                // マイグレーションHelpBox
+                MigrationHelpBox(materialEditor);
             }
 
             // 現在無効なラベルを保持するリスト
-            var disable = new List<string>();
+            var disable = new HashSet<string>();
             // プロパティを順に描画
             foreach (var prop in properties) {
                 // ラベル付き displayName を、ラベルと名称に分割
@@ -71,6 +85,7 @@ namespace UnlitWF
                 // 描画
                 GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
                 if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
+                    // テクスチャとカラーを1行で表示するものにマッチした場合
                     MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties, false);
                     if (propTex != null) {
                         materialEditor.TexturePropertySingleLine(guiContent, propTex, prop);
@@ -114,6 +129,22 @@ namespace UnlitWF
             }
         }
 
+        private void MigrationHelpBox(MaterialEditor materialEditor) {
+            var editor = new WFMaterialEditUtility();
+
+            if (editor.ExistsOldNameProperty(materialEditor.targets)) {
+                var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
+                    "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
+                    "This Material may have been created in an older version. Convert to new version?";
+                if (materialEditor.HelpBoxWithButton(
+                                    new GUIContent(tex),
+                                    new GUIContent("Fix Now"))) {
+                    // 名称を全て変更
+                    editor.RenameOldNameProperties(materialEditor.targets);
+                }
+            }
+        }
+
         private void SuggestShadowColor(object[] targets) {
             foreach (object obj in targets) {
                 Material m = obj as Material;
@@ -149,13 +180,6 @@ namespace UnlitWF
             }
             return hur;
         }
-
-        private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
-            { "_TS_BaseColor", "_TS_BaseTex" },
-            { "_TS_1stColor", "_TS_1stTex" },
-            { "_TS_2ndColor", "_TS_2ndTex" },
-            { "_ES_Color", "_ES_MaskTex" },
-        };
 
         public static void DrawShurikenStyleHeader(Rect position, string text, MaterialProperty prop) {
             // SurikenStyleHeader

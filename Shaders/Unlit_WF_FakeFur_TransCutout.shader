@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/12/22 whiteflare,
+     *      ver:2020/02/01 whiteflare,
      */
 
     Properties {
@@ -33,7 +33,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BrendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
@@ -90,7 +90,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] BoostLight Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
@@ -145,8 +145,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -171,9 +169,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-            #include "WF_UnToon.cginc"
             #include "WF_FakeFur.cginc"
 
             ENDCG
@@ -181,6 +176,8 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
     }
+
+    FallBack "Unlit/Transparent"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

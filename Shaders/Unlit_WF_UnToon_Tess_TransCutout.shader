@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
 
     /*
      * authors:
-     *      ver:2019/12/22 whiteflare,
+     *      ver:2020/02/01 whiteflare,
      */
 
     Properties {
@@ -32,7 +32,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BrendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
@@ -42,8 +42,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_CutOff              ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
 
         // Tessellation
         [WFHeader(Tessellation)]
@@ -88,19 +87,19 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         [WFHeaderToggle(Metallic)]
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
-            _MT_Smoothness          ("[MT] Smoothness", Range(0, 1)) = 0.95
-            _MT_BlendType           ("[MT] Brightness", Range(0, 1)) = 0.2
+            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.95
+            _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [Toggle(_)]
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [NoScaleOffset]
-            _MT_MaskTex             ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MetallicGlossMap       ("[MT] MetallicMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
-            _MT_Smoothness2         ("[MT] Smoothness", Range(0, 1)) = 0.8
+            _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
 
         [Header(Metallic Secondary)]
         [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
@@ -141,7 +140,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] BoostLight Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
@@ -173,14 +172,18 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
-        [WFHeaderToggle(Emissive Scroll)]
+        [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
-            _ES_Color               ("[ES] Emissive Color", Color) = (1, 1, 1, 1)
+            _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _ES_MaskTex             ("[ES] Mask Texture", 2D) = "white" {}
-        [Enum(EXCITATION,0,SAWTOOTH_WAVE,1,SIN_WAVE,2,ALWAYS_ON,3)]
-            _ES_Shape               ("[ES] Wave Type", Float) = 0
+            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
+        [Enum(ADD,0,ALPHA,1)]
+            _ES_BlendType           ("[ES] Blend Type", Float) = 0
+
+        [Header(Emissive Scroll)]
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
+            _ES_Shape               ("[ES] Wave Type", Float) = 3
         [Toggle(_)]
             _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
@@ -209,10 +212,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
-        [NoScaleOffset]
-            _AO_MaskTex             ("[AO] Occlusion Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _AO_InvMaskVal          ("[AO] Invert Mask Value", Range(0, 1)) = 0
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
@@ -221,10 +220,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [Toggle(_)]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-
-        [WFHeader(DebugMode)]
-        [KeywordEnum(NONE,MAGENTA,CLIP,POSITION,NORMAL,TANGENT,BUMPED_NORMAL,LIGHT_COLOR,LIGHT_MAP)]
-            _WF_DebugView           ("Debug View", Float) = 0
     }
 
     SubShader {
@@ -243,13 +238,14 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutout_upper
+            #pragma fragment frag
             #pragma hull hull
             #pragma domain domain_outline
 
             #pragma target 5.0
 
             #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _CL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
@@ -257,10 +253,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon_Tessellation.cginc"
 
             ENDCG
@@ -275,16 +267,18 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutout_upper
+            #pragma fragment frag
             #pragma hull hull
             #pragma domain domain
 
             #pragma target 5.0
 
             #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
@@ -293,10 +287,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon_Tessellation.cginc"
 
             ENDCG
@@ -311,13 +301,14 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_cutout_upper
+            #pragma fragment frag
             #pragma hull hull
             #pragma domain domain
 
             #pragma target 5.0
 
             #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
@@ -331,17 +322,16 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma shader_feature _WF_DEBUGVIEW_NONE _WF_DEBUGVIEW_MAGENTA _WF_DEBUGVIEW_CLIP _WF_DEBUGVIEW_POSITION _WF_DEBUGVIEW_NORMAL _WF_DEBUGVIEW_TANGENT _WF_DEBUGVIEW_BUMPED_NORMAL _WF_DEBUGVIEW_LIGHT_COLOR _WF_DEBUGVIEW_LIGHT_MAP
-
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon_Tessellation.cginc"
 
             ENDCG
         }
 
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
+
+    FallBack "Unlit/Transparent Cutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

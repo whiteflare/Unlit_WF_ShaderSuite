@@ -20,10 +20,9 @@
 
     /*
      * authors:
-     *      ver:2019/11/24 whiteflare,
+     *      ver:2020/02/01 whiteflare,
      */
 
-    #include "WF_Common.cginc"
     #include "WF_UnToon.cginc"
 
     ////////////////////////////
@@ -39,11 +38,11 @@
         float       _HL_BlendNormal_##id;                                                                                           \
         DECL_SUB_TEX2D(_HL_MaskTex_##id);                                                                                           \
         float       _HL_InvMaskVal_##id;                                                                                            \
-        void affectMatcapColor_##id(float2 matcapVector, float2 mask_uv, inout float4 color) {                                      \
+        void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
             if (TGL_ON(_HL_Enable_##id)) {                                                                                          \
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;                                                                     \
                 float3 matcap_color = tex2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                           \
-                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, mask_uv, _HL_InvMaskVal_##id).rgb;                         \
+                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, uv_main, _HL_InvMaskVal_##id).rgb;                         \
                 if (_HL_CapType_##id == 1) {                                                                                        \
                     float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor_##id) * 2);                   \
                     color.rgb += matcap_color * lightcap_power * _HL_Power_##id;                                                    \
@@ -85,13 +84,13 @@
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
 
         // BumpMap
-        float3 ls_normal = i.normal;
-        float3 ls_bump_normal;
-        affectBumpNormal(i, uv_main, ls_bump_normal, color);
+        float3 ws_normal = i.normal;
+        float3 ws_bump_normal;
+        affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(i.ls_vertex, ls_normal);
-        float3 vs_bump_normal = calcMatcapVector(i.ls_vertex, ls_bump_normal);
+        float3 vs_normal = calcMatcapVector(i.ws_vertex, ws_normal);
+        float3 vs_bump_normal = calcMatcapVector(i.ws_vertex, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
@@ -106,36 +105,21 @@
         WF_POWERCAP_AFFECT(8);
 
         // 階調影
-        affectToonShade(i, ls_normal, ls_bump_normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, vs_normal, angle_light_camera, color);
+        affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlphaWithFresnel(i.uv, ls_normal, localSpaceViewDir(i.ls_vertex), color);
+        affectAlphaWithFresnel(i.uv, ws_normal, worldSpaceViewDir(i.ws_vertex), color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
         // fog
         UNITY_APPLY_FOG(i.fogCoord, color);
 
-        // デバッグビュー
-        WF_AFFECT_DEBUGVIEW;
-
-        return color;
-    }
-
-    float4 frag_powercap_cutout_upper(v2f i) : SV_Target { // Cutout閾値よりも上側を描画
-        float4 color = frag_powercap(i);
-        clip(color.a - _AL_CutOff);
-        return color;
-    }
-
-    float4 frag_powercap_cutout_lower(v2f i) : SV_Target { // Cutout閾値よりも下側を描画
-        float4 color = frag_powercap(i);
-        clip(_AL_CutOff - color.a);
         return color;
     }
 

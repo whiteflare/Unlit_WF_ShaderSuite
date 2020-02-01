@@ -46,6 +46,13 @@ namespace UnlitWF
             }
         }
 
+        /// <summary>
+        /// プロパティ名の文字列から、Prefix+Suffixと名前を分割する。
+        /// </summary>
+        /// <param name="text">プロパティ名</param>
+        /// <param name="label">Prefix+Suffix</param>
+        /// <param name="name">名前</param>
+        /// <returns></returns>
         public static bool FormatPropName(string text, out string label, out string name) {
             var mm = PAT_PROP_NAME.Match(text ?? "");
             if (mm.Success) {
@@ -60,8 +67,184 @@ namespace UnlitWF
             }
         }
 
+        /// <summary>
+        /// プレフィックス名のついてない特殊なプロパティ名の対応辞書
+        /// </summary>
+        private static readonly Dictionary<string, string> SPECIAL_PROP_NAME = new Dictionary<string, string>() {
+            { "_Cutoff", "AL" },
+            { "_BumpMap", "NM" },
+            { "_BumpScale", "NM" },
+            { "_DetailNormalMap", "NM" },
+            { "_DetailNormalMapScale", "NM" },
+            { "_MetallicGlossMap", "MT" },
+            { "_EmissionColor", "ES" },
+            { "_EmissionMap", "ES" },
+            { "_OcclusionMap", "AO" },
+        };
+
+        public static string GetPrefixFromPropName(string prop_name) {
+            string label;
+            if (SPECIAL_PROP_NAME.TryGetValue(prop_name, out label)) {
+                return label;
+            }
+            string name;
+            WFCommonUtility.FormatPropName(prop_name, out label, out name);
+            return label;
+        }
+
         public static bool IsEnableToggle(string label, string name) {
             return label != null && name.ToLower() == "enable";
+        }
+    }
+
+    internal class ShaderPropertyView
+    {
+        public readonly Material material;
+        public readonly SerializedObject serialObject;
+        public readonly SerializedProperty parent;
+        public readonly SerializedProperty property;
+        public readonly String name;
+        public readonly SerializedProperty value;
+
+        public ShaderPropertyView(Material material, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property) {
+            this.material = material;
+            this.serialObject = serialObject;
+            this.parent = parent;
+            this.property = property;
+
+            SerializedProperty first = property.FindPropertyRelative("first");
+            this.name = first != null ? first.stringValue : "no_name";
+            this.value = property.FindPropertyRelative("second");
+        }
+
+        public void Rename(string newName) {
+            property.FindPropertyRelative("first").stringValue = newName;
+        }
+
+        public void Remove() {
+            var props = ToPropertyList(material, serialObject, parent);
+            for (int i = props.Count - 1; 0 <= i; i--) {
+                if (props[i].name == this.name) {
+                    parent.DeleteArrayElementAtIndex(i);
+                }
+            }
+        }
+
+        public void CopyTo(ShaderPropertyView other) {
+            // テクスチャだけなんか SerializedProperty から見えないので Material からセットする
+            if (parent.name == "m_TexEnvs") {
+                other.material.SetTexture(other.name, material.GetTexture(name));
+                other.material.SetTextureOffset(other.name, material.GetTextureOffset(name));
+                other.material.SetTextureScale(other.name, material.GetTextureScale(name));
+                return;
+            }
+            var src_value = this.value;
+            var dst_value = other.value;
+            switch (src_value.propertyType) {
+                case SerializedPropertyType.Float:
+                    dst_value.floatValue = src_value.floatValue;
+                    break;
+                case SerializedPropertyType.Color:
+                    dst_value.colorValue = src_value.colorValue;
+                    break;
+                case SerializedPropertyType.ObjectReference:
+                    dst_value.objectReferenceValue = src_value.objectReferenceValue;
+                    break;
+
+                case SerializedPropertyType.Integer:
+                    dst_value.intValue = src_value.intValue;
+                    break;
+                case SerializedPropertyType.Boolean:
+                    dst_value.boolValue = src_value.boolValue;
+                    break;
+                case SerializedPropertyType.Enum:
+                    dst_value.enumValueIndex = src_value.enumValueIndex;
+                    break;
+                case SerializedPropertyType.Vector2:
+                    dst_value.vector2Value = src_value.vector2Value;
+                    break;
+                case SerializedPropertyType.Vector3:
+                    dst_value.vector3Value = src_value.vector3Value;
+                    break;
+                case SerializedPropertyType.Vector4:
+                    dst_value.vector4Value = src_value.vector4Value;
+                    break;
+                case SerializedPropertyType.Vector2Int:
+                    dst_value.vector2IntValue = src_value.vector2IntValue;
+                    break;
+                case SerializedPropertyType.Vector3Int:
+                    dst_value.vector3IntValue = src_value.vector3IntValue;
+                    break;
+            }
+        }
+
+        public static void AllApplyPropertyChange(IEnumerable<ShaderPropertyView> props) {
+            foreach (var so in GetUniqueSerialObject(props)) {
+                so.ApplyModifiedProperties();
+            }
+        }
+
+        public static HashSet<SerializedObject> GetUniqueSerialObject(IEnumerable<ShaderPropertyView> props) {
+            var ret = new HashSet<SerializedObject>();
+            foreach (var prop in props) {
+                if (prop != null && prop.serialObject != null) {
+                    ret.Add(prop.serialObject);
+                }
+            }
+            return ret;
+        }
+
+        public static HashSet<Material> GetUniqueMaterials(IEnumerable<ShaderPropertyView> props) {
+            var ret = new HashSet<Material>();
+            foreach (var prop in props) {
+                if (prop != null && prop.material != null) {
+                    ret.Add(prop.material);
+                }
+            }
+            return ret;
+        }
+
+        public static List<ShaderPropertyView> ToPropertyList(IEnumerable<Material> matlist) {
+            var list = new List<ShaderPropertyView>();
+            foreach (Material mat in matlist) {
+                list.AddRange(ToPropertyList(mat));
+            }
+            return list;
+        }
+
+        public static Dictionary<string, ShaderPropertyView> ToPropertyMap(Material mat) {
+            var ret = new Dictionary<string, ShaderPropertyView>();
+            foreach (var prop in ToPropertyList(mat)) {
+                ret[prop.name] = prop;
+            }
+            return ret;
+        }
+
+        public static List<ShaderPropertyView> ToPropertyList(Material mat) {
+            SerializedObject so = new SerializedObject(mat);
+            so.Update();
+            return ToPropertyList(mat, so);
+        }
+
+        public static List<ShaderPropertyView> ToPropertyList(Material material, SerializedObject so) {
+            var list = new List<ShaderPropertyView>();
+            var m_SavedProperties = so.FindProperty("m_SavedProperties");
+            if (m_SavedProperties != null) {
+                list.AddRange(ToPropertyList(material, so, m_SavedProperties.FindPropertyRelative("m_Floats")));
+                list.AddRange(ToPropertyList(material, so, m_SavedProperties.FindPropertyRelative("m_Colors")));
+                list.AddRange(ToPropertyList(material, so, m_SavedProperties.FindPropertyRelative("m_TexEnvs")));
+            }
+            return list;
+        }
+
+        public static List<ShaderPropertyView> ToPropertyList(Material material, SerializedObject so, SerializedProperty prop) {
+            var list = new List<ShaderPropertyView>();
+            if (prop != null) {
+                for (int i = 0; i < prop.arraySize; i++) {
+                    list.Add(new ShaderPropertyView(material, so, prop, prop.GetArrayElementAtIndex(i)));
+                }
+            }
+            return list;
         }
     }
 
@@ -112,7 +295,7 @@ namespace UnlitWF
             { "[MT] Brightness", "[MT] 明るさ" },
             { "[MT] Monochrome Reflection", "[MT] モノクロ反射" },
             { "[MT] Specular", "[MT] スペキュラ反射" },
-            { "[MT] MetallicMap Texture", "[MT] メタリックマップ" },
+            { "[MT] MetallicMap Texture", "[MT] MetallicSmoothnessマップ" },
             { "[MT] 2nd CubeMap Blend", "[MT] キューブマップ混合タイプ" },
             { "[MT] 2nd CubeMap", "[MT] キューブマップ" },
             // Light Matcap
@@ -132,7 +315,7 @@ namespace UnlitWF
             { "[SH] 1st Border", "[SH] 1影の境界位置" },
             { "[SH] 2nd Border", "[SH] 2影の境界位置" },
             { "[SH] Feather", "[SH] 境界のぼかし強度" },
-            { "[SH] BoostLight Mask Texture", "[SH] ブーストライトマスク" },
+            { "[SH] Anti-Shadow Mask Texture", "[SH] アンチシャドウマスク" },
             { "[SH] Shade Color Suggest", "[SH] 影色を自動設定する" },
             // RimLight
             { "[RM] Rim Color", "[RM] リムライト色" },
@@ -147,7 +330,8 @@ namespace UnlitWF
             { "[OL] Blend Power", "[OL] 混合の強度" },
             { "[OL] ScreenTone Mask Texture", "[OL] マスクテクスチャ" },
             // EmissiveScroll
-            { "[ES] Emissive Color", "[ES] Emissive色" },
+            { "[ES] Emission", "[ES] Emission" },
+            { "[ES] Blend Type", "[ES] 混合タイプ" },
             { "[ES] Mask Texture", "[ES] マスクテクスチャ" },
             { "[ES] Wave Type", "[ES] 波形" },
             { "[ES] Direction", "[ES] 方向" },
@@ -155,12 +339,13 @@ namespace UnlitWF
             { "[ES] Sharpness", "[ES] 鋭さ" },
             { "[ES] ScrollSpeed", "[ES] スピード" },
             { "[ES] Cull Mode", "[ES] カリングモード" },
-            { "[ES] Z-shift", "[ES] Z方向の調整" },
+            { "[ES] Z-shift", "[ES] カメラに近づける" },
             // Outline
             { "[LI] Line Color", "[LI] 線の色" },
             { "[LI] Line Width", "[LI] 線の太さ" },
+            { "[LI] Line Type", "[LI] 線の種類" },
             { "[LI] Outline Mask Texture", "[LI] マスクテクスチャ" },
-            { "[LI] Z-shift (tweak)", "[LI] Z方向の調整" },
+            { "[LI] Z-shift (tweak)", "[LI] カメラから遠ざける" },
             // Ambient Occlusion
             { "[AO] Occlusion Map", "[AO] オクルージョンマップ" },
             { "[AO] Use LightMap", "[AO] ライトマップも使用する" },

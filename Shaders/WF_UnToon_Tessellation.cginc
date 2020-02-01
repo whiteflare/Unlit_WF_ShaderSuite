@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2019/10/27 whiteflare,
+     *      ver:2020/02/01 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -70,7 +70,7 @@
 
         #define MUL_BARY(array, member)   (bary.x * array[0].member + bary.y * array[1].member + bary.z * array[2].member)
 
-        o.ls_vertex     = MUL_BARY(i, ls_vertex);
+        o.ws_vertex     = MUL_BARY(i, ws_vertex);
         o.uv            = MUL_BARY(i, uv);
         #ifdef _LMAP_ENABLE
             o.uv_lmap   = MUL_BARY(i, uv_lmap);
@@ -84,14 +84,14 @@
         // Phong Tessellation
         float3 phg[3];
         for (int a = 0; a < 3; a++) {
-            phg[a] = i[a].normal * (dot( i[a].ls_vertex.xyz, i[a].normal ) - dot(o.ls_vertex.xyz, i[a].normal));
+            phg[a] = i[a].normal * (dot( i[a].ws_vertex.xyz, i[a].normal ) - dot(o.ws_vertex.xyz, i[a].normal));
         }
-        o.ls_vertex.xyz += MUL_BARY(phg, xyz) * _Smoothing / 2.0;
+        o.ws_vertex.xyz += MUL_BARY(phg, xyz) * _Smoothing / 2.0;
 
         // Displacement HeightMap
         float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
         float disp = SAMPLE_MASK_VALUE_LOD(_DispMap, float4(uv_main, 0, 0), 0).r * _DispMapScale - _DispMapLevel;
-        o.ls_vertex.xyz += o.normal * disp * 0.01;
+        o.ws_vertex.xyz += o.normal * disp * 0.01;
 
         #undef MUL_BARY
 
@@ -99,26 +99,26 @@
     }
 
     [domain("tri")]
-    v2f domain(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+    v2f domain(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
         v2f o = domainCore(hsConst, i, bary);
-        vs_vertex = UnityObjectToClipPos(o.ls_vertex.xyz);
+        o.vs_vertex = UnityWorldToClipPos(o.ws_vertex.xyz);
         return o;
     }
 
     [domain("tri")]
-    v2f domain_outline(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+    v2f domain_outline(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
         v2f o = domainCore(hsConst, i, bary);
         // SV_POSITION を上書き
-        shiftOutlineVertex(o, vs_vertex);
+        o.vs_vertex = shiftOutlineVertex(o);
 
         return o;
     }
 
     [domain("tri")]
-    v2f domain_emissiveScroll(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation, out float4 vs_vertex : SV_Position) {
+    v2f domain_emissiveScroll(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
         v2f o = domainCore(hsConst, i, bary);
         // SV_POSITION を上書き
-        shiftEmissiveScrollVertex(o, vs_vertex);
+        o.vs_vertex = shiftEmissiveScrollVertex(o);
 
         return o;
     }

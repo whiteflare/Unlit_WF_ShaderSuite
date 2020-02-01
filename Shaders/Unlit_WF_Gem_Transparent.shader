@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     /*
      * authors:
-     *      ver:2019/12/22 whiteflare,
+     *      ver:2020/02/01 whiteflare,
      */
 
     Properties {
@@ -32,7 +32,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [WFHeader(Lit)]
         [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
             _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BrendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -47,7 +47,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [WFHeader(Gem Reflection)]
         [NoScaleOffset]
             _MT_Cubemap             ("[GM] CubeMap", Cube) = "" {}
-            _MT_BlendType           ("[GM] Brightness", Range(0, 1)) = 0.2
+            _MT_Brightness          ("[GM] Brightness", Range(0, 1)) = 0.2
         [Toggle(_)]
             _MT_Monochrome          ("[GM] Monochrome Reflection", Range(0, 1)) = 1
 
@@ -63,7 +63,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
         [HideInInspector]
         [FixFloat(1.0)]
-            _MT_Smoothness          ("[MT] Smoothness", Range(0, 1)) = 1
+            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
         [HideInInspector]
         [FixFloat(0.0)]
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0
@@ -75,7 +75,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 2
         [HideInInspector]
         [FixNoTexture]
-            _MT_MaskTex             ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MetallicGlossMap       ("[MT] MetallicMap Texture", 2D) = "white" {}
         [HideInInspector]
         [FixFloat(0.0)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
@@ -85,7 +85,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "DisableBatching" = "True"
         }
 
         Pass {
@@ -110,8 +109,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -139,13 +136,13 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
             #include "WF_UnToon.cginc"
 
             ENDCG
         }
     }
+
+    FallBack "Unlit/Transparent"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
