@@ -226,6 +226,7 @@
     }
 
     // geometry シェーダでアウトラインメッシュを張るタイプ。NORMALとEDGEをどちらもサポートする。
+#if SHADER_TARGET >= 40
     [maxvertexcount(10)]
     void geom_outline(triangle v2f v[3], inout TriangleStream<v2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
@@ -265,6 +266,7 @@
         }
         #endif
     }
+#endif
 
     ////////////////////////////
     // アウトラインキャンセラ用 vertex&fragment shader

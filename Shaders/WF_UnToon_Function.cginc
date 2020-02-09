@@ -372,7 +372,7 @@
 
                 // 法線計算
                 float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のworld法線空間
-                float3 ws_bump_normal = mul( normalTangent, tangentTransform);
+                ws_bump_normal = mul( normalTangent, tangentTransform);
 
                 // NormalMap は陰影として描画する
                 // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を加算することで明暗を付ける
@@ -409,19 +409,20 @@
 
         inline float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
-#ifndef _WF_MOBILE
-            if (_MT_CubemapType == 1) {
-                // ADDITION
-                return pickReflectionProbe(ws_vertex, ws_normal, metal_lod)
-                    + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
-            }
-            if (_MT_CubemapType == 2) {
-                // ONLY_SECOND_MAP
-                return pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
-            }
-#endif
-            // OFF
+#ifdef _WF_MOBILE
             return pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
+#else
+            float3 color = ZERO_VEC3;
+            // ONLYでなければ PROBE を加算
+            if (_MT_CubemapType != 0) {
+                color += pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
+            }
+            // OFFでなければ SECOND_MAP を加算
+            if (_MT_CubemapType != 0) {
+                color += pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
+            }
+            return color;
+#endif
         }
 
         inline float3 pickSpecular(float3 ws_vertex, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
@@ -568,7 +569,7 @@
                 float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv).rgb / base_color.rgb;
                 float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv).rgb / base_color.rgb;
 #else
-                float3 base_color = base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb );
+                float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb );
                 float3 shadow_color_1st = _TS_1stColor.rgb / base_color.rgb;
                 float3 shadow_color_2nd = _TS_2ndColor.rgb / base_color.rgb;
 #endif

@@ -44,9 +44,6 @@
     #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
     #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
 
-    #define WF_SAMPLE_TEX2D_LOD(tex, coord, lod)                        tex.SampleLevel(sampler##tex,coord, lod)
-    #define WF_SAMPLE_TEX2D_SAMPLER_LOD(tex, samplertex, coord, lod)    tex.SampleLevel(sampler##samplertex, coord, lod)
-
 #if 1
     // サンプラー節約のための差し替えマクロ
     // 節約にはなるけど最適化などで _MainTex のサンプリングが消えると途端に破綻する諸刃の剣
@@ -283,21 +280,28 @@
 
     inline float3 pickLightmapLod(float2 uv_lmap) {
         float3 color = ZERO_VEC3;
-        #ifdef LIGHTMAP_ON
-        {
-            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_Lightmap, uv, 0);
-            float3 lmap_color = DecodeLightmap(lmap_tex);
-            color += lmap_color;
-        }
-        #endif
-        #ifdef DYNAMICLIGHTMAP_ON
-        {
-            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
-            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
-            color += lmap_color;
-        }
+        #ifdef SHADER_API_D3D11
+            #define WF_SAMPLE_TEX2D_LOD(tex, coord, lod)                        tex.SampleLevel(sampler##tex,coord, lod)
+            #define WF_SAMPLE_TEX2D_SAMPLER_LOD(tex, samplertex, coord, lod)    tex.SampleLevel(sampler##samplertex, coord, lod)
+
+            #ifdef LIGHTMAP_ON
+            {
+                float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+                float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_Lightmap, uv, 0);
+                float3 lmap_color = DecodeLightmap(lmap_tex);
+                color += lmap_color;
+            }
+            #endif
+            #ifdef DYNAMICLIGHTMAP_ON
+            {
+                float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+                float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
+                float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
+                color += lmap_color;
+            }
+            #endif
+        #else
+            color = ONE_VEC3;
         #endif
         return color;
     }
