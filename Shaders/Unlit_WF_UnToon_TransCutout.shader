@@ -219,7 +219,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
@@ -251,7 +251,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AL_CUTOUT

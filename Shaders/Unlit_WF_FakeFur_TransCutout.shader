@@ -136,7 +136,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _CL_ENABLE
             #define _HL_ENABLE

@@ -236,7 +236,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
             #pragma vertex vert
             #pragma fragment frag_powercap
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _NM_ENABLE
             #define _TR_ENABLE

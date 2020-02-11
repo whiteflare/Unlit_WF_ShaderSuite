@@ -235,7 +235,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AO_ENABLE
@@ -274,7 +274,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AO_ENABLE

@@ -268,7 +268,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #pragma vertex vert_outline_canceller
             #pragma fragment frag_outline_canceller
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

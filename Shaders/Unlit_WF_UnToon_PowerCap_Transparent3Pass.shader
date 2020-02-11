@@ -248,7 +248,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag_powercap
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -278,7 +278,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -308,7 +308,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag_powercap
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
