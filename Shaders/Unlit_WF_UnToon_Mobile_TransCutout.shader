@@ -99,6 +99,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
+        [PowerSlider(4.0)]
+            _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
