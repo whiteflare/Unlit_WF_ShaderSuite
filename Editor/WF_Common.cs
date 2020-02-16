@@ -344,6 +344,7 @@ namespace UnlitWF
             { "[LI] Line Color", "[LI] 線の色" },
             { "[LI] Line Width", "[LI] 線の太さ" },
             { "[LI] Line Type", "[LI] 線の種類" },
+            { "[LI] Blend Base Color", "[LI] ベース色とのブレンド" },
             { "[LI] Outline Mask Texture", "[LI] マスクテクスチャ" },
             { "[LI] Z-shift (tweak)", "[LI] カメラから遠ざける" },
             // Ambient Occlusion

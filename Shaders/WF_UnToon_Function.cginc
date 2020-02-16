@@ -672,23 +672,37 @@
         float4      _TL_LineColor;
         float       _TL_LineWidth;
         int         _TL_LineType;
+        float       _TL_BlendBase;
         DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
 
         inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
+                // アウトライン色をベースと合成
+                color.rgb = lerp(_TL_LineColor.rgb, color.rgb, _TL_BlendBase);
+            }
+        }
+
+        inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
+            if (TGL_ON(_TL_Enable)) {
+                // アウトラインAlphaをベースと合成
                 float mask = SAMPLE_MASK_VALUE(_TL_MaskTex, uv_main, _TL_InvMaskVal).r;
                 if (mask < 0.1) {
+                    color.a = 0;
                     discard;
                 } else {
-                    // アウトライン色をベースと合成
-                    color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+                    #ifdef _AL_ENABLE
+                        color.a = _TL_LineColor.a * mask;
+                    #else
+                        color.a = 1;
+                    #endif
                 }
             }
         }
     #else
         #define affectOutline(uv_main, color)
+        #define affectOutlineAlpha(uv_main, color)
     #endif
 
     ////////////////////////////

@@ -193,10 +193,11 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
         // アウトライン
         [WFHeaderToggle(Outline)]
             _TL_Enable              ("[LI] Enable", Float) = 0
-            _TL_LineColor           ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
+            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
         [Enum(NORMAL,0,EDGE,1)]
             _TL_LineType            ("[LI] Line Type", Float) = 0
+            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
         [Toggle(_)]

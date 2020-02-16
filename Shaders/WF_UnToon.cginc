@@ -159,6 +159,8 @@
 
         // Alpha
         affectAlphaWithFresnel(uv_main, ws_normal, worldSpaceViewDir(i.ws_vertex), color);
+        // Outline Alpha
+        affectOutlineAlpha(uv_main, color);
         // EmissiveScroll
         affectEmissiveScroll(i.ws_vertex, uv_main, color);
 
