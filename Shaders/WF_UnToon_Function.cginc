@@ -414,7 +414,7 @@
 #else
             float3 color = ZERO_VEC3;
             // ONLYでなければ PROBE を加算
-            if (_MT_CubemapType != 0) {
+            if (_MT_CubemapType != 2) {
                 color += pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
             }
             // OFFでなければ SECOND_MAP を加算
