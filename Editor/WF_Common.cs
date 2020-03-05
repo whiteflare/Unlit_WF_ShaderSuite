@@ -261,6 +261,8 @@ namespace UnlitWF
             { "Blend Normal", "ノーマルマップ強度" },
             // Lit
             { "Anti-Glare", "まぶしさ防止" },
+            { "Darken (min value)", "暗さの最小値" },
+            { "Lighten (max value)", "明るさの最大値" },
             { "Blend Light Color", "ライト色の混合強度" },
             { "Cast Shadows", "他の物体に影を落とす" },
             // Alpha

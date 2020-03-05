@@ -129,7 +129,8 @@
     #define LIT_MODE_CUSTOM_WORLDSPACE  3
     #define LIT_MODE_CUSTOM_LOCALSPACE  4
 
-    int             _GL_Level;
+    float           _GL_LevelMin;
+    float           _GL_LevelMax;
     float           _GL_BlendPower;
     uint            _GL_LightMode;
     float           _GL_CustomAzimuth;
@@ -206,7 +207,7 @@
         float power = AVE_RGB(color);                                       // 明度
         color = lerp( power.xxx, color, _GL_BlendPower);                    // 色の混合
         color = saturate( color / AVE_RGB(color) );                         // 正規化
-        color = color * saturate( power * 2 + (100 - _GL_Level) * 0.01 );   // アンチグレア
+        color = color * lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // アンチグレア
         return color;
     }
 
