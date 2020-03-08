@@ -81,7 +81,6 @@ namespace UnlitWF
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("UnlitWF / CleanUp material property", styleTitle);
             EditorGUILayout.Space();
-            EditorGUILayout.HelpBox("This is EXPERIMENTAL tools. Do Backup please.\nこのツールは実験的機能です。バックアップを忘れずに。", MessageType.Warning);
             EditorGUILayout.Space();
 
             // メイン
@@ -97,6 +96,19 @@ namespace UnlitWF
             EditorGUILayout.PropertyField(so.FindProperty("materials"), new GUIContent("list"), true);
             EditorGUILayout.Space();
 
+            // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
+            bool removeOther = false;
+            foreach (Material mm in param.materials) {
+                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
+                    EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
+                    if (GUILayout.Button("Remove other materials")) {
+                        removeOther = true;
+                    }
+                    break;
+                }
+            }
+            EditorGUILayout.Space();
+
             // オプション
             EditorGUILayout.LabelField("options", EditorStyles.boldLabel);
             prop = so.FindProperty("resetUnused");
@@ -109,14 +121,13 @@ namespace UnlitWF
             so.ApplyModifiedPropertiesWithoutUndo();
             so.SetIsDifferentCacheDirty();
 
-            // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
-            foreach (Material mm in param.materials) {
-                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
-                    EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                    break;
-                }
+            // UnlitWF 以外のマテリアルを除去
+            if (removeOther) {
+                var newlist = new List<Material>();
+                newlist.AddRange(param.materials);
+                newlist.RemoveAll(mm => !mm.shader.name.Contains("UnlitWF"));
+                param.materials = newlist.ToArray();
             }
-            EditorGUILayout.Space();
 
             if (GUILayout.Button("CleanUp")) {
                 new WFMaterialEditUtility().CleanUpProperties(param);
@@ -187,7 +198,6 @@ namespace UnlitWF
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("UnlitWF / Reset material property", styleTitle);
             EditorGUILayout.Space();
-            EditorGUILayout.HelpBox("This is EXPERIMENTAL tools. Do Backup please.\nこのツールは実験的機能です。バックアップを忘れずに。", MessageType.Warning);
             EditorGUILayout.Space();
 
             // メイン
@@ -201,6 +211,19 @@ namespace UnlitWF
             // マテリアルリスト
             EditorGUILayout.LabelField("materials", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(so.FindProperty("materials"), new GUIContent("list"), true);
+            EditorGUILayout.Space();
+
+            // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
+            bool removeOther = false;
+            foreach (Material mm in param.materials) {
+                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
+                    EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
+                    if (GUILayout.Button("Remove other materials")) {
+                        removeOther = true;
+                    }
+                    break;
+                }
+            }
             EditorGUILayout.Space();
 
             // 対象
@@ -224,14 +247,13 @@ namespace UnlitWF
             so.ApplyModifiedPropertiesWithoutUndo();
             so.SetIsDifferentCacheDirty();
 
-            // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
-            foreach (Material mm in param.materials) {
-                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
-                    EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                    break;
-                }
+            // UnlitWF 以外のマテリアルを除去
+            if (removeOther) {
+                var newlist = new List<Material>();
+                newlist.AddRange(param.materials);
+                newlist.RemoveAll(mm => !mm.shader.name.Contains("UnlitWF"));
+                param.materials = newlist.ToArray();
             }
-            EditorGUILayout.Space();
 
             if (GUILayout.Button("Reset Values")) {
                 new WFMaterialEditUtility().ResetProperties(param);
@@ -304,7 +326,6 @@ namespace UnlitWF
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("UnlitWF / Copy material property", styleTitle);
             EditorGUILayout.Space();
-            EditorGUILayout.HelpBox("This is EXPERIMENTAL tools. Do Backup please.\nこのツールは実験的機能です。バックアップを忘れずに。", MessageType.Warning);
             EditorGUILayout.Space();
 
             // メイン
@@ -319,8 +340,27 @@ namespace UnlitWF
             EditorGUILayout.LabelField("source materials", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(so.FindProperty("materialSource"), new GUIContent("material"), true);
             EditorGUILayout.Space();
+
+            if (param.materialSource != null && param.materialSource.shader != null && !param.materialSource.shader.name.Contains("UnlitWF")) {
+                EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
+                EditorGUILayout.Space();
+            }
+
             EditorGUILayout.LabelField("destination materials", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(so.FindProperty("materialDestination"), new GUIContent("list"), true);
+            EditorGUILayout.Space();
+
+            // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
+            bool removeOther = false;
+            foreach (Material mm in param.materialDestination) {
+                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
+                    EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
+                    if (GUILayout.Button("Remove other materials")) {
+                        removeOther = true;
+                    }
+                    break;
+                }
+            }
             EditorGUILayout.Space();
 
             // 対象
@@ -343,17 +383,13 @@ namespace UnlitWF
             so.ApplyModifiedPropertiesWithoutUndo();
             so.SetIsDifferentCacheDirty();
 
-            // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
-            var materials = new List<Material>();
-            materials.Add(param.materialSource);
-            materials.AddRange(param.materialDestination);
-            foreach (Material mm in materials) {
-                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
-                    EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                    break;
-                }
+            // UnlitWF 以外のマテリアルを除去
+            if (removeOther) {
+                var newlist = new List<Material>();
+                newlist.AddRange(param.materialDestination);
+                newlist.RemoveAll(mm => !mm.shader.name.Contains("UnlitWF"));
+                param.materialDestination = newlist.ToArray();
             }
-            EditorGUILayout.Space();
 
             if (GUILayout.Button("Copy Values")) {
                 new WFMaterialEditUtility().CopyProperties(param);
@@ -416,7 +452,6 @@ namespace UnlitWF
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("UnlitWF / Migration material", styleTitle);
             EditorGUILayout.Space();
-            EditorGUILayout.HelpBox("This is EXPERIMENTAL tools. Do Backup please.\nこのツールは実験的機能です。バックアップを忘れずに。", MessageType.Warning);
             EditorGUILayout.Space();
 
             // メイン
@@ -432,19 +467,29 @@ namespace UnlitWF
             EditorGUILayout.PropertyField(so.FindProperty("materials"), new GUIContent("list"), true);
             EditorGUILayout.Space();
 
+            // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
+            bool removeOther = false;
+            foreach (Material mm in param.materials) {
+                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
+                    EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
+                    if (GUILayout.Button("Remove other materials")) {
+                        removeOther = true;
+                    }
+                    break;
+                }
+            }
             EditorGUILayout.Space();
 
             so.ApplyModifiedPropertiesWithoutUndo();
             so.SetIsDifferentCacheDirty();
 
-            // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
-            foreach (Material mm in param.materials) {
-                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
-                    EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                    break;
-                }
+            // UnlitWF 以外のマテリアルを除去
+            if (removeOther) {
+                var newlist = new List<Material>();
+                newlist.AddRange(param.materials);
+                newlist.RemoveAll(mm => !mm.shader.name.Contains("UnlitWF"));
+                param.materials = newlist.ToArray();
             }
-            EditorGUILayout.Space();
 
             if (GUILayout.Button("Convert")) {
                 new WFMaterialEditUtility().RenameOldNameProperties(param);
