@@ -340,7 +340,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
         UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/WF_UnToon_Transparent3Pass"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

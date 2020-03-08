@@ -157,7 +157,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic" {
             ENDCG
         }
 
-        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture/META"
+        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout/META"
     }
 
     FallBack "Unlit/Transparent Cutout"

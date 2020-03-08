@@ -239,10 +239,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_FRONT"
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/EMISSIVE_SCROLL"
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Texture/META"
+        UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -256,7 +256,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
         UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
-    FallBack "Unlit/Texture"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

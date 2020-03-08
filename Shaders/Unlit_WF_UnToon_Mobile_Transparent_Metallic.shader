@@ -171,7 +171,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic" {
             ENDCG
         }
 
-        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture/META"
+        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent/META"
     }
 
     FallBack "Unlit/Transparent"

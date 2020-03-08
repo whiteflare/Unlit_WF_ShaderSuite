@@ -289,7 +289,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
         UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
-    FallBack "Unlit/Texture"
+    FallBack "UnlitWF/WF_UnToon_Texture"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
