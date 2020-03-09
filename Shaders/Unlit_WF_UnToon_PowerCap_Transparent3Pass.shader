@@ -28,14 +28,6 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
 
-        // Lit
-        [WFHeader(Lit)]
-        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
-            _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
-        [Toggle(_)]
-            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
-
         // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
@@ -219,6 +211,16 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
+        // Lit
+        [WFHeader(Lit)]
+        [Gamma]
+            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+        [Gamma]
+            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+        [Toggle(_)]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
+
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
             _GL_LightMode           ("Sun Source", Float) = 0
@@ -248,7 +250,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag_powercap
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -278,7 +280,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -308,7 +310,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag_powercap
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -326,10 +328,10 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
         }
 
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Texture/META"
+        UsePass "UnlitWF/WF_UnToon_TransCutout/META"
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -129,7 +129,8 @@
     #define LIT_MODE_CUSTOM_WORLDSPACE  3
     #define LIT_MODE_CUSTOM_LOCALSPACE  4
 
-    int             _GL_Level;
+    float           _GL_LevelMin;
+    float           _GL_LevelMax;
     float           _GL_BlendPower;
     uint            _GL_LightMode;
     float           _GL_CustomAzimuth;
@@ -206,7 +207,7 @@
         float power = AVE_RGB(color);                                       // 明度
         color = lerp( power.xxx, color, _GL_BlendPower);                    // 色の混合
         color = saturate( color / AVE_RGB(color) );                         // 正規化
-        color = color * saturate( power * 2 + (100 - _GL_Level) * 0.01 );   // アンチグレア
+        color = color * lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // アンチグレア
         return color;
     }
 
@@ -372,7 +373,7 @@
 
                 // 法線計算
                 float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のworld法線空間
-                float3 ws_bump_normal = mul( normalTangent, tangentTransform);
+                ws_bump_normal = mul( normalTangent, tangentTransform);
 
                 // NormalMap は陰影として描画する
                 // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を加算することで明暗を付ける
@@ -409,19 +410,20 @@
 
         inline float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
-#ifndef _WF_MOBILE
-            if (_MT_CubemapType == 1) {
-                // ADDITION
-                return pickReflectionProbe(ws_vertex, ws_normal, metal_lod)
-                    + pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
-            }
-            if (_MT_CubemapType == 2) {
-                // ONLY_SECOND_MAP
-                return pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
-            }
-#endif
-            // OFF
+#ifdef _WF_MOBILE
             return pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
+#else
+            float3 color = ZERO_VEC3;
+            // ONLYでなければ PROBE を加算
+            if (_MT_CubemapType != 2) {
+                color += pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
+            }
+            // OFFでなければ SECOND_MAP を加算
+            if (_MT_CubemapType != 0) {
+                color += pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
+            }
+            return color;
+#endif
         }
 
         inline float3 pickSpecular(float3 ws_vertex, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
@@ -568,7 +570,7 @@
                 float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv).rgb / base_color.rgb;
                 float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv).rgb / base_color.rgb;
 #else
-                float3 base_color = base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb );
+                float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb );
                 float3 shadow_color_1st = _TS_1stColor.rgb / base_color.rgb;
                 float3 shadow_color_2nd = _TS_2ndColor.rgb / base_color.rgb;
 #endif
@@ -671,23 +673,37 @@
         float4      _TL_LineColor;
         float       _TL_LineWidth;
         int         _TL_LineType;
+        float       _TL_BlendBase;
         DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
 
         inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
+                // アウトライン色をベースと合成
+                color.rgb = lerp(_TL_LineColor.rgb, color.rgb, _TL_BlendBase);
+            }
+        }
+
+        inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
+            if (TGL_ON(_TL_Enable)) {
+                // アウトラインAlphaをベースと合成
                 float mask = SAMPLE_MASK_VALUE(_TL_MaskTex, uv_main, _TL_InvMaskVal).r;
                 if (mask < 0.1) {
+                    color.a = 0;
                     discard;
                 } else {
-                    // アウトライン色をベースと合成
-                    color.rgb = lerp(color.rgb, _TL_LineColor.rgb, _TL_LineColor.a);
+                    #ifdef _AL_ENABLE
+                        color.a = _TL_LineColor.a * mask;
+                    #else
+                        color.a = 1;
+                    #endif
                 }
             }
         }
     #else
         #define affectOutline(uv_main, color)
+        #define affectOutlineAlpha(uv_main, color)
     #endif
 
     ////////////////////////////

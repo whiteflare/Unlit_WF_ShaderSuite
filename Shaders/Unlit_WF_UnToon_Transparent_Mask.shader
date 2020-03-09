@@ -28,14 +28,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
 
-        // Lit
-        [WFHeader(Lit)]
-        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
-            _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
-        [Toggle(_)]
-            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
-
         // StencilMask
         [WFHeader(Stencil Mask)]
         [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
@@ -177,6 +169,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
+        [PowerSlider(4.0)]
+            _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
 
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
@@ -197,6 +191,16 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
+        // Lit
+        [WFHeader(Lit)]
+        [Gamma]
+            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+        [Gamma]
+            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+        [Toggle(_)]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
@@ -233,7 +237,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AO_ENABLE
@@ -272,7 +276,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _AL_ENABLE
             #define _AO_ENABLE
@@ -294,10 +298,10 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
         }
 
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Texture/META"
+        UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

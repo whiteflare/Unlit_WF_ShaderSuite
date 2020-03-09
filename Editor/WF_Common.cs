@@ -261,6 +261,8 @@ namespace UnlitWF
             { "Blend Normal", "ノーマルマップ強度" },
             // Lit
             { "Anti-Glare", "まぶしさ防止" },
+            { "Darken (min value)", "暗さの最小値" },
+            { "Lighten (max value)", "明るさの最大値" },
             { "Blend Light Color", "ライト色の混合強度" },
             { "Cast Shadows", "他の物体に影を落とす" },
             // Alpha
@@ -344,6 +346,7 @@ namespace UnlitWF
             { "[LI] Line Color", "[LI] 線の色" },
             { "[LI] Line Width", "[LI] 線の太さ" },
             { "[LI] Line Type", "[LI] 線の種類" },
+            { "[LI] Blend Base Color", "[LI] ベース色とのブレンド" },
             { "[LI] Outline Mask Texture", "[LI] マスクテクスチャ" },
             { "[LI] Z-shift (tweak)", "[LI] カメラから遠ざける" },
             // Ambient Occlusion

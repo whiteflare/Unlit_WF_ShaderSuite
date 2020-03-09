@@ -28,12 +28,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
 
-        // Lit
-        [WFHeader(Lit)]
-        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
-            _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
-
         // Alpha
         [WFHeader(Transparent Alpha)]
         [FixNoTexture]
@@ -50,6 +44,14 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _MT_Brightness          ("[GM] Brightness", Range(0, 1)) = 0.2
         [Toggle(_)]
             _MT_Monochrome          ("[GM] Monochrome Reflection", Range(0, 1)) = 1
+
+        // Lit
+        [WFHeader(Lit)]
+        [Gamma]
+            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+        [Gamma]
+            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
 
         // hidden parameter
         [HideInInspector]

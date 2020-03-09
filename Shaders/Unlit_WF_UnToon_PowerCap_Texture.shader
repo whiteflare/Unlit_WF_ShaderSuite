@@ -30,14 +30,6 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
 
-        // Lit
-        [WFHeader(Lit)]
-        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
-            _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
-        [Toggle(_)]
-            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
-
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
@@ -209,6 +201,16 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
+        // Lit
+        [WFHeader(Lit)]
+        [Gamma]
+            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+        [Gamma]
+            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+        [Toggle(_)]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
+
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
             _GL_LightMode           ("Sun Source", Float) = 0
@@ -236,7 +238,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
             #pragma vertex vert
             #pragma fragment frag_powercap
 
-            #pragma target 3.0
+            #pragma target 4.0
 
             #define _NM_ENABLE
             #define _TR_ENABLE
@@ -254,7 +256,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
         UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
-    FallBack "Unlit/Texture"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

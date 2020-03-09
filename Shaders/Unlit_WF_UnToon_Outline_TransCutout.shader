@@ -28,14 +28,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
 
-        // Lit
-        [WFHeader(Lit)]
-        [Enum(OFF,0,BRIGHT,80,DARK,97,BLACK,100)]
-            _GL_Level               ("Anti-Glare", Float) = 97
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
-        [Toggle(_)]
-            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
-
         // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
@@ -170,6 +162,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
+        [PowerSlider(4.0)]
+            _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
 
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
@@ -184,10 +178,11 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         // アウトライン
         [WFHeaderToggle(Outline)]
             _TL_Enable              ("[LI] Enable", Float) = 0
-            _TL_LineColor           ("[LI] Line Color", Color) = (0, 0, 0, 0.8)
+            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
         [Enum(NORMAL,0,EDGE,1)]
             _TL_LineType            ("[LI] Line Type", Float) = 0
+            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -203,6 +198,16 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
+        // Lit
+        [WFHeader(Lit)]
+        [Gamma]
+            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+        [Gamma]
+            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+        [Toggle(_)]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
@@ -251,10 +256,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         UsePass "UnlitWF/WF_UnToon_TransCutout/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_TransCutout/MAIN_FRONT"
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Texture/META"
+        UsePass "UnlitWF/WF_UnToon_TransCutout/META"
     }
 
-    FallBack "Unlit/Transparent Cutout"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

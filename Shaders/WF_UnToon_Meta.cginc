@@ -52,6 +52,7 @@
     sampler2D       _EmissionMap;
     float4          _EmissionColor;
     float           _ES_BlendType;
+    float           _ES_BakeIntensity;
 
     v2f_meta vert_meta(appdata v) {
         v2f_meta o;
@@ -83,7 +84,7 @@
         o.SpecularColor = o.Albedo.rgb;
 
         float3 emission = _EmissionColor.rgb * tex2D(_EmissionMap, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
-        o.Emission      = emission * _ES_Enable;
+        o.Emission      = emission * _ES_Enable * _ES_BakeIntensity;
 
         #ifdef EDITOR_VISUALIZATION
             o.VizUV         = i.vizUV;
