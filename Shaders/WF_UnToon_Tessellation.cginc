@@ -34,6 +34,7 @@
     #define _TESS_MIN_DIST 0
     #define _TESS_MAX_DIST 2
 
+    float       _TessType;
     float       _TessFactor;
     float       _Smoothing;
     sampler2D   _DispMap;   // vert内で取得するので独自のサンプラーを使う
@@ -50,9 +51,22 @@
     }
 
     HsConstantOutput hullConst(InputPatch<v2f, 3> i) {
+        // 2～16 の値域をもつ _TessFactor から tessFactor を計算する
+        float4 tessFactor;
 
-        float4 v = float4(0, 0, 0, 1);
-        float4 tessFactor = UnityDistanceBasedTess(v, v, v, _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor);
+        if (_TessType == 0) { // DISTANCE
+            float4 v = float4(0, 0, 0, 1);
+            tessFactor = UnityDistanceBasedTess(v, v, v, _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor);
+        }
+        else if (_TessType == 1) {  // EDGE_LENGTH
+            float4 v0 = mul(unity_WorldToObject, float4(i[0].ws_vertex, 1));
+            float4 v1 = mul(unity_WorldToObject, float4(i[1].ws_vertex, 1));
+            float4 v2 = mul(unity_WorldToObject, float4(i[2].ws_vertex, 1));
+            tessFactor = UnityEdgeLengthBasedTess(v0, v1, v2, 64 / _TessFactor);
+        }
+        else {  // FIXED
+            tessFactor = _TessFactor.xxxx;
+        }
 
         HsConstantOutput o = (HsConstantOutput) 0;
         o.tessFact[0] = tessFactor.x;

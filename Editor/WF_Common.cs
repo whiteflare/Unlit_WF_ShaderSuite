@@ -272,7 +272,8 @@ namespace UnlitWF
             { "[AL] Fresnel Power", "[AL] フレネル強度" },
             { "[AL] Cutoff Threshold", "[AL] カットアウトしきい値" },
             // Tessellation
-            { "Tessellation", "テッセレーション分割強度" },
+            { "Tess Type", "Tessタイプ" },
+            { "Tess Factor", "Tess分割強度" },
             { "Smoothing", "Phongスムージング" },
             { "Displacement HeightMap", "ハイトマップ" },
             { "HeightMap Scale", "ハイトマップのスケール" },

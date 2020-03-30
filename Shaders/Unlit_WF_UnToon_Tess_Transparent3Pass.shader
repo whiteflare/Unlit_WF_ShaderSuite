@@ -42,8 +42,10 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
         // Tessellation
         [WFHeader(Tessellation)]
+        [Enum(DISTANCE,0,EDGE_LENGTH,1,FIXED,2)]
+            _TessType               ("Tess Type", Float) = 0
         [IntRange]
-            _TessFactor             ("Tessellation", Range(1, 16)) = 4
+            _TessFactor             ("Tess Factor", Range(1, 16)) = 4
             _Smoothing              ("Smoothing", Range(0, 2)) = 1.0
         [NoScaleOffset]
             _DispMap                ("Displacement HeightMap", 2D) = "black" {}
