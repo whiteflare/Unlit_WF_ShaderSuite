@@ -53,6 +53,16 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
 
+        [WFHeader(Lit Advance)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode           ("Sun Source", Float) = 0
+            _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
+        [Toggle(_)]
+            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
+        [Toggle(_)]
+            _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+
         // hidden parameter
         [HideInInspector]
         [FixFloat(0.0)]

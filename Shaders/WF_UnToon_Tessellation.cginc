@@ -50,19 +50,30 @@
         return i[id];
     }
 
+    float4 worldDistanceBasedTess(float3 ws_vertex, float minDist, float maxDist, float tess) {
+        float dist = distance(ws_vertex, _WorldSpaceCameraPos);
+        float f = clamp(1.0 - (dist - minDist) / (maxDist - minDist), 0.01, 1.0) * tess;
+        return UnityCalcTriEdgeTessFactors(f.xxx);
+    }
+
+    float4 worldEdgeLengthBasedTess(float3 ws_vertex0, float3 ws_vertex1, float3 ws_vertex2, float edgeLength) {
+        float4 tess;
+        tess.x = UnityCalcEdgeTessFactor(ws_vertex1, ws_vertex2, edgeLength);
+        tess.y = UnityCalcEdgeTessFactor(ws_vertex2, ws_vertex0, edgeLength);
+        tess.z = UnityCalcEdgeTessFactor(ws_vertex0, ws_vertex1, edgeLength);
+        tess.w = (tess.x + tess.y + tess.z) / 3.0f;
+        return tess;
+    }
+
     HsConstantOutput hullConst(InputPatch<v2f, 3> i) {
         // 2～16 の値域をもつ _TessFactor から tessFactor を計算する
         float4 tessFactor;
 
         if (_TessType == 0) { // DISTANCE
-            float4 v = float4(0, 0, 0, 1);
-            tessFactor = UnityDistanceBasedTess(v, v, v, _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor);
+            tessFactor = worldDistanceBasedTess(calcWorldSpaceBasePos(i[0].ws_vertex), _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor);
         }
         else if (_TessType == 1) {  // EDGE_LENGTH
-            float4 v0 = mul(unity_WorldToObject, float4(i[0].ws_vertex, 1));
-            float4 v1 = mul(unity_WorldToObject, float4(i[1].ws_vertex, 1));
-            float4 v2 = mul(unity_WorldToObject, float4(i[2].ws_vertex, 1));
-            tessFactor = UnityEdgeLengthBasedTess(v0, v1, v2, 64 / _TessFactor);
+            tessFactor = worldEdgeLengthBasedTess(i[0].ws_vertex, i[1].ws_vertex, i[2].ws_vertex, 64 / _TessFactor);
         }
         else {  // FIXED
             tessFactor = _TessFactor.xxxx;

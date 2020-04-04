@@ -216,6 +216,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [Toggle(_)]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
+        [Toggle(_)]
+            _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
     }
 
     SubShader {

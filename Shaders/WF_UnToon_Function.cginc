@@ -136,6 +136,7 @@
     float           _GL_CustomAzimuth;
     float           _GL_CustomAltitude;
     float           _GL_DisableBackLit;
+    float           _GL_DisableBasePos;
 
     inline uint calcAutoSelectMainLight(float3 ws_vertex) {
         float3 pointLight1Color = calcPointLight1Color(ws_vertex);
@@ -154,13 +155,19 @@
         }
     }
 
-    inline float4 calcWorldSpaceBasePos(float4 ls_vertex) {
-        // この実装は Batching で問題となる、ので問題となる実装を 1 箇所に集約
-        return mul(unity_ObjectToWorld, float4(0, 0, 0, ls_vertex.w));
+    inline float3 calcWorldSpaceBasePos(float3 ws_vertex) {
+        if (TGL_OFF(_GL_DisableBasePos)) {
+            // Object原点をBasePosとして使用する
+            return mul(unity_ObjectToWorld, float4(0, 0, 0, 1));
+        }
+        else {
+            // 現在の座標をBasePosとして使用する
+            return ws_vertex;
+        }
     }
 
-    inline float4 calcWorldSpaceLightDir(float4 ls_vertex) {
-        float3 ws_vertex = calcWorldSpaceBasePos(ls_vertex);
+    inline float4 calcWorldSpaceLightDir(float3 ws_vertex) {
+        ws_vertex = calcWorldSpaceBasePos(ws_vertex);
         uint mode = _GL_LightMode;
         if (mode == LIT_MODE_AUTO) {
             mode = calcAutoSelectMainLight(ws_vertex);
@@ -219,7 +226,7 @@
             return 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
         }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(float4(0, 0, 0, 1)).xz;
+        float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(i.ws_vertex).xz;
         float angle_light_camera = dot( SafeNormalizeVec2(i.ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
             * (1 - smoothstep(0.9, 1, abs(i.ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         return angle_light_camera;

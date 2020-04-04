@@ -149,7 +149,7 @@
         i.ws_vertex = mul(unity_ObjectToWorld, gi.ls_vertex);
         i.normal = UnityObjectToWorldNormal(gi.normal);
 
-        i.ws_light_dir = calcWorldSpaceLightDir(gi.ls_vertex);
+        i.ws_light_dir = calcWorldSpaceLightDir(i.ws_vertex);
 
         // 環境光取得
         float3 ambientColor = OmniDirectional_ShadeSH9();

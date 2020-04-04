@@ -88,7 +88,7 @@
         o.ws_vertex = mul(unity_ObjectToWorld, v.vertex).xyz;
         o.vs_vertex = UnityWorldToClipPos(o.ws_vertex);
         o.uv = v.uv;
-        o.ws_light_dir = calcWorldSpaceLightDir(v.vertex);
+        o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
         #ifdef _LMAP_ENABLE
             o.uv_lmap = v.uv_lmap;
         #endif
