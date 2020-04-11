@@ -273,7 +273,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Name: 
-  m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: 8f656bc72f028ba4ab1b5e6748d53b4e, type: 2}
 --- !u!1 &742734315
 GameObject:

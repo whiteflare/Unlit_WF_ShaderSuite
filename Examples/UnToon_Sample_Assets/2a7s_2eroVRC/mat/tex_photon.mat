@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_photon
   m_Shader: {fileID: 4800000, guid: 0a7a6cdca16a38548a5d81aca8d4e3ba, type: 3}
-  m_ShaderKeywords: _
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -109,7 +109,10 @@ Material:
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
     - _GL_DisableBackLit: 0
+    - _GL_DisableBasePos: 0
     - _GL_Level: 97
+    - _GL_LevelMax: 0.8
+    - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
     - _HL_CapType: 0
