@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2019 whiteflare.
+ *  Copyright 2018-2020 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/02/01 whiteflare,
+     *      ver:2020/04/11 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -149,7 +149,7 @@
         i.ws_vertex = mul(unity_ObjectToWorld, gi.ls_vertex);
         i.normal = UnityObjectToWorldNormal(gi.normal);
 
-        i.ws_light_dir = calcWorldSpaceLightDir(gi.ls_vertex);
+        i.ws_light_dir = calcWorldSpaceLightDir(i.ws_vertex);
 
         // 環境光取得
         float3 ambientColor = OmniDirectional_ShadeSH9();

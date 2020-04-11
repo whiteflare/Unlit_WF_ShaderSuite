@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2019 whiteflare.
+ *  Copyright 2018-2020 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/02/01 whiteflare,
+     *      ver:2020/04/11 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -34,6 +34,7 @@
     #define _TESS_MIN_DIST 0
     #define _TESS_MAX_DIST 2
 
+    float       _TessType;
     float       _TessFactor;
     float       _Smoothing;
     sampler2D   _DispMap;   // vert内で取得するので独自のサンプラーを使う
@@ -49,10 +50,34 @@
         return i[id];
     }
 
-    HsConstantOutput hullConst(InputPatch<v2f, 3> i) {
+    float4 worldDistanceBasedTess(float3 ws_vertex, float minDist, float maxDist, float tess) {
+        float dist = distance(ws_vertex, _WorldSpaceCameraPos);
+        float f = clamp(1.0 - (dist - minDist) / (maxDist - minDist), 0.01, 1.0) * tess;
+        return UnityCalcTriEdgeTessFactors(f.xxx);
+    }
 
-        float4 v = float4(0, 0, 0, 1);
-        float4 tessFactor = UnityDistanceBasedTess(v, v, v, _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor);
+    float4 worldEdgeLengthBasedTess(float3 ws_vertex0, float3 ws_vertex1, float3 ws_vertex2, float edgeLength) {
+        float4 tess;
+        tess.x = UnityCalcEdgeTessFactor(ws_vertex1, ws_vertex2, edgeLength);
+        tess.y = UnityCalcEdgeTessFactor(ws_vertex2, ws_vertex0, edgeLength);
+        tess.z = UnityCalcEdgeTessFactor(ws_vertex0, ws_vertex1, edgeLength);
+        tess.w = (tess.x + tess.y + tess.z) / 3.0f;
+        return tess;
+    }
+
+    HsConstantOutput hullConst(InputPatch<v2f, 3> i) {
+        // 2～16 の値域をもつ _TessFactor から tessFactor を計算する
+        float4 tessFactor;
+
+        if (_TessType == 0) { // DISTANCE
+            tessFactor = worldDistanceBasedTess(calcWorldSpaceBasePos(i[0].ws_vertex), _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor);
+        }
+        else if (_TessType == 1) {  // EDGE_LENGTH
+            tessFactor = worldEdgeLengthBasedTess(i[0].ws_vertex, i[1].ws_vertex, i[2].ws_vertex, 64 / _TessFactor);
+        }
+        else {  // FIXED
+            tessFactor = _TessFactor.xxxx;
+        }
 
         HsConstantOutput o = (HsConstantOutput) 0;
         o.tessFact[0] = tessFactor.x;

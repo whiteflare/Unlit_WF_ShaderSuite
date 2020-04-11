@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2019 whiteflare.
+ *  Copyright 2018-2020 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/02/01 whiteflare,
+     *      ver:2020/04/11 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -88,7 +88,7 @@
         o.ws_vertex = mul(unity_ObjectToWorld, v.vertex).xyz;
         o.vs_vertex = UnityWorldToClipPos(o.ws_vertex);
         o.uv = v.uv;
-        o.ws_light_dir = calcWorldSpaceLightDir(v.vertex);
+        o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
         #ifdef _LMAP_ENABLE
             o.uv_lmap = v.uv_lmap;
         #endif

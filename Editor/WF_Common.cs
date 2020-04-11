@@ -272,7 +272,8 @@ namespace UnlitWF
             { "[AL] Fresnel Power", "[AL] フレネル強度" },
             { "[AL] Cutoff Threshold", "[AL] カットアウトしきい値" },
             // Tessellation
-            { "Tessellation", "テッセレーション分割強度" },
+            { "Tess Type", "Tessタイプ" },
+            { "Tess Factor", "Tess分割強度" },
             { "Smoothing", "Phongスムージング" },
             { "Displacement HeightMap", "ハイトマップ" },
             { "HeightMap Scale", "ハイトマップのスケール" },
@@ -360,6 +361,7 @@ namespace UnlitWF
             { "Custom Sun Azimuth", "カスタム太陽の方角" },
             { "Custom Sun Altitude", "カスタム太陽の高度" },
             { "Disable BackLit", "逆光補正しない" },
+            { "Disable ObjectBasePos", "メッシュ原点を取得しない" },
             // DebugMode
             { "Debug View", "デバッグ表示" },
             // Gem Reflection

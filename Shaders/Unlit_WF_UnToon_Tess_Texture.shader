@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2019 whiteflare.
+ *  Copyright 2018-2020 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
 
     /*
      * authors:
-     *      ver:2020/02/01 whiteflare,
+     *      ver:2020/04/11 whiteflare,
      */
 
     Properties {
@@ -32,8 +32,10 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
 
         // Tessellation
         [WFHeader(Tessellation)]
+        [Enum(DISTANCE,0,EDGE_LENGTH,1,FIXED,2)]
+            _TessType               ("Tess Type", Float) = 0
         [IntRange]
-            _TessFactor             ("Tessellation", Range(1, 16)) = 4
+            _TessFactor             ("Tess Factor", Range(1, 16)) = 4
             _Smoothing              ("Smoothing", Range(0, 2)) = 1.0
         [NoScaleOffset]
             _DispMap                ("Displacement HeightMap", 2D) = "black" {}
@@ -216,6 +218,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [Toggle(_)]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
+        [Toggle(_)]
+            _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
     }
 
     SubShader {

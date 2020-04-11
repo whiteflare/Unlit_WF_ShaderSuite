@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2019 whiteflare.
+ *  Copyright 2018-2020 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/02/01 whiteflare,
+     *      ver:2020/04/11 whiteflare,
      */
 
     Properties {
@@ -52,6 +52,16 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [Gamma]
             _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+
+        [WFHeader(Lit Advance)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+            _GL_LightMode           ("Sun Source", Float) = 0
+            _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
+            _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
+        [Toggle(_)]
+            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
+        [Toggle(_)]
+            _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         // hidden parameter
         [HideInInspector]
