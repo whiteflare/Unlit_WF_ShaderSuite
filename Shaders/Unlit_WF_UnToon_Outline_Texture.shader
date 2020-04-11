@@ -30,6 +30,22 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
 
+        // アウトライン
+        [HideInInspector]
+        [FixFloat(1.0)]
+            _TL_Enable              ("[LI] Enable", Float) = 0
+        [WFHeader(Outline)]
+            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
+        [Enum(NORMAL,0,EDGE,1)]
+            _TL_LineType            ("[LI] Line Type", Float) = 0
+            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+
         // 色変換
         [WFHeaderToggle(Color Change)]
             _CL_Enable              ("[CL] Enable", Float) = 0
@@ -166,20 +182,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture" {
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-
-        // アウトライン
-        [WFHeaderToggle(Outline)]
-            _TL_Enable              ("[LI] Enable", Float) = 0
-            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
-        [Enum(NORMAL,0,EDGE,1)]
-            _TL_LineType            ("[LI] Line Type", Float) = 0
-            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
