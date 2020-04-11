@@ -361,6 +361,7 @@ namespace UnlitWF
             { "Custom Sun Azimuth", "カスタム太陽の方角" },
             { "Custom Sun Altitude", "カスタム太陽の高度" },
             { "Disable BackLit", "逆光補正しない" },
+            { "Disable ObjectBasePos", "メッシュ原点を取得しない" },
             // DebugMode
             { "Debug View", "デバッグ表示" },
             // Gem Reflection
