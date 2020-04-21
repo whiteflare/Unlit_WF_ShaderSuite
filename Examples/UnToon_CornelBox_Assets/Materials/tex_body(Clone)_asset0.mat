@@ -121,7 +121,7 @@ Material:
     - _CL_DeltaH: 0
     - _CL_DeltaS: 0
     - _CL_DeltaV: 0
-    - _CL_Enable: 1
+    - _CL_Enable: 0
     - _CL_Monochrome: 0
     - _CullMode: 0
     - _Cutoff: 0.9
@@ -145,6 +145,7 @@ Material:
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 270
     - _GL_DisableBackLit: 0
+    - _GL_DisableBasePos: 0
     - _GL_Level: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
