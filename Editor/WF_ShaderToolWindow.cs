@@ -521,7 +521,7 @@ namespace UnlitWF
 
         #region マイグレーション
 
-        public bool ExistsOldNameProperty(object[] objlist) {
+        public bool ExistsOldNameProperty(params object[] objlist) {
             return 0 < CreateOldNamePropertyList(objlist).Count;
         }
 
@@ -564,6 +564,10 @@ namespace UnlitWF
                     oldPropList.Add(prop);
                 }
             }
+
+            // ShaderGUI側のマテリアルキャッシュをリセット
+            ShaderCustomEditor.ResetOldMaterialTable();
+
             return oldPropList;
         }
 

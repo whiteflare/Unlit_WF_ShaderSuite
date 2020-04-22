@@ -19,6 +19,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Linq;
 using UnityEditor;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -118,29 +120,60 @@ namespace UnlitWF
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
-
-            // DebugView の NONE ならばキーワードを削除する
-            foreach (object t in materialEditor.targets) {
-                Material mm = t as Material;
-                if (mm == null || Array.IndexOf(mm.shaderKeywords, "_WF_DEBUGVIEW_NONE") < 0) {
-                    continue;
-                }
-                mm.DisableKeyword("_WF_DEBUGVIEW_NONE");
-            }
         }
 
         private void MigrationHelpBox(MaterialEditor materialEditor) {
-            var editor = new WFMaterialEditUtility();
+            var mats = materialEditor.targets.Select(obj => obj as Material).Where(mat => mat != null).ToArray();
 
-            if (editor.ExistsOldNameProperty(materialEditor.targets)) {
+            if (IsOldMaterial(mats)) {
                 var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
                     "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
                     "This Material may have been created in an older version. Convert to new version?";
                 if (materialEditor.HelpBoxWithButton(
                                     new GUIContent(tex),
                                     new GUIContent("Fix Now"))) {
+                    var editor = new WFMaterialEditUtility();
                     // 名称を全て変更
-                    editor.RenameOldNameProperties(materialEditor.targets);
+                    editor.RenameOldNameProperties(mats);
+                    // リセット
+                    ResetOldMaterialTable(mats);
+                }
+            }
+        }
+
+        static ConditionalWeakTable<Material, string> oldVersionMaterials = new ConditionalWeakTable<Material, string>();
+
+        private static bool IsOldMaterial(params object[] mats) {
+            var editor = new WFMaterialEditUtility();
+
+            bool result = false;
+            lock (oldVersionMaterials) {
+                foreach (Material mat in mats) {
+                    if (mat == null) {
+                        continue;
+                    }
+                    bool old = false;
+                    string value;
+                    if (oldVersionMaterials.TryGetValue(mat, out value)) {
+                        old = bool.Parse(value);
+                    }
+                    else {
+                        old = editor.ExistsOldNameProperty(mat);
+                        oldVersionMaterials.Add(mat, old.ToString());
+                    }
+                    result |= old;
+                }
+            }
+            return result;
+        }
+
+        public static void ResetOldMaterialTable(params object[] mats) {
+            lock (oldVersionMaterials) {
+                foreach (Material mat in mats) {
+                    if (mat == null) {
+                        continue;
+                    }
+                    oldVersionMaterials.Remove(mat);
                 }
             }
         }
