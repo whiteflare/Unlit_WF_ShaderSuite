@@ -47,17 +47,46 @@
             #define _AL_CustomValue 1
         #endif
 
-        inline void affectAlpha(float2 uv, inout float4 color) {
+        inline float pickAlpha(float2 uv, float alpha) {
             if (_AL_Source == 1) {
-                color.a = tex2D(_AL_MaskTex, uv).r * _AL_Power * _AL_CustomValue;
+                return tex2D(_AL_MaskTex, uv).r;
             }
             else if (_AL_Source == 2) {
-                color.a = tex2D(_AL_MaskTex, uv).a * _AL_Power * _AL_CustomValue;
+                return tex2D(_AL_MaskTex, uv).a;
             }
             else {
-                color.a = color.a * _AL_Power * _AL_CustomValue;
+                return alpha;
             }
         }
+
+        inline void affectAlpha(float2 uv, inout float4 color) {
+            float baseAlpha = pickAlpha(uv, color.a);
+
+            #if defined(_AL_CUTOUT)
+                if (baseAlpha < _Cutoff) {
+                    discard;
+                } else {
+                    color.a = 1.0;
+                }
+            #elif defined(_AL_CUTOUT_UPPER)
+                if (baseAlpha < _Cutoff) {
+                    discard;
+                } else {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                }
+            #elif defined(_AL_CUTOUT_LOWER)
+                if (baseAlpha < _Cutoff) {
+                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                } else {
+                    discard;
+                }
+            #else
+                baseAlpha *= _AL_Power * _AL_CustomValue;
+            #endif
+
+            color.a = baseAlpha;
+        }
+
     #else
         #define affectAlpha(uv, color) color.a = 1.0
     #endif
@@ -96,13 +125,13 @@
         // アルファ計算
         #ifdef _AL_ENABLE
             float4 color = tex2D(_MainTex, i.uv) * _Color;
+            affectAlpha(i.uv, color);
             #ifdef _AL_CUTOUT
                 if (color.a < _Cutoff) {
                     discard;
                     return float4(0, 0, 0, 0);
                 }
             #else
-                affectAlpha(i.uv, color);
                 if (color.a < 0.75) {
                     discard;
                     return float4(0, 0, 0, 0);
