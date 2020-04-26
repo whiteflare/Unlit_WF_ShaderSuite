@@ -281,6 +281,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             Name "SHADOWCASTER"
             Tags{ "LightMode" = "ShadowCaster" }
 
+            Cull Off
+
             CGPROGRAM
 
             #pragma vertex vert_shadow

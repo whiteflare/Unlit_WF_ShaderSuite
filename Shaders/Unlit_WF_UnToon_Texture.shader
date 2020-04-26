@@ -239,6 +239,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             Name "SHADOWCASTER"
             Tags{ "LightMode" = "ShadowCaster" }
 
+            Cull [_CullMode]
+
             CGPROGRAM
 
             #pragma vertex vert_shadow
