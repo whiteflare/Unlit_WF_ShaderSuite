@@ -40,6 +40,28 @@ namespace UnlitWF
             { "_EmissionColor", "_EmissionMap" },
         };
 
+        /// <summary>
+        /// 値を設定したら他プロパティの値を自動で設定するやつ
+        /// </summary>
+        private readonly List<DefaultValueSetter> DEF_VALUE_SETTER = new List<DefaultValueSetter>() {
+            (p, all) => {
+                if (p.name == "_DetailNormalMap" && p.textureValue != null) {
+                    var target = FindProperty("_NM_2ndType", all, false);
+                    if (target != null && target.floatValue == 0) { // OFF
+                        target.floatValue = 1; // BLEND
+                    }
+                }
+            },
+            (p, all) => {
+                if (p.name == "_MT_Cubemap" && p.textureValue != null) {
+                    var target = FindProperty("_MT_CubemapType", all, false);
+                    if (target != null && target.floatValue == 0) { // OFF
+                        target.floatValue = 2; // ONLY_SECOND_MAP
+                    }
+                }
+            },
+        };
+
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
             materialEditor.SetDefaultGUIWidths();
 
@@ -84,6 +106,9 @@ namespace UnlitWF
                 //     continue;
                 // }
 
+                // 更新監視
+                EditorGUI.BeginChangeCheck();
+
                 // 描画
                 GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
                 if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
@@ -101,6 +126,13 @@ namespace UnlitWF
                 }
                 else {
                     materialEditor.ShaderProperty(prop, guiContent);
+                }
+
+                // 更新監視
+                if (EditorGUI.EndChangeCheck()) {
+                    foreach (var setter in DEF_VALUE_SETTER) {
+                        setter(prop, properties);
+                    }
                 }
 
                 // ラベルが指定されていてenableならば有効無効をリストに追加
@@ -121,6 +153,8 @@ namespace UnlitWF
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
         }
+
+        delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
 
         private void MigrationHelpBox(MaterialEditor materialEditor) {
             var mats = materialEditor.targets.Select(obj => obj as Material).Where(mat => mat != null).ToArray();
