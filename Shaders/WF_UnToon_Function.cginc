@@ -24,6 +24,73 @@
      */
 
     ////////////////////////////
+    // Textureピックアップ関数
+    ////////////////////////////
+
+    /* このセクションでは、どのテクスチャから何色を参照するかを定義する */
+
+    #ifndef WF_TEX2D_ALPHA_MAIN_ALPHA
+        #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   alpha
+    #endif
+    #ifndef WF_TEX2D_ALPHA_MASK_RED
+        #define WF_TEX2D_ALPHA_MASK_RED(uv)     PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r
+    #endif
+    #ifndef WF_TEX2D_ALPHA_MASK_ALPHA
+        #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a
+    #endif
+
+    #ifndef WF_TEX2D_EMISSION
+        #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgb
+    #endif
+
+    #ifndef WF_TEX2D_NORMAL
+        #define WF_TEX2D_NORMAL(uv)             UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, uv), _BumpScale ).xyz
+    #endif
+    #ifndef WF_TEX2D_NORMAL_DTL
+        #define WF_TEX2D_NORMAL_DTL(uv)         UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv), _DetailNormalMapScale ).xyz
+    #endif
+    #ifndef WF_TEX2D_NORMAL_DTL_MASK
+        #define WF_TEX2D_NORMAL_DTL_MASK(uv)    SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv, _NM_InvMaskVal).r
+    #endif
+
+    #ifndef WF_TEX2D_METAL_GLOSS
+        #define WF_TEX2D_METAL_GLOSS(uv)        SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra
+    #endif
+
+    #ifndef WF_TEX2D_MATCAP_MASK
+        #define WF_TEX2D_MATCAP_MASK(uv)        SAMPLE_MASK_VALUE(_HL_MaskTex, uv, _HL_InvMaskVal).rgb
+    #endif
+
+    #ifndef WF_TEX2D_SHADE_BASE
+        #define WF_TEX2D_SHADE_BASE(uv)         PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, uv).rgb
+    #endif
+    #ifndef WF_TEX2D_SHADE_1ST
+        #define WF_TEX2D_SHADE_1ST(uv)          PICK_SUB_TEX2D(_TS_1stTex, _MainTex, uv).rgb
+    #endif
+    #ifndef WF_TEX2D_SHADE_2ND
+        #define WF_TEX2D_SHADE_2ND(uv)          PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, uv).rgb
+    #endif
+    #ifndef WF_TEX2D_SHADE_MASK
+        #define WF_TEX2D_SHADE_MASK(uv)         SAMPLE_MASK_VALUE(_TS_MaskTex, uv, _TS_InvMaskVal).r
+    #endif
+
+    #ifndef WF_TEX2D_RIM_MASK
+        #define WF_TEX2D_RIM_MASK(uv)           SAMPLE_MASK_VALUE(_TR_MaskTex, uv, _TR_InvMaskVal).rgb
+    #endif
+
+    #ifndef WF_TEX2D_SCREEN_MASK
+        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).rgb
+    #endif
+
+    #ifndef WF_TEX2D_OUTLINE_MASK
+        #define WF_TEX2D_OUTLINE_MASK(uv)       SAMPLE_MASK_VALUE(_TL_MaskTex, uv, _TL_InvMaskVal).r
+    #endif
+
+    #ifndef WF_TEX2D_OCCLUSION
+        #define WF_TEX2D_OCCLUSION(uv)          SAMPLE_MASK_VALUE(_OcclusionMap, uv, 0).rgb
+    #endif
+
+    ////////////////////////////
     // Alpha Transparent
     ////////////////////////////
 
@@ -32,7 +99,7 @@
     #ifdef _AL_ENABLE
         int             _AL_Source;
         float           _AL_Power;
-        sampler2D       _AL_MaskTex;
+        DECL_SUB_TEX2D(_AL_MaskTex);
         float           _AL_Fresnel;
 
         #ifndef _AL_CustomValue
@@ -41,13 +108,13 @@
 
         inline float pickAlpha(float2 uv, float alpha) {
             if (_AL_Source == 1) {
-                return tex2D(_AL_MaskTex, uv).r;
+                return WF_TEX2D_ALPHA_MASK_RED(uv);
             }
             else if (_AL_Source == 2) {
-                return tex2D(_AL_MaskTex, uv).a;
+                return WF_TEX2D_ALPHA_MASK_ALPHA(uv);
             }
             else {
-                return alpha;
+                return WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
             }
         }
 
@@ -268,7 +335,7 @@
 
     #ifdef _ES_ENABLE
         float       _ES_Enable;
-        sampler2D   _EmissionMap;
+        DECL_SUB_TEX2D(_EmissionMap);
         float4      _EmissionColor;
         float       _ES_BlendType;
 
@@ -312,7 +379,7 @@
         inline void affectEmissiveScroll(float3 ws_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
                 float waving    = calcEmissiveWaving(ws_vertex);
-                float3 es_mask  = tex2D(_EmissionMap, mask_uv).rgb;
+                float3 es_mask  = WF_TEX2D_EMISSION(mask_uv);
                 float es_power  = MAX_RGB(es_mask);
                 float3 es_color = _EmissionColor.rgb * es_mask.rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
 
@@ -361,19 +428,19 @@
         inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
             if (TGL_ON(_NM_Enable)) {
                 // 1st NormalMap
-                float3 normalTangent = UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, uv_main), _BumpScale );
+                float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
 
 #ifndef _WF_MOBILE
                 // 2nd NormalMap
                 float2 uv_dtl = TRANSFORM_TEX(i.uv, _DetailNormalMap);
                 if (_NM_2ndType == 1) { // BLEND
-                    float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv_main, _NM_InvMaskVal);
-                    float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv_dtl), _DetailNormalMapScale);
+                    float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
+                    float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL(uv_dtl);
                     normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
                 }
                 else if (_NM_2ndType == 2) { // SWITCH
-                    float dtlPower = SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv_main, _NM_InvMaskVal);
-                    float3 dtlNormalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv_dtl), _DetailNormalMapScale);
+                    float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
+                    float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL(uv_dtl);
                     normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
                 }
 #endif
@@ -448,7 +515,7 @@
         inline void affectMetallic(v2f i, float3 ws_vertex, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
                 float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
-                float2 metallicSmoothness = SAMPLE_MASK_VALUE(_MetallicGlossMap, uv_main, _MT_InvMaskVal).ra;
+                float2 metallicSmoothness = WF_TEX2D_METAL_GLOSS(uv_main);
                 float metallic = _MT_Metallic * metallicSmoothness.x;
                 if (0.01 < metallic) {
                     // リフレクション
@@ -495,7 +562,7 @@
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
                 float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
                 // マスク参照
-                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex, uv_main, _HL_InvMaskVal).rgb;
+                float3 matcap_mask = WF_TEX2D_MATCAP_MASK(uv_main);
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
@@ -566,16 +633,16 @@
 
         inline void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
-                float boostlight = 0.5 + 0.25 * SAMPLE_MASK_VALUE(_TS_MaskTex, uv_main, _TS_InvMaskVal).r;
+                float boostlight = 0.5 + 0.25 * WF_TEX2D_SHADE_MASK(uv_main);
                 float3 ws_shade_normal = normalize(lerp(ws_normal, ws_bump_normal, _TS_BlendNormal));
                 float brightness = dot(ws_shade_normal, i.ws_light_dir.xyz) * (1 - boostlight) + boostlight;
                 // ビュー相対位置シフト
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
                 // 影色計算
 #ifndef _WF_MOBILE
-                float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, i.uv).rgb );
-                float3 shadow_color_1st = _TS_1stColor.rgb * PICK_SUB_TEX2D(_TS_1stTex, _MainTex, i.uv).rgb / base_color.rgb;
-                float3 shadow_color_2nd = _TS_2ndColor.rgb * PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, i.uv).rgb / base_color.rgb;
+                float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
+                float3 shadow_color_1st = _TS_1stColor.rgb * WF_TEX2D_SHADE_1ST(uv_main) / base_color.rgb;
+                float3 shadow_color_2nd = _TS_2ndColor.rgb * WF_TEX2D_SHADE_2ND(uv_main) / base_color.rgb;
 #else
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb );
                 float3 shadow_color_1st = _TS_1stColor.rgb / base_color.rgb;
@@ -617,7 +684,7 @@
                 rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
                 rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
                 // 順光の場合はリムライトを暗くする
-                float3 rimPower = saturate(0.8 - angle_light_camera) * _TR_Color.a * SAMPLE_MASK_VALUE(_TR_MaskTex, uv_main, _TR_InvMaskVal).rgb;
+                float3 rimPower = saturate(0.8 - angle_light_camera) * _TR_Color.a * WF_TEX2D_RIM_MASK(uv_main);
                 // 色計算
                 float3 rimColor = _TR_Color.rgb - (TGL_OFF(_TR_BlendType) ? MEDIAN_GRAY : color.rgb);
                 color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, smoothstep(1, 1.05, length(rim_uv)) );
@@ -633,7 +700,7 @@
 
     #ifdef _OL_ENABLE
         float       _OL_Enable;
-        sampler2D   _OL_OverlayTex;
+        sampler2D   _OL_OverlayTex; // MainTexと大きく構造が異なるので独自のサンプラーを使う
         float4      _OL_OverlayTex_ST;
         int         _OL_BlendType;
         float       _OL_Power;
@@ -663,7 +730,7 @@
         inline void affectOverlayTexture(float3 ws_vertex, float2 uv_main, inout float4 color) {
             if (TGL_ON(_OL_Enable)) {
                 float2 uv_overlay = computeOverlayTex(ws_vertex);
-                float3 power = _OL_Power * SAMPLE_MASK_VALUE(_OL_MaskTex, uv_main, _OL_InvMaskVal).rgb;
+                float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
                 color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay).rgb, power);
             }
         }
@@ -695,7 +762,7 @@
         inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
                 // アウトラインAlphaをベースと合成
-                float mask = SAMPLE_MASK_VALUE(_TL_MaskTex, uv_main, _TL_InvMaskVal).r;
+                float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
                 if (mask < 0.1) {
                     color.a = 0;
                     discard;
@@ -730,7 +797,7 @@
             if (TGL_ON(_AO_Enable)) {
                 float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
-                occlusion *= SAMPLE_MASK_VALUE(_OcclusionMap, uv_main, 0).rgb;
+                occlusion *= WF_TEX2D_OCCLUSION(uv_main);
 #endif
                 #ifdef _LMAP_ENABLE
                 if (TGL_ON(_AO_UseLightMap)) {

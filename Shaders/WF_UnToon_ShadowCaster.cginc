@@ -23,7 +23,7 @@
      *      ver:2020/02/01 whiteflare,
      */
 
-    #include "UnityCG.cginc"
+    #include "WF_Common.cginc"
 
     struct v2f_shadow {
         V2F_SHADOW_CASTER;
@@ -33,15 +33,25 @@
     };
 
     float           _GL_CastShadow;
-    sampler2D       _MainTex;
+    DECL_MAIN_TEX2D(_MainTex);
     float4          _MainTex_ST;
     float4          _Color;
     float           _Cutoff;
 
+    #ifndef WF_TEX2D_ALPHA_MAIN_ALPHA
+        #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   alpha
+    #endif
+    #ifndef WF_TEX2D_ALPHA_MASK_RED
+        #define WF_TEX2D_ALPHA_MASK_RED(uv)     PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r
+    #endif
+    #ifndef WF_TEX2D_ALPHA_MASK_ALPHA
+        #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a
+    #endif
+
     #ifdef _AL_ENABLE
         int             _AL_Source;
         float           _AL_Power;
-        sampler2D       _AL_MaskTex;
+        DECL_SUB_TEX2D(_AL_MaskTex);
 
         #ifndef _AL_CustomValue
             #define _AL_CustomValue 1
@@ -49,13 +59,13 @@
 
         inline float pickAlpha(float2 uv, float alpha) {
             if (_AL_Source == 1) {
-                return tex2D(_AL_MaskTex, uv).r;
+                return WF_TEX2D_ALPHA_MASK_RED(uv);
             }
             else if (_AL_Source == 2) {
-                return tex2D(_AL_MaskTex, uv).a;
+                return WF_TEX2D_ALPHA_MASK_ALPHA(uv);
             }
             else {
-                return alpha;
+                return WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
             }
         }
 
@@ -124,7 +134,7 @@
 
         // アルファ計算
         #ifdef _AL_ENABLE
-            float4 color = tex2D(_MainTex, i.uv) * _Color;
+            float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
             affectAlpha(i.uv, color);
             #ifdef _AL_CUTOUT
                 if (color.a < _Cutoff) {

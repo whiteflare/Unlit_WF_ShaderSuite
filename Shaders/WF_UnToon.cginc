@@ -326,8 +326,11 @@
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
 
-            // EmissiveScroll
+	        // メイン
             float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+	        color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color / 256;	// _EmissionMapを参照するために_MainTexに手を付けておく
+
+            // EmissiveScroll
             affectEmissiveScroll(i.ws_vertex, uv_main, color);
 
             // Alpha は 0-1 にクランプ
