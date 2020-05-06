@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Linq;
 using UnityEditor;
 using System.Text.RegularExpressions;
@@ -175,41 +174,40 @@ namespace UnlitWF
             }
         }
 
-        static ConditionalWeakTable<Material, string> oldVersionMaterials = new ConditionalWeakTable<Material, string>();
+        static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
+        static WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
 
         private static bool IsOldMaterial(params object[] mats) {
             var editor = new WFMaterialEditUtility();
 
             bool result = false;
-            lock (oldVersionMaterials) {
-                foreach (Material mat in mats) {
-                    if (mat == null) {
-                        continue;
-                    }
-                    bool old = false;
-                    string value;
-                    if (oldVersionMaterials.TryGetValue(mat, out value)) {
-                        old = bool.Parse(value);
-                    }
-                    else {
-                        old = editor.ExistsOldNameProperty(mat);
-                        oldVersionMaterials.Add(mat, old.ToString());
-                    }
-                    result |= old;
+            foreach (Material mat in mats) {
+                if (mat == null) {
+                    continue;
                 }
+                if (newMaterialVersionCache.Contains(mat)) {
+                    continue;
+                }
+                if (oldMaterialVersionCache.Contains(mat)) {
+                    result |= true;
+                    return true;
+                }
+                bool old = editor.ExistsOldNameProperty(mat);
+                if (old) {
+                    oldMaterialVersionCache.Add(mat);
+                }
+                else {
+                    newMaterialVersionCache.Add(mat);
+                }
+                result |= old;
             }
             return result;
         }
 
-        public static void ResetOldMaterialTable(params object[] mats) {
-            lock (oldVersionMaterials) {
-                foreach (Material mat in mats) {
-                    if (mat == null) {
-                        continue;
-                    }
-                    oldVersionMaterials.Remove(mat);
-                }
-            }
+        public static void ResetOldMaterialTable(params object[] values) {
+            var mats = values.Select(mat => mat as Material).Where(mat => mat != null).ToArray();
+            oldMaterialVersionCache.RemoveAll(mats);
+            newMaterialVersionCache.RemoveAll(mats);
         }
 
         private void SuggestShadowColor(object[] targets) {
