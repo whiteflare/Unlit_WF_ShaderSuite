@@ -215,7 +215,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AO_ENABLE
             #define _CL_ENABLE

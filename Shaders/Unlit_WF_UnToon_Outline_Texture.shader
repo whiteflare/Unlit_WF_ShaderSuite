@@ -233,7 +233,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture" {
             #pragma geometry geom_outline
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _CL_ENABLE
             #define _TL_ENABLE

@@ -139,7 +139,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _CL_ENABLE
             #define _HL_ENABLE

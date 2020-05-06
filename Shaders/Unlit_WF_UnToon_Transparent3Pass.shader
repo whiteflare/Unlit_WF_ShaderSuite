@@ -231,7 +231,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -266,7 +266,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -299,7 +299,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -334,7 +334,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma vertex vert_emissiveScroll
             #pragma fragment frag_emissiveScroll
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _ES_ENABLE

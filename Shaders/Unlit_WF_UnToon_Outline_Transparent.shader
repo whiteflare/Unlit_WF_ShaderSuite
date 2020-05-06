@@ -248,7 +248,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #pragma geometry geom_outline
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _CL_ENABLE
@@ -275,7 +275,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #pragma vertex vert_outline_canceller
             #pragma fragment frag_outline_canceller
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
