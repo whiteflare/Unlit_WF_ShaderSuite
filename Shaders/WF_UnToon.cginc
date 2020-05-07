@@ -133,14 +133,16 @@
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
+        float3 ws_camera_dir = worldSpaceViewDir(i.ws_vertex);
+
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(i.ws_vertex, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(i.ws_vertex, ws_bump_normal);
+        float3 vs_normal = calcMatcapVector(ws_camera_dir, ws_normal);
+        float3 vs_bump_normal = calcMatcapVector(ws_camera_dir, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
         // メタリック
-        affectMetallic(i, i.ws_vertex, uv_main, ws_normal, ws_bump_normal, color);
+        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
         affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), uv_main, color);
         // 階調影
@@ -158,7 +160,7 @@
         affectOcclusion(i, uv_main, color);
 
         // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, worldSpaceViewDir(i.ws_vertex), color);
+        affectAlphaWithFresnel(uv_main, ws_normal, ws_camera_dir, color);
         // Outline Alpha
         affectOutlineAlpha(uv_main, color);
         // EmissiveScroll
@@ -326,9 +328,9 @@
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
 
-	        // メイン
+            // メイン
             float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-	        color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color / 256;	// _EmissionMapを参照するために_MainTexに手を付けておく
+            color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color / 256;  // _EmissionMapを参照するために_MainTexに手を付けておく
 
             // EmissiveScroll
             affectEmissiveScroll(i.ws_vertex, uv_main, color);

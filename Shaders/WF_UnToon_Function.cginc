@@ -500,10 +500,8 @@
 #endif
         }
 
-        inline float3 pickSpecular(float3 ws_vertex, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
+        inline float3 pickSpecular(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
             float roughness         = (1 - smoothness) * (1 - smoothness);
-
-            float3 ws_camera_dir    = worldSpaceViewDir(ws_vertex);
 
             float3 halfVL           = normalize(ws_camera_dir + ws_light_dir);
             float NdotH             = max(0, dot( ws_normal, halfVL ));
@@ -512,14 +510,14 @@
             return max(ZERO_VEC3, specular);
         }
 
-        inline void affectMetallic(v2f i, float3 ws_vertex, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+        inline void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
                 float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
                 float2 metallicSmoothness = WF_TEX2D_METAL_GLOSS(uv_main);
                 float metallic = _MT_Metallic * metallicSmoothness.x;
                 if (0.01 < metallic) {
                     // リフレクション
-                    float3 reflection = pickReflection(ws_vertex, ws_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
+                    float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
                     if (TGL_ON(_MT_Monochrome)) {
                         reflection = calcBrightness(reflection);
                     }
@@ -527,7 +525,7 @@
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(ws_vertex, ws_metal_normal, i.ws_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
+                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
                     }
 
                     // 合成
@@ -539,7 +537,7 @@
             }
         }
     #else
-        #define affectMetallic(i, ws_vertex, uv_main, ws_normal, ws_bump_normal, color)
+        #define affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color)
     #endif
 
     ////////////////////////////

@@ -88,9 +88,11 @@
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
+        float3 ws_camera_dir = worldSpaceViewDir(i.ws_vertex);
+
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(i.ws_vertex, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(i.ws_vertex, ws_bump_normal);
+        float3 vs_normal = calcMatcapVector(ws_camera_dir, ws_normal);
+        float3 vs_bump_normal = calcMatcapVector(ws_camera_dir, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
@@ -113,7 +115,7 @@
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlphaWithFresnel(i.uv, ws_normal, worldSpaceViewDir(i.ws_vertex), color);
+        affectAlphaWithFresnel(i.uv, ws_normal, ws_camera_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
