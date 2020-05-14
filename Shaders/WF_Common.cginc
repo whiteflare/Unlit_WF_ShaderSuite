@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/02/01 whiteflare,
+     *      ver:2020/05/14 whiteflare,
      */
 
     #include "UnityCG.cginc"

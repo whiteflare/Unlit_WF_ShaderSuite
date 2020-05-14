@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2020/04/11 whiteflare,
+     *      ver:2020/05/14 whiteflare,
      */
 
     Properties {
