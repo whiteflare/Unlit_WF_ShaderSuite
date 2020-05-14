@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2019 whiteflare.
+ *  Copyright 2018-2020 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -448,6 +449,52 @@ namespace UnlitWF
     internal enum EditorLanguage
     {
         English, 日本語
+    }
+
+    internal class WeakRefCache<T> where T: class
+    {
+        private readonly List<WeakReference> refs = new List<WeakReference>();
+
+        public bool Contains(T target) {
+            lock (refs) {
+                // 終了しているものは全て削除
+                refs.RemoveAll(r => !r.IsAlive);
+
+                // 参照が存在しているならばtrue
+                foreach (var r in refs) {
+                    if (r.Target == target) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public void Add(T target) {
+            lock (refs) {
+                if (Contains(target)) {
+                    return;
+                }
+                refs.Add(new WeakReference(target));
+            }
+        }
+
+        public void Remove(T target) {
+            RemoveAll(target);
+        }
+
+        public void RemoveAll(params object[] targets) {
+            lock (refs) {
+                // 終了しているものは全て削除
+                refs.RemoveAll(r => !r.IsAlive);
+
+                // 一致しているものを全て削除
+                refs.RemoveAll(r => {
+                    var tgt = r.Target as T;
+                    return tgt != null && targets.Contains(tgt);
+                });
+            }
+        }
     }
 }
 

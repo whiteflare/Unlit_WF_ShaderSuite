@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
     /*
      * authors:
-     *      ver:2020/04/11 whiteflare,
+     *      ver:2020/05/14 whiteflare,
      */
 
     Properties {
@@ -215,7 +215,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AO_ENABLE
             #define _CL_ENABLE
@@ -238,6 +238,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         Pass {
             Name "SHADOWCASTER"
             Tags{ "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
 
             CGPROGRAM
 

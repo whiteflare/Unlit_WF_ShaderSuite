@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2020/04/11 whiteflare,
+     *      ver:2020/05/14 whiteflare,
      */
 
     Properties {
@@ -178,7 +178,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _ES_CullMode            ("[ES] Cull Mode", int) = 0
-            _ES_Z_Shift             ("[ES] Z-shift", Range(0, 1)) = 0.05
+            _ES_Z_Shift             ("[ES] Z-shift", Range(0, 1)) = 0
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -231,7 +231,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -266,7 +266,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -299,7 +299,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
@@ -334,7 +334,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma vertex vert_emissiveScroll
             #pragma fragment frag_emissiveScroll
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _ES_ENABLE

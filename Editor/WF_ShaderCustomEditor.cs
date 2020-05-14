@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2019 whiteflare.
+ *  Copyright 2018-2020 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -36,6 +37,28 @@ namespace UnlitWF
             { "_TS_2ndColor", "_TS_2ndTex" },
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
+        };
+
+        /// <summary>
+        /// 値を設定したら他プロパティの値を自動で設定するやつ
+        /// </summary>
+        private readonly List<DefaultValueSetter> DEF_VALUE_SETTER = new List<DefaultValueSetter>() {
+            (p, all) => {
+                if (p.name == "_DetailNormalMap" && p.textureValue != null) {
+                    var target = FindProperty("_NM_2ndType", all, false);
+                    if (target != null && target.floatValue == 0) { // OFF
+                        target.floatValue = 1; // BLEND
+                    }
+                }
+            },
+            (p, all) => {
+                if (p.name == "_MT_Cubemap" && p.textureValue != null) {
+                    var target = FindProperty("_MT_CubemapType", all, false);
+                    if (target != null && target.floatValue == 0) { // OFF
+                        target.floatValue = 2; // ONLY_SECOND_MAP
+                    }
+                }
+            },
         };
 
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
@@ -82,6 +105,9 @@ namespace UnlitWF
                 //     continue;
                 // }
 
+                // 更新監視
+                EditorGUI.BeginChangeCheck();
+
                 // 描画
                 GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
                 if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
@@ -101,6 +127,13 @@ namespace UnlitWF
                     materialEditor.ShaderProperty(prop, guiContent);
                 }
 
+                // 更新監視
+                if (EditorGUI.EndChangeCheck()) {
+                    foreach (var setter in DEF_VALUE_SETTER) {
+                        setter(prop, properties);
+                    }
+                }
+
                 // ラベルが指定されていてenableならば有効無効をリストに追加
                 // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
                 if (WFCommonUtility.IsEnableToggle(label, name)) {
@@ -118,31 +151,63 @@ namespace UnlitWF
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
-
-            // DebugView の NONE ならばキーワードを削除する
-            foreach (object t in materialEditor.targets) {
-                Material mm = t as Material;
-                if (mm == null || Array.IndexOf(mm.shaderKeywords, "_WF_DEBUGVIEW_NONE") < 0) {
-                    continue;
-                }
-                mm.DisableKeyword("_WF_DEBUGVIEW_NONE");
-            }
         }
 
-        private void MigrationHelpBox(MaterialEditor materialEditor) {
-            var editor = new WFMaterialEditUtility();
+        delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
 
-            if (editor.ExistsOldNameProperty(materialEditor.targets)) {
+        private void MigrationHelpBox(MaterialEditor materialEditor) {
+            var mats = materialEditor.targets.Select(obj => obj as Material).Where(mat => mat != null).ToArray();
+
+            if (IsOldMaterial(mats)) {
                 var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
                     "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
                     "This Material may have been created in an older version. Convert to new version?";
                 if (materialEditor.HelpBoxWithButton(
                                     new GUIContent(tex),
                                     new GUIContent("Fix Now"))) {
+                    var editor = new WFMaterialEditUtility();
                     // 名称を全て変更
-                    editor.RenameOldNameProperties(materialEditor.targets);
+                    editor.RenameOldNameProperties(mats);
+                    // リセット
+                    ResetOldMaterialTable(mats);
                 }
             }
+        }
+
+        static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
+        static WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
+
+        private static bool IsOldMaterial(params object[] mats) {
+            var editor = new WFMaterialEditUtility();
+
+            bool result = false;
+            foreach (Material mat in mats) {
+                if (mat == null) {
+                    continue;
+                }
+                if (newMaterialVersionCache.Contains(mat)) {
+                    continue;
+                }
+                if (oldMaterialVersionCache.Contains(mat)) {
+                    result |= true;
+                    return true;
+                }
+                bool old = editor.ExistsOldNameProperty(mat);
+                if (old) {
+                    oldMaterialVersionCache.Add(mat);
+                }
+                else {
+                    newMaterialVersionCache.Add(mat);
+                }
+                result |= old;
+            }
+            return result;
+        }
+
+        public static void ResetOldMaterialTable(params object[] values) {
+            var mats = values.Select(mat => mat as Material).Where(mat => mat != null).ToArray();
+            oldMaterialVersionCache.RemoveAll(mats);
+            newMaterialVersionCache.RemoveAll(mats);
         }
 
         private void SuggestShadowColor(object[] targets) {

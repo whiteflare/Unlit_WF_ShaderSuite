@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
     /*
      * authors:
-     *      ver:2020/04/11 whiteflare,
+     *      ver:2020/05/14 whiteflare,
      */
 
     Properties {
@@ -239,7 +239,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AO_ENABLE
@@ -278,7 +278,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AO_ENABLE

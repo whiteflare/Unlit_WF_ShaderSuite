@@ -135,7 +135,10 @@ Material:
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
     - _GL_DisableBackLit: 0
+    - _GL_DisableBasePos: 0
     - _GL_Level: 0
+    - _GL_LevelMax: 0.8
+    - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -192,7 +195,7 @@ Material:
     - _WF_DebugView: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0, g: 0, b: 1.4, a: 1}
+    - _Color: {r: 0.64502615, g: 0.64502615, b: 11.2, a: 1}
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

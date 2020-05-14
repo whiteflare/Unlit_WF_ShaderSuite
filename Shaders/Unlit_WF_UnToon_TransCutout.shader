@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
     /*
      * authors:
-     *      ver:2020/04/11 whiteflare,
+     *      ver:2020/05/14 whiteflare,
      */
 
     Properties {
@@ -223,7 +223,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
@@ -255,7 +255,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.0
+            #pragma target 4.5
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
@@ -280,6 +280,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         Pass {
             Name "SHADOWCASTER"
             Tags{ "LightMode" = "ShadowCaster" }
+
+            Cull Off
 
             CGPROGRAM
 

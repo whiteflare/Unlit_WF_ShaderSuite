@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/02/01 whiteflare,
+     *      ver:2020/05/14 whiteflare,
      */
 
     #include "UnityCG.cginc"
@@ -193,13 +193,21 @@
         #endif
     }
 
+    inline float3 worldSpaceCameraPosStereoLerp(float x) {
+        return lerp(_WorldSpaceCameraPos, worldSpaceCameraPos(), x);
+    }
+
     inline float3 worldSpaceViewDir(float3 ws_vertex) {
         return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex);
     }
 
-    inline float3 localSpaceViewDir(float3 ws_vertex) {
-        return UnityWorldToObjectDir(worldSpaceCameraPos() - ws_vertex);
+    inline float3 worldSpaceViewDirStereoLerp(float3 ws_vertex, float x) {
+        return SafeNormalizeVec3(worldSpaceCameraPosStereoLerp(x) - ws_vertex);
     }
+
+//    inline float3 localSpaceViewDir(float3 ws_vertex) {
+//        return UnityWorldToObjectDir(worldSpaceCameraPos() - ws_vertex);
+//    }
 
     inline bool isInMirror() {
         return unity_CameraProjection[2][0] != 0.0f || unity_CameraProjection[2][1] != 0.0f;
@@ -209,12 +217,11 @@
     // Matcap
     ////////////////////////////
 
-    inline float3 calcMatcapVector(in float3 ws_vertex, in float3 ws_normal) {
+    inline float3 calcMatcapVector(in float3 ws_camera_dir, in float3 ws_normal) {
         float3 vs_normal = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
 
         #ifdef _MATCAP_VIEW_CORRECT_ENABLE
-            float3 ws_view_dir = worldSpaceViewDir(ws_vertex);
-            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
+            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_camera_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
             float3 detail = vs_normal.xyz * float3(-1, -1, 1);
             vs_normal = base * dot(base, detail) / base.z - detail;
         #endif
