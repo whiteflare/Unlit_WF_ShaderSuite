@@ -193,8 +193,16 @@
         #endif
     }
 
+    inline float3 worldSpaceCameraPosStereoLerp(float x) {
+        return lerp(_WorldSpaceCameraPos, worldSpaceCameraPos(), x);
+    }
+
     inline float3 worldSpaceViewDir(float3 ws_vertex) {
         return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex);
+    }
+
+    inline float3 worldSpaceViewDirStereoLerp(float3 ws_vertex, float x) {
+        return SafeNormalizeVec3(worldSpaceCameraPosStereoLerp(x) - ws_vertex);
     }
 
 //    inline float3 localSpaceViewDir(float3 ws_vertex) {
