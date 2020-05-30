@@ -492,8 +492,14 @@ namespace UnlitWF
             }
 
             if (GUILayout.Button("Convert")) {
-                new WFMaterialEditUtility().RenameOldNameProperties(param);
+                if (new WFMaterialEditUtility().RenameOldNameProperties(param)) {
+                    // ShaderGUI側のマテリアルキャッシュをリセット
+                    ShaderCustomEditor.ResetOldMaterialTable();
+                    // 変更したマテリアルを保存
+                    AssetDatabase.SaveAssets();
+                }
             }
+
             EditorGUILayout.Space();
 
             // スクロール終了
@@ -525,11 +531,11 @@ namespace UnlitWF
             return 0 < CreateOldNamePropertyList(objlist).Count;
         }
 
-        public void RenameOldNameProperties(MigrationParameter param) {
-            RenameOldNameProperties(param.materials);
+        public bool RenameOldNameProperties(MigrationParameter param) {
+            return RenameOldNameProperties(param.materials);
         }
 
-        public void RenameOldNameProperties(object[] objlist) {
+        public bool RenameOldNameProperties(object[] objlist) {
             var oldPropList = CreateOldNamePropertyList(objlist);
             // 名称を全て変更
             foreach (var prop in oldPropList) {
@@ -539,6 +545,7 @@ namespace UnlitWF
             foreach (var so in ShaderPropertyView.GetUniqueSerialObject(oldPropList)) {
                 so.ApplyModifiedProperties();
             }
+            return 0 < oldPropList.Count;
         }
 
         private List<ShaderPropertyView> CreateOldNamePropertyList(object[] objlist) { // ShaderCustomEditor側から呼び出されるのでobject[]
@@ -564,9 +571,6 @@ namespace UnlitWF
                     oldPropList.Add(prop);
                 }
             }
-
-            // ShaderGUI側のマテリアルキャッシュをリセット
-            ShaderCustomEditor.ResetOldMaterialTable();
 
             return oldPropList;
         }
@@ -623,7 +627,8 @@ namespace UnlitWF
                 if (dst.TryGetValue(src_prop.name, out dst_prop)) {
                     src_prop.CopyTo(dst_prop);
                     changed.Add(dst_prop);
-                } else {
+                }
+                else {
                     Debug.Log("not found: " + src_prop.name);
                 }
             }
