@@ -75,14 +75,14 @@ LightmapSettings:
     m_BakeBackend: 1
     m_PVRSampling: 1
     m_PVRDirectSampleCount: 128
-    m_PVRSampleCount: 512
-    m_PVRBounces: 2
+    m_PVRSampleCount: 1024
+    m_PVRBounces: 3
     m_PVRFilterTypeDirect: 1
     m_PVRFilterTypeIndirect: 1
-    m_PVRFilterTypeAO: 1
+    m_PVRFilterTypeAO: 0
     m_PVRFilteringMode: 2
     m_PVRCulling: 1
-    m_PVRFilteringGaussRadiusDirect: 1
+    m_PVRFilteringGaussRadiusDirect: 5
     m_PVRFilteringGaussRadiusIndirect: 5
     m_PVRFilteringGaussRadiusAO: 2
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
@@ -396,7 +396,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1720054505243556, guid: 3af6ea1e5e16d184da3ddb6d8c119940, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4408566008046670, guid: 3af6ea1e5e16d184da3ddb6d8c119940, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1512,7 +1512,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1190234301749460, guid: 1aba99f0c3bc49e449f300e33ab4d65e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4505890316033214, guid: 1aba99f0c3bc49e449f300e33ab4d65e, type: 3}
       propertyPath: m_LocalPosition.x
