@@ -59,6 +59,14 @@ namespace UnlitWF
                     }
                 }
             },
+            (p, all) => {
+                if (p.name == "_AL_MaskTex" && p.textureValue != null) {
+                    var target = FindProperty("_AL_Source", all, false);
+                    if (target != null && target.floatValue == 0) { // MAIN_TEX_ALPHA
+                        target.floatValue = 1; // MASK_TEX_RED
+                    }
+                }
+            },
         };
 
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
