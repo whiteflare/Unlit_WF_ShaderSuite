@@ -631,11 +631,18 @@
 
         inline void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
-                float boostlight = 0.5 + 0.25 * WF_TEX2D_SHADE_MASK(uv_main);
+                // 陰用法線とライト方向から Harf-Lambert
                 float3 ws_shade_normal = normalize(lerp(ws_normal, ws_bump_normal, _TS_BlendNormal));
-                float brightness = dot(ws_shade_normal, i.ws_light_dir.xyz) * (1 - boostlight) + boostlight;
+                float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
+
+                // アンチシャドウマスク加算
+                brightness = lerp(brightness,
+                    isInMirror() ? lerp(brightness, 1, 0.2) : lerp(brightness, 1, 0.5),
+                    WF_TEX2D_SHADE_MASK(uv_main));
+
                 // ビュー相対位置シフト
-                brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
+                brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);    // 鏡内は固定されて値が変化しない
+
                 // 影色計算
 #ifndef _WF_MOBILE
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
@@ -648,6 +655,7 @@
 #endif
                 shadow_color_1st = lerp(ONE_VEC3, shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
                 shadow_color_2nd = lerp(ONE_VEC3, shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
+
                 // 色計算
                 color.rgb *= lerp(
                     lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
