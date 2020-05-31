@@ -289,9 +289,6 @@
         if (TGL_ON(_GL_DisableBackLit)) {
             return 0;
         }
-        if (isInMirror()) {
-            return 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
-        }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(i.ws_vertex).xz;
         float angle_light_camera = dot( SafeNormalizeVec2(i.ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
@@ -636,12 +633,14 @@
                 float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
 
                 // アンチシャドウマスク加算
-                brightness = lerp(brightness,
-                    isInMirror() ? lerp(brightness, 1, 0.2) : lerp(brightness, 1, 0.5),
-                    WF_TEX2D_SHADE_MASK(uv_main));
+                float anti_shade = WF_TEX2D_SHADE_MASK(uv_main);
+                brightness = lerp(brightness, lerp(brightness, 1, 0.5), anti_shade);
+                if (isInMirror()) {
+                    angle_light_camera *= anti_shade;
+                }
 
                 // ビュー相対位置シフト
-                brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);    // 鏡内は固定されて値が変化しない
+                brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
 
                 // 影色計算
 #ifndef _WF_MOBILE
@@ -684,6 +683,9 @@
 
         inline void affectRimLight(v2f i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TR_Enable)) {
+                if (isInMirror()) {
+                    angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
+                }
                 // vs_normalからリムライト範囲を計算
                 float2 rim_uv = vs_normal.xy;
                 rim_uv.x *= _TR_PowerSide + 1;
