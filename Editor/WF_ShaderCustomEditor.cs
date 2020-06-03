@@ -26,6 +26,7 @@ using UnityEngine;
 
 namespace UnlitWF
 {
+
     public class ShaderCustomEditor : ShaderGUI
     {
         /// <summary>
@@ -38,6 +39,8 @@ namespace UnlitWF
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
         };
+
+        delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
 
         /// <summary>
         /// 値を設定したら他プロパティの値を自動で設定するやつ
@@ -74,13 +77,10 @@ namespace UnlitWF
 
             Material mat = materialEditor.target as Material;
             if (mat != null) {
-                // シェーダ名の表示
-                var rect = EditorGUILayout.GetControlRect();
-                rect.y += 2;
-                GUI.Label(rect, "Current Shader", EditorStyles.boldLabel);
-                GUILayout.Label(new Regex(@".*/").Replace(mat.shader.name, ""));
+                // CurrentShader
+                OnGuiSub_ShowCurrentShaderName(materialEditor, mat);
                 // マイグレーションHelpBox
-                MigrationHelpBox(materialEditor);
+                OnGUISub_MigrationHelpBox(materialEditor);
             }
 
             // 現在無効なラベルを保持するリスト
@@ -161,9 +161,59 @@ namespace UnlitWF
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
         }
 
-        delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
+        private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, Material mat) {
+            // シェーダ名の表示
+            var rect = EditorGUILayout.GetControlRect();
+            rect.y += 2;
+            GUI.Label(rect, "Current Shader", EditorStyles.boldLabel);
+            GUILayout.Label(new Regex(@".*/").Replace(mat.shader.name, ""));
 
-        private void MigrationHelpBox(MaterialEditor materialEditor) {
+            // シェーダ切り替えボタン
+            var snm = WFShaderNameDictionary.TryFindFromName(mat.shader.name);
+            if (snm != null) {
+                var targets = materialEditor.targets.Select(m => m as Material).Where(m => m != null).ToArray();
+
+                rect = EditorGUILayout.GetControlRect();
+                rect.y += 2;
+                GUI.Label(rect, "Current Shader Variants", EditorStyles.boldLabel);
+                // バリアント
+                {
+                    var variants = WFShaderNameDictionary.GetVariantList(snm);
+                    var labels = variants.Select(nm => nm.Variant).ToArray();
+                    int idx = Array.IndexOf(labels, snm.Variant);
+                    EditorGUI.BeginChangeCheck();
+                    int select = EditorGUILayout.Popup("Variant", idx, labels);
+                    if (EditorGUI.EndChangeCheck() && idx != select) {
+                        var shader = Shader.Find(variants[select].Name);
+                        if (shader != null) {
+                            Undo.RecordObjects(targets, "change shader");
+                            foreach(var m in targets) {
+                                m.shader = shader;
+                            }
+                        }
+                    }
+                }
+                // Render Type
+                {
+                    var variants = WFShaderNameDictionary.GetRenderTypeList(snm);
+                    var labels = variants.Select(nm => nm.RenderType).ToArray();
+                    int idx = Array.IndexOf(labels, snm.RenderType);
+                    EditorGUI.BeginChangeCheck();
+                    int select = EditorGUILayout.Popup("RenderType", idx, labels);
+                    if (EditorGUI.EndChangeCheck() && idx != select) {
+                        var shader = Shader.Find(variants[select].Name);
+                        if (shader != null) {
+                            Undo.RecordObjects(targets, "change shader");
+                            foreach (var m in targets) {
+                                m.shader = shader;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void OnGUISub_MigrationHelpBox(MaterialEditor materialEditor) {
             var mats = materialEditor.targets.Select(obj => obj as Material).Where(mat => mat != null).ToArray();
 
             if (IsOldMaterial(mats)) {
