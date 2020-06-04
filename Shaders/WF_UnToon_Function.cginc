@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/05/14 whiteflare,
+     *      ver:2020/06/04 whiteflare,
      */
 
     ////////////////////////////
@@ -288,9 +288,6 @@
     inline float calcAngleLightCamera(v2f i) {
         if (TGL_ON(_GL_DisableBackLit)) {
             return 0;
-        }
-        if (isInMirror()) {
-            return 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
         }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(i.ws_vertex).xz;
@@ -631,11 +628,20 @@
 
         inline void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
-                float boostlight = 0.5 + 0.25 * WF_TEX2D_SHADE_MASK(uv_main);
+                // 陰用法線とライト方向から Harf-Lambert
                 float3 ws_shade_normal = normalize(lerp(ws_normal, ws_bump_normal, _TS_BlendNormal));
-                float brightness = dot(ws_shade_normal, i.ws_light_dir.xyz) * (1 - boostlight) + boostlight;
+                float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
+
+                // アンチシャドウマスク加算
+                float anti_shade = WF_TEX2D_SHADE_MASK(uv_main);
+                brightness = lerp(brightness, lerp(brightness, 1, 0.5), anti_shade);
+                if (isInMirror()) {
+                    angle_light_camera *= anti_shade;
+                }
+
                 // ビュー相対位置シフト
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
+
                 // 影色計算
 #ifndef _WF_MOBILE
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
@@ -648,6 +654,7 @@
 #endif
                 shadow_color_1st = lerp(ONE_VEC3, shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
                 shadow_color_2nd = lerp(ONE_VEC3, shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
+
                 // 色計算
                 color.rgb *= lerp(
                     lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
@@ -676,6 +683,9 @@
 
         inline void affectRimLight(v2f i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TR_Enable)) {
+                if (isInMirror()) {
+                    angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
+                }
                 // vs_normalからリムライト範囲を計算
                 float2 rim_uv = vs_normal.xy;
                 rim_uv.x *= _TR_PowerSide + 1;

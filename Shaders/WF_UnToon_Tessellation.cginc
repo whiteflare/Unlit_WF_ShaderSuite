@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/04/11 whiteflare,
+     *      ver:2020/06/04 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -66,18 +66,17 @@
     }
 
     HsConstantOutput hullConst(InputPatch<v2f, 3> i) {
-        // 2～16 の値域をもつ _TessFactor から tessFactor を計算する
-        float4 tessFactor;
+        UNITY_SETUP_INSTANCE_ID(i[0]);
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i[0]);
 
-        if (_TessType == 0) { // DISTANCE
-            tessFactor = worldDistanceBasedTess(calcWorldSpaceBasePos(i[0].ws_vertex), _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor);
-        }
-        else if (_TessType == 1) {  // EDGE_LENGTH
-            tessFactor = worldEdgeLengthBasedTess(i[0].ws_vertex, i[1].ws_vertex, i[2].ws_vertex, 64 / _TessFactor);
-        }
-        else {  // FIXED
-            tessFactor = _TessFactor.xxxx;
-        }
+        // 2～16 の値域をもつ _TessFactor から tessFactor を計算する
+        float4 tessFactor =
+            // DISTANCE
+            _TessType < 0.5 ? worldDistanceBasedTess(calcWorldSpaceBasePos(i[0].ws_vertex), _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor)
+                // EDGE_LENGTH
+                : _TessType < 1.5 ? worldEdgeLengthBasedTess(i[0].ws_vertex, i[1].ws_vertex, i[2].ws_vertex, 64 / _TessFactor)
+                // FIXED
+                : _TessFactor.xxxx;
 
         HsConstantOutput o = (HsConstantOutput) 0;
         o.tessFact[0] = tessFactor.x;

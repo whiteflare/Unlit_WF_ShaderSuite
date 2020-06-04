@@ -134,9 +134,10 @@ Material:
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 270
     - _GL_DisableBackLit: 0
+    - _GL_DisableBasePos: 0
     - _GL_Level: 0
     - _GL_LevelMax: 0.8
-    - _GL_LevelMin: 0.12499998
+    - _GL_LevelMin: 0
     - _GL_LightMode: 3
     - _HL_BlendNormal: 0.1
     - _HL_CapType: 0
