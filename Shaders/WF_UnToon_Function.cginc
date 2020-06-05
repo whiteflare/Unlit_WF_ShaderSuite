@@ -54,7 +54,11 @@
     #endif
 
     #ifndef WF_TEX2D_METAL_GLOSS
-        #define WF_TEX2D_METAL_GLOSS(uv)        SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra * float2(1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
+        #else
+            #define WF_TEX2D_METAL_GLOSS(uv)    SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra
+        #endif
     #endif
 
     #ifndef WF_TEX2D_MATCAP_MASK
@@ -474,6 +478,8 @@
         DECL_SUB_TEX2D(_MetallicGlossMap);
         float       _MT_InvMaskVal;
 #ifndef _WF_MOBILE
+        DECL_SUB_TEX2D(_SpecGlossMap);
+        float       _MT_InvRoughnessMaskVal;
         int         _MT_CubemapType;
         samplerCUBE _MT_Cubemap;
         float4      _MT_Cubemap_HDR;

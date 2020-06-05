@@ -300,6 +300,8 @@ namespace UnlitWF
             { "[MT] Monochrome Reflection", "[MT] モノクロ反射" },
             { "[MT] Specular", "[MT] スペキュラ反射" },
             { "[MT] MetallicMap Texture", "[MT] MetallicSmoothnessマップ" },
+            { "[MT] MetallicSmoothnessMap Texture", "[MT] MetallicSmoothnessマップ" },
+            { "[MT] RoughnessMap Texture", "[MT] Roughnessマップ" },
             { "[MT] 2nd CubeMap Blend", "[MT] キューブマップ混合タイプ" },
             { "[MT] 2nd CubeMap", "[MT] キューブマップ" },
             // Light Matcap
