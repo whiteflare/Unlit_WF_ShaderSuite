@@ -66,13 +66,25 @@
     #endif
 
     #ifndef WF_TEX2D_SHADE_BASE
-        #define WF_TEX2D_SHADE_BASE(uv)         PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, uv).rgb
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_SHADE_BASE(uv)     PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, uv).rgb
+        #else
+            #define WF_TEX2D_SHADE_BASE(uv)     ONE_VEC3
+        #endif
     #endif
     #ifndef WF_TEX2D_SHADE_1ST
-        #define WF_TEX2D_SHADE_1ST(uv)          PICK_SUB_TEX2D(_TS_1stTex, _MainTex, uv).rgb
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_SHADE_1ST(uv)      PICK_SUB_TEX2D(_TS_1stTex, _MainTex, uv).rgb
+        #else
+            #define WF_TEX2D_SHADE_1ST(uv)      ONE_VEC3
+        #endif
     #endif
     #ifndef WF_TEX2D_SHADE_2ND
-        #define WF_TEX2D_SHADE_2ND(uv)          PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, uv).rgb
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_SHADE_2ND(uv)      PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, uv).rgb
+        #else
+            #define WF_TEX2D_SHADE_2ND(uv)      ONE_VEC3
+        #endif
     #endif
     #ifndef WF_TEX2D_SHADE_MASK
         #define WF_TEX2D_SHADE_MASK(uv)         SAMPLE_MASK_VALUE(_TS_MaskTex, uv, _TS_InvMaskVal).r
@@ -632,6 +644,13 @@
             }
         }
 
+        inline void calcShadowColor(float4 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
+            shadow_color = lerp( 
+                lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power * color.a),
+                shadow_color,
+                smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
+        }
+
         inline void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
                 // 陰用法線とライト方向から Harf-Lambert
@@ -649,23 +668,14 @@
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
 
                 // 影色計算
-#ifndef _WF_MOBILE
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
-                float3 shadow_color_1st = _TS_1stColor.rgb * WF_TEX2D_SHADE_1ST(uv_main) / base_color.rgb;
-                float3 shadow_color_2nd = _TS_2ndColor.rgb * WF_TEX2D_SHADE_2ND(uv_main) / base_color.rgb;
-#else
-                float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb );
-                float3 shadow_color_1st = _TS_1stColor.rgb / base_color.rgb;
-                float3 shadow_color_2nd = _TS_2ndColor.rgb / base_color.rgb;
-#endif
-                shadow_color_1st = lerp(ONE_VEC3, shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
-                shadow_color_2nd = lerp(ONE_VEC3, shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
-
-                // 色計算
-                color.rgb *= lerp(
-                    lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
-                    ONE_VEC3,
-                    smoothstep(_TS_1stBorder, _TS_1stBorder + max(_TS_Feather, 0.001), brightness));
+                float3 shadow_color = ONE_VEC3;
+                // 1影
+                calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+                // 2影
+                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                // 乗算
+                color.rgb *= shadow_color;
             }
         }
     #else
