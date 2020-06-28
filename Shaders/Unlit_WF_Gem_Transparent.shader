@@ -44,6 +44,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _MT_Brightness          ("[GM] Brightness", Range(0, 1)) = 0.2
         [Toggle(_)]
             _MT_Monochrome          ("[GM] Monochrome Reflection", Range(0, 1)) = 1
+        [PowerSlider(4.0)]
+            _MT_CubemapPower        ("[GM] 2nd CubeMap Power", Range(0, 16)) = 1
 
         // Lit
         [WFHeader(Lit)]

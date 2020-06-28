@@ -495,6 +495,7 @@
         int         _MT_CubemapType;
         samplerCUBE _MT_Cubemap;
         float4      _MT_Cubemap_HDR;
+        float       _MT_CubemapPower;
 #endif
 
         inline float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
@@ -509,7 +510,7 @@
             }
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
-                color += pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
+                color += pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod) * _MT_CubemapPower;
             }
             return color;
 #endif

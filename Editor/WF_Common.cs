@@ -304,6 +304,7 @@ namespace UnlitWF
             { "[MT] RoughnessMap Texture", "[MT] Roughnessマップ" },
             { "[MT] 2nd CubeMap Blend", "[MT] キューブマップ混合タイプ" },
             { "[MT] 2nd CubeMap", "[MT] キューブマップ" },
+            { "[MT] 2nd CubeMap Power", "[MT] キューブマップ強度" },
             // Light Matcap
             { "[HL] Matcap Type", "[HL] matcapタイプ" },
             { "[HL] Matcap Sampler", "[HL] matcapサンプラ" },
@@ -453,7 +454,7 @@ namespace UnlitWF
         English, 日本語
     }
 
-    internal class WeakRefCache<T> where T: class
+    internal class WeakRefCache<T> where T : class
     {
         private readonly List<WeakReference> refs = new List<WeakReference>();
 

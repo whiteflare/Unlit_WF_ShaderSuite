@@ -95,6 +95,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
+        [PowerSlider(4.0)]
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
