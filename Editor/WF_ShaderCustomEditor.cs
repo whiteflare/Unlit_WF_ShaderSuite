@@ -72,6 +72,16 @@ namespace UnlitWF
             },
         };
 
+        /// <summary>
+        /// 見つけ次第削除するシェーダキーワード
+        /// </summary>
+        private readonly List<string> DELETE_KEYWORD = new List<string>() {
+            "_",
+            "_ALPHATEST_ON",
+            "_ALPHABLEND_ON",
+            "_ALPHAPREMULTIPLY_ON",
+        };
+
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
             materialEditor.SetDefaultGUIWidths();
 
@@ -159,6 +169,18 @@ namespace UnlitWF
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
+
+            // 不要なシェーダキーワードは削除
+            foreach (object t in materialEditor.targets) {
+                Material mm = t as Material;
+                if (mm != null) {
+                    foreach (var key in DELETE_KEYWORD) {
+                        if (mm.IsKeywordEnabled(key)) {
+                            mm.DisableKeyword(key);
+                        }
+                    }
+                }
+            }
         }
 
         private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, Material mat) {
@@ -187,7 +209,7 @@ namespace UnlitWF
                         var shader = Shader.Find(variants[select].Name);
                         if (shader != null) {
                             Undo.RecordObjects(targets, "change shader");
-                            foreach(var m in targets) {
+                            foreach (var m in targets) {
                                 m.shader = shader;
                             }
                         }
