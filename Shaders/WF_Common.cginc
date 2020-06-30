@@ -194,7 +194,7 @@
     }
 
     inline float3 worldSpaceCameraPosStereoLerp(float x) {
-        return lerp(_WorldSpaceCameraPos, worldSpaceCameraPos(), x);
+        return lerp(worldSpaceCameraPos(), _WorldSpaceCameraPos, x);
     }
 
     inline float3 worldSpaceViewDir(float3 ws_vertex) {

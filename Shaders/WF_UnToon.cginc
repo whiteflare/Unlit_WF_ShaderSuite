@@ -133,22 +133,19 @@
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
+        // 右目と左目の中間への方向
         float3 ws_camera_dir = worldSpaceViewDir(i.ws_vertex);
-
-        // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(ws_camera_dir, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_camera_dir, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
         // メタリック
         affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
-        affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), uv_main, color);
+        affectMatcapColor(calcMatcapVector(worldSpaceViewDirStereoLerp(i.ws_vertex, _HL_Parallax), lerp(ws_normal, ws_bump_normal, _HL_BlendNormal)), uv_main, color);
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
+        affectRimLight(i, uv_main, calcMatcapVector(ws_camera_dir, ws_normal), angle_light_camera, color);
         // ScreenTone
         affectOverlayTexture(i.ws_vertex, uv_main, color);
         // Outline

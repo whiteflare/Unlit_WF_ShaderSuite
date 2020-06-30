@@ -567,6 +567,7 @@
         float3      _HL_MatcapColor;
         float       _HL_Power;
         float       _HL_BlendNormal;
+        float       _HL_Parallax;
         DECL_SUB_TEX2D(_HL_MaskTex);
         float       _HL_InvMaskVal;
 
