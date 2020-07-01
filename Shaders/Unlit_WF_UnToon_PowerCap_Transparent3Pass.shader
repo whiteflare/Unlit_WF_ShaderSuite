@@ -71,6 +71,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_MatcapColor_1       ("[HA] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 1
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -85,6 +86,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_MatcapColor_2       ("[HB] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_2             ("[HB] Power", Range(0, 2)) = 1
             _HL_BlendNormal_2       ("[HB] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_2          ("[HB] Parallax", Range(0, 1)) = 1
         [NoScaleOffset]
             _HL_MaskTex_2           ("[HB] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -99,6 +101,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_MatcapColor_3       ("[HC] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_3             ("[HC] Power", Range(0, 2)) = 1
             _HL_BlendNormal_3       ("[HC] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_3          ("[HC] Parallax", Range(0, 1)) = 1
         [NoScaleOffset]
             _HL_MaskTex_3           ("[HC] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -113,6 +116,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_MatcapColor_4       ("[HD] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_4             ("[HD] Power", Range(0, 2)) = 1
             _HL_BlendNormal_4       ("[HD] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_4          ("[HD] Parallax", Range(0, 1)) = 1
         [NoScaleOffset]
             _HL_MaskTex_4           ("[HD] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -127,6 +131,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_MatcapColor_5       ("[HE] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_5             ("[HE] Power", Range(0, 2)) = 1
             _HL_BlendNormal_5       ("[HE] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_5          ("[HE] Parallax", Range(0, 1)) = 1
         [NoScaleOffset]
             _HL_MaskTex_5           ("[HE] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -141,6 +146,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_MatcapColor_6       ("[HF] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_6             ("[HF] Power", Range(0, 2)) = 1
             _HL_BlendNormal_6       ("[HF] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_6          ("[HF] Parallax", Range(0, 1)) = 1
         [NoScaleOffset]
             _HL_MaskTex_6           ("[HF] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -155,6 +161,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_MatcapColor_7       ("[HG] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_7             ("[HG] Power", Range(0, 2)) = 1
             _HL_BlendNormal_7       ("[HG] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_7          ("[HG] Parallax", Range(0, 1)) = 1
         [NoScaleOffset]
             _HL_MaskTex_7           ("[HG] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -169,6 +176,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_MatcapColor_8       ("[HH] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_8             ("[HH] Power", Range(0, 2)) = 1
             _HL_BlendNormal_8       ("[HH] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_8          ("[HH] Parallax", Range(0, 1)) = 1
         [NoScaleOffset]
             _HL_MaskTex_8           ("[HH] Mask Texture", 2D) = "white" {}
         [Toggle(_)]

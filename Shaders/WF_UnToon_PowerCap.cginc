@@ -36,6 +36,7 @@
         float3      _HL_MatcapColor_##id;                                                                                           \
         float       _HL_Power_##id;                                                                                                 \
         float       _HL_BlendNormal_##id;                                                                                           \
+        float       _HL_Parallax_##id;                                                                                              \
         DECL_SUB_TEX2D(_HL_MaskTex_##id);                                                                                           \
         float       _HL_InvMaskVal_##id;                                                                                            \
         void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
@@ -59,7 +60,7 @@
             }                                                                                                                       \
         }
 
-    #define WF_POWERCAP_AFFECT(id)  affectMatcapColor_##id(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal_##id), i.uv, color)
+    #define WF_POWERCAP_AFFECT(id)  affectMatcapColor_##id(calcMatcapVector(matcapVector, _HL_BlendNormal_##id, _HL_Parallax_##id), i.uv, color)
 
     WF_POWERCAP_DECL(1)
     WF_POWERCAP_DECL(2)
@@ -96,6 +97,8 @@
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
+        float4x4 matcapVector = calcMatcapVectorArray(ws_camera_dir, worldSpaceViewDirStereoLerp(i.ws_vertex, 1), ws_normal, ws_bump_normal);
+
         // Highlight
         WF_POWERCAP_AFFECT(1);
         WF_POWERCAP_AFFECT(2);
@@ -109,7 +112,7 @@
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
+        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, 0, 0), angle_light_camera, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;

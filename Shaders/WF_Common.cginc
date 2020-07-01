@@ -26,9 +26,6 @@
     #include "UnityCG.cginc"
     #include "Lighting.cginc"
 
-    #define _MATCAP_VIEW_CORRECT_ENABLE
-    #define _MATCAP_ROTATE_CORRECT_ENABLE
-
     ////////////////////////////
     // Common Utility
     ////////////////////////////
@@ -217,26 +214,63 @@
     // Matcap
     ////////////////////////////
 
+    inline float3 matcapViewCorrect(float3 vs_normal, float3 ws_camera_dir) {
+        float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_camera_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
+        float3 detail = vs_normal.xyz * float3(-1, -1, 1);
+        return base * dot(base, detail) / base.z - detail;
+    }
+
+    inline float2x2 matcapRotateCorrectMatrix() {
+        float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
+        float top_angle = 0;
+        if (any(vs_topdir)) {
+            vs_topdir = normalize(vs_topdir);
+            top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
+        }
+        float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
+        return matrixRotate;
+    }
+
     inline float3 calcMatcapVector(in float3 ws_camera_dir, in float3 ws_normal) {
+        // ワールド法線をビュー法線に変換
         float3 vs_normal = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
 
-        #ifdef _MATCAP_VIEW_CORRECT_ENABLE
-            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_camera_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
-            float3 detail = vs_normal.xyz * float3(-1, -1, 1);
-            vs_normal = base * dot(base, detail) / base.z - detail;
-        #endif
-
-        #ifdef _MATCAP_ROTATE_CORRECT_ENABLE
-            float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
-            if (any(vs_topdir)) {
-                vs_topdir = normalize(vs_topdir);
-                float top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
-                float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
-                vs_normal.xy = mul( vs_normal.xy, matrixRotate );
-            }
-        #endif
+        // カメラ位置にて補正する
+        vs_normal = matcapViewCorrect(vs_normal, ws_camera_dir);
+        // 真上を揃える
+        vs_normal.xy = mul( vs_normal.xy, matcapRotateCorrectMatrix() );
 
         return normalize( vs_normal );
+    }
+
+    inline float4x4 calcMatcapVectorArray(in float3 ws_camera_dir_center, in float3 ws_camera_dir_side, in float3 ws_normal, in float3 ws_bump_normal) {
+        // ワールド法線をビュー法線に変換
+        float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
+        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
+
+        // カメラ位置にて補正する
+        float3 vs_normal_center         = matcapViewCorrect(vs_normal, ws_camera_dir_center);
+        float3 vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir_side);
+        float3 vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_camera_dir_center);
+        float3 vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir_side);
+
+        // 真上を揃える
+        float2x2 rotate = matcapRotateCorrectMatrix();
+        vs_normal_center.xy         = mul( vs_normal_center.xy, rotate );
+        vs_normal_side.xy           = mul( vs_normal_side.xy, rotate );
+        vs_bump_normal_center.xy    = mul( vs_bump_normal_center.xy, rotate );
+        vs_bump_normal_side.xy      = mul( vs_bump_normal_side.xy, rotate );
+
+        float4x4 matcapVector;
+        matcapVector[0] = float4( normalize( vs_normal_center ), 0);
+        matcapVector[1] = float4( normalize( vs_bump_normal_center ), 0);
+        matcapVector[2] = float4( normalize( vs_normal_side ), 0);
+        matcapVector[3] = float4( normalize( vs_bump_normal_side ), 0);
+        return matcapVector;
+    }
+
+    inline float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
+        return lerp( lerp(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerp(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax);
     }
 
     ////////////////////////////
