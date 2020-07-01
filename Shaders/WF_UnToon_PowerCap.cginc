@@ -89,15 +89,16 @@
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
-        float3 ws_camera_dir = worldSpaceViewDir(i.ws_vertex);
+        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
+        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(ws_camera_dir, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_camera_dir, ws_bump_normal);
+        float3 vs_normal = calcMatcapVector(ws_view_dir, ws_normal);
+        float3 vs_bump_normal = calcMatcapVector(ws_view_dir, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
-        float4x4 matcapVector = calcMatcapVectorArray(ws_camera_dir, worldSpaceViewDirStereoLerp(i.ws_vertex, 1), ws_normal, ws_bump_normal);
+        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 
         // Highlight
         WF_POWERCAP_AFFECT(1);
@@ -118,7 +119,7 @@
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlphaWithFresnel(i.uv, ws_normal, ws_camera_dir, color);
+        affectAlphaWithFresnel(i.uv, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

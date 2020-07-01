@@ -133,19 +133,24 @@
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
-        // 右目と左目の中間への方向
-        float3 ws_camera_dir = worldSpaceViewDir(i.ws_vertex);
+        // ビューポイントへの方向
+        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
+        // カメラへの方向
+        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
+        // matcapベクトルの配列
+        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
+
         // メタリック
-        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
+        affectMetallic(i, ws_view_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
-        affectMatcapColor(calcMatcapVector(worldSpaceViewDirStereoLerp(i.ws_vertex, _HL_Parallax), lerp(ws_normal, ws_bump_normal, _HL_BlendNormal)), uv_main, color);
+        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax), uv_main, color);
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, uv_main, calcMatcapVector(ws_camera_dir, ws_normal), angle_light_camera, color);
+        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, 0, 0), angle_light_camera, color);
         // ScreenTone
         affectOverlayTexture(i.ws_vertex, uv_main, color);
         // Outline
@@ -157,7 +162,7 @@
         affectOcclusion(i, uv_main, color);
 
         // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, ws_camera_dir, color);
+        affectAlphaWithFresnel(uv_main, ws_normal, ws_view_dir, color);
         // Outline Alpha
         affectOutlineAlpha(uv_main, color);
         // EmissiveScroll
@@ -177,7 +182,7 @@
     ////////////////////////////
 
     float4 shiftDepthVertex(float3 ws_vertex, float width) {
-        float3 ws_camera_dir = _WorldSpaceCameraPos.xyz - ws_vertex.xyz; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
+        float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex); // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
         // カメラ方向の z シフト量を加算
         float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
 

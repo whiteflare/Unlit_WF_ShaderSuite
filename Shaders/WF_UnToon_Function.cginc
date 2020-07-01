@@ -306,7 +306,7 @@
             return 0;
         }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(i.ws_vertex).xz;
+        float2 xz_camera_pos = worldSpaceViewPointPos().xz - calcWorldSpaceBasePos(i.ws_vertex).xz;
         float angle_light_camera = dot( SafeNormalizeVec2(i.ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
             * (1 - smoothstep(0.9, 1, abs(i.ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         return angle_light_camera;
