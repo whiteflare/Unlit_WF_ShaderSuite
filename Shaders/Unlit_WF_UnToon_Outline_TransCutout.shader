@@ -251,6 +251,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             #pragma fragment frag
 
             #pragma target 4.5
+            #pragma require geometry
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
