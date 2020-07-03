@@ -309,6 +309,7 @@ namespace UnlitWF
             { "[HL] Matcap Type", "[HL] matcapタイプ" },
             { "[HL] Matcap Sampler", "[HL] matcapサンプラ" },
             { "[HL] Matcap Color", "[HL] matcap色調整" },
+            { "[HL] Parallax", "[HL] 視差(Parallax)" },
             { "[HL] Power", "[HL] matcap強度" },
             { "[HL] Mask Texture", "[HL] マスクテクスチャ" },
             // ToonShade
@@ -332,6 +333,7 @@ namespace UnlitWF
             { "[RM] Power Bottom", "[RM] 強度(下)" },
             { "[RM] RimLight Mask Texture", "[RM] マスクテクスチャ" },
             // Overlay or ScreenTone
+            { "[OL] UV Type", "[OL] UVタイプ" },
             { "[OL] Texture", "[OL] テクスチャ" },
             { "[OL] Blend Type", "[OL] 混合タイプ" },
             { "[OL] Blend Power", "[OL] 混合の強度" },
