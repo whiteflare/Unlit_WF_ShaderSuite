@@ -175,6 +175,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
         // Overlay Texture
         [WFHeaderToggle(ScreenTone Texture)]
             _OL_Enable              ("[OL] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1,SKYBOX,2)]
+            _OL_UVType              ("[OL] UV Type", Float) = 0
             _OL_OverlayTex          ("[OL] Texture", 2D) = "white" {}
         [Enum(ALPHA,0,ADD,1,MUL,2)]
             _OL_BlendType           ("[OL] Blend Type", Float) = 0

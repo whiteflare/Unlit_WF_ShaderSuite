@@ -726,6 +726,7 @@
 
     #ifdef _OL_ENABLE
         float       _OL_Enable;
+        int         _OL_UVType;
         sampler2D   _OL_OverlayTex; // MainTexと大きく構造が異なるので独自のサンプラーを使う
         float4      _OL_OverlayTex_ST;
         int         _OL_BlendType;
@@ -740,7 +741,7 @@
             float lat = acos( ws_view_dir.y );                  // -PI ~ +PI
             float2 uv = float2(-lon, -lat) * UNITY_INV_TWO_PI + 0.5;
 
-            return TRANSFORM_TEX(uv, _OL_OverlayTex);
+            return uv;
         }
 
         inline float3 blendOverlayColor(float3 color, float3 ov_color, float3 power) {
@@ -753,15 +754,16 @@
             return lerp(color, ov_color, power);    // ブレンド
         }
 
-        inline void affectOverlayTexture(float3 ws_vertex, float2 uv_main, inout float4 color) {
+        inline void affectOverlayTexture(v2f i, float2 uv_main, inout float4 color) {
             if (TGL_ON(_OL_Enable)) {
-                float2 uv_overlay = computeOverlayTex(ws_vertex);
+                float2 uv_overlay = _OL_UVType == 0 ? i.uv : _OL_UVType == 1 ? i.uv_lmap : computeOverlayTex(i.ws_vertex);
+                uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
                 float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
                 color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay).rgb, power);
             }
         }
     #else
-        #define affectOverlayTexture(ws_vertex, uv_main, color)
+        #define affectOverlayTexture(i, uv_main, color)
     #endif
 
     ////////////////////////////

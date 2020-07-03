@@ -96,9 +96,7 @@
 
         o.ws_vertex     = MUL_BARY(i, ws_vertex);
         o.uv            = MUL_BARY(i, uv);
-        #ifdef _LMAP_ENABLE
-            o.uv_lmap   = MUL_BARY(i, uv_lmap);
-        #endif
+        o.uv_lmap       = MUL_BARY(i, uv_lmap);
         o.normal        = normalize( MUL_BARY(i, normal) );
         #ifdef _NM_ENABLE
             o.tangent   = normalize( MUL_BARY(i, tangent) );

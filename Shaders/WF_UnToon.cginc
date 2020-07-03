@@ -32,9 +32,7 @@
     struct appdata {
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
-        #ifdef _LMAP_ENABLE
-            float2 uv_lmap      : TEXCOORD1;
-        #endif
+        float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
         #ifdef _NM_ENABLE
             float4 tangent      : TANGENT;
@@ -44,20 +42,18 @@
 
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        float3 ws_vertex        : TEXCOORD1;
-        float4 ws_light_dir     : TEXCOORD2;
         float3 light_color      : COLOR0;
         #ifdef _TS_ENABLE
             float shadow_power  : COLOR1;
         #endif
-        float3 normal           : TEXCOORD3;    // world space
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 ws_vertex        : TEXCOORD2;
+        float4 ws_light_dir     : TEXCOORD3;
+        float3 normal           : TEXCOORD4;    // world space
         #ifdef _NM_ENABLE
-            float3 tangent      : TEXCOORD4;    // world space
-            float3 bitangent    : TEXCOORD5;    // world space
-        #endif
-        #ifdef _LMAP_ENABLE
-            float2 uv_lmap      : TEXCOORD6;
+            float3 tangent      : TEXCOORD5;    // world space
+            float3 bitangent    : TEXCOORD6;    // world space
         #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -88,10 +84,8 @@
         o.ws_vertex = mul(unity_ObjectToWorld, v.vertex).xyz;
         o.vs_vertex = UnityWorldToClipPos(o.ws_vertex);
         o.uv = v.uv;
+        o.uv_lmap = v.uv_lmap;
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
-        #ifdef _LMAP_ENABLE
-            o.uv_lmap = v.uv_lmap;
-        #endif
 
         o.normal = UnityObjectToWorldNormal(v.normal.xyz);
         #ifdef _NM_ENABLE
@@ -152,7 +146,7 @@
         // リムライト
         affectRimLight(i, uv_main, calcMatcapVector(matcapVector, 0, 0), angle_light_camera, color);
         // ScreenTone
-        affectOverlayTexture(i.ws_vertex, uv_main, color);
+        affectOverlayTexture(i, uv_main, color);
         // Outline
         affectOutline(uv_main, color);
 
