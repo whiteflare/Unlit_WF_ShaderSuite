@@ -38,6 +38,7 @@ namespace UnlitWF
             { "_TS_2ndColor", "_TS_2ndTex" },
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
+            { "_OL_Color", "_OL_OverlayTex" },
         };
 
         delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
@@ -133,6 +134,12 @@ namespace UnlitWF
                     MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties, false);
                     if (propTex != null) {
                         materialEditor.TexturePropertySingleLine(guiContent, propTex, prop);
+                        if (!propTex.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
+                            using (new EditorGUI.IndentLevelScope()) {
+                                materialEditor.TextureScaleOffsetProperty(propTex);
+                                EditorGUILayout.Space();
+                            }
+                        }
                     }
                     else {
                         materialEditor.ShaderProperty(prop, guiContent);

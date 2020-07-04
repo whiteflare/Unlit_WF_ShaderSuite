@@ -721,12 +721,13 @@
     #endif
 
     ////////////////////////////
-    // ScreenTone Texture
+    // Decal Texture
     ////////////////////////////
 
     #ifdef _OL_ENABLE
         float       _OL_Enable;
         int         _OL_UVType;
+        float4      _OL_Color;
         sampler2D   _OL_OverlayTex; // MainTexと大きく構造が異なるので独自のサンプラーを使う
         float4      _OL_OverlayTex_ST;
         int         _OL_BlendType;
@@ -744,14 +745,15 @@
             return uv;
         }
 
-        inline float3 blendOverlayColor(float3 color, float3 ov_color, float3 power) {
+        inline float3 blendOverlayColor(float3 color, float4 ov_color, float3 power) {
+            ov_color.a *= power;
             if (_OL_BlendType == 1) {
-                return color + ov_color * power;    // 加算
+                return color + ov_color.rgb * ov_color.a;    // 加算
             }
             if (_OL_BlendType == 2) {
-                return color * lerp( ONE_VEC3, ov_color, power);    // 重み付き乗算
+                return color * lerp( ONE_VEC3, ov_color.rgb, ov_color.a);    // 重み付き乗算
             }
-            return lerp(color, ov_color, power);    // ブレンド
+            return lerp(color, ov_color.rgb, ov_color.a);    // ブレンド
         }
 
         inline void affectOverlayTexture(v2f i, float2 uv_main, inout float4 color) {
@@ -759,7 +761,7 @@
                 float2 uv_overlay = _OL_UVType == 0 ? i.uv : _OL_UVType == 1 ? i.uv_lmap : computeOverlayTex(i.ws_vertex);
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
                 float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
-                color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay).rgb, power);
+                color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
             }
         }
     #else

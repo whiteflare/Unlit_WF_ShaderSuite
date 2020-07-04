@@ -145,7 +145,7 @@
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
         affectRimLight(i, uv_main, calcMatcapVector(matcapVector, 0, 0), angle_light_camera, color);
-        // ScreenTone
+        // Decal
         affectOverlayTexture(i, uv_main, color);
         // Outline
         affectOutline(uv_main, color);

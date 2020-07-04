@@ -332,12 +332,14 @@ namespace UnlitWF
             { "[RM] Power Side", "[RM] 強度(横)" },
             { "[RM] Power Bottom", "[RM] 強度(下)" },
             { "[RM] RimLight Mask Texture", "[RM] マスクテクスチャ" },
-            // Overlay or ScreenTone
+            // Decal
             { "[OL] UV Type", "[OL] UVタイプ" },
+            { "[OL] Decal Color", "[OL] Decalテクスチャ" },
+            { "[OL] Decal Texture", "[OL] Decalテクスチャ" },
             { "[OL] Texture", "[OL] テクスチャ" },
             { "[OL] Blend Type", "[OL] 混合タイプ" },
             { "[OL] Blend Power", "[OL] 混合の強度" },
-            { "[OL] ScreenTone Mask Texture", "[OL] マスクテクスチャ" },
+            { "[OL] Decal Mask Texture", "[OL] マスクテクスチャ" },
             // EmissiveScroll
             { "[ES] Emission", "[ES] Emission" },
             { "[ES] Blend Type", "[ES] 混合タイプ" },

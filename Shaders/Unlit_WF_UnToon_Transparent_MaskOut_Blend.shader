@@ -156,17 +156,19 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
-        // Overlay Texture
-        [WFHeaderToggle(ScreenTone Texture)]
+        // Decal Texture
+        [WFHeaderToggle(Decal Texture)]
             _OL_Enable              ("[OL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2)]
             _OL_UVType              ("[OL] UV Type", Float) = 0
-            _OL_OverlayTex          ("[OL] Texture", 2D) = "white" {}
+        [HDR]
+            _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
+            _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
         [Enum(ALPHA,0,ADD,1,MUL,2)]
             _OL_BlendType           ("[OL] Blend Type", Float) = 0
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] ScreenTone Mask Texture", 2D) = "white" {}
+            _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
