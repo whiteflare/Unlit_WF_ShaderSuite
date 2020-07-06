@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/06/04 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -51,7 +51,7 @@
     }
 
     float4 worldDistanceBasedTess(float3 ws_vertex, float minDist, float maxDist, float tess) {
-        float dist = distance(ws_vertex, _WorldSpaceCameraPos);
+        float dist = distance(ws_vertex, worldSpaceViewPointPos());
         float f = clamp(1.0 - (dist - minDist) / (maxDist - minDist), 0.01, 1.0) * tess;
         return UnityCalcTriEdgeTessFactors(f.xxx);
     }
@@ -96,9 +96,7 @@
 
         o.ws_vertex     = MUL_BARY(i, ws_vertex);
         o.uv            = MUL_BARY(i, uv);
-        #ifdef _LMAP_ENABLE
-            o.uv_lmap   = MUL_BARY(i, uv_lmap);
-        #endif
+        o.uv_lmap       = MUL_BARY(i, uv_lmap);
         o.normal        = normalize( MUL_BARY(i, normal) );
         #ifdef _NM_ENABLE
             o.tangent   = normalize( MUL_BARY(i, tangent) );

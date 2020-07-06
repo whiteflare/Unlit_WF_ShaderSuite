@@ -20,14 +20,11 @@
 
     /*
      * authors:
-     *      ver:2020/05/14 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     #include "UnityCG.cginc"
     #include "Lighting.cginc"
-
-    #define _MATCAP_VIEW_CORRECT_ENABLE
-    #define _MATCAP_ROTATE_CORRECT_ENABLE
 
     ////////////////////////////
     // Common Utility
@@ -73,7 +70,7 @@
         #define _LMAP_ENABLE
     #endif
 
-    inline float2 SafeNormalizeVec2(float2 in_vec) {
+    float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
         if (lenSq < 0.0001) {
             return float2(0, 0);
@@ -81,7 +78,7 @@
         return in_vec * rsqrt(lenSq);
     }
 
-    inline float3 SafeNormalizeVec3(float3 in_vec) {
+    float3 SafeNormalizeVec3(float3 in_vec) {
         float lenSq = dot(in_vec, in_vec);
         if (lenSq < 0.0001) {
             return float3(0, 0, 0);
@@ -96,15 +93,15 @@
     static const float3 BT601 = { 0.299, 0.587, 0.114 };
     static const float3 BT709 = { 0.21, 0.72, 0.07 };
 
-    inline float calcBrightness(float3 color) {
+    float calcBrightness(float3 color) {
         return dot(color, BT601);
     }
 
-    inline float3 calcPointLight1Pos() {
+    float3 calcPointLight1Pos() {
         return float3(unity_4LightPosX0.x, unity_4LightPosY0.x, unity_4LightPosZ0.x);
     }
 
-    inline float3 calcPointLight1Color(float3 ws_vertex) {
+    float3 calcPointLight1Color(float3 ws_vertex) {
         float3 ws_lightPos = calcPointLight1Pos();
         if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
             return float3(0, 0, 0); // XYZすべて0はポイントライト未設定と判定する
@@ -115,7 +112,7 @@
         return unity_LightColor[0].rgb * atten;
     }
 
-    inline float3 OmniDirectional_ShadeSH9() {
+    float3 OmniDirectional_ShadeSH9() {
         // UnityCG.cginc にある ShadeSH9 の等方向版
         float3 col = 0;
         col += ShadeSH9( float4(+1, 0, 0, 1) );
@@ -128,7 +125,7 @@
         return col / 3;
     }
 
-    inline float3 OmniDirectional_Shade4PointLights(
+    float3 OmniDirectional_Shade4PointLights(
         float4 lpX, float4 lpY, float4 lpZ,
         float3 col0, float3 col1, float3 col2, float3 col3,
         float4 lightAttenSq, float3 ws_vertex) {
@@ -159,7 +156,7 @@
         return col;
     }
 
-    inline float3 calcPointLight1WorldDir(float3 ws_vertex) {
+    float3 calcPointLight1WorldDir(float3 ws_vertex) {
         ws_vertex = calcPointLight1Pos() - ws_vertex;
         if (dot(ws_vertex, ws_vertex) < 0.1) {
             ws_vertex = float3(0, 1, 0);
@@ -167,7 +164,7 @@
         return SafeNormalizeVec3( ws_vertex );
     }
 
-    inline float3 calcPointLight1Dir(float3 ws_vertex) {
+    float3 calcPointLight1Dir(float3 ws_vertex) {
         ws_vertex = calcPointLight1Pos() - ws_vertex;
         if (dot(ws_vertex, ws_vertex) < 0.1) {
             ws_vertex = float3(0, 1, 0);
@@ -175,7 +172,7 @@
         return UnityWorldToObjectDir( ws_vertex );
     }
 
-    inline float3 calcHorizontalCoordSystem(float azimuth, float alt) {
+    float3 calcHorizontalCoordSystem(float azimuth, float alt) {
         azimuth = radians(azimuth + 90);
         alt = radians(alt);
         return normalize( float3(cos(azimuth) * cos(alt), sin(alt), -sin(azimuth) * cos(alt)) );
@@ -185,7 +182,11 @@
     // Camera management
     ////////////////////////////
 
-    inline float3 worldSpaceCameraPos() {
+    float3 worldSpaceCameraDir(float3 ws_vertex) {
+        return normalize(_WorldSpaceCameraPos - ws_vertex);
+    }
+
+    float3 worldSpaceViewPointPos() {
         #ifdef USING_STEREO_MATRICES
             return (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
         #else
@@ -193,23 +194,15 @@
         #endif
     }
 
-    inline float3 worldSpaceCameraPosStereoLerp(float x) {
-        return lerp(_WorldSpaceCameraPos, worldSpaceCameraPos(), x);
+    float3 worldSpaceViewPointDir(float3 ws_vertex) {
+        return SafeNormalizeVec3(worldSpaceViewPointPos() - ws_vertex);
     }
 
-    inline float3 worldSpaceViewDir(float3 ws_vertex) {
-        return SafeNormalizeVec3(worldSpaceCameraPos() - ws_vertex);
+    float3 worldSpaceViewDirStereoLerp(float3 ws_vertex, float x) {
+        return SafeNormalizeVec3(lerp(worldSpaceViewPointPos(), _WorldSpaceCameraPos, x) - ws_vertex);
     }
 
-    inline float3 worldSpaceViewDirStereoLerp(float3 ws_vertex, float x) {
-        return SafeNormalizeVec3(worldSpaceCameraPosStereoLerp(x) - ws_vertex);
-    }
-
-//    inline float3 localSpaceViewDir(float3 ws_vertex) {
-//        return UnityWorldToObjectDir(worldSpaceCameraPos() - ws_vertex);
-//    }
-
-    inline bool isInMirror() {
+    bool isInMirror() {
         return unity_CameraProjection[2][0] != 0.0f || unity_CameraProjection[2][1] != 0.0f;
     }
 
@@ -217,33 +210,70 @@
     // Matcap
     ////////////////////////////
 
-    inline float3 calcMatcapVector(in float3 ws_camera_dir, in float3 ws_normal) {
+    float3 matcapViewCorrect(float3 vs_normal, float3 ws_view_dir) {
+        float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
+        float3 detail = vs_normal.xyz * float3(-1, -1, 1);
+        return base * dot(base, detail) / base.z - detail;
+    }
+
+    float2x2 matcapRotateCorrectMatrix() {
+        float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
+        float top_angle = 0;
+        if (any(vs_topdir)) {
+            vs_topdir = normalize(vs_topdir);
+            top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
+        }
+        float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
+        return matrixRotate;
+    }
+
+    float3 calcMatcapVector(in float3 ws_view_dir, in float3 ws_normal) {
+        // ワールド法線をビュー法線に変換
         float3 vs_normal = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
 
-        #ifdef _MATCAP_VIEW_CORRECT_ENABLE
-            float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_camera_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
-            float3 detail = vs_normal.xyz * float3(-1, -1, 1);
-            vs_normal = base * dot(base, detail) / base.z - detail;
-        #endif
-
-        #ifdef _MATCAP_ROTATE_CORRECT_ENABLE
-            float2 vs_topdir = mul( (float3x3)UNITY_MATRIX_V, float3(0, 1, 0) ).xy;
-            if (any(vs_topdir)) {
-                vs_topdir = normalize(vs_topdir);
-                float top_angle = sign(vs_topdir.x) * acos( clamp(vs_topdir.y, -1, 1) );
-                float2x2 matrixRotate = { cos(top_angle), sin(top_angle), -sin(top_angle), cos(top_angle) };
-                vs_normal.xy = mul( vs_normal.xy, matrixRotate );
-            }
-        #endif
+        // カメラ位置にて補正する
+        vs_normal = matcapViewCorrect(vs_normal, ws_view_dir);
+        // 真上を揃える
+        vs_normal.xy = mul( vs_normal.xy, matcapRotateCorrectMatrix() );
 
         return normalize( vs_normal );
+    }
+
+    float4x4 calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+        // ワールド法線をビュー法線に変換
+        float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
+        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
+
+        // カメラ位置にて補正する
+        float3 vs_normal_center         = matcapViewCorrect(vs_normal, ws_view_dir);
+        float3 vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir);
+        float3 vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_view_dir);
+        float3 vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir);
+
+        // 真上を揃える
+        float2x2 rotate = matcapRotateCorrectMatrix();
+        vs_normal_center.xy         = mul( vs_normal_center.xy, rotate );
+        vs_normal_side.xy           = mul( vs_normal_side.xy, rotate );
+        vs_bump_normal_center.xy    = mul( vs_bump_normal_center.xy, rotate );
+        vs_bump_normal_side.xy      = mul( vs_bump_normal_side.xy, rotate );
+
+        float4x4 matcapVector;
+        matcapVector[0] = float4( normalize(vs_normal_center), 0 );
+        matcapVector[1] = float4( normalize(vs_bump_normal_center), 0 );
+        matcapVector[2] = float4( normalize(vs_normal_side), 0 );
+        matcapVector[3] = float4( normalize(vs_bump_normal_side), 0 );
+        return matcapVector;
+    }
+
+    float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
+        return lerp( lerp(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerp(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax);
     }
 
     ////////////////////////////
     // RGB-HSV convert
     ////////////////////////////
 
-    inline float3 rgb2hsv(float3 c) {
+    float3 rgb2hsv(float3 c) {
         // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
         static float4 k = float4( 0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0 );
         static float e = 1.0e-10;
@@ -253,7 +283,7 @@
         return float3( abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x );
     }
 
-    inline float3 hsv2rgb(float3 c) {
+    float3 hsv2rgb(float3 c) {
         // i see "https://qiita.com/_nabe/items/c8ba019f26d644db34a8"
         static float4 k = float4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
         float3 p = abs( frac(c.xxx + k.xyz) * 6.0 - k.www );
@@ -264,7 +294,7 @@
     // Lightmap Sampler
     ////////////////////////////
 
-    inline float3 pickLightmap(float2 uv_lmap) {
+    float3 pickLightmap(float2 uv_lmap) {
         float3 color = ZERO_VEC3;
         #ifdef LIGHTMAP_ON
         {
@@ -285,7 +315,7 @@
         return color;
     }
 
-    inline float3 pickLightmapLod(float2 uv_lmap) {
+    float3 pickLightmapLod(float2 uv_lmap) {
         float3 color = ZERO_VEC3;
         #ifdef SHADER_API_D3D11
             #define WF_SAMPLE_TEX2D_LOD(tex, coord, lod)                        tex.SampleLevel(sampler##tex,coord, lod)
@@ -317,8 +347,8 @@
     // ReflectionProbe Sampler
     ////////////////////////////
 
-    inline float4 pickReflectionProbe(float3 ws_vertex, float3 ws_normal, float lod) {
-        float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
+    float4 pickReflectionProbe(float3 ws_vertex, float3 ws_normal, float lod) {
+        float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float3 dir0 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
@@ -333,8 +363,8 @@
         return lerp(color1, color0, unity_SpecCube0_BoxMin.w);
     }
 
-    inline float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ws_normal, float lod) {
-        float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
+    float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ws_normal, float lod) {
+        float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float4 color = texCUBElod(cubemap, float4(reflect_dir, lod) );

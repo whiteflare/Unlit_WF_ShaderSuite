@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/05/14 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -31,11 +31,12 @@
 
     #define WF_POWERCAP_DECL(id)                                                                                                    \
         float       _HL_Enable_##id;                                                                                                \
-        int         _HL_CapType_##id;                                                                                               \
+        uint        _HL_CapType_##id;                                                                                               \
         sampler2D   _HL_MatcapTex_##id;                                                                                             \
         float3      _HL_MatcapColor_##id;                                                                                           \
         float       _HL_Power_##id;                                                                                                 \
         float       _HL_BlendNormal_##id;                                                                                           \
+        float       _HL_Parallax_##id;                                                                                              \
         DECL_SUB_TEX2D(_HL_MaskTex_##id);                                                                                           \
         float       _HL_InvMaskVal_##id;                                                                                            \
         void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
@@ -59,7 +60,7 @@
             }                                                                                                                       \
         }
 
-    #define WF_POWERCAP_AFFECT(id)  affectMatcapColor_##id(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal_##id), i.uv, color)
+    #define WF_POWERCAP_AFFECT(id)  affectMatcapColor_##id(calcMatcapVector(matcapVector, _HL_BlendNormal_##id, _HL_Parallax_##id), i.uv, color)
 
     WF_POWERCAP_DECL(1)
     WF_POWERCAP_DECL(2)
@@ -88,13 +89,16 @@
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
-        float3 ws_camera_dir = worldSpaceViewDir(i.ws_vertex);
+        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
+        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(ws_camera_dir, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_camera_dir, ws_bump_normal);
+        float3 vs_normal = calcMatcapVector(ws_view_dir, ws_normal);
+        float3 vs_bump_normal = calcMatcapVector(ws_view_dir, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
+
+        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 
         // Highlight
         WF_POWERCAP_AFFECT(1);
@@ -109,13 +113,13 @@
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
+        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, 0, 0), angle_light_camera, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
         // Alpha
-        affectAlphaWithFresnel(i.uv, ws_normal, ws_camera_dir, color);
+        affectAlphaWithFresnel(i.uv, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

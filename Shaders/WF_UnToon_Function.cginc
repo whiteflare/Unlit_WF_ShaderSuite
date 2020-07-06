@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/06/04 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     ////////////////////////////
@@ -54,7 +54,11 @@
     #endif
 
     #ifndef WF_TEX2D_METAL_GLOSS
-        #define WF_TEX2D_METAL_GLOSS(uv)        SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra * float2(1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
+        #else
+            #define WF_TEX2D_METAL_GLOSS(uv)    SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra
+        #endif
     #endif
 
     #ifndef WF_TEX2D_MATCAP_MASK
@@ -62,13 +66,25 @@
     #endif
 
     #ifndef WF_TEX2D_SHADE_BASE
-        #define WF_TEX2D_SHADE_BASE(uv)         PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, uv).rgb
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_SHADE_BASE(uv)     PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, uv).rgb
+        #else
+            #define WF_TEX2D_SHADE_BASE(uv)     ONE_VEC3
+        #endif
     #endif
     #ifndef WF_TEX2D_SHADE_1ST
-        #define WF_TEX2D_SHADE_1ST(uv)          PICK_SUB_TEX2D(_TS_1stTex, _MainTex, uv).rgb
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_SHADE_1ST(uv)      PICK_SUB_TEX2D(_TS_1stTex, _MainTex, uv).rgb
+        #else
+            #define WF_TEX2D_SHADE_1ST(uv)      ONE_VEC3
+        #endif
     #endif
     #ifndef WF_TEX2D_SHADE_2ND
-        #define WF_TEX2D_SHADE_2ND(uv)          PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, uv).rgb
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_SHADE_2ND(uv)      PICK_SUB_TEX2D(_TS_2ndTex, _MainTex, uv).rgb
+        #else
+            #define WF_TEX2D_SHADE_2ND(uv)      ONE_VEC3
+        #endif
     #endif
     #ifndef WF_TEX2D_SHADE_MASK
         #define WF_TEX2D_SHADE_MASK(uv)         SAMPLE_MASK_VALUE(_TS_MaskTex, uv, _TS_InvMaskVal).r
@@ -97,7 +113,7 @@
     float           _Cutoff;
 
     #ifdef _AL_ENABLE
-        int             _AL_Source;
+        uint            _AL_Source;
         float           _AL_Power;
         DECL_SUB_TEX2D(_AL_MaskTex);
         float           _AL_Fresnel;
@@ -290,7 +306,7 @@
             return 0;
         }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float2 xz_camera_pos = worldSpaceCameraPos().xz - calcWorldSpaceBasePos(i.ws_vertex).xz;
+        float2 xz_camera_pos = worldSpaceViewPointPos().xz - calcWorldSpaceBasePos(i.ws_vertex).xz;
         float angle_light_camera = dot( SafeNormalizeVec2(i.ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
             * (1 - smoothstep(0.9, 1, abs(i.ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         return angle_light_camera;
@@ -339,7 +355,8 @@
     #ifdef _ES_SIMPLE_ENABLE
         #define calcEmissiveWaving(ws_vertex)   (1)
     #else
-        int         _ES_Shape;
+        uint        _ES_Shape;
+        uint        _ES_DirType;
         float4      _ES_Direction;
         float       _ES_LevelOffset;
         float       _ES_Sharpness;
@@ -347,29 +364,21 @@
         float       _ES_AlphaScroll;
 
         inline float calcEmissiveWaving(float3 ws_vertex) {
-            float time = _Time.y * _ES_Speed - dot(ws_vertex, _ES_Direction.xyz);
-            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
-            if (_ES_Shape == 0) {
-                // 励起波
-                float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
-                float waving = 8 * v * (1 - v) - 1;
-                return saturate(waving + _ES_LevelOffset);
-            }
-            else if (_ES_Shape == 1) {
-                // のこぎり波
-                float waving = 1 - 2 * frac(time * UNITY_INV_TWO_PI);
-                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
-            }
-            else if (_ES_Shape == 2) {
-                // 正弦波
-                float waving = sin( time );
-                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
-            }
-            else {
+            if (_ES_Shape == 3) {
                 // 定数
-                float waving = 1;
-                return saturate(waving + _ES_LevelOffset);
+                return saturate(1 + _ES_LevelOffset);
             }
+            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
+            float time = _Time.y * _ES_Speed - dot( _ES_DirType == 0 ? ws_vertex : mul(unity_WorldToObject, float4(ws_vertex, 1)).xyz, _ES_Direction.xyz);
+            float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
+            float waving =
+                // 励起波
+                _ES_Shape == 0 ? 8 * v * (1 - v) - 1 :
+                // のこぎり波
+                _ES_Shape == 1 ? (1 - 2 * frac(time * UNITY_INV_TWO_PI)) * _ES_Sharpness :
+                // 正弦波
+                sin( time ) * _ES_Sharpness;
+            return saturate(waving + _ES_LevelOffset);
         }
     #endif
 
@@ -414,7 +423,7 @@
         float       _NM_FlipTangent;
 #ifndef _WF_MOBILE
         // 2nd NormalMap
-        float       _NM_2ndType;
+        uint        _NM_2ndType;
         DECL_MAIN_TEX2D(_DetailNormalMap);
         float4      _DetailNormalMap_ST;
         float       _DetailNormalMapScale;
@@ -474,9 +483,12 @@
         DECL_SUB_TEX2D(_MetallicGlossMap);
         float       _MT_InvMaskVal;
 #ifndef _WF_MOBILE
-        int         _MT_CubemapType;
+        DECL_SUB_TEX2D(_SpecGlossMap);
+        float       _MT_InvRoughnessMaskVal;
+        uint        _MT_CubemapType;
         samplerCUBE _MT_Cubemap;
         float4      _MT_Cubemap_HDR;
+        float       _MT_CubemapPower;
 #endif
 
         inline float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
@@ -491,7 +503,7 @@
             }
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
-                color += pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
+                color += pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod) * _MT_CubemapPower;
             }
             return color;
 #endif
@@ -543,11 +555,12 @@
 
     #ifdef _HL_ENABLE
         float       _HL_Enable;
-        int         _HL_CapType;
+        uint        _HL_CapType;
         sampler2D   _HL_MatcapTex;  // MainTexと大きく構造が異なるので独自のサンプラーを使う
         float3      _HL_MatcapColor;
         float       _HL_Power;
         float       _HL_BlendNormal;
+        float       _HL_Parallax;
         DECL_SUB_TEX2D(_HL_MaskTex);
         float       _HL_InvMaskVal;
 
@@ -626,6 +639,13 @@
             }
         }
 
+        inline void calcShadowColor(float4 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
+            shadow_color = lerp( 
+                lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power * color.a),
+                shadow_color,
+                smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
+        }
+
         inline void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
                 // 陰用法線とライト方向から Harf-Lambert
@@ -643,23 +663,14 @@
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
 
                 // 影色計算
-#ifndef _WF_MOBILE
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
-                float3 shadow_color_1st = _TS_1stColor.rgb * WF_TEX2D_SHADE_1ST(uv_main) / base_color.rgb;
-                float3 shadow_color_2nd = _TS_2ndColor.rgb * WF_TEX2D_SHADE_2ND(uv_main) / base_color.rgb;
-#else
-                float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb );
-                float3 shadow_color_1st = _TS_1stColor.rgb / base_color.rgb;
-                float3 shadow_color_2nd = _TS_2ndColor.rgb / base_color.rgb;
-#endif
-                shadow_color_1st = lerp(ONE_VEC3, shadow_color_1st, i.shadow_power * _TS_Power * _TS_1stColor.a);
-                shadow_color_2nd = lerp(ONE_VEC3, shadow_color_2nd, i.shadow_power * _TS_Power * _TS_2ndColor.a);
-
-                // 色計算
-                color.rgb *= lerp(
-                    lerp(shadow_color_2nd, shadow_color_1st, smoothstep(_TS_2ndBorder - max(_TS_Feather, 0.001), _TS_2ndBorder, brightness) ),
-                    ONE_VEC3,
-                    smoothstep(_TS_1stBorder, _TS_1stBorder + max(_TS_Feather, 0.001), brightness));
+                float3 shadow_color = ONE_VEC3;
+                // 1影
+                calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+                // 2影
+                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                // 乗算
+                color.rgb *= shadow_color;
             }
         }
     #else
@@ -703,14 +714,16 @@
     #endif
 
     ////////////////////////////
-    // ScreenTone Texture
+    // Decal Texture
     ////////////////////////////
 
     #ifdef _OL_ENABLE
         float       _OL_Enable;
+        uint        _OL_UVType;
+        float4      _OL_Color;
         sampler2D   _OL_OverlayTex; // MainTexと大きく構造が異なるので独自のサンプラーを使う
         float4      _OL_OverlayTex_ST;
-        int         _OL_BlendType;
+        uint        _OL_BlendType;
         float       _OL_Power;
         DECL_SUB_TEX2D(_OL_MaskTex);
         float       _OL_InvMaskVal;
@@ -722,28 +735,30 @@
             float lat = acos( ws_view_dir.y );                  // -PI ~ +PI
             float2 uv = float2(-lon, -lat) * UNITY_INV_TWO_PI + 0.5;
 
-            return TRANSFORM_TEX(uv, _OL_OverlayTex);
+            return uv;
         }
 
-        inline float3 blendOverlayColor(float3 color, float3 ov_color, float3 power) {
+        inline float3 blendOverlayColor(float3 color, float4 ov_color, float3 power) {
+            ov_color.a *= power;
             if (_OL_BlendType == 1) {
-                return color + ov_color * power;    // 加算
+                return color + ov_color.rgb * ov_color.a;    // 加算
             }
             if (_OL_BlendType == 2) {
-                return color * lerp( ONE_VEC3, ov_color, power);    // 重み付き乗算
+                return color * lerp( ONE_VEC3, ov_color.rgb, ov_color.a);    // 重み付き乗算
             }
-            return lerp(color, ov_color, power);    // ブレンド
+            return lerp(color, ov_color.rgb, ov_color.a);    // ブレンド
         }
 
-        inline void affectOverlayTexture(float3 ws_vertex, float2 uv_main, inout float4 color) {
+        inline void affectOverlayTexture(v2f i, float2 uv_main, inout float4 color) {
             if (TGL_ON(_OL_Enable)) {
-                float2 uv_overlay = computeOverlayTex(ws_vertex);
+                float2 uv_overlay = _OL_UVType == 0 ? i.uv : _OL_UVType == 1 ? i.uv_lmap : computeOverlayTex(i.ws_vertex);
+                uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
                 float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
-                color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay).rgb, power);
+                color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
             }
         }
     #else
-        #define affectOverlayTexture(ws_vertex, uv_main, color)
+        #define affectOverlayTexture(i, uv_main, color)
     #endif
 
     ////////////////////////////
@@ -754,7 +769,7 @@
         float       _TL_Enable;
         float4      _TL_LineColor;
         float       _TL_LineWidth;
-        int         _TL_LineType;
+        uint        _TL_LineType;
         float       _TL_BlendBase;
         DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;

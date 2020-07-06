@@ -300,12 +300,16 @@ namespace UnlitWF
             { "[MT] Monochrome Reflection", "[MT] モノクロ反射" },
             { "[MT] Specular", "[MT] スペキュラ反射" },
             { "[MT] MetallicMap Texture", "[MT] MetallicSmoothnessマップ" },
+            { "[MT] MetallicSmoothnessMap Texture", "[MT] MetallicSmoothnessマップ" },
+            { "[MT] RoughnessMap Texture", "[MT] Roughnessマップ" },
             { "[MT] 2nd CubeMap Blend", "[MT] キューブマップ混合タイプ" },
             { "[MT] 2nd CubeMap", "[MT] キューブマップ" },
+            { "[MT] 2nd CubeMap Power", "[MT] キューブマップ強度" },
             // Light Matcap
             { "[HL] Matcap Type", "[HL] matcapタイプ" },
             { "[HL] Matcap Sampler", "[HL] matcapサンプラ" },
             { "[HL] Matcap Color", "[HL] matcap色調整" },
+            { "[HL] Parallax", "[HL] 視差(Parallax)" },
             { "[HL] Power", "[HL] matcap強度" },
             { "[HL] Mask Texture", "[HL] マスクテクスチャ" },
             // ToonShade
@@ -328,17 +332,21 @@ namespace UnlitWF
             { "[RM] Power Side", "[RM] 強度(横)" },
             { "[RM] Power Bottom", "[RM] 強度(下)" },
             { "[RM] RimLight Mask Texture", "[RM] マスクテクスチャ" },
-            // Overlay or ScreenTone
+            // Decal
+            { "[OL] UV Type", "[OL] UVタイプ" },
+            { "[OL] Decal Color", "[OL] Decalテクスチャ" },
+            { "[OL] Decal Texture", "[OL] Decalテクスチャ" },
             { "[OL] Texture", "[OL] テクスチャ" },
             { "[OL] Blend Type", "[OL] 混合タイプ" },
             { "[OL] Blend Power", "[OL] 混合の強度" },
-            { "[OL] ScreenTone Mask Texture", "[OL] マスクテクスチャ" },
+            { "[OL] Decal Mask Texture", "[OL] マスクテクスチャ" },
             // EmissiveScroll
             { "[ES] Emission", "[ES] Emission" },
             { "[ES] Blend Type", "[ES] 混合タイプ" },
             { "[ES] Mask Texture", "[ES] マスクテクスチャ" },
             { "[ES] Wave Type", "[ES] 波形" },
             { "[ES] Direction", "[ES] 方向" },
+            { "[ES] Direction Type", "[ES] 方向の種類" },
             { "[ES] LevelOffset", "[ES] ゼロ点調整" },
             { "[ES] Sharpness", "[ES] 鋭さ" },
             { "[ES] ScrollSpeed", "[ES] スピード" },
@@ -451,7 +459,7 @@ namespace UnlitWF
         English, 日本語
     }
 
-    internal class WeakRefCache<T> where T: class
+    internal class WeakRefCache<T> where T : class
     {
         private readonly List<WeakReference> refs = new List<WeakReference>();
 

@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/05/14 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -32,9 +32,7 @@
     struct appdata {
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
-        #ifdef _LMAP_ENABLE
-            float2 uv_lmap      : TEXCOORD1;
-        #endif
+        float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
         #ifdef _NM_ENABLE
             float4 tangent      : TANGENT;
@@ -44,20 +42,18 @@
 
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        float3 ws_vertex        : TEXCOORD1;
-        float4 ws_light_dir     : TEXCOORD2;
         float3 light_color      : COLOR0;
         #ifdef _TS_ENABLE
             float shadow_power  : COLOR1;
         #endif
-        float3 normal           : TEXCOORD3;    // world space
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 ws_vertex        : TEXCOORD2;
+        float4 ws_light_dir     : TEXCOORD3;
+        float3 normal           : TEXCOORD4;    // world space
         #ifdef _NM_ENABLE
-            float3 tangent      : TEXCOORD4;    // world space
-            float3 bitangent    : TEXCOORD5;    // world space
-        #endif
-        #ifdef _LMAP_ENABLE
-            float2 uv_lmap      : TEXCOORD6;
+            float3 tangent      : TEXCOORD5;    // world space
+            float3 bitangent    : TEXCOORD6;    // world space
         #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -88,10 +84,8 @@
         o.ws_vertex = mul(unity_ObjectToWorld, v.vertex).xyz;
         o.vs_vertex = UnityWorldToClipPos(o.ws_vertex);
         o.uv = v.uv;
+        o.uv_lmap = v.uv_lmap;
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
-        #ifdef _LMAP_ENABLE
-            o.uv_lmap = v.uv_lmap;
-        #endif
 
         o.normal = UnityObjectToWorldNormal(v.normal.xyz);
         #ifdef _NM_ENABLE
@@ -133,24 +127,26 @@
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
-        float3 ws_camera_dir = worldSpaceViewDir(i.ws_vertex);
-
-        // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(ws_camera_dir, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_camera_dir, ws_bump_normal);
+        // ビューポイントへの方向
+        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
+        // カメラへの方向
+        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i);
 
+        // matcapベクトルの配列
+        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
+
         // メタリック
-        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
+        affectMetallic(i, ws_view_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
-        affectMatcapColor(lerp(vs_normal, vs_bump_normal, _HL_BlendNormal), uv_main, color);
+        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax), uv_main, color);
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, uv_main, vs_normal, angle_light_camera, color);
-        // ScreenTone
-        affectOverlayTexture(i.ws_vertex, uv_main, color);
+        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, 0, 0), angle_light_camera, color);
+        // Decal
+        affectOverlayTexture(i, uv_main, color);
         // Outline
         affectOutline(uv_main, color);
 
@@ -160,7 +156,7 @@
         affectOcclusion(i, uv_main, color);
 
         // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, ws_camera_dir, color);
+        affectAlphaWithFresnel(uv_main, ws_normal, ws_view_dir, color);
         // Outline Alpha
         affectOutlineAlpha(uv_main, color);
         // EmissiveScroll
@@ -180,7 +176,7 @@
     ////////////////////////////
 
     float4 shiftDepthVertex(float3 ws_vertex, float width) {
-        float3 ws_camera_dir = _WorldSpaceCameraPos.xyz - ws_vertex.xyz; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
+        float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex); // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
         // カメラ方向の z シフト量を加算
         float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
 

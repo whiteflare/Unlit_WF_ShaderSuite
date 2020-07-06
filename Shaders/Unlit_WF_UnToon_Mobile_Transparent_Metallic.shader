@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic" {
 
     /*
      * authors:
-     *      ver:2020/04/11 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     Properties {
@@ -55,13 +55,13 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic" {
         [WFHeaderToggle(Metallic)]
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
-            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.95
+            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [Toggle(_)]
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [NoScaleOffset]
-            _MetallicGlossMap       ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
@@ -103,6 +103,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic" {
         [Toggle(_)]
             _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2

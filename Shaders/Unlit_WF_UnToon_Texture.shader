@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
     /*
      * authors:
-     *      ver:2020/05/14 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     Properties {
@@ -63,15 +63,19 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [WFHeaderToggle(Metallic)]
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
-            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.95
+            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
         [Toggle(_)]
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 1
         [NoScaleOffset]
-            _MetallicGlossMap       ("[MT] MetallicMap Texture", 2D) = "white" {}
+            _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
+        [Toggle(_)]
+            _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
@@ -82,6 +86,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
+        [PowerSlider(4.0)]
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
@@ -93,6 +99,7 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _HL_MatcapColor         ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -135,15 +142,19 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
-        // Overlay Texture
-        [WFHeaderToggle(ScreenTone Texture)]
+        // Decal Texture
+        [WFHeaderToggle(Decal Texture)]
             _OL_Enable              ("[OL] Enable", Float) = 0
-            _OL_OverlayTex          ("[OL] Texture", 2D) = "white" {}
+        [Enum(UV1,0,UV2,1,SKYBOX,2)]
+            _OL_UVType              ("[OL] UV Type", Float) = 0
+        [HDR]
+            _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
+            _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
         [Enum(ALPHA,0,ADD,1,MUL,2)]
             _OL_BlendType           ("[OL] Blend Type", Float) = 0
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] ScreenTone Mask Texture", 2D) = "white" {}
+            _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
@@ -163,6 +174,8 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
