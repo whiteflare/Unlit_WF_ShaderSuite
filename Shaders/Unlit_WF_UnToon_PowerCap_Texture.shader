@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture" {
 
     /*
      * authors:
-     *      ver:2020/05/14 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     Properties {
