@@ -31,7 +31,7 @@
 
     #define WF_POWERCAP_DECL(id)                                                                                                    \
         float       _HL_Enable_##id;                                                                                                \
-        int         _HL_CapType_##id;                                                                                               \
+        uint        _HL_CapType_##id;                                                                                               \
         sampler2D   _HL_MatcapTex_##id;                                                                                             \
         float3      _HL_MatcapColor_##id;                                                                                           \
         float       _HL_Power_##id;                                                                                                 \
