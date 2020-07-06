@@ -201,6 +201,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
         [Toggle(_)]
             _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2

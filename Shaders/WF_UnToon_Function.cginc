@@ -356,6 +356,7 @@
         #define calcEmissiveWaving(ws_vertex)   (1)
     #else
         int         _ES_Shape;
+        int         _ES_DirType;
         float4      _ES_Direction;
         float       _ES_LevelOffset;
         float       _ES_Sharpness;
@@ -363,29 +364,21 @@
         float       _ES_AlphaScroll;
 
         inline float calcEmissiveWaving(float3 ws_vertex) {
-            float time = _Time.y * _ES_Speed - dot(ws_vertex, _ES_Direction.xyz);
-            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
-            if (_ES_Shape == 0) {
-                // 励起波
-                float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
-                float waving = 8 * v * (1 - v) - 1;
-                return saturate(waving + _ES_LevelOffset);
-            }
-            else if (_ES_Shape == 1) {
-                // のこぎり波
-                float waving = 1 - 2 * frac(time * UNITY_INV_TWO_PI);
-                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
-            }
-            else if (_ES_Shape == 2) {
-                // 正弦波
-                float waving = sin( time );
-                return saturate(waving * _ES_Sharpness + _ES_LevelOffset);
-            }
-            else {
+            if (_ES_Shape == 3) {
                 // 定数
-                float waving = 1;
-                return saturate(waving + _ES_LevelOffset);
+                return saturate(1 + _ES_LevelOffset);
             }
+            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
+            float time = _Time.y * _ES_Speed - dot( _ES_DirType == 0 ? ws_vertex : mul(unity_WorldToObject, float4(ws_vertex, 1)).xyz, _ES_Direction.xyz);
+            float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
+            float waving =
+                // 励起波
+                _ES_Shape == 0 ? 8 * v * (1 - v) - 1 :
+                // のこぎり波
+                _ES_Shape == 1 ? (1 - 2 * frac(time * UNITY_INV_TWO_PI)) * _ES_Sharpness :
+                // 正弦波
+                sin( time ) * _ES_Sharpness;
+            return saturate(waving + _ES_LevelOffset);
         }
     #endif
 
