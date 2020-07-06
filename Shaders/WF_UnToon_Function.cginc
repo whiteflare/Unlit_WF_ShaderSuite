@@ -113,7 +113,7 @@
     float           _Cutoff;
 
     #ifdef _AL_ENABLE
-        int             _AL_Source;
+        uint            _AL_Source;
         float           _AL_Power;
         DECL_SUB_TEX2D(_AL_MaskTex);
         float           _AL_Fresnel;
@@ -355,8 +355,8 @@
     #ifdef _ES_SIMPLE_ENABLE
         #define calcEmissiveWaving(ws_vertex)   (1)
     #else
-        int         _ES_Shape;
-        int         _ES_DirType;
+        uint        _ES_Shape;
+        uint        _ES_DirType;
         float4      _ES_Direction;
         float       _ES_LevelOffset;
         float       _ES_Sharpness;
@@ -423,7 +423,7 @@
         float       _NM_FlipTangent;
 #ifndef _WF_MOBILE
         // 2nd NormalMap
-        float       _NM_2ndType;
+        uint        _NM_2ndType;
         DECL_MAIN_TEX2D(_DetailNormalMap);
         float4      _DetailNormalMap_ST;
         float       _DetailNormalMapScale;
@@ -485,7 +485,7 @@
 #ifndef _WF_MOBILE
         DECL_SUB_TEX2D(_SpecGlossMap);
         float       _MT_InvRoughnessMaskVal;
-        int         _MT_CubemapType;
+        uint        _MT_CubemapType;
         samplerCUBE _MT_Cubemap;
         float4      _MT_Cubemap_HDR;
         float       _MT_CubemapPower;
@@ -555,7 +555,7 @@
 
     #ifdef _HL_ENABLE
         float       _HL_Enable;
-        int         _HL_CapType;
+        uint        _HL_CapType;
         sampler2D   _HL_MatcapTex;  // MainTexと大きく構造が異なるので独自のサンプラーを使う
         float3      _HL_MatcapColor;
         float       _HL_Power;
@@ -719,11 +719,11 @@
 
     #ifdef _OL_ENABLE
         float       _OL_Enable;
-        int         _OL_UVType;
+        uint        _OL_UVType;
         float4      _OL_Color;
         sampler2D   _OL_OverlayTex; // MainTexと大きく構造が異なるので独自のサンプラーを使う
         float4      _OL_OverlayTex_ST;
-        int         _OL_BlendType;
+        uint        _OL_BlendType;
         float       _OL_Power;
         DECL_SUB_TEX2D(_OL_MaskTex);
         float       _OL_InvMaskVal;
@@ -769,7 +769,7 @@
         float       _TL_Enable;
         float4      _TL_LineColor;
         float       _TL_LineWidth;
-        int         _TL_LineType;
+        uint        _TL_LineType;
         float       _TL_BlendBase;
         DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;
