@@ -346,6 +346,7 @@ namespace UnlitWF
             { "[ES] Mask Texture", "[ES] マスクテクスチャ" },
             { "[ES] Wave Type", "[ES] 波形" },
             { "[ES] Direction", "[ES] 方向" },
+            { "[ES] Direction Type", "[ES] 方向の種類" },
             { "[ES] LevelOffset", "[ES] ゼロ点調整" },
             { "[ES] Sharpness", "[ES] 鋭さ" },
             { "[ES] ScrollSpeed", "[ES] スピード" },
