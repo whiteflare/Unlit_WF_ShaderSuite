@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
+Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Outline_Texture" {
 
     /*
      * authors:
@@ -27,18 +27,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
-
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-        [NoScaleOffset]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _CullMode               ("Cull Mode", int) = 2
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -218,6 +208,20 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
+        // アウトライン
+        [WFHeaderToggle(Outline)]
+            _TL_Enable              ("[LI] Enable", Float) = 0
+            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
+        [Enum(NORMAL,0,EDGE,1)]
+            _TL_LineType            ("[LI] Line Type", Float) = 0
+            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -241,18 +245,18 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "RenderType" = "Opaque"
+            "Queue" = "Geometry"
             "DisableBatching" = "True"
         }
 
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture/OUTLINE"
+
         Pass {
-            Name "MAIN_OPAQUE"
+            Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull OFF
-            ZWrite ON
-            Blend Off
+            Cull [_CullMode]
 
             CGPROGRAM
 
@@ -261,9 +265,6 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_UPPER
             #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
@@ -277,72 +278,11 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             ENDCG
         }
 
-        Pass {
-            Name "MAIN_BACK"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull FRONT
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #pragma target 4.5
-
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_LOWER
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "MAIN_FRONT"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull BACK
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag_powercap
-
-            #pragma target 4.5
-
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_LOWER
-            #define _HL_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon_PowerCap.cginc"
-
-            ENDCG
-        }
-
-        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_TransCutout/META"
+        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Texture/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
