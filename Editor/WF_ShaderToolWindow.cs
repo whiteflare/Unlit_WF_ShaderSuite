@@ -539,16 +539,16 @@ namespace UnlitWF
             var oldPropList = CreateOldNamePropertyList(objlist);
             // 名称を全て変更
             foreach (var prop in oldPropList) {
-                prop.Rename(MIGRATION_PROP_RENAME[prop.name]);
+                prop.Rename(MIGRATION_PROP_RENAME[prop.Name]);
             }
             // 保存
-            foreach (var so in ShaderPropertyView.GetUniqueSerialObject(oldPropList)) {
+            foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(oldPropList)) {
                 so.ApplyModifiedProperties();
             }
             return 0 < oldPropList.Count;
         }
 
-        private List<ShaderPropertyView> CreateOldNamePropertyList(object[] objlist) { // ShaderCustomEditor側から呼び出されるのでobject[]
+        private List<ShaderSerializedProperty> CreateOldNamePropertyList(object[] objlist) { // ShaderCustomEditor側から呼び出されるのでobject[]
             // 操作対象のマテリアル
             var matlist = new List<Material>();
             foreach (var obj in objlist) {
@@ -563,11 +563,11 @@ namespace UnlitWF
                 matlist.Add(mat);
             }
 
-            var props = ShaderPropertyView.ToPropertyList(matlist);
+            var props = ShaderSerializedProperty.AsList(matlist);
 
-            var oldPropList = new List<ShaderPropertyView>();
+            var oldPropList = new List<ShaderSerializedProperty>();
             foreach (var prop in props) {
-                if (MIGRATION_PROP_RENAME.ContainsKey(prop.name)) {
+                if (MIGRATION_PROP_RENAME.ContainsKey(prop.Name)) {
                     oldPropList.Add(prop);
                 }
             }
@@ -583,10 +583,10 @@ namespace UnlitWF
             if (param.materialSource == null) {
                 return;
             }
-            var src_props = new List<ShaderPropertyView>();
+            var src_props = new List<ShaderMaterialProperty>();
 
-            foreach (var src_prop in ShaderPropertyView.ToPropertyList(param.materialSource)) {
-                string label = WFCommonUtility.GetPrefixFromPropName(src_prop.name);
+            foreach (var src_prop in ShaderMaterialProperty.AsList(param.materialSource)) {
+                string label = WFCommonUtility.GetPrefixFromPropName(src_prop.Name);
                 if (label == null) {
                     continue;
                 }
@@ -612,27 +612,25 @@ namespace UnlitWF
                 if (dst == null) {
                     continue;
                 }
-                var dst_props = ShaderPropertyView.ToPropertyMap(dst);
-
+                var dst_props = ShaderMaterialProperty.AsDict(dst);
+                
                 // コピー
-                CopyProperties(src_props, dst_props);
-                EditorUtility.SetDirty(dst);
+                if (CopyProperties(src_props, dst_props)) {
+                    EditorUtility.SetDirty(dst);
+                }
             }
+            AssetDatabase.SaveAssets();
         }
 
-        private void CopyProperties(List<ShaderPropertyView> src, Dictionary<string, ShaderPropertyView> dst) {
-            var changed = new List<ShaderPropertyView>();
+        private bool CopyProperties(List<ShaderMaterialProperty> src, Dictionary<string, ShaderMaterialProperty> dst) {
+            var changed = false;
             foreach (var src_prop in src) {
-                ShaderPropertyView dst_prop;
-                if (dst.TryGetValue(src_prop.name, out dst_prop)) {
-                    src_prop.CopyTo(dst_prop);
-                    changed.Add(dst_prop);
-                }
-                else {
-                    Debug.Log("not found: " + src_prop.name);
+                ShaderMaterialProperty dst_prop;
+                if (dst.TryGetValue(src_prop.Name, out dst_prop)) {
+                    changed |= src_prop.CopyTo(dst_prop);
                 }
             }
-            ShaderPropertyView.AllApplyPropertyChange(changed);
+            return changed;
         }
 
         #endregion
@@ -644,35 +642,35 @@ namespace UnlitWF
                 if (material == null) {
                     continue;
                 }
-                var props = ShaderPropertyView.ToPropertyList(material);
+                var props = ShaderSerializedProperty.AsList(material);
 
                 // 無効になってる機能のプレフィックスを集める
                 var delPrefix = new List<string>();
                 foreach (var p in props) {
                     string label, name;
-                    WFCommonUtility.FormatPropName(p.name, out label, out name);
-                    if (label != null && name.ToLower() == "enable" && p.value.floatValue == 0) {
+                    WFCommonUtility.FormatPropName(p.Name, out label, out name);
+                    if (label != null && name.ToLower() == "enable" && p.FloatValue == 0) {
                         delPrefix.Add(label);
                     }
                 }
 
-                var del_props = new HashSet<ShaderPropertyView>();
+                var del_props = new HashSet<ShaderSerializedProperty>();
 
                 // プレフィックスに合致する設定値を消去
-                Predicate<ShaderPropertyView> predPrefix = p => {
-                    string label = WFCommonUtility.GetPrefixFromPropName(p.name);
+                Predicate<ShaderSerializedProperty> predPrefix = p => {
+                    string label = WFCommonUtility.GetPrefixFromPropName(p.Name);
                     return label != null && delPrefix.Contains(label);
                 };
                 props.FindAll(predPrefix).ForEach(p => del_props.Add(p));
                 // 未使用の値を削除
-                Predicate<ShaderPropertyView> predUnused = p => param.resetUnused && !material.HasProperty(p.name);
+                Predicate<ShaderSerializedProperty> predUnused = p => param.resetUnused && !material.HasProperty(p.Name);
                 props.FindAll(predUnused).ForEach(p => del_props.Add(p));
                 // 削除実行
                 DeleteProperties(del_props);
 
                 // キーワードクリア
                 if (param.resetKeywords) {
-                    foreach (var so in ShaderPropertyView.GetUniqueSerialObject(props)) {
+                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props)) {
                         DeleteShaderKeyword(so);
                     }
                 }
@@ -687,21 +685,21 @@ namespace UnlitWF
                     continue;
                 }
 
-                var props = ShaderPropertyView.ToPropertyList(material);
-                var del_props = new HashSet<ShaderPropertyView>();
+                var props = ShaderSerializedProperty.AsList(material);
+                var del_props = new HashSet<ShaderSerializedProperty>();
 
                 // 条件に合致するプロパティを削除
                 foreach (var p in props) {
-                    if (param.resetColor && p.parent.name == "m_Colors") {
+                    if (param.resetColor && p.ParentName == "m_Colors") {
                         del_props.Add(p);
                     }
-                    else if (param.resetFloat && p.parent.name == "m_Floats") {
+                    else if (param.resetFloat && p.ParentName == "m_Floats") {
                         del_props.Add(p);
                     }
-                    else if (param.resetTexture && p.parent.name == "m_TexEnvs") {
+                    else if (param.resetTexture && p.ParentName == "m_TexEnvs") {
                         del_props.Add(p);
                     }
-                    else if (param.resetUnused && !material.HasProperty(p.name)) {
+                    else if (param.resetUnused && !material.HasProperty(p.Name)) {
                         del_props.Add(p);
                     }
                 }
@@ -710,7 +708,7 @@ namespace UnlitWF
 
                 // キーワードクリア
                 if (param.resetKeywords) {
-                    foreach (var so in ShaderPropertyView.GetUniqueSerialObject(props)) {
+                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props)) {
                         DeleteShaderKeyword(so);
                     }
                 }
@@ -720,10 +718,10 @@ namespace UnlitWF
             }
         }
 
-        private void DeleteProperties(IEnumerable<ShaderPropertyView> props) {
+        private void DeleteProperties(IEnumerable<ShaderSerializedProperty> props) {
             var del_names = new HashSet<string>();
             foreach (var p in props) {
-                del_names.Add(p.name);
+                del_names.Add(p.Name);
                 p.Remove();
             }
             if (0 < del_names.Count) {
@@ -731,7 +729,7 @@ namespace UnlitWF
                 names.Sort();
                 UnityEngine.Debug.Log("UnlitWF/MaterialTools deleted property: " + string.Join(", ", names.ToArray()));
             }
-            ShaderPropertyView.AllApplyPropertyChange(props);
+            ShaderSerializedProperty.AllApplyPropertyChange(props);
         }
 
         public void DeleteShaderKeyword(SerializedObject so) {
