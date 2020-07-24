@@ -548,8 +548,6 @@ namespace UnlitWF
             new WFShaderName("UnToon", "PowerCap", "Transparent", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent"),
             new WFShaderName("UnToon", "PowerCap", "Transparent3Pass", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass"),
 
-            new WFShaderName("UnToon", "PowerCapOutline", "Texture", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Outline_Texture"),
-
             new WFShaderName("UnToon", "Tessellation", "Texture", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture"),
             new WFShaderName("UnToon", "Tessellation", "TransCutout", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout"),
             new WFShaderName("UnToon", "Tessellation", "Transparent", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
