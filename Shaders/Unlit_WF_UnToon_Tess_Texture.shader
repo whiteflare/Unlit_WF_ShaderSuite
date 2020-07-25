@@ -257,7 +257,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
 
             #pragma target 5.0
 
-            #define _CL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase

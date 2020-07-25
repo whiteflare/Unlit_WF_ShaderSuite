@@ -257,7 +257,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
-            #define _CL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase

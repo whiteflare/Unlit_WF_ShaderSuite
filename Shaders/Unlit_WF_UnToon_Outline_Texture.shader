@@ -249,7 +249,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _CL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase
