@@ -86,6 +86,13 @@
             #define WF_TEX2D_SHADE_2ND(uv)      ONE_VEC3
         #endif
     #endif
+    #ifndef WF_TEX2D_SHADE_3RD
+        #ifndef _WF_MOBILE
+            #define WF_TEX2D_SHADE_3RD(uv)      PICK_SUB_TEX2D(_TS_3rdTex, _MainTex, uv).rgb
+        #else
+            #define WF_TEX2D_SHADE_3RD(uv)      ONE_VEC3
+        #endif
+    #endif
     #ifndef WF_TEX2D_SHADE_MASK
         #define WF_TEX2D_SHADE_MASK(uv)         SAMPLE_MASK_VALUE(_TS_MaskTex, uv, _TS_InvMaskVal).r
     #endif
@@ -613,14 +620,17 @@
         float4      _TS_BaseColor;
         float4      _TS_1stColor;
         float4      _TS_2ndColor;
+        float4      _TS_3rdColor;
 #ifndef _WF_MOBILE
         DECL_SUB_TEX2D(_TS_BaseTex);
         DECL_SUB_TEX2D(_TS_1stTex);
         DECL_SUB_TEX2D(_TS_2ndTex);
+        DECL_SUB_TEX2D(_TS_3rdTex);
 #endif
         float       _TS_Power;
         float       _TS_1stBorder;
         float       _TS_2ndBorder;
+        float       _TS_3rdBorder;
         float       _TS_Feather;
         float       _TS_BlendNormal;
         DECL_SUB_TEX2D(_TS_MaskTex);
@@ -679,6 +689,10 @@
                 calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
                 // 2影
                 calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                // 3影
+#ifdef _TS_TRISHADE_ENABLE
+                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
+#endif
                 // 乗算
                 color.rgb *= shadow_color;
             }
