@@ -903,6 +903,30 @@
     }
 
     ////////////////////////////
+    // Fog
+    ////////////////////////////
+
+    #ifdef _FG_ENABLE
+        float       _FG_Enable;
+        float3      _FG_Color;
+        float       _FG_MinDist;
+        float       _FG_MaxDist;
+        float       _FG_Exponential;
+        float3      _FG_BaseOffset;
+        float3      _FG_Scale;
+
+        inline void affectToonFog(v2f i, inout float4 color) {
+            if (TGL_ON(_FG_Enable)) {
+                float3 ls_vertex = mul(unity_WorldToObject, float4(i.ws_vertex, 1));
+                float power = smoothstep(_FG_MinDist, _FG_MaxDist, length(ls_vertex * _FG_Scale - _FG_BaseOffset));
+                color.rgb = lerp(color.rgb, _FG_Color * i.light_color, pow(power, _FG_Exponential));
+            }
+        }
+    #else
+        #define affectToonFog(i, color)
+    #endif
+
+    ////////////////////////////
     // Debug View
     ////////////////////////////
 

@@ -212,6 +212,16 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
+        // Fog
+        [WFHeaderToggle(Fog)]
+            _FG_Enable              ("[FG] Enable", Float) = 0
+            _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
+            _FG_MinDist             ("[FG] Fog Min Distance", Float) = 0.5
+            _FG_MaxDist             ("[FG] Fog Min Distance", Float) = 0.8
+            _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
+            _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
+            _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -241,7 +251,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
         }
 
         GrabPass { "_UnToonTransparentOutlineCanceller" }
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE"
+        UsePass "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent/OUTLINE"
         UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
 
         Pass {
@@ -263,6 +273,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_UPPER
             #define _AO_ENABLE
+            #define _FG_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
@@ -298,6 +309,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_LOWER
             #define _AO_ENABLE
+            #define _FG_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
@@ -331,6 +343,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_LOWER
             #define _AO_ENABLE
+            #define _FG_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
@@ -347,7 +360,34 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/EMISSIVE_SCROLL"
+        Pass {
+            Name "EMISSIVE_SCROLL"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull [_ES_CullMode]
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert_emissiveScroll
+            #pragma fragment frag_emissiveScroll
+
+            #pragma target 4.5
+
+            #define _AL_ENABLE
+            #define _ES_ENABLE
+            #define _ES_FORCE_ALPHASCROLL
+            #define _FG_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }

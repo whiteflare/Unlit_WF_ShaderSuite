@@ -155,6 +155,8 @@
         affectOutlineAlpha(uv_main, color);
         // EmissiveScroll
         affectEmissiveScroll(i.ws_vertex, uv_main, color);
+        // ToonFog
+        affectToonFog(i, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
