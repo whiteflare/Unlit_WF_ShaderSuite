@@ -44,6 +44,23 @@ namespace UnlitWF
         public const string ASSETS_MIGRATION = PATH_ASSETS + "Migration material";
     }
 
+    internal static class ToolCommon
+    {
+        public static bool IsUnlitWFMaterial(Material mm) {
+            if (mm != null && mm.shader != null) {
+                return mm.shader.name.Contains("UnlitWF") && !mm.shader.name.Contains("Debug");
+            }
+            return false;
+        }
+
+        public static bool IsNotUnlitWFMaterial(Material mm) {
+            if (mm != null && mm.shader != null) {
+                return !IsUnlitWFMaterial(mm);
+            }
+            return false;
+        }
+    }
+
     #region クリンナップ系
 
     public class CleanUpParameter : ScriptableObject
@@ -123,7 +140,7 @@ namespace UnlitWF
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
             bool removeOther = false;
             foreach (Material mm in param.materials) {
-                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
+                if (ToolCommon.IsNotUnlitWFMaterial(mm)) {
                     EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
                     if (GUILayout.Button("Remove other materials")) {
                         removeOther = true;
@@ -149,7 +166,7 @@ namespace UnlitWF
             if (removeOther) {
                 var newlist = new List<Material>();
                 newlist.AddRange(param.materials);
-                newlist.RemoveAll(mm => !mm.shader.name.Contains("UnlitWF"));
+                newlist.RemoveAll(mm => !ToolCommon.IsUnlitWFMaterial(mm));
                 param.materials = newlist.ToArray();
             }
 
@@ -249,7 +266,7 @@ namespace UnlitWF
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
             bool removeOther = false;
             foreach (Material mm in param.materials) {
-                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
+                if (ToolCommon.IsNotUnlitWFMaterial(mm)) {
                     EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
                     if (GUILayout.Button("Remove other materials")) {
                         removeOther = true;
@@ -296,7 +313,7 @@ namespace UnlitWF
             if (removeOther) {
                 var newlist = new List<Material>();
                 newlist.AddRange(param.materials);
-                newlist.RemoveAll(mm => !mm.shader.name.Contains("UnlitWF"));
+                newlist.RemoveAll(mm => !ToolCommon.IsUnlitWFMaterial(mm));
                 param.materials = newlist.ToArray();
             }
 
@@ -400,7 +417,7 @@ namespace UnlitWF
             EditorGUILayout.PropertyField(so.FindProperty("materialSource"), new GUIContent("material"), true);
             EditorGUILayout.Space();
 
-            if (param.materialSource != null && param.materialSource.shader != null && !param.materialSource.shader.name.Contains("UnlitWF")) {
+            if (ToolCommon.IsNotUnlitWFMaterial(param.materialSource)) {
                 EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
                 EditorGUILayout.Space();
             }
@@ -412,7 +429,7 @@ namespace UnlitWF
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
             bool removeOther = false;
             foreach (Material mm in param.materialDestination) {
-                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
+                if (ToolCommon.IsNotUnlitWFMaterial(mm)) {
                     EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
                     if (GUILayout.Button("Remove other materials")) {
                         removeOther = true;
@@ -461,7 +478,7 @@ namespace UnlitWF
             if (removeOther) {
                 var newlist = new List<Material>();
                 newlist.AddRange(param.materialDestination);
-                newlist.RemoveAll(mm => !mm.shader.name.Contains("UnlitWF"));
+                newlist.RemoveAll(mm => !ToolCommon.IsUnlitWFMaterial(mm));
                 param.materialDestination = newlist.ToArray();
             }
 
@@ -550,7 +567,7 @@ namespace UnlitWF
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
             bool removeOther = false;
             foreach (Material mm in param.materials) {
-                if (mm != null && mm.shader != null && !mm.shader.name.Contains("UnlitWF")) {
+                if (ToolCommon.IsNotUnlitWFMaterial(mm)) {
                     EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
                     if (GUILayout.Button("Remove other materials")) {
                         removeOther = true;
@@ -567,7 +584,7 @@ namespace UnlitWF
             if (removeOther) {
                 var newlist = new List<Material>();
                 newlist.AddRange(param.materials);
-                newlist.RemoveAll(mm => !mm.shader.name.Contains("UnlitWF"));
+                newlist.RemoveAll(mm => !ToolCommon.IsUnlitWFMaterial(mm));
                 param.materials = newlist.ToArray();
             }
 
