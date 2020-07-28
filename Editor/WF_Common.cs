@@ -96,8 +96,8 @@ namespace UnlitWF
         /// <param name="prop_name"></param>
         /// <returns></returns>
         public static string GetPrefixFromPropName(string prop_name) {
-            string label;
-            if (SPECIAL_PROP_NAME.TryGetValue(prop_name, out label)) {
+            string label = SPECIAL_PROP_NAME.GetValueOrNull(prop_name);
+            if (label != null) {
                 return label;
             }
             string name;
@@ -183,17 +183,20 @@ namespace UnlitWF
 
     internal class ShaderSerializedProperty
     {
+        public readonly string name;
+        public readonly ShaderMaterialProperty materialProperty;
         private readonly SerializedObject serialObject;
         private readonly SerializedProperty parent;
         private readonly SerializedProperty property;
         private readonly SerializedProperty value;
 
-        ShaderSerializedProperty(ShaderMaterialProperty matProp, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property) {
+        ShaderSerializedProperty(string name, ShaderMaterialProperty matProp, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property) {
+            this.name = name;
+            this.materialProperty = matProp;
             this.serialObject = serialObject;
             this.parent = parent;
             this.property = property;
 
-            this.MaterialProperty = matProp;
             this.value = property.FindPropertyRelative("second");
         }
 
@@ -206,10 +209,12 @@ namespace UnlitWF
             return p.FindPropertyRelative("second");
         }
 
-        public ShaderMaterialProperty MaterialProperty { get; }
-        public string Name { get { return MaterialProperty.Name; } }
-        public string Description { get { return MaterialProperty.Description; } }
-        public ShaderUtil.ShaderPropertyType Type { get { return MaterialProperty.Type; } }
+        public bool HasPropertyInShader
+        {
+            get { return materialProperty != null;  }
+        }
+
+        public ShaderUtil.ShaderPropertyType Type { get { return materialProperty.Type; } }
 
         public string ParentName { get { return parent.name; } }
 
@@ -224,7 +229,7 @@ namespace UnlitWF
         public void Remove() {
             for (int i = parent.arraySize - 1; 0 <= i; i--) {
                 var prop = parent.GetArrayElementAtIndex(i);
-                if (GetSerializedName(prop) == this.Name) {
+                if (GetSerializedName(prop) == this.name) {
                     parent.DeleteArrayElementAtIndex(i);
                 }
             }
@@ -274,14 +279,25 @@ namespace UnlitWF
                 for (int i = 0; i < parent.arraySize; i++) {
                     var prop = parent.GetArrayElementAtIndex(i);
                     var name = GetSerializedName(prop);
-                    ShaderMaterialProperty matProp;
-                    if (name != null && matProps.TryGetValue(name, out matProp)) {
-                        result.Add(new ShaderSerializedProperty(matProp, so, parent, prop));
+                    if (name != null) {
+                        result.Add(new ShaderSerializedProperty(name, matProps.GetValueOrNull(name), so, parent, prop));
                     }
                 }
             }
             return result;
         }
+    }
+
+    internal static class CollectionUtility
+    {
+        public static T GetValueOrNull<K, T>(this Dictionary<K, T> dict, K key) where T : class {
+            T value;
+            if (dict.TryGetValue(key, out value)) {
+                return value;
+            }
+            return null;
+        }
+
     }
 
     internal static class WFI18N
@@ -458,13 +474,13 @@ namespace UnlitWF
             text = text ?? "";
             Dictionary<string, string> current = GetDict();
             if (current != null) {
-                string ret;
-                if (current.TryGetValue(text, out ret)) {
+                string ret = current.GetValueOrNull(text);
+                if (ret != null) {
                     return ret;
                 }
-                string label, name2;
-                if (WFCommonUtility.FormatDispName(text, out label, out name2, out ret)) {
-                    if (current.TryGetValue(name2, out ret)) {
+                if (WFCommonUtility.FormatDispName(text, out string label, out string name2, out ret)) {
+                    ret = current.GetValueOrNull(name2);
+                    if (ret != null) {
                         return "[" + label + "] " + ret;
                     }
                 }
