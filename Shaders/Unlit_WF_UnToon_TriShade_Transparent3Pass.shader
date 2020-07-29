@@ -217,7 +217,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             _FG_Enable              ("[FG] Enable", Float) = 0
             _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
             _FG_MinDist             ("[FG] Fog Min Distance", Float) = 0.5
-            _FG_MaxDist             ("[FG] Fog Min Distance", Float) = 0.8
+            _FG_MaxDist             ("[FG] Fog Max Distance", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
             _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)

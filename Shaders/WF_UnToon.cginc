@@ -156,7 +156,7 @@
         // EmissiveScroll
         affectEmissiveScroll(i.ws_vertex, uv_main, color);
         // ToonFog
-        affectToonFog(i, color);
+        affectToonFog(i, ws_view_dir, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);

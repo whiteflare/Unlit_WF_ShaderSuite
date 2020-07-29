@@ -908,22 +908,26 @@
 
     #ifdef _FG_ENABLE
         float       _FG_Enable;
-        float3      _FG_Color;
+        float4      _FG_Color;
         float       _FG_MinDist;
         float       _FG_MaxDist;
         float       _FG_Exponential;
         float3      _FG_BaseOffset;
         float3      _FG_Scale;
 
-        inline void affectToonFog(v2f i, inout float4 color) {
+        inline void affectToonFog(v2f i, float3 ws_view_dir, inout float4 color) {
             if (TGL_ON(_FG_Enable)) {
-                float3 ls_vertex = mul(unity_WorldToObject, float4(i.ws_vertex, 1));
-                float power = smoothstep(_FG_MinDist, _FG_MaxDist, length(ls_vertex * _FG_Scale - _FG_BaseOffset));
-                color.rgb = lerp(color.rgb, _FG_Color * i.light_color, pow(power, _FG_Exponential));
+                float3 ws_offset_vertex = (i.ws_vertex - mul(unity_ObjectToWorld, float4(_FG_BaseOffset, 1)).xyz) * max(ZERO_VEC3, _FG_Scale);
+                float power = 
+                    // 前後の判定
+                    smoothstep(0, 0.2, -dot(ws_view_dir.xz, ws_offset_vertex.xz))
+                    // 原点からの距離の判定
+                    * smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_offset_vertex ));
+                color.rgb = lerp(color.rgb, _FG_Color.rgb * i.light_color, _FG_Color.a * pow(power, _FG_Exponential));
             }
         }
     #else
-        #define affectToonFog(i, color)
+        #define affectToonFog(i, ws_view_dir, color)
     #endif
 
     ////////////////////////////
