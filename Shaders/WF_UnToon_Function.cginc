@@ -917,12 +917,15 @@
 
         inline void affectToonFog(v2f i, float3 ws_view_dir, inout float4 color) {
             if (TGL_ON(_FG_Enable)) {
-                float3 ws_offset_vertex = (i.ws_vertex - mul(unity_ObjectToWorld, float4(_FG_BaseOffset, 1)).xyz) * max(ZERO_VEC3, _FG_Scale);
+                float3 ws_base_position = mul(unity_ObjectToWorld, float4(_FG_BaseOffset, 1)).xyz;
+                float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
                 float power = 
-                    // 前後の判定
-                    smoothstep(0, 0.2, -dot(ws_view_dir.xz, ws_offset_vertex.xz))
                     // 原点からの距離の判定
-                    * smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_offset_vertex ));
+                    smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_offset_vertex ))
+                    // 前後の判定
+                    * smoothstep(0, 0.2, -dot(ws_view_dir.xz, ws_offset_vertex.xz))
+                    // カメラと原点の水平距離の判定
+                    * smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
                 color.rgb = lerp(color.rgb, _FG_Color.rgb * i.light_color, _FG_Color.a * pow(power, _FG_Exponential));
             }
         }
