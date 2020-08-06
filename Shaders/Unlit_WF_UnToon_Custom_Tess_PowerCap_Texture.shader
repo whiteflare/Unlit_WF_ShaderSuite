@@ -18,7 +18,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Texture" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/06 whiteflare,
      */
 
     Properties {
