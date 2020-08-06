@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/06 whiteflare,
      */
 
     Properties {
@@ -265,7 +265,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #pragma require geometry
 
             #define _AL_ENABLE
-            #define _CL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase

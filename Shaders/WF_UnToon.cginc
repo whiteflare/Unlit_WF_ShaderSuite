@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/06 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -176,7 +176,8 @@
     ////////////////////////////
 
     float4 shiftDepthVertex(float3 ws_vertex, float width) {
-        float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex); // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
+        // ワールド座標でのカメラ方向と距離を計算
+        float3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
         // カメラ方向の z シフト量を加算
         float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
 

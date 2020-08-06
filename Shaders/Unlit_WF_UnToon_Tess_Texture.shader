@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/06 whiteflare,
      */
 
     Properties {
@@ -257,7 +257,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
 
             #pragma target 5.0
 
-            #define _CL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
             #pragma multi_compile_fwdbase

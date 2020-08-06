@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/06 whiteflare,
      */
 
     Properties {
@@ -60,8 +60,22 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
-
         [WFHeaderToggle(Light Matcap 1)]
+            _HL_Enable              ("[HL] Enable", Float) = 0
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+            _HL_CapType             ("[HL] Matcap Type", Float) = 0
+        [NoScaleOffset]
+            _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
+            _HL_MatcapColor         ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power               ("[HL] Power", Range(0, 2)) = 1
+            _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+        [NoScaleOffset]
+            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+
+        [WFHeaderToggle(Light Matcap 2)]
             _HL_Enable_1            ("[HA] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
@@ -76,7 +90,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
         [Toggle(_)]
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Light Matcap 2)]
+        [WFHeaderToggle(Light Matcap 3)]
             _HL_Enable_2            ("[HB] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType_2           ("[HB] Matcap Type", Float) = 0
@@ -91,7 +105,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
         [Toggle(_)]
             _HL_InvMaskVal_2        ("[HB] Invert Mask Value", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Light Matcap 3)]
+        [WFHeaderToggle(Light Matcap 4)]
             _HL_Enable_3            ("[HC] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType_3           ("[HC] Matcap Type", Float) = 0
@@ -106,7 +120,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
         [Toggle(_)]
             _HL_InvMaskVal_3        ("[HC] Invert Mask Value", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Light Matcap 4)]
+        [WFHeaderToggle(Light Matcap 5)]
             _HL_Enable_4            ("[HD] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType_4           ("[HD] Matcap Type", Float) = 0
@@ -121,7 +135,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
         [Toggle(_)]
             _HL_InvMaskVal_4        ("[HD] Invert Mask Value", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Light Matcap 5)]
+        [WFHeaderToggle(Light Matcap 6)]
             _HL_Enable_5            ("[HE] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType_5           ("[HE] Matcap Type", Float) = 0
@@ -136,7 +150,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
         [Toggle(_)]
             _HL_InvMaskVal_5        ("[HE] Invert Mask Value", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Light Matcap 6)]
+        [WFHeaderToggle(Light Matcap 7)]
             _HL_Enable_6            ("[HF] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType_6           ("[HF] Matcap Type", Float) = 0
@@ -151,7 +165,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
         [Toggle(_)]
             _HL_InvMaskVal_6        ("[HF] Invert Mask Value", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Light Matcap 7)]
+        [WFHeaderToggle(Light Matcap 8)]
             _HL_Enable_7            ("[HG] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType_7           ("[HG] Matcap Type", Float) = 0
@@ -165,21 +179,6 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_MaskTex_7           ("[HG] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_7        ("[HG] Invert Mask Value", Range(0, 1)) = 0
-
-        [WFHeaderToggle(Light Matcap 8)]
-            _HL_Enable_8            ("[HH] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType_8           ("[HH] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex_8         ("[HH] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_8       ("[HH] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power_8             ("[HH] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_8       ("[HH] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_8          ("[HH] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex_8           ("[HH] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal_8        ("[HH] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -292,6 +291,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+            #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE

@@ -78,14 +78,26 @@ namespace UnlitWF
             { "_DetailNormalMap", "NM" },
             { "_DetailNormalMapScale", "NM" },
             { "_MetallicGlossMap", "MT" },
+            { "_SpecGlossMap", "MT" },
             { "_EmissionColor", "ES" },
             { "_EmissionMap", "ES" },
             { "_OcclusionMap", "AO" },
+            { "_TessType", "TE" },
+            { "_TessFactor", "TE" },
+            { "_Smoothing", "TE" },
+            { "_DispMap", "TE" },
+            { "_DispMapScale", "TE" },
+            { "_DispMapLevel", "TE" },
         };
 
+        /// <summary>
+        /// プロパティ物理名からラベル文字列を抽出する。特殊な名称は辞書を参照してラベル文字列を返却する。
+        /// </summary>
+        /// <param name="prop_name"></param>
+        /// <returns></returns>
         public static string GetPrefixFromPropName(string prop_name) {
-            string label;
-            if (SPECIAL_PROP_NAME.TryGetValue(prop_name, out label)) {
+            string label = SPECIAL_PROP_NAME.GetValueOrNull(prop_name);
+            if (label != null) {
                 return label;
             }
             string name;
@@ -98,94 +110,138 @@ namespace UnlitWF
         }
     }
 
-    internal class ShaderPropertyView
+    internal class ShaderMaterialProperty
     {
-        public readonly Material material;
-        public readonly SerializedObject serialObject;
-        public readonly SerializedProperty parent;
-        public readonly SerializedProperty property;
-        public readonly String name;
-        public readonly SerializedProperty value;
+        public readonly Material Material;
+        private readonly Shader shader;
+        private readonly int index;
 
-        public ShaderPropertyView(Material material, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property) {
-            this.material = material;
+        ShaderMaterialProperty(Material material, Shader shader, int index) {
+            this.Material = material;
+            this.shader = shader;
+            this.index = index;
+        }
+
+        /// <summary>
+        /// プロパティの物理名
+        /// </summary>
+        public string Name { get { return ShaderUtil.GetPropertyName(shader, index); } }
+        /// <summary>
+        /// プロパティの説明文
+        /// </summary>
+        public string Description { get { return ShaderUtil.GetPropertyDescription(shader, index); } }
+        /// <summary>
+        /// プロパティの型
+        /// </summary>
+        public ShaderUtil.ShaderPropertyType Type { get { return ShaderUtil.GetPropertyType(shader, index); } }
+
+        public bool CopyTo(ShaderMaterialProperty dst) {
+            var srcType = Type;
+            var dstType = dst.Type;
+            if (srcType == dstType) {
+                switch (srcType) {
+                    case ShaderUtil.ShaderPropertyType.Color:
+                        dst.Material.SetColor(dst.Name, this.Material.GetColor(Name));
+                        return true;
+                    case ShaderUtil.ShaderPropertyType.Float:
+                    case ShaderUtil.ShaderPropertyType.Range:
+                        dst.Material.SetFloat(dst.Name, this.Material.GetFloat(Name));
+                        return true;
+                    case ShaderUtil.ShaderPropertyType.Vector:
+                        dst.Material.SetVector(dst.Name, this.Material.GetVector(Name));
+                        return true;
+                    case ShaderUtil.ShaderPropertyType.TexEnv:
+                        dst.Material.SetTexture(dst.Name, this.Material.GetTexture(Name));
+                        dst.Material.SetTextureOffset(dst.Name, this.Material.GetTextureOffset(Name));
+                        dst.Material.SetTextureScale(dst.Name, this.Material.GetTextureScale(Name));
+                        return true;
+                    default:
+                        break;
+                }
+            }
+            return false;
+        }
+
+        public static List<ShaderMaterialProperty> AsList(Material material) {
+            var shader = material.shader;
+            int cnt = ShaderUtil.GetPropertyCount(shader);
+            var result = new List<ShaderMaterialProperty>();
+            for (int i = 0; i < cnt; i++) {
+                result.Add(new ShaderMaterialProperty(material, shader, i));
+            }
+            return result;
+        }
+
+        public static Dictionary<string, ShaderMaterialProperty> AsDict(Material material) {
+            var result = new Dictionary<string, ShaderMaterialProperty>();
+            foreach (var p in AsList(material)) {
+                result.Add(p.Name, p);
+            }
+            return result;
+        }
+    }
+
+    internal class ShaderSerializedProperty
+    {
+        public readonly string name;
+        public readonly ShaderMaterialProperty materialProperty;
+        private readonly SerializedObject serialObject;
+        private readonly SerializedProperty parent;
+        private readonly SerializedProperty property;
+        private readonly SerializedProperty value;
+
+        ShaderSerializedProperty(string name, ShaderMaterialProperty matProp, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property) {
+            this.name = name;
+            this.materialProperty = matProp;
             this.serialObject = serialObject;
             this.parent = parent;
             this.property = property;
 
-            SerializedProperty first = property.FindPropertyRelative("first");
-            this.name = first != null ? first.stringValue : "no_name";
             this.value = property.FindPropertyRelative("second");
         }
+
+        private static string GetSerializedName(SerializedProperty p) {
+            SerializedProperty first = p.FindPropertyRelative("first");
+            return first != null ? first.stringValue : null;
+        }
+
+        private static SerializedProperty GetSerializedValue(SerializedProperty p) {
+            return p.FindPropertyRelative("second");
+        }
+
+        public bool HasPropertyInShader
+        {
+            get { return materialProperty != null;  }
+        }
+
+        public ShaderUtil.ShaderPropertyType Type { get { return materialProperty.Type; } }
+
+        public string ParentName { get { return parent.name; } }
+
+        public float FloatValue { get { return value.floatValue; } set { this.value.floatValue = value; } }
+        public Color ColorValue { get { return value.colorValue; } set { this.value.colorValue = value; } }
+        public Vector4 VectorValue { get { return value.vector4Value; } set { this.value.vector4Value = value; } }
 
         public void Rename(string newName) {
             property.FindPropertyRelative("first").stringValue = newName;
         }
 
         public void Remove() {
-            var props = ToPropertyList(material, serialObject, parent);
-            for (int i = props.Count - 1; 0 <= i; i--) {
-                if (props[i].name == this.name) {
+            for (int i = parent.arraySize - 1; 0 <= i; i--) {
+                var prop = parent.GetArrayElementAtIndex(i);
+                if (GetSerializedName(prop) == this.name) {
                     parent.DeleteArrayElementAtIndex(i);
                 }
             }
         }
 
-        public void CopyTo(ShaderPropertyView other) {
-            // テクスチャだけなんか SerializedProperty から見えないので Material からセットする
-            if (parent.name == "m_TexEnvs") {
-                other.material.SetTexture(other.name, material.GetTexture(name));
-                other.material.SetTextureOffset(other.name, material.GetTextureOffset(name));
-                other.material.SetTextureScale(other.name, material.GetTextureScale(name));
-                return;
-            }
-            var src_value = this.value;
-            var dst_value = other.value;
-            switch (src_value.propertyType) {
-                case SerializedPropertyType.Float:
-                    dst_value.floatValue = src_value.floatValue;
-                    break;
-                case SerializedPropertyType.Color:
-                    dst_value.colorValue = src_value.colorValue;
-                    break;
-                case SerializedPropertyType.ObjectReference:
-                    dst_value.objectReferenceValue = src_value.objectReferenceValue;
-                    break;
-
-                case SerializedPropertyType.Integer:
-                    dst_value.intValue = src_value.intValue;
-                    break;
-                case SerializedPropertyType.Boolean:
-                    dst_value.boolValue = src_value.boolValue;
-                    break;
-                case SerializedPropertyType.Enum:
-                    dst_value.enumValueIndex = src_value.enumValueIndex;
-                    break;
-                case SerializedPropertyType.Vector2:
-                    dst_value.vector2Value = src_value.vector2Value;
-                    break;
-                case SerializedPropertyType.Vector3:
-                    dst_value.vector3Value = src_value.vector3Value;
-                    break;
-                case SerializedPropertyType.Vector4:
-                    dst_value.vector4Value = src_value.vector4Value;
-                    break;
-                case SerializedPropertyType.Vector2Int:
-                    dst_value.vector2IntValue = src_value.vector2IntValue;
-                    break;
-                case SerializedPropertyType.Vector3Int:
-                    dst_value.vector3IntValue = src_value.vector3IntValue;
-                    break;
-            }
-        }
-
-        public static void AllApplyPropertyChange(IEnumerable<ShaderPropertyView> props) {
+        public static void AllApplyPropertyChange(IEnumerable<ShaderSerializedProperty> props) {
             foreach (var so in GetUniqueSerialObject(props)) {
                 so.ApplyModifiedProperties();
             }
         }
 
-        public static HashSet<SerializedObject> GetUniqueSerialObject(IEnumerable<ShaderPropertyView> props) {
+        public static HashSet<SerializedObject> GetUniqueSerialObject(IEnumerable<ShaderSerializedProperty> props) {
             var ret = new HashSet<SerializedObject>();
             foreach (var prop in props) {
                 if (prop != null && prop.serialObject != null) {
@@ -195,58 +251,53 @@ namespace UnlitWF
             return ret;
         }
 
-        public static HashSet<Material> GetUniqueMaterials(IEnumerable<ShaderPropertyView> props) {
-            var ret = new HashSet<Material>();
-            foreach (var prop in props) {
-                if (prop != null && prop.material != null) {
-                    ret.Add(prop.material);
-                }
-            }
-            return ret;
-        }
-
-        public static List<ShaderPropertyView> ToPropertyList(IEnumerable<Material> matlist) {
-            var list = new List<ShaderPropertyView>();
+        public static List<ShaderSerializedProperty> AsList(IEnumerable<Material> matlist) {
+            var result = new List<ShaderSerializedProperty>();
             foreach (Material mat in matlist) {
-                list.AddRange(ToPropertyList(mat));
+                result.AddRange(AsList(mat));
             }
-            return list;
+            return result;
         }
 
-        public static Dictionary<string, ShaderPropertyView> ToPropertyMap(Material mat) {
-            var ret = new Dictionary<string, ShaderPropertyView>();
-            foreach (var prop in ToPropertyList(mat)) {
-                ret[prop.name] = prop;
-            }
-            return ret;
-        }
-
-        public static List<ShaderPropertyView> ToPropertyList(Material mat) {
-            SerializedObject so = new SerializedObject(mat);
+        public static List<ShaderSerializedProperty> AsList(Material material) {
+            var matProps = ShaderMaterialProperty.AsDict(material);
+            SerializedObject so = new SerializedObject(material);
             so.Update();
-            return ToPropertyList(mat, so);
-        }
-
-        public static List<ShaderPropertyView> ToPropertyList(Material material, SerializedObject so) {
-            var list = new List<ShaderPropertyView>();
+            var result = new List<ShaderSerializedProperty>();
             var m_SavedProperties = so.FindProperty("m_SavedProperties");
             if (m_SavedProperties != null) {
-                list.AddRange(ToPropertyList(material, so, m_SavedProperties.FindPropertyRelative("m_Floats")));
-                list.AddRange(ToPropertyList(material, so, m_SavedProperties.FindPropertyRelative("m_Colors")));
-                list.AddRange(ToPropertyList(material, so, m_SavedProperties.FindPropertyRelative("m_TexEnvs")));
+                result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_Floats"), matProps));
+                result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_Colors"), matProps));
+                result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_TexEnvs"), matProps));
             }
-            return list;
+            return result;
         }
 
-        public static List<ShaderPropertyView> ToPropertyList(Material material, SerializedObject so, SerializedProperty prop) {
-            var list = new List<ShaderPropertyView>();
-            if (prop != null) {
-                for (int i = 0; i < prop.arraySize; i++) {
-                    list.Add(new ShaderPropertyView(material, so, prop, prop.GetArrayElementAtIndex(i)));
+        private static List<ShaderSerializedProperty> AsList(Material material, SerializedObject so, SerializedProperty parent, Dictionary<string, ShaderMaterialProperty> matProps) {
+            var result = new List<ShaderSerializedProperty>();
+            if (parent != null) {
+                for (int i = 0; i < parent.arraySize; i++) {
+                    var prop = parent.GetArrayElementAtIndex(i);
+                    var name = GetSerializedName(prop);
+                    if (name != null) {
+                        result.Add(new ShaderSerializedProperty(name, matProps.GetValueOrNull(name), so, parent, prop));
+                    }
                 }
             }
-            return list;
+            return result;
         }
+    }
+
+    internal static class CollectionUtility
+    {
+        public static T GetValueOrNull<K, T>(this Dictionary<K, T> dict, K key) where T : class {
+            T value;
+            if (dict.TryGetValue(key, out value)) {
+                return value;
+            }
+            return null;
+        }
+
     }
 
     internal static class WFI18N
@@ -423,13 +474,13 @@ namespace UnlitWF
             text = text ?? "";
             Dictionary<string, string> current = GetDict();
             if (current != null) {
-                string ret;
-                if (current.TryGetValue(text, out ret)) {
+                string ret = current.GetValueOrNull(text);
+                if (ret != null) {
                     return ret;
                 }
-                string label, name2;
-                if (WFCommonUtility.FormatDispName(text, out label, out name2, out ret)) {
-                    if (current.TryGetValue(name2, out ret)) {
+                if (WFCommonUtility.FormatDispName(text, out string label, out string name2, out ret)) {
+                    ret = current.GetValueOrNull(name2);
+                    if (ret != null) {
                         return "[" + label + "] " + ret;
                     }
                 }
@@ -549,6 +600,7 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Outline", "Transparent_MaskOut_Blend", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend"),
 
             new WFShaderName("UnToon", "PowerCap", "Texture", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture"),
+            new WFShaderName("UnToon", "PowerCap", "TransCutout", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout"),
             new WFShaderName("UnToon", "PowerCap", "Transparent", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent"),
             new WFShaderName("UnToon", "PowerCap", "Transparent3Pass", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass"),
 
