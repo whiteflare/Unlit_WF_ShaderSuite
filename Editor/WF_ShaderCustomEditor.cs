@@ -213,13 +213,7 @@ namespace UnlitWF
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("Variant", idx, labels);
                     if (EditorGUI.EndChangeCheck() && idx != select) {
-                        var shader = Shader.Find(variants[select].Name);
-                        if (shader != null) {
-                            Undo.RecordObjects(targets, "change shader");
-                            foreach (var m in targets) {
-                                m.shader = shader;
-                            }
-                        }
+                        OnGuiSub_ChangeCurrentShaderVariant(targets, variants[select].Name);
                     }
                 }
                 // Render Type
@@ -230,15 +224,22 @@ namespace UnlitWF
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("RenderType", idx, labels);
                     if (EditorGUI.EndChangeCheck() && idx != select) {
-                        var shader = Shader.Find(variants[select].Name);
-                        if (shader != null) {
-                            Undo.RecordObjects(targets, "change shader");
-                            foreach (var m in targets) {
-                                m.shader = shader;
-                            }
-                        }
+                        OnGuiSub_ChangeCurrentShaderVariant(targets, variants[select].Name);
                     }
                 }
+            }
+        }
+
+        private void OnGuiSub_ChangeCurrentShaderVariant(Material[] targets, string name) {
+            var shader = Shader.Find(name);
+            if (shader != null) {
+                Undo.RecordObjects(targets, "change shader");
+                foreach (var m in targets) {
+                    m.shader = shader;
+                }
+            }
+            else {
+                Debug.LogErrorFormat("Shader Not Found in this projects: {0}", name);
             }
         }
 
