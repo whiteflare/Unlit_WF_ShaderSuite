@@ -99,7 +99,11 @@
     #endif
 
     #ifndef WF_TEX2D_OUTLINE_MASK
-        #define WF_TEX2D_OUTLINE_MASK(uv)       SAMPLE_MASK_VALUE(_TL_MaskTex, uv, _TL_InvMaskVal).r
+        #ifndef _TL_MASK_APPLY_LEGACY
+            #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv, _TL_InvMaskVal).r
+        #else
+            #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE(_TL_MaskTex, uv, _TL_InvMaskVal).r
+        #endif
     #endif
 
     #ifndef WF_TEX2D_OCCLUSION
@@ -771,9 +775,25 @@
         float       _TL_LineWidth;
         uint        _TL_LineType;
         float       _TL_BlendBase;
-        DECL_SUB_TEX2D(_TL_MaskTex);
         float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
+
+        #ifndef _TL_MASK_APPLY_LEGACY
+            // マスクをシフト時に太さに反映する場合
+            sampler2D   _TL_MaskTex;
+        #else
+            // マスクをfragmentでアルファに反映する場合
+            DECL_SUB_TEX2D(_TL_MaskTex);
+        #endif
+
+        inline float getOutlineShiftWidth(float2 uv_main) {
+            #ifndef _TL_MASK_APPLY_LEGACY
+                float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
+            #else
+                float mask = 1;
+            #endif
+            return _TL_LineWidth * 0.01 * mask;
+        }
 
         inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
@@ -784,20 +804,30 @@
 
         inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
-                // アウトラインAlphaをベースと合成
-                float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
-                if (mask < 0.1) {
-                    color.a = 0;
-                    discard;
-                } else {
+                #ifndef _TL_MASK_APPLY_LEGACY
+                    // マスクをシフト時に太さに反映する場合
                     #ifdef _AL_ENABLE
-                        color.a = _TL_LineColor.a * mask;
+                        color.a = _TL_LineColor.a;
                     #else
                         color.a = 1;
                     #endif
-                }
+                #else
+                    // マスクをfragmentでアルファに反映する場合
+                    float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
+                    if (mask < 0.1) {
+                        color.a = 0;
+                        discard;
+                    } else {
+                        #ifdef _AL_ENABLE
+                            color.a = _TL_LineColor.a * mask;
+                        #else
+                            color.a = 1;
+                        #endif
+                    }
+                #endif
             }
         }
+
     #else
         #define affectOutline(uv_main, color)
         #define affectOutlineAlpha(uv_main, color)

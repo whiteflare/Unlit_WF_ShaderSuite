@@ -210,7 +210,7 @@
 
     float4 shiftOutlineVertex(inout v2f o) {
         #ifdef _TL_ENABLE
-            return shiftOutlineVertex(o, _TL_LineWidth * 0.01, -_TL_Z_Shift);
+            return shiftOutlineVertex(o, getOutlineShiftWidth(TRANSFORM_TEX(o.uv, _MainTex)), -_TL_Z_Shift);
         #else
             return UnityObjectToClipPos( ZERO_VEC3 );
         #endif
