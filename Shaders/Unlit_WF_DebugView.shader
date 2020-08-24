@@ -290,4 +290,6 @@ Shader "UnlitWF/Debug/WF_DebugView" {
             ENDCG
         }
     }
+
+    CustomEditor "UnlitWF.WF_DebugViewEditor"
 }
