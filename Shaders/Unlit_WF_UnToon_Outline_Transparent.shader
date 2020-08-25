@@ -245,7 +245,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             "DisableBatching" = "True"
         }
 
-        GrabPass { "_UnToonTransparentOutlineCanceller" }
+        GrabPass { "_UnToonOutlineCancel" }
 
         Pass {
             Name "OUTLINE"
@@ -293,6 +293,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+
+            #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineCancel
 
             #include "WF_UnToon.cginc"
 

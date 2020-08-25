@@ -249,7 +249,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             "DisableBatching" = "True"
         }
 
-        GrabPass { "_UnToonTransparentOutlineCanceller" }
+        GrabPass { "_UnToonOutlineCancelLater" }
 
         Pass {
             Name "OUTLINE"
@@ -286,7 +286,37 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             ENDCG
         }
 
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
+        Pass {
+            Name "OUTLINE_CANCELLER"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert_outline_canceller
+            #pragma fragment frag_outline_canceller
+
+            #pragma target 4.5
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineCancelLater
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_Transparent_MaskOut/MAIN_FRONT"
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"

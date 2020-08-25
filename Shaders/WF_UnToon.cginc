@@ -277,7 +277,9 @@
     // アウトラインキャンセラ用 vertex&fragment shader
     ////////////////////////////
 
-    sampler2D _UnToonTransparentOutlineCanceller;
+#ifdef _TL_CANCEL_GRAB_TEXTURE
+
+    sampler2D _TL_CANCEL_GRAB_TEXTURE;
 
     struct v2f_canceller {
         float4      vertex  : SV_POSITION;
@@ -293,8 +295,10 @@
     }
 
     float4 frag_outline_canceller(v2f_canceller i) : SV_Target {
-        return tex2Dproj(_UnToonTransparentOutlineCanceller, UNITY_PROJ_COORD(i.uv_grab));
+        return tex2Dproj(_TL_CANCEL_GRAB_TEXTURE, UNITY_PROJ_COORD(i.uv_grab));
     }
+
+#endif
 
     ////////////////////////////
     // EmissiveScroll専用パス用 vertex&fragment shader

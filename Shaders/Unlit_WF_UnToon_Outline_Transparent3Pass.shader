@@ -245,7 +245,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             "DisableBatching" = "True"
         }
 
-        GrabPass { "_UnToonTransparentOutlineCanceller" }
+        GrabPass { "_UnToonOutlineCancel" }
         UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE"
         UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
 
