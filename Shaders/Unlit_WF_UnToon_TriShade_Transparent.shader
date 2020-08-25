@@ -248,7 +248,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             "DisableBatching" = "True"
         }
 
-        GrabPass { "_UnToonTransparentOutlineCanceller" }
+        GrabPass { "_UnToonOutlineCancel" }
 
         Pass {
             Name "OUTLINE"

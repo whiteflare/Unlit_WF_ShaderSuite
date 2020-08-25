@@ -252,7 +252,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             "DisableBatching" = "True"
         }
 
-        GrabPass { "_UnToonTransparentOutlineCanceller" }
+        GrabPass { "_UnToonOutlineCancelLater" }
 
         Pass {
             Name "OUTLINE"
@@ -290,7 +290,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             ENDCG
         }
 
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut/OUTLINE_CANCELLER"
 
         Pass {
             Name "MAIN_BACK"

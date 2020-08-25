@@ -253,9 +253,9 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
             "DisableBatching" = "True"
         }
 
-        GrabPass { "_UnToonTransparentOutlineCanceller" }
+        GrabPass { "_UnToonOutlineCancelLater" }
         UsePass "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut/OUTLINE"
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut/OUTLINE_CANCELLER"
 
         UsePass "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut/MAIN_BACK"
         UsePass "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut/MAIN_FRONT"
