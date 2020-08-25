@@ -385,7 +385,7 @@ namespace UnlitWF
             { "[RM] RimLight Mask Texture", "[RM] マスクテクスチャ" },
             // Decal
             { "[OL] UV Type", "[OL] UVタイプ" },
-            { "[OL] Decal Color", "[OL] Decalテクスチャ" },
+            { "[OL] Decal Color", "[OL] Decal色" },
             { "[OL] Decal Texture", "[OL] Decalテクスチャ" },
             { "[OL] Texture", "[OL] テクスチャ" },
             { "[OL] Blend Type", "[OL] 混合タイプ" },
