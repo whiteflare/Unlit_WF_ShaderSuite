@@ -23,8 +23,8 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
     Properties {
         [Header(Base)]
-        [Enum(BLACK,0,MAGENTA,1,DISCARD,2,VERTEX,3)]
-        _ModeColor  ("Color", Float)                = 0
+        [Enum(OFF,0,WHITE,1,BLACK,2,MAGENTA,3,DISCARD,4,VERTEX,5)]
+        _ModeColor  ("Color", Float)                = 1
 
         [Header(Position)]
         [Enum(OFF,0,LOCAL_POSITION,1,WORLD_POSITION,2)]
@@ -52,7 +52,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
   
         [Header(Other Settings)]
         [IntRange]
-        _GridScale  ("grid scale", Range(0,8))      = 0
+        _GridScale  ("grid scale", Range(0,8))      = 4
         _GridFactor ("grid factor", Range(0, 1))    = 0.5
     }
 
@@ -152,12 +152,15 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 // 基本色
                 switch(_ModeColor) {
                     case 1:
-                        color.rb = 1;
-                        break;
-                    case 2:
-                        discard;
+                        color.rgb = 1;
                         break;
                     case 3:
+                        color.rb = 1;
+                        break;
+                    case 4:
+                        discard;
+                        break;
+                    case 5:
                         color.rgb = i.vcolor;
                         break;
                     default:
