@@ -28,11 +28,31 @@ namespace UnlitWF
 
     public class WF_DebugViewEditor : ShaderGUI
     {
+        public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
+            // newShaderの割り当て
+            base.AssignNewShaderToMaterial(material, oldShader, newShader);
+            // 初期化
+            PostChangeShader(material, oldShader, newShader);
+        }
+
+        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader) {
+            // 古いシェーダ名の保存に OverrideTag を利用する
+            if (material != null && oldShader != null && !IsSupportedShader(oldShader)) {
+                material.SetOverrideTag("PrevShader", oldShader.name);
+            }
+        }
+
+        public static bool IsSupportedShader(Shader shader) {
+            return shader != null && shader.name.Contains("UnlitWF/") && shader.name.Contains("WF_DebugView");
+        }
+
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
             materialEditor.SetDefaultGUIWidths();
 
-            var mat = materialEditor.target as Material;
+            // 元シェーダに戻すボタン
+            OnGuiSub_SwitchPrevShaderButton(materialEditor);
 
+            var mat = materialEditor.target as Material;
             // モード変更メニュー表示
             foreach (var section in sections) {
                 GUI.Label(EditorGUI.IndentedRect(EditorGUILayout.GetControlRect()), section.name, EditorStyles.boldLabel);
@@ -58,6 +78,29 @@ namespace UnlitWF
             GUI.Label(EditorGUI.IndentedRect(EditorGUILayout.GetControlRect()), "Advanced Options", EditorStyles.boldLabel);
             materialEditor.RenderQueueField();
             materialEditor.EnableInstancingField();
+            EditorGUILayout.Space();
+
+            // 一番下にも、元シェーダに戻すボタンを置く
+            OnGuiSub_SwitchPrevShaderButton(materialEditor);
+        }
+
+        private static void OnGuiSub_SwitchPrevShaderButton(MaterialEditor materialEditor) {
+            // 編集中のマテリアルの配列
+            var mats = materialEditor.targets.Select(obj => obj as Material).Where(m => m != null).ToArray();
+
+            // PrevShader タグを持っているものがひとつでもあればボタン表示
+            if (mats.Select(m => m.GetTag("PrevShader", false)).Any(tag => !string.IsNullOrWhiteSpace(tag))) {
+
+                if (GUI.Button(EditorGUI.IndentedRect(EditorGUILayout.GetControlRect()), "Switch Prev Shader")) {
+                    // 元のシェーダに戻す
+                    Undo.RecordObjects(mats, "change shader");
+                    // それぞれのマテリアルに設定された PrevShader へと切り替え
+                    foreach (var mat in mats) {
+                        WFCommonUtility.ChangeShader(mat, mat.GetTag("PrevShader", false));
+                    }
+                }
+                EditorGUILayout.Space();
+            }
         }
 
         private readonly List<DebugModeSection> sections = new List<DebugModeSection>() {
