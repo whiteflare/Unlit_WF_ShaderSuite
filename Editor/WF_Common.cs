@@ -125,6 +125,9 @@ namespace UnlitWF
             if (newShader != null) {
                 Undo.RecordObjects(targets, "change shader");
                 foreach (var m in targets) {
+                    if (m == null) {
+                        continue;
+                    }
                     var oldShader = m.shader;
                     m.shader = newShader;
                     // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)

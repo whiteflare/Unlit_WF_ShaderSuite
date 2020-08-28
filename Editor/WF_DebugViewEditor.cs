@@ -28,6 +28,11 @@ namespace UnlitWF
 
     public class WF_DebugViewEditor : ShaderGUI
     {
+        [MenuItem("CONTEXT/Material/Switch WF_DebugView shader")]
+        public static void Init(MenuCommand cmd) {
+            WFCommonUtility.ChangeShader(cmd.context as Material, "UnlitWF/Debug/WF_DebugView");
+        }
+
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
             // newShaderの割り当て
             base.AssignNewShaderToMaterial(material, oldShader, newShader);
