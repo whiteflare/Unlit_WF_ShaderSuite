@@ -224,10 +224,10 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 // 法線
                 switch(_ModeNormal) {
                     case 1:
-                        color.rgb = saturate(i.normal + 0.5);
+                        color.rgb = saturate(normalize(i.normal.xyz) + 0.5);
                         break;
                     case 2:
-                        color.rgb = saturate(i.tangent + 0.5);
+                        color.rgb = saturate(normalize(i.tangent.xyz) + 0.5);
                         break;
                     default:
                         break;
