@@ -739,10 +739,11 @@
         float4      _OL_OverlayTex_ST;
         uint        _OL_BlendType;
         float       _OL_Power;
+        float       _OL_CustomParam1;
         DECL_SUB_TEX2D(_OL_MaskTex);
         float       _OL_InvMaskVal;
 
-        inline float2 computeOverlayTex(float3 ws_vertex) {
+        float2 computeOverlayTex(float3 ws_vertex) {
             float3 ws_view_dir = normalize( ws_vertex - _WorldSpaceCameraPos.xyz );
 
             float lon = atan2( ws_view_dir.z, ws_view_dir.x );  // -PI ~ +PI
@@ -752,27 +753,33 @@
             return uv;
         }
 
-        inline float3 blendOverlayColor(float3 color, float4 ov_color, float3 power) {
-            ov_color.a *= power;
-            if (_OL_BlendType == 1) {
-                return color + ov_color.rgb * ov_color.a;    // 加算
-            }
-            if (_OL_BlendType == 2) {
-                return color * lerp( ONE_VEC3, ov_color.rgb, ov_color.a);    // 重み付き乗算
-            }
-            return lerp(color, ov_color.rgb, ov_color.a);    // ブレンド
+        float2 computeAngelRingUV(float3 vs_normal, float2 uv2) {
+            return float2(vs_normal.x, lerp(uv2.y, vs_normal.y, _OL_CustomParam1));
         }
 
-        inline void affectOverlayTexture(v2f i, float2 uv_main, inout float4 color) {
+        inline float3 blendOverlayColor(float3 color, float4 ov_color, float3 power) {
+            ov_color.a *= power;
+            return
+                _OL_BlendType == 1 ? color + ov_color.rgb * ov_color.a                          // 加算
+                    : _OL_BlendType == 2 ? color * lerp( ONE_VEC3, ov_color.rgb, ov_color.a)    // 重み付き乗算
+                        : lerp(color, ov_color.rgb, ov_color.a);                                // ブレンド
+        }
+
+        inline void affectOverlayTexture(v2f i, float2 uv_main, float3 vs_normal, inout float4 color) {
             if (TGL_ON(_OL_Enable)) {
-                float2 uv_overlay = _OL_UVType == 0 ? i.uv : _OL_UVType == 1 ? i.uv_lmap : computeOverlayTex(i.ws_vertex);
+                float2 uv_overlay =
+                    _OL_UVType == 1 ? i.uv_lmap                                             // UV2
+                        : _OL_UVType == 2 ? computeOverlayTex(i.ws_vertex)                  // SKYBOX
+                            : _OL_UVType == 3 ? computeAngelRingUV(vs_normal, i.uv_lmap)    // ANGELRING
+                                : i.uv                                                      // UV1
+                    ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
                 float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
                 color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
             }
         }
     #else
-        #define affectOverlayTexture(i, uv_main, color)
+        #define affectOverlayTexture(i, uv_main, vs_normal, color)
     #endif
 
     ////////////////////////////

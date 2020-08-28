@@ -155,7 +155,7 @@
         // リムライト
         affectRimLight(i, uv_main, calcMatcapVector(matcapVector, _TR_BlendNormal, 0), angle_light_camera, color);
         // Decal
-        affectOverlayTexture(i, uv_main, color);
+        affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 0.5), color);
         // Outline
         affectOutline(uv_main, color);
 
