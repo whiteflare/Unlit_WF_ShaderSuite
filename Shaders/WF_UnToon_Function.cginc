@@ -764,7 +764,7 @@
         }
 
         float2 computeAngelRingUV(float3 vs_normal, float2 uv2) {
-            return float2(vs_normal.x, lerp(uv2.y, vs_normal.y, _OL_CustomParam1));
+            return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OL_CustomParam1));
         }
 
         inline float3 blendOverlayColor(float3 color, float4 ov_color, float3 power) {
