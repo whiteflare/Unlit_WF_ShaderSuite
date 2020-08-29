@@ -28,9 +28,19 @@ namespace UnlitWF
 
     public class WF_DebugViewEditor : ShaderGUI
     {
-        [MenuItem("CONTEXT/Material/Switch WF_DebugView shader")]
-        public static void Init(MenuCommand cmd) {
-            WFCommonUtility.ChangeShader(cmd.context as Material, "UnlitWF/Debug/WF_DebugView");
+        public const string SHADER_NAME_DEBUGVIEW = "UnlitWF/Debug/WF_DebugView";
+
+        [MenuItem(MenuPathString.MATERIAL_DEBUGVIEW)]
+        public static void ChangeFromMenu(MenuCommand cmd) {
+            WFCommonUtility.ChangeShader(cmd.context as Material, SHADER_NAME_DEBUGVIEW);
+        }
+
+        [MenuItem(MenuPathString.TOOLS_DEBUGVIEW)]
+        [MenuItem(MenuPathString.ASSETS_DEBUGVIEW)]
+        private static void ChangeFromMenu() {
+            foreach(var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
+                WFCommonUtility.ChangeShader(mat, SHADER_NAME_DEBUGVIEW);
+            }
         }
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {

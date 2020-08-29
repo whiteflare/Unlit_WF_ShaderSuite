@@ -201,7 +201,7 @@ namespace UnlitWF
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
 
             if (EditorGUILayout.Popup("Change DebugView shader", 0, new string[] { "OFF", "DEBUG" }) == 1) {
-                WFCommonUtility.ChangeShader(materialEditor.targets, "UnlitWF/Debug/WF_DebugView");
+                WFCommonUtility.ChangeShader(materialEditor.targets, WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW);
             }
         }
 
