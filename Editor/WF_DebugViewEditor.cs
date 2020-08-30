@@ -111,7 +111,11 @@ namespace UnlitWF
                     Undo.RecordObjects(mats, "change shader");
                     // それぞれのマテリアルに設定された PrevShader へと切り替え
                     foreach (var mat in mats) {
-                        WFCommonUtility.ChangeShader(mat, mat.GetTag("PrevShader", false));
+                        var name = mat.GetTag("PrevShader", false);
+                        // DebugViewの保存に使っているタグはクリア
+                        mat.SetOverrideTag("PrevShader", "");
+                        // シェーダ切り替え
+                        WFCommonUtility.ChangeShader(mat, name);
                     }
                 }
                 EditorGUILayout.Space();
