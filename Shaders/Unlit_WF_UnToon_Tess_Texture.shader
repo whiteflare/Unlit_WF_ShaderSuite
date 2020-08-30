@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
 
     /*
      * authors:
-     *      ver:2020/08/06 whiteflare,
+     *      ver:2020/08/30 whiteflare,
      */
 
     Properties {
@@ -78,8 +78,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture" {
             _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
-        [Toggle(_)]
-            _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 1
+            _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]

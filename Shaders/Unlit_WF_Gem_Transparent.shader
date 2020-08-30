@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/30 whiteflare,
      */
 
     Properties {
@@ -42,7 +42,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [NoScaleOffset]
             _MT_Cubemap             ("[GM] CubeMap", Cube) = "" {}
             _MT_Brightness          ("[GM] Brightness", Range(0, 1)) = 0.2
-        [Toggle(_)]
             _MT_Monochrome          ("[GM] Monochrome Reflection", Range(0, 1)) = 1
         [PowerSlider(4.0)]
             _MT_CubemapPower        ("[GM] 2nd CubeMap Power", Range(0, 16)) = 1

@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/08/06 whiteflare,
+     *      ver:2020/08/30 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -210,7 +210,7 @@
 
     float4 shiftOutlineVertex(inout v2f o) {
         #ifdef _TL_ENABLE
-            return shiftOutlineVertex(o, _TL_LineWidth * 0.01, -_TL_Z_Shift);
+            return shiftOutlineVertex(o, getOutlineShiftWidth(TRANSFORM_TEX(o.uv, _MainTex)), -_TL_Z_Shift);
         #else
             return UnityObjectToClipPos( ZERO_VEC3 );
         #endif
@@ -234,16 +234,20 @@
 
         #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
-            float width = _TL_LineWidth * 0.01;
-            float shift = -_TL_Z_Shift - (TGL_ON(_TL_LineType) ? width * 10 : 0);
+            float width0 = getOutlineShiftWidth(TRANSFORM_TEX(v[0].uv, _MainTex));
+            float width1 = getOutlineShiftWidth(TRANSFORM_TEX(v[1].uv, _MainTex));
+            float width2 = getOutlineShiftWidth(TRANSFORM_TEX(v[2].uv, _MainTex));
+            float shift0 = -_TL_Z_Shift - (TGL_ON(_TL_LineType) ? width0 * 10 : 0);
+            float shift1 = -_TL_Z_Shift - (TGL_ON(_TL_LineType) ? width1 * 10 : 0);
+            float shift2 = -_TL_Z_Shift - (TGL_ON(_TL_LineType) ? width2 * 10 : 0);
 
             // NORMAL
             v2f p0 = v[0];
             v2f p1 = v[1];
             v2f p2 = v[2];
-            p0.vs_vertex = shiftOutlineVertex(p0, width, shift);
-            p1.vs_vertex = shiftOutlineVertex(p1, width, shift);
-            p2.vs_vertex = shiftOutlineVertex(p2, width, shift);
+            p0.vs_vertex = shiftOutlineVertex(p0, width0, shift0);
+            p1.vs_vertex = shiftOutlineVertex(p1, width1, shift1);
+            p2.vs_vertex = shiftOutlineVertex(p2, width2, shift2);
             triStream.Append(p0);
             triStream.Append(p1);
             triStream.Append(p2);
@@ -253,9 +257,9 @@
                 v2f n0 = v[0];
                 v2f n1 = v[1];
                 v2f n2 = v[2];
-                n0.vs_vertex = shiftOutlineVertex(n0, -width, shift);
-                n1.vs_vertex = shiftOutlineVertex(n1, -width, shift);
-                n2.vs_vertex = shiftOutlineVertex(n2, -width, shift);
+                n0.vs_vertex = shiftOutlineVertex(n0, -width0, shift0);
+                n1.vs_vertex = shiftOutlineVertex(n1, -width1, shift1);
+                n2.vs_vertex = shiftOutlineVertex(n2, -width2, shift2);
                 triStream.Append(n2);
                 triStream.Append(p0);
                 triStream.Append(n0);
@@ -273,7 +277,9 @@
     // アウトラインキャンセラ用 vertex&fragment shader
     ////////////////////////////
 
-    sampler2D _UnToonTransparentOutlineCanceller;
+#ifdef _TL_CANCEL_GRAB_TEXTURE
+
+    sampler2D _TL_CANCEL_GRAB_TEXTURE;
 
     struct v2f_canceller {
         float4      vertex  : SV_POSITION;
@@ -289,8 +295,10 @@
     }
 
     float4 frag_outline_canceller(v2f_canceller i) : SV_Target {
-        return tex2Dproj(_UnToonTransparentOutlineCanceller, UNITY_PROJ_COORD(i.uv_grab));
+        return tex2Dproj(_TL_CANCEL_GRAB_TEXTURE, UNITY_PROJ_COORD(i.uv_grab));
     }
+
+#endif
 
     ////////////////////////////
     // EmissiveScroll専用パス用 vertex&fragment shader

@@ -42,6 +42,10 @@ namespace UnlitWF
 
         public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration material";
         public const string ASSETS_MIGRATION = PATH_ASSETS + "Migration material";
+
+        public const string TOOLS_DEBUGVIEW = PATH_TOOLS + "Switch DebugView shader";
+        public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "Switch DebugView shader";
+        public const string MATERIAL_DEBUGVIEW = "CONTEXT/Material/Switch WF_DebugView shader";
     }
 
     internal static class ToolCommon

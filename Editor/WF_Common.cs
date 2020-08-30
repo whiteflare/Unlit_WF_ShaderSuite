@@ -108,6 +108,41 @@ namespace UnlitWF
         public static bool IsEnableToggle(string label, string name) {
             return label != null && name.ToLower() == "enable";
         }
+
+        public static void ChangeShader(UnityEngine.Object[] targets, string name) {
+            ChangeShader(targets.Select(obj => obj as Material).Where(mat => mat != null).ToArray(), name);
+        }
+
+        public static void ChangeShader(Material target, string name) {
+            ChangeShader(new Material[] { target }, name);
+        }
+
+        public static void ChangeShader(Material[] targets, string name) {
+            if (string.IsNullOrWhiteSpace(name)) {
+                return; // なにもしない
+            }
+            var newShader = Shader.Find(name);
+            if (newShader != null) {
+                Undo.RecordObjects(targets, "change shader");
+                foreach (var m in targets) {
+                    if (m == null) {
+                        continue;
+                    }
+                    var oldShader = m.shader;
+                    m.shader = newShader;
+                    // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
+                    if (WF_DebugViewEditor.IsSupportedShader(newShader)) {
+                        WF_DebugViewEditor.PostChangeShader(m, oldShader, newShader);
+                    }
+                    else if (ShaderCustomEditor.IsSupportedShader(newShader)) {
+                        ShaderCustomEditor.PostChangeShader(m, oldShader, newShader);
+                    }
+                }
+            }
+            else {
+                Debug.LogErrorFormat("Shader Not Found in this projects: {0}", name);
+            }
+        }
     }
 
     internal class ShaderMaterialProperty
@@ -385,7 +420,7 @@ namespace UnlitWF
             { "[RM] RimLight Mask Texture", "[RM] マスクテクスチャ" },
             // Decal
             { "[OL] UV Type", "[OL] UVタイプ" },
-            { "[OL] Decal Color", "[OL] Decalテクスチャ" },
+            { "[OL] Decal Color", "[OL] Decal色" },
             { "[OL] Decal Texture", "[OL] Decalテクスチャ" },
             { "[OL] Texture", "[OL] テクスチャ" },
             { "[OL] Blend Type", "[OL] 混合タイプ" },

@@ -38,7 +38,6 @@ namespace UnlitWF
             { "_TS_2ndColor", "_TS_2ndTex" },
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
-            { "_OL_Color", "_OL_OverlayTex" },
         };
 
         delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
@@ -76,12 +75,36 @@ namespace UnlitWF
         /// <summary>
         /// 見つけ次第削除するシェーダキーワード
         /// </summary>
-        private readonly List<string> DELETE_KEYWORD = new List<string>() {
+        private static readonly List<string> DELETE_KEYWORD = new List<string>() {
             "_",
             "_ALPHATEST_ON",
             "_ALPHABLEND_ON",
             "_ALPHAPREMULTIPLY_ON",
         };
+
+        public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
+            // 割り当て
+            base.AssignNewShaderToMaterial(material, oldShader, newShader);
+            // クリンナップ
+            PostChangeShader(material, oldShader, newShader);
+        }
+
+        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader) {
+            if (material != null) {
+                // DebugViewの保存に使っているタグはクリア
+                material.SetOverrideTag("PrevShader", "");
+                // 不要なシェーダキーワードは削除
+                foreach (var key in DELETE_KEYWORD) {
+                    if (material.IsKeywordEnabled(key)) {
+                        material.DisableKeyword(key);
+                    }
+                }
+            }
+        }
+
+        public static bool IsSupportedShader(Shader shader) {
+            return shader != null && shader.name.Contains("UnlitWF/") && !shader.name.Contains("WF_DebugView");
+        }
 
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
             materialEditor.SetDefaultGUIWidths();
@@ -177,16 +200,8 @@ namespace UnlitWF
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
 
-            // 不要なシェーダキーワードは削除
-            foreach (object t in materialEditor.targets) {
-                Material mm = t as Material;
-                if (mm != null) {
-                    foreach (var key in DELETE_KEYWORD) {
-                        if (mm.IsKeywordEnabled(key)) {
-                            mm.DisableKeyword(key);
-                        }
-                    }
-                }
+            if (EditorGUILayout.Popup("Change DebugView shader", 0, new string[] { "OFF", "DEBUG" }) == 1) {
+                WFCommonUtility.ChangeShader(materialEditor.targets, WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW);
             }
         }
 
@@ -213,13 +228,7 @@ namespace UnlitWF
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("Variant", idx, labels);
                     if (EditorGUI.EndChangeCheck() && idx != select) {
-                        var shader = Shader.Find(variants[select].Name);
-                        if (shader != null) {
-                            Undo.RecordObjects(targets, "change shader");
-                            foreach (var m in targets) {
-                                m.shader = shader;
-                            }
-                        }
+                        WFCommonUtility.ChangeShader(targets, variants[select].Name);
                     }
                 }
                 // Render Type
@@ -230,13 +239,7 @@ namespace UnlitWF
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("RenderType", idx, labels);
                     if (EditorGUI.EndChangeCheck() && idx != select) {
-                        var shader = Shader.Find(variants[select].Name);
-                        if (shader != null) {
-                            Undo.RecordObjects(targets, "change shader");
-                            foreach (var m in targets) {
-                                m.shader = shader;
-                            }
-                        }
+                        WFCommonUtility.ChangeShader(targets, variants[select].Name);
                     }
                 }
             }
