@@ -136,7 +136,7 @@ namespace UnlitWF
                     Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
                     fieldpos.height = 20;
                     if (GUI.Button(fieldpos, "APPLY")) {
-                        SuggestShadowColor(materialEditor.targets);
+                        SuggestShadowColor(WFCommonUtility.AsMaterials(materialEditor.targets));
                     }
                 }
 
@@ -201,7 +201,7 @@ namespace UnlitWF
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
 
             if (EditorGUILayout.Popup("Change DebugView shader", 0, new string[] { "OFF", "DEBUG" }) == 1) {
-                WFCommonUtility.ChangeShader(materialEditor.targets, WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW);
+                WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, WFCommonUtility.AsMaterials(materialEditor.targets));
             }
         }
 
@@ -215,7 +215,7 @@ namespace UnlitWF
             // シェーダ切り替えボタン
             var snm = WFShaderNameDictionary.TryFindFromName(mat.shader.name);
             if (snm != null) {
-                var targets = materialEditor.targets.Select(m => m as Material).Where(m => m != null).ToArray();
+                var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
 
                 rect = EditorGUILayout.GetControlRect();
                 rect.y += 2;
@@ -228,7 +228,7 @@ namespace UnlitWF
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("Variant", idx, labels);
                     if (EditorGUI.EndChangeCheck() && idx != select) {
-                        WFCommonUtility.ChangeShader(targets, variants[select].Name);
+                        WFCommonUtility.ChangeShader(variants[select].Name, targets);
                     }
                 }
                 // Render Type
@@ -239,14 +239,14 @@ namespace UnlitWF
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("RenderType", idx, labels);
                     if (EditorGUI.EndChangeCheck() && idx != select) {
-                        WFCommonUtility.ChangeShader(targets, variants[select].Name);
+                        WFCommonUtility.ChangeShader(variants[select].Name, targets);
                     }
                 }
             }
         }
 
         private void OnGUISub_MigrationHelpBox(MaterialEditor materialEditor) {
-            var mats = materialEditor.targets.Select(obj => obj as Material).Where(mat => mat != null).ToArray();
+            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
             if (IsOldMaterial(mats)) {
                 var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
@@ -300,12 +300,8 @@ namespace UnlitWF
             newMaterialVersionCache.RemoveAll(mats);
         }
 
-        private void SuggestShadowColor(object[] targets) {
-            foreach (object obj in targets) {
-                Material m = obj as Material;
-                if (m == null) {
-                    continue;
-                }
+        private void SuggestShadowColor(Material[] mats) {
+            foreach (var m in mats) {
                 Undo.RecordObject(m, "shade color change");
                 // ベース色を取得
                 Color baseColor = m.GetColor("_TS_BaseColor");

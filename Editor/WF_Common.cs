@@ -109,22 +109,14 @@ namespace UnlitWF
             return label != null && name.ToLower() == "enable";
         }
 
-        public static void ChangeShader(UnityEngine.Object[] targets, string name) {
-            ChangeShader(targets.Select(obj => obj as Material).Where(mat => mat != null).ToArray(), name);
-        }
-
-        public static void ChangeShader(Material target, string name) {
-            ChangeShader(new Material[] { target }, name);
-        }
-
-        public static void ChangeShader(Material[] targets, string name) {
-            if (string.IsNullOrWhiteSpace(name)) {
+        public static void ChangeShader(string name, params Material[] mats) {
+            if (string.IsNullOrWhiteSpace(name) || mats.Length == 0) {
                 return; // なにもしない
             }
             var newShader = Shader.Find(name);
             if (newShader != null) {
-                Undo.RecordObjects(targets, "change shader");
-                foreach (var m in targets) {
+                Undo.RecordObjects(mats, "change shader");
+                foreach (var m in mats) {
                     if (m == null) {
                         continue;
                     }
@@ -142,6 +134,10 @@ namespace UnlitWF
             else {
                 Debug.LogErrorFormat("Shader Not Found in this projects: {0}", name);
             }
+        }
+
+        public static Material[] AsMaterials(params UnityEngine.Object[] array) {
+            return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
         }
     }
 
