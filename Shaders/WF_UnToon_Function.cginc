@@ -531,9 +531,7 @@
                 if (0.01 < metallic) {
                     // リフレクション
                     float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
-                    if (TGL_ON(_MT_Monochrome)) {
-                        reflection = calcBrightness(reflection);
-                    }
+                    reflection = lerp(reflection, calcBrightness(reflection), _MT_Monochrome);
 
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
