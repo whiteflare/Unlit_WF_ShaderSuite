@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/30 whiteflare,
      */
 
     Properties {

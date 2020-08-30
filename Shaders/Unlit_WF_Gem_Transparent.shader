@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/30 whiteflare,
      */
 
     Properties {
