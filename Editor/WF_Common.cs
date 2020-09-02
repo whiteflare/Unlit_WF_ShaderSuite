@@ -455,10 +455,20 @@ namespace UnlitWF
             { "Disable ObjectBasePos", "メッシュ原点を取得しない" },
             // DebugMode
             { "Debug View", "デバッグ表示" },
+            // Gem Background
+            { "[GB] Background Color", "[GR] 背景色(裏面色)" },
             // Gem Reflection
-            { "[GM] CubeMap", "[GM] キューブマップ" },
-            { "[GM] Brightness", "[GM] 明るさ" },
-            { "[GM] Monochrome Reflection", "[GM] モノクロ反射" },
+            { "[GR] Blend Power", "[GR] ブレンド強度" },
+            { "[GR] CubeMap", "[GR] キューブマップ" },
+            { "[GR] Brightness", "[GR] 明るさ" },
+            { "[GR] Monochrome Reflection", "[GR] モノクロ反射" },
+            { "[GR] 2nd CubeMap Power", "[GR] キューブマップ強度" },
+            // Gem Flake
+            { "[GF] Resolution (front)", "[GF] 細かさ(表面)" },
+            { "[GF] Resolution (back)", "[GF] 細かさ(裏面)" },
+            { "[GF] Shear", "[GF] シア" },
+            { "[GF] Brighten", "[GF] 明るさ" },
+            { "[GF] Darken", "[GF] 暗さ" },
         };
 
         private static EditorLanguage? langMode = null;
@@ -643,6 +653,7 @@ namespace UnlitWF
             new WFShaderName("FakeFur", "Basic", "TransCutout", "UnlitWF/WF_FakeFur_TransCutout"),
             new WFShaderName("FakeFur", "Basic", "Transparent", "UnlitWF/WF_FakeFur_Transparent"),
 
+            new WFShaderName("Gem", "Basic", "Opaque", "UnlitWF/WF_Gem_Opaque"),
             new WFShaderName("Gem", "Basic", "Transparent", "UnlitWF/WF_Gem_Transparent"),
         };
 

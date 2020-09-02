@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_Gem_Transparent" {
+Shader "UnlitWF/WF_Gem_Opaque" {
 
     /*
      * authors:
@@ -27,20 +27,13 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [HDR]
             _Color                  ("Color", Color) = (0.8, 0.4, 0.4, 1)
             _MainTex                ("Main Texture", 2D) = "white" {}
-            _AlphaFront             ("Transparency (front)", Range(0, 1)) = 0.5
-            _AlphaBack              ("Transparency (back)", Range(0, 1)) = 0.8
-
-        [WFHeaderToggle(Gem Background)]
-            _GB_Enable              ("[GB] Enable", Float) = 0
-        [HDR]
-            _GB_ColorBack           ("[GB] Background Color", Color) = (0.2, 0.2, 0.2, 1)
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _CullMode               ("Cull Mode", int) = 2
 
         [WFHeaderToggle(Gem Flake)]
             _GF_Enable              ("[GF] Enable", Float) = 1
         [PowerSlider(4.0)]
             _GF_FlakeSizeFront      ("[GF] Resolution (front)", Range(0.1, 16)) = 1
-        [PowerSlider(4.0)]
-            _GF_FlakeSizeBack       ("[GF] Resolution (back)", Range(0.1, 16)) = 1
             _GF_FlakeShear          ("[GF] Shear", Range(0, 1)) = 0.5
             _GF_FlakeBrighten       ("[GF] Brighten", Range(0, 8)) = 2
             _GF_FlakeDarken         ("[GF] Darken", Range(0, 8)) = 0.5
@@ -55,18 +48,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GR_Monochrome          ("[GR] Monochrome Reflection", Range(0, 1)) = 1
         [PowerSlider(4.0)]
             _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 16)) = 1
-
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [FixNoTexture]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [HideInInspector]
-        [FixFloat(0.0)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 0.8
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // Lit
         [WFHeader(Lit)]
@@ -89,43 +70,15 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "RenderType" = "Opaque"
+            "Queue" = "Geometry"
         }
 
         Pass {
-            Name "MAIN_BACK"
+            Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull FRONT
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag_gem_back
-
-            #pragma target 3.0
-
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_Gem.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "MAIN_FRONT"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull BACK
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha One
+            Cull [_CullMode]
 
             CGPROGRAM
 
@@ -134,8 +87,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             #pragma target 3.0
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -146,7 +97,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         }
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "Unlit/Texture"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

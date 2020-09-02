@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: c0f75d3ed420fd144a74722588d3bc21
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _MainTex: {instanceID: 0}
+  - _GR_Cubemap: {fileID: 8900000, guid: 80b684ec03e5e1c40943d9eb0e0d32f4, type: 3}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
