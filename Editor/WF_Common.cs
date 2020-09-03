@@ -456,7 +456,7 @@ namespace UnlitWF
             // DebugMode
             { "Debug View", "デバッグ表示" },
             // Gem Background
-            { "[GB] Background Color", "[GR] 背景色(裏面色)" },
+            { "[GB] Background Color", "[GR] 背景色 (裏面色)" },
             // Gem Reflection
             { "[GR] Blend Power", "[GR] ブレンド強度" },
             { "[GR] CubeMap", "[GR] キューブマップ" },
@@ -464,11 +464,12 @@ namespace UnlitWF
             { "[GR] Monochrome Reflection", "[GR] モノクロ反射" },
             { "[GR] 2nd CubeMap Power", "[GR] キューブマップ強度" },
             // Gem Flake
-            { "[GF] Resolution (front)", "[GF] 細かさ(表面)" },
-            { "[GF] Resolution (back)", "[GF] 細かさ(裏面)" },
+            { "[GF] Flake Size (front)", "[GF] 大きさ (表面)" },
+            { "[GF] Flake Size (back)", "[GF] 大きさ (裏面)" },
             { "[GF] Shear", "[GF] シア" },
             { "[GF] Brighten", "[GF] 明るさ" },
             { "[GF] Darken", "[GF] 暗さ" },
+            { "[GF] Twinkle", "[GF] またたき" },
         };
 
         private static EditorLanguage? langMode = null;

@@ -32,11 +32,12 @@ Shader "UnlitWF/WF_Gem_Opaque" {
 
         [WFHeaderToggle(Gem Flake)]
             _GF_Enable              ("[GF] Enable", Float) = 1
-        [PowerSlider(4.0)]
-            _GF_FlakeSizeFront      ("[GF] Resolution (front)", Range(0.1, 16)) = 1
+        [PowerSlider(2.0)]
+            _GF_FlakeSizeFront      ("[GF] Flake Size (front)", Range(0, 1)) = 0.1
             _GF_FlakeShear          ("[GF] Shear", Range(0, 1)) = 0.5
             _GF_FlakeBrighten       ("[GF] Brighten", Range(0, 8)) = 2
             _GF_FlakeDarken         ("[GF] Darken", Range(0, 8)) = 0.5
+            _GF_Twinkle             ("[GF] Twinkle", Range(0, 4)) = 2
 
         // Gem
         [WFHeaderToggle(Gem Reflection)]

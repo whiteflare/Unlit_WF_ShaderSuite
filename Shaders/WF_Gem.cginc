@@ -31,24 +31,26 @@
 
     float           _GF_Enable;
     float           _GF_FlakeSizeFront;
+    float           _GF_FlakeSizeBack;
     float           _GF_FlakeShear;
     float           _GF_FlakeBrighten;
     float           _GF_FlakeDarken;
-    float           _GF_FlakeSizeBack;
+    float           _GF_Twinkle;
 
     void affectGemFlake(v2f i, float3 ws_camera_dir, float3 ws_normal, float size, inout float4 color) {
         if (TGL_ON(_GF_Enable)) {
             float2 matcapVector = calcMatcapVector(ws_camera_dir, ws_normal) * size;
+            float3 ls_camera_dir = SafeNormalizeVec3(worldSpaceViewPointPos() - calcWorldSpaceBasePos(i.ws_vertex));
 
             float2 checker = step(0.5, frac(matcapVector.xy + matcapVector.yx * _GF_FlakeShear
-                + dot(_WorldSpaceCameraPos.xyz, _WorldSpaceCameraPos.yzx)
+                + dot(ls_camera_dir.xyz, ls_camera_dir.yzx) * _GF_Twinkle
             ));
             color.rgb *= checker.x != checker.y ? _GF_FlakeBrighten : _GF_FlakeDarken;
 
             matcapVector *= float2(1, -1);
 
             checker = step(0.5, frac(matcapVector.xy + matcapVector.yx * _GF_FlakeShear
-                + dot(_WorldSpaceCameraPos.xyz, _WorldSpaceCameraPos.zxy)
+                + dot(ls_camera_dir.xyz, ls_camera_dir.zyx) * _GF_Twinkle
             ));
             color.rgb *= checker.x != checker.y ? _GF_FlakeBrighten : _GF_FlakeDarken;
         }
@@ -116,7 +118,7 @@
         // リフレクション
         affectGemReflection(i, ws_normal.zyx, color);
         // フレーク
-        affectGemFlake(i, ws_camera_dir, ws_normal, _GF_FlakeSizeBack, color);
+        affectGemFlake(i, ws_camera_dir, ws_normal, 1 / NON_ZERO_FLOAT(_GF_FlakeSizeBack), color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
@@ -158,7 +160,7 @@
         // リフレクション
         affectGemReflection(i, ws_normal, color);
         // フレーク
-        affectGemFlake(i, ws_camera_dir, ws_normal, _GF_FlakeSizeFront, color);
+        affectGemFlake(i, ws_camera_dir, ws_normal, 1 / NON_ZERO_FLOAT(_GF_FlakeSizeFront), color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
