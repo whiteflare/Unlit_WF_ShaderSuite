@@ -257,6 +257,58 @@ namespace UnlitWF
             property.FindPropertyRelative("first").stringValue = newName;
         }
 
+        private static void TryCopyValue(SerializedProperty src, SerializedProperty dst) {
+            if (src == null || dst == null) {
+                return;
+            }
+
+            switch (src.propertyType) {
+                case SerializedPropertyType.Generic:
+                    // テクスチャ系の子をコピーする
+                    TryCopyValue(src.FindPropertyRelative("m_Texture"), dst.FindPropertyRelative("m_Texture"));
+                    TryCopyValue(src.FindPropertyRelative("m_Scale"), dst.FindPropertyRelative("m_Scale"));
+                    TryCopyValue(src.FindPropertyRelative("m_Offset"), dst.FindPropertyRelative("m_Offset"));
+                    break;
+                case SerializedPropertyType.Float:
+                    dst.floatValue = src.floatValue;
+                    break;
+                case SerializedPropertyType.Color:
+                    dst.colorValue = src.colorValue;
+                    break;
+                case SerializedPropertyType.ObjectReference:
+                    dst.objectReferenceValue = src.objectReferenceValue;
+                    break;
+                case SerializedPropertyType.Integer:
+                    dst.intValue = src.intValue;
+                    break;
+                case SerializedPropertyType.Boolean:
+                    dst.boolValue = src.boolValue;
+                    break;
+                case SerializedPropertyType.Enum:
+                    dst.enumValueIndex = src.enumValueIndex;
+                    break;
+                case SerializedPropertyType.Vector2:
+                    dst.vector2Value = src.vector2Value;
+                    break;
+                case SerializedPropertyType.Vector3:
+                    dst.vector3Value = src.vector3Value;
+                    break;
+                case SerializedPropertyType.Vector4:
+                    dst.vector4Value = src.vector4Value;
+                    break;
+                case SerializedPropertyType.Vector2Int:
+                    dst.vector2IntValue = src.vector2IntValue;
+                    break;
+                case SerializedPropertyType.Vector3Int:
+                    dst.vector3IntValue = src.vector3IntValue;
+                    break;
+            }
+        }
+
+        public void CopyTo(ShaderSerializedProperty other) {
+            TryCopyValue(this.value, other.value);
+        }
+
         public void Remove() {
             for (int i = parent.arraySize - 1; 0 <= i; i--) {
                 var prop = parent.GetArrayElementAtIndex(i);
@@ -280,6 +332,14 @@ namespace UnlitWF
                 }
             }
             return ret;
+        }
+
+        public static Dictionary<string, ShaderSerializedProperty> AsDict(Material material) {
+            var result = new Dictionary<string, ShaderSerializedProperty>();
+            foreach(var prop in AsList(material)) {
+                result[prop.name] = prop;
+            }
+            return result;
         }
 
         public static List<ShaderSerializedProperty> AsList(IEnumerable<Material> matlist) {
