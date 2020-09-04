@@ -87,16 +87,10 @@
         o.uv_lmap = v.uv_lmap;
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
-        o.normal = UnityObjectToWorldNormal(v.normal.xyz);
         #ifdef _NM_ENABLE
-            float tan_sign = step(0, v.tangent.w) * 2 - 1;
-            if (TGL_OFF(_NM_FlipTangent)) {
-                o.tangent = UnityObjectToWorldNormal(v.tangent.xyz);
-                o.bitangent = cross(o.normal, o.tangent) * tan_sign;
-            } else {
-                o.tangent = UnityObjectToWorldNormal(v.tangent.xyz) * tan_sign;
-                o.bitangent = cross(o.normal, o.tangent);
-            }
+            localNormalToWorldTangentSpace(v.normal, v.tangent, o.normal, o.tangent, o.bitangent, _NM_FlipTangent);
+        #else
+            localNormalToWorldTangentSpace(v.normal, o.normal);
         #endif
 
         // 環境光取得

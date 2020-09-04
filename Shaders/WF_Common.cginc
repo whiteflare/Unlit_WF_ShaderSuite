@@ -86,6 +86,38 @@
         return in_vec * rsqrt(lenSq);
     }
 
+    float3 SafeNormalizeVec3Normal(float3 in_vec) {
+        float lenSq = dot(in_vec, in_vec);
+        if (lenSq < 0.0001) {
+            return float3(0, 0, 1);
+        }
+        return in_vec * rsqrt(lenSq);
+    }
+
+    ////////////////////////////
+    // Normal
+    ////////////////////////////
+
+    void localNormalToWorldTangentSpace(float3 normal, out float3 out_normal) {
+        out_normal = UnityObjectToWorldNormal(normal);
+    }
+
+    void localNormalToWorldTangentSpace(float3 normal, float4 tangent, out float3 out_normal, out float3 out_tangent, out float3 out_bitangent, float flipTangent) {
+        // Normalは普通に計算
+        localNormalToWorldTangentSpace(normal, out_normal);
+
+        float tan_sign = step(0, tangent.w) * 2 - 1;
+        if (TGL_OFF(flipTangent)) {
+            // 通常のtangent算出
+            out_tangent = UnityObjectToWorldNormal(tangent.xyz);
+            out_bitangent = cross(out_normal, out_tangent) * tan_sign;
+        } else {
+            // tangentフリップ版
+            out_tangent = UnityObjectToWorldNormal(tangent.xyz) * tan_sign;
+            out_bitangent = cross(out_normal, out_tangent);
+        }
+    }
+
     ////////////////////////////
     // Lighting
     ////////////////////////////
