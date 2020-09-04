@@ -35,32 +35,31 @@
 
     struct v2g {
         float2 uv               : TEXCOORD0;
-        float4 ls_vertex        : TEXCOORD1;
-        float3 normal           : TEXCOORD2;
+        float4 ws_vertex        : TEXCOORD1;
+        float3 ws_normal        : TEXCOORD2;
+        float3 ws_tangent       : TEXCOORD3;
+        float3 ws_bitangent     : TEXCOORD4;
         UNITY_VERTEX_OUTPUT_STEREO
-        float2 uv2              : TEXCOORD3;
-        float3 waving           : TEXCOORD4;
     };
 
     struct g2f {
         float2 uv               : TEXCOORD0;
-        float4 ls_vertex        : TEXCOORD1;
-        float3 normal           : TEXCOORD2;
+        float4 ws_vertex        : TEXCOORD1;
+        float3 ws_normal        : TEXCOORD2;
         UNITY_VERTEX_OUTPUT_STEREO
-        float2 uv2              : TEXCOORD3;
         float height            : COLOR0;
         float4 vertex           : SV_POSITION;
     };
 
-    float       _CutOffLevel;
-
-    sampler2D   _FurMaskTex;
-    sampler2D   _FurNoiseTex;
-    float4      _FurNoiseTex_ST;
-    float       _FurHeight;
-    float       _FurShadowPower;
-    uint        _FurRepeat;
-    float4      _FurVector;
+    sampler2D       _FR_NoiseTex;
+    float4          _FR_NoiseTex_ST;
+    float           _FR_Height;
+    float4          _FR_Vector;
+    sampler2D       _FG_BumpMap;
+    float           _FG_FlipTangent;
+    uint            _FR_Repeat;
+    float           _FR_ShadowPower;
+    sampler2D       _FR_MaskTex;
 
     v2g vert_fakefur(appdata_fur v) {
         v2g o;
@@ -69,15 +68,9 @@
         UNITY_INITIALIZE_OUTPUT(v2g, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-        o.ls_vertex = v.vertex;
-        o.normal = normalize(v.normal.xyz);
-        o.uv2 = TRANSFORM_TEX(v.uv, _FurNoiseTex);
-
-        float3 tangent = normalize(v.tangent.xyz);
-        float3 bitangent = cross(o.normal, tangent) * v.tangent.w;
-        float3x3 tangentTransform = float3x3(tangent, bitangent, o.normal);
-        o.waving = mul(_FurVector.xyz, tangentTransform);
+        o.uv = v.uv;
+        o.ws_vertex = mul(unity_ObjectToWorld, v.vertex);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FG_FlipTangent);
 
         return o;
     }
@@ -87,15 +80,14 @@
         UNITY_INITIALIZE_OUTPUT(g2f, o);
         UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(g2f, o);
         o.uv                = p.uv;
-        o.ls_vertex         = p.ls_vertex;
-        o.normal            = p.normal;
-        o.uv2               = p.uv2;
+        o.ws_vertex         = p.ws_vertex;
+        o.ws_normal         = p.ws_normal;
         return o;
     }
 
     inline void transferGeomVertex(inout g2f o, float4 vb, float4 vu, float height) {
-        o.ls_vertex = lerp(vb, vu, height);
-        o.vertex = UnityObjectToClipPos( o.ls_vertex );
+        o.ws_vertex = lerp(vb, vu, height);
+        o.vertex = UnityWorldToClipPos( o.ws_vertex );
         o.height = height;
     }
 
@@ -103,23 +95,45 @@
         v2g o;
         UNITY_INITIALIZE_OUTPUT(v2g, o);
         o.uv                = lerp(x.uv,            y.uv,               div);
-        o.ls_vertex         = lerp(x.ls_vertex,     y.ls_vertex,        div);
-        o.normal            = lerp(x.normal,        y.normal,           div);
-        o.uv2               = lerp(x.uv2,           y.uv2,              div);
-        o.waving            = lerp(x.waving,        y.waving,           div);
+        o.ws_vertex         = lerp(x.ws_vertex,     y.ws_vertex,        div);
+        o.ws_normal         = lerp(x.ws_normal,     y.ws_normal,        div);
+        o.ws_tangent        = lerp(x.ws_tangent,    y.ws_tangent,       div);
+        o.ws_bitangent      = lerp(x.ws_bitangent,  y.ws_bitangent,     div);
         return o;
     }
 
+    float3 calcFurVector(v2g v[3], uint i) {
+        // Tangent Transform 計算
+        float3x3 tangentTransform = float3x3(v[i].ws_tangent, v[i].ws_bitangent, v[i].ws_normal);
+
+        // Static Fur Vector 計算
+        float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
+
+#ifndef _FR_DISABLE_NORMAL_MAP
+        // NormalMap Fur Vector 計算
+        float2 uv_main = TRANSFORM_TEX(v[i].uv, _MainTex);
+        float3 vec_map = UnpackNormal(tex2Dlod(_FG_BumpMap, float4(uv_main.x, uv_main.y, 0, 0)));
+        vec_fur = BlendNormals(vec_fur, vec_map);
+#endif
+
+        return mul(vec_fur , tangentTransform);
+    }
+
     void fakefur(v2g v[3], inout TriangleStream<g2f> triStream) {
-        float4 vb[3] = { v[0].ls_vertex, v[1].ls_vertex, v[2].ls_vertex };
+        // 底辺座標
+        float4 vb[3] = { v[0].ws_vertex, v[1].ws_vertex, v[2].ws_vertex };
+        // 頂点座標
         float4 vu[3] = vb;
+
+        // normal方向に従ってfurを伸ばす
         {
             for (uint i = 0; i < 3; i++) {
-                vu[i].xyz += (v[i].normal.xyz + v[i].waving.xyz) * _FurHeight;
+                // 法線 * ファー高さぶんだけ頂点移動
+                vu[i].xyz += calcFurVector(v, i) * _FR_Height;
             }
         }
+        // ファーを増殖
         {
-            // 1回あたり8頂点
             for (uint i = 0; i < 4; i++) {
                 uint n = i % 3;
                 g2f o = initGeomOutput(v[n]);
@@ -134,9 +148,13 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
         v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
-        for (uint i = 0; i < _FurRepeat; i++) {
-            float rate = i / (float) _FurRepeat;
-            v2g v2[3] = { lerp_v2g(v[0], c, rate), lerp_v2g(v[1], c, rate), lerp_v2g(v[2], c, rate) };
+        for (uint i = 0; i < _FR_Repeat; i++) {
+            float rate = i / (float) _FR_Repeat;
+            v2g v2[3] = {
+                lerp_v2g(v[0], c, rate),
+                lerp_v2g(v[1], c, rate),
+                lerp_v2g(v[2], c, rate)
+            };
             fakefur(v2, triStream);
         }
     }
@@ -146,8 +164,8 @@
 
         v2f i = (v2f) 0;
         i.uv = gi.uv;
-        i.ws_vertex = mul(unity_ObjectToWorld, gi.ls_vertex);
-        i.normal = UnityObjectToWorldNormal(gi.normal);
+        i.ws_vertex = gi.ws_vertex;
+        i.normal = gi.ws_normal;
 
         i.ws_light_dir = calcWorldSpaceLightDir(i.ws_vertex);
 
@@ -178,20 +196,29 @@
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
-        float4 maskTex = tex2D(_FurMaskTex, uv_main);
+        float4 maskTex = tex2D(_FR_MaskTex, uv_main);
         if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
             discard;
         }
 
-        float3 noise = tex2D(_FurNoiseTex, gi.uv2).rgb;
-        color = saturate( float4( color - (1 - noise) * _FurShadowPower, calcBrightness(noise) - pow(gi.height, 3)) );
+        // ファーノイズを追加
+        float3 noise = tex2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).rgb;
+        color = saturate( float4( color - (1 - noise) * _FR_ShadowPower, calcBrightness(noise) - pow(gi.height, 4)) );
 
         return color;
     }
 
     fixed4 frag_fakefur_cutoff(g2f i) : SV_Target {
         float4 color = frag_fakefur(i);
-        if (color.a < _CutOffLevel) {
+        if (color.a < _Cutoff / 2) {
+            discard;
+        }
+        return color;
+    }
+
+    fixed4 frag_fakefur_cutoff_upper(g2f i) : SV_Target {
+        float4 color = frag_fakefur(i);
+        if (_Cutoff / 2 <= color.a) {
             discard;
         }
         return color;

@@ -530,6 +530,15 @@ namespace UnlitWF
             { "[GF] Brighten", "[GF] 明るさ" },
             { "[GF] Darken", "[GF] 暗さ" },
             { "[GF] Twinkle", "[GF] またたき" },
+            // Fake Fur
+            { "[FR] Fur Noise Texture", "[FR] ノイズテクスチャ" },
+            { "[FR] Fur Height", "[FR] 高さ" },
+            { "[FR] Fur Vector", "[FR] 方向" },
+            { "[FR] NormalMap Texture", "[FR] ノーマルマップ" },
+            { "[FR] Flip Tangent", "[FR] タンジェント反転" },
+            { "[FR] Fur Repeat", "[FR] ファーの枚数" },
+            { "[FR] Fur ShadowPower", "[FR] 影の強さ" },
+            { "[FR] Fur Mask Texture", "[FR] マスクテクスチャ" },
         };
 
         private static EditorLanguage? langMode = null;

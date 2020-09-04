@@ -617,13 +617,20 @@ namespace UnlitWF
         /// </summary>
         private readonly Dictionary<string, string> MIGRATION_PROP_RENAME = new Dictionary<string, string>() {
             { "_AL_CutOff", "_Cutoff" },
-            { "_MT_MaskTex", "_MetallicGlossMap" },
+            { "_CutOffLevel", "_Cutoff" },
+            { "_ES_Color", "_EmissionColor" },
+            { "_ES_MaskTex", "_EmissionMap" },
+            { "_FurHeight", "_FR_Height" },
+            { "_FurMaskTex", "_FR_MaskTex" },
+            { "_FurNoiseTex", "_FR_NoiseTex" },
+            { "_FurRepeat", "_FR_Repeat" },
+            { "_FurShadowPower", "_FR_ShadowPower" },
+            // { "_FurVector", "_FR_Vector" }, // FurVectorの値は再設定が必要なので変換しない
+            { "_GL_BrendPower", "_GL_BlendPower" },
             { "_MT_BlendType", "_MT_Brightness" },
+            { "_MT_MaskTex", "_MetallicGlossMap" },
             { "_MT_Smoothness", "_MT_ReflSmooth" },
             { "_MT_Smoothness2", "_MT_SpecSmooth" },
-            { "_ES_MaskTex", "_EmissionMap" },
-            { "_ES_Color", "_EmissionColor" },
-            { "_GL_BrendPower", "_GL_BlendPower" },
         };
 
         #region マイグレーション

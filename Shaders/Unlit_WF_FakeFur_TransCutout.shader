@@ -27,18 +27,23 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
-            _CutOffLevel            ("Alpha CutOff Level", Range(0, 1)) = 0.5
+            _Cutoff                 ("Alpha CutOff Level", Range(0, 1)) = 0.5
 
         // ファー設定
-        [WFHeader(Fur Settings)]
+        [WFHeader(Fake Fur)]
+            _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
+            _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
+            _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
         [NoScaleOffset]
-            _FurMaskTex             ("Fur Mask Texture", 2D) = "white" {}
-            _FurNoiseTex            ("Fur Noise Texture", 2D) = "white" {}
-            _FurHeight              ("Fur Height", Range(0, 0.1)) = 0.05
-            _FurShadowPower         ("Fur ShadowPower", Range(0, 1)) = 0
+        [Normal]
+            _FG_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
+        [Toggle(_)]
+            _FG_FlipTangent         ("[FR] Flip Tangent", Float) = 0
         [IntRange]
-            _FurRepeat              ("Fur Repeat", Range(1, 8)) = 3
-            _FurVector              ("Fur Static Vector", Vector) = (0, 0, 0, 0)
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 8)) = 3
+            _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _FR_MaskTex             ("[FR] Fur Mask Texture", 2D) = "white" {}
 
         // 色変換
         [WFHeaderToggle(Color Change)]
