@@ -36,6 +36,7 @@
     float           _GF_FlakeBrighten;
     float           _GF_FlakeDarken;
     float           _GF_Twinkle;
+    float           _GF_BlendNormal;
 
     void affectGemFlake(v2f i, float3 ws_camera_dir, float3 ws_normal, float size, inout float4 color) {
         if (TGL_ON(_GF_Enable)) {
@@ -67,6 +68,7 @@
     samplerCUBE     _GR_Cubemap;
     float4          _GR_Cubemap_HDR;
     float           _GR_CubemapPower;
+    float           _GR_BlendNormal;
 
     void affectGemReflection(v2f i, float3 ws_normal, inout float4 color) {
         if (TGL_ON(_GR_Enable)) {
@@ -108,7 +110,9 @@
         color.a = 1;
 #endif
 
+        // BumpMap
         float3 ws_normal = i.normal;
+        float3 ws_bump_normal = calcBumpNormal(i, uv_main);
 
         // ビューポイントへの方向
         float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
@@ -116,9 +120,9 @@
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // リフレクション
-        affectGemReflection(i, ws_normal.zyx, color);
+        affectGemReflection(i, lerp(ws_normal.zyx, ws_bump_normal.zyx, _GR_BlendNormal), color);
         // フレーク
-        affectGemFlake(i, ws_camera_dir, ws_normal, 1 / NON_ZERO_FLOAT(_GF_FlakeSizeBack), color);
+        affectGemFlake(i, ws_camera_dir, lerp(ws_normal, ws_bump_normal, _GF_BlendNormal), 1 / NON_ZERO_FLOAT(_GF_FlakeSizeBack), color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
@@ -150,7 +154,9 @@
         color.a = 1;
 #endif
 
+        // BumpMap
         float3 ws_normal = i.normal;
+        float3 ws_bump_normal = calcBumpNormal(i, uv_main);
 
         // ビューポイントへの方向
         float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
@@ -158,9 +164,9 @@
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // リフレクション
-        affectGemReflection(i, ws_normal, color);
+        affectGemReflection(i, lerp(ws_normal, ws_bump_normal, _GR_BlendNormal), color);
         // フレーク
-        affectGemFlake(i, ws_camera_dir, ws_normal, 1 / NON_ZERO_FLOAT(_GF_FlakeSizeFront), color);
+        affectGemFlake(i, ws_camera_dir, lerp(ws_normal, ws_bump_normal, _GF_BlendNormal), 1 / NON_ZERO_FLOAT(_GF_FlakeSizeFront), color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;

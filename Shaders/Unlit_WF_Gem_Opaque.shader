@@ -30,6 +30,7 @@ Shader "UnlitWF/WF_Gem_Opaque" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
 
+        // Flake
         [WFHeaderToggle(Gem Flake)]
             _GF_Enable              ("[GF] Enable", Float) = 1
         [PowerSlider(2.0)]
@@ -38,8 +39,9 @@ Shader "UnlitWF/WF_Gem_Opaque" {
             _GF_FlakeBrighten       ("[GF] Brighten", Range(0, 8)) = 2
             _GF_FlakeDarken         ("[GF] Darken", Range(0, 8)) = 0.5
             _GF_Twinkle             ("[GF] Twinkle", Range(0, 4)) = 2
+            _GF_BlendNormal         ("[GF] Blend Normal", Range(0, 1)) = 0.1
 
-        // Gem
+        // Reflection
         [WFHeaderToggle(Gem Reflection)]
             _GR_Enable              ("[GR] Enable", Float) = 1
             _GR_Power               ("[GR] Blend Power", Range(0, 1)) = 1
@@ -49,6 +51,16 @@ Shader "UnlitWF/WF_Gem_Opaque" {
             _GR_Monochrome          ("[GR] Monochrome Reflection", Range(0, 1)) = 1
         [PowerSlider(4.0)]
             _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 16)) = 1
+            _GR_BlendNormal         ("[GR] Blend Normal", Range(0, 1)) = 0.1
+
+        // 法線マップ
+        [WFHeaderToggle(NormalMap)]
+            _NM_Enable              ("[NM] Enable", Float) = 0
+        [NoScaleOffset]
+            _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
+            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
+        [Toggle(_)]
+            _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
 
         // Lit
         [WFHeader(Lit)]
@@ -87,6 +99,9 @@ Shader "UnlitWF/WF_Gem_Opaque" {
             #pragma fragment frag_gem_front
 
             #pragma target 3.0
+
+            #define _NM_ENABLE
+            #define _WF_MOBILE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

@@ -435,7 +435,7 @@
         float       _NM_InvMaskVal;
 #endif
 
-        inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
+        inline float3 calcBumpNormal(v2f i, float2 uv_main) {
             if (TGL_ON(_NM_Enable)) {
                 // 1st NormalMap
                 float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
@@ -457,17 +457,25 @@
 
                 // 法線計算
                 float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のworld法線空間
-                ws_bump_normal = mul( normalTangent, tangentTransform);
+                return mul( normalTangent, tangentTransform);
+            }
+            else {
+                return i.normal;
+            }
+        }
 
+        inline void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
+            // bump_normal 計算
+            ws_bump_normal = calcBumpNormal(i, uv_main);
+            
+            if (TGL_ON(_NM_Enable)) {
                 // NormalMap は陰影として描画する
                 // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を加算することで明暗を付ける
                 color.rgb += (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(i.normal, i.ws_light_dir.xyz)) * _NM_Power;
             }
-            else {
-                ws_bump_normal = i.normal;
-            }
         }
     #else
+        #define calcBumpNormal(i, uv_main) i.normal
         #define affectBumpNormal(i, uv_main, ws_bump_normal, color)  ws_bump_normal = i.normal
     #endif
 
