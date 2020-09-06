@@ -768,20 +768,26 @@
         }
 
         inline float3 blendOverlayColor(float3 color, float4 ov_color, float3 power) {
-            ov_color.a *= power;
-            return
-                _OL_BlendType == 1 ? color + ov_color.rgb * ov_color.a                          // 加算
-                    : _OL_BlendType == 2 ? color * lerp( ONE_VEC3, ov_color.rgb, ov_color.a)    // 重み付き乗算
-                        : lerp(color, ov_color.rgb, ov_color.a);                                // ブレンド
+            float3 rgb = 
+                _OL_BlendType == 0 ? ov_color.rgb                           // ブレンド
+                : _OL_BlendType == 1 ? color + ov_color.rgb                 // 加算
+                : _OL_BlendType == 2 ? color * ov_color.rgb                 // 乗算
+                : _OL_BlendType == 3 ? color + ov_color.rgb - MEDIAN_GRAY   // 加減算
+                : _OL_BlendType == 4 ? 1 - (1 - color) * (1 - ov_color.rgb) // スクリーン
+                : _OL_BlendType == 5 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(color), 0.5))   // オーバーレイ
+                : _OL_BlendType == 6 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(ov_color), 0.5))   // オーバーレイ
+                : color                                                     // 何もしない
+                ;
+            return lerp(color, rgb, ov_color.a * power);
         }
 
         inline void affectOverlayTexture(v2f i, float2 uv_main, float3 vs_normal, inout float4 color) {
             if (TGL_ON(_OL_Enable)) {
                 float2 uv_overlay =
-                    _OL_UVType == 1 ? i.uv_lmap                                             // UV2
-                        : _OL_UVType == 2 ? computeOverlayTex(i.ws_vertex)                  // SKYBOX
-                            : _OL_UVType == 3 ? computeAngelRingUV(vs_normal, i.uv_lmap)    // ANGELRING
-                                : i.uv                                                      // UV1
+                    _OL_UVType == 1 ? i.uv_lmap                                             	// UV2
+                    : _OL_UVType == 2 ? computeOverlayTex(i.ws_vertex)                  		// SKYBOX
+                    : _OL_UVType == 3 ? computeAngelRingUV(vs_normal, i.uv_lmap)    			// ANGELRING
+                    : i.uv                                                      				// UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
                 float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
