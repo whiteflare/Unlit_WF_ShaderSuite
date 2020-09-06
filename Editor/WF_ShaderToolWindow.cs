@@ -775,7 +775,9 @@ namespace UnlitWF
                     string label = WFCommonUtility.GetPrefixFromPropName(p.name);
                     return label != null && delPrefix.Contains(label);
                 };
-                props.FindAll(predPrefix).ForEach(p => del_props.Add(p));
+                props.FindAll(predPrefix)
+                    // ただしEnableToggle自体は初期化しない
+                    .Where(p => !WFCommonUtility.IsEnableToggleFromPropName(p.name)).ToList().ForEach(p => del_props.Add(p));
                 // 未使用の値を削除
                 Predicate<ShaderSerializedProperty> predUnused = p => param.resetUnused && !p.HasPropertyInShader;
                 props.FindAll(predUnused).ForEach(p => del_props.Add(p));

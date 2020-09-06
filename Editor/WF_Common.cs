@@ -105,6 +105,12 @@ namespace UnlitWF
             return label;
         }
 
+        public static bool IsEnableToggleFromPropName(string prop_name) {
+            string label, name;
+            WFCommonUtility.FormatPropName(prop_name, out label, out name);
+            return IsEnableToggle(label, name);
+        }
+
         public static bool IsEnableToggle(string label, string name) {
             return label != null && name.ToLower() == "enable";
         }
