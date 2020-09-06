@@ -165,7 +165,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
         [HDR]
             _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
             _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
-        [Enum(ALPHA,0,ADD,1,MUL,2)]
+        [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
             _OL_BlendType           ("[OL] Blend Type", Float) = 0
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
