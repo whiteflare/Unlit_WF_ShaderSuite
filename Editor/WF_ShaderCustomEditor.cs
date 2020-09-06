@@ -83,16 +83,22 @@ namespace UnlitWF
         };
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
+            PreChangeShader(material, oldShader, newShader);
+
             // 割り当て
             base.AssignNewShaderToMaterial(material, oldShader, newShader);
-            // クリンナップ
+
             PostChangeShader(material, oldShader, newShader);
+        }
+
+        public static void PreChangeShader(Material material, Shader oldShader, Shader newShader) {
+            // nop
         }
 
         public static void PostChangeShader(Material material, Shader oldShader, Shader newShader) {
             if (material != null) {
                 // DebugViewの保存に使っているタグはクリア
-                material.SetOverrideTag("PrevShader", "");
+                WF_DebugViewEditor.ClearDebugOverrideTag(material);
                 // 不要なシェーダキーワードは削除
                 foreach (var key in DELETE_KEYWORD) {
                     if (material.IsKeywordEnabled(key)) {

@@ -127,6 +127,15 @@ namespace UnlitWF
                         continue;
                     }
                     var oldShader = m.shader;
+
+                    // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
+                    if (WF_DebugViewEditor.IsSupportedShader(newShader)) {
+                        WF_DebugViewEditor.PreChangeShader(m, oldShader, newShader);
+                    }
+                    else if (ShaderCustomEditor.IsSupportedShader(newShader)) {
+                        ShaderCustomEditor.PreChangeShader(m, oldShader, newShader);
+                    }
+                    // マテリアルにシェーダ割り当て
                     m.shader = newShader;
                     // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
                     if (WF_DebugViewEditor.IsSupportedShader(newShader)) {
