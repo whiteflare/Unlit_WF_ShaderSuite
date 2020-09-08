@@ -149,7 +149,8 @@
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main);
         color *= _Color;
 #ifdef _AL_ENABLE
-        color.a *= _AlphaFront;
+        color.rgb *= color.a;
+        color.a = _AlphaFront;
 #else
         color.a = 1;
 #endif

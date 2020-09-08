@@ -141,7 +141,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             Cull BACK
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha One
+            Blend One OneMinusSrcAlpha
 
             CGPROGRAM
 
