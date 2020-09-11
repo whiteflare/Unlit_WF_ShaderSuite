@@ -47,7 +47,7 @@ Material:
     - _GB_Enable: 1
     - _GF_BlendNormal: 0.1
     - _GF_Enable: 1
-    - _GF_FlakeBrighten: 8
+    - _GF_FlakeBrighten: 6
     - _GF_FlakeDarken: 0.2
     - _GF_FlakeShear: 0.5
     - _GF_FlakeSizeBack: 0.5
