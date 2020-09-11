@@ -14,11 +14,11 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
+Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/08/30 whiteflare,
      */
 
     Properties {
@@ -30,6 +30,31 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
 
+        // アウトライン
+        [HideInInspector]
+        [FixFloat(1.0)]
+            _TL_Enable              ("[LI] Enable", Float) = 0
+        [WFHeader(Outline)]
+            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
+        [Enum(NORMAL,0,EDGE,1)]
+            _TL_LineType            ("[LI] Line Type", Float) = 0
+            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+
+        // 色変換
+        [WFHeaderToggle(Color Change)]
+            _CL_Enable              ("[CL] Enable", Float) = 0
+        [Toggle(_)]
+            _CL_Monochrome          ("[CL] monochrome", Range(0, 1)) = 0
+            _CL_DeltaH              ("[CL] Hur", Range(0, 1)) = 0
+            _CL_DeltaS              ("[CL] Saturation", Range(-1, 1)) = 0
+            _CL_DeltaV              ("[CL] Brightness", Range(-1, 1)) = 0
+
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
@@ -39,6 +64,45 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Toggle(_)]
             _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
+
+        [Header(NormalMap Secondary)]
+        [Enum(OFF,0,BLEND,1,SWITCH,2)]
+            _NM_2ndType             ("[NM] 2nd Normal Blend", Float) = 0
+            _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
+            _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
+        [NoScaleOffset]
+            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
+
+        // メタリックマップ
+        [WFHeaderToggle(Metallic)]
+            _MT_Enable              ("[MT] Enable", Float) = 0
+            _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
+            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
+            _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
+            _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
+            _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
+        [Toggle(_)]
+            _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
+
+        [Header(Metallic Specular)]
+            _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
+            _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
+
+        [Header(Metallic Secondary)]
+        [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
+            _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
+        [NoScaleOffset]
+            _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
+        [PowerSlider(4.0)]
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
@@ -60,8 +124,14 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[SH] Enable", Float) = 0
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
             _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
+        [NoScaleOffset]
+            _TS_1stTex              ("[SH] 1st Shade Texture", 2D) = "white" {}
             _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
+        [NoScaleOffset]
+            _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
@@ -87,7 +157,24 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
-        // Emission
+        // Decal Texture
+        [WFHeaderToggle(Decal Texture)]
+            _OL_Enable              ("[OL] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1,SKYBOX,2,ANGEL_RING,3)]
+            _OL_UVType              ("[OL] UV Type", Float) = 0
+        [HDR]
+            _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
+            _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
+        [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
+            _OL_BlendType           ("[OL] Blend Type", Float) = 0
+            _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
+            _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
+
+        // EmissiveScroll
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
@@ -99,9 +186,21 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         [PowerSlider(4.0)]
             _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
 
+        [Header(Emissive Scroll)]
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
+            _ES_Shape               ("[ES] Wave Type", Float) = 3
+            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
+            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
         [Toggle(_)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
@@ -114,6 +213,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         [Gamma]
             _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+        [Toggle(_)]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
@@ -130,30 +231,26 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
+            "DisableBatching" = "True"
         }
 
         Pass {
-            Name "MAIN"
+            Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull [_CullMode]
+            Cull Front
 
             CGPROGRAM
 
             #pragma vertex vert
+            #pragma geometry geom_outline
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.5
+            #pragma require geometry
 
-            #define _WF_MOBILE
-
-            #define _AO_ENABLE
-            #define _ES_ENABLE
-            #define _ES_SIMPLE_ENABLE
-            #define _HL_ENABLE
-            #define _NM_ENABLE
+            #define _TL_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -163,26 +260,12 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture" {
             ENDCG
         }
 
-        Pass {
-            Name "META"
-            Tags { "LightMode" = "Meta" }
-
-            Cull Off
-
-            CGPROGRAM
-
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-
-            #pragma shader_feature EDITOR_VISUALIZATION
-
-            #include "WF_UnToon_Meta.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Opaque/MAIN"
+        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
-    FallBack "Unlit/Texture"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque_Metallic"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

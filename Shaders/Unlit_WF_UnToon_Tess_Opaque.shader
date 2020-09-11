@@ -14,11 +14,11 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Texture" {
+Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/08/06 whiteflare,
+     *      ver:2020/08/30 whiteflare,
      */
 
     Properties {
@@ -71,8 +71,37 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Texture" {
         [Toggle(_)]
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
+        // メタリックマップ
+        [WFHeaderToggle(Metallic)]
+            _MT_Enable              ("[MT] Enable", Float) = 0
+            _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
+            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
+            _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
+            _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
+            _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
+        [Toggle(_)]
+            _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
+
+        [Header(Metallic Specular)]
+            _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
+            _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
+
+        [Header(Metallic Secondary)]
+        [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
+            _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
+        [NoScaleOffset]
+            _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
+        [PowerSlider(4.0)]
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
+
         // Matcapハイライト
-        [WFHeaderToggle(Light Matcap 1)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
@@ -86,111 +115,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Texture" {
             _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
-
-        [WFHeaderToggle(Light Matcap 2)]
-            _HL_Enable_1            ("[HA] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_1       ("[HA] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
-
-        [WFHeaderToggle(Light Matcap 3)]
-            _HL_Enable_2            ("[HB] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType_2           ("[HB] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex_2         ("[HB] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_2       ("[HB] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power_2             ("[HB] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_2       ("[HB] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_2          ("[HB] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex_2           ("[HB] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal_2        ("[HB] Invert Mask Value", Range(0, 1)) = 0
-
-        [WFHeaderToggle(Light Matcap 4)]
-            _HL_Enable_3            ("[HC] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType_3           ("[HC] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex_3         ("[HC] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_3       ("[HC] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power_3             ("[HC] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_3       ("[HC] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_3          ("[HC] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex_3           ("[HC] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal_3        ("[HC] Invert Mask Value", Range(0, 1)) = 0
-
-        [WFHeaderToggle(Light Matcap 5)]
-            _HL_Enable_4            ("[HD] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType_4           ("[HD] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex_4         ("[HD] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_4       ("[HD] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power_4             ("[HD] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_4       ("[HD] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_4          ("[HD] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex_4           ("[HD] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal_4        ("[HD] Invert Mask Value", Range(0, 1)) = 0
-
-        [WFHeaderToggle(Light Matcap 6)]
-            _HL_Enable_5            ("[HE] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType_5           ("[HE] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex_5         ("[HE] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_5       ("[HE] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power_5             ("[HE] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_5       ("[HE] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_5          ("[HE] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex_5           ("[HE] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal_5        ("[HE] Invert Mask Value", Range(0, 1)) = 0
-
-        [WFHeaderToggle(Light Matcap 7)]
-            _HL_Enable_6            ("[HF] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType_6           ("[HF] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex_6         ("[HF] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_6       ("[HF] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power_6             ("[HF] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_6       ("[HF] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_6          ("[HF] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex_6           ("[HF] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal_6        ("[HF] Invert Mask Value", Range(0, 1)) = 0
-
-        [WFHeaderToggle(Light Matcap 8)]
-            _HL_Enable_7            ("[HG] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType_7           ("[HG] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex_7         ("[HG] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_7       ("[HG] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power_7             ("[HG] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_7       ("[HG] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_7          ("[HG] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex_7           ("[HG] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal_7        ("[HG] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -229,6 +153,45 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Texture" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
+        // Decal Texture
+        [WFHeaderToggle(Decal Texture)]
+            _OL_Enable              ("[OL] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1,SKYBOX,2,ANGEL_RING,3)]
+            _OL_UVType              ("[OL] UV Type", Float) = 0
+        [HDR]
+            _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
+            _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
+        [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
+            _OL_BlendType           ("[OL] Blend Type", Float) = 0
+            _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
+            _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
+
+        // EmissiveScroll
+        [WFHeaderToggle(Emission)]
+            _ES_Enable              ("[ES] Enable", Float) = 0
+        [HDR]
+            _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
+        [Enum(ADD,0,ALPHA,1)]
+            _ES_BlendType           ("[ES] Blend Type", Float) = 0
+        [PowerSlider(4.0)]
+            _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
+
+        [Header(Emissive Scroll)]
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
+            _ES_Shape               ("[ES] Wave Type", Float) = 3
+            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
+            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
         // アウトライン
         [WFHeaderToggle(Outline)]
             _TL_Enable              ("[LI] Enable", Float) = 0
@@ -240,6 +203,16 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Texture" {
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         // Lit
         [WFHeader(Lit)]
@@ -269,7 +242,31 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Texture" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture/OUTLINE"
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma hull hull
+            #pragma domain domain_outline
+
+            #pragma target 5.0
+
+            #define _TL_ENABLE
+            #define _TR_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon_Tessellation.cginc"
+
+            ENDCG
+        }
 
         Pass {
             Name "MAIN"
@@ -280,31 +277,35 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Texture" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_powercap
+            #pragma fragment frag
             #pragma hull hull
             #pragma domain domain
 
             #pragma target 5.0
 
+            #define _AO_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
             #define _HL_ENABLE
+            #define _MT_ENABLE
             #define _NM_ENABLE
+            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_UnToon_PowerCap.cginc"
             #include "WF_UnToon_Tessellation.cginc"
 
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Texture/META"
+        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
-    FallBack "UnlitWF/WF_UnToon_Texture"
+    FallBack "UnlitWF/WF_UnToon_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

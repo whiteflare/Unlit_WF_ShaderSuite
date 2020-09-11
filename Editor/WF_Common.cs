@@ -703,7 +703,7 @@ namespace UnlitWF
     internal static class WFShaderNameDictionary
     {
         private static readonly List<WFShaderName> ShaderNameList = new List<WFShaderName>() {
-            new WFShaderName("UnToon", "Basic", "Texture", "UnlitWF/WF_UnToon_Texture"),
+            new WFShaderName("UnToon", "Basic", "Opaque", "UnlitWF/WF_UnToon_Opaque"),
             new WFShaderName("UnToon", "Basic", "TransCutout", "UnlitWF/WF_UnToon_TransCutout"),
             new WFShaderName("UnToon", "Basic", "Transparent", "UnlitWF/WF_UnToon_Transparent"),
             new WFShaderName("UnToon", "Basic", "Transparent3Pass", "UnlitWF/WF_UnToon_Transparent3Pass"),
@@ -711,29 +711,29 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut", "UnlitWF/WF_UnToon_Transparent_MaskOut"),
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut_Blend", "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
 
-            new WFShaderName("UnToon", "Mobile", "Texture", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture"),
+            new WFShaderName("UnToon", "Mobile", "Opaque", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
             new WFShaderName("UnToon", "Mobile", "TransCutout", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
             new WFShaderName("UnToon", "Mobile", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
 
-            new WFShaderName("UnToon", "MobileMetallic", "Texture", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic"),
+            new WFShaderName("UnToon", "MobileMetallic", "Opaque", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque_Metallic"),
             new WFShaderName("UnToon", "MobileMetallic", "TransCutout", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic"),
             new WFShaderName("UnToon", "MobileMetallic", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic"),
 
             new WFShaderName("UnToon", "MobileOverlay", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
 
-            new WFShaderName("UnToon", "Outline", "Texture", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture"),
+            new WFShaderName("UnToon", "Outline", "Opaque", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
             new WFShaderName("UnToon", "Outline", "TransCutout", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
             new WFShaderName("UnToon", "Outline", "Transparent", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent"),
             new WFShaderName("UnToon", "Outline", "Transparent3Pass", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass"),
             new WFShaderName("UnToon", "Outline", "Transparent_MaskOut", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut"),
             new WFShaderName("UnToon", "Outline", "Transparent_MaskOut_Blend", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend"),
 
-            new WFShaderName("UnToon", "PowerCap", "Texture", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture"),
+            new WFShaderName("UnToon", "PowerCap", "Opaque", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque"),
             new WFShaderName("UnToon", "PowerCap", "TransCutout", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout"),
             new WFShaderName("UnToon", "PowerCap", "Transparent", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent"),
             new WFShaderName("UnToon", "PowerCap", "Transparent3Pass", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass"),
 
-            new WFShaderName("UnToon", "Tessellation", "Texture", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture"),
+            new WFShaderName("UnToon", "Tessellation", "Opaque", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque"),
             new WFShaderName("UnToon", "Tessellation", "TransCutout", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout"),
             new WFShaderName("UnToon", "Tessellation", "Transparent", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
             new WFShaderName("UnToon", "Tessellation", "Transparent3Pass", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
