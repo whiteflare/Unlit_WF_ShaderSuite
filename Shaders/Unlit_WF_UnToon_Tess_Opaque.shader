@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_UnToon_Texture" {
+Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
 
     /*
      * authors:
@@ -29,6 +29,18 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
+
+        // Tessellation
+        [WFHeader(Tessellation)]
+        [Enum(DISTANCE,0,EDGE_LENGTH,1,FIXED,2)]
+            _TessType               ("Tess Type", Float) = 0
+        [IntRange]
+            _TessFactor             ("Tess Factor", Range(1, 16)) = 4
+            _Smoothing              ("Smoothing", Range(0, 2)) = 1.0
+        [NoScaleOffset]
+            _DispMap                ("Displacement HeightMap", 2D) = "black" {}
+            _DispMapScale           ("HeightMap Scale", Range(0, 1)) = 1
+            _DispMapLevel           ("HeightMap Level", Range(0, 1)) = 0
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -179,6 +191,18 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
+        // アウトライン
+        [WFHeaderToggle(Outline)]
+            _TL_Enable              ("[LI] Enable", Float) = 0
+            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
+            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
@@ -214,6 +238,33 @@ Shader "UnlitWF/WF_UnToon_Texture" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
+            "DisableBatching" = "True"
+        }
+
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma hull hull
+            #pragma domain domain_outline
+
+            #pragma target 5.0
+
+            #define _TL_ENABLE
+            #define _TR_ENABLE
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon_Tessellation.cginc"
+
+            ENDCG
         }
 
         Pass {
@@ -226,8 +277,10 @@ Shader "UnlitWF/WF_UnToon_Texture" {
 
             #pragma vertex vert
             #pragma fragment frag
+            #pragma hull hull
+            #pragma domain domain
 
-            #pragma target 4.5
+            #pragma target 5.0
 
             #define _AO_ENABLE
             #define _CL_ENABLE
@@ -242,50 +295,16 @@ Shader "UnlitWF/WF_UnToon_Texture" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_UnToon.cginc"
+            #include "WF_UnToon_Tessellation.cginc"
 
             ENDCG
         }
 
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            Cull [_CullMode]
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "META"
-            Tags { "LightMode" = "Meta" }
-
-            Cull Off
-
-            CGPROGRAM
-
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-
-            #pragma shader_feature EDITOR_VISUALIZATION
-
-            #include "WF_UnToon_Meta.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic"
+    FallBack "UnlitWF/WF_UnToon_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

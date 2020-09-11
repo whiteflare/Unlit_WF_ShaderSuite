@@ -14,11 +14,11 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic" {
+Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/07/06 whiteflare,
      */
 
     Properties {
@@ -40,22 +40,21 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic" {
         [Toggle(_)]
             _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
 
-        // メタリックマップ
-        [WFHeaderToggle(Metallic)]
-            _MT_Enable              ("[MT] Enable", Float) = 0
-            _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
-            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
-            _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
-            _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
-            _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        // Matcapハイライト
+        [WFHeaderToggle(Light Matcap)]
+            _HL_Enable              ("[HL] Enable", Float) = 0
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+            _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
-            _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
+            _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
+            _HL_MatcapColor         ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power               ("[HL] Power", Range(0, 2)) = 1
+            _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+        [NoScaleOffset]
+            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
-            _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
-
-        [Header(Metallic Specular)]
-            _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
-            _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
+            _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -72,6 +71,21 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic" {
             _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
+
+        // リムライト
+        [WFHeaderToggle(RimLight)]
+            _TR_Enable              ("[RM] Enable", Float) = 0
+        [HDR]
+            _TR_Color               ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
+        [Enum(ADD,0,ALPHA,1)]
+            _TR_BlendType           ("[RM] Blend Type", Float) = 0
+            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
+            _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
+            _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+        [NoScaleOffset]
+            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // Emission
         [WFHeaderToggle(Emission)]
@@ -136,8 +150,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic" {
             #define _AO_ENABLE
             #define _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
-            #define _MT_ENABLE
+            #define _HL_ENABLE
             #define _NM_ENABLE
+            #define _TR_ENABLE
             #define _TS_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -148,7 +163,23 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic" {
             ENDCG
         }
 
-        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture/META"
+        Pass {
+            Name "META"
+            Tags { "LightMode" = "Meta" }
+
+            Cull Off
+
+            CGPROGRAM
+
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta
+
+            #pragma shader_feature EDITOR_VISUALIZATION
+
+            #include "WF_UnToon_Meta.cginc"
+
+            ENDCG
+        }
     }
 
     FallBack "Unlit/Texture"

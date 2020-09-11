@@ -14,11 +14,11 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Texture" {
+Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/08/06 whiteflare,
      */
 
     Properties {
@@ -29,6 +29,27 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Texture" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
+
+        // Tessellation
+        [WFHeader(Tessellation)]
+        [Enum(DISTANCE,0,EDGE_LENGTH,1,FIXED,2)]
+            _TessType               ("Tess Type", Float) = 0
+        [IntRange]
+            _TessFactor             ("Tess Factor", Range(1, 16)) = 4
+            _Smoothing              ("Smoothing", Range(0, 2)) = 1.0
+        [NoScaleOffset]
+            _DispMap                ("Displacement HeightMap", 2D) = "black" {}
+            _DispMapScale           ("HeightMap Scale", Range(0, 1)) = 1
+            _DispMapLevel           ("HeightMap Level", Range(0, 1)) = 0
+
+        // 色変換
+        [WFHeaderToggle(Color Change)]
+            _CL_Enable              ("[CL] Enable", Float) = 0
+        [Toggle(_)]
+            _CL_Monochrome          ("[CL] monochrome", Range(0, 1)) = 0
+            _CL_DeltaH              ("[CL] Hur", Range(0, 1)) = 0
+            _CL_DeltaS              ("[CL] Saturation", Range(-1, 1)) = 0
+            _CL_DeltaV              ("[CL] Brightness", Range(-1, 1)) = 0
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -213,8 +234,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Texture" {
             _TL_Enable              ("[LI] Enable", Float) = 0
             _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
             _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
-        [Enum(NORMAL,0,EDGE,1)]
-            _TL_LineType            ("[LI] Line Type", Float) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
@@ -250,7 +269,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Texture" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture/OUTLINE"
+        UsePass "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque/OUTLINE"
 
         Pass {
             Name "MAIN"
@@ -262,8 +281,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Texture" {
 
             #pragma vertex vert
             #pragma fragment frag_powercap
+            #pragma hull hull
+            #pragma domain domain
 
-            #pragma target 4.5
+            #pragma target 5.0
 
             #define _HL_ENABLE
             #define _NM_ENABLE
@@ -274,15 +295,16 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Texture" {
             #pragma multi_compile_instancing
 
             #include "WF_UnToon_PowerCap.cginc"
+            #include "WF_UnToon_Tessellation.cginc"
 
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Texture/META"
+        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture"
+    FallBack "UnlitWF/WF_UnToon_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
