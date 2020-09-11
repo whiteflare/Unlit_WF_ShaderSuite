@@ -161,6 +161,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [Toggle(_)]
