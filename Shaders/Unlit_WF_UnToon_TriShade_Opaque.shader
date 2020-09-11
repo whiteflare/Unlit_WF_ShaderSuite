@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Texture" {
+Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
 
     /*
      * authors:
@@ -296,11 +296,11 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Texture" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Texture/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Texture/META"
+        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque_Metallic"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

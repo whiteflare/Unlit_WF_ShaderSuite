@@ -738,7 +738,7 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Tessellation", "Transparent", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
             new WFShaderName("UnToon", "Tessellation", "Transparent3Pass", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
 
-            new WFShaderName("UnToon", "TriShade", "Texture", "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Texture"),
+            new WFShaderName("UnToon", "TriShade", "Opaque", "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Texture"),
             new WFShaderName("UnToon", "TriShade", "TransCutout", "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout"),
             new WFShaderName("UnToon", "TriShade", "Transparent", "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent"),
             new WFShaderName("UnToon", "TriShade", "Transparent3Pass", "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass"),
