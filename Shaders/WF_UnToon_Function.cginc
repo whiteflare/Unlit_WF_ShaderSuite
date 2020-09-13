@@ -98,6 +98,10 @@
         #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).rgb
     #endif
 
+    #ifndef WF_TEX2D_OUTLINE_COLOR
+        #define WF_TEX2D_OUTLINE_COLOR(uv)      PICK_SUB_TEX2D(_TL_CustomColorTex, _MainTex, uv).rgb
+    #endif
+
     #ifndef WF_TEX2D_OUTLINE_MASK
         #ifndef _TL_MASK_APPLY_LEGACY
             #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv, _TL_InvMaskVal).r
@@ -778,13 +782,13 @@
 
     #ifdef _TL_ENABLE
         float       _TL_Enable;
-        float4      _TL_LineColor;
         float       _TL_LineWidth;
         uint        _TL_LineType;
-        float       _TL_BlendBase;
-        float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
-
+        float4      _TL_LineColor;
+        float       _TL_BlendBase;
+        DECL_SUB_TEX2D(_TL_CustomColorTex);
+        float       _TL_BlendCustom;
         #ifndef _TL_MASK_APPLY_LEGACY
             // マスクをシフト時に太さに反映する場合
             sampler2D   _TL_MaskTex;
@@ -792,6 +796,7 @@
             // マスクをfragmentでアルファに反映する場合
             DECL_SUB_TEX2D(_TL_MaskTex);
         #endif
+        float       _TL_InvMaskVal;
 
         inline float getOutlineShiftWidth(float2 uv_main) {
             #ifndef _TL_MASK_APPLY_LEGACY
@@ -806,6 +811,8 @@
             if (TGL_ON(_TL_Enable)) {
                 // アウトライン色をベースと合成
                 color.rgb = lerp(_TL_LineColor.rgb, color.rgb, _TL_BlendBase);
+                // カスタムカラーをベースと合成
+                color.rgb = lerp(color.rgb, WF_TEX2D_OUTLINE_COLOR(uv_main), _TL_BlendCustom);
             }
         }
 
