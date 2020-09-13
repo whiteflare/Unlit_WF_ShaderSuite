@@ -715,6 +715,7 @@
         float       _TR_PowerBottom;
         DECL_SUB_TEX2D(_TR_MaskTex);
         float       _TR_InvMaskVal;
+        float       _TR_BlendNormal;
 
         inline void affectRimLight(v2f i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TR_Enable)) {

@@ -138,7 +138,7 @@
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, 0, 0), angle_light_camera, color);
+        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, _TR_BlendNormal, 0), angle_light_camera, color);
         // Decal
         affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 0.5), color);
         // Outline
