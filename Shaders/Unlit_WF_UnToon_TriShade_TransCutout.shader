@@ -347,7 +347,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
         UsePass "UnlitWF/WF_UnToon_TransCutout/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

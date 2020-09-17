@@ -324,7 +324,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
