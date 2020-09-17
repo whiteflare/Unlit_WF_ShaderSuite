@@ -328,7 +328,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         }
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

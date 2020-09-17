@@ -165,7 +165,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         }
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

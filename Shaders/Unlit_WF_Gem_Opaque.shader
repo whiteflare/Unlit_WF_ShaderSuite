@@ -113,7 +113,7 @@ Shader "UnlitWF/WF_Gem_Opaque" {
         }
     }
 
-    FallBack "Unlit/Texture"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

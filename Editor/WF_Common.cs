@@ -711,12 +711,7 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Mobile", "Opaque", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
             new WFShaderName("UnToon", "Mobile", "TransCutout", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
             new WFShaderName("UnToon", "Mobile", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
-
-            new WFShaderName("UnToon", "MobileMetallic", "Opaque", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque_Metallic"),
-            new WFShaderName("UnToon", "MobileMetallic", "TransCutout", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic"),
-            new WFShaderName("UnToon", "MobileMetallic", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic"),
-
-            new WFShaderName("UnToon", "MobileOverlay", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
+            new WFShaderName("UnToon", "Mobile", "TransparentOverlay", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
 
             new WFShaderName("UnToon", "Outline", "Opaque", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
             new WFShaderName("UnToon", "Outline", "TransCutout", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
