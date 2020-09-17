@@ -189,7 +189,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
