@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/09/18 whiteflare,
      */
 
     Properties {
