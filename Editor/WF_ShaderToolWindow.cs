@@ -617,18 +617,25 @@ namespace UnlitWF
         /// </summary>
         private readonly Dictionary<string, string> MIGRATION_PROP_RENAME = new Dictionary<string, string>() {
             { "_AL_CutOff", "_Cutoff" },
-            { "_MT_MaskTex", "_MetallicGlossMap" },
+            { "_CutOffLevel", "_Cutoff" },
+            { "_ES_Color", "_EmissionColor" },
+            { "_ES_MaskTex", "_EmissionMap" },
+            { "_FurHeight", "_FR_Height" },
+            { "_FurMaskTex", "_FR_MaskTex" },
+            { "_FurNoiseTex", "_FR_NoiseTex" },
+            { "_FurRepeat", "_FR_Repeat" },
+            { "_FurShadowPower", "_FR_ShadowPower" },
+            // { "_FurVector", "_FR_Vector" }, // FurVectorの値は再設定が必要なので変換しない
+            { "_GL_BrendPower", "_GL_BlendPower" },
             { "_MT_BlendType", "_MT_Brightness" },
+            { "_MT_MaskTex", "_MetallicGlossMap" },
             { "_MT_Smoothness", "_MT_ReflSmooth" },
             { "_MT_Smoothness2", "_MT_SpecSmooth" },
-            { "_ES_MaskTex", "_EmissionMap" },
-            { "_ES_Color", "_EmissionColor" },
-            { "_GL_BrendPower", "_GL_BlendPower" },
         };
 
         #region マイグレーション
 
-        public bool ExistsOldNameProperty(params object[] objlist) {
+        public bool ExistsOldNameProperty(params UnityEngine.Object[] objlist) {
             return 0 < CreateOldNamePropertyList(objlist).Count;
         }
 
@@ -636,44 +643,43 @@ namespace UnlitWF
             return RenameOldNameProperties(param.materials);
         }
 
-        public bool RenameOldNameProperties(object[] objlist) {
+        public bool RenameOldNameProperties(UnityEngine.Object[] objlist) {
             var oldPropList = CreateOldNamePropertyList(objlist);
             // 名称を全て変更
-            foreach (var prop in oldPropList) {
-                prop.Rename(MIGRATION_PROP_RENAME[prop.name]);
+            foreach (var propPair in oldPropList) {
+                if (propPair.Value != null) {
+                    propPair.Key.CopyTo(propPair.Value);
+                }
             }
             // 保存
-            foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(oldPropList)) {
-                so.ApplyModifiedProperties();
+            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Values);
+            // 旧プロパティは全て削除
+            foreach (var prop in oldPropList.Keys) {
+                prop.Remove();
             }
+            // 保存
+            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Keys);
             return 0 < oldPropList.Count;
         }
 
-        private List<ShaderSerializedProperty> CreateOldNamePropertyList(object[] objlist) { // ShaderCustomEditor側から呼び出されるのでobject[]
-            // 操作対象のマテリアル
-            var matlist = new List<Material>();
-            foreach (var obj in objlist) {
-                var mat = obj as Material;
-                if (mat == null) {
-                    continue;
-                }
+        private Dictionary<ShaderSerializedProperty, ShaderSerializedProperty> CreateOldNamePropertyList(UnityEngine.Object[] objlist) { // ShaderCustomEditor側から呼び出されるのでobject[]
+            var result = new Dictionary<ShaderSerializedProperty, ShaderSerializedProperty>();
+
+            foreach (var mat in WFCommonUtility.AsMaterials(objlist)) {
                 if (mat.shader.name.Contains("MatcapShadows")) {
                     // MatcapShadowsは古いので対象にしない
                     continue;
                 }
-                matlist.Add(mat);
-            }
-
-            var props = ShaderSerializedProperty.AsList(matlist);
-
-            var oldPropList = new List<ShaderSerializedProperty>();
-            foreach (var prop in props) {
-                if (MIGRATION_PROP_RENAME.ContainsKey(prop.name)) {
-                    oldPropList.Add(prop);
+                var props = ShaderSerializedProperty.AsDict(mat);
+                foreach (var pair in MIGRATION_PROP_RENAME) {
+                    var before = props.GetValueOrNull(pair.Key);
+                    if (before != null) {
+                        result[before] = props.GetValueOrNull(pair.Value);
+                    }
                 }
             }
 
-            return oldPropList;
+            return result;
         }
 
         #endregion
@@ -769,7 +775,9 @@ namespace UnlitWF
                     string label = WFCommonUtility.GetPrefixFromPropName(p.name);
                     return label != null && delPrefix.Contains(label);
                 };
-                props.FindAll(predPrefix).ForEach(p => del_props.Add(p));
+                props.FindAll(predPrefix)
+                    // ただしEnableToggle自体は初期化しない
+                    .Where(p => !WFCommonUtility.IsEnableToggleFromPropName(p.name)).ToList().ForEach(p => del_props.Add(p));
                 // 未使用の値を削除
                 Predicate<ShaderSerializedProperty> predUnused = p => param.resetUnused && !p.HasPropertyInShader;
                 props.FindAll(predUnused).ForEach(p => del_props.Add(p));

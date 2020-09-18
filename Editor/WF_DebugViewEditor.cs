@@ -29,32 +29,41 @@ namespace UnlitWF
     public class WF_DebugViewEditor : ShaderGUI
     {
         public const string SHADER_NAME_DEBUGVIEW = "UnlitWF/Debug/WF_DebugView";
+        public const string TAG_PREV_SHADER = "PrevShader";
+        public const string TAG_PREV_QUEUE = "PrevQueue";
 
         [MenuItem(MenuPathString.MATERIAL_DEBUGVIEW)]
         public static void ChangeFromMenu(MenuCommand cmd) {
-            WFCommonUtility.ChangeShader(cmd.context as Material, SHADER_NAME_DEBUGVIEW);
+            WFCommonUtility.ChangeShader(SHADER_NAME_DEBUGVIEW, cmd.context as Material);
         }
 
         [MenuItem(MenuPathString.TOOLS_DEBUGVIEW)]
         [MenuItem(MenuPathString.ASSETS_DEBUGVIEW)]
         private static void ChangeFromMenu() {
             foreach(var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
-                WFCommonUtility.ChangeShader(mat, SHADER_NAME_DEBUGVIEW);
+                WFCommonUtility.ChangeShader(SHADER_NAME_DEBUGVIEW, mat);
             }
         }
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
+            PreChangeShader(material, oldShader, newShader);
+
             // newShaderの割り当て
             base.AssignNewShaderToMaterial(material, oldShader, newShader);
-            // 初期化
+
             PostChangeShader(material, oldShader, newShader);
         }
 
-        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader) {
+        public static void PreChangeShader(Material material, Shader oldShader, Shader newShader) {
             // 古いシェーダ名の保存に OverrideTag を利用する
             if (material != null && oldShader != null && !IsSupportedShader(oldShader)) {
-                material.SetOverrideTag("PrevShader", oldShader.name);
+                material.SetOverrideTag(TAG_PREV_SHADER, oldShader.name);
+                material.SetOverrideTag(TAG_PREV_QUEUE, material.renderQueue.ToString());
             }
+        }
+
+        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader) {
+            // nop
         }
 
         public static bool IsSupportedShader(Shader shader) {
@@ -68,16 +77,20 @@ namespace UnlitWF
             OnGuiSub_SwitchPrevShaderButton(materialEditor);
 
             var mat = materialEditor.target as Material;
+            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
+
             // モード変更メニュー表示
             foreach (var section in sections) {
                 GUI.Label(EditorGUI.IndentedRect(EditorGUILayout.GetControlRect()), section.name, EditorStyles.boldLabel);
                 foreach (var mode in section.modes) {
                     bool active = mode.IsActive(mat);
+                    EditorGUI.showMixedValue = mode.IsMixedValue(mats);
                     EditorGUI.BeginChangeCheck();
                     active = EditorGUILayout.Toggle(mode.displayName, active);
                     if (EditorGUI.EndChangeCheck()) {
-                        mode.SetActive(mat);
+                        mode.SetActive(mats);
                     }
+                    EditorGUI.showMixedValue = false;
                 }
                 EditorGUILayout.Space();
             }
@@ -101,24 +114,36 @@ namespace UnlitWF
 
         private static void OnGuiSub_SwitchPrevShaderButton(MaterialEditor materialEditor) {
             // 編集中のマテリアルの配列
-            var mats = materialEditor.targets.Select(obj => obj as Material).Where(m => m != null).ToArray();
+            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
             // PrevShader タグを持っているものがひとつでもあればボタン表示
-            if (mats.Select(m => m.GetTag("PrevShader", false)).Any(tag => !string.IsNullOrWhiteSpace(tag))) {
+            if (mats.Select(m => m.GetTag(TAG_PREV_SHADER, false)).Any(tag => !string.IsNullOrWhiteSpace(tag))) {
 
                 if (GUI.Button(EditorGUI.IndentedRect(EditorGUILayout.GetControlRect()), "Switch Prev Shader")) {
                     // 元のシェーダに戻す
                     Undo.RecordObjects(mats, "change shader");
                     // それぞれのマテリアルに設定された PrevShader へと切り替え
                     foreach (var mat in mats) {
-                        var name = mat.GetTag("PrevShader", false);
+                        var name = mat.GetTag(TAG_PREV_SHADER, false);
+                        var queue = mat.GetTag(TAG_PREV_QUEUE, false);
                         // DebugViewの保存に使っているタグはクリア
-                        mat.SetOverrideTag("PrevShader", "");
+                        ClearDebugOverrideTag(mat);
                         // シェーダ切り替え
-                        WFCommonUtility.ChangeShader(mat, name);
+                        WFCommonUtility.ChangeShader(name, mat);
+                        // queue戻し
+                        if (queue != null && int.TryParse(queue, out int numQueue)) {
+                            mat.renderQueue = numQueue;
+                        }
                     }
                 }
                 EditorGUILayout.Space();
+            }
+        }
+
+        public static void ClearDebugOverrideTag(Material mat) {
+            if (mat != null) {
+                mat.SetOverrideTag(TAG_PREV_SHADER, "");
+                mat.SetOverrideTag(TAG_PREV_QUEUE, "");
             }
         }
 
@@ -188,8 +213,12 @@ namespace UnlitWF
                 return mat != null && mat.HasProperty(propertyName) && mat.GetInt(propertyName) == value;
             }
 
-            public void SetActive(Material mat) {
-                if (mat != null) {
+            public bool IsMixedValue(Material[] targets) {
+                return WFCommonUtility.AsMaterials(targets).Select(mat => IsActive(mat)).Distinct().Count() == 2;
+            }
+
+            public void SetActive(Material[] targets) {
+                foreach(var mat in WFCommonUtility.AsMaterials(targets)) {
                     // リセット
                     foreach (var p in ShaderMaterialProperty.AsList(mat).Where(p => p.Name.StartsWith("_Mode"))) {
                         mat.SetInt(p.Name, 0);

@@ -18,33 +18,68 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/09/18 whiteflare,
      */
 
     Properties {
         // 基本
-        [WFHeader(Base)]
-            _MainTex                ("Main Texture", 2D) = "white" {}
+        [WFHeader(Gem Surface)]
         [HDR]
-            _Color                  ("Color", Color) = (1, 1, 1, 1)
+            _Color                  ("Color", Color) = (0.8, 0.4, 0.4, 1)
+            _MainTex                ("Main Texture", 2D) = "white" {}
+            _AlphaFront             ("Transparency (front)", Range(0, 1)) = 0.5
+            _AlphaBack              ("Transparency (back)", Range(0, 1)) = 0.8
+
+        [WFHeaderToggle(Gem Background)]
+            _GB_Enable              ("[GB] Enable", Float) = 0
+        [HDR]
+            _GB_ColorBack           ("[GB] Background Color", Color) = (0.2, 0.2, 0.2, 1)
+
+        // Flake
+        [WFHeaderToggle(Gem Flake)]
+            _GF_Enable              ("[GF] Enable", Float) = 1
+        [PowerSlider(2.0)]
+            _GF_FlakeSizeFront      ("[GF] Flake Size (front)", Range(0, 1)) = 0.1
+        [PowerSlider(2.0)]
+            _GF_FlakeSizeBack       ("[GF] Flake Size (back)", Range(0, 1)) = 0.25
+            _GF_FlakeShear          ("[GF] Shear", Range(0, 1)) = 0.5
+            _GF_FlakeBrighten       ("[GF] Brighten", Range(0, 8)) = 2
+            _GF_FlakeDarken         ("[GF] Darken", Range(0, 8)) = 0.5
+            _GF_Twinkle             ("[GF] Twinkle", Range(0, 4)) = 2
+            _GF_BlendNormal         ("[GF] Blend Normal", Range(0, 1)) = 0.1
+
+        // Reflection
+        [WFHeaderToggle(Gem Reflection)]
+            _GR_Enable              ("[GR] Enable", Float) = 1
+            _GR_Power               ("[GR] Blend Power", Range(0, 1)) = 1
+        [NoScaleOffset]
+            _GR_Cubemap             ("[GR] CubeMap", Cube) = "" {}
+            _GR_Brightness          ("[GR] Brightness", Range(0, 1)) = 0
+            _GR_Monochrome          ("[GR] Monochrome Reflection", Range(0, 1)) = 1
+        [PowerSlider(4.0)]
+            _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 16)) = 1
+            _GR_BlendNormal         ("[GR] Blend Normal", Range(0, 1)) = 0.1
 
         // Alpha
         [WFHeader(Transparent Alpha)]
         [FixNoTexture]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 0.8
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
-        // Gem
-        [WFHeader(Gem Reflection)]
+        // 法線マップ
+        [WFHeaderToggle(NormalMap)]
+            _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
-            _MT_Cubemap             ("[GM] CubeMap", Cube) = "" {}
-            _MT_Brightness          ("[GM] Brightness", Range(0, 1)) = 0.2
-            _MT_Monochrome          ("[GM] Monochrome Reflection", Range(0, 1)) = 1
-        [PowerSlider(4.0)]
-            _MT_CubemapPower        ("[GM] 2nd CubeMap Power", Range(0, 16)) = 1
+            _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
+            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
+        [Toggle(_)]
+            _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
 
         // Lit
         [WFHeader(Lit)]
@@ -63,41 +98,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
-
-        // hidden parameter
-        [HideInInspector]
-        [FixFloat(0.0)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-        [HideInInspector]
-        [FixFloat(1.0)]
-            _MT_Enable              ("[MT] Enable", Float) = 1
-        [HideInInspector]
-        [FixFloat(1.0)]
-            _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
-        [HideInInspector]
-        [FixFloat(1.0)]
-            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
-        [HideInInspector]
-        [FixFloat(0.0)]
-            _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0
-        [HideInInspector]
-        [FixFloat(0.0)]
-            _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
-        [HideInInspector]
-        [FixFloat(2.0)]
-            _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 2
-        [HideInInspector]
-        [FixNoTexture]
-            _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
-        [HideInInspector]
-        [FixFloat(0.0)]
-            _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
-        [HideInInspector]
-        [FixNoTexture]
-            _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
-        [HideInInspector]
-        [FixFloat(0.0)]
-            _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
     }
 
     SubShader {
@@ -117,18 +117,20 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag
+            #pragma fragment frag_gem_back
 
             #pragma target 3.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
-            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _WF_MOBILE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_UnToon.cginc"
+            #include "WF_Gem.cginc"
 
             ENDCG
         }
@@ -139,29 +141,31 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             Cull BACK
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha One
+            Blend One OneMinusSrcAlpha
 
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag
+            #pragma fragment frag_gem_front
 
             #pragma target 3.0
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
-            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _WF_MOBILE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_UnToon.cginc"
+            #include "WF_Gem.cginc"
 
             ENDCG
         }
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/09/18 whiteflare,
      */
 
     Properties {
@@ -29,15 +29,20 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
 
         // ファー設定
-        [WFHeader(Fur Settings)]
+        [WFHeader(Fake Fur)]
+            _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
+            _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
+            _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
         [NoScaleOffset]
-            _FurMaskTex             ("Fur Mask Texture", 2D) = "white" {}
-            _FurNoiseTex            ("Fur Noise Texture", 2D) = "white" {}
-            _FurHeight              ("Fur Height", Range(0, 0.1)) = 0.05
-            _FurShadowPower         ("Fur ShadowPower", Range(0, 1)) = 0
+        [Normal]
+            _FG_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
+        [Toggle(_)]
+            _FG_FlipTangent         ("[FR] Flip Tangent", Float) = 0
         [IntRange]
-            _FurRepeat              ("Fur Repeat", Range(1, 8)) = 3
-            _FurVector              ("Fur Static Vector", Vector) = (0, 0, 0, 0)
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 8)) = 3
+            _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _FR_MaskTex             ("[FR] Fur Mask Texture", 2D) = "white" {}
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -96,6 +101,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -183,7 +189,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

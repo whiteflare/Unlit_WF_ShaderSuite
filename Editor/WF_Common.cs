@@ -105,30 +105,37 @@ namespace UnlitWF
             return label;
         }
 
+        public static bool IsEnableToggleFromPropName(string prop_name) {
+            string label, name;
+            WFCommonUtility.FormatPropName(prop_name, out label, out name);
+            return IsEnableToggle(label, name);
+        }
+
         public static bool IsEnableToggle(string label, string name) {
             return label != null && name.ToLower() == "enable";
         }
 
-        public static void ChangeShader(UnityEngine.Object[] targets, string name) {
-            ChangeShader(targets.Select(obj => obj as Material).Where(mat => mat != null).ToArray(), name);
-        }
-
-        public static void ChangeShader(Material target, string name) {
-            ChangeShader(new Material[] { target }, name);
-        }
-
-        public static void ChangeShader(Material[] targets, string name) {
-            if (string.IsNullOrWhiteSpace(name)) {
+        public static void ChangeShader(string name, params Material[] mats) {
+            if (string.IsNullOrWhiteSpace(name) || mats.Length == 0) {
                 return; // なにもしない
             }
             var newShader = Shader.Find(name);
             if (newShader != null) {
-                Undo.RecordObjects(targets, "change shader");
-                foreach (var m in targets) {
+                Undo.RecordObjects(mats, "change shader");
+                foreach (var m in mats) {
                     if (m == null) {
                         continue;
                     }
                     var oldShader = m.shader;
+
+                    // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
+                    if (WF_DebugViewEditor.IsSupportedShader(newShader)) {
+                        WF_DebugViewEditor.PreChangeShader(m, oldShader, newShader);
+                    }
+                    else if (ShaderCustomEditor.IsSupportedShader(newShader)) {
+                        ShaderCustomEditor.PreChangeShader(m, oldShader, newShader);
+                    }
+                    // マテリアルにシェーダ割り当て
                     m.shader = newShader;
                     // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
                     if (WF_DebugViewEditor.IsSupportedShader(newShader)) {
@@ -142,6 +149,10 @@ namespace UnlitWF
             else {
                 Debug.LogErrorFormat("Shader Not Found in this projects: {0}", name);
             }
+        }
+
+        public static Material[] AsMaterials(params UnityEngine.Object[] array) {
+            return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
         }
     }
 
@@ -261,6 +272,58 @@ namespace UnlitWF
             property.FindPropertyRelative("first").stringValue = newName;
         }
 
+        private static void TryCopyValue(SerializedProperty src, SerializedProperty dst) {
+            if (src == null || dst == null) {
+                return;
+            }
+
+            switch (src.propertyType) {
+                case SerializedPropertyType.Generic:
+                    // テクスチャ系の子をコピーする
+                    TryCopyValue(src.FindPropertyRelative("m_Texture"), dst.FindPropertyRelative("m_Texture"));
+                    TryCopyValue(src.FindPropertyRelative("m_Scale"), dst.FindPropertyRelative("m_Scale"));
+                    TryCopyValue(src.FindPropertyRelative("m_Offset"), dst.FindPropertyRelative("m_Offset"));
+                    break;
+                case SerializedPropertyType.Float:
+                    dst.floatValue = src.floatValue;
+                    break;
+                case SerializedPropertyType.Color:
+                    dst.colorValue = src.colorValue;
+                    break;
+                case SerializedPropertyType.ObjectReference:
+                    dst.objectReferenceValue = src.objectReferenceValue;
+                    break;
+                case SerializedPropertyType.Integer:
+                    dst.intValue = src.intValue;
+                    break;
+                case SerializedPropertyType.Boolean:
+                    dst.boolValue = src.boolValue;
+                    break;
+                case SerializedPropertyType.Enum:
+                    dst.enumValueIndex = src.enumValueIndex;
+                    break;
+                case SerializedPropertyType.Vector2:
+                    dst.vector2Value = src.vector2Value;
+                    break;
+                case SerializedPropertyType.Vector3:
+                    dst.vector3Value = src.vector3Value;
+                    break;
+                case SerializedPropertyType.Vector4:
+                    dst.vector4Value = src.vector4Value;
+                    break;
+                case SerializedPropertyType.Vector2Int:
+                    dst.vector2IntValue = src.vector2IntValue;
+                    break;
+                case SerializedPropertyType.Vector3Int:
+                    dst.vector3IntValue = src.vector3IntValue;
+                    break;
+            }
+        }
+
+        public void CopyTo(ShaderSerializedProperty other) {
+            TryCopyValue(this.value, other.value);
+        }
+
         public void Remove() {
             for (int i = parent.arraySize - 1; 0 <= i; i--) {
                 var prop = parent.GetArrayElementAtIndex(i);
@@ -284,6 +347,14 @@ namespace UnlitWF
                 }
             }
             return ret;
+        }
+
+        public static Dictionary<string, ShaderSerializedProperty> AsDict(Material material) {
+            var result = new Dictionary<string, ShaderSerializedProperty>();
+            foreach(var prop in AsList(material)) {
+                result[prop.name] = prop;
+            }
+            return result;
         }
 
         public static List<ShaderSerializedProperty> AsList(IEnumerable<Material> matlist) {
@@ -459,10 +530,30 @@ namespace UnlitWF
             { "Disable ObjectBasePos", "メッシュ原点を取得しない" },
             // DebugMode
             { "Debug View", "デバッグ表示" },
+            // Gem Background
+            { "[GB] Background Color", "[GR] 背景色 (裏面色)" },
             // Gem Reflection
-            { "[GM] CubeMap", "[GM] キューブマップ" },
-            { "[GM] Brightness", "[GM] 明るさ" },
-            { "[GM] Monochrome Reflection", "[GM] モノクロ反射" },
+            { "[GR] Blend Power", "[GR] ブレンド強度" },
+            { "[GR] CubeMap", "[GR] キューブマップ" },
+            { "[GR] Brightness", "[GR] 明るさ" },
+            { "[GR] Monochrome Reflection", "[GR] モノクロ反射" },
+            { "[GR] 2nd CubeMap Power", "[GR] キューブマップ強度" },
+            // Gem Flake
+            { "[GF] Flake Size (front)", "[GF] 大きさ (表面)" },
+            { "[GF] Flake Size (back)", "[GF] 大きさ (裏面)" },
+            { "[GF] Shear", "[GF] シア" },
+            { "[GF] Brighten", "[GF] 明るさ" },
+            { "[GF] Darken", "[GF] 暗さ" },
+            { "[GF] Twinkle", "[GF] またたき" },
+            // Fake Fur
+            { "[FR] Fur Noise Texture", "[FR] ノイズテクスチャ" },
+            { "[FR] Fur Height", "[FR] 高さ" },
+            { "[FR] Fur Vector", "[FR] 方向" },
+            { "[FR] NormalMap Texture", "[FR] ノーマルマップ" },
+            { "[FR] Flip Tangent", "[FR] タンジェント反転" },
+            { "[FR] Fur Repeat", "[FR] ファーの枚数" },
+            { "[FR] Fur ShadowPower", "[FR] 影の強さ" },
+            { "[FR] Fur Mask Texture", "[FR] マスクテクスチャ" },
         };
 
         private static EditorLanguage? langMode = null;
@@ -609,7 +700,7 @@ namespace UnlitWF
     internal static class WFShaderNameDictionary
     {
         private static readonly List<WFShaderName> ShaderNameList = new List<WFShaderName>() {
-            new WFShaderName("UnToon", "Basic", "Texture", "UnlitWF/WF_UnToon_Texture"),
+            new WFShaderName("UnToon", "Basic", "Opaque", "UnlitWF/WF_UnToon_Opaque"),
             new WFShaderName("UnToon", "Basic", "TransCutout", "UnlitWF/WF_UnToon_TransCutout"),
             new WFShaderName("UnToon", "Basic", "Transparent", "UnlitWF/WF_UnToon_Transparent"),
             new WFShaderName("UnToon", "Basic", "Transparent3Pass", "UnlitWF/WF_UnToon_Transparent3Pass"),
@@ -617,29 +708,24 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut", "UnlitWF/WF_UnToon_Transparent_MaskOut"),
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut_Blend", "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
 
-            new WFShaderName("UnToon", "Mobile", "Texture", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture"),
+            new WFShaderName("UnToon", "Mobile", "Opaque", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
             new WFShaderName("UnToon", "Mobile", "TransCutout", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
             new WFShaderName("UnToon", "Mobile", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
+            new WFShaderName("UnToon", "Mobile", "TransparentOverlay", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
 
-            new WFShaderName("UnToon", "MobileMetallic", "Texture", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Texture_Metallic"),
-            new WFShaderName("UnToon", "MobileMetallic", "TransCutout", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout_Metallic"),
-            new WFShaderName("UnToon", "MobileMetallic", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent_Metallic"),
-
-            new WFShaderName("UnToon", "MobileOverlay", "Transparent", "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
-
-            new WFShaderName("UnToon", "Outline", "Texture", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Texture"),
+            new WFShaderName("UnToon", "Outline", "Opaque", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
             new WFShaderName("UnToon", "Outline", "TransCutout", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
             new WFShaderName("UnToon", "Outline", "Transparent", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent"),
             new WFShaderName("UnToon", "Outline", "Transparent3Pass", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass"),
             new WFShaderName("UnToon", "Outline", "Transparent_MaskOut", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut"),
             new WFShaderName("UnToon", "Outline", "Transparent_MaskOut_Blend", "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend"),
 
-            new WFShaderName("UnToon", "PowerCap", "Texture", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Texture"),
+            new WFShaderName("UnToon", "PowerCap", "Opaque", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque"),
             new WFShaderName("UnToon", "PowerCap", "TransCutout", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout"),
             new WFShaderName("UnToon", "PowerCap", "Transparent", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent"),
             new WFShaderName("UnToon", "PowerCap", "Transparent3Pass", "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass"),
 
-            new WFShaderName("UnToon", "Tessellation", "Texture", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Texture"),
+            new WFShaderName("UnToon", "Tessellation", "Opaque", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque"),
             new WFShaderName("UnToon", "Tessellation", "TransCutout", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout"),
             new WFShaderName("UnToon", "Tessellation", "Transparent", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
             new WFShaderName("UnToon", "Tessellation", "Transparent3Pass", "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
@@ -647,6 +733,7 @@ namespace UnlitWF
             new WFShaderName("FakeFur", "Basic", "TransCutout", "UnlitWF/WF_FakeFur_TransCutout"),
             new WFShaderName("FakeFur", "Basic", "Transparent", "UnlitWF/WF_FakeFur_Transparent"),
 
+            new WFShaderName("Gem", "Basic", "Opaque", "UnlitWF/WF_Gem_Opaque"),
             new WFShaderName("Gem", "Basic", "Transparent", "UnlitWF/WF_Gem_Transparent"),
         };
 
