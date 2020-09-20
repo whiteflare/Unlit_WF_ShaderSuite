@@ -809,10 +809,10 @@
 
         inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
+                // アウトライン色をカスタムカラーと合成
+                float3 line_color = lerp(_TL_LineColor.rgb, WF_TEX2D_OUTLINE_COLOR(uv_main), _TL_BlendCustom);
                 // アウトライン色をベースと合成
-                color.rgb = lerp(_TL_LineColor.rgb, color.rgb, _TL_BlendBase);
-                // カスタムカラーをベースと合成
-                color.rgb = lerp(color.rgb, WF_TEX2D_OUTLINE_COLOR(uv_main), _TL_BlendCustom);
+                color.rgb = lerp(line_color, color.rgb, _TL_BlendBase);
             }
         }
 
