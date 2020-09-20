@@ -516,7 +516,9 @@ namespace UnlitWF
             { "[LI] Line Color", "[LI] 線の色" },
             { "[LI] Line Width", "[LI] 線の太さ" },
             { "[LI] Line Type", "[LI] 線の種類" },
-            { "[LI] Blend Base Color", "[LI] ベース色とのブレンド" },
+            { "[LI] Custom Color Texture", "[LI] 線色テクスチャ" },
+            { "[LI] Blend Custom Color Texture", "[LI] 線色テクスチャとブレンド" },
+            { "[LI] Blend Base Color", "[LI] ベース色とブレンド" },
             { "[LI] Outline Mask Texture", "[LI] マスクテクスチャ" },
             { "[LI] Z-shift (tweak)", "[LI] カメラから遠ざける" },
             // Ambient Occlusion
