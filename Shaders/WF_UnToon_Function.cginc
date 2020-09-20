@@ -44,7 +44,7 @@
     #endif
 
     #ifndef WF_TEX2D_NORMAL
-        #define WF_TEX2D_NORMAL(uv)             UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, uv), _BumpScale ).xyz
+        #define WF_TEX2D_NORMAL(uv)             UnpackScaleNormal( PICK_MAIN_TEX2D(_BumpMap, uv), _BumpScale ).xyz
     #endif
     #ifndef WF_TEX2D_NORMAL_DTL
         #define WF_TEX2D_NORMAL_DTL(uv)         UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv), _DetailNormalMapScale ).xyz
@@ -432,7 +432,7 @@
     #ifdef _NM_ENABLE
         float       _NM_Enable;
         // 1st NormalMap
-        DECL_SUB_TEX2D(_BumpMap);
+        DECL_MAIN_TEX2D(_BumpMap);  // UVはMainTexと共通だが別のFilterを使えるようにsampler2Dで定義する
         float       _BumpScale;
         float       _NM_Power;
         float       _NM_FlipTangent;
