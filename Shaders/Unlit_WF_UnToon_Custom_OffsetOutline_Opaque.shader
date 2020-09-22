@@ -40,6 +40,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
         [Enum(NORMAL,0,EDGE,1)]
             _TL_LineType            ("[LI] Line Type", Float) = 0
+        [NoScaleOffset]
+            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
+            _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
