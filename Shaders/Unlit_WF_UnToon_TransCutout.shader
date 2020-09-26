@@ -27,6 +27,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _CullMode               ("Cull Mode", int) = 0
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -226,43 +228,10 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         }
 
         Pass {
-            Name "MAIN_BACK"
+            Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull FRONT
-            AlphaToMask [_AL_AlphaToMask]
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #pragma target 4.5
-
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
-            #define _AO_ENABLE
-            #define _CL_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "MAIN_FRONT"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull BACK
+            Cull [_CullMode]
             AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
@@ -296,7 +265,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             Name "SHADOWCASTER"
             Tags{ "LightMode" = "ShadowCaster" }
 
-            Cull Off
+            Cull [_CullMode]
 
             CGPROGRAM
 
