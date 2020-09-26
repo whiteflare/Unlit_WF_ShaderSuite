@@ -125,6 +125,7 @@
         float           _AL_Power;
         DECL_SUB_TEX2D(_AL_MaskTex);
         float           _AL_Fresnel;
+        float           _AL_AlphaToMask;
 
         #ifndef _AL_CustomValue
             #define _AL_CustomValue 1
@@ -146,10 +147,9 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
+                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
+                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
                     discard;
-                } else {
-                    color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
                 if (baseAlpha < _Cutoff) {
@@ -174,10 +174,9 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
+                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
+                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
                     discard;
-                } else {
-                    color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
                 if (baseAlpha < _Cutoff) {

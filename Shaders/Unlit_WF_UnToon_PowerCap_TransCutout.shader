@@ -35,6 +35,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+        [Toggle(_)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -248,6 +250,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 
@@ -276,6 +279,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull BACK
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 

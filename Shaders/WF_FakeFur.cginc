@@ -60,6 +60,7 @@
     uint            _FR_Repeat;
     float           _FR_ShadowPower;
     sampler2D       _FR_MaskTex;
+    float           _AL_AlphaToMask;
 
     v2g vert_fakefur(appdata_fur v) {
         v2g o;
@@ -210,15 +211,9 @@
 
     fixed4 frag_fakefur_cutoff(g2f i) : SV_Target {
         float4 color = frag_fakefur(i);
-        if (color.a < _Cutoff / 2) {
-            discard;
-        }
-        return color;
-    }
 
-    fixed4 frag_fakefur_cutoff_upper(g2f i) : SV_Target {
-        float4 color = frag_fakefur(i);
-        if (_Cutoff / 2 <= color.a) {
+        color.a = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, color.a);
+        if (TGL_OFF(_AL_AlphaToMask) && color.a < 0.5) {
             discard;
         }
         return color;

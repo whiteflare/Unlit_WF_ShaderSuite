@@ -37,6 +37,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+        [Toggle(_)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
 
         // メタリックマップ
         [WFHeaderToggle(Metallic)]
@@ -153,6 +155,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 
