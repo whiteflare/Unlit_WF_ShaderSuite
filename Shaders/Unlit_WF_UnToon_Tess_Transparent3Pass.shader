@@ -258,7 +258,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout/OUTLINE"
+        UsePass "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout/OUTLINE"
 
         Pass {
             Name "MAIN_OPAQUE"
