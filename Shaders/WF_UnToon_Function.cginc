@@ -816,29 +816,31 @@
         }
 
         inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
-            if (TGL_ON(_TL_Enable)) {
-                #ifndef _TL_MASK_APPLY_LEGACY
-                    // マスクをシフト時に太さに反映する場合
-                    #ifdef _AL_ENABLE
-                        color.a = _TL_LineColor.a;
-                    #else
-                        color.a = 1;
-                    #endif
-                #else
-                    // マスクをfragmentでアルファに反映する場合
-                    float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
-                    if (mask < 0.1) {
-                        color.a = 0;
-                        discard;
-                    } else {
+            #ifndef _AL_CUTOUT
+                if (TGL_ON(_TL_Enable)) {
+                    #ifndef _TL_MASK_APPLY_LEGACY
+                        // マスクをシフト時に太さに反映する場合
                         #ifdef _AL_ENABLE
-                            color.a = _TL_LineColor.a * mask;
+                            color.a = _TL_LineColor.a;
                         #else
                             color.a = 1;
                         #endif
-                    }
-                #endif
-            }
+                    #else
+                        // マスクをfragmentでアルファに反映する場合
+                        float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
+                        if (mask < 0.1) {
+                            color.a = 0;
+                            discard;
+                        } else {
+                            #ifdef _AL_ENABLE
+                                color.a = _TL_LineColor.a * mask;
+                            #else
+                                color.a = 1;
+                            #endif
+                        }
+                    #endif
+                }
+            #endif
         }
 
     #else
