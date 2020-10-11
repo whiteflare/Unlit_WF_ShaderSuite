@@ -65,6 +65,7 @@
     #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
     #define ZERO_VEC3                               float3(0, 0, 0)
     #define ONE_VEC3                                float3(1, 1, 1)
+    #define ONE_VEC4                                float4(1, 1, 1, 1)
 
     #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
         #define _LMAP_ENABLE

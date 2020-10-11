@@ -29,6 +29,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 0
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -175,6 +177,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _MT_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -195,6 +198,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
+            #define _VC_ENABLE
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

@@ -27,6 +27,8 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -257,6 +259,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -290,6 +293,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -325,6 +329,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -352,6 +357,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _AL_ENABLE
             #define _ES_ENABLE
             #define _ES_FORCE_ALPHASCROLL
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

@@ -29,6 +29,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _MainTex                ("Main Texture", 2D) = "white" {}
             _AlphaFront             ("Transparency (front)", Range(0, 1)) = 0.5
             _AlphaBack              ("Transparency (back)", Range(0, 1)) = 0.8
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         [WFHeaderToggle(Gem Background)]
             _GB_Enable              ("[GB] Enable", Float) = 0
@@ -124,6 +126,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _NM_ENABLE
+            #define _VC_ENABLE
             #define _WF_MOBILE
 
             #pragma multi_compile_fwdbase
@@ -153,6 +156,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _NM_ENABLE
+            #define _VC_ENABLE
             #define _WF_MOBILE
 
             #pragma multi_compile_fwdbase

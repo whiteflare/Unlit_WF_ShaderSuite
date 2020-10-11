@@ -29,6 +29,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(UnityEngine.Rendering.CullMode)]
             _CullMode               ("Cull Mode", int) = 0
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -104,6 +106,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

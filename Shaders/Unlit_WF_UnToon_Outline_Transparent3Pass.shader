@@ -27,6 +27,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Alpha
         [WFHeader(Transparent Alpha)]

@@ -29,6 +29,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // アウトライン
         [HideInInspector]
@@ -254,6 +256,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
             #define _TL_ENABLE
             #define _TR_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

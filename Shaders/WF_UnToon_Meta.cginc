@@ -27,26 +27,36 @@
     #include "UnityMetaPass.cginc"
 
     #define ZERO_VEC3   float3(0, 0, 0)
+    #define ONE_VEC4    float4(1, 1, 1, 1)
 
     struct appdata {
         float4 vertex           : POSITION;
         float2 uv0              : TEXCOORD0;
         float2 uv1              : TEXCOORD1;
         float2 uv2              : TEXCOORD2;
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
     };
 
     struct v2f_meta {
         float4 pos              : SV_POSITION;
         float2 uv               : TEXCOORD0;
-        #ifdef EDITOR_VISUALIZATION
-            float2 vizUV        : TEXCOORD1;
-            float4 lightCoord   : TEXCOORD2;
-        #endif
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
+#ifdef EDITOR_VISUALIZATION
+        float2 vizUV        	: TEXCOORD1;
+        float4 lightCoord   	: TEXCOORD2;
+#endif
     };
 
     sampler2D       _MainTex;
     float4          _MainTex_ST;
     float4          _Color;
+#ifdef _VC_ENABLE
+    float           _UseVertexColor;
+#endif
 
     float           _ES_Enable;
     sampler2D       _EmissionMap;
@@ -60,16 +70,19 @@
 
         o.pos   = UnityMetaVertexPosition(v.vertex, v.uv1.xy, v.uv2.xy, unity_LightmapST, unity_DynamicLightmapST);
         o.uv    = TRANSFORM_TEX(v.uv0, _MainTex);
+#ifdef _VC_ENABLE
+        o.vertex_color = v.vertex_color;
+#endif
 
-        #ifdef EDITOR_VISUALIZATION
-            if (unity_VisualizationMode == EDITORVIZ_TEXTURE) {
-                o.vizUV = UnityMetaVizUV(unity_EditorViz_UVIndex, v.uv0.xy, v.uv1.xy, v.uv2.xy, unity_EditorViz_Texture_ST);
-            }
-            else if (unity_VisualizationMode == EDITORVIZ_SHOWLIGHTMASK) {
-                o.vizUV         = v.uv1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-                o.lightCoord    = mul(unity_EditorViz_WorldToLight, mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1)));
-            }
-        #endif
+#ifdef EDITOR_VISUALIZATION
+        if (unity_VisualizationMode == EDITORVIZ_TEXTURE) {
+            o.vizUV = UnityMetaVizUV(unity_EditorViz_UVIndex, v.uv0.xy, v.uv1.xy, v.uv2.xy, unity_EditorViz_Texture_ST);
+        }
+        else if (unity_VisualizationMode == EDITORVIZ_SHOWLIGHTMASK) {
+            o.vizUV         = v.uv1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            o.lightCoord    = mul(unity_EditorViz_WorldToLight, mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1)));
+        }
+#endif
 
         return o;
     }
@@ -79,6 +92,9 @@
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
         float4 color    = _Color * tex2D(_MainTex, i.uv);
+#ifdef _VC_ENABLE
+        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
+#endif
 
         o.Albedo        = color.rgb * color.a;
         o.SpecularColor = o.Albedo.rgb;
@@ -86,10 +102,10 @@
         float3 emission = _EmissionColor.rgb * tex2D(_EmissionMap, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
         o.Emission      = emission * _ES_Enable * _ES_BakeIntensity;
 
-        #ifdef EDITOR_VISUALIZATION
-            o.VizUV         = i.vizUV;
-            o.LightCoord    = i.lightCoord;
-        #endif
+#ifdef EDITOR_VISUALIZATION
+        o.VizUV         = i.vizUV;
+        o.LightCoord    = i.lightCoord;
+#endif
 
         return UnityMetaFragment(o);
     }
