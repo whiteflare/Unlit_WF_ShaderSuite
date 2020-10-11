@@ -132,6 +132,7 @@
         float           _AL_Power;
         DECL_SUB_TEX2D(_AL_MaskTex);
         float           _AL_Fresnel;
+        float           _AL_AlphaToMask;
 
         #ifndef _AL_CustomValue
             #define _AL_CustomValue 1
@@ -153,10 +154,9 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
+                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
+                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
                     discard;
-                } else {
-                    color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
                 if (baseAlpha < _Cutoff) {
@@ -181,10 +181,9 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
+                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
+                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
                     discard;
-                } else {
-                    color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
                 if (baseAlpha < _Cutoff) {
@@ -844,29 +843,31 @@
         }
 
         inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
-            if (TGL_ON(_TL_Enable)) {
-                #ifndef _TL_MASK_APPLY_LEGACY
-                    // マスクをシフト時に太さに反映する場合
-                    #ifdef _AL_ENABLE
-                        color.a = _TL_LineColor.a;
-                    #else
-                        color.a = 1;
-                    #endif
-                #else
-                    // マスクをfragmentでアルファに反映する場合
-                    float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
-                    if (mask < 0.1) {
-                        color.a = 0;
-                        discard;
-                    } else {
+            #ifndef _AL_CUTOUT
+                if (TGL_ON(_TL_Enable)) {
+                    #ifndef _TL_MASK_APPLY_LEGACY
+                        // マスクをシフト時に太さに反映する場合
                         #ifdef _AL_ENABLE
-                            color.a = _TL_LineColor.a * mask;
+                            color.a = _TL_LineColor.a;
                         #else
                             color.a = 1;
                         #endif
-                    }
-                #endif
-            }
+                    #else
+                        // マスクをfragmentでアルファに反映する場合
+                        float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
+                        if (mask < 0.1) {
+                            color.a = 0;
+                            discard;
+                        } else {
+                            #ifdef _AL_ENABLE
+                                color.a = _TL_LineColor.a * mask;
+                            #else
+                                color.a = 1;
+                            #endif
+                        }
+                    #endif
+                }
+            #endif
         }
 
     #else

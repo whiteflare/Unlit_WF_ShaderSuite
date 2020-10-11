@@ -28,6 +28,8 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
             _Cutoff                 ("Alpha CutOff Level", Range(0, 1)) = 0.5
+        [Toggle(_)]
+            _AL_AlphaToMask         ("Alpha-To-Coverage (use MSAA)", Float) = 1
 
         // ファー設定
         [WFHeader(Fake Fur)]
@@ -166,6 +168,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull OFF
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 

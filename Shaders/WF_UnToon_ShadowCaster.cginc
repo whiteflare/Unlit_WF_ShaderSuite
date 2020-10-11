@@ -73,10 +73,9 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
+                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
+                if (baseAlpha < 0.5) {
                     discard;
-                } else {
-                    color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
                 if (baseAlpha < _Cutoff) {
@@ -109,7 +108,7 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-        if (_GL_CastShadow < 0.5) {
+        if (TGL_OFF(_GL_CastShadow)) {
             // 無効化
             o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
         }
@@ -127,7 +126,7 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        if (_GL_CastShadow < 0.5) {
+        if (TGL_OFF(_GL_CastShadow)) {
             discard;
             return float4(0, 0, 0, 0);
         }
@@ -136,21 +135,13 @@
         #ifdef _AL_ENABLE
             float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
             affectAlpha(i.uv, color);
-            #ifdef _AL_CUTOUT
-                if (color.a < _Cutoff) {
-                    discard;
-                    return float4(0, 0, 0, 0);
-                }
-            #else
-                if (color.a < 0.75) {
-                    discard;
-                    return float4(0, 0, 0, 0);
-                }
-            #endif
+            if (color.a < 0.5) {
+                discard;
+                return float4(0, 0, 0, 0);
+            }
         #endif
 
-        // ShadowCaster
-        return frag_shadow_caster(i);
+		return frag_shadow_caster(i);
     }
 
 #endif
