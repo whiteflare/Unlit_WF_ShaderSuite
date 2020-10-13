@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     #include "UnityCG.cginc"
@@ -65,6 +65,7 @@
     #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
     #define ZERO_VEC3                               float3(0, 0, 0)
     #define ONE_VEC3                                float3(1, 1, 1)
+    #define ONE_VEC4                                float4(1, 1, 1, 1)
 
     #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
         #define _LMAP_ENABLE

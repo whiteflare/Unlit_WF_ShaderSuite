@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     ////////////////////////////
@@ -44,7 +44,7 @@
     #endif
 
     #ifndef WF_TEX2D_NORMAL
-        #define WF_TEX2D_NORMAL(uv)             UnpackScaleNormal( PICK_SUB_TEX2D(_BumpMap, _MainTex, uv), _BumpScale ).xyz
+        #define WF_TEX2D_NORMAL(uv)             UnpackScaleNormal( PICK_MAIN_TEX2D(_BumpMap, uv), _BumpScale ).xyz
     #endif
     #ifndef WF_TEX2D_NORMAL_DTL
         #define WF_TEX2D_NORMAL_DTL(uv)         UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv), _DetailNormalMapScale ).xyz
@@ -98,6 +98,10 @@
         #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).rgb
     #endif
 
+    #ifndef WF_TEX2D_OUTLINE_COLOR
+        #define WF_TEX2D_OUTLINE_COLOR(uv)      PICK_SUB_TEX2D(_TL_CustomColorTex, _MainTex, uv).rgb
+    #endif
+
     #ifndef WF_TEX2D_OUTLINE_MASK
         #ifndef _TL_MASK_APPLY_LEGACY
             #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv, _TL_InvMaskVal).r
@@ -121,6 +125,7 @@
         float           _AL_Power;
         DECL_SUB_TEX2D(_AL_MaskTex);
         float           _AL_Fresnel;
+        float           _AL_AlphaToMask;
 
         #ifndef _AL_CustomValue
             #define _AL_CustomValue 1
@@ -142,10 +147,9 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
+                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
+                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
                     discard;
-                } else {
-                    color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
                 if (baseAlpha < _Cutoff) {
@@ -170,10 +174,9 @@
             float baseAlpha = pickAlpha(uv, color.a);
 
             #if defined(_AL_CUTOUT)
-                if (baseAlpha < _Cutoff) {
+                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
+                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
                     discard;
-                } else {
-                    color.a = 1.0;
                 }
             #elif defined(_AL_CUTOUT_UPPER)
                 if (baseAlpha < _Cutoff) {
@@ -421,7 +424,7 @@
     #ifdef _NM_ENABLE
         float       _NM_Enable;
         // 1st NormalMap
-        DECL_SUB_TEX2D(_BumpMap);
+        DECL_MAIN_TEX2D(_BumpMap);  // UVはMainTexと共通だが別のFilterを使えるようにsampler2Dで定義する
         float       _BumpScale;
         float       _NM_Power;
         float       _NM_FlipTangent;
@@ -778,13 +781,13 @@
 
     #ifdef _TL_ENABLE
         float       _TL_Enable;
-        float4      _TL_LineColor;
         float       _TL_LineWidth;
         uint        _TL_LineType;
-        float       _TL_BlendBase;
-        float       _TL_InvMaskVal;
         float       _TL_Z_Shift;
-
+        float4      _TL_LineColor;
+        float       _TL_BlendBase;
+        DECL_SUB_TEX2D(_TL_CustomColorTex);
+        float       _TL_BlendCustom;
         #ifndef _TL_MASK_APPLY_LEGACY
             // マスクをシフト時に太さに反映する場合
             sampler2D   _TL_MaskTex;
@@ -792,6 +795,7 @@
             // マスクをfragmentでアルファに反映する場合
             DECL_SUB_TEX2D(_TL_MaskTex);
         #endif
+        float       _TL_InvMaskVal;
 
         inline float getOutlineShiftWidth(float2 uv_main) {
             #ifndef _TL_MASK_APPLY_LEGACY
@@ -804,35 +808,39 @@
 
         inline void affectOutline(float2 uv_main, inout float4 color) {
             if (TGL_ON(_TL_Enable)) {
+                // アウトライン色をカスタムカラーと合成
+                float3 line_color = lerp(_TL_LineColor.rgb, WF_TEX2D_OUTLINE_COLOR(uv_main), _TL_BlendCustom);
                 // アウトライン色をベースと合成
-                color.rgb = lerp(_TL_LineColor.rgb, color.rgb, _TL_BlendBase);
+                color.rgb = lerp(line_color, color.rgb, _TL_BlendBase);
             }
         }
 
         inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
-            if (TGL_ON(_TL_Enable)) {
-                #ifndef _TL_MASK_APPLY_LEGACY
-                    // マスクをシフト時に太さに反映する場合
-                    #ifdef _AL_ENABLE
-                        color.a = _TL_LineColor.a;
-                    #else
-                        color.a = 1;
-                    #endif
-                #else
-                    // マスクをfragmentでアルファに反映する場合
-                    float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
-                    if (mask < 0.1) {
-                        color.a = 0;
-                        discard;
-                    } else {
+            #ifndef _AL_CUTOUT
+                if (TGL_ON(_TL_Enable)) {
+                    #ifndef _TL_MASK_APPLY_LEGACY
+                        // マスクをシフト時に太さに反映する場合
                         #ifdef _AL_ENABLE
-                            color.a = _TL_LineColor.a * mask;
+                            color.a = _TL_LineColor.a;
                         #else
                             color.a = 1;
                         #endif
-                    }
-                #endif
-            }
+                    #else
+                        // マスクをfragmentでアルファに反映する場合
+                        float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
+                        if (mask < 0.1) {
+                            color.a = 0;
+                            discard;
+                        } else {
+                            #ifdef _AL_ENABLE
+                                color.a = _TL_LineColor.a * mask;
+                            #else
+                                color.a = 1;
+                            #endif
+                        }
+                    #endif
+                }
+            #endif
         }
 
     #else

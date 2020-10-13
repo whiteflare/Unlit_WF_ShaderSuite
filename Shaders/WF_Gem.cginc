@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/08/06 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -102,6 +102,9 @@
 
         // メイン
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main);
+#ifdef _VC_ENABLE
+        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
+#endif
 #ifdef _AL_ENABLE
         color *= TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
         color.a *= _AlphaBack;
@@ -147,6 +150,9 @@
 
         // メイン
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main);
+#ifdef _VC_ENABLE
+        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
+#endif
         color *= _Color;
 #ifdef _AL_ENABLE
         color.rgb *= color.a;

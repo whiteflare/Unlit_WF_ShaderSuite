@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
 
     /*
      * authors:
-     *      ver:2020/09/18 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     Properties {
@@ -27,6 +27,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // StencilMask
         [WFHeader(Stencil Mask)]
@@ -52,6 +54,9 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
         [Enum(NORMAL,0,EDGE,1)]
             _TL_LineType            ("[LI] Line Type", Float) = 0
+        [NoScaleOffset]
+            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
+            _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
@@ -277,6 +282,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             #define _AL_ENABLE
             #define _TL_ENABLE
             #define _TR_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

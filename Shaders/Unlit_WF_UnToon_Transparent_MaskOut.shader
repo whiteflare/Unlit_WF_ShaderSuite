@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
     /*
      * authors:
-     *      ver:2020/09/18 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     Properties {
@@ -27,6 +27,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // StencilMask
         [WFHeader(Stencil Mask)]
@@ -261,6 +263,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -301,6 +304,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

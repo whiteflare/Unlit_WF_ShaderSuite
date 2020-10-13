@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2020/09/18 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     Properties {
@@ -27,6 +27,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -210,6 +212,9 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _TL_Enable              ("[LI] Enable", Float) = 0
             _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
             _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
+        [NoScaleOffset]
+            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
+            _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
@@ -255,7 +260,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout/OUTLINE"
+        UsePass "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout/OUTLINE"
 
         Pass {
             Name "MAIN_OPAQUE"
@@ -285,6 +290,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -320,6 +326,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -357,6 +364,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

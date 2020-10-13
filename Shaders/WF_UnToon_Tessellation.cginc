@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/07/06 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -95,13 +95,16 @@
         #define MUL_BARY(array, member)   (bary.x * array[0].member + bary.y * array[1].member + bary.z * array[2].member)
 
         o.ws_vertex     = MUL_BARY(i, ws_vertex);
+#ifdef _VC_ENABLE
+        o.vertex_color  = MUL_BARY(i, vertex_color);
+#endif
         o.uv            = MUL_BARY(i, uv);
         o.uv_lmap       = MUL_BARY(i, uv_lmap);
         o.normal        = normalize( MUL_BARY(i, normal) );
-        #ifdef _NM_ENABLE
-            o.tangent   = normalize( MUL_BARY(i, tangent) );
-            o.bitangent = normalize( MUL_BARY(i, bitangent) );
-        #endif
+#ifdef _NM_ENABLE
+        o.tangent   = normalize( MUL_BARY(i, tangent) );
+        o.bitangent = normalize( MUL_BARY(i, bitangent) );
+#endif
 
         // Phong Tessellation
         float3 phg[3];

@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     #include "WF_Common.cginc"
@@ -31,30 +31,36 @@
 
     struct appdata {
         float4 vertex           : POSITION;
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
         float2 uv               : TEXCOORD0;
         float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
-        #ifdef _NM_ENABLE
+#ifdef _NM_ENABLE
             float4 tangent      : TANGENT;
-        #endif
+#endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
-        float3 light_color      : COLOR0;
-        #ifdef _TS_ENABLE
-            float shadow_power  : COLOR1;
-        #endif
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
+        float3 light_color      : COLOR1;
+#ifdef _TS_ENABLE
+        float shadow_power      : COLOR2;
+#endif
         float2 uv               : TEXCOORD0;
         float2 uv_lmap          : TEXCOORD1;
         float3 ws_vertex        : TEXCOORD2;
         float4 ws_light_dir     : TEXCOORD3;
         float3 normal           : TEXCOORD4;    // world space
-        #ifdef _NM_ENABLE
+#ifdef _NM_ENABLE
             float3 tangent      : TEXCOORD5;    // world space
             float3 bitangent    : TEXCOORD6;    // world space
-        #endif
+#endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
@@ -63,6 +69,9 @@
     DECL_MAIN_TEX2D(_MainTex);
     float4          _MainTex_ST;
     float4          _Color;
+#ifdef _VC_ENABLE
+    float           _UseVertexColor;
+#endif
 
     ////////////////////////////
     // UnToon function
@@ -83,6 +92,9 @@
 
         o.ws_vertex = mul(unity_ObjectToWorld, v.vertex).xyz;
         o.vs_vertex = UnityWorldToClipPos(o.ws_vertex);
+#ifdef _VC_ENABLE
+        o.vertex_color = v.vertex_color;
+#endif
         o.uv = v.uv;
         o.uv_lmap = v.uv_lmap;
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
@@ -113,6 +125,9 @@
 
         // メイン
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
+#ifdef _VC_ENABLE
+        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
+#endif
 
         // 色変換
         affectColorChange(color);

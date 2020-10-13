@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_Gem_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/09/18 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     Properties {
@@ -29,6 +29,8 @@ Shader "UnlitWF/WF_Gem_Opaque" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Flake
         [WFHeaderToggle(Gem Flake)]
@@ -101,6 +103,7 @@ Shader "UnlitWF/WF_Gem_Opaque" {
             #pragma target 3.0
 
             #define _NM_ENABLE
+            #define _VC_ENABLE
             #define _WF_MOBILE
 
             #pragma multi_compile_fwdbase

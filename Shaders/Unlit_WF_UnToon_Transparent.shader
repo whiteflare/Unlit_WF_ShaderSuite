@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/09/18 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     Properties {
@@ -27,6 +27,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
+        [Toggle(_)]
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -252,6 +254,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -287,6 +290,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+            #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -327,6 +331,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
+            #define _VC_ENABLE
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

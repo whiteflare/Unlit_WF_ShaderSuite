@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/08/06 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -91,6 +91,9 @@
 
         // メイン
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
+#ifdef _VC_ENABLE
+        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
+#endif
 
         // BumpMap
         float3 ws_normal = i.normal;
