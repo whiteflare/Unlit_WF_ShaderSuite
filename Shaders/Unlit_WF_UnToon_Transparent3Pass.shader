@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2020/09/18 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     Properties {
