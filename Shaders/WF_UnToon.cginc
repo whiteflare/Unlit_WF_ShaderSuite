@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/10/13 whiteflare,
      */
 
     #include "WF_Common.cginc"
