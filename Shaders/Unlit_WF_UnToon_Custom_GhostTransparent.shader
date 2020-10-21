@@ -39,6 +39,18 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
 
+        // 3chカラーマスク
+        [WFHeaderToggle(3ch Color Mask)]
+            _CH_Enable              ("[CH] Enable", Float) = 0
+        [NoScaleOffset]
+            _CH_3chMaskTex          ("[CH] 3ch Mask Texture", 2D) = "black" {}
+        [HDR]
+            _CH_ColorR              ("[CH] R ch Color", Color) = (1, 1, 1, 1)
+        [HDR]
+            _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
+        [HDR]
+            _CH_ColorB              ("[CH] B chl Color", Color) = (1, 1, 1, 1)
+
         // 色変換
         [WFHeaderToggle(Color Change)]
             _CL_Enable              ("[CL] Enable", Float) = 0
@@ -254,6 +266,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
+            #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _MT_ENABLE
@@ -288,6 +301,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
+            #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE

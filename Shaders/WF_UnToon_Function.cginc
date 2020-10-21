@@ -39,6 +39,10 @@
         #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a
     #endif
 
+    #ifndef WF_TEX2D_3CH_MASK
+        #define WF_TEX2D_3CH_MASK(uv)           PICK_SUB_TEX2D(_CH_3chMaskTex, _MainTex, uv).rgb
+    #endif
+
     #ifndef WF_TEX2D_EMISSION
         #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgb
     #endif
@@ -347,6 +351,34 @@
     #else
         // Dummy
         #define affectColorChange(color)
+    #endif
+
+    ////////////////////////////
+    // 3ch Color Mask
+    ////////////////////////////
+
+    #ifdef _CH_ENABLE
+        float       _CH_Enable;
+        DECL_SUB_TEX2D(_CH_3chMaskTex);
+        float4		_CH_ColorR;
+        float4		_CH_ColorG;
+        float4		_CH_ColorB;
+
+        inline void affect3chColorMask(float2 mask_uv, inout float4 color) {
+            if (TGL_ON(_CH_Enable)) {
+                float3 mask  = WF_TEX2D_3CH_MASK(mask_uv);
+                float4 c1 = color * _CH_ColorR;
+                float4 c2 = color * _CH_ColorG;
+                float4 c3 = color * _CH_ColorB;
+                color = lerp(color, c1, mask.r);
+                color = lerp(color, c2, mask.g);
+                color = lerp(color, c3, mask.b);
+            }
+        }
+
+    #else
+        // Dummy
+        #define affect3chColorMask(mask_uv, color)
     #endif
 
     ////////////////////////////
