@@ -30,13 +30,13 @@
     /* このセクションでは、どのテクスチャから何色を参照するかを定義する */
 
     #ifndef WF_TEX2D_ALPHA_MAIN_ALPHA
-        #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   alpha
+        #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   saturate( TGL_OFF(_AL_InvMaskVal) ? alpha : 1 - alpha )
     #endif
     #ifndef WF_TEX2D_ALPHA_MASK_RED
-        #define WF_TEX2D_ALPHA_MASK_RED(uv)     PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r
+        #define WF_TEX2D_ALPHA_MASK_RED(uv)     saturate( TGL_OFF(_AL_InvMaskVal) ? PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r : 1 - PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r )
     #endif
     #ifndef WF_TEX2D_ALPHA_MASK_ALPHA
-        #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a
+        #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   saturate( TGL_OFF(_AL_InvMaskVal) ? PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a : 1 - PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a )
     #endif
 
     #ifndef WF_TEX2D_3CH_MASK
@@ -128,6 +128,7 @@
         uint            _AL_Source;
         float           _AL_Power;
         DECL_SUB_TEX2D(_AL_MaskTex);
+        float			_AL_InvMaskVal;
         float           _AL_Fresnel;
         float           _AL_AlphaToMask;
 
