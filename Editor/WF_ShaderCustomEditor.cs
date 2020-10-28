@@ -210,6 +210,18 @@ namespace UnlitWF
             if (EditorGUILayout.Popup("Change DebugView shader", 0, new string[] { "OFF", "DEBUG" }) == 1) {
                 WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, WFCommonUtility.AsMaterials(materialEditor.targets));
             }
+
+            // 不要なシェーダキーワードは削除
+            foreach (object t in materialEditor.targets) {
+                Material mm = t as Material;
+                if (mm != null) {
+                    foreach (var key in DELETE_KEYWORD) {
+                        if (mm.IsKeywordEnabled(key)) {
+                            mm.DisableKeyword(key);
+                        }
+                    }
+                }
+            }
         }
 
         private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, Material mat) {
