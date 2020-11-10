@@ -106,7 +106,7 @@
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
         UNITY_TRANSFER_INSTANCE_ID(v, o);
-//        UNITY_TRANSFER_FOG(o, o.vs_vertex);
+        o.fogFactor = ComputeFogFactor(o.vs_vertex.z);
         return o;
     }
 
@@ -170,7 +170,7 @@
         color.a = saturate(color.a);
 
         // fog
-//        UNITY_APPLY_FOG(i.fogCoord, color);
+        color.rgb = MixFog(color.rgb, i.fogFactor);
 
         return color;
     }
