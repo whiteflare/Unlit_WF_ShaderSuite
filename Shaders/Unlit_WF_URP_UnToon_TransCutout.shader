@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
+Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_TransCutout" {
 
     /*
      * authors:
@@ -28,9 +28,19 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 2
+            _CullMode               ("Cull Mode", int) = 0
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
+
+        // Alpha
+        [WFHeader(Transparent Alpha)]
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
+        [NoScaleOffset]
+            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+        [Toggle(_)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -216,8 +226,8 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest"
             "RenderPipeline" = "LightweightPipeline"
         }
 
@@ -236,6 +246,8 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
 
             #pragma target 3.0
 
+            #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
@@ -286,9 +298,10 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
+            #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _VC_ENABLE
 
-            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
             #include "WF_URP_UnToon_Input.hlsl"
@@ -310,6 +323,8 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
+            #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing

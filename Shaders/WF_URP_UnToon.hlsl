@@ -61,17 +61,10 @@
             float3 tangent      : TEXCOORD5;    // world space
             float3 bitangent    : TEXCOORD6;    // world space
 #endif
-        half fogFactor			: COLOR3;
+        half fogFactor          : COLOR3;
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
-
-    DECL_MAIN_TEX2D(_MainTex);
-    float4          _MainTex_ST;
-    float4          _Color;
-#ifdef _VC_ENABLE
-    float           _UseVertexColor;
-#endif
 
     ////////////////////////////
     // UnToon function
@@ -315,8 +308,6 @@
     // EmissiveScroll専用パス用 vertex&fragment shader
     ////////////////////////////
 
-    float _ES_Z_Shift;
-
     float4 shiftEmissiveScrollVertex(inout v2f o) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
@@ -370,8 +361,6 @@
     // ZOffset 付き vertex shader
     ////////////////////////////
 
-    float _AL_Z_Offset;
-
     v2f vert_with_zoffset(appdata v) {
         // 通常の vert を使う
         v2f o = vert(v);
@@ -381,5 +370,138 @@
         return o;
     }
 
+    ////////////////////////////
+    // Depth Only
+    ////////////////////////////
+
+    struct v2f_depth {
+        float4 pos              : SV_POSITION;
+        float2 uv               : TEXCOORD0;
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+        UNITY_VERTEX_OUTPUT_STEREO
+    };
+
+    v2f_depth vert_depth(appdata i) {
+        v2f_depth o;
+
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_INITIALIZE_OUTPUT(v2f_depth, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+        o.pos   = UnityObjectToClipPos(i.vertex.xyz);
+        o.uv    = TRANSFORM_TEX(i.uv, _MainTex);
+#ifdef _VC_ENABLE
+        o.vertex_color = i.vertex_color;
+#endif
+
+        return o;
+    }
+
+    float4 frag_depth(v2f_depth i) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+        // アルファ計算
+        #ifdef _AL_ENABLE
+            float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
+#ifdef _VC_ENABLE
+            color *= i.vertex_color;
+#endif
+            affectAlpha(i.uv, color);
+            if (color.a < 0.5) {
+                discard;
+                return ZERO_VEC4;
+            }
+        #endif
+
+        return ZERO_VEC4;
+    }
+
+    ////////////////////////////
+    // ShadowCaster
+    ////////////////////////////
+
+    struct v2f_shadow {
+        float4 pos          : SV_POSITION;
+        float2 uv           : TEXCOORD1;
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+        UNITY_VERTEX_OUTPUT_STEREO
+    };
+
+    float4 _ShadowBias; // x: depth bias, y: normal bias
+    float3 _LightDirection;
+
+    float4 GetShadowPositionHClip(appdata input) {
+        float3 positionWS = TransformObjectToWorld(input.vertex.xyz);
+        float3 normalWS = TransformObjectToWorldNormal(input.normal);
+
+        float invNdotL = 1.0 - saturate(dot(_LightDirection, normalWS));
+        float scale = invNdotL * _ShadowBias.y;
+
+        // normal bias is negative since we want to apply an inset normal offset
+        positionWS = _LightDirection * _ShadowBias.xxx + positionWS;
+        positionWS = normalWS * scale.xxx + positionWS;
+        float4 positionCS = TransformWorldToHClip(positionWS);
+
+#if UNITY_REVERSED_Z
+        positionCS.z = min(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+#else
+        positionCS.z = max(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+#endif
+
+        return positionCS;
+    }
+
+    v2f_shadow vert_shadow(appdata v) {
+        v2f_shadow o;
+
+        UNITY_SETUP_INSTANCE_ID(v);
+        UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+        o.pos = GetShadowPositionHClip(v);
+        if (TGL_OFF(_GL_CastShadow)) {
+            // 無効化
+            o.pos = UnityObjectToClipPos( ZERO_VEC3 );
+        }
+        o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+#ifdef _VC_ENABLE
+        o.vertex_color = v.vertex_color;
+#endif
+
+        UNITY_TRANSFER_INSTANCE_ID(v, o);
+        return o;
+    }
+
+    float4 frag_shadow(v2f_shadow i) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+        if (TGL_OFF(_GL_CastShadow)) {
+            discard;
+            return ZERO_VEC4;
+        }
+
+        // アルファ計算
+        #ifdef _AL_ENABLE
+            float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
+#ifdef _VC_ENABLE
+            color *= i.vertex_color;
+#endif
+            affectAlpha(i.uv, color);
+            if (color.a < 0.5) {
+                discard;
+                return float4(0, 0, 0, 0);
+            }
+        #endif
+
+        return ZERO_VEC4;
+    }
 
 #endif

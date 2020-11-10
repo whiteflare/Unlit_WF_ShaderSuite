@@ -38,11 +38,11 @@
     #define TGL_01(value)   step(0.5, value)
 
     static const float3 MEDIAN_GRAY =
-	    #ifdef UNITY_COLORSPACE_GAMMA
-	        float3(0.5, 0.5, 0.5);
-	    #else
-	        SRGBToLinear( float3(0.5, 0.5, 0.5) );
-	    #endif
+        #ifdef UNITY_COLORSPACE_GAMMA
+            float3(0.5, 0.5, 0.5);
+        #else
+            SRGBToLinear( float3(0.5, 0.5, 0.5) );
+        #endif
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
     #define AVE3(r, g, b)   ((r + g + b) / 3)
@@ -54,20 +54,22 @@
     #define PICK_MAIN_TEX2D(tex, uv)        SAMPLE_TEXTURE2D(tex, sampler##tex, uv)
     #define PICK_SUB_TEX2D(tex, name, uv)   SAMPLE_TEXTURE2D(tex, sampler##name, uv)
 
+
 // Unity BuiltinRP で定義されていた関数を LightweightRP で定義しなおして差異を吸収する
 
-	#define UnityObjectToClipPos		TransformObjectToHClip
-	#define UnityWorldToClipPos			TransformWorldToHClip
-	#define UnityObjectToWorldDir		TransformObjectToWorldDir
-	#define UnityWorldToObjectDir		TransformWorldToObjectDir
-	#define UnityObjectToWorldNormal	TransformObjectToWorldNormal
+    #define UnityObjectToClipPos        TransformObjectToHClip
+    #define UnityWorldToClipPos         TransformWorldToHClip
+    #define UnityObjectToWorldDir       TransformObjectToWorldDir
+    #define UnityWorldToObjectDir       TransformWorldToObjectDir
+    #define UnityObjectToWorldNormal    TransformObjectToWorldNormal
 
-	#define UNITY_INITIALIZE_OUTPUT(name, val)	val = (name) 0
-	#define UNITY_SAMPLE_TEXCUBE_LOD(tex, dir, lod)						SAMPLE_TEXTURECUBE_LOD(tex, sampler##tex, dir, lod)
-	#define UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(tex, name, dir, lod)		SAMPLE_TEXTURECUBE_LOD(tex, sampler##name, dir, lod)
+    #define UNITY_INITIALIZE_OUTPUT(name, val)  val = (name) 0
+    #define UNITY_SAMPLE_TEXCUBE_LOD(tex, dir, lod)                     SAMPLE_TEXTURECUBE_LOD(tex, sampler##tex, dir, lod)
+    #define UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(tex, name, dir, lod)       SAMPLE_TEXTURECUBE_LOD(tex, sampler##name, dir, lod)
 
-	#define _LightColor0				_MainLightColor
-	#define _WorldSpaceLightPos0		_MainLightPosition
+    #define _LightColor0                _MainLightColor
+    #define _WorldSpaceLightPos0        _MainLightPosition
+    #define UNITY_INV_TWO_PI            0.15915494309f
 
 
 
@@ -79,7 +81,7 @@
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)
     #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
     #define ZERO_VEC3                               float3(0, 0, 0)
-    #define ZERO_VEC4   							float4(0, 0, 0, 0)
+    #define ZERO_VEC4                               float4(0, 0, 0, 0)
     #define ONE_VEC3                                float3(1, 1, 1)
     #define ONE_VEC4                                float4(1, 1, 1, 1)
 
@@ -147,7 +149,7 @@
     }
 
     float3 calcPointLight1Pos() {
-    	return 1 <= GetAdditionalLightsCount() ? _AdditionalLightsPosition[0].xyz : ZERO_VEC3;
+        return 1 <= GetAdditionalLightsCount() ? _AdditionalLightsPosition[0].xyz : ZERO_VEC3;
     }
 
     float3 calcPointLight1Color(float3 ws_vertex) {
@@ -178,10 +180,10 @@
         float3 col = ZERO_VEC3;
 
         int pixelLightCount = GetAdditionalLightsCount();
-	    for (int i = 0; i < pixelLightCount; ++i) {
-	        Light light = GetAdditionalLight(i, ws_vertex);
-	        col += light.color * light.distanceAttenuation;
-	    }
+        for (int i = 0; i < pixelLightCount; ++i) {
+            Light light = GetAdditionalLight(i, ws_vertex);
+            col += light.color * light.distanceAttenuation;
+        }
 
         return col;
     }
@@ -352,7 +354,7 @@
         {
             float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
             float4 lmap_tex = SAMPLE_TEXTURE2D_LOD(unity_Lightmap, samplerunity_Lightmap, uv, 0);
-	        float3 lmap_color = DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+            float3 lmap_color = DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
             color += lmap_color;
         }
         #endif
@@ -384,7 +386,7 @@
         color0.rgb = DecodeHDREnvironment(color0, unity_SpecCube0_HDR);
         // color1.rgb = DecodeHDREnvironment(color1, unity_SpecCube1_HDR);
 
-		return color0;
+        return color0;
         // return lerp(color1, color0, unity_SpecCube0_BoxMin.w);
     }
 

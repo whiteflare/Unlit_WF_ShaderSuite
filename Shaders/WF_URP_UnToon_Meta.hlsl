@@ -25,21 +25,6 @@
 
     #include "WF_URP_Common.hlsl"
 
-	DECL_MAIN_TEX2D(_MainTex);
-	DECL_SUB_TEX2D(_EmissionMap);
-
-CBUFFER_START(UnityPerMaterial)
-    float4          _MainTex_ST;
-    float4          _Color;
-    float           _ES_Enable;
-    float4          _EmissionColor;
-    float           _ES_BlendType;
-    float           _ES_BakeIntensity;
-#ifdef _VC_ENABLE
-    float           _UseVertexColor;
-#endif
-CBUFFER_END
-
     struct appdata {
         float4 vertex           : POSITION;
         float2 uv0              : TEXCOORD0;

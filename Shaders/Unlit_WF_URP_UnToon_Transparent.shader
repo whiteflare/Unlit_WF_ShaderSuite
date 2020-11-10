@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
+Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Transparent" {
 
     /*
      * authors:
@@ -28,9 +28,20 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 2
+            _CullMode               ("Cull Mode", int) = 0
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
+
+        // Alpha
+        [WFHeader(Transparent Alpha)]
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
+        [NoScaleOffset]
+            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
+            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -176,6 +187,8 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
@@ -216,8 +229,8 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
             "RenderPipeline" = "LightweightPipeline"
         }
 
@@ -226,6 +239,8 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
             Tags { "LightMode" = "LightweightForward" }
 
             Cull [_CullMode]
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
 
             HLSLPROGRAM
 
@@ -236,13 +251,13 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
 
             #pragma target 3.0
 
+            #define _AL_ENABLE
+            #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
-            #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
-            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
@@ -275,9 +290,9 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            ZWrite On
-            ColorMask 0
             Cull[_CullMode]
+            ZWrite [_AL_ZWrite]
+            ColorMask 0
 
             HLSLPROGRAM
 
@@ -286,9 +301,9 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
+            #define _AL_ENABLE
             #define _VC_ENABLE
 
-            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
             #include "WF_URP_UnToon_Input.hlsl"
@@ -310,6 +325,7 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Opaque" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
+            #define _AL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing
