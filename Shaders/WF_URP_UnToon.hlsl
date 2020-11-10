@@ -61,7 +61,7 @@
             float3 tangent      : TEXCOORD5;    // world space
             float3 bitangent    : TEXCOORD6;    // world space
 #endif
-        half fogFactor          : COLOR3;
+        UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -83,8 +83,8 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.ws_vertex = TransformObjectToWorld(v.vertex.xyz).xyz;
-        o.vs_vertex = TransformObjectToHClip(v.vertex.xyz);
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
 #ifdef _VC_ENABLE
         o.vertex_color = v.vertex_color;
 #endif
@@ -106,7 +106,7 @@
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
         UNITY_TRANSFER_INSTANCE_ID(v, o);
-        o.fogFactor = ComputeFogFactor(o.vs_vertex.z);
+        UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
     }
 
@@ -170,7 +170,7 @@
         color.a = saturate(color.a);
 
         // fog
-        color.rgb = MixFog(color.rgb, i.fogFactor);
+        UNITY_APPLY_FOG(i.fogCoord, color);
 
         return color;
     }
@@ -438,8 +438,8 @@
     float3 _LightDirection;
 
     float4 GetShadowPositionHClip(appdata input) {
-        float3 positionWS = TransformObjectToWorld(input.vertex.xyz);
-        float3 normalWS = TransformObjectToWorldNormal(input.normal);
+        float3 positionWS = UnityObjectToWorldPos(input.vertex.xyz);
+        float3 normalWS = UnityObjectToWorldNormal(input.normal);
 
         float invNdotL = 1.0 - saturate(dot(_LightDirection, normalWS));
         float scale = invNdotL * _ShadowBias.y;

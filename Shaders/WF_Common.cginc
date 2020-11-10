@@ -26,6 +26,30 @@
     #include "UnityCG.cginc"
     #include "Lighting.cginc"
 
+#ifdef WF_FORCE_USE_SAMPLER
+    // 強制的にサンプラーを定義する版
+    #define DECL_MAIN_TEX2D(name)           sampler2D name
+    #define DECL_SUB_TEX2D(name)            sampler2D name
+    #define PICK_MAIN_TEX2D(tex, uv)        tex2D(tex, uv)
+    #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
+    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        tex2Dlod(tex, float4(uv, 0, lod))
+    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   tex2Dlod(tex, float4(uv, 0, lod))
+#else
+    // 通常版
+    #define DECL_MAIN_TEX2D(name)           UNITY_DECLARE_TEX2D(name)
+    #define DECL_SUB_TEX2D(name)            UNITY_DECLARE_TEX2D_NOSAMPLER(name)
+    #define PICK_MAIN_TEX2D(tex, uv)        UNITY_SAMPLE_TEX2D(tex, uv)
+    #define PICK_SUB_TEX2D(tex, name, uv)   UNITY_SAMPLE_TEX2D_SAMPLER(tex, name, uv)
+#ifdef SHADER_API_D3D11
+    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        tex.SampleLevel(sampler##tex,coord, lod)
+    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   tex.SampleLevel(sampler##samplertex, coord, lod)
+#endif
+#endif
+
+
+    #define UnityObjectToWorldPos(v)    ( mul(unity_ObjectToWorld, float4(v.xyz, 1)).xyz )
+    #define UnityWorldToObjectPos(v)    ( mul(unity_WorldToObject, float4(v.xyz, 1)).xyz )
+
     ////////////////////////////
     // Common Utility
     ////////////////////////////
@@ -41,21 +65,6 @@
     #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
     #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
 
-#if 1
-    // サンプラー節約のための差し替えマクロ
-    // 節約にはなるけど最適化などで _MainTex のサンプリングが消えると途端に破綻する諸刃の剣
-    #define DECL_MAIN_TEX2D(name)           UNITY_DECLARE_TEX2D(name)
-    #define DECL_SUB_TEX2D(name)            UNITY_DECLARE_TEX2D_NOSAMPLER(name)
-    #define PICK_MAIN_TEX2D(tex, uv)        UNITY_SAMPLE_TEX2D(tex, uv)
-    #define PICK_SUB_TEX2D(tex, name, uv)   UNITY_SAMPLE_TEX2D_SAMPLER(tex, name, uv)
-#else
-    // 通常版
-    #define DECL_MAIN_TEX2D(name)           sampler2D name
-    #define DECL_SUB_TEX2D(name)            sampler2D name
-    #define PICK_MAIN_TEX2D(tex, uv)        tex2D(tex, uv)
-    #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
-#endif
-
     #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : float4(1 - rgba.rgb, rgba.a) )
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)), inv )
@@ -64,6 +73,7 @@
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)
     #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
     #define ZERO_VEC3                               float3(0, 0, 0)
+    #define ZERO_VEC4                               float4(0, 0, 0, 0)
     #define ONE_VEC3                                float3(1, 1, 1)
     #define ONE_VEC4                                float4(1, 1, 1, 1)
 
@@ -123,30 +133,15 @@
     // Lighting
     ////////////////////////////
 
-    static const float3 BT601 = { 0.299, 0.587, 0.114 };
-    static const float3 BT709 = { 0.21, 0.72, 0.07 };
-
-    float calcBrightness(float3 color) {
-        return dot(color, BT601);
+    float3 getMainLightDirection() {
+        return _WorldSpaceLightPos0.xyz;
     }
 
-    float3 calcPointLight1Pos() {
-        return float3(unity_4LightPosX0.x, unity_4LightPosY0.x, unity_4LightPosZ0.x);
+    float3 sampleMainLightColor() {
+        return _LightColor0.rgb;
     }
 
-    float3 calcPointLight1Color(float3 ws_vertex) {
-        float3 ws_lightPos = calcPointLight1Pos();
-        if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
-            return float3(0, 0, 0); // XYZすべて0はポイントライト未設定と判定する
-        }
-        float3 ls_lightPos = ws_lightPos - ws_vertex;
-        float lengthSq = dot(ls_lightPos, ls_lightPos);
-        float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
-        return unity_LightColor[0].rgb * atten;
-    }
-
-    float3 OmniDirectional_ShadeSH9() {
-        // UnityCG.cginc にある ShadeSH9 の等方向版
+    float3 sampleSHLightColor() {
         float3 col = 0;
         col += ShadeSH9( float4(+1, 0, 0, 1) );
         col += ShadeSH9( float4(-1, 0, 0, 1) );
@@ -156,6 +151,21 @@
         col += ShadeSH9( float4(0, +1, 0, 1) );
         col += ShadeSH9( float4(0, -1, 0, 1) );
         return col / 3;
+    }
+
+    float3 getPoint1LightPos() {
+        return float3(unity_4LightPosX0.x, unity_4LightPosY0.x, unity_4LightPosZ0.x);
+    }
+
+    float3 samplePoint1LightColor(float3 ws_vertex) {
+        float3 ws_lightPos = getPoint1LightPos();
+        if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
+            return ZERO_VEC3; // XYZすべて0はポイントライト未設定と判定する
+        }
+        float3 ls_lightPos = ws_lightPos - ws_vertex;
+        float lengthSq = dot(ls_lightPos, ls_lightPos);
+        float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
+        return unity_LightColor[0].rgb * atten;
     }
 
     float3 OmniDirectional_Shade4PointLights(
@@ -189,8 +199,40 @@
         return col;
     }
 
+
+    float3 sampleAdditionalLightColor(float3 ws_vertex) {
+        return OmniDirectional_Shade4PointLights(
+                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                unity_LightColor[0].rgb,
+                unity_LightColor[1].rgb,
+                unity_LightColor[2].rgb,
+                unity_LightColor[3].rgb,
+                unity_4LightAtten0,
+                ws_vertex
+            );
+    }
+
+    float3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
+        return OmniDirectional_Shade4PointLights(
+                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+                ZERO_VEC3,
+                unity_LightColor[1].rgb,
+                unity_LightColor[2].rgb,
+                unity_LightColor[3].rgb,
+                unity_4LightAtten0,
+                ws_vertex
+            );
+    }
+
+    static const float3 BT601 = { 0.299, 0.587, 0.114 };
+    static const float3 BT709 = { 0.21, 0.72, 0.07 };
+
+    float calcBrightness(float3 color) {
+        return dot(color, BT601);
+    }
+
     float3 calcPointLight1WorldDir(float3 ws_vertex) {
-        ws_vertex = calcPointLight1Pos() - ws_vertex;
+        ws_vertex = getPoint1LightPos() - ws_vertex;
         if (dot(ws_vertex, ws_vertex) < 0.1) {
             ws_vertex = float3(0, 1, 0);
         }
@@ -198,7 +240,7 @@
     }
 
     float3 calcPointLight1Dir(float3 ws_vertex) {
-        ws_vertex = calcPointLight1Pos() - ws_vertex;
+        ws_vertex = getPoint1LightPos() - ws_vertex;
         if (dot(ws_vertex, ws_vertex) < 0.1) {
             ws_vertex = float3(0, 1, 0);
         }
@@ -332,7 +374,7 @@
         #ifdef LIGHTMAP_ON
         {
             float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            float4 lmap_tex = UNITY_SAMPLE_TEX2D(unity_Lightmap, uv);
+            float4 lmap_tex = PICK_MAIN_TEX2D(unity_Lightmap, uv);
             float3 lmap_color = DecodeLightmap(lmap_tex);
             color += lmap_color;
         }
@@ -340,7 +382,7 @@
         #ifdef DYNAMICLIGHTMAP_ON
         {
             float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-            float4 lmap_tex = UNITY_SAMPLE_TEX2D(unity_DynamicLightmap, uv);
+            float4 lmap_tex = PICK_MAIN_TEX2D(unity_DynamicLightmap, uv);
             float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
             color += lmap_color;
         }
@@ -350,14 +392,11 @@
 
     float3 pickLightmapLod(float2 uv_lmap) {
         float3 color = ZERO_VEC3;
-        #ifdef SHADER_API_D3D11
-            #define WF_SAMPLE_TEX2D_LOD(tex, coord, lod)                        tex.SampleLevel(sampler##tex,coord, lod)
-            #define WF_SAMPLE_TEX2D_SAMPLER_LOD(tex, samplertex, coord, lod)    tex.SampleLevel(sampler##samplertex, coord, lod)
-
+        #ifdef PICK_MAIN_TEX2D_LOD
             #ifdef LIGHTMAP_ON
             {
                 float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-                float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_Lightmap, uv, 0);
+                float4 lmap_tex = PICK_MAIN_TEX2D_LOD(unity_Lightmap, uv, 0);
                 float3 lmap_color = DecodeLightmap(lmap_tex);
                 color += lmap_color;
             }
@@ -365,7 +404,7 @@
             #ifdef DYNAMICLIGHTMAP_ON
             {
                 float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-                float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
+                float4 lmap_tex = PICK_MAIN_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
                 float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
                 color += lmap_color;
             }

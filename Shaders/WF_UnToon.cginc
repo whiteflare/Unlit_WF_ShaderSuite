@@ -90,8 +90,8 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.ws_vertex = mul(unity_ObjectToWorld, v.vertex).xyz;
-        o.vs_vertex = UnityWorldToClipPos(o.ws_vertex);
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
 #ifdef _VC_ENABLE
         o.vertex_color = v.vertex_color;
 #endif
@@ -149,7 +149,7 @@
         // メタリック
         affectMetallic(i, ws_view_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
-        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax), uv_main, color);
+        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax).xy, uv_main, color);
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト

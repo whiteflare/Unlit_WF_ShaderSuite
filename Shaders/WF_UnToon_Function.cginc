@@ -236,13 +236,13 @@
     float           _GL_DisableBasePos;
 
     inline uint calcAutoSelectMainLight(float3 ws_vertex) {
-        float3 pointLight1Color = calcPointLight1Color(ws_vertex);
+        float3 pointLight1Color = samplePoint1LightColor(ws_vertex);
 
-        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
+        if (calcBrightness(sampleMainLightColor()) < calcBrightness(pointLight1Color)) {
             // ディレクショナルよりポイントライトのほうが明るいならばそちらを採用
             return LIT_MODE_ONLY_POINT_LIT;
 
-        } else if (any(_WorldSpaceLightPos0.xyz)) {
+        } else if (any(getMainLightDirection())) {
             // ディレクショナルライトが入っているならばそれを採用
             return LIT_MODE_ONLY_DIR_LIT;
 
@@ -255,7 +255,7 @@
     inline float3 calcWorldSpaceBasePos(float3 ws_vertex) {
         if (TGL_OFF(_GL_DisableBasePos)) {
             // Object原点をBasePosとして使用する
-            return mul(unity_ObjectToWorld, float4(0, 0, 0, 1));
+            return UnityObjectToWorldPos(ZERO_VEC3);
         }
         else {
             // 現在の座標をBasePosとして使用する
@@ -270,7 +270,7 @@
             mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
-            return float4( _WorldSpaceLightPos0.xyz , +1 );
+            return float4( getMainLightDirection() , +1 );
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
             return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
@@ -285,11 +285,7 @@
     }
 
     inline float3 calcWorldSpaceLightColor(float3 ws_vertex, float lightType) {
-        if ( TGL_ON(-lightType) ) {
-            float3 pointLight1Color = calcPointLight1Color(ws_vertex);
-            return pointLight1Color; // ポイントライト
-        }
-        return _LightColor0.rgb; // ディレクショナルライト
+        return TGL_ON(-lightType) ? samplePoint1LightColor(ws_vertex) : sampleMainLightColor();
     }
 
     inline void affectAntiGlare(float glLevel, inout float4 color) {
@@ -297,16 +293,9 @@
     }
 
     inline float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
-        float3 lightColorMain = _LightColor0.rgb;
-        float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
-                unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                unity_LightColor[0].rgb,
-                unity_LightColor[1].rgb,
-                unity_LightColor[2].rgb,
-                unity_LightColor[3].rgb,
-                unity_4LightAtten0,
-                ws_vertex
-            );
+        float3 lightColorMain = sampleMainLightColor();
+        float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
+
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
         float power = AVE_RGB(color);                                       // 明度
         color = lerp( power.xxx, color, _GL_BlendPower);                    // 色の混合
@@ -383,7 +372,7 @@
                 return saturate(1 + _ES_LevelOffset);
             }
             // 周期 2PI、値域 [-1, +1] の関数で光量を決める
-            float time = _Time.y * _ES_Speed - dot( _ES_DirType == 0 ? ws_vertex : mul(unity_WorldToObject, float4(ws_vertex, 1)).xyz, _ES_Direction.xyz);
+            float time = _Time.y * _ES_Speed - dot( _ES_DirType == 0 ? ws_vertex : UnityWorldToObjectPos(ws_vertex), _ES_Direction.xyz);
             float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
             float waving =
                 // 励起波
@@ -516,12 +505,12 @@
         inline float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
 #ifdef _WF_MOBILE
-            return pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
+            return pickReflectionProbe(ws_vertex, ws_normal, metal_lod).rgb;
 #else
             float3 color = ZERO_VEC3;
             // ONLYでなければ PROBE を加算
             if (_MT_CubemapType != 2) {
-                color += pickReflectionProbe(ws_vertex, ws_normal, metal_lod);
+                color += pickReflectionProbe(ws_vertex, ws_normal, metal_lod).rgb;
             }
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
@@ -554,7 +543,7 @@
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
+                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir.xyz, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
                     }
 
                     // 合成
@@ -642,15 +631,8 @@
         inline void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
             if (TGL_ON(_TS_Enable)) {
                 float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
-                float3 lightColorSub4 = OmniDirectional_Shade4PointLights(
-                        unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
-                        0 < ws_light_dir.w ? unity_LightColor[0].rgb : ZERO_VEC3,
-                        unity_LightColor[1].rgb,
-                        unity_LightColor[2].rgb,
-                        unity_LightColor[3].rgb,
-                        unity_4LightAtten0,
-                        ws_vertex
-                    );
+                float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
+
                 float main = saturate(calcBrightness( lightColorMain ));
                 float sub4 = saturate(calcBrightness( lightColorSub4 ));
                 float ambient = saturate(calcBrightness( ambientColor ));
@@ -779,7 +761,7 @@
                 : _OL_BlendType == 3 ? color + ov_color.rgb - MEDIAN_GRAY   // 加減算
                 : _OL_BlendType == 4 ? 1 - (1 - color) * (1 - ov_color.rgb) // スクリーン
                 : _OL_BlendType == 5 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(color), 0.5))   // オーバーレイ
-                : _OL_BlendType == 6 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(ov_color), 0.5))   // オーバーレイ
+                : _OL_BlendType == 6 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(ov_color.rgb), 0.5))   // オーバーレイ
                 : color                                                     // 何もしない
                 ;
             return lerp(color, rgb, ov_color.a * power);
@@ -920,7 +902,7 @@
             #endif
             return color;
         #else
-            return OmniDirectional_ShadeSH9();
+            return sampleSHLightColor();
         #endif
     }
 
@@ -939,7 +921,7 @@
 
         inline void affectToonFog(v2f i, float3 ws_view_dir, inout float4 color) {
             if (TGL_ON(_FG_Enable)) {
-                float3 ws_base_position = mul(unity_ObjectToWorld, float4(_FG_BaseOffset, 1)).xyz;
+                float3 ws_base_position = UnityObjectToWorldPos(_FG_BaseOffset);
                 float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
                 float power = 
                     // 原点からの距離の判定
@@ -954,37 +936,5 @@
     #else
         #define affectToonFog(i, ws_view_dir, color)
     #endif
-
-    ////////////////////////////
-    // Debug View
-    ////////////////////////////
-
-//    #ifdef _WF_DEBUGVIEW_MAGENTA
-//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rb += 1
-//    #elif _WF_DEBUGVIEW_CLIP
-//        #define WF_AFFECT_DEBUGVIEW     discard
-//    #elif _WF_DEBUGVIEW_POSITION
-//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += saturate( abs(mul(unity_WorldToObject, i.ws_vertex) ) )
-//    #elif _WF_DEBUGVIEW_NORMAL
-//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(ws_normal).rgb / 2 + 0.5
-//    #elif _WF_DEBUGVIEW_TANGENT
-//        #ifdef _NM_ENABLE
-//            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(i.tangent.rgb) / 2 + 0.5
-//        #else
-//            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256
-//        #endif
-//    #elif _WF_DEBUGVIEW_BUMPED_NORMAL
-//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += UnityWorldToObjectDir(ws_bump_normal).rgb / 2 + 0.5
-//    #elif _WF_DEBUGVIEW_LIGHT_COLOR
-//        #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += i.light_color.rgb
-//    #elif _WF_DEBUGVIEW_LIGHT_MAP
-//        #ifdef _LMAP_ENABLE
-//            #define WF_AFFECT_DEBUGVIEW     color.rgb /= 256; color.rgb += pickLightmap(i.uv_lmap).rgb
-//        #else
-//            #define WF_AFFECT_DEBUGVIEW     discard
-//        #endif
-//    #else
-//        #define WF_AFFECT_DEBUGVIEW
-//    #endif
 
 #endif

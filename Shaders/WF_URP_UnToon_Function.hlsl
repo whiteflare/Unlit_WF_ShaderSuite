@@ -44,10 +44,10 @@
     #endif
 
     #ifndef WF_TEX2D_NORMAL
-        #define WF_TEX2D_NORMAL(uv)             UnpackNormalScale( PICK_MAIN_TEX2D(_BumpMap, uv), _BumpScale ).xyz
+        #define WF_TEX2D_NORMAL(uv)             UnpackScaleNormal( PICK_MAIN_TEX2D(_BumpMap, uv), _BumpScale ).xyz
     #endif
     #ifndef WF_TEX2D_NORMAL_DTL
-        #define WF_TEX2D_NORMAL_DTL(uv)         UnpackNormalScale( PICK_MAIN_TEX2D(_DetailNormalMap, uv), _DetailNormalMapScale ).xyz
+        #define WF_TEX2D_NORMAL_DTL(uv)         UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv), _DetailNormalMapScale ).xyz
     #endif
     #ifndef WF_TEX2D_NORMAL_DTL_MASK
         #define WF_TEX2D_NORMAL_DTL_MASK(uv)    SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv, _NM_InvMaskVal).r
@@ -219,13 +219,13 @@
     #define LIT_MODE_CUSTOM_LOCALSPACE  4
 
     inline uint calcAutoSelectMainLight(float3 ws_vertex) {
-        float3 pointLight1Color = calcPointLight1Color(ws_vertex);
+        float3 pointLight1Color = samplePoint1LightColor(ws_vertex);
 
-        if (calcBrightness(_LightColor0.rgb) < calcBrightness(pointLight1Color)) {
+        if (calcBrightness(sampleMainLightColor()) < calcBrightness(pointLight1Color)) {
             // ディレクショナルよりポイントライトのほうが明るいならばそちらを採用
             return LIT_MODE_ONLY_POINT_LIT;
 
-        } else if (any(_WorldSpaceLightPos0.xyz)) {
+        } else if (any(getMainLightDirection())) {
             // ディレクショナルライトが入っているならばそれを採用
             return LIT_MODE_ONLY_DIR_LIT;
 
@@ -238,7 +238,7 @@
     inline float3 calcWorldSpaceBasePos(float3 ws_vertex) {
         if (TGL_OFF(_GL_DisableBasePos)) {
             // Object原点をBasePosとして使用する
-            return TransformObjectToWorld(ZERO_VEC3);
+            return UnityObjectToWorldPos(ZERO_VEC3);
         }
         else {
             // 現在の座標をBasePosとして使用する
@@ -253,7 +253,7 @@
             mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
-            return float4( _WorldSpaceLightPos0.xyz , +1 );
+            return float4( getMainLightDirection() , +1 );
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
             return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
@@ -268,7 +268,7 @@
     }
 
     inline float3 calcWorldSpaceLightColor(float3 ws_vertex, float lightType) {
-        return TGL_ON(-lightType) ? calcPointLight1Color(ws_vertex) : _LightColor0.rgb;
+        return TGL_ON(-lightType) ? samplePoint1LightColor(ws_vertex) : sampleMainLightColor();
     }
 
     inline void affectAntiGlare(float glLevel, inout float4 color) {
@@ -276,8 +276,8 @@
     }
 
     inline float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
-        float3 lightColorMain = _LightColor0.rgb;
-        float3 lightColorSub4 = calcAllAdditionalLightColor(ws_vertex);
+        float3 lightColorMain = sampleMainLightColor();
+        float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
 
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
         float power = AVE_RGB(color);                                       // 明度
@@ -337,7 +337,7 @@
                 return saturate(1 + _ES_LevelOffset);
             }
             // 周期 2PI、値域 [-1, +1] の関数で光量を決める
-            float time = _Time.y * _ES_Speed - dot( _ES_DirType == 0 ? ws_vertex : mul(unity_WorldToObject, float4(ws_vertex, 1)).xyz, _ES_Direction.xyz);
+            float time = _Time.y * _ES_Speed - dot( _ES_DirType == 0 ? ws_vertex : UnityWorldToObjectPos(ws_vertex), _ES_Direction.xyz);
             float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
             float waving =
                 // 励起波
@@ -394,7 +394,7 @@
                 if (_NM_2ndType == 1) { // BLEND
                     float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
                     float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL(uv_dtl);
-                    normalTangent = lerp(normalTangent, BlendNormal(normalTangent, dtlNormalTangent), dtlPower);
+                    normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
                 }
                 else if (_NM_2ndType == 2) { // SWITCH
                     float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
@@ -456,7 +456,7 @@
 
             float3 halfVL           = normalize(ws_camera_dir + ws_light_dir);
             float NdotH             = max(0, dot( ws_normal, halfVL ));
-            float3 specular         = spec_color * D_GGX(NdotH, roughness);
+            float3 specular         = spec_color * GGXTerm(NdotH, roughness);
 
             return max(ZERO_VEC3, specular);
         }
@@ -505,11 +505,11 @@
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
-                    float3 lightcap_power = saturate(matcap_mask * LinearToSRGB(_HL_MatcapColor) * 2);
+                    float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2);
                     color.rgb += matcap_color * lightcap_power * _HL_Power;
                 } else if(_HL_CapType == 2) {
                     // 乗算合成
-                    float3 lightcap_power = saturate(matcap_mask * LinearToSRGB(_HL_MatcapColor) * 2);
+                    float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2);
                     color.rgb *= ONE_VEC3 + (matcap_color * lightcap_power - ONE_VEC3) * _HL_Power * MAX_RGB(matcap_mask);
                 } else {
                     // 中間色合成
@@ -534,7 +534,7 @@
         inline void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
             if (TGL_ON(_TS_Enable)) {
                 float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
-                float3 lightColorSub4 = calcAllAdditionalLightColor(ws_vertex); // TODO メインライトの置き換え
+                float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
 
                 float main = saturate(calcBrightness( lightColorMain ));
                 float sub4 = saturate(calcBrightness( lightColorSub4 ));
@@ -763,7 +763,7 @@
             #endif
             return color;
         #else
-            return OmniDirectional_ShadeSH9();
+            return sampleSHLightColor();
         #endif
     }
 
@@ -775,7 +775,7 @@
 
         inline void affectToonFog(v2f i, float3 ws_view_dir, inout float4 color) {
             if (TGL_ON(_FG_Enable)) {
-                float3 ws_base_position = mul(unity_ObjectToWorld, float4(_FG_BaseOffset, 1)).xyz;
+                float3 ws_base_position = UnityObjectToWorldPos(_FG_BaseOffset);
                 float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
                 float power = 
                     // 原点からの距離の判定

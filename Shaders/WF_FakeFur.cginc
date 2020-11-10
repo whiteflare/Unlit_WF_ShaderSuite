@@ -35,7 +35,7 @@
 
     struct v2g {
         float2 uv               : TEXCOORD0;
-        float4 ws_vertex        : TEXCOORD1;
+        float3 ws_vertex        : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
         float3 ws_tangent       : TEXCOORD3;
         float3 ws_bitangent     : TEXCOORD4;
@@ -44,7 +44,7 @@
 
     struct g2f {
         float2 uv               : TEXCOORD0;
-        float4 ws_vertex        : TEXCOORD1;
+        float3 ws_vertex        : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
         UNITY_VERTEX_OUTPUT_STEREO
         float height            : COLOR0;
@@ -70,7 +70,7 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.uv = v.uv;
-        o.ws_vertex = mul(unity_ObjectToWorld, v.vertex);
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex);
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FG_FlipTangent);
 
         return o;
@@ -86,7 +86,7 @@
         return o;
     }
 
-    inline void transferGeomVertex(inout g2f o, float4 vb, float4 vu, float height) {
+    inline void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
         o.ws_vertex = lerp(vb, vu, height);
         o.vertex = UnityWorldToClipPos( o.ws_vertex );
         o.height = height;
@@ -122,9 +122,9 @@
 
     void fakefur(v2g v[3], inout TriangleStream<g2f> triStream) {
         // 底辺座標
-        float4 vb[3] = { v[0].ws_vertex, v[1].ws_vertex, v[2].ws_vertex };
+        float3 vb[3] = { v[0].ws_vertex, v[1].ws_vertex, v[2].ws_vertex };
         // 頂点座標
-        float4 vu[3] = vb;
+        float3 vu[3] = vb;
 
         // normal方向に従ってfurを伸ばす
         {
@@ -171,7 +171,7 @@
         i.ws_light_dir = calcWorldSpaceLightDir(i.ws_vertex);
 
         // 環境光取得
-        float3 ambientColor = OmniDirectional_ShadeSH9();
+        float3 ambientColor = sampleSHLightColor();
         // 影コントラスト
         calcToonShadeContrast(i.ws_vertex, i.ws_light_dir, ambientColor, i.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算

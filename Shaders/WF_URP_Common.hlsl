@@ -25,35 +25,37 @@
 
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
-    #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/EntityLighting.hlsl"
-    #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
     #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
 
     ////////////////////////////
-    // Common Utility
+    // Compatible
     ////////////////////////////
 
-    #define TGL_ON(value)   (0.5 <= value)
-    #define TGL_OFF(value)  (value < 0.5)
-    #define TGL_01(value)   step(0.5, value)
-
-    static const float3 MEDIAN_GRAY =
+    float IsGammaSpace() {
         #ifdef UNITY_COLORSPACE_GAMMA
-            float3(0.5, 0.5, 0.5);
+            return 1;
         #else
-            SRGBToLinear( float3(0.5, 0.5, 0.5) );
+            return 0;
         #endif
+    }
 
-    #define MAX3(r, g, b)   max(r, max(g, b) )
-    #define AVE3(r, g, b)   ((r + g + b) / 3)
-    #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
-    #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
-
+#ifdef WF_FORCE_USE_SAMPLER
+    // 強制的にサンプラーを定義する版
+    #define DECL_MAIN_TEX2D(name)           sampler2D name
+    #define DECL_SUB_TEX2D(name)            sampler2D name
+    #define PICK_MAIN_TEX2D(tex, uv)        tex2D(tex, uv)
+    #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
+    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        tex2Dlod(tex, float4(uv, 0, lod))
+    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   tex2Dlod(tex, float4(uv, 0, lod))
+#else
+    // 通常版
     #define DECL_MAIN_TEX2D(name)           TEXTURE2D(name); SAMPLER(sampler##name)
     #define DECL_SUB_TEX2D(name)            TEXTURE2D(name)
     #define PICK_MAIN_TEX2D(tex, uv)        SAMPLE_TEXTURE2D(tex, sampler##tex, uv)
     #define PICK_SUB_TEX2D(tex, name, uv)   SAMPLE_TEXTURE2D(tex, sampler##name, uv)
-
+    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        SAMPLE_TEXTURE2D_LOD(tex, sampler##tex, uv, lod)
+    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   SAMPLE_TEXTURE2D_LOD(tex, sampler##name, uv, lod)
+#endif
 
 // Unity BuiltinRP で定義されていた関数を LightweightRP で定義しなおして差異を吸収する
 
@@ -63,15 +65,49 @@
     #define UnityWorldToObjectDir       TransformWorldToObjectDir
     #define UnityObjectToWorldNormal    TransformObjectToWorldNormal
 
+    #define UnityObjectToWorldPos(v)    TransformObjectToWorld(v)
+    #define UnityWorldToObjectPos(v)    TransformWorldToObject(v)
+
+    #define UNITY_FOG_COORDS(id)        half fogCoord : TEXCOORD##id;
+    #define UNITY_TRANSFER_FOG(o, p)    o.fogCoord = ComputeFogFactor(p.z)
+    #define UNITY_APPLY_FOG(f, c)       c.rgb = MixFog(c.rgb, f)
+
     #define UNITY_INITIALIZE_OUTPUT(name, val)  val = (name) 0
     #define UNITY_SAMPLE_TEXCUBE_LOD(tex, dir, lod)                     SAMPLE_TEXTURECUBE_LOD(tex, sampler##tex, dir, lod)
     #define UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(tex, name, dir, lod)       SAMPLE_TEXTURECUBE_LOD(tex, sampler##name, dir, lod)
 
-    #define _LightColor0                _MainLightColor
-    #define _WorldSpaceLightPos0        _MainLightPosition
+    #define GammaToLinearSpace          SRGBToLinear
+    #define LinearToGammaSpace          LinearToSRGB
     #define UNITY_INV_TWO_PI            0.15915494309f
+    #define UnpackScaleNormal           UnpackNormalScale
+    #define BlendNormals                BlendNormal
+    #define GGXTerm                     D_GGX
 
+    float3 DecodeLightmap(float4 lmap_tex) {
+        return DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+    }
+    float3 DecodeRealtimeLightmap(float4 lmap_tex) {
+        return DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+    }
 
+    float3 DecodeHDR(float4 color, float4 inst) {
+        return DecodeHDREnvironment(color, inst);
+    }
+
+    ////////////////////////////
+    // Common Utility
+    ////////////////////////////
+
+    #define TGL_ON(value)   (0.5 <= value)
+    #define TGL_OFF(value)  (value < 0.5)
+    #define TGL_01(value)   step(0.5, value)
+
+    static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
+
+    #define MAX3(r, g, b)   max(r, max(g, b) )
+    #define AVE3(r, g, b)   ((r + g + b) / 3)
+    #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
+    #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
 
     #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : float4(1 - rgba.rgb, rgba.a) )
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
@@ -141,30 +177,15 @@
     // Lighting
     ////////////////////////////
 
-    static const float3 BT601 = { 0.299, 0.587, 0.114 };
-    static const float3 BT709 = { 0.21, 0.72, 0.07 };
-
-    float calcBrightness(float3 color) {
-        return dot(color, BT601);
+    float3 getMainLightDirection() {
+        return _MainLightPosition.xyz;
     }
 
-    float3 calcPointLight1Pos() {
-        return 1 <= GetAdditionalLightsCount() ? _AdditionalLightsPosition[0].xyz : ZERO_VEC3;
+    float3 sampleMainLightColor() {
+        return _MainLightColor.rgb;
     }
 
-    float3 calcPointLight1Color(float3 ws_vertex) {
-        float3 ws_lightPos = calcPointLight1Pos();
-        if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
-            return float3(0, 0, 0); // XYZすべて0はポイントライト未設定と判定する
-        }
-        float3 ls_lightPos = ws_lightPos - ws_vertex;
-        float lengthSq = dot(ls_lightPos, ls_lightPos);
-        float atten = DistanceAttenuation(lengthSq, _AdditionalLightsAttenuation[0].xy) * AngleAttenuation(_AdditionalLightsSpotDir[0].xyz, SafeNormalizeVec3(ls_lightPos), _AdditionalLightsAttenuation[0].zw);
-        return _AdditionalLightsColor[0].rgb * atten;
-    }
-
-    float3 OmniDirectional_ShadeSH9() {
-        // UnityCG.cginc にある ShadeSH9 の等方向版
+    float3 sampleSHLightColor() {
         float3 col = 0;
         col += SampleSH( float3(+1, 0, 0) );
         col += SampleSH( float3(-1, 0, 0) );
@@ -176,7 +197,20 @@
         return col / 3;
     }
 
-    float3 calcAllAdditionalLightColor(float3 ws_vertex) {
+    float3 getPoint1LightPos() {
+        return 1 <= GetAdditionalLightsCount() ? _AdditionalLightsPosition[0].xyz : ZERO_VEC3;
+    }
+
+    float3 samplePoint1LightColor(float3 ws_vertex) {
+        if (GetAdditionalLightsCount() < 1) {
+            return ZERO_VEC3;
+        } else {
+            Light light = GetAdditionalLight(0, ws_vertex);
+            return light.color * light.distanceAttenuation;
+        }
+    }
+
+    float3 sampleAdditionalLightColor(float3 ws_vertex) {
         float3 col = ZERO_VEC3;
 
         int pixelLightCount = GetAdditionalLightsCount();
@@ -188,8 +222,27 @@
         return col;
     }
 
+    float3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
+        float3 col = ZERO_VEC3;
+
+        int pixelLightCount = GetAdditionalLightsCount();
+        for (int i = 1; i < pixelLightCount; ++i) {
+            Light light = GetAdditionalLight(i, ws_vertex);
+            col += light.color * light.distanceAttenuation;
+        }
+
+        return col;
+    }
+
+    static const float3 BT601 = { 0.299, 0.587, 0.114 };
+    static const float3 BT709 = { 0.21, 0.72, 0.07 };
+
+    float calcBrightness(float3 color) {
+        return dot(color, BT601);
+    }
+
     float3 calcPointLight1WorldDir(float3 ws_vertex) {
-        ws_vertex = calcPointLight1Pos() - ws_vertex;
+        ws_vertex = getPoint1LightPos() - ws_vertex;
         if (dot(ws_vertex, ws_vertex) < 0.1) {
             ws_vertex = float3(0, 1, 0);
         }
@@ -197,7 +250,7 @@
     }
 
     float3 calcPointLight1Dir(float3 ws_vertex) {
-        ws_vertex = calcPointLight1Pos() - ws_vertex;
+        ws_vertex = getPoint1LightPos() - ws_vertex;
         if (dot(ws_vertex, ws_vertex) < 0.1) {
             ws_vertex = float3(0, 1, 0);
         }
@@ -331,16 +384,16 @@
         #ifdef LIGHTMAP_ON
         {
             float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            float4 lmap_tex = SAMPLE_TEXTURE2D(unity_Lightmap, samplerunity_Lightmap, uv);
-            float3 lmap_color = DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+            float4 lmap_tex = PICK_MAIN_TEX2D(unity_Lightmap, uv);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
             color += lmap_color;
         }
         #endif
         #ifdef DYNAMICLIGHTMAP_ON
         {
             float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-            float4 lmap_tex = SAMPLE_TEXTURE2D(unity_DynamicLightmap, samplerunity_DynamicLightmap, uv);
-            float3 lmap_color = DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+            float4 lmap_tex = PICK_MAIN_TEX2D(unity_DynamicLightmap, uv);
+            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
             color += lmap_color;
         }
         #endif
@@ -353,16 +406,16 @@
         #ifdef LIGHTMAP_ON
         {
             float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            float4 lmap_tex = SAMPLE_TEXTURE2D_LOD(unity_Lightmap, samplerunity_Lightmap, uv, 0);
-            float3 lmap_color = DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+            float4 lmap_tex = PICK_MAIN_TEX2D_LOD(unity_Lightmap, uv, 0);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
             color += lmap_color;
         }
         #endif
         #ifdef DYNAMICLIGHTMAP_ON
         {
             float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-            float4 lmap_tex = WF_SAMPLE_TEX2D_LOD(unity_DynamicLightmap, samplerunity_DynamicLightmap, uv, 0);
-            float3 lmap_color = DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+            float4 lmap_tex = PICK_MAIN_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
+            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
             color += lmap_color;
         }
         #endif
@@ -377,17 +430,13 @@
         float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
-        float3 dir0 = reflect_dir; // BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
-        // float3 dir1 = reflect_dir; // BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube1_ProbePosition, unity_SpecCube1_BoxMin, unity_SpecCube1_BoxMax);
+        float3 dir0 = reflect_dir;
 
         float4 color0 = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
-        // float4 color1 = UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(unity_SpecCube1, unity_SpecCube0, dir1, lod);
 
-        color0.rgb = DecodeHDREnvironment(color0, unity_SpecCube0_HDR);
-        // color1.rgb = DecodeHDREnvironment(color1, unity_SpecCube1_HDR);
+        color0.rgb = DecodeHDR(color0, unity_SpecCube0_HDR);
 
         return color0;
-        // return lerp(color1, color0, unity_SpecCube0_BoxMin.w);
     }
 
     float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ws_normal, float lod) {
@@ -395,7 +444,7 @@
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float4 color = texCUBElod(cubemap, float4(reflect_dir, lod) );
-        return DecodeHDREnvironment(color, cubemap_HDR);
+        return DecodeHDR(color, cubemap_HDR);
     }
 
 #endif

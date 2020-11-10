@@ -46,8 +46,8 @@
         float4 vertex_color     : COLOR0;
 #endif
 #ifdef EDITOR_VISUALIZATION
-        float2 vizUV        	: TEXCOORD1;
-        float4 lightCoord   	: TEXCOORD2;
+        float2 vizUV            : TEXCOORD1;
+        float4 lightCoord       : TEXCOORD2;
 #endif
     };
 
@@ -80,7 +80,7 @@
         }
         else if (unity_VisualizationMode == EDITORVIZ_SHOWLIGHTMASK) {
             o.vizUV         = v.uv1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            o.lightCoord    = mul(unity_EditorViz_WorldToLight, mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1)));
+            o.lightCoord    = mul(unity_EditorViz_WorldToLight, UnityObjectToWorldPos(v.vertex));
         }
 #endif
 
