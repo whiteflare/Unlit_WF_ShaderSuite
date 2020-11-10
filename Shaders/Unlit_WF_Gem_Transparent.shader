@@ -36,6 +36,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GB_Enable              ("[GB] Enable", Float) = 0
         [HDR]
             _GB_ColorBack           ("[GB] Background Color", Color) = (0.2, 0.2, 0.2, 1)
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _GB_BackCulllMode       ("[GB] Background CullMode", Float) = 1
 
         // Flake
         [WFHeaderToggle(Gem Flake)]
@@ -112,7 +114,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             Name "MAIN_BACK"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull FRONT
+            Cull [_GB_BackCulllMode]
             ZWrite [_AL_ZWrite]
             Blend SrcAlpha OneMinusSrcAlpha
 
