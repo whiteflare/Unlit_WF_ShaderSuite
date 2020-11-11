@@ -41,9 +41,23 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 1
+
+        // 3chカラーマスク
+        [WFHeaderToggle(3ch Color Mask)]
+            _CH_Enable              ("[CH] Enable", Float) = 0
+        [NoScaleOffset]
+            _CH_3chMaskTex          ("[CH] 3ch Mask Texture", 2D) = "black" {}
+        [HDR]
+            _CH_ColorR              ("[CH] R ch Color", Color) = (1, 1, 1, 1)
+        [HDR]
+            _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
+        [HDR]
+            _CH_ColorB              ("[CH] B chl Color", Color) = (1, 1, 1, 1)
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -258,6 +272,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
             #define _AL_ENABLE
             #define _AO_ENABLE
+            #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _MT_ENABLE
@@ -297,6 +312,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
             #define _AL_ENABLE
             #define _AO_ENABLE
+            #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE

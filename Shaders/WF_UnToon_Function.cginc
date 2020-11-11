@@ -30,13 +30,17 @@
     /* このセクションでは、どのテクスチャから何色を参照するかを定義する */
 
     #ifndef WF_TEX2D_ALPHA_MAIN_ALPHA
-        #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   alpha
+        #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   saturate( TGL_OFF(_AL_InvMaskVal) ? alpha : 1 - alpha )
     #endif
     #ifndef WF_TEX2D_ALPHA_MASK_RED
-        #define WF_TEX2D_ALPHA_MASK_RED(uv)     PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r
+        #define WF_TEX2D_ALPHA_MASK_RED(uv)     saturate( TGL_OFF(_AL_InvMaskVal) ? PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r : 1 - PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r )
     #endif
     #ifndef WF_TEX2D_ALPHA_MASK_ALPHA
-        #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a
+        #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   saturate( TGL_OFF(_AL_InvMaskVal) ? PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a : 1 - PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a )
+    #endif
+
+    #ifndef WF_TEX2D_3CH_MASK
+        #define WF_TEX2D_3CH_MASK(uv)           PICK_SUB_TEX2D(_CH_3chMaskTex, _MainTex, uv).rgb
     #endif
 
     #ifndef WF_TEX2D_EMISSION
@@ -320,6 +324,34 @@
     #else
         // Dummy
         #define affectColorChange(color)
+    #endif
+
+    ////////////////////////////
+    // 3ch Color Mask
+    ////////////////////////////
+
+    #ifdef _CH_ENABLE
+        float       _CH_Enable;
+        DECL_SUB_TEX2D(_CH_3chMaskTex);
+        float4		_CH_ColorR;
+        float4		_CH_ColorG;
+        float4		_CH_ColorB;
+
+        inline void affect3chColorMask(float2 mask_uv, inout float4 color) {
+            if (TGL_ON(_CH_Enable)) {
+                float3 mask  = WF_TEX2D_3CH_MASK(mask_uv);
+                float4 c1 = color * _CH_ColorR;
+                float4 c2 = color * _CH_ColorG;
+                float4 c3 = color * _CH_ColorB;
+                color = lerp(color, c1, mask.r);
+                color = lerp(color, c2, mask.g);
+                color = lerp(color, c3, mask.b);
+            }
+        }
+
+    #else
+        // Dummy
+        #define affect3chColorMask(mask_uv, color)
     #endif
 
     ////////////////////////////

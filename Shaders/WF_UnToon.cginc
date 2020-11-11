@@ -126,6 +126,8 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
 
+		// カラーマスク
+		affect3chColorMask(uv_main, color);
         // 色変換
         affectColorChange(color);
         // BumpMap

@@ -77,6 +77,7 @@
     float           _AL_Fresnel;
     float           _AL_AlphaToMask;
     float           _AL_Z_Offset;
+    float           _AL_InvMaskVal;
 
     float           _GL_CastShadow;
     float           _GL_LevelMin;
