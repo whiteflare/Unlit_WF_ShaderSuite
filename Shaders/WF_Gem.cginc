@@ -23,24 +23,21 @@
      *      ver:2020/10/13 whiteflare,
      */
 
+    #include "WF_Common.cginc"
+
+CBUFFER_START(UnityPerMaterial)
+    #include "WF_Gem_Input.cginc"
+CBUFFER_END
+
     #include "WF_UnToon.cginc"
 
     ////////////////////////////
     // Gem Flake
     ////////////////////////////
 
-    float           _GF_Enable;
-    float           _GF_FlakeSizeFront;
-    float           _GF_FlakeSizeBack;
-    float           _GF_FlakeShear;
-    float           _GF_FlakeBrighten;
-    float           _GF_FlakeDarken;
-    float           _GF_Twinkle;
-    float           _GF_BlendNormal;
-
     void affectGemFlake(v2f i, float3 ws_camera_dir, float3 ws_normal, float size, inout float4 color) {
         if (TGL_ON(_GF_Enable)) {
-            float2 matcapVector = calcMatcapVector(ws_camera_dir, ws_normal) * size;
+            float2 matcapVector = calcMatcapVector(ws_camera_dir, ws_normal).xy * size;
             float3 ls_camera_dir = SafeNormalizeVec3(worldSpaceViewPointPos() - calcWorldSpaceBasePos(i.ws_vertex));
 
             float2 checker = step(0.5, frac(matcapVector.xy + matcapVector.yx * _GF_FlakeShear
@@ -61,15 +58,6 @@
     // Gem Reflection
     ////////////////////////////
 
-    float           _GR_Enable;
-    float           _GR_Power;
-    float           _GR_Brightness;
-    float           _GR_Monochrome;
-    samplerCUBE     _GR_Cubemap;
-    float4          _GR_Cubemap_HDR;
-    float           _GR_CubemapPower;
-    float           _GR_BlendNormal;
-
     void affectGemReflection(v2f i, float3 ws_normal, inout float4 color) {
         if (TGL_ON(_GR_Enable)) {
             // リフレクション
@@ -87,12 +75,6 @@
     ////////////////////////////
     // fragment shader
     ////////////////////////////
-
-    float           _AlphaFront;
-    float           _AlphaBack;
-
-    float           _GB_Enable;
-    float4          _GB_ColorBack;
 
     float4 frag_gem_back(v2f i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);

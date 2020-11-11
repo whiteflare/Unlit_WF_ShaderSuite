@@ -37,9 +37,26 @@ CBUFFER_END
     // main structure
     ////////////////////////////
 
+    struct appdata {
+        float4 vertex           : POSITION;
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 normal           : NORMAL;
+#ifdef _NM_ENABLE
+            float4 tangent      : TANGENT;
+#endif
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+    };
+
     struct v2f_shadow {
-        V2F_SHADOW_CASTER;
-        float2 uv : TEXCOORD1;
+        float4 pos          : SV_POSITION;
+        float2 uv           : TEXCOORD1;
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -54,26 +71,49 @@ CBUFFER_END
     // vertex&fragment shader
     ////////////////////////////
 
-    v2f_shadow vert_shadow(appdata_base v) {
+    float4 _ShadowBias; // x: depth bias, y: normal bias
+    float3 _LightDirection;
+
+    float4 GetShadowPositionHClip(appdata input) {
+        float3 positionWS = UnityObjectToWorldPos(input.vertex.xyz);
+        float3 normalWS = UnityObjectToWorldNormal(input.normal);
+
+        float invNdotL = 1.0 - saturate(dot(_LightDirection, normalWS));
+        float scale = invNdotL * _ShadowBias.y;
+
+        // normal bias is negative since we want to apply an inset normal offset
+        positionWS = _LightDirection * _ShadowBias.xxx + positionWS;
+        positionWS = normalWS * scale.xxx + positionWS;
+        float4 positionCS = TransformWorldToHClip(positionWS);
+
+#if UNITY_REVERSED_Z
+        positionCS.z = min(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+#else
+        positionCS.z = max(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+#endif
+
+        return positionCS;
+    }
+
+    v2f_shadow vert_shadow(appdata v) {
         v2f_shadow o;
 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+        o.pos = GetShadowPositionHClip(v);
         if (TGL_OFF(_GL_CastShadow)) {
             // 無効化
-            o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
+            o.pos = UnityObjectToClipPos( ZERO_VEC3 );
         }
-        o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+        o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+#ifdef _VC_ENABLE
+        o.vertex_color = v.vertex_color;
+#endif
 
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         return o;
-    }
-
-    float4 frag_shadow_caster(v2f_shadow i) {
-        SHADOW_CASTER_FRAGMENT(i)
     }
 
     float4 frag_shadow(v2f_shadow i) : SV_Target {
@@ -82,12 +122,15 @@ CBUFFER_END
 
         if (TGL_OFF(_GL_CastShadow)) {
             discard;
-            return float4(0, 0, 0, 0);
+            return ZERO_VEC4;
         }
 
         // アルファ計算
         #ifdef _AL_ENABLE
             float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
+#ifdef _VC_ENABLE
+            color *= i.vertex_color;
+#endif
             affectAlpha(i.uv, color);
             if (color.a < 0.5) {
                 discard;
@@ -95,7 +138,7 @@ CBUFFER_END
             }
         #endif
 
-        return frag_shadow_caster(i);
+        return ZERO_VEC4;
     }
 
 #endif

@@ -23,8 +23,6 @@
      *      ver:2020/10/13 whiteflare,
      */
 
-    #include "WF_URP_Common.hlsl"
-
     ////////////////////////////
     // Texture & Sampler
     ////////////////////////////
@@ -69,8 +67,6 @@
     // Other uniform variable
     ////////////////////////////
 
-CBUFFER_START(UnityPerMaterial)
-
     float4          _MainTex_ST;
     float4          _Color;
     float           _Cutoff;
@@ -97,7 +93,6 @@ CBUFFER_START(UnityPerMaterial)
     float           _CL_DeltaS;
     float           _CL_DeltaV;
     float           _CL_Monochrome;
-
 
     float           _ES_Enable;
     float4          _EmissionColor;
@@ -195,7 +190,5 @@ CBUFFER_START(UnityPerMaterial)
     float           _FG_Exponential;
     float3          _FG_BaseOffset;
     float3          _FG_Scale;
-
-CBUFFER_END
 
 #endif

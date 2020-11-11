@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Transparent" {
+Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
     /*
      * authors:
@@ -251,6 +251,8 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Transparent" {
 
             #pragma target 3.0
 
+            #define _WF_PLATFORM_LWRP
+
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
@@ -280,8 +282,7 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Transparent" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "WF_URP_UnToon_Input.hlsl"
-            #include "WF_URP_UnToon.hlsl"
+            #include "WF_UnToon.cginc"
 
             ENDHLSL
         }
@@ -301,13 +302,14 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Transparent" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
+            #define _WF_PLATFORM_LWRP
+
             #define _AL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing
 
-            #include "WF_URP_UnToon_Input.hlsl"
-            #include "WF_URP_UnToon.hlsl"
+            #include "WF_UnToonURP_DepthOnly.hlsl"
 
             ENDHLSL
         }
@@ -325,13 +327,14 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Transparent" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
+            #define _WF_PLATFORM_LWRP
+
             #define _AL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing
 
-            #include "WF_URP_UnToon_Input.hlsl"
-            #include "WF_URP_UnToon.hlsl"
+            #include "WF_UnToonURP_ShadowCaster.hlsl"
 
             ENDHLSL
         }
@@ -349,10 +352,11 @@ Shader "UnlitWF/UnToon_URP/WF_UnToon_URP_Transparent" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
+            #define _WF_PLATFORM_LWRP
+
             #define _VC_ENABLE
 
-            #include "WF_URP_UnToon_Input.hlsl"
-            #include "WF_URP_UnToon_Meta.hlsl"
+            #include "WF_UnToonURP_Meta.hlsl"
 
             ENDHLSL
         }

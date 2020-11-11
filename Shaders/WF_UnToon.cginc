@@ -23,7 +23,15 @@
      *      ver:2020/10/13 whiteflare,
      */
 
+    ////////////////////////////
+    // uniform variable
+    ////////////////////////////
+
     #include "WF_Common.cginc"
+
+CBUFFER_START(UnityPerMaterial)
+    #include "WF_UnToon_Input.cginc"
+CBUFFER_END
 
     ////////////////////////////
     // main structure
@@ -66,13 +74,6 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    DECL_MAIN_TEX2D(_MainTex);
-    float4          _MainTex_ST;
-    float4          _Color;
-#ifdef _VC_ENABLE
-    float           _UseVertexColor;
-#endif
-
     ////////////////////////////
     // UnToon function
     ////////////////////////////
@@ -106,7 +107,7 @@
         #endif
 
         // 環境光取得
-        float3 ambientColor = calcAmbientColorVertex(v);
+        float3 ambientColor = calcAmbientColorVertex(v.uv_lmap);
         // 影コントラスト
         calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
@@ -141,7 +142,7 @@
         // カメラへの方向
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i);
+        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
 
         // matcapベクトルの配列
         float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
@@ -315,8 +316,6 @@
     // EmissiveScroll専用パス用 vertex&fragment shader
     ////////////////////////////
 
-    float _ES_Z_Shift;
-
     float4 shiftEmissiveScrollVertex(inout v2f o) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
@@ -369,8 +368,6 @@
     ////////////////////////////
     // ZOffset 付き vertex shader
     ////////////////////////////
-
-    float _AL_Z_Offset;
 
     v2f vert_with_zoffset(appdata v) {
         // 通常の vert を使う

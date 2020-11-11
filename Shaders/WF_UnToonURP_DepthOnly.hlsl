@@ -37,9 +37,26 @@ CBUFFER_END
     // main structure
     ////////////////////////////
 
-    struct v2f_shadow {
-        V2F_SHADOW_CASTER;
-        float2 uv : TEXCOORD1;
+    struct appdata {
+        float4 vertex           : POSITION;
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 normal           : NORMAL;
+#ifdef _NM_ENABLE
+            float4 tangent      : TANGENT;
+#endif
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+    };
+
+    struct v2f_depth {
+        float4 pos              : SV_POSITION;
+        float2 uv               : TEXCOORD0;
+#ifdef _VC_ENABLE
+        float4 vertex_color     : COLOR0;
+#endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -54,48 +71,40 @@ CBUFFER_END
     // vertex&fragment shader
     ////////////////////////////
 
-    v2f_shadow vert_shadow(appdata_base v) {
-        v2f_shadow o;
+    v2f_depth vert_depth(appdata i) {
+        v2f_depth o;
 
-        UNITY_SETUP_INSTANCE_ID(v);
-        UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_INITIALIZE_OUTPUT(v2f_depth, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-        if (TGL_OFF(_GL_CastShadow)) {
-            // 無効化
-            o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
-        }
-        o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+        o.pos   = UnityObjectToClipPos(i.vertex.xyz);
+        o.uv    = TRANSFORM_TEX(i.uv, _MainTex);
+#ifdef _VC_ENABLE
+        o.vertex_color = i.vertex_color;
+#endif
 
-        UNITY_TRANSFER_INSTANCE_ID(v, o);
         return o;
     }
 
-    float4 frag_shadow_caster(v2f_shadow i) {
-        SHADOW_CASTER_FRAGMENT(i)
-    }
-
-    float4 frag_shadow(v2f_shadow i) : SV_Target {
+    float4 frag_depth(v2f_depth i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-
-        if (TGL_OFF(_GL_CastShadow)) {
-            discard;
-            return float4(0, 0, 0, 0);
-        }
 
         // アルファ計算
         #ifdef _AL_ENABLE
             float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
+#ifdef _VC_ENABLE
+            color *= i.vertex_color;
+#endif
             affectAlpha(i.uv, color);
             if (color.a < 0.5) {
                 discard;
-                return float4(0, 0, 0, 0);
+                return ZERO_VEC4;
             }
         #endif
 
-        return frag_shadow_caster(i);
+        return ZERO_VEC4;
     }
 
 #endif

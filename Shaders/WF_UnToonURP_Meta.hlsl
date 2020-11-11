@@ -23,7 +23,19 @@
      *      ver:2020/10/13 whiteflare,
      */
 
-    #include "WF_URP_Common.hlsl"
+    ////////////////////////////
+    // uniform variable
+    ////////////////////////////
+
+    #include "WF_Common.cginc"
+
+CBUFFER_START(UnityPerMaterial)
+    #include "WF_UnToon_Input.cginc"
+CBUFFER_END
+
+    ////////////////////////////
+    // main structure
+    ////////////////////////////
 
     struct appdata {
         float4 vertex           : POSITION;
@@ -43,7 +55,15 @@
 #endif
     };
 
+    ////////////////////////////
+    // Unity Meta function
+    ////////////////////////////
+
     #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/MetaInput.hlsl"
+
+    ////////////////////////////
+    // vertex&fragment shader
+    ////////////////////////////
 
     v2f_meta vert_meta(appdata i) {
         v2f_meta o;
@@ -59,7 +79,8 @@
     }
 
     float4 frag_meta(v2f_meta i) : SV_Target {
-        MetaInput o = (MetaInput) 0;
+        MetaInput o;
+        UNITY_INITIALIZE_OUTPUT(MetaInput, o);
 
         float4 color    = _Color * PICK_MAIN_TEX2D(_MainTex, i.uv);
 #ifdef _VC_ENABLE

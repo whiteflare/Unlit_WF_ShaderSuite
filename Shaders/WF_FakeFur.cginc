@@ -185,7 +185,7 @@
         affectColorChange(color);
 
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i);
+        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir);
         // 階調影
         affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
 
