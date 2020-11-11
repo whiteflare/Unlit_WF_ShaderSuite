@@ -67,6 +67,10 @@
     // vertex&fragment shader
     ////////////////////////////
 
+#ifndef UNIVERSAL_SHADOWS_INCLUDED
+    float4 _ShadowBias;
+#endif
+
     float3 _LightDirection;
 
     float4 GetShadowPositionHClip(appdata input) {
