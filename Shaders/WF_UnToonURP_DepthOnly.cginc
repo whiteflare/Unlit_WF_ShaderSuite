@@ -27,11 +27,7 @@
     // uniform variable
     ////////////////////////////
 
-    #include "WF_Common.cginc"
-
-CBUFFER_START(UnityPerMaterial)
-    #include "WF_UnToon_Input.cginc"
-CBUFFER_END
+    #include "WF_DefVal_UnToon.cginc"
 
     ////////////////////////////
     // main structure

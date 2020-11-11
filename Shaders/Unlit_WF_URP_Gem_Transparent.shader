@@ -147,6 +147,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
+            #include "WF_DefVal_Gem.cginc"
             #include "WF_Gem.cginc"
 
             ENDHLSL
@@ -174,6 +175,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
 
             #pragma multi_compile_instancing
 
+            #include "WF_DefVal_Gem.cginc"
             #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL

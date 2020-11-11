@@ -15,47 +15,26 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INC_UNLIT_WF_GEM_INPUT
-#define INC_UNLIT_WF_GEM_INPUT
+#ifndef INC_UNLIT_WF_DEFVAL_UNTOON
+#define INC_UNLIT_WF_DEFVAL_UNTOON
 
     /*
      * authors:
      *      ver:2020/10/13 whiteflare,
      */
 
-    #include "WF_UnToon_Input.cginc"
+    #include "WF_Common.cginc"
 
-    ////////////////////////////
-    // Texture & Sampler
-    ////////////////////////////
+    #ifndef WF_DEFINED_UNIFORM
+    #define WF_DEFINED_UNIFORM
 
-    samplerCUBE     _GR_Cubemap;
+        CBUFFER_START(UnityPerMaterial)
 
-    ////////////////////////////
-    // Other uniform variable
-    ////////////////////////////
+        #include "WF_UnToon_Uniform.cginc"
+        #include "WF_Gem_Uniform.cginc"
 
-    float           _GF_Enable;
-    float           _GF_FlakeSizeFront;
-    float           _GF_FlakeSizeBack;
-    float           _GF_FlakeShear;
-    float           _GF_FlakeBrighten;
-    float           _GF_FlakeDarken;
-    float           _GF_Twinkle;
-    float           _GF_BlendNormal;
+        CBUFFER_END
 
-    float           _GR_Enable;
-    float           _GR_Power;
-    float           _GR_Brightness;
-    float           _GR_Monochrome;
-    float4          _GR_Cubemap_HDR;
-    float           _GR_CubemapPower;
-    float           _GR_BlendNormal;
-
-    float           _AlphaFront;
-    float           _AlphaBack;
-
-    float           _GB_Enable;
-    float4          _GB_ColorBack;
+    #endif
 
 #endif

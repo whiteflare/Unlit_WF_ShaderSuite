@@ -27,11 +27,7 @@
     // uniform variable
     ////////////////////////////
 
-    #include "WF_Common.cginc"
-
-CBUFFER_START(UnityPerMaterial)
-    #include "WF_UnToon_Input.cginc"
-CBUFFER_END
+    #include "WF_DefVal_UnToon.cginc"
 
     ////////////////////////////
     // main structure
@@ -71,12 +67,17 @@ CBUFFER_END
     // vertex&fragment shader
     ////////////////////////////
 
-    float4 _ShadowBias; // x: depth bias, y: normal bias
     float3 _LightDirection;
 
     float4 GetShadowPositionHClip(appdata input) {
         float3 positionWS = UnityObjectToWorldPos(input.vertex.xyz);
         float3 normalWS = UnityObjectToWorldNormal(input.normal);
+
+#ifdef UNIVERSAL_SHADOWS_INCLUDED
+
+        float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection));
+
+#else   // LIGHTWEIGHT_SHADOWS_INCLUDED
 
         float invNdotL = 1.0 - saturate(dot(_LightDirection, normalWS));
         float scale = invNdotL * _ShadowBias.y;
@@ -85,6 +86,8 @@ CBUFFER_END
         positionWS = _LightDirection * _ShadowBias.xxx + positionWS;
         positionWS = normalWS * scale.xxx + positionWS;
         float4 positionCS = TransformWorldToHClip(positionWS);
+
+#endif
 
 #if UNITY_REVERSED_Z
         positionCS.z = min(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);

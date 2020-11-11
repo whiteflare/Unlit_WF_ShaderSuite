@@ -23,12 +23,7 @@
      *      ver:2020/10/13 whiteflare,
      */
 
-    #include "WF_Common.cginc"
-
-CBUFFER_START(UnityPerMaterial)
-    #include "WF_FakeFur_Input.cginc"
-CBUFFER_END
-
+    #include "WF_DefVal_FakeFur.cginc"
     #include "WF_UnToon.cginc"
 
     struct appdata_fur {

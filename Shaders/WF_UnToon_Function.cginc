@@ -361,7 +361,7 @@
                     lerp(color.rgb, es_color, waving),
                     es_power);
 
-                #ifndef _ES_SIMPLE_ENABLE
+                #if !defined(_ES_SIMPLE_ENABLE) && !defined(_AL_CUTOUT)
                     #ifdef _ES_FORCE_ALPHASCROLL
                         color.a = max(color.a, waving * _EmissionColor.a * es_power);
                     #else

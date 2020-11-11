@@ -27,11 +27,7 @@
     // uniform variable
     ////////////////////////////
 
-    #include "WF_Common.cginc"
-
-CBUFFER_START(UnityPerMaterial)
-    #include "WF_UnToon_Input.cginc"
-CBUFFER_END
+    #include "WF_DefVal_UnToon.cginc"
 
     ////////////////////////////
     // main structure
@@ -69,7 +65,12 @@ CBUFFER_END
         v2f_meta o;
         UNITY_INITIALIZE_OUTPUT(v2f_meta, o);
 
+#ifdef UNIVERSAL_META_PASS_INCLUDED
+        o.pos   = MetaVertexPosition(i.vertex, i.uv1, i.uv2, unity_LightmapST, unity_DynamicLightmapST);
+#else
         o.pos   = MetaVertexPosition(i.vertex, i.uv1, i.uv2, unity_LightmapST);
+#endif
+
         o.uv    = TRANSFORM_TEX(i.uv0, _MainTex);
 #ifdef _VC_ENABLE
         o.vertex_color = i.vertex_color;
