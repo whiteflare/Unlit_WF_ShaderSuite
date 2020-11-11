@@ -27,7 +27,7 @@
     // uniform variable
     ////////////////////////////
 
-    #include "WF_DefVal_UnToon.cginc"
+    #include "WF_INPUT_UnToon.cginc"
 
     ////////////////////////////
     // main structure

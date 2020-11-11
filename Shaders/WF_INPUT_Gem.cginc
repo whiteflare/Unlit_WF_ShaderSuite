@@ -15,8 +15,8 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INC_UNLIT_WF_DEFVAL_FAKEFUR
-#define INC_UNLIT_WF_DEFVAL_FAKEFUR
+#ifndef INC_UNLIT_WF_INPUT_GEM
+#define INC_UNLIT_WF_INPUT_GEM
 
     /*
      * authors:
@@ -31,7 +31,7 @@
         CBUFFER_START(UnityPerMaterial)
 
         #include "WF_UnToon_Uniform.cginc"
-        #include "WF_FakeFur_Uniform.cginc"
+        #include "WF_Gem_Uniform.cginc"
 
         CBUFFER_END
 

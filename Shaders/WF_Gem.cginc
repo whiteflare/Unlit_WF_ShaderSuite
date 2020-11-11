@@ -23,7 +23,7 @@
      *      ver:2020/10/13 whiteflare,
      */
 
-    #include "WF_DefVal_Gem.cginc"
+    #include "WF_INPUT_Gem.cginc"
     #include "WF_UnToon.cginc"
 
     ////////////////////////////
