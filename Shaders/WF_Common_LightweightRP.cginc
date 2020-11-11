@@ -39,7 +39,7 @@
         #endif
     }
 
-#ifndef WF_FORCE_USE_SAMPLER
+#ifndef _WF_FORCE_USE_SAMPLER
     // 通常版
     #define DECL_MAIN_TEX2D(name)           TEXTURE2D(name); SAMPLER(sampler##name)
     #define DECL_SUB_TEX2D(name)            TEXTURE2D(name)

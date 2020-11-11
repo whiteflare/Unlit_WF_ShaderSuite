@@ -26,7 +26,7 @@
     #include "UnityCG.cginc"
     #include "Lighting.cginc"
 
-#ifndef WF_FORCE_USE_SAMPLER
+#ifndef _WF_FORCE_USE_SAMPLER
 
     // 通常版
     #define DECL_MAIN_TEX2D(name)           UNITY_DECLARE_TEX2D(name)

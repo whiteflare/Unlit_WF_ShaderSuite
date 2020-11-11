@@ -35,7 +35,7 @@
     #include "WF_Common_BuiltinRP.cginc"
 #endif
 
-#ifdef WF_FORCE_USE_SAMPLER
+#ifdef _WF_FORCE_USE_SAMPLER
     // 強制的にサンプラーを定義する版
     #define DECL_MAIN_TEX2D(name)           sampler2D name
     #define DECL_SUB_TEX2D(name)            sampler2D name
