@@ -294,7 +294,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_UnToonURP_DepthOnly.hlsl"
+            #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL
         }
@@ -318,7 +318,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
 
             #pragma multi_compile_instancing
 
-            #include "WF_UnToonURP_ShadowCaster.hlsl"
+            #include "WF_UnToonURP_ShadowCaster.cginc"
 
             ENDHLSL
         }
@@ -340,7 +340,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
 
             #define _VC_ENABLE
 
-            #include "WF_UnToonURP_Meta.hlsl"
+            #include "WF_UnToonURP_Meta.cginc"
 
             ENDHLSL
         }

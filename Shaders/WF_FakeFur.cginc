@@ -23,6 +23,12 @@
      *      ver:2020/10/13 whiteflare,
      */
 
+    #include "WF_Common.cginc"
+
+CBUFFER_START(UnityPerMaterial)
+    #include "WF_FakeFur_Input.cginc"
+CBUFFER_END
+
     #include "WF_UnToon.cginc"
 
     struct appdata_fur {
@@ -51,16 +57,9 @@
         float4 vertex           : SV_POSITION;
     };
 
-    sampler2D       _FR_NoiseTex;
-    float4          _FR_NoiseTex_ST;
-    float           _FR_Height;
-    float4          _FR_Vector;
-    sampler2D       _FG_BumpMap;
-    float           _FG_FlipTangent;
-    uint            _FR_Repeat;
-    float           _FR_ShadowPower;
-    sampler2D       _FR_MaskTex;
-    float           _AL_AlphaToMask;
+    ////////////////////////////
+    // vertex & fragment shader
+    ////////////////////////////
 
     v2g vert_fakefur(appdata_fur v) {
         v2g o;

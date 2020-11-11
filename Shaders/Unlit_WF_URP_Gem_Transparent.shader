@@ -142,6 +142,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
             // Unity defined keywords
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile_fog
 
             //--------------------------------------
             #pragma multi_compile_instancing
@@ -173,7 +174,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
 
             #pragma multi_compile_instancing
 
-            #include "WF_UnToonURP_DepthOnly.hlsl"
+            #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL
         }

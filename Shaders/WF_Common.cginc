@@ -29,7 +29,7 @@
 
 #ifdef _WF_PLATFORM_LWRP
     // Lightweight RP 向け定義
-    #include "WF_Common_LightweightRP.hlsl"
+    #include "WF_Common_LightweightRP.cginc"
 #else
     // Builtin RP 向け定義
     #include "WF_Common_BuiltinRP.cginc"

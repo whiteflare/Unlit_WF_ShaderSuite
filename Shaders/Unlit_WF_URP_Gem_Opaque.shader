@@ -156,7 +156,7 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
 
             #pragma multi_compile_instancing
 
-            #include "WF_UnToonURP_DepthOnly.hlsl"
+            #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL
         }
