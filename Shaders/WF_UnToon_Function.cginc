@@ -331,11 +331,6 @@
     ////////////////////////////
 
     #ifdef _CH_ENABLE
-        float       _CH_Enable;
-        DECL_SUB_TEX2D(_CH_3chMaskTex);
-        float4		_CH_ColorR;
-        float4		_CH_ColorG;
-        float4		_CH_ColorB;
 
         inline void affect3chColorMask(float2 mask_uv, inout float4 color) {
             if (TGL_ON(_CH_Enable)) {

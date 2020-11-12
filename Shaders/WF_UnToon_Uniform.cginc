@@ -36,6 +36,7 @@
         DECL_SUB_TEX2D(_TR_MaskTex);
         DECL_SUB_TEX2D(_OL_MaskTex);
         DECL_SUB_TEX2D(_TL_CustomColorTex);
+        DECL_SUB_TEX2D(_CH_3chMaskTex);
 #ifndef _WF_MOBILE
         DECL_SUB_TEX2D(_NM_2ndMaskTex);
         DECL_SUB_TEX2D(_SpecGlossMap);
@@ -88,6 +89,11 @@
     float           _GL_CustomAltitude;
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
+
+    float           _CH_Enable;
+    float4          _CH_ColorR;
+    float4          _CH_ColorG;
+    float4          _CH_ColorB;
 
     float           _CL_Enable;
     float           _CL_DeltaH;
