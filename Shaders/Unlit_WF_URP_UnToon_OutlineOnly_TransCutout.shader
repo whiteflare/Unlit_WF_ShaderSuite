@@ -184,6 +184,7 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_TransCutout" {
 
             #include "WF_INPUT_UnToon.cginc"
             #include "WF_UnToon.cginc"
+            // WF_UnToon_DepthOnly.cginc ではなく、アウトライン処理を持っている WF_UnToon.cginc を使う
 
             ENDHLSL
         }

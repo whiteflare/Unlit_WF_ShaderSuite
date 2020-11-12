@@ -126,8 +126,8 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
 
-		// カラーマスク
-		affect3chColorMask(uv_main, color);
+        // カラーマスク
+        affect3chColorMask(uv_main, color);
         // 色変換
         affectColorChange(color);
         // BumpMap
@@ -185,37 +185,8 @@
     // アウトライン用 vertex&fragment shader
     ////////////////////////////
 
-    float4 shiftDepthVertex(float3 ws_vertex, float width) {
-        // ワールド座標でのカメラ方向と距離を計算
-        float3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
-        // カメラ方向の z シフト量を加算
-        float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
-
-        float4 vertex;
-        if (unity_OrthoParams.w < 0.5) {
-            // カメラが perspective のときは単にカメラ方向にシフトする
-            vertex = UnityWorldToClipPos( ws_vertex + zShiftVec );
-        } else {
-            // カメラが orthographic のときはシフト後の z のみ採用する
-            vertex = UnityWorldToClipPos( ws_vertex );
-            vertex.z = UnityWorldToClipPos( ws_vertex + zShiftVec ).z;
-        }
-        return vertex;
-    }
-
     float4 shiftOutlineVertex(inout v2f o, float width, float shift) {
-        #ifdef _TL_ENABLE
-        if (TGL_ON(_TL_Enable)) {
-            // 外側にシフトする
-            o.ws_vertex.xyz += o.normal * width;
-            // Zシフト
-            return shiftDepthVertex(o.ws_vertex, shift);
-        } else {
-            return UnityObjectToClipPos( ZERO_VEC3 );
-        }
-        #else
-            return UnityObjectToClipPos( ZERO_VEC3 );
-        #endif
+        return shiftOutlineVertex(o.ws_vertex, o.normal, width, shift);
     }
 
     float4 shiftOutlineVertex(inout v2f o) {
