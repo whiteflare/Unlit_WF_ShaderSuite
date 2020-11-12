@@ -55,7 +55,11 @@
     // Unity Meta function
     ////////////////////////////
 
+#if UNITY_VERSION < 201904
     #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/MetaInput.hlsl"
+#else
+    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl"
+#endif
 
     ////////////////////////////
     // vertex&fragment shader
