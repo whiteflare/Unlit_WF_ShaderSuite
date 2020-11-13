@@ -171,6 +171,8 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_TransCutout" {
 
             ENDHLSL
         }
+
+        UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 
     FallBack "Hidden/InternalErrorShader"

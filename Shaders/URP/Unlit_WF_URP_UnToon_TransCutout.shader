@@ -324,7 +324,7 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_UnToon.cginc"
-            #include "WF_UnToonURP_DepthOnly.cginc"
+            #include "../WF_UnToon_DepthOnly.cginc"
 
             ENDHLSL
         }

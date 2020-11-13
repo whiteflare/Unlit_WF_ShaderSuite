@@ -152,6 +152,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
 
             ENDHLSL
         }
+
+        UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 
     FallBack "Hidden/InternalErrorShader"
