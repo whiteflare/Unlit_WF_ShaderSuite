@@ -286,7 +286,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
             #define _AL_ENABLE
             #define _TL_ENABLE
-            #define _TR_ENABLE
             #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
