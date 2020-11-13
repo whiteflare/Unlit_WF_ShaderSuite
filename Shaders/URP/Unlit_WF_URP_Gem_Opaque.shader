@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF_URP/WF_Gem_Transparent" {
+Shader "UnlitWF_URP/WF_Gem_Opaque" {
 
     /*
      * authors:
@@ -27,7 +27,6 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
         [HDR]
             _Color                  ("Color", Color) = (0.8, 0.4, 0.4, 1)
             _MainTex                ("Main Texture", 2D) = "white" {}
-            _AlphaFront             ("Transparency (front)", Range(0, 1)) = 0.5
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
         [Toggle(_)]
@@ -55,18 +54,6 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
         [PowerSlider(4.0)]
             _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 16)) = 1
             _GR_BlendNormal         ("[GR] Blend Normal", Range(0, 1)) = 0.1
-
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [FixNoTexture]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [HideInInspector]
-        [FixFloat(0.0)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 0.8
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -98,8 +85,8 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "RenderType" = "Opaque"
+            "Queue" = "Geometry"
             "RenderPipeline" = "LightweightPipeline"
         }
 
@@ -108,9 +95,6 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
             Tags { "LightMode" = "LightweightForward" }
 
             Cull [_CullMode]
-
-            ZWrite [_AL_ZWrite]
-            Blend One OneMinusSrcAlpha
 
             HLSLPROGRAM
 
@@ -124,8 +108,6 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
             #define _NM_ENABLE
             #define _VC_ENABLE
 
@@ -147,8 +129,8 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_Gem.cginc"
-            #include "WF_Gem.cginc"
+            #include "../WF_INPUT_Gem.cginc"
+            #include "../WF_Gem.cginc"
 
             ENDHLSL
         }
@@ -157,7 +139,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            ZWrite [_AL_ZWrite]
+            ZWrite On
             ColorMask 0
             Cull[_CullMode]
 
@@ -175,7 +157,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
 
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_Gem.cginc"
+            #include "../WF_INPUT_Gem.cginc"
             #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL

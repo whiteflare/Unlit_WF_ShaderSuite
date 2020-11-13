@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
+Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
 
     /*
      * authors:
@@ -32,11 +32,6 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // StencilMask
-        [WFHeader(Stencil Mask)]
-        [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
-            _StencilMaskID          ("ID", int) = 8
-
         // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
@@ -45,9 +40,9 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+        [Toggle(_)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
 
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
@@ -205,8 +200,6 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
-        [Toggle(_)]
-            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
@@ -247,8 +240,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest"
             "RenderPipeline" = "LightweightPipeline"
         }
 
@@ -257,15 +250,6 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             Tags { "LightMode" = "LightweightForward" }
 
             Cull [_CullMode]
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            Stencil {
-                Ref [_StencilMaskID]
-                WriteMask [_StencilMaskID]
-                Comp ALWAYS
-                Pass replace
-            }
 
             HLSLPROGRAM
 
@@ -279,12 +263,15 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             #define _WF_PLATFORM_LWRP
 
             #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
+            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
@@ -307,8 +294,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
-            #include "WF_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }
@@ -317,16 +304,9 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            Cull[_CullMode]
-            ZWrite [_AL_ZWrite]
+            ZWrite On
             ColorMask 0
-
-            Stencil {
-                Ref [_StencilMaskID]
-                WriteMask [_StencilMaskID]
-                Comp ALWAYS
-                Pass replace
-            }
+            Cull[_CullMode]
 
             HLSLPROGRAM
 
@@ -338,18 +318,66 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             #define _WF_PLATFORM_LWRP
 
             #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL
         }
 
-        UsePass "UnlitWF_URP/WF_UnToon_Transparent/SHADOWCASTER"
-        UsePass "UnlitWF_URP/WF_UnToon_Transparent/META"
+        Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
+
+            #define _WF_PLATFORM_LWRP
+
+            #define _AL_ENABLE
+            #define _AL_CUTOUT
+            #define _VC_ENABLE
+
+            #pragma multi_compile_instancing
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "WF_UnToonURP_ShadowCaster.cginc"
+
+            ENDHLSL
+        }
+
+        Pass {
+            Name "META"
+            Tags { "LightMode" = "Meta" }
+
+            Cull Off
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta
+
+            #define _WF_PLATFORM_LWRP
+
+            #define _VC_ENABLE
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "WF_UnToonURP_Meta.cginc"
+
+            ENDHLSL
+        }
     }
 
     FallBack "Hidden/InternalErrorShader"

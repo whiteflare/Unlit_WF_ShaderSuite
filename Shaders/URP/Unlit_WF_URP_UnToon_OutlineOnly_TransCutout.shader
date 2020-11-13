@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_Opaque" {
+Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_TransCutout" {
 
     /*
      * authors:
@@ -50,6 +50,18 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_Opaque" {
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+
+        // Alpha
+        [WFHeader(Transparent Alpha)]
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
+        [NoScaleOffset]
+            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+        [Toggle(_)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
 
         // リムライト
         [WFHeaderToggle(RimLight)]
@@ -90,8 +102,8 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_Opaque" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry-1"
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest-1"
             "RenderPipeline" = "LightweightPipeline"
         }
 
@@ -114,6 +126,8 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_Opaque" {
 
             #define _WF_PLATFORM_LWRP
 
+            #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _TL_ENABLE
             #define _TR_ENABLE
             #define _VC_ENABLE
@@ -136,8 +150,8 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_Opaque" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
-            #include "WF_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }
@@ -160,14 +174,16 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_Opaque" {
 
             #define _WF_PLATFORM_LWRP
 
+            #define _AL_ENABLE
+            #define _AL_CUTOUT
             #define _TL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
-            #include "WF_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
             // WF_UnToon_DepthOnly.cginc ではなく、アウトライン処理を持っている WF_UnToon.cginc を使う
 
             ENDHLSL

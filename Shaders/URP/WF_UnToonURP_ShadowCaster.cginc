@@ -27,7 +27,7 @@
     // uniform variable
     ////////////////////////////
 
-    #include "WF_INPUT_UnToon.cginc"
+    #include "../WF_INPUT_UnToon.cginc"
 
     ////////////////////////////
     // main structure
@@ -61,7 +61,7 @@
     // UnToon function
     ////////////////////////////
 
-    #include "WF_UnToon_Function.cginc"
+    #include "../WF_UnToon_Function.cginc"
 
     ////////////////////////////
     // vertex&fragment shader

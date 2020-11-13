@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
+Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
     /*
      * authors:
@@ -45,6 +45,47 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
+        // 3chカラーマスク
+        [WFHeaderToggle(3ch Color Mask)]
+            _CH_Enable              ("[CH] Enable", Float) = 0
+        [NoScaleOffset]
+            _CH_3chMaskTex          ("[CH] 3ch Mask Texture", 2D) = "black" {}
+        [HDR]
+            _CH_ColorR              ("[CH] R ch Color", Color) = (1, 1, 1, 1)
+        [HDR]
+            _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
+        [HDR]
+            _CH_ColorB              ("[CH] B chl Color", Color) = (1, 1, 1, 1)
+
+        // 色変換
+        [WFHeaderToggle(Color Change)]
+            _CL_Enable              ("[CL] Enable", Float) = 0
+        [Toggle(_)]
+            _CL_Monochrome          ("[CL] monochrome", Range(0, 1)) = 0
+            _CL_DeltaH              ("[CL] Hur", Range(0, 1)) = 0
+            _CL_DeltaS              ("[CL] Saturation", Range(-1, 1)) = 0
+            _CL_DeltaV              ("[CL] Brightness", Range(-1, 1)) = 0
+
+        // 法線マップ
+        [WFHeaderToggle(NormalMap)]
+            _NM_Enable              ("[NM] Enable", Float) = 0
+        [NoScaleOffset]
+            _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
+            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
+            _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
+        [Toggle(_)]
+            _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
+
+        [Header(NormalMap Secondary)]
+        [Enum(OFF,0,BLEND,1,SWITCH,2)]
+            _NM_2ndType             ("[NM] 2nd Normal Blend", Float) = 0
+            _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
+            _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
+        [NoScaleOffset]
+            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
+
         // メタリックマップ
         [WFHeaderToggle(Metallic)]
             _MT_Enable              ("[MT] Enable", Float) = 0
@@ -57,10 +98,22 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
+        [Toggle(_)]
+            _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
             _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
+
+        [Header(Metallic Secondary)]
+        [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
+            _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
+        [NoScaleOffset]
+            _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
+        [PowerSlider(4.0)]
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
@@ -82,8 +135,14 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[SH] Enable", Float) = 0
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
             _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
+        [NoScaleOffset]
+            _TS_1stTex              ("[SH] 1st Shade Texture", 2D) = "white" {}
             _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
+        [NoScaleOffset]
+            _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
@@ -109,6 +168,23 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
+
+        // Decal Texture
+        [WFHeaderToggle(Decal Texture)]
+            _OL_Enable              ("[OL] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1,SKYBOX,2,ANGEL_RING,3)]
+            _OL_UVType              ("[OL] UV Type", Float) = 0
+        [HDR]
+            _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
+            _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
+        [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
+            _OL_BlendType           ("[OL] Blend Type", Float) = 0
+            _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
+            _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
         // EmissiveScroll
         [WFHeaderToggle(Emission)]
@@ -137,6 +213,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
         [Toggle(_)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
@@ -188,14 +266,15 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #pragma target 3.0
 
             #define _WF_PLATFORM_LWRP
-            #define _WF_MOBILE
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
             #define _ES_ENABLE
-            #define _HL_ENABLE
             #define _MT_ENABLE
+            #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
@@ -218,8 +297,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
-            #include "WF_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }
@@ -228,9 +307,9 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            ZWrite On
-            ColorMask 0
             Cull[_CullMode]
+            ZWrite [_AL_ZWrite]
+            ColorMask 0
 
             HLSLPROGRAM
 
@@ -240,15 +319,13 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #pragma fragment frag_depth
 
             #define _WF_PLATFORM_LWRP
-            #define _WF_MOBILE
 
             #define _AL_ENABLE
             #define _VC_ENABLE
 
-            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL
@@ -268,14 +345,13 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #pragma fragment frag_shadow
 
             #define _WF_PLATFORM_LWRP
-            #define _WF_MOBILE
 
             #define _AL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_ShadowCaster.cginc"
 
             ENDHLSL
@@ -295,12 +371,10 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #pragma fragment frag_meta
 
             #define _WF_PLATFORM_LWRP
-            #define _WF_MOBILE
 
-            #define _AL_ENABLE
             #define _VC_ENABLE
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_Meta.cginc"
 
             ENDHLSL

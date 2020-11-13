@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
+Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
     /*
      * authors:
@@ -28,21 +28,19 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 0
+            _CullMode               ("Cull Mode", int) = 2
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
+        // 法線マップ
+        [WFHeaderToggle(NormalMap)]
+            _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+            _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
+            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
+            _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Toggle(_)]
-            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
-        [Toggle(_)]
-            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
+            _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
 
         // メタリックマップ
         [WFHeaderToggle(Metallic)]
@@ -152,8 +150,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
     SubShader {
         Tags {
-            "RenderType" = "TransparentCutout"
-            "Queue" = "AlphaTest"
+            "RenderType" = "Opaque"
+            "Queue" = "Geometry"
             "RenderPipeline" = "LightweightPipeline"
         }
 
@@ -162,7 +160,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             Tags { "LightMode" = "LightweightForward" }
 
             Cull [_CullMode]
-            AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM
 
@@ -176,13 +173,12 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
             #define _AO_ENABLE
             #define _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
+            #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
@@ -205,8 +201,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
-            #include "WF_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }
@@ -218,7 +214,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             ZWrite On
             ColorMask 0
             Cull[_CullMode]
-            AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM
 
@@ -230,14 +225,12 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
             #define _VC_ENABLE
 
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL
@@ -259,13 +252,11 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_ShadowCaster.cginc"
 
             ENDHLSL
@@ -287,11 +278,9 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
             #define _VC_ENABLE
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_Meta.cginc"
 
             ENDHLSL

@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
+Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
     /*
      * authors:
@@ -28,19 +28,22 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 2
+            _CullMode               ("Cull Mode", int) = 0
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // 法線マップ
-        [WFHeaderToggle(NormalMap)]
-            _NM_Enable              ("[NM] Enable", Float) = 0
+        // Alpha
+        [WFHeader(Transparent Alpha)]
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
-            _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
-            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
-            _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
+            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [Toggle(_)]
-            _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
+            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
+            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
+            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // メタリックマップ
         [WFHeaderToggle(Metallic)]
@@ -107,7 +110,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
-        // Emission
+        // EmissiveScroll
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
@@ -118,6 +121,18 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
         [PowerSlider(4.0)]
             _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
+
+        [Header(Emissive Scroll)]
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
+            _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
+            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
+            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -150,8 +165,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
             "RenderPipeline" = "LightweightPipeline"
         }
 
@@ -160,6 +175,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             Tags { "LightMode" = "LightweightForward" }
 
             Cull [_CullMode]
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
 
             HLSLPROGRAM
 
@@ -173,12 +190,12 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
+            #define _AL_ENABLE
+            #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
             #define _ES_ENABLE
-            #define _ES_SIMPLE_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
-            #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
@@ -201,8 +218,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
-            #include "WF_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }
@@ -225,12 +242,13 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
+            #define _AL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL
@@ -252,11 +270,12 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
+            #define _AL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_ShadowCaster.cginc"
 
             ENDHLSL
@@ -278,9 +297,10 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
+            #define _AL_ENABLE
             #define _VC_ENABLE
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_Meta.cginc"
 
             ENDHLSL

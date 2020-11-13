@@ -15,8 +15,8 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INC_UNLIT_WF_UNTOON_META
-#define INC_UNLIT_WF_UNTOON_META
+#ifndef INC_UNLIT_WF_UNTOON_SHADOWCASTER
+#define INC_UNLIT_WF_UNTOON_SHADOWCASTER
 
     /*
      * authors:
@@ -27,7 +27,7 @@
     // uniform variable
     ////////////////////////////
 
-    #include "WF_INPUT_UnToon.cginc"
+    #include "../WF_INPUT_UnToon.cginc"
 
     ////////////////////////////
     // main structure
@@ -35,47 +35,47 @@
 
     struct appdata {
         float4 vertex           : POSITION;
-        float2 uv0              : TEXCOORD0;
-        float2 uv1              : TEXCOORD1;
-        float2 uv2              : TEXCOORD2;
 #ifdef _VC_ENABLE
         float4 vertex_color     : COLOR0;
 #endif
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 normal           : NORMAL;
+#ifdef _NM_ENABLE
+            float4 tangent      : TANGENT;
+#endif
+        UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
-    struct v2f_meta {
+    struct v2f_depth {
         float4 pos              : SV_POSITION;
         float2 uv               : TEXCOORD0;
 #ifdef _VC_ENABLE
         float4 vertex_color     : COLOR0;
 #endif
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+        UNITY_VERTEX_OUTPUT_STEREO
     };
 
     ////////////////////////////
-    // Unity Meta function
+    // UnToon function
     ////////////////////////////
 
-#if UNITY_VERSION < 201904
-    #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/MetaInput.hlsl"
-#else
-    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl"
-#endif
+    #include "../WF_UnToon_Function.cginc"
 
     ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
 
-    v2f_meta vert_meta(appdata i) {
-        v2f_meta o;
-        UNITY_INITIALIZE_OUTPUT(v2f_meta, o);
+    v2f_depth vert_depth(appdata i) {
+        v2f_depth o;
 
-#ifdef UNIVERSAL_META_PASS_INCLUDED
-        o.pos   = MetaVertexPosition(i.vertex, i.uv1, i.uv2, unity_LightmapST, unity_DynamicLightmapST);
-#else
-        o.pos   = MetaVertexPosition(i.vertex, i.uv1, i.uv2, unity_LightmapST);
-#endif
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_INITIALIZE_OUTPUT(v2f_depth, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.uv    = TRANSFORM_TEX(i.uv0, _MainTex);
+        o.pos   = UnityObjectToClipPos(i.vertex.xyz);
+        o.uv    = TRANSFORM_TEX(i.uv, _MainTex);
 #ifdef _VC_ENABLE
         o.vertex_color = i.vertex_color;
 #endif
@@ -83,22 +83,24 @@
         return o;
     }
 
-    float4 frag_meta(v2f_meta i) : SV_Target {
-        MetaInput o;
-        UNITY_INITIALIZE_OUTPUT(MetaInput, o);
+    float4 frag_depth(v2f_depth i) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        float4 color    = _Color * PICK_MAIN_TEX2D(_MainTex, i.uv);
+        // アルファ計算
+        #ifdef _AL_ENABLE
+            float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
 #ifdef _VC_ENABLE
-        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
+            color *= i.vertex_color;
 #endif
+            affectAlpha(i.uv, color);
+            if (color.a < 0.5) {
+                discard;
+                return ZERO_VEC4;
+            }
+        #endif
 
-        o.Albedo        = color.rgb * color.a;
-        o.SpecularColor = o.Albedo.rgb;
-
-        float3 emission = _EmissionColor.rgb * PICK_SUB_TEX2D(_EmissionMap, _MainTex, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
-        o.Emission      = emission * _ES_Enable * _ES_BakeIntensity;
-
-        return MetaFragment(o);
+        return ZERO_VEC4;
     }
 
 #endif

@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF_URP/WF_UnToon_Transparent" {
+Shader "UnlitWF_URP/WF_UnToon_Opaque" {
 
     /*
      * authors:
@@ -28,22 +28,9 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 0
+            _CullMode               ("Cull Mode", int) = 2
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
-
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-        [NoScaleOffset]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
@@ -201,8 +188,6 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
-        [Toggle(_)]
-            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
@@ -243,8 +228,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "RenderType" = "Opaque"
+            "Queue" = "Geometry"
             "RenderPipeline" = "LightweightPipeline"
         }
 
@@ -253,8 +238,6 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             Tags { "LightMode" = "LightweightForward" }
 
             Cull [_CullMode]
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
 
             HLSLPROGRAM
 
@@ -267,14 +250,14 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
             #define _WF_PLATFORM_LWRP
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
+            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
@@ -297,8 +280,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
-            #include "WF_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }
@@ -307,9 +290,9 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            Cull[_CullMode]
-            ZWrite [_AL_ZWrite]
+            ZWrite On
             ColorMask 0
+            Cull[_CullMode]
 
             HLSLPROGRAM
 
@@ -320,12 +303,12 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
             #define _WF_PLATFORM_LWRP
 
-            #define _AL_ENABLE
             #define _VC_ENABLE
 
+            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_DepthOnly.cginc"
 
             ENDHLSL
@@ -346,12 +329,11 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
             #define _WF_PLATFORM_LWRP
 
-            #define _AL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_ShadowCaster.cginc"
 
             ENDHLSL
@@ -374,7 +356,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
             #define _VC_ENABLE
 
-            #include "WF_INPUT_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_Meta.cginc"
 
             ENDHLSL
