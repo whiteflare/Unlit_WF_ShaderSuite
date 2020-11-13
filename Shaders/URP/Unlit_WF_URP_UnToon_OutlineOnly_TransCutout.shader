@@ -63,22 +63,6 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_TransCutout" {
         [Toggle(_)]
             _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
 
-        // リムライト
-        [WFHeaderToggle(RimLight)]
-            _TR_Enable              ("[RM] Enable", Float) = 0
-        [HDR]
-            _TR_Color               ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [Enum(ADD,0,ALPHA,1)]
-            _TR_BlendType           ("[RM] Blend Type", Float) = 0
-            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
-            _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
-            _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
-            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
-
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -129,7 +113,6 @@ Shader "UnlitWF_URP/WF_UnToon_OutlineOnly_TransCutout" {
             #define _AL_ENABLE
             #define _AL_CUTOUT
             #define _TL_ENABLE
-            #define _TR_ENABLE
             #define _VC_ENABLE
 
             // -------------------------------------
