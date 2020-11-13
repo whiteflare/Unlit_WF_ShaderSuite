@@ -111,4 +111,20 @@
         return UnityMetaFragment(o);
     }
 
+    float4 frag_meta_black(v2f_meta i) : SV_Target {
+        UnityMetaInput o;
+        UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
+
+        o.Albedo        = ZERO_VEC3;
+        o.SpecularColor = ZERO_VEC3;
+        o.Emission      = ZERO_VEC3;
+
+#ifdef EDITOR_VISUALIZATION
+        o.VizUV         = i.vizUV;
+        o.LightCoord    = i.lightCoord;
+#endif
+
+        return UnityMetaFragment(o);
+    }
+
 #endif
