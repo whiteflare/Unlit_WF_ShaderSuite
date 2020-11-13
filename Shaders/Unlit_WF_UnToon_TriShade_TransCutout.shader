@@ -275,7 +275,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             #define _AL_CUTOUT
             #define _FG_ENABLE
             #define _TL_ENABLE
-            #define _TR_ENABLE
             #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
