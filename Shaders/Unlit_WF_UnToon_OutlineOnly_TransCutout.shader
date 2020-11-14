@@ -121,7 +121,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
         UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 
-    FallBack "Hidden/UnlitWF/WF_UnToon_Hidden"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
