@@ -42,7 +42,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
         [Toggle(_)]
-            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // Tessellation
         [WFHeader(Tessellation)]
@@ -291,7 +291,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #define _AL_ENABLE
             #define _AL_CUTOUT
             #define _TL_ENABLE
-            #define _TR_ENABLE
             #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

@@ -42,7 +42,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
         [Toggle(_)]
-            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // アウトライン
         [HideInInspector]
@@ -264,36 +264,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             "DisableBatching" = "True"
         }
 
-        Pass {
-            Name "OUTLINE"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull FRONT
-            AlphaToMask [_AL_AlphaToMask]
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma geometry geom_outline
-            #pragma fragment frag
-
-            #pragma target 4.5
-            #pragma require geometry
-
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
-            #define _TL_ENABLE
-            #define _TR_ENABLE
-            #define _VC_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout/OUTLINE"
         UsePass "UnlitWF/WF_UnToon_TransCutout/MAIN"
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_TransCutout/META"

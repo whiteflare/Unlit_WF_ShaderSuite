@@ -23,7 +23,15 @@
      *      ver:2020/10/13 whiteflare,
      */
 
-    #include "WF_Common.cginc"
+    ////////////////////////////
+    // uniform variable
+    ////////////////////////////
+
+    #include "WF_INPUT_UnToon.cginc"
+
+    ////////////////////////////
+    // main structure
+    ////////////////////////////
 
     struct v2f_shadow {
         V2F_SHADOW_CASTER;
@@ -32,73 +40,15 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    float           _GL_CastShadow;
-    DECL_MAIN_TEX2D(_MainTex);
-    float4          _MainTex_ST;
-    float4          _Color;
-    float           _Cutoff;
+    ////////////////////////////
+    // UnToon function
+    ////////////////////////////
 
-    #ifndef WF_TEX2D_ALPHA_MAIN_ALPHA
-        #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   alpha
-    #endif
-    #ifndef WF_TEX2D_ALPHA_MASK_RED
-        #define WF_TEX2D_ALPHA_MASK_RED(uv)     PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).r
-    #endif
-    #ifndef WF_TEX2D_ALPHA_MASK_ALPHA
-        #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a
-    #endif
+    #include "WF_UnToon_Function.cginc"
 
-    #ifdef _AL_ENABLE
-        int             _AL_Source;
-        float           _AL_Power;
-        DECL_SUB_TEX2D(_AL_MaskTex);
-
-        #ifndef _AL_CustomValue
-            #define _AL_CustomValue 1
-        #endif
-
-        inline float pickAlpha(float2 uv, float alpha) {
-            if (_AL_Source == 1) {
-                return WF_TEX2D_ALPHA_MASK_RED(uv);
-            }
-            else if (_AL_Source == 2) {
-                return WF_TEX2D_ALPHA_MASK_ALPHA(uv);
-            }
-            else {
-                return WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
-            }
-        }
-
-        inline void affectAlpha(float2 uv, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a);
-
-            #if defined(_AL_CUTOUT)
-                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
-                if (baseAlpha < 0.5) {
-                    discard;
-                }
-            #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _Cutoff) {
-                    discard;
-                } else {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                }
-            #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _Cutoff) {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                } else {
-                    discard;
-                }
-            #else
-                baseAlpha *= _AL_Power * _AL_CustomValue;
-            #endif
-
-            color.a = baseAlpha;
-        }
-
-    #else
-        #define affectAlpha(uv, color) color.a = 1.0
-    #endif
+    ////////////////////////////
+    // vertex&fragment shader
+    ////////////////////////////
 
     v2f_shadow vert_shadow(appdata_base v) {
         v2f_shadow o;
@@ -141,7 +91,16 @@
             }
         #endif
 
-		return frag_shadow_caster(i);
+        return frag_shadow_caster(i);
     }
+
+    float4 frag_shadow_hidden(v2f_shadow i) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+        discard;
+        return float4(0, 0, 0, 0);
+    }
+
 
 #endif

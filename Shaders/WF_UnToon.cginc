@@ -23,7 +23,11 @@
      *      ver:2020/10/13 whiteflare,
      */
 
-    #include "WF_Common.cginc"
+    ////////////////////////////
+    // uniform variable
+    ////////////////////////////
+
+    #include "WF_INPUT_UnToon.cginc"
 
     ////////////////////////////
     // main structure
@@ -66,13 +70,6 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    DECL_MAIN_TEX2D(_MainTex);
-    float4          _MainTex_ST;
-    float4          _Color;
-#ifdef _VC_ENABLE
-    float           _UseVertexColor;
-#endif
-
     ////////////////////////////
     // UnToon function
     ////////////////////////////
@@ -90,8 +87,8 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.ws_vertex = mul(unity_ObjectToWorld, v.vertex).xyz;
-        o.vs_vertex = UnityWorldToClipPos(o.ws_vertex);
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
 #ifdef _VC_ENABLE
         o.vertex_color = v.vertex_color;
 #endif
@@ -106,7 +103,7 @@
         #endif
 
         // 環境光取得
-        float3 ambientColor = calcAmbientColorVertex(v);
+        float3 ambientColor = calcAmbientColorVertex(v.uv_lmap);
         // 影コントラスト
         calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
@@ -129,8 +126,8 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
 
-		// カラーマスク
-		affect3chColorMask(uv_main, color);
+        // カラーマスク
+        affect3chColorMask(uv_main, color);
         // 色変換
         affectColorChange(color);
         // BumpMap
@@ -143,7 +140,7 @@
         // カメラへの方向
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i);
+        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
 
         // matcapベクトルの配列
         float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
@@ -151,7 +148,7 @@
         // メタリック
         affectMetallic(i, ws_view_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
-        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax), uv_main, color);
+        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax).xy, uv_main, color);
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
@@ -172,6 +169,8 @@
         affectOutlineAlpha(uv_main, color);
         // EmissiveScroll
         affectEmissiveScroll(i.ws_vertex, uv_main, color);
+        // ToonFog
+        affectToonFog(i, ws_view_dir, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
@@ -186,37 +185,8 @@
     // アウトライン用 vertex&fragment shader
     ////////////////////////////
 
-    float4 shiftDepthVertex(float3 ws_vertex, float width) {
-        // ワールド座標でのカメラ方向と距離を計算
-        float3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
-        // カメラ方向の z シフト量を加算
-        float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
-
-        float4 vertex;
-        if (unity_OrthoParams.w < 0.5) {
-            // カメラが perspective のときは単にカメラ方向にシフトする
-            vertex = UnityWorldToClipPos( ws_vertex + zShiftVec );
-        } else {
-            // カメラが orthographic のときはシフト後の z のみ採用する
-            vertex = UnityWorldToClipPos( ws_vertex );
-            vertex.z = UnityWorldToClipPos( ws_vertex + zShiftVec ).z;
-        }
-        return vertex;
-    }
-
     float4 shiftOutlineVertex(inout v2f o, float width, float shift) {
-        #ifdef _TL_ENABLE
-        if (TGL_ON(_TL_Enable)) {
-            // 外側にシフトする
-            o.ws_vertex.xyz += o.normal * width;
-            // Zシフト
-            return shiftDepthVertex(o.ws_vertex, shift);
-        } else {
-            return UnityObjectToClipPos( ZERO_VEC3 );
-        }
-        #else
-            return UnityObjectToClipPos( ZERO_VEC3 );
-        #endif
+        return shiftOutlineVertex(o.ws_vertex, o.normal, width, shift);
     }
 
     float4 shiftOutlineVertex(inout v2f o) {
@@ -315,8 +285,6 @@
     // EmissiveScroll専用パス用 vertex&fragment shader
     ////////////////////////////
 
-    float _ES_Z_Shift;
-
     float4 shiftEmissiveScrollVertex(inout v2f o) {
         #ifdef _ES_ENABLE
         if (TGL_ON(_ES_Enable)) {
@@ -369,8 +337,6 @@
     ////////////////////////////
     // ZOffset 付き vertex shader
     ////////////////////////////
-
-    float _AL_Z_Offset;
 
     v2f vert_with_zoffset(appdata v) {
         // 通常の vert を使う

@@ -276,7 +276,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
             #pragma target 5.0
 
             #define _TL_ENABLE
-            #define _TR_ENABLE
             #define _VC_ENABLE
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
