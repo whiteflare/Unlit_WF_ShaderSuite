@@ -527,6 +527,13 @@ namespace UnlitWF
             { "[AO] Contrast", "[AO] コントラスト" },
             { "[AO] Brightness", "[AO] 明るさ" },
             { "[AO] Occlusion Mask Texture", "[AO] マスクテクスチャ" },
+            // Toon Fog
+            { "[FG] Color", "[FG] フォグの色" },
+            { "[FG] Fog Min Distance", "[FG] フォグが効き始める距離" },
+            { "[FG] Fog Max Distance", "[FG] フォグが最大になる距離" },
+            { "[FG] Exponential", "[FG] 変化の鋭さ" },
+            { "[FG] Base Offset", "[FG] フォグ原点の位置(オフセット)" },
+            { "[FG] Scale", "[FG] フォグ範囲のスケール" },
             // Lit Advance
             { "Sun Source", "太陽光のモード" },
             { "Custom Sun Azimuth", "カスタム太陽の方角" },
