@@ -476,8 +476,6 @@ namespace UnlitWF
             { "[SH] 1st Shade Texture", "[SH] 1影色テクスチャ" },
             { "[SH] 2nd Shade Color", "[SH] 2影色" },
             { "[SH] 2nd Shade Texture", "[SH] 2影色テクスチャ" },
-            { "[SH] 3rd Shade Color", "[SH] 3影色" },
-            { "[SH] 3rd Shade Texture", "[SH] 3影色テクスチャ" },
             { "[SH] Shade Power", "[SH] 影の強度" },
             { "[SH] 1st Border", "[SH] 1影の境界位置" },
             { "[SH] 2nd Border", "[SH] 2影の境界位置" },
@@ -527,13 +525,6 @@ namespace UnlitWF
             { "[AO] Contrast", "[AO] コントラスト" },
             { "[AO] Brightness", "[AO] 明るさ" },
             { "[AO] Occlusion Mask Texture", "[AO] マスクテクスチャ" },
-            // Toon Fog
-            { "[FG] Color", "[FG] フォグの色" },
-            { "[FG] Fog Min Distance", "[FG] フォグが効き始める距離" },
-            { "[FG] Fog Max Distance", "[FG] フォグが最大になる距離" },
-            { "[FG] Exponential", "[FG] 変化の鋭さ" },
-            { "[FG] Base Offset", "[FG] フォグ原点の位置(オフセット)" },
-            { "[FG] Scale", "[FG] フォグ範囲のスケール" },
             // Lit Advance
             { "Sun Source", "太陽光のモード" },
             { "Custom Sun Azimuth", "カスタム太陽の方角" },
@@ -745,14 +736,6 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Tessellation", "TransCutout",           "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout"),
             new WFShaderName("UnToon", "Tessellation", "Transparent",           "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
             new WFShaderName("UnToon", "Tessellation", "Transparent3Pass",      "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
-
-            new WFShaderName("UnToon", "TriShade", "Opaque",                    "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque"),
-            new WFShaderName("UnToon", "TriShade", "TransCutout",               "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout"),
-            new WFShaderName("UnToon", "TriShade", "Transparent",               "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent"),
-            new WFShaderName("UnToon", "TriShade", "Transparent3Pass",          "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass"),
-            new WFShaderName("UnToon", "TriShade", "Transparent_Mask",          "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask"),
-            new WFShaderName("UnToon", "TriShade", "Transparent_MaskOut",       "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut"),
-            new WFShaderName("UnToon", "TriShade", "Transparent_MaskOut_Blend", "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend"),
 
             new WFShaderName("FakeFur", "Basic", "TransCutout",                 "UnlitWF/WF_FakeFur_TransCutout"),
             new WFShaderName("FakeFur", "Basic", "Transparent",                 "UnlitWF/WF_FakeFur_Transparent"),

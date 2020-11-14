@@ -149,11 +149,9 @@
     float4          _TS_BaseColor;
     float4          _TS_1stColor;
     float4          _TS_2ndColor;
-    float4          _TS_3rdColor;
     float           _TS_Power;
     float           _TS_1stBorder;
     float           _TS_2ndBorder;
-    float           _TS_3rdBorder;
     float           _TS_Feather;
     float           _TS_BlendNormal;
     float           _TS_InvMaskVal;
@@ -189,13 +187,5 @@
     float           _AO_UseLightMap;
     float           _AO_Contrast;
     float           _AO_Brightness;
-
-    float           _FG_Enable;
-    float4          _FG_Color;
-    float           _FG_MinDist;
-    float           _FG_MaxDist;
-    float           _FG_Exponential;
-    float3          _FG_BaseOffset;
-    float3          _FG_Scale;
 
 #endif
