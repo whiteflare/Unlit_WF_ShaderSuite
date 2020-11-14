@@ -42,7 +42,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
         [Toggle(_)]
-            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
