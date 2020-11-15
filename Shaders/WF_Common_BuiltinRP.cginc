@@ -35,8 +35,8 @@
     #define PICK_SUB_TEX2D(tex, name, uv)   UNITY_SAMPLE_TEX2D_SAMPLER(tex, name, uv)
 
 #ifdef SHADER_API_D3D11
-    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        tex.SampleLevel(sampler##tex,coord, lod)
-    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   tex.SampleLevel(sampler##samplertex, coord, lod)
+    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        tex.SampleLevel(sampler##tex, uv, lod)
+    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   tex.SampleLevel(sampler##samplertex, uv, lod)
 #endif
 
 #endif
