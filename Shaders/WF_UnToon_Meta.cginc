@@ -20,14 +20,18 @@
 
     /*
      * authors:
-     *      ver:2020/10/13 whiteflare,
+     *      ver:2020/11/19 whiteflare,
      */
 
-    #include "UnityCG.cginc"
-    #include "UnityMetaPass.cginc"
+    ////////////////////////////
+    // uniform variable
+    ////////////////////////////
 
-    #define ZERO_VEC3   float3(0, 0, 0)
-    #define ONE_VEC4    float4(1, 1, 1, 1)
+    #include "WF_INPUT_UnToon.cginc"
+
+    ////////////////////////////
+    // main structure
+    ////////////////////////////
 
     struct appdata {
         float4 vertex           : POSITION;
@@ -46,23 +50,20 @@
         float4 vertex_color     : COLOR0;
 #endif
 #ifdef EDITOR_VISUALIZATION
-        float2 vizUV        	: TEXCOORD1;
-        float4 lightCoord   	: TEXCOORD2;
+        float2 vizUV            : TEXCOORD1;
+        float4 lightCoord       : TEXCOORD2;
 #endif
     };
 
-    sampler2D       _MainTex;
-    float4          _MainTex_ST;
-    float4          _Color;
-#ifdef _VC_ENABLE
-    float           _UseVertexColor;
-#endif
+    ////////////////////////////
+    // Unity Meta function
+    ////////////////////////////
 
-    float           _ES_Enable;
-    sampler2D       _EmissionMap;
-    float4          _EmissionColor;
-    float           _ES_BlendType;
-    float           _ES_BakeIntensity;
+    #include "UnityMetaPass.cginc"
+
+    ////////////////////////////
+    // vertex&fragment shader
+    ////////////////////////////
 
     v2f_meta vert_meta(appdata v) {
         v2f_meta o;
@@ -80,7 +81,7 @@
         }
         else if (unity_VisualizationMode == EDITORVIZ_SHOWLIGHTMASK) {
             o.vizUV         = v.uv1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            o.lightCoord    = mul(unity_EditorViz_WorldToLight, mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1)));
+            o.lightCoord    = mul(unity_EditorViz_WorldToLight, UnityObjectToWorldPos(v.vertex));
         }
 #endif
 
@@ -91,7 +92,7 @@
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
-        float4 color    = _Color * tex2D(_MainTex, i.uv);
+        float4 color    = _Color * PICK_MAIN_TEX2D(_MainTex, i.uv);
 #ifdef _VC_ENABLE
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
@@ -99,8 +100,24 @@
         o.Albedo        = color.rgb * color.a;
         o.SpecularColor = o.Albedo.rgb;
 
-        float3 emission = _EmissionColor.rgb * tex2D(_EmissionMap, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
+        float3 emission = _EmissionColor.rgb * PICK_SUB_TEX2D(_EmissionMap, _MainTex, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
         o.Emission      = emission * _ES_Enable * _ES_BakeIntensity;
+
+#ifdef EDITOR_VISUALIZATION
+        o.VizUV         = i.vizUV;
+        o.LightCoord    = i.lightCoord;
+#endif
+
+        return UnityMetaFragment(o);
+    }
+
+    float4 frag_meta_black(v2f_meta i) : SV_Target {
+        UnityMetaInput o;
+        UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
+
+        o.Albedo        = ZERO_VEC3;
+        o.SpecularColor = ZERO_VEC3;
+        o.Emission      = ZERO_VEC3;
 
 #ifdef EDITOR_VISUALIZATION
         o.VizUV         = i.vizUV;

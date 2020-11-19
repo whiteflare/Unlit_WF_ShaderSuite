@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/10/13 whiteflare,
+     *      ver:2020/11/19 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -107,7 +107,7 @@
         float3 vs_normal = calcMatcapVector(ws_view_dir, ws_normal);
         float3 vs_bump_normal = calcMatcapVector(ws_view_dir, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i);
+        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir);
 
         float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 

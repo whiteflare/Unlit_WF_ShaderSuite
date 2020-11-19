@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/10/13 whiteflare,
+     *      ver:2020/11/19 whiteflare,
      */
 
     Properties {
@@ -36,6 +36,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GB_Enable              ("[GB] Enable", Float) = 0
         [HDR]
             _GB_ColorBack           ("[GB] Background Color", Color) = (0.2, 0.2, 0.2, 1)
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _GB_BackCulllMode       ("[GB] Background CullMode", Float) = 1
 
         // Flake
         [WFHeaderToggle(Gem Flake)]
@@ -69,6 +71,9 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [HideInInspector]
         [FixFloat(0.0)]
             _AL_Source              ("[AL] Alpha Source", Float) = 0
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 0.8
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
         [Enum(OFF,0,ON,1)]
@@ -112,7 +117,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             Name "MAIN_BACK"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull FRONT
+            Cull [_GB_BackCulllMode]
             ZWrite [_AL_ZWrite]
             Blend SrcAlpha OneMinusSrcAlpha
 

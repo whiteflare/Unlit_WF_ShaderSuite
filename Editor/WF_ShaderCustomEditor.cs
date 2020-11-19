@@ -36,6 +36,7 @@ namespace UnlitWF
             { "_TS_BaseColor", "_TS_BaseTex" },
             { "_TS_1stColor", "_TS_1stTex" },
             { "_TS_2ndColor", "_TS_2ndTex" },
+            { "_TS_3rdColor", "_TS_3rdTex" },
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
         };
@@ -209,6 +210,18 @@ namespace UnlitWF
             if (EditorGUILayout.Popup("Change DebugView shader", 0, new string[] { "OFF", "DEBUG" }) == 1) {
                 WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, WFCommonUtility.AsMaterials(materialEditor.targets));
             }
+
+            // 不要なシェーダキーワードは削除
+            foreach (object t in materialEditor.targets) {
+                Material mm = t as Material;
+                if (mm != null) {
+                    foreach (var key in DELETE_KEYWORD) {
+                        if (mm.IsKeywordEnabled(key)) {
+                            mm.DisableKeyword(key);
+                        }
+                    }
+                }
+            }
         }
 
         private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, Material mat) {
@@ -314,11 +327,19 @@ namespace UnlitWF
                 float hur, sat, val;
                 Color.RGBToHSV(baseColor, out hur, out sat, out val);
                 // 影1
-                Color shade1Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f);
-                m.SetColor("_TS_1stColor", shade1Color);
+                if (m.HasProperty("_TS_1stColor")) {
+                    Color shade1Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f);
+                    m.SetColor("_TS_1stColor", shade1Color);
+                }
                 // 影2
-                Color shade2Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f);
-                m.SetColor("_TS_2ndColor", shade2Color);
+                if (m.HasProperty("_TS_2ndColor")) {
+                    Color shade2Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f);
+                    m.SetColor("_TS_2ndColor", shade2Color);
+                }
+                if (m.HasProperty("_TS_3rdColor")) {
+                    Color shade3Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.7f);
+                    m.SetColor("_TS_3rdColor", shade3Color);
+                }
             }
         }
 

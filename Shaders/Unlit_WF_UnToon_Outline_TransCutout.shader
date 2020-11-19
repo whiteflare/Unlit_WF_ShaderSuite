@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
 
     /*
      * authors:
-     *      ver:2020/10/13 whiteflare,
+     *      ver:2020/11/19 whiteflare,
      */
 
     Properties {
@@ -38,9 +38,11 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
         [Toggle(_)]
-            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 1
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // アウトライン
         [HideInInspector]
@@ -60,6 +62,18 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+
+        // 3chカラーマスク
+        [WFHeaderToggle(3ch Color Mask)]
+            _CH_Enable              ("[CH] Enable", Float) = 0
+        [NoScaleOffset]
+            _CH_3chMaskTex          ("[CH] 3ch Mask Texture", 2D) = "black" {}
+        [HDR]
+            _CH_ColorR              ("[CH] R ch Color", Color) = (1, 1, 1, 1)
+        [HDR]
+            _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
+        [HDR]
+            _CH_ColorB              ("[CH] B chl Color", Color) = (1, 1, 1, 1)
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -176,14 +190,15 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         // Decal Texture
         [WFHeaderToggle(Decal Texture)]
             _OL_Enable              ("[OL] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1,SKYBOX,2)]
+        [Enum(UV1,0,UV2,1,SKYBOX,2,ANGEL_RING,3)]
             _OL_UVType              ("[OL] UV Type", Float) = 0
         [HDR]
             _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
             _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
-        [Enum(ALPHA,0,ADD,1,MUL,2)]
+        [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
             _OL_BlendType           ("[OL] Blend Type", Float) = 0
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
+            _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
             _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -249,36 +264,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             "DisableBatching" = "True"
         }
 
-        Pass {
-            Name "OUTLINE"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull FRONT
-            AlphaToMask [_AL_AlphaToMask]
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma geometry geom_outline
-            #pragma fragment frag
-
-            #pragma target 4.5
-            #pragma require geometry
-
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
-            #define _TL_ENABLE
-            #define _TR_ENABLE
-            #define _VC_ENABLE
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout/OUTLINE"
         UsePass "UnlitWF/WF_UnToon_TransCutout/MAIN"
         UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_TransCutout/META"

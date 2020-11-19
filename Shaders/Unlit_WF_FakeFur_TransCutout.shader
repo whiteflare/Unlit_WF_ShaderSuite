@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2020/10/13 whiteflare,
+     *      ver:2020/11/19 whiteflare,
      */
 
     Properties {
@@ -29,7 +29,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
             _Cutoff                 ("Alpha CutOff Level", Range(0, 1)) = 0.5
         [Toggle(_)]
-            _AL_AlphaToMask         ("Alpha-To-Coverage (use MSAA)", Float) = 1
+            _AL_AlphaToMask         ("Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // ファー設定
         [WFHeader(Fake Fur)]

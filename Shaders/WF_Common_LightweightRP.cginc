@@ -1,0 +1,171 @@
+﻿/*
+ *  The MIT License
+ *
+ *  Copyright 2018-2020 whiteflare.
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+#ifndef INC_UNLIT_WF_COMMON_LIGHTWEIGHT_RP
+#define INC_UNLIT_WF_COMMON_LIGHTWEIGHT_RP
+
+    /*
+     * authors:
+     *      ver:2020/11/19 whiteflare,
+     */
+
+    #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+    #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+#if UNITY_VERSION < 201904
+    #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
+#else
+    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+#endif
+
+    ////////////////////////////
+    // Compatible
+    ////////////////////////////
+
+    float IsGammaSpace() {
+        #ifdef UNITY_COLORSPACE_GAMMA
+            return 1;
+        #else
+            return 0;
+        #endif
+    }
+
+#ifndef _WF_FORCE_USE_SAMPLER
+    // 通常版
+    #define DECL_MAIN_TEX2D(name)           TEXTURE2D(name); SAMPLER(sampler##name)
+    #define DECL_SUB_TEX2D(name)            TEXTURE2D(name)
+    #define PICK_MAIN_TEX2D(tex, uv)        SAMPLE_TEXTURE2D(tex, sampler##tex, uv)
+    #define PICK_SUB_TEX2D(tex, name, uv)   SAMPLE_TEXTURE2D(tex, sampler##name, uv)
+    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        SAMPLE_TEXTURE2D_LOD(tex, sampler##tex, uv, lod)
+    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   SAMPLE_TEXTURE2D_LOD(tex, sampler##name, uv, lod)
+#endif
+
+// Unity BuiltinRP で定義されていた関数を LightweightRP で定義しなおして差異を吸収する
+
+    #define UnityObjectToClipPos        TransformObjectToHClip
+    #define UnityWorldToClipPos         TransformWorldToHClip
+    #define UnityObjectToWorldDir       TransformObjectToWorldDir
+    #define UnityWorldToObjectDir       TransformWorldToObjectDir
+    #define UnityObjectToWorldNormal    TransformObjectToWorldNormal
+
+    #define UnityObjectToWorldPos(v)    TransformObjectToWorld(v)
+    #define UnityWorldToObjectPos(v)    TransformWorldToObject(v)
+
+    #define UNITY_FOG_COORDS(id)        half fogCoord : TEXCOORD##id;
+    #define UNITY_TRANSFER_FOG(o, p)    o.fogCoord = ComputeFogFactor(p.z)
+    #define UNITY_APPLY_FOG(f, c)       c.rgb = MixFog(c.rgb, f)
+
+    #define UNITY_INITIALIZE_OUTPUT(name, val)  val = (name) 0
+    #define UNITY_SAMPLE_TEXCUBE_LOD(tex, dir, lod)                     SAMPLE_TEXTURECUBE_LOD(tex, sampler##tex, dir, lod)
+    #define UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(tex, name, dir, lod)       SAMPLE_TEXTURECUBE_LOD(tex, sampler##name, dir, lod)
+
+    #define GammaToLinearSpace          SRGBToLinear
+    #define LinearToGammaSpace          LinearToSRGB
+    #define UNITY_INV_TWO_PI            0.15915494309f
+    #define UnpackScaleNormal           UnpackNormalScale
+    #define BlendNormals                BlendNormal
+    #define GGXTerm                     D_GGX
+
+    float3 DecodeLightmap(float4 lmap_tex) {
+        return DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+    }
+    float3 DecodeRealtimeLightmap(float4 lmap_tex) {
+        return DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
+    }
+
+    float3 DecodeHDR(float4 color, float4 inst) {
+        return DecodeHDREnvironment(color, inst);
+    }
+
+    ////////////////////////////
+    // Lighting
+    ////////////////////////////
+
+    float3 getMainLightDirection() {
+        return _MainLightPosition.xyz;
+    }
+
+    float3 sampleMainLightColor() {
+        return _MainLightColor.rgb;
+    }
+
+    float3 sampleSHLightColor() {
+        float3 col = float3(0, 0, 0);
+        col += SampleSH( float3(+1, 0, 0) );
+        col += SampleSH( float3(-1, 0, 0) );
+        col += SampleSH( float3(0, 0, +1) );
+        col += SampleSH( float3(0, 0, -1) );
+        col /= 4;
+        col += SampleSH( float3(0, +1, 0) );
+        col += SampleSH( float3(0, -1, 0) );
+        return col / 3;
+    }
+
+    float3 getPoint1LightPos() {
+        return 1 <= GetAdditionalLightsCount() ? _AdditionalLightsPosition[0].xyz : float3(0, 0, 0);
+    }
+
+    float3 samplePoint1LightColor(float3 ws_vertex) {
+        if (GetAdditionalLightsCount() < 1) {
+            return float3(0, 0, 0);
+        } else {
+            Light light = GetAdditionalLight(0, ws_vertex);
+            return light.color * light.distanceAttenuation;
+        }
+    }
+
+    float3 sampleAdditionalLightColor(float3 ws_vertex) {
+        float3 col = float3(0, 0, 0);
+
+        int pixelLightCount = GetAdditionalLightsCount();
+        for (int i = 0; i < pixelLightCount; ++i) {
+            Light light = GetAdditionalLight(i, ws_vertex);
+            col += light.color * light.distanceAttenuation;
+        }
+
+        return col;
+    }
+
+    float3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
+        float3 col = float3(0, 0, 0);
+
+        int pixelLightCount = GetAdditionalLightsCount();
+        for (int i = 1; i < pixelLightCount; ++i) {
+            Light light = GetAdditionalLight(i, ws_vertex);
+            col += light.color * light.distanceAttenuation;
+        }
+
+        return col;
+    }
+
+    ////////////////////////////
+    // ReflectionProbe Sampler
+    ////////////////////////////
+
+    float4 pickReflectionProbe(float3 ws_vertex, float3 ws_normal, float lod) {
+        float3 ws_camera_dir = normalize(_WorldSpaceCameraPos - ws_vertex);
+        float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
+
+        float3 dir0 = reflect_dir;
+
+        float4 color0 = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
+
+        color0.rgb = DecodeHDR(color0, unity_SpecCube0_HDR);
+
+        return color0;
+    }
+
+#endif
