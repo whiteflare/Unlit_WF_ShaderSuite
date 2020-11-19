@@ -18,7 +18,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
     /*
      * authors:
-     *      ver:2020/10/13 whiteflare,
+     *      ver:2020/11/19 whiteflare,
      */
 
     Properties {

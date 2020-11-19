@@ -18,7 +18,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/10/13 whiteflare,
+     *      ver:2020/11/19 whiteflare,
      */
 
     Properties {
