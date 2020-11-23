@@ -35,7 +35,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         _ModeUV     ("show UV", Float)              = 0
 
         [Header(Normal and Tangent)]
-        [Enum(OFF,0,NORMAL,1,TANGENT,2)]
+        [Enum(OFF,0,NORMAL_LS,1,TANGENT_LS,2,NORMAL_WS,3,TANGENT_WS,4)]
         _ModeNormal ("show Normal", Float)          = 0
 
         [Header(Lighting)]
@@ -228,6 +228,12 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                         break;
                     case 2:
                         color.rgb = saturate(normalize(i.tangent.xyz) + 0.5);
+                        break;
+                    case 3:
+                        color.rgb = saturate(UnityObjectToWorldNormal(i.normal.xyz) + 0.5);
+                        break;
+                    case 4:
+                        color.rgb = saturate(UnityObjectToWorldNormal(i.tangent.xyz) + 0.5);
                         break;
                     default:
                         break;
