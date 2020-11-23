@@ -170,8 +170,11 @@ namespace UnlitWF
             new DebugModeSection("Show Normals", new List<DebugMode>(){
                 new DebugMode("Normal (local space)", "_ModeNormal", 1),
                 new DebugMode("Tangent (local space)", "_ModeNormal", 2),
-                new DebugMode("Normal (world space)", "_ModeNormal", 3),
-                new DebugMode("Tangent (world space)", "_ModeNormal", 4),
+                new DebugMode("BiTangent (local space)", "_ModeNormal", 3),
+                new DebugMode("Normal (world space)", "_ModeNormal", 4),
+                new DebugMode("Tangent (world space)", "_ModeNormal", 5),
+                new DebugMode("BiTangent (world space)", "_ModeNormal", 6),
+                new DebugMode("view Parallel Normal and Tangent", "_ModeNormal", 7),
             }),
             new DebugModeSection("Show Lightings", new List<DebugMode>(){
                 new DebugMode("Light 0", "_ModeLight", 1),

@@ -35,7 +35,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         _ModeUV     ("show UV", Float)              = 0
 
         [Header(Normal and Tangent)]
-        [Enum(OFF,0,NORMAL_LS,1,TANGENT_LS,2,NORMAL_WS,3,TANGENT_WS,4)]
+        [Enum(OFF,0,NORMAL_LS,1,TANGENT_LS,2,BITANGENT_LS,3,NORMAL_WS,4,TANGENT_WS,5,BITANGENT_LS,6,VIEW_PARA_NORMAL,7)]
         _ModeNormal ("show Normal", Float)          = 0
 
         [Header(Lighting)]
@@ -98,8 +98,9 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 float2 uv2          : TEXCOORD3;
                 float2 uv3          : TEXCOORD4;
                 float2 uv4          : TEXCOORD5;
-                float3 normal       : NORMAL;
-                float3 tangent      : TANGENT;
+                float3 normal       : TEXCOORD6;
+                float3 tangent      : TEXCOORD7;
+                float3 bitangent    : TEXCOORD8;
             };
 
             v2f vert (appdata v)
@@ -114,7 +115,8 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 o.uv3       = v.uv3;
                 o.uv4       = v.uv4;
                 o.normal    = v.normal;
-                o.tangent   = v.tangent.xyz * v.tangent.w;
+                o.tangent   = v.tangent.xyz;
+                o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
                 return o;
             }
 
@@ -230,10 +232,19 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                         color.rgb = saturate(normalize(i.tangent.xyz) + 0.5);
                         break;
                     case 3:
-                        color.rgb = saturate(UnityObjectToWorldNormal(i.normal.xyz) + 0.5);
+                        color.rgb = saturate(normalize(i.bitangent.xyz) + 0.5);
                         break;
                     case 4:
+                        color.rgb = saturate(UnityObjectToWorldNormal(i.normal.xyz) + 0.5);
+                        break;
+                    case 5:
                         color.rgb = saturate(UnityObjectToWorldNormal(i.tangent.xyz) + 0.5);
+                        break;
+                    case 6:
+                        color.rgb = saturate(UnityObjectToWorldNormal(i.bitangent.xyz) + 0.5);
+                        break;
+                    case 7:
+                        color.rgb = saturate( pow( abs( dot(UnityObjectToWorldNormal(i.normal.xyz), UnityObjectToWorldNormal(i.tangent.xyz)) ), 100));
                         break;
                     default:
                         break;
