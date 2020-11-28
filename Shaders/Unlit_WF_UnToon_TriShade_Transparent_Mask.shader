@@ -93,8 +93,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
-        [PowerSlider(4.0)]
-            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]

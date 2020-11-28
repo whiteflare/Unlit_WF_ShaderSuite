@@ -472,7 +472,7 @@
             }
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
-                color += pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod) * _MT_CubemapPower;
+                color += pow(pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod), NON_ZERO_FLOAT(_MT_CubemapPower));
             }
             return color;
 #endif
