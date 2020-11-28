@@ -289,7 +289,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             v2f vert_custom(in appdata v) {
                 v2f o;
                 o = vert(v);
-                o.vs_vertex = shiftDepthVertex(o.ws_vertex, max(0, -_Z_Shift));
+                o.vs_vertex = shiftDepthVertex(o.ws_vertex, -_Z_Shift);
                 return o;
             }
 
