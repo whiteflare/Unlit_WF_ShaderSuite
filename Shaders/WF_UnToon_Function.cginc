@@ -69,6 +69,13 @@
         #define WF_TEX2D_MATCAP_MASK(uv)        SAMPLE_MASK_VALUE(_HL_MaskTex, uv, _HL_InvMaskVal).rgb
     #endif
 
+    #ifndef WF_TEX2D_LAME_TEX
+        #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LM_Texture, _MainTex, uv).rgb
+    #endif
+    #ifndef WF_TEX2D_LAME_MASK
+        #define WF_TEX2D_LAME_MASK(uv)          SAMPLE_MASK_VALUE(_LM_MaskTex, uv, _LM_InvMaskVal).r
+    #endif
+
     #ifndef WF_TEX2D_SHADE_BASE
         #ifndef _WF_MOBILE
             #define WF_TEX2D_SHADE_BASE(uv)     PICK_SUB_TEX2D(_TS_BaseTex, _MainTex, uv).rgb
@@ -458,6 +465,13 @@
     // Metallic
     ////////////////////////////
 
+    float smoothnessToSpecularPower(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float smoothness) {
+        float roughness     = (1 - smoothness) * (1 - smoothness);
+        float3 halfVL       = normalize(ws_camera_dir + ws_light_dir);
+        float NdotH         = max(0, dot( ws_normal, halfVL ));
+        return max(0, GGXTerm(NdotH, roughness));
+    }
+
     #ifdef _MT_ENABLE
 
         inline float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
@@ -479,13 +493,7 @@
         }
 
         inline float3 pickSpecular(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
-            float roughness         = (1 - smoothness) * (1 - smoothness);
-
-            float3 halfVL           = normalize(ws_camera_dir + ws_light_dir);
-            float NdotH             = max(0, dot( ws_normal, halfVL ));
-            float3 specular         = spec_color * GGXTerm(NdotH, roughness);
-
-            return max(ZERO_VEC3, specular);
+            return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
         }
 
         inline void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
@@ -550,6 +558,77 @@
         }
     #else
         #define affectMatcapColor(matcapVector, uv_main, color)
+    #endif
+
+    ////////////////////////////
+    // Lame
+    ////////////////////////////
+
+    #ifdef _LM_ENABLE
+
+        float random1(float2 st) {  // float2 -> float [0-1)
+            return frac(sin(dot(st ,float2(12.9898, 78.233))) * 43758.5453);
+        }
+
+        float2 random2(float2 st) { // float2 -> float2 [0-1)
+            float2 ret = 0;
+            ret.x = random1(st);
+            ret.y = random1(st + ret);
+            return ret;
+        }
+
+        float3 random3(float2 st) { // float2 -> float3 [0-1)
+            float3 ret = 0;
+            ret.x = random1(st);
+            ret.y = random1(st + ret.xy);
+            ret.z = random1(st + ret.xy);
+            return ret;
+        }
+
+        void affectLame(v2f i, float2 uv_main, float3 ws_normal, inout float4 color) {
+            if (TGL_ON(_LM_Enable)) {
+                float power = WF_TEX2D_LAME_MASK(uv_main);
+                if (0 < power) {
+                    float   scale = NON_ZERO_FLOAT(_LM_Scale) / 100;
+                    float2  st = uv_main / scale;
+
+                    float2  ist = floor(st);
+                    float2  fst = frac(st);
+                    float3  min_pos = float3(0, 0, 5);
+
+                    for (int y = -1; y <= 1; y++) {
+                        for (int x = -1; x <= 1; x++) {
+                            float2 neighbor = float2(x, y);
+                            float3 pos;
+                            pos.xy  = 0.5 + 0.5 * sin( random2((ist + neighbor) * scale) * 2 - 1 );
+                            pos.z   = length(neighbor + pos.xy - fst);
+                            min_pos = pos.z < min_pos.z ? pos : min_pos;
+                        }
+                    }
+
+                    float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
+
+                    // 密度
+                    power *= step(1 - _LM_Dencity / 4, abs(min_pos.x));
+                    // 距離フェード
+                    power *= 1 - smoothstep(_LM_MinDist, _LM_MinDist + 1, length(ws_camera_vec));
+                    // フレークのばらつき
+                    power *= random1(min_pos.xy);
+                    // NdotV起因の強度
+                    power *= pow(saturate(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LM_Spot));
+                    // アニメーション
+                    power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
+
+                    float3 lame_color = _LM_Color.rgb;
+                    lame_color *= WF_TEX2D_LAME_TEX(uv_main);
+                    lame_color += _LM_RandColor * (random3(min_pos) * 2 - 1);
+
+                    color.rgb += max(ZERO_VEC3, lame_color) * power;
+                }
+            }
+        }
+    #else
+        #define affectLame(i, uv_main, ws_normal, color)
     #endif
 
     ////////////////////////////

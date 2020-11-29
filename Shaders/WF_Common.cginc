@@ -161,11 +161,23 @@
     // Camera management
     ////////////////////////////
 
+    float3 worldSpaceCameraVector(float3 ws_vertex) {
+        // カメラへの正規化されていないベクトル
+        return _WorldSpaceCameraPos - ws_vertex;
+    }
+
+    float3 worldSpaceCameraDistance(float3 ws_vertex) {
+        // カメラへの距離
+        return length(worldSpaceCameraVector(ws_vertex));
+    }
+
     float3 worldSpaceCameraDir(float3 ws_vertex) {
-        return normalize(_WorldSpaceCameraPos - ws_vertex);
+        // カメラ方向(正規化されたベクトル)
+        return normalize(worldSpaceCameraVector(ws_vertex));
     }
 
     float3 worldSpaceViewPointPos() {
+        // ビューポイントの座標。これは SinglePass Stereo のときは左目と右目の中点になる。
         #ifdef USING_STEREO_MATRICES
             return (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
         #else
@@ -173,8 +185,19 @@
         #endif
     }
 
+    float3 worldSpaceViewPointVector(float3 ws_vertex) {
+        // ビューポイントへの正規化されていないベクトル
+        return worldSpaceViewPointPos() - ws_vertex;
+    }
+
+    float3 worldSpaceViewPointDistance(float3 ws_vertex) {
+        // ビューポイントへの距離
+        return length(worldSpaceViewPointVector(ws_vertex));
+    }
+
     float3 worldSpaceViewPointDir(float3 ws_vertex) {
-        return SafeNormalizeVec3(worldSpaceViewPointPos() - ws_vertex);
+        // ビューポイント方向(正規化されたベクトル)
+        return SafeNormalizeVec3(worldSpaceViewPointVector(ws_vertex));
     }
 
     float3 worldSpaceViewDirStereoLerp(float3 ws_vertex, float x) {

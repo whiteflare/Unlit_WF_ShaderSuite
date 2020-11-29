@@ -39,6 +39,7 @@ namespace UnlitWF
             { "_TS_3rdColor", "_TS_3rdTex" },
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
+            { "_LM_Color", "_LM_Texture" },
         };
 
         delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);

@@ -469,6 +469,16 @@ namespace UnlitWF
             { "[HL] Parallax", "[HL] 視差(Parallax)" },
             { "[HL] Power", "[HL] matcap強度" },
             { "[HL] Mask Texture", "[HL] マスクテクスチャ" },
+            // Lame
+            { "[LM] Color", "[LM] ラメ色" },
+            { "[LM] Texture", "[LM] ラメ色テクスチャ" },
+            { "[LM] Random Color", "[LM] ランダム色パラメタ" },
+            { "[LM] Scale", "[LM] スケール" },
+            { "[LM] Dencity", "[LM] 密度" },
+            { "[LM] Dist Fade Start", "[LM] 距離フェード開始" },
+            { "[LM] Spot Fade Strength", "[LM] スポットフェード強度" },
+            { "[LM] Anim Speed", "[LM] アニメ速度" },
+            { "[LM] Mask Texture", "[LM] マスクテクスチャ" },
             // ToonShade
             { "[SH] Base Color", "[SH] ベース色" },
             { "[SH] Base Shade Texture", "[SH] ベース色テクスチャ" },

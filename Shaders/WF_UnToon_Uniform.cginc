@@ -45,6 +45,8 @@
         DECL_SUB_TEX2D(_TS_2ndTex);
         DECL_SUB_TEX2D(_TS_3rdTex);
         DECL_SUB_TEX2D(_OcclusionMap);
+        DECL_SUB_TEX2D(_LM_Texture);
+        DECL_SUB_TEX2D(_LM_MaskTex);
 #endif
 #ifdef _TL_MASK_APPLY_LEGACY
         DECL_SUB_TEX2D(_TL_MaskTex);    // マスクをfragmentでアルファに反映する場合
@@ -144,6 +146,17 @@
     float           _HL_BlendNormal;
     float           _HL_Parallax;
     float           _HL_InvMaskVal;
+
+    float           _LM_Enable;
+    float4          _LM_Texture_ST;
+    float3          _LM_Color;
+    float3          _LM_RandColor;
+    float           _LM_Scale;
+    float           _LM_Dencity;
+    float           _LM_MinDist;
+    float           _LM_Spot;
+    float           _LM_AnimSpeed;
+    float           _LM_InvMaskVal;
 
     float           _TS_Enable;
     float4          _TS_BaseColor;

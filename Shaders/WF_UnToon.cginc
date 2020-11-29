@@ -149,6 +149,8 @@
         affectMetallic(i, ws_view_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
         affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax).xy, uv_main, color);
+        // ラメ
+        affectLame(i, uv_main, ws_normal, color);
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
