@@ -146,7 +146,7 @@
         float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 
         // メタリック
-        affectMetallic(i, ws_view_dir, uv_main, ws_normal, ws_bump_normal, color);
+        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
         affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax).xy, uv_main, color);
         // ラメ
