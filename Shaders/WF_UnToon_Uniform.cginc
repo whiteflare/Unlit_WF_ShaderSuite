@@ -75,7 +75,7 @@
     float           _Cutoff;
     float           _UseVertexColor;
 
-    int             _AL_Source;
+    uint            _AL_Source;
     float           _AL_Power;
     float           _AL_Fresnel;
     float           _AL_AlphaToMask;
