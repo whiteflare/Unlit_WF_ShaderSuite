@@ -56,7 +56,8 @@
     void affectGemReflection(v2f i, float3 ws_normal, inout float4 color) {
         if (TGL_ON(_GR_Enable)) {
             // リフレクション
-            float3 reflection = pow(pickReflectionCubemap(_GR_Cubemap, _GR_Cubemap_HDR, i.ws_vertex, ws_normal, 0), NON_ZERO_FLOAT(_GR_CubemapPower)); // smoothnessは1固定
+            float3 cubemap = pickReflectionCubemap(_GR_Cubemap, _GR_Cubemap_HDR, i.ws_vertex, ws_normal, 0); // smoothnessは1固定
+            float3 reflection = pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(_GR_CubemapPower));
             reflection = lerp(reflection, calcBrightness(reflection), _GR_Monochrome);
 
             // 合成
