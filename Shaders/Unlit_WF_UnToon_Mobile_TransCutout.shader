@@ -168,10 +168,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
             #pragma target 3.0
 
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
-
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
 
             #define _AO_ENABLE
             #define _ES_ENABLE
@@ -201,6 +199,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
+
+            #define _WF_ALPHA_CUTOUT
 
             #define _VC_ENABLE
 

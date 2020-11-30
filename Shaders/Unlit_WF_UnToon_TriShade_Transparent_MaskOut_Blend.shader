@@ -288,7 +288,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
@@ -334,7 +334,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_FRESNEL
 
             #define _AO_ENABLE
             #define _ES_ENABLE

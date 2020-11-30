@@ -103,10 +103,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
             #pragma target 3.0
 
+            #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
-
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
 
             #define _AO_ENABLE
             #define _VC_ENABLE

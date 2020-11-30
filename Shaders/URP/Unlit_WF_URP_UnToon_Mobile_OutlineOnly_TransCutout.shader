@@ -104,8 +104,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
             #pragma target 3.0
 
-            #define _AL_CUTOUT
-            #define _AL_ENABLE
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
@@ -151,8 +150,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             #pragma vertex vert_outline
             #pragma fragment frag
 
-            #define _AL_CUTOUT
-            #define _AL_ENABLE
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 

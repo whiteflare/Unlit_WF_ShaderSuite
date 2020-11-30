@@ -274,7 +274,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
 
             #define _FG_ENABLE
             #define _TL_ENABLE
@@ -306,8 +306,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
@@ -344,8 +343,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
 
             #define _AO_ENABLE
             #define _ES_ENABLE

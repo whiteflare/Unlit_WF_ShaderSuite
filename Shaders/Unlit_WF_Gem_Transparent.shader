@@ -127,11 +127,9 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             #pragma target 3.0
 
+            #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
             #define _WF_MOBILE
-
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
 
             #define _NM_ENABLE
             #define _VC_ENABLE
@@ -160,10 +158,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             #pragma target 3.0
 
+            #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
-
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
 
             #define _NM_ENABLE
             #define _VC_ENABLE

@@ -136,82 +136,74 @@
     // Alpha Transparent
     ////////////////////////////
 
+    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_FRESNEL) || defined(_WF_ALPHA_CUT_UPPER) || defined(_WF_ALPHA_CUT_LOWER)
+        #ifndef _WF_ALPHA_BLEND
+            #define _WF_ALPHA_BLEND
+        #endif
+    #endif
+
+    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_CUTOUT)
+        #ifndef _AL_ENABLE
+            #define _AL_ENABLE
+        #endif
+    #endif
+
     #ifdef _AL_ENABLE
         #ifndef _AL_CustomValue
             #define _AL_CustomValue 1
         #endif
 
         inline float pickAlpha(float2 uv, float alpha) {
-            if (_AL_Source == 1) {
-                return WF_TEX2D_ALPHA_MASK_RED(uv);
-            }
-            else if (_AL_Source == 2) {
-                return WF_TEX2D_ALPHA_MASK_ALPHA(uv);
-            }
-            else {
-                return WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
-            }
+            return _AL_Source == 1 ? WF_TEX2D_ALPHA_MASK_RED(uv)
+                 : _AL_Source == 2 ? WF_TEX2D_ALPHA_MASK_ALPHA(uv)
+                 : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        inline void affectAlpha(float2 uv, inout float4 color) {
+        inline float affectAlpha(float2 uv, inout float4 color) {
             float baseAlpha = pickAlpha(uv, color.a);
+            float alpha = baseAlpha;
 
-            #if defined(_AL_CUTOUT)
-                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
-                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
+            /*
+             * カットアウト処理
+             * cutoutに使うものは、pickAlpha と _AL_CustomValue の値。
+             * 一方、Fresnel は cutout には巻き込まない。
+             * _AL_CustomValue を使っている MaskOut_Blend は cutout を使わない。
+             */
+
+            #if defined(_WF_ALPHA_CUTOUT)
+                alpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, alpha);
+                if (TGL_OFF(_AL_AlphaToMask) && alpha < 0.5) {
                     discard;
                 }
-            #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _Cutoff) {
+            #elif defined(_WF_ALPHA_CUT_UPPER)
+                if (alpha < _Cutoff) {
                     discard;
                 } else {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                    alpha *= _AL_Power;
                 }
-            #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _Cutoff) {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
+            #elif defined(_WF_ALPHA_CUT_LOWER)
+                if (alpha < _Cutoff) {
+                    alpha *= _AL_Power;
                 } else {
                     discard;
                 }
             #else
-                baseAlpha *= _AL_Power * _AL_CustomValue;
+                alpha *= _AL_Power * _AL_CustomValue;
             #endif
 
-            color.a = baseAlpha;
+            color.a = alpha;
+
+            return baseAlpha; // ベースアルファを返却する
         }
 
         inline void affectAlphaWithFresnel(float2 uv, float3 ws_normal, float3 ws_viewdir, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a);
+            float baseAlpha = affectAlpha(uv, color);
 
-            #if defined(_AL_CUTOUT)
-                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
-                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
-                    discard;
-                }
-            #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _Cutoff) {
-                    discard;
-                } else {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                }
-            #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _Cutoff) {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                } else {
-                    discard;
-                }
-            #else
-                baseAlpha *= _AL_Power * _AL_CustomValue;
-            #endif
-
-            #ifndef _AL_FRESNEL_ENABLE
-                // ベースアルファ
-                color.a = baseAlpha;
-            #else
+            #ifdef _WF_ALPHA_FRESNEL
                 // フレネルアルファ
-                float maxValue = max( pickAlpha(uv, color.a) * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
+                float maxValue = max( baseAlpha * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
                 float fa = 1 - abs( dot( ws_normal, ws_viewdir ) );
-                color.a = lerp( baseAlpha, maxValue, fa * fa * fa * fa );
+                color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
             #endif
         }
     #else
@@ -395,7 +387,7 @@
                     lerp(color.rgb, es_color, waving),
                     es_power);
 
-                #if !defined(_ES_SIMPLE_ENABLE) && !defined(_AL_CUTOUT)
+                #if !defined(_ES_SIMPLE_ENABLE) && !defined(_WF_ALPHA_CUTOUT)
                     #ifdef _ES_FORCE_ALPHASCROLL
                         color.a = max(color.a, waving * _EmissionColor.a * es_power);
                     #else
@@ -802,7 +794,7 @@
         }
 
         inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
-            #ifndef _AL_CUTOUT
+            #ifndef _WF_ALPHA_CUTOUT
                 if (TGL_ON(_TL_Enable)) {
                     #ifndef _TL_MASK_APPLY_LEGACY
                         // マスクをシフト時に太さに反映する場合

@@ -270,8 +270,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
+            #define _WF_ALPHA_CUTOUT
 
             #define _FG_ENABLE
             #define _TL_ENABLE
@@ -300,8 +299,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
+            #define _WF_ALPHA_CUTOUT
 
             #define _AO_ENABLE
             #define _ES_ENABLE

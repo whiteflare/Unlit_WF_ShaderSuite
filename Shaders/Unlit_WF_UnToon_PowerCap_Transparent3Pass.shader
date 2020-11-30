@@ -278,9 +278,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_UPPER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_UPPER
 
             #define _CH_ENABLE
             #define _HL_ENABLE
@@ -313,9 +312,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_LOWER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_LOWER
 
             #define _CH_ENABLE
             #define _HL_ENABLE
@@ -348,9 +346,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_LOWER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_LOWER
 
             #define _CH_ENABLE
             #define _HL_ENABLE

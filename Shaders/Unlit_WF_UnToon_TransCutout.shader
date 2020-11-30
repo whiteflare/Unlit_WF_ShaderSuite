@@ -277,8 +277,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
+            #define _WF_ALPHA_CUTOUT
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
@@ -313,8 +313,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
+            #define _WF_ALPHA_CUTOUT
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
@@ -334,6 +333,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
+
+            #define _WF_ALPHA_CUTOUT
 
             #define _VC_ENABLE
 

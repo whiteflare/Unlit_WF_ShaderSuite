@@ -276,9 +276,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_UPPER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_UPPER
 
             #define _AO_ENABLE
             #define _FG_ENABLE
@@ -315,9 +314,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_LOWER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_LOWER
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
@@ -353,9 +351,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_LOWER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_LOWER
 
             #define _AO_ENABLE
             #define _FG_ENABLE
@@ -392,7 +389,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
             #define _ES_ENABLE
             #define _ES_FORCE_ALPHASCROLL
             #define _FG_ENABLE

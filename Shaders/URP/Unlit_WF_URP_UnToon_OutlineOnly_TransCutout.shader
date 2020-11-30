@@ -108,8 +108,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
+            #define _WF_ALPHA_CUTOUT
             #define _WF_PLATFORM_LWRP
 
             #define _TL_ENABLE
@@ -155,8 +154,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             #pragma geometry geom_outline
             #pragma fragment frag
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
+            #define _WF_ALPHA_CUTOUT
             #define _WF_PLATFORM_LWRP
 
             #define _TL_ENABLE

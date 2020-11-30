@@ -289,7 +289,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
@@ -335,7 +335,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_FRESNEL
 
             #define _AO_ENABLE
             #define _CH_ENABLE

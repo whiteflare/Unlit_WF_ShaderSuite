@@ -295,7 +295,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
 
             #pragma target 3.0
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
             #define _WF_PLATFORM_LWRP
 
             #define _AO_ENABLE
@@ -355,7 +355,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
             #define _WF_PLATFORM_LWRP
 
             #define _VC_ENABLE

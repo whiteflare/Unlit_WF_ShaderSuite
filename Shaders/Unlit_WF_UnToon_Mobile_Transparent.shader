@@ -182,10 +182,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
             #pragma target 3.0
 
-            #define _WF_MOBILE
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_MOBILE
 
             #define _AO_ENABLE
             #define _ES_ENABLE
@@ -214,6 +213,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
+
+            #define _WF_ALPHA_BLEND
 
             #define _VC_ENABLE
 

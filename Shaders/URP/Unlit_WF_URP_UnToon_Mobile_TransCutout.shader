@@ -173,8 +173,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
             #pragma target 3.0
 
-            #define _AL_CUTOUT
-            #define _AL_ENABLE
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
@@ -227,8 +226,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
-            #define _AL_CUTOUT
-            #define _AL_ENABLE
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
@@ -256,8 +254,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _AL_CUTOUT
-            #define _AL_ENABLE
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
@@ -284,8 +281,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #define _AL_CUTOUT
-            #define _AL_ENABLE
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 

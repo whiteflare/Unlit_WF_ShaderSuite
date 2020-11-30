@@ -101,8 +101,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
             #pragma target 3.0
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
+            #define _WF_ALPHA_CUTOUT
 
             #define _TL_ENABLE
             #define _VC_ENABLE

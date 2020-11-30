@@ -105,8 +105,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
+            #define _WF_ALPHA_CUTOUT
 
             #define _TL_ENABLE
             #define _VC_ENABLE

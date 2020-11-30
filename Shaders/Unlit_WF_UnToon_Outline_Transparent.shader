@@ -303,7 +303,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
 
             #define _TL_ENABLE
             #define _VC_ENABLE

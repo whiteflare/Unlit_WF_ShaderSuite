@@ -264,8 +264,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
@@ -304,8 +303,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
 
             #define _AO_ENABLE
             #define _CH_ENABLE
@@ -339,7 +337,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
@@ -359,6 +357,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
+
+            #define _WF_ALPHA_BLEND
 
             #define _VC_ENABLE
 

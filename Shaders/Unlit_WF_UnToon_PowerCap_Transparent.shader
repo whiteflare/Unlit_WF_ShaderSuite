@@ -277,8 +277,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
 
             #define _CH_ENABLE
             #define _HL_ENABLE
@@ -311,8 +310,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
 
             #define _CH_ENABLE
             #define _HL_ENABLE
