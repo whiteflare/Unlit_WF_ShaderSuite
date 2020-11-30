@@ -74,6 +74,7 @@
 
     #define GammaToLinearSpace          SRGBToLinear
     #define LinearToGammaSpace          LinearToSRGB
+    #define UNITY_TWO_PI                6.28318530718f
     #define UNITY_INV_TWO_PI            0.15915494309f
     #define UnpackScaleNormal           UnpackNormalScale
     #define BlendNormals                BlendNormal
