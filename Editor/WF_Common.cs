@@ -475,6 +475,7 @@ namespace UnlitWF
             { "[LM] Random Color", "[LM] ランダム色パラメタ" },
             { "[LM] Scale", "[LM] スケール" },
             { "[LM] Dencity", "[LM] 密度" },
+            { "[LM] Glitter", "[LM] きらきら" },
             { "[LM] Dist Fade Start", "[LM] 距離フェード開始" },
             { "[LM] Spot Fade Strength", "[LM] スポットフェード強度" },
             { "[LM] Anim Speed", "[LM] アニメ速度" },
