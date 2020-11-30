@@ -608,16 +608,18 @@
 
                     float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
 
-                    // 密度
-                    power *= step(1 - _LM_Dencity / 4, abs(min_pos.x));
-                    // 距離フェード
-                    power *= 1 - smoothstep(_LM_MinDist, _LM_MinDist + 1, length(ws_camera_vec));
-                    // フレークのばらつき
-                    power *= random1(min_pos.xy);
-                    // NdotV起因の強度
-                    power *= pow(saturate(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LM_Spot));
-                    // アニメーション
+                    // アニメーション項
                     power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
+                    // Glitter項
+                    power = lerp(power, max(power, pow(power + 0.1, 32)), _LM_Glitter);
+                    // 密度項
+                    power *= step(1 - _LM_Dencity / 4, abs(min_pos.x));
+                    // フレークのばらつき項
+                    power *= random1(min_pos.xy);
+                    // 距離フェード項
+                    power *= 1 - smoothstep(_LM_MinDist, _LM_MinDist + 1, length(ws_camera_vec));
+                    // NdotV起因の強度項
+                    power *= pow(abs(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LM_Spot));
 
                     float3 lame_color = _LM_Color.rgb;
                     lame_color *= WF_TEX2D_LAME_TEX(uv_main);

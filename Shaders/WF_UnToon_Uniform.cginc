@@ -153,6 +153,7 @@
     float3          _LM_RandColor;
     float           _LM_Scale;
     float           _LM_Dencity;
+    float           _LM_Glitter;
     float           _LM_MinDist;
     float           _LM_Spot;
     float           _LM_AnimSpeed;

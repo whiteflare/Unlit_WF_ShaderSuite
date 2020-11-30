@@ -158,9 +158,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
             _LM_Scale               ("[LM] Scale", Range(0, 1)) = 0.5
             _LM_Dencity             ("[LM] Dencity", Range(0, 1)) = 0.5
+            _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5
             _LM_MinDist             ("[LM] Dist Fade Start", Range(0, 5)) = 2.0
             _LM_Spot                ("[LM] Spot Fade Strength", Range(0, 16)) = 2.0
-            _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0
+            _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
             _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
