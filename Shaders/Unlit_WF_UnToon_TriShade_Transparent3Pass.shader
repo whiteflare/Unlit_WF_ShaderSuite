@@ -279,6 +279,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_UPPER
+
             #define _AO_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
@@ -289,6 +290,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -316,6 +318,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_LOWER
+            #define _WF_FACE_BACK
+
             #define _AO_ENABLE
             #define _FG_ENABLE
             #define _MT_ENABLE
@@ -324,6 +328,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -351,6 +356,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_LOWER
+
             #define _AO_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
@@ -361,6 +367,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -390,6 +397,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _ES_FORCE_ALPHASCROLL
             #define _FG_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

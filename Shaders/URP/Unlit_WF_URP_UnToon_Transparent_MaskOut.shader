@@ -294,20 +294,19 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
 
             #pragma target 3.0
 
+            #define _AL_ENABLE
             #define _WF_PLATFORM_LWRP
 
-            #define _AL_ENABLE
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _LM_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
-
-            #define _LM_ENABLE
 
             // -------------------------------------
             // Lightweight Pipeline keywords
@@ -354,9 +353,9 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
+            #define _AL_ENABLE
             #define _WF_PLATFORM_LWRP
 
-            #define _AL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_instancing

@@ -176,6 +176,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -189,7 +190,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
@@ -197,6 +198,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #pragma fragment frag_meta
 
             #define _VC_ENABLE
+
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

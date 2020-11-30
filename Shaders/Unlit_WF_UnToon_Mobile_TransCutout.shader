@@ -172,6 +172,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
+
             #define _AO_ENABLE
             #define _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
@@ -180,6 +181,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -193,7 +195,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
@@ -201,6 +203,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma fragment frag_meta
 
             #define _VC_ENABLE
+
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

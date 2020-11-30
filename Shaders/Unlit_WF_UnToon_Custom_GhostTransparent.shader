@@ -266,15 +266,20 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+            #define _WF_FACE_BACK
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
+            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -301,6 +306,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
@@ -312,6 +318,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -333,6 +340,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma fragment frag_shadow
 
             #define _AL_ENABLE
+
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 
@@ -345,7 +353,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
@@ -353,6 +361,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma fragment frag_meta
 
             #define _VC_ENABLE
+
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

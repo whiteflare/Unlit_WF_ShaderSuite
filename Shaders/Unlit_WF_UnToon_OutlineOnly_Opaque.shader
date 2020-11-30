@@ -81,7 +81,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
             Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull Front
+            Cull FRONT
 
             CGPROGRAM
 
@@ -94,6 +94,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
 
             #define _TL_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

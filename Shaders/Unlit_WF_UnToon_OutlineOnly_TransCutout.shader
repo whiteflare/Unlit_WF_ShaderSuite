@@ -107,8 +107,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
+
             #define _TL_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

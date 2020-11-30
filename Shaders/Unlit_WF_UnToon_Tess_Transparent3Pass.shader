@@ -316,18 +316,18 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_UPPER
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _HL_ENABLE
+            #define _LM_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
-
-            #define _LM_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -358,16 +358,19 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_LOWER
+            #define _WF_FACE_BACK
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
+            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
-
-            #define _LM_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -398,18 +401,18 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
             #define _AL_CUTOUT_LOWER
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _HL_ENABLE
+            #define _LM_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
-
-            #define _LM_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

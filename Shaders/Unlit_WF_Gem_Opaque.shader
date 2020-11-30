@@ -101,9 +101,10 @@ Shader "UnlitWF/WF_Gem_Opaque" {
 
             #pragma target 3.0
 
+            #define _WF_MOBILE
+
             #define _NM_ENABLE
             #define _VC_ENABLE
-            #define _WF_MOBILE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

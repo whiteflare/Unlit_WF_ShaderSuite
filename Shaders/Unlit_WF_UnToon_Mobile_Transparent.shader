@@ -186,6 +186,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+
             #define _AO_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
@@ -193,6 +194,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -206,12 +208,14 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
+
+            #define _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

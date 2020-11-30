@@ -318,17 +318,19 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             #pragma target 4.5
 
             #define _AL_ENABLE
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
+            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
-
-            #define _LM_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -364,19 +366,19 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             #pragma target 4.5
 
             #define _AL_ENABLE
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
+            #define _LM_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
-
-            #define _LM_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

@@ -270,6 +270,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

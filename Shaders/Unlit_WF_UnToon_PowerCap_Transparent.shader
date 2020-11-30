@@ -279,11 +279,14 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+
             #define _CH_ENABLE
+            #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -310,12 +313,14 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
             #define _AL_ENABLE
             #define _AL_FRESNEL_ENABLE
+
             #define _CH_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

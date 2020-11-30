@@ -285,9 +285,11 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             #pragma require geometry
 
             #define _AL_ENABLE
+
             #define _FG_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -321,6 +323,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             #pragma target 4.5
 
             #define _AL_ENABLE
+            #define _WF_FACE_BACK
+
             #define _AO_ENABLE
             #define _ES_ENABLE
             #define _FG_ENABLE
@@ -330,6 +334,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -361,6 +366,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             #pragma target 4.5
 
             #define _AL_ENABLE
+
             #define _AO_ENABLE
             #define _ES_ENABLE
             #define _FG_ENABLE
@@ -372,6 +378,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

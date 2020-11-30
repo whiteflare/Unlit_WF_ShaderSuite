@@ -105,8 +105,8 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
 
             #pragma target 3.0
 
-            #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
 
             #define _NM_ENABLE
             #define _VC_ENABLE
@@ -150,8 +150,8 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
-            #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
 
             #define _VC_ENABLE
 

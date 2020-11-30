@@ -272,9 +272,11 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
+
             #define _FG_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -300,6 +302,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
+
             #define _AO_ENABLE
             #define _ES_ENABLE
             #define _FG_ENABLE
@@ -311,6 +314,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

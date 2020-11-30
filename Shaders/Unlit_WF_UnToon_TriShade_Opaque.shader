@@ -246,7 +246,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull Front
+            Cull FRONT
 
             CGPROGRAM
 
@@ -260,6 +260,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             #define _FG_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -293,6 +294,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

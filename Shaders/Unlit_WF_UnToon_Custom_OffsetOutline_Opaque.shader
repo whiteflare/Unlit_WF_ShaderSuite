@@ -278,6 +278,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

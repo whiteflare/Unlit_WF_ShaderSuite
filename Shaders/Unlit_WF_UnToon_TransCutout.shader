@@ -315,6 +315,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
             #define _AL_ENABLE
             #define _AL_CUTOUT
+
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 
@@ -327,7 +328,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
@@ -335,6 +336,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #pragma fragment frag_meta
 
             #define _VC_ENABLE
+
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"
