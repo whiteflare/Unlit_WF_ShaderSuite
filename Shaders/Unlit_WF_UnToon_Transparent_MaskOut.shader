@@ -141,6 +141,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _LM_Texture             ("[LM] Texture", 2D) = "white" {}
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
+        [Enum(POLYGON,0,POINT,1)]
+            _LM_Shape               ("[LM] Shape", Float) = 0
             _LM_Scale               ("[LM] Scale", Range(0, 1)) = 0.5
             _LM_Dencity             ("[LM] Dencity", Range(0, 1)) = 0.5
             _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5

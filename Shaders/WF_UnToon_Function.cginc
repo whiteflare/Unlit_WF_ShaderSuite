@@ -613,6 +613,8 @@
                     power *= 1 - smoothstep(_LM_MinDist, _LM_MinDist + 1, length(ws_camera_vec));
                     // NdotV起因の強度項
                     power *= pow(abs(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LM_Spot));
+                    // 形状
+                    power *= _LM_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
 
                     float3 lame_color = _LM_Color.rgb;
                     lame_color *= WF_TEX2D_LAME_TEX(uv_main);
