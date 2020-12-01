@@ -618,7 +618,7 @@
 
                     float3 lame_color = _LM_Color.rgb;
                     lame_color *= WF_TEX2D_LAME_TEX(uv_main);
-                    lame_color += _LM_RandColor * (random3(min_pos) * 2 - 1);
+                    lame_color += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
 
                     color.rgb += max(ZERO_VEC3, lame_color) * power;
                 }
