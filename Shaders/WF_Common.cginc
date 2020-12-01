@@ -293,56 +293,6 @@
     }
 
     ////////////////////////////
-    // Lightmap Sampler
-    ////////////////////////////
-
-    float3 pickLightmap(float2 uv_lmap) {
-        float3 color = ZERO_VEC3;
-        #ifdef LIGHTMAP_ON
-        {
-            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            float4 lmap_tex = PICK_MAIN_TEX2D(unity_Lightmap, uv);
-            float3 lmap_color = DecodeLightmap(lmap_tex);
-            color += lmap_color;
-        }
-        #endif
-        #ifdef DYNAMICLIGHTMAP_ON
-        {
-            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-            float4 lmap_tex = PICK_MAIN_TEX2D(unity_DynamicLightmap, uv);
-            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
-            color += lmap_color;
-        }
-        #endif
-        return color;
-    }
-
-    float3 pickLightmapLod(float2 uv_lmap) {
-        float3 color = ZERO_VEC3;
-        #ifdef PICK_MAIN_TEX2D_LOD
-            #ifdef LIGHTMAP_ON
-            {
-                float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-                float4 lmap_tex = PICK_MAIN_TEX2D_LOD(unity_Lightmap, uv, 0);
-                float3 lmap_color = DecodeLightmap(lmap_tex);
-                color += lmap_color;
-            }
-            #endif
-            #ifdef DYNAMICLIGHTMAP_ON
-            {
-                float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-                float4 lmap_tex = PICK_MAIN_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
-                float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
-                color += lmap_color;
-            }
-            #endif
-        #else
-            color = ONE_VEC3;
-        #endif
-        return color;
-    }
-
-    ////////////////////////////
     // ReflectionProbe Sampler
     ////////////////////////////
 

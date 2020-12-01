@@ -153,18 +153,55 @@
     }
 
     ////////////////////////////
+    // Lightmap Sampler
+    ////////////////////////////
+
+    float3 pickLightmap(float2 uv_lmap) {
+        float3 color = float3(0, 0, 0);
+        #ifdef LIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            float4 lmap_tex = PICK_MAIN_TEX2D(unity_Lightmap, uv);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        #ifdef DYNAMICLIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+            float4 lmap_tex = PICK_MAIN_TEX2D(unity_DynamicLightmap, uv);
+            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        return color;
+    }
+
+    float3 pickLightmapLod(float2 uv_lmap) {
+        return float3(1, 1, 1);
+        // SRP Batcher を有効にするために、vertシェーダとfragシェーダの両方から読むことを諦め、fragシェーダの方を生かす。vertでは白色を返す。
+    }
+
+    ////////////////////////////
     // ReflectionProbe Sampler
     ////////////////////////////
 
     float4 pickReflectionProbe(float3 ws_vertex, float3 ws_normal, float lod) {
+        float4 color0 = float4(0, 0, 0, 1);
+
+#if !defined(_ENVIRONMENTREFLECTIONS_OFF)
         float3 ws_camera_dir = normalize(_WorldSpaceCameraPos - ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float3 dir0 = reflect_dir;
 
-        float4 color0 = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
+        color0 = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
 
+#if !defined(UNITY_USE_NATIVE_HDR)
         color0.rgb = DecodeHDR(color0, unity_SpecCube0_HDR);
+#endif
+
+#endif
 
         return color0;
     }
