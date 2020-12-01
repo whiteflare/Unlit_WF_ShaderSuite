@@ -120,10 +120,12 @@
     float           _BumpScale;
     float           _NM_Power;
     float           _NM_FlipTangent;
+#ifndef _WF_MOBILE
     uint            _NM_2ndType;
     float4          _DetailNormalMap_ST;
     float           _DetailNormalMapScale;
     float           _NM_InvMaskVal;
+#endif
 
     float           _MT_Enable;
     float           _MT_Metallic;
@@ -134,10 +136,12 @@
     float           _MT_Specular;
     float           _MT_SpecSmooth;
     float           _MT_InvMaskVal;
+#ifndef _WF_MOBILE
     float           _MT_InvRoughnessMaskVal;
     uint            _MT_CubemapType;
     float4          _MT_Cubemap_HDR;
     float           _MT_CubemapPower;
+#endif
 
     float           _HL_Enable;
     uint            _HL_CapType;
