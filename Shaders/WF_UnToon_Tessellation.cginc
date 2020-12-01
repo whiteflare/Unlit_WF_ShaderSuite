@@ -34,13 +34,6 @@
     #define _TESS_MIN_DIST 0
     #define _TESS_MAX_DIST 2
 
-    float       _TessType;
-    float       _TessFactor;
-    float       _Smoothing;
-    sampler2D   _DispMap;   // vert内で取得するので独自のサンプラーを使う
-    float       _DispMapScale;
-    float       _DispMapLevel;
-
     [domain("tri")]
     [partitioning("integer")]
     [outputtopology("triangle_cw")]

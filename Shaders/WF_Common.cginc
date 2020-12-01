@@ -35,16 +35,6 @@
     #include "WF_Common_BuiltinRP.cginc"
 #endif
 
-#ifdef _WF_FORCE_USE_SAMPLER
-    // 強制的にサンプラーを定義する版
-    #define DECL_MAIN_TEX2D(name)           sampler2D name
-    #define DECL_SUB_TEX2D(name)            sampler2D name
-    #define PICK_MAIN_TEX2D(tex, uv)        tex2D(tex, uv)
-    #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
-    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        tex2Dlod(tex, float4(uv, 0, lod))
-    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   tex2Dlod(tex, float4(uv, 0, lod))
-#endif
-
     ////////////////////////////
     // Common Utility
     ////////////////////////////
@@ -296,6 +286,10 @@
     // ReflectionProbe Sampler
     ////////////////////////////
 
+    #define pickReflectionCubemap(cubemap, hdrInst, ws_vertex, ws_normal, lod)  \
+        ( DecodeHDR( PICK_MAIN_TEXCUBE_LOD(cubemap, reflect(-worldSpaceCameraDir(ws_vertex), ws_normal), lod ), hdrInst) )
+
+/*
     float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ws_normal, float lod) {
         float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
@@ -303,5 +297,6 @@
         float4 color = texCUBElod(cubemap, float4(reflect_dir, lod) );
         return DecodeHDR(color, cubemap_HDR);
     }
+*/
 
 #endif

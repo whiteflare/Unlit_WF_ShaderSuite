@@ -32,8 +32,27 @@
 #endif
 
     ////////////////////////////
+    // Texture Definition
+    ////////////////////////////
+
+    #define DECL_MAIN_TEX2D(name)                       TEXTURE2D(name); SAMPLER(sampler##name)
+    #define PICK_MAIN_TEX2D(tex, uv)                    SAMPLE_TEXTURE2D(tex, sampler##tex, uv)
+    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)           SAMPLE_TEXTURE2D_LOD(tex, sampler##tex, uv, lod)
+
+    #define DECL_SUB_TEX2D(name)                        TEXTURE2D(name)
+    #define PICK_SUB_TEX2D(tex, name, uv)               SAMPLE_TEXTURE2D(tex, sampler##name, uv)
+    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)      SAMPLE_TEXTURE2D_LOD(tex, sampler##name, uv, lod)
+
+    #define DECL_MAIN_TEXCUBE(name)                     TEXTURECUBE(name); SAMPLER(sampler##name)
+    #define PICK_MAIN_TEXCUBE_LOD(tex, dir, lod)        SAMPLE_TEXTURECUBE_LOD(tex, sampler##tex, dir, lod)
+
+    #define PICK_SUB_TEXCUBE_LOD(tex, name, dir, lod)   SAMPLE_TEXTURECUBE_LOD(tex, sampler##name, dir, lod)
+
+    ////////////////////////////
     // Compatible
     ////////////////////////////
+
+    // Unity BuiltinRP で定義されていた関数を LightweightRP で定義しなおして差異を吸収する
 
     float IsGammaSpace() {
         #ifdef UNITY_COLORSPACE_GAMMA
@@ -42,18 +61,6 @@
             return 0;
         #endif
     }
-
-#ifndef _WF_FORCE_USE_SAMPLER
-    // 通常版
-    #define DECL_MAIN_TEX2D(name)           TEXTURE2D(name); SAMPLER(sampler##name)
-    #define DECL_SUB_TEX2D(name)            TEXTURE2D(name)
-    #define PICK_MAIN_TEX2D(tex, uv)        SAMPLE_TEXTURE2D(tex, sampler##tex, uv)
-    #define PICK_SUB_TEX2D(tex, name, uv)   SAMPLE_TEXTURE2D(tex, sampler##name, uv)
-    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        SAMPLE_TEXTURE2D_LOD(tex, sampler##tex, uv, lod)
-    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   SAMPLE_TEXTURE2D_LOD(tex, sampler##name, uv, lod)
-#endif
-
-// Unity BuiltinRP で定義されていた関数を LightweightRP で定義しなおして差異を吸収する
 
     #define UnityObjectToClipPos        TransformObjectToHClip
     #define UnityWorldToClipPos         TransformWorldToHClip

@@ -310,6 +310,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma target 5.0
 
             #define _WF_ALPHA_CUTOUT
+            #define _WF_UNTOON_TESS
 
             #define _TL_ENABLE
             #define _VC_ENABLE
@@ -340,6 +341,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma target 5.0
 
             #define _WF_ALPHA_CUTOUT
+            #define _WF_UNTOON_TESS
 
             #define _AO_ENABLE
             #define _CH_ENABLE

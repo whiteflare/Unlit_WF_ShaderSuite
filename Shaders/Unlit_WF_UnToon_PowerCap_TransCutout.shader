@@ -278,6 +278,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #pragma target 4.5
 
             #define _WF_ALPHA_CUTOUT
+            #define _WF_UNTOON_POWERCAP
 
             #define _CH_ENABLE
             #define _HL_ENABLE

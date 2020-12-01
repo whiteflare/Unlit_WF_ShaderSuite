@@ -29,7 +29,7 @@
     // Texture & Sampler
     ////////////////////////////
 
-    samplerCUBE     _GR_Cubemap;
+    DECL_MAIN_TEXCUBE(_GR_Cubemap);
 
     ////////////////////////////
     // Other uniform variable

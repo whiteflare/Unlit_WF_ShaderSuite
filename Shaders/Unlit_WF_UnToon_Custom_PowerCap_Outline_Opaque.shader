@@ -283,6 +283,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
 
             #pragma target 4.5
 
+            #define _WF_UNTOON_POWERCAP
+
             #define _CH_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE

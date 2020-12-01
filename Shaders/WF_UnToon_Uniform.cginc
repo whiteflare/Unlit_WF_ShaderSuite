@@ -27,43 +27,53 @@
     // Texture & Sampler
     ////////////////////////////
 
+    // _MainTex ================================================
+
     DECL_MAIN_TEX2D(_MainTex);
-        DECL_SUB_TEX2D(_AL_MaskTex);
-        DECL_SUB_TEX2D(_EmissionMap);
-        DECL_SUB_TEX2D(_MetallicGlossMap);
-        DECL_SUB_TEX2D(_HL_MaskTex);
-        DECL_SUB_TEX2D(_TS_MaskTex);
-        DECL_SUB_TEX2D(_TR_MaskTex);
-        DECL_SUB_TEX2D(_OL_MaskTex);
-        DECL_SUB_TEX2D(_TL_CustomColorTex);
-        DECL_SUB_TEX2D(_CH_3chMaskTex);
+
+    // _MainTex の Sampler で参照するサブテクスチャ ============
+
+    DECL_SUB_TEX2D(_AL_MaskTex);
+    DECL_SUB_TEX2D(_EmissionMap);
+    DECL_SUB_TEX2D(_MetallicGlossMap);
+    DECL_SUB_TEX2D(_HL_MaskTex);
+    DECL_SUB_TEX2D(_TS_MaskTex);
+    DECL_SUB_TEX2D(_TR_MaskTex);
+    DECL_SUB_TEX2D(_OL_MaskTex);
+    DECL_SUB_TEX2D(_TL_CustomColorTex);
+    DECL_SUB_TEX2D(_CH_3chMaskTex);
 #ifndef _WF_MOBILE
-        DECL_SUB_TEX2D(_NM_2ndMaskTex);
-        DECL_SUB_TEX2D(_SpecGlossMap);
-        DECL_SUB_TEX2D(_TS_BaseTex);
-        DECL_SUB_TEX2D(_TS_1stTex);
-        DECL_SUB_TEX2D(_TS_2ndTex);
-        DECL_SUB_TEX2D(_TS_3rdTex);
-        DECL_SUB_TEX2D(_OcclusionMap);
-        DECL_SUB_TEX2D(_LM_Texture);
-        DECL_SUB_TEX2D(_LM_MaskTex);
+    DECL_SUB_TEX2D(_NM_2ndMaskTex);
+    DECL_SUB_TEX2D(_SpecGlossMap);
+    DECL_SUB_TEX2D(_TS_BaseTex);
+    DECL_SUB_TEX2D(_TS_1stTex);
+    DECL_SUB_TEX2D(_TS_2ndTex);
+    DECL_SUB_TEX2D(_TS_3rdTex);
+    DECL_SUB_TEX2D(_OcclusionMap);
+    DECL_SUB_TEX2D(_LM_Texture);
+    DECL_SUB_TEX2D(_LM_MaskTex);
 #endif
 #ifdef _TL_MASK_APPLY_LEGACY
-        DECL_SUB_TEX2D(_TL_MaskTex);    // マスクをfragmentでアルファに反映する場合
+    DECL_SUB_TEX2D(_TL_MaskTex);    // マスクをfragmentでアルファに反映する場合
 #endif
 
-    DECL_MAIN_TEX2D(_BumpMap); // UVはMainTexと共通だが別のFilterを使えるようにsampler2Dで定義する
+    // 独自の Sampler で参照するサブテクスチャ =================
 
+    DECL_MAIN_TEX2D(_BumpMap); // UVはMainTexと共通だが別のFilterを使えるようにsampler2Dで定義する
 #ifndef _WF_MOBILE
     DECL_MAIN_TEX2D(_DetailNormalMap);
 #endif
+    DECL_MAIN_TEXCUBE(_MT_Cubemap);
+    sampler2D       _HL_MatcapTex;
+    sampler2D       _OL_OverlayTex;
 
-    samplerCUBE _MT_Cubemap;
-    sampler2D   _HL_MatcapTex;
-    sampler2D   _OL_OverlayTex;
+    // vert から tex2Dlod で参照するサブテクスチャ =============
 
 #ifndef _TL_MASK_APPLY_LEGACY
-        sampler2D   _TL_MaskTex;        // マスクをシフト時に太さに反映する場合
+    sampler2D       _TL_MaskTex;        // マスクをシフト時に太さに反映する場合
+#endif
+#ifdef _WF_UNTOON_TESS
+    sampler2D       _DispMap;   // vert内で取得するので独自のサンプラーを使う
 #endif
 
     ////////////////////////////
@@ -216,5 +226,34 @@
     float           _FG_Exponential;
     float3          _FG_BaseOffset;
     float3          _FG_Scale;
+
+#ifdef _WF_UNTOON_TESS
+    uint            _TessType;
+    float           _TessFactor;
+    float           _Smoothing;
+    float           _DispMapScale;
+    float           _DispMapLevel;
+#endif
+
+#ifdef _WF_UNTOON_POWERCAP
+    #define WF_POWERCAP_DECL(id)            \
+        float       _HL_Enable_##id;        \
+        uint        _HL_CapType_##id;       \
+        sampler2D   _HL_MatcapTex_##id;     \
+        float3      _HL_MatcapColor_##id;   \
+        float       _HL_Power_##id;         \
+        float       _HL_BlendNormal_##id;   \
+        float       _HL_Parallax_##id;      \
+        DECL_SUB_TEX2D(_HL_MaskTex_##id);   \
+        float       _HL_InvMaskVal_##id;
+
+    WF_POWERCAP_DECL(1)
+    WF_POWERCAP_DECL(2)
+    WF_POWERCAP_DECL(3)
+    WF_POWERCAP_DECL(4)
+    WF_POWERCAP_DECL(5)
+    WF_POWERCAP_DECL(6)
+    WF_POWERCAP_DECL(7)
+#endif
 
 #endif

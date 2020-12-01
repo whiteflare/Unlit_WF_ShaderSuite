@@ -26,20 +26,30 @@
     #include "UnityCG.cginc"
     #include "Lighting.cginc"
 
-#ifndef _WF_FORCE_USE_SAMPLER
+    ////////////////////////////
+    // Texture Definition
+    ////////////////////////////
 
-    // 通常版
-    #define DECL_MAIN_TEX2D(name)           UNITY_DECLARE_TEX2D(name)
-    #define DECL_SUB_TEX2D(name)            UNITY_DECLARE_TEX2D_NOSAMPLER(name)
-    #define PICK_MAIN_TEX2D(tex, uv)        UNITY_SAMPLE_TEX2D(tex, uv)
-    #define PICK_SUB_TEX2D(tex, name, uv)   UNITY_SAMPLE_TEX2D_SAMPLER(tex, name, uv)
-
+    #define DECL_MAIN_TEX2D(name)                       UNITY_DECLARE_TEX2D(name)
+    #define PICK_MAIN_TEX2D(tex, uv)                    UNITY_SAMPLE_TEX2D(tex, uv)
 #ifdef SHADER_API_D3D11
-    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        tex.SampleLevel(sampler##tex, uv, lod)
-    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   tex.SampleLevel(sampler##samplertex, uv, lod)
+    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)           tex.SampleLevel(sampler##tex, uv, lod)
 #endif
 
+    #define DECL_SUB_TEX2D(name)                        UNITY_DECLARE_TEX2D_NOSAMPLER(name)
+    #define PICK_SUB_TEX2D(tex, name, uv)               UNITY_SAMPLE_TEX2D_SAMPLER(tex, name, uv)
+#ifdef SHADER_API_D3D11
+    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)      tex.SampleLevel(sampler##samplertex, uv, lod)
 #endif
+
+    #define DECL_MAIN_TEXCUBE(name)                     UNITY_DECLARE_TEXCUBE(name)
+    #define PICK_MAIN_TEXCUBE_LOD(tex, dir, lod)        UNITY_SAMPLE_TEXCUBE_LOD(tex, dir, lod)
+
+    #define PICK_SUB_TEXCUBE_LOD(tex, name, dir, lod)   UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(tex, name, dir, lod)
+
+    ////////////////////////////
+    // Compatible
+    ////////////////////////////
 
     #define UnityObjectToWorldPos(v)    ( mul(unity_ObjectToWorld, float4(v.xyz, 1)).xyz )
     #define UnityWorldToObjectPos(v)    ( mul(unity_WorldToObject, float4(v.xyz, 1)).xyz )
@@ -200,8 +210,8 @@
         float3 dir0 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
         float3 dir1 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube1_ProbePosition, unity_SpecCube1_BoxMin, unity_SpecCube1_BoxMax);
 
-        float4 color0 = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
-        float4 color1 = UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(unity_SpecCube1, unity_SpecCube0, dir1, lod);
+        float4 color0 = PICK_MAIN_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
+        float4 color1 = PICK_SUB_TEXCUBE_LOD(unity_SpecCube1, unity_SpecCube0, dir1, lod);
 
         color0.rgb = DecodeHDR(color0, unity_SpecCube0_HDR);
         color1.rgb = DecodeHDR(color1, unity_SpecCube1_HDR);

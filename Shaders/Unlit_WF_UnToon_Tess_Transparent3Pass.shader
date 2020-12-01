@@ -317,6 +317,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUT_UPPER
+            #define _WF_UNTOON_TESS
 
             #define _AO_ENABLE
             #define _CH_ENABLE
@@ -359,6 +360,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUT_LOWER
             #define _WF_FACE_BACK
+            #define _WF_UNTOON_TESS
 
             #define _AO_ENABLE
             #define _CH_ENABLE
@@ -400,6 +402,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUT_LOWER
+            #define _WF_UNTOON_TESS
 
             #define _AO_ENABLE
             #define _CH_ENABLE

@@ -31,16 +31,7 @@
 
     #ifdef _HL_ENABLE
 
-        #define WF_POWERCAP_DECL(id)                                                                                                    \
-            float       _HL_Enable_##id;                                                                                                \
-            uint        _HL_CapType_##id;                                                                                               \
-            sampler2D   _HL_MatcapTex_##id;                                                                                             \
-            float3      _HL_MatcapColor_##id;                                                                                           \
-            float       _HL_Power_##id;                                                                                                 \
-            float       _HL_BlendNormal_##id;                                                                                           \
-            float       _HL_Parallax_##id;                                                                                              \
-            DECL_SUB_TEX2D(_HL_MaskTex_##id);                                                                                           \
-            float       _HL_InvMaskVal_##id;                                                                                            \
+        #define WF_POWERCAP_FUNC(id)                                                                                                    \
             void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
                 if (TGL_ON(_HL_Enable_##id)) {                                                                                          \
                     float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;                                                                     \
@@ -66,18 +57,18 @@
 
     #else
 
-        #define WF_POWERCAP_DECL(id)
+        #define WF_POWERCAP_FUNC(id)
         #define WF_POWERCAP_AFFECT(id)
 
     #endif
 
-    WF_POWERCAP_DECL(1)
-    WF_POWERCAP_DECL(2)
-    WF_POWERCAP_DECL(3)
-    WF_POWERCAP_DECL(4)
-    WF_POWERCAP_DECL(5)
-    WF_POWERCAP_DECL(6)
-    WF_POWERCAP_DECL(7)
+    WF_POWERCAP_FUNC(1)
+    WF_POWERCAP_FUNC(2)
+    WF_POWERCAP_FUNC(3)
+    WF_POWERCAP_FUNC(4)
+    WF_POWERCAP_FUNC(5)
+    WF_POWERCAP_FUNC(6)
+    WF_POWERCAP_FUNC(7)
 
     ////////////////////////////
     // vertex&fragment shader

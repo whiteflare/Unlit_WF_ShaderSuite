@@ -298,6 +298,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
+            #define _WF_UNTOON_TESS
 
             #define _AO_ENABLE
             #define _CH_ENABLE
@@ -337,6 +338,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             #pragma target 5.0
 
             #define _WF_ALPHA_FRESNEL
+            #define _WF_UNTOON_TESS
 
             #define _AO_ENABLE
             #define _CH_ENABLE

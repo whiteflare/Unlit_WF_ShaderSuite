@@ -280,6 +280,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUT_UPPER
+            #define _WF_UNTOON_POWERCAP
 
             #define _CH_ENABLE
             #define _HL_ENABLE
@@ -348,6 +349,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUT_LOWER
+            #define _WF_UNTOON_POWERCAP
 
             #define _CH_ENABLE
             #define _HL_ENABLE

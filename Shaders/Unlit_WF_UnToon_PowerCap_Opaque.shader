@@ -264,6 +264,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
             #pragma target 4.5
 
+            #define _WF_UNTOON_POWERCAP
+
             #define _CH_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE
