@@ -35,8 +35,11 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         _ModeUV     ("show UV", Float)              = 0
 
         [Header(Normal and Tangent)]
-        [Enum(OFF,0,NORMAL_LS,1,TANGENT_LS,2,BITANGENT_LS,3,NORMAL_WS,4,TANGENT_WS,5,BITANGENT_LS,6,VIEW_PARA_NORMAL,7)]
+        [Enum(OFF,0,NORMAL_LS,1,TANGENT_LS,2,BITANGENT_LS,3,NORMAL_WS,4,TANGENT_WS,5,BITANGENT_LS,6)]
         _ModeNormal ("show Normal", Float)          = 0
+
+        [Enum(OFF,0,VIEW_PARA_NORMAL,1)]
+        _ModeParaNormal ("show Parallel Normal", Float) = 0
 
         [Header(Lighting)]
         [Enum(OFF,0,LIGHT_0,1,LIGHT_4,2,SHADE_SH9,3)]
@@ -124,6 +127,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
             int _ModePos;
             int _ModeUV;
             int _ModeNormal;
+            int _ModeParaNormal;
             int _ModeLight;
             int _ModeLightMap;
             int _ModeSpecCube;
@@ -243,7 +247,11 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                     case 6:
                         color.rgb = saturate(UnityObjectToWorldNormal(i.bitangent.xyz) + 0.5);
                         break;
-                    case 7:
+                    default:
+                        break;
+                }
+                switch(_ModeParaNormal) {
+                    case 1:
                         color.rgb = saturate( pow( abs( dot(UnityObjectToWorldNormal(i.normal.xyz), UnityObjectToWorldNormal(i.tangent.xyz)) ), 100));
                         break;
                     default:
