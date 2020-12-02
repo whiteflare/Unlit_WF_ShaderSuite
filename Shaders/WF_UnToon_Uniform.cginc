@@ -53,7 +53,7 @@
     DECL_SUB_TEX2D      (_LM_Texture);
     DECL_SUB_TEX2D      (_LM_MaskTex);
 #endif
-#ifdef _TL_MASK_APPLY_LEGACY    // マスクをfragmentでアルファに反映する場合
+#ifdef _WF_LEGACY_TL_MASK    // マスクをfragmentでアルファに反映する場合
     DECL_SUB_TEX2D      (_TL_MaskTex);
 #endif
 
@@ -69,11 +69,13 @@
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
 
-#ifndef _TL_MASK_APPLY_LEGACY   // マスクをシフト時に太さに反映する場合
+#ifndef _WF_LEGACY_TL_MASK   // マスクをシフト時に太さに反映する場合
     DECL_VERT_TEX2D     (_TL_MaskTex);
 #endif
 #ifdef _WF_UNTOON_TESS
+#ifdef _WF_LEGACY_TE_USE_DISPMAP
     DECL_VERT_TEX2D     (_DispMap);
+#endif
 #endif
 
     ////////////////////////////
@@ -232,8 +234,10 @@
     uint            _TessType;
     float           _TessFactor;
     float           _Smoothing;
+#ifdef _WF_LEGACY_TE_USE_DISPMAP
     float           _DispMapScale;
     float           _DispMapLevel;
+#endif
 #endif
 
 #ifdef _WF_UNTOON_POWERCAP

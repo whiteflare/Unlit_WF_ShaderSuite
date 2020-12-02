@@ -39,10 +39,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
         [IntRange]
             _TessFactor             ("Tess Factor", Range(1, 16)) = 4
             _Smoothing              ("Smoothing", Range(0, 2)) = 1.0
-        [NoScaleOffset]
-            _DispMap                ("Displacement HeightMap", 2D) = "black" {}
-            _DispMapScale           ("HeightMap Scale", Range(0, 1)) = 1
-            _DispMapLevel           ("HeightMap Level", Range(0, 1)) = 0
 
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]

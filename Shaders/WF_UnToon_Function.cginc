@@ -121,7 +121,7 @@
     #endif
 
     #ifndef WF_TEX2D_OUTLINE_MASK
-        #ifndef _TL_MASK_APPLY_LEGACY
+        #ifndef _WF_LEGACY_TL_MASK
             #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv, _TL_InvMaskVal).r
         #else
             #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE(_TL_MaskTex, uv, _TL_InvMaskVal).r
@@ -776,7 +776,7 @@
     #ifdef _TL_ENABLE
 
         inline float getOutlineShiftWidth(float2 uv_main) {
-            #ifndef _TL_MASK_APPLY_LEGACY
+            #ifndef _WF_LEGACY_TL_MASK
                 float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
             #else
                 float mask = 1;
@@ -796,7 +796,7 @@
         inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
             #ifndef _WF_ALPHA_CUTOUT
                 if (TGL_ON(_TL_Enable)) {
-                    #ifndef _TL_MASK_APPLY_LEGACY
+                    #ifndef _WF_LEGACY_TL_MASK
                         // マスクをシフト時に太さに反映する場合
                         #ifdef _AL_ENABLE
                             color.a = _TL_LineColor.a;
