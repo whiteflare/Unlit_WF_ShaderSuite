@@ -108,7 +108,7 @@
 
         // Displacement HeightMap
         float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
-        float disp = SAMPLE_MASK_VALUE_LOD(_DispMap, float4(uv_main, 0, 0), 0).r * _DispMapScale - _DispMapLevel;
+        float disp = PICK_VERT_TEX2D_LOD(_DispMap, uv_main, 0).r * _DispMapScale - _DispMapLevel;
         o.ws_vertex.xyz += o.normal * disp * 0.01;
 
         #undef MUL_BARY
