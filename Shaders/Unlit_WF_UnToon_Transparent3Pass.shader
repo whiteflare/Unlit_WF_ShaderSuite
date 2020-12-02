@@ -222,6 +222,8 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
@@ -331,6 +333,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
+            #define _ES_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE
@@ -370,6 +373,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
+            #define _ES_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE
@@ -377,35 +381,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
-            #define _VC_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "EMISSIVE_SCROLL"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull [_ES_CullMode]
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert_emissiveScroll
-            #pragma fragment frag_emissiveScroll
-
-            #pragma target 4.5
-
-            #define _WF_ALPHA_BLEND
-            #define _ES_ENABLE
-            #define _ES_FORCE_ALPHASCROLL
             #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase

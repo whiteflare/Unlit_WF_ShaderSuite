@@ -239,6 +239,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
@@ -294,7 +296,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_OPAQUE"
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_BACK"
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_FRONT"
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/EMISSIVE_SCROLL"
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
