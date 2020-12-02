@@ -41,10 +41,11 @@
 
     #define PICK_SUB_TEXCUBE_LOD(tex, name, dir, lod)   UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(tex, name, dir, lod)
 
-    #define DECL_VERT_TEX2D(name)                       UNITY_DECLARE_TEX2D(name)
 #ifdef SHADER_API_D3D11
+    #define DECL_VERT_TEX2D(name)                       UNITY_DECLARE_TEX2D(name)
     #define PICK_VERT_TEX2D_LOD(tex, uv, lod)           tex.SampleLevel(sampler##tex, uv, lod)
 #else
+    #define DECL_VERT_TEX2D(name)                       sampler2D name
     #define PICK_VERT_TEX2D_LOD(tex, uv, lod)           tex2Dlod(tex, float4(uv.x, uv.y, 0, lod))
 #endif
 
