@@ -35,7 +35,7 @@
             void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
                 if (TGL_ON(_HL_Enable_##id)) {                                                                                          \
                     float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;                                                                     \
-                    float3 matcap_color = tex2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                           \
+                    float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                 \
                     float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, uv_main, _HL_InvMaskVal_##id).rgb;                         \
                     if (_HL_CapType_##id == 1) {                                                                                        \
                         float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor_##id) * 2);                   \

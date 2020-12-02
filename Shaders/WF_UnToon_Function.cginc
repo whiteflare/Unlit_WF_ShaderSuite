@@ -527,7 +527,7 @@
             if (TGL_ON(_HL_Enable)) {
                 // matcap サンプリング
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
-                float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+                float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
                 // マスク参照
                 float3 matcap_mask = WF_TEX2D_MATCAP_MASK(uv_main);
                 // 色合成
@@ -764,7 +764,7 @@
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
                 float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
-                color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
+                color.rgb = blendOverlayColor(color.rgb, PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
             }
         }
     #else

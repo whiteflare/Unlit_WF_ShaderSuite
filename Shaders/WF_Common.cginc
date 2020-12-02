@@ -52,7 +52,7 @@
 
     #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : float4(1 - rgba.rgb, rgba.a) )
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
-    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)), inv )
+    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( PICK_VERT_TEX2D_LOD(tex, uv, 0), inv )
 
     #define NZF                                     0.00390625
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)

@@ -29,9 +29,9 @@
     // Texture & Sampler
     ////////////////////////////
 
-    sampler2D       _FR_NoiseTex;
-    sampler2D       _FG_BumpMap;
-    sampler2D       _FR_MaskTex;
+    DECL_MAIN_TEX2D (_FR_NoiseTex);
+    DECL_VERT_TEX2D (_FG_BumpMap);
+    DECL_SUB_TEX2D  (_FR_MaskTex);
 
     ////////////////////////////
     // Other uniform variable
