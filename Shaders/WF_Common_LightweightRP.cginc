@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"

@@ -18,7 +18,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
