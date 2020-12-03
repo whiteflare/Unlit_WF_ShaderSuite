@@ -174,6 +174,8 @@
         // メイン
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
+        // アルファマスク適用
+        affectAlphaMask(uv_main, color);
 
         // 色変換
         affectColorChange(color);
@@ -185,9 +187,6 @@
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
-
-        // Alpha
-        affectAlpha(uv_main, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

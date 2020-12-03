@@ -93,7 +93,7 @@
 #ifdef _VC_ENABLE
             color *= i.vertex_color;
 #endif
-            affectAlpha(i.uv, color);
+            affectAlphaMask(i.uv, color);
             if (color.a < 0.5) {
                 discard;
                 return ZERO_VEC4;

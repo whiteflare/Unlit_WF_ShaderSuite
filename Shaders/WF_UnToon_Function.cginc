@@ -159,7 +159,7 @@
                  : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        inline float affectAlpha(float2 uv, inout float4 color) {
+        inline float affectAlphaMask(float2 uv, inout float4 color) {
             float baseAlpha = pickAlpha(uv, color.a);
             float alpha = baseAlpha;
 
@@ -196,9 +196,7 @@
             return baseAlpha; // ベースアルファを返却する
         }
 
-        inline void affectAlphaWithFresnel(float2 uv, float3 ws_normal, float3 ws_viewdir, inout float4 color) {
-            float baseAlpha = affectAlpha(uv, color);
-
+        inline void affectFresnelAlpha(float2 uv, float3 ws_normal, float3 ws_viewdir, float baseAlpha, inout float4 color) {
             #ifdef _WF_ALPHA_FRESNEL
                 // フレネルアルファ
                 float maxValue = max( baseAlpha * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
@@ -207,8 +205,8 @@
             #endif
         }
     #else
-        #define affectAlpha(uv, color)                                      color.a = 1.0
-        #define affectAlphaWithFresnel(uv, ws_normal, ws_viewdir, color)    color.a = 1.0
+        #define affectAlphaMask(uv, color)                                      color.a = 1.0
+        #define affectFresnelAlpha(uv, ws_normal, ws_viewdir, baseAlpha, color)	color.a = 1.0
     #endif
 
     ////////////////////////////

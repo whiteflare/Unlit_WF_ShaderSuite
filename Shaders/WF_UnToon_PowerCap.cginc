@@ -85,6 +85,8 @@
 #ifdef _VC_ENABLE
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;
@@ -120,8 +122,8 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
-        // Alpha
-        affectAlphaWithFresnel(i.uv, ws_normal, ws_view_dir, color);
+        // フレネル
+        affectFresnelAlpha(i.uv, ws_normal, ws_view_dir, alpha, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

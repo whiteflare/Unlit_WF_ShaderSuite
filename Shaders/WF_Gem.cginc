@@ -90,6 +90,8 @@
         color *= _Color;
         color.a = 1;
 #endif
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;
@@ -108,9 +110,8 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
-        // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, ws_view_dir, color);
-
+        // フレネル
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
@@ -138,6 +139,8 @@
 #else
         color.a = 1;
 #endif
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;
@@ -156,9 +159,8 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
-        // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, ws_view_dir, color);
-
+        // フレネル
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
