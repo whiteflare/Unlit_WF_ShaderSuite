@@ -344,12 +344,14 @@ namespace UnlitWF
         public bool copyNormal = false;
         public bool copyMetallic = false;
         public bool copyMatcap = false;
+        public bool copyLame = false;
         public bool copyToonShade = false;
         public bool copyRimLight = false;
         public bool copyDecal = false;
         public bool copyEmissive = false;
         public bool copyOcclusion = false;
         public bool copyOutline = false;
+        public bool copyToonFog = false;
         public bool copyLit = false;
         public bool copyTessellation = false;
     }
@@ -456,6 +458,8 @@ namespace UnlitWF
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Metallic");
             prop = so.FindProperty("copyMatcap");
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Light Matcap");
+            prop = so.FindProperty("copyLame");
+            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Lame");
             prop = so.FindProperty("copyToonShade");
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::ToonShade");
             prop = so.FindProperty("copyRimLight");
@@ -468,6 +472,8 @@ namespace UnlitWF
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Ambient Occlusion");
             prop = so.FindProperty("copyOutline");
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Outline");
+            prop = so.FindProperty("copyToonFog");
+            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Toon Fog");
             prop = so.FindProperty("copyLit");
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Lit & Lit Advance");
             prop = so.FindProperty("copyTessellation");
@@ -699,12 +705,14 @@ namespace UnlitWF
             if (param.copyEmissive) { copy_target.Add("ES"); }
             if (param.copyLit) { copy_target.Add("GL"); }
             if (param.copyMatcap) { copy_target.Add("HL"); }
+            if (param.copyLame) { copy_target.Add("LM"); }
             if (param.copyMetallic) { copy_target.Add("MT"); }
             if (param.copyNormal) { copy_target.Add("NM"); }
             if (param.copyOcclusion) { copy_target.Add("AO"); }
             if (param.copyOutline) { copy_target.Add("TL"); }
             if (param.copyRimLight) { copy_target.Add("TR"); }
             if (param.copyToonShade) { copy_target.Add("TS"); }
+            if (param.copyToonFog) { copy_target.Add("FG"); }
             if (param.copyTessellation) { copy_target.Add("TE"); }
 
             foreach (var src_prop in ShaderMaterialProperty.AsList(param.materialSource)) {
