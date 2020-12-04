@@ -477,7 +477,7 @@
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
                 float3 cubemap = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
-                color += pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(_MT_CubemapPower));
+                color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
             }
             return color;
 #endif

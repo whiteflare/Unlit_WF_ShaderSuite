@@ -57,7 +57,7 @@
         if (TGL_ON(_GR_Enable)) {
             // リフレクション
             float3 cubemap = pickReflectionCubemap(_GR_Cubemap, _GR_Cubemap_HDR, i.ws_vertex, ws_normal, 0); // smoothnessは1固定
-            float3 reflection = pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(_GR_CubemapPower));
+            float3 reflection = lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _GR_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _GR_CubemapPower;
             reflection = lerp(reflection, calcBrightness(reflection), _GR_Monochrome);
 
             // 合成
@@ -83,6 +83,9 @@
 #ifdef _VC_ENABLE
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
+
 #ifdef _AL_ENABLE
         color *= TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
         color.a *= _AlphaBack;
@@ -90,8 +93,6 @@
         color *= _Color;
         color.a = 1;
 #endif
-        // アルファマスク適用
-        float alpha = affectAlphaMask(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;
@@ -133,14 +134,15 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
         color *= _Color;
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
+
 #ifdef _AL_ENABLE
         color.rgb *= color.a;
         color.a = _AlphaFront;
 #else
         color.a = 1;
 #endif
-        // アルファマスク適用
-        float alpha = affectAlphaMask(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;

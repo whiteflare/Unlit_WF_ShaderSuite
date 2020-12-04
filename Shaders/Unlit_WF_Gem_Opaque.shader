@@ -52,6 +52,7 @@ Shader "UnlitWF/WF_Gem_Opaque" {
             _GR_Brightness          ("[GR] Brightness", Range(0, 1)) = 0
             _GR_Monochrome          ("[GR] Monochrome Reflection", Range(0, 1)) = 1
             _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 2)) = 1
+            _GR_CubemapHighCut      ("[GR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 1
             _GR_BlendNormal         ("[GR] Blend Normal", Range(0, 1)) = 0.1
 
         // 法線マップ

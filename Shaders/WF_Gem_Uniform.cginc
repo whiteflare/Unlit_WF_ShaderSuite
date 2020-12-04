@@ -50,6 +50,7 @@
     float           _GR_Monochrome;
     float4          _GR_Cubemap_HDR;
     float           _GR_CubemapPower;
+    float           _GR_CubemapHighCut;
     float           _GR_BlendNormal;
 
     float           _AlphaFront;

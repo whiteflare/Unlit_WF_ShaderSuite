@@ -109,6 +109,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
             _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
+            _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 1
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
