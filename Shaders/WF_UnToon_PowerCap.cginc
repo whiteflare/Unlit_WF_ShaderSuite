@@ -86,7 +86,7 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
         // アルファマスク適用
-        float alpha = affectAlphaMask(uv_main, color);
+        affectAlphaMask(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;
@@ -123,7 +123,7 @@
         color.rgb *= i.light_color;
 
         // フレネル
-        affectFresnelAlpha(i.uv, ws_normal, ws_view_dir, alpha, color);
+        affectFresnelAlpha(i.uv, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

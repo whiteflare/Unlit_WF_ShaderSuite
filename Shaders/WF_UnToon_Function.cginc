@@ -159,9 +159,8 @@
                  : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        inline float affectAlphaMask(float2 uv, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a);
-            float alpha = baseAlpha;
+        inline void affectAlphaMask(float2 uv, inout float4 color) {
+            float alpha = pickAlpha(uv, color.a);
 
             /*
              * カットアウト処理
@@ -192,21 +191,19 @@
             #endif
 
             color.a = alpha;
-
-            return baseAlpha; // ベースアルファを返却する
         }
 
-        inline void affectFresnelAlpha(float2 uv, float3 ws_normal, float3 ws_viewdir, float baseAlpha, inout float4 color) {
+        inline void affectFresnelAlpha(float2 uv, float3 ws_normal, float3 ws_viewdir, inout float4 color) {
             #ifdef _WF_ALPHA_FRESNEL
                 // フレネルアルファ
-                float maxValue = max( baseAlpha * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
+                float maxValue = max(color.a, _AL_Fresnel * _AL_CustomValue);
                 float fa = 1 - abs( dot( ws_normal, ws_viewdir ) );
                 color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
             #endif
         }
     #else
-        #define affectAlphaMask(uv, color)                                      color.a = 1.0
-        #define affectFresnelAlpha(uv, ws_normal, ws_viewdir, baseAlpha, color)	color.a = 1.0
+        #define affectAlphaMask(uv, color)                              color.a = 1.0
+        #define affectFresnelAlpha(uv, ws_normal, ws_viewdir, color)
     #endif
 
     ////////////////////////////
@@ -779,8 +776,10 @@
 
         inline float getOutlineShiftWidth(float2 uv_main) {
             #ifndef _WF_LEGACY_TL_MASK
+                // マスクをシフト時に太さに反映する場合
                 float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
             #else
+                // マスクをfragmentでアルファに反映する場合
                 float mask = 1;
             #endif
             return _TL_LineWidth * 0.01 * mask;
@@ -792,19 +791,12 @@
                 float3 line_color = lerp(_TL_LineColor.rgb, WF_TEX2D_OUTLINE_COLOR(uv_main), _TL_BlendCustom);
                 // アウトライン色をベースと合成
                 color.rgb = lerp(line_color, color.rgb, _TL_BlendBase);
-            }
-        }
 
-        inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
-            #ifndef _WF_ALPHA_CUTOUT
-                if (TGL_ON(_TL_Enable)) {
+                // アウトラインアルファを反映
+	            #ifdef _WF_ALPHA_BLEND
                     #ifndef _WF_LEGACY_TL_MASK
                         // マスクをシフト時に太さに反映する場合
-                        #ifdef _AL_ENABLE
-                            color.a = _TL_LineColor.a;
-                        #else
-                            color.a = 1;
-                        #endif
+                        color.a = _TL_LineColor.a;
                     #else
                         // マスクをfragmentでアルファに反映する場合
                         float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
@@ -812,20 +804,15 @@
                             color.a = 0;
                             discard;
                         } else {
-                            #ifdef _AL_ENABLE
-                                color.a = _TL_LineColor.a * mask;
-                            #else
-                                color.a = 1;
-                            #endif
+                            color.a = _TL_LineColor.a * mask;
                         }
                     #endif
-                }
-            #endif
+	            #endif
+            }
         }
 
     #else
         #define affectOutline(uv_main, color)
-        #define affectOutlineAlpha(uv_main, color)
     #endif
 
     float4 shiftDepthVertex(float3 ws_vertex, float width) { // これは複数箇所から使うので _TL_ENABLE には入れない

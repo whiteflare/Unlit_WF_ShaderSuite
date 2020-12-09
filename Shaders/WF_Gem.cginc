@@ -84,7 +84,7 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
         // アルファマスク適用
-        float alpha = affectAlphaMask(uv_main, color);
+        affectAlphaMask(uv_main, color);
 
 #ifdef _AL_ENABLE
         color *= TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
@@ -112,7 +112,7 @@
         color.rgb *= i.light_color;
 
         // フレネル
-        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
@@ -135,7 +135,7 @@
 #endif
         color *= _Color;
         // アルファマスク適用
-        float alpha = affectAlphaMask(uv_main, color);
+        affectAlphaMask(uv_main, color);
 
 #ifdef _AL_ENABLE
         color.rgb *= color.a;
@@ -162,7 +162,7 @@
         color.rgb *= i.light_color;
 
         // フレネル
-        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

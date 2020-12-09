@@ -126,7 +126,7 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
         // アルファマスク適用
-        float alpha = affectAlphaMask(uv_main, color);
+        affectAlphaMask(uv_main, color);
 
         // カラーマスク
         affect3chColorMask(uv_main, color);
@@ -167,15 +167,13 @@
         // Ambient Occlusion
         affectOcclusion(i, uv_main, color);
 
-        // フレネル
-        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
-        // Outline Alpha
-        affectOutlineAlpha(uv_main, color);
         // EmissiveScroll
         affectEmissiveScroll(i.ws_vertex, uv_main, color);
         // ToonFog
         affectToonFog(i, ws_view_dir, color);
 
+        // フレネル
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
