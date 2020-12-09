@@ -117,7 +117,7 @@
 
     float           _ES_Enable;
     float4          _EmissionColor;
-    float           _ES_BlendType;
+    uint            _ES_BlendType;
     uint            _ES_Shape;
     uint            _ES_DirType;
     float4          _ES_Direction;

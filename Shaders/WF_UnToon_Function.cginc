@@ -44,7 +44,7 @@
     #endif
 
     #ifndef WF_TEX2D_EMISSION
-        #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgb
+        #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgba
     #endif
 
     #ifndef WF_TEX2D_NORMAL
@@ -376,21 +376,23 @@
 
         inline void affectEmissiveScroll(float3 ws_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
-                float waving    = calcEmissiveWaving(ws_vertex);
-                float3 es_mask  = WF_TEX2D_EMISSION(mask_uv);
-                float es_power  = MAX_RGB(es_mask);
-                float3 es_color = _EmissionColor.rgb * es_mask.rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
+                float4 es_color = _EmissionColor * WF_TEX2D_EMISSION(mask_uv);
+                float waving    = calcEmissiveWaving(ws_vertex) * es_color.a;
 
-                color.rgb = lerp(color.rgb,
-                    lerp(color.rgb, es_color, waving),
-                    es_power);
+                // RGB側の合成
+                color.rgb =
+                    // 加算合成
+                    _ES_BlendType == 0 ? color.rgb + es_color.rgb * waving :
+                    // ブレンド
+                    lerp(color.rgb, es_color.rgb, waving);
 
-                #if !defined(_ES_SIMPLE_ENABLE) && !defined(_WF_ALPHA_CUTOUT)
+                // Alpha側の合成
+                #if defined(_WF_ALPHA_BLEND) && !defined(_ES_SIMPLE_ENABLE)
                     #ifdef _ES_FORCE_ALPHASCROLL
-                        color.a = max(color.a, waving * _EmissionColor.a * es_power);
+                        color.a = max(color.a, waving);
                     #else
                         if (TGL_ON(_ES_AlphaScroll)) {
-                            color.a = max(color.a, waving * _EmissionColor.a * es_power);
+                            color.a = max(color.a, waving);
                         }
                     #endif
                 #endif
