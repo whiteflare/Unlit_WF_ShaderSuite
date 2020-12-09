@@ -373,13 +373,16 @@
 
         inline void affectEmissiveScroll(float3 ws_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
-                float4 es_color = _EmissionColor * WF_TEX2D_EMISSION(mask_uv);
+                float4 es_mask  = WF_TEX2D_EMISSION(mask_uv);
+                float4 es_color = _EmissionColor * es_mask;
                 float waving    = calcEmissiveWaving(ws_vertex) * es_color.a;
 
                 // RGB側の合成
                 color.rgb =
                     // 加算合成
                     _ES_BlendType == 0 ? color.rgb + es_color.rgb * waving :
+                    // 旧形式のブレンド
+                    _ES_BlendType == 1 ? lerp(color.rgb, es_color.rgb, waving * MAX_RGB(es_mask.rgb)) :
                     // ブレンド
                     lerp(color.rgb, es_color.rgb, waving);
 

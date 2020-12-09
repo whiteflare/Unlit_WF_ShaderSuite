@@ -214,7 +214,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
-        [Enum(ADD,0,ALPHA,1)]
+        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
         [PowerSlider(4.0)]
             _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
