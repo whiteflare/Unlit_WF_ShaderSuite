@@ -138,6 +138,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _LM_Texture             ("[LM] Texture", 2D) = "white" {}
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _LM_ChangeAlpha         ("[LM] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LM_Shape               ("[LM] Shape", Float) = 0
             _LM_Scale               ("[LM] Scale", Range(0, 1)) = 0.5
@@ -222,7 +224,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
         [Toggle(_)]
-            _ES_AlphaScroll         ("[ES] Alpha mo Scroll", Range(0, 1)) = 0
+            _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0

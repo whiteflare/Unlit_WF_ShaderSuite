@@ -166,7 +166,7 @@
 
     float           _LM_Enable;
     float4          _LM_Texture_ST;
-    float3          _LM_Color;
+    float4          _LM_Color;
     float3          _LM_RandColor;
     uint            _LM_Shape;
     float           _LM_Scale;
@@ -175,6 +175,7 @@
     float           _LM_MinDist;
     float           _LM_Spot;
     float           _LM_AnimSpeed;
+    float           _LM_ChangeAlpha;
     float           _LM_InvMaskVal;
 
     float           _TS_Enable;

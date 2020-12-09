@@ -70,7 +70,7 @@
     #endif
 
     #ifndef WF_TEX2D_LAME_TEX
-        #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LM_Texture, _MainTex, uv).rgb
+        #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LM_Texture, _MainTex, uv).rgba
     #endif
     #ifndef WF_TEX2D_LAME_MASK
         #define WF_TEX2D_LAME_MASK(uv)          SAMPLE_MASK_VALUE(_LM_MaskTex, uv, _LM_InvMaskVal).r
@@ -613,11 +613,13 @@
                     // 形状
                     power *= _LM_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
 
-                    float3 lame_color = _LM_Color.rgb;
-                    lame_color *= WF_TEX2D_LAME_TEX(uv_main);
-                    lame_color += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
+                    float4 lame_color = _LM_Color * WF_TEX2D_LAME_TEX(uv_main);
+                    lame_color.rgb += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
 
                     color.rgb += max(ZERO_VEC3, lame_color) * power;
+                    #ifdef _WF_ALPHA_BLEND
+                        color.a = max(color.a, lerp(color.a, lame_color.a, saturate(power * _LM_ChangeAlpha)));
+                    #endif
                 }
             }
         }
@@ -793,7 +795,7 @@
                 color.rgb = lerp(line_color, color.rgb, _TL_BlendBase);
 
                 // アウトラインアルファを反映
-	            #ifdef _WF_ALPHA_BLEND
+                #ifdef _WF_ALPHA_BLEND
                     #ifndef _WF_LEGACY_TL_MASK
                         // マスクをシフト時に太さに反映する場合
                         color.a = _TL_LineColor.a;
@@ -807,7 +809,7 @@
                             color.a = _TL_LineColor.a * mask;
                         }
                     #endif
-	            #endif
+                #endif
             }
         }
 
