@@ -619,7 +619,7 @@
                     float4 lame_color = _LM_Color * WF_TEX2D_LAME_TEX(uv_main);
                     lame_color.rgb += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
 
-                    color.rgb += max(ZERO_VEC3, lame_color) * power;
+                    color.rgb += max(ZERO_VEC3, lame_color.rgb) * power;
                     #ifdef _WF_ALPHA_BLEND
                         color.a = max(color.a, lerp(color.a, lame_color.a, saturate(power * _LM_ChangeAlpha)));
                     #endif
