@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AL_MaskTex:
-        m_Texture: {fileID: 2800000, guid: 5c9fbc5e0f4fbfb46ba31c3c08b9e326, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -32,7 +32,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: 3d12ade8a7e64f84683bcdadff67bdfc, type: 3}
+        m_Texture: {fileID: 2800000, guid: 932a27bc2fe7702429e2569679724d57, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HL_MaskTex:
@@ -80,9 +80,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AL_Fresnel: 0
-    - _AL_Power: 0.5
-    - _AL_Source: 1
+    - _AL_Fresnel: 0.5
+    - _AL_InvMaskVal: 0
+    - _AL_Power: 0.16
+    - _AL_Source: 0
     - _AL_ZWrite: 0
     - _AO_Brightness: 0
     - _AO_Contrast: 1
@@ -99,6 +100,7 @@ Material:
     - _ES_AlphaScroll: 1
     - _ES_BakeIntensity: 1
     - _ES_BlendType: 0
+    - _ES_DirType: 0
     - _ES_Enable: 1
     - _ES_LevelOffset: 0
     - _ES_Shape: 0
@@ -118,6 +120,7 @@ Material:
     - _HL_CapType: 0
     - _HL_Enable: 0
     - _HL_InvMaskVal: 0
+    - _HL_Parallax: 0.75
     - _HL_Power: 1
     - _HL_Range: 1
     - _MT_BlendNormal: 0.1
@@ -128,11 +131,13 @@ Material:
     - _MT_Metallic: 0.5
     - _MT_Monochrome: 1
     - _MT_ReflSmooth: 0.5
+    - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_2ndType: 0
     - _NM_Enable: 0
     - _NM_InvMaskVal: 0
     - _NM_Power: 0.25
+    - _TR_BlendNormal: 0
     - _TR_BlendType: 0
     - _TR_Enable: 0
     - _TR_InvMaskVal: 0
@@ -146,10 +151,11 @@ Material:
     - _TS_Feather: 0.05
     - _TS_InvMaskVal: 0
     - _TS_Power: 1
+    - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ES_Direction: {r: 0, g: 10, b: 0, a: 0}
-    - _EmissionColor: {r: 2, g: 2, b: 2, a: 1}
+    - _EmissionColor: {r: 3.9999995, g: 3.9999995, b: 3.9999995, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.7, g: 0.7, b: 0.9, a: 1}
