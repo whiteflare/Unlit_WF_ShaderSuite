@@ -18,7 +18,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -108,8 +108,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
-        [PowerSlider(4.0)]
-            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
+            _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
@@ -265,17 +265,21 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_FACE_BACK
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
+            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -300,8 +304,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
@@ -313,6 +317,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -333,7 +338,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
+
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 
@@ -346,14 +352,17 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
+            #define _WF_ALPHA_BLEND
+
             #define _VC_ENABLE
+
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -168,10 +168,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
             #pragma target 3.0
 
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
             #define _AO_ENABLE
             #define _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
@@ -180,6 +179,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -193,14 +193,17 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
+            #define _WF_ALPHA_CUTOUT
+
             #define _VC_ENABLE
+
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

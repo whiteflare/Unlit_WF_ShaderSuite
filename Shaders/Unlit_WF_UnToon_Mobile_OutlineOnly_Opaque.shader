@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -81,7 +81,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull Front
+            Cull FRONT
 
             CGPROGRAM
 
@@ -92,6 +92,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
 
             #define _TL_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

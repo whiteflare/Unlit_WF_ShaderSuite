@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/10/13 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -33,13 +33,6 @@
 
     #define _TESS_MIN_DIST 0
     #define _TESS_MAX_DIST 2
-
-    float       _TessType;
-    float       _TessFactor;
-    float       _Smoothing;
-    sampler2D   _DispMap;   // vert内で取得するので独自のサンプラーを使う
-    float       _DispMapScale;
-    float       _DispMapLevel;
 
     [domain("tri")]
     [partitioning("integer")]
@@ -115,7 +108,7 @@
 
         // Displacement HeightMap
         float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
-        float disp = SAMPLE_MASK_VALUE_LOD(_DispMap, float4(uv_main, 0, 0), 0).r * _DispMapScale - _DispMapLevel;
+        float disp = PICK_VERT_TEX2D_LOD(_DispMap, uv_main, 0).r * _DispMapScale - _DispMapLevel;
         o.ws_vertex.xyz += o.normal * disp * 0.01;
 
         #undef MUL_BARY

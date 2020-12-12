@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     ////////////////////////////
@@ -33,16 +33,6 @@
 #else
     // Builtin RP 向け定義
     #include "WF_Common_BuiltinRP.cginc"
-#endif
-
-#ifdef _WF_FORCE_USE_SAMPLER
-    // 強制的にサンプラーを定義する版
-    #define DECL_MAIN_TEX2D(name)           sampler2D name
-    #define DECL_SUB_TEX2D(name)            sampler2D name
-    #define PICK_MAIN_TEX2D(tex, uv)        tex2D(tex, uv)
-    #define PICK_SUB_TEX2D(tex, name, uv)   tex2D(tex, uv)
-    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        tex2Dlod(tex, float4(uv, 0, lod))
-    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   tex2Dlod(tex, float4(uv, 0, lod))
 #endif
 
     ////////////////////////////
@@ -62,7 +52,7 @@
 
     #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : float4(1 - rgba.rgb, rgba.a) )
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
-    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( tex2Dlod(tex, float4(uv.x, uv.y, 0, 0)), inv )
+    #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( PICK_VERT_TEX2D_LOD(tex, uv, 0), inv )
 
     #define NZF                                     0.00390625
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)
@@ -161,11 +151,23 @@
     // Camera management
     ////////////////////////////
 
+    float3 worldSpaceCameraVector(float3 ws_vertex) {
+        // カメラへの正規化されていないベクトル
+        return _WorldSpaceCameraPos - ws_vertex;
+    }
+
+    float3 worldSpaceCameraDistance(float3 ws_vertex) {
+        // カメラへの距離
+        return length(worldSpaceCameraVector(ws_vertex));
+    }
+
     float3 worldSpaceCameraDir(float3 ws_vertex) {
-        return normalize(_WorldSpaceCameraPos - ws_vertex);
+        // カメラ方向(正規化されたベクトル)
+        return normalize(worldSpaceCameraVector(ws_vertex));
     }
 
     float3 worldSpaceViewPointPos() {
+        // ビューポイントの座標。これは SinglePass Stereo のときは左目と右目の中点になる。
         #ifdef USING_STEREO_MATRICES
             return (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) * 0.5;
         #else
@@ -173,8 +175,19 @@
         #endif
     }
 
+    float3 worldSpaceViewPointVector(float3 ws_vertex) {
+        // ビューポイントへの正規化されていないベクトル
+        return worldSpaceViewPointPos() - ws_vertex;
+    }
+
+    float3 worldSpaceViewPointDistance(float3 ws_vertex) {
+        // ビューポイントへの距離
+        return length(worldSpaceViewPointVector(ws_vertex));
+    }
+
     float3 worldSpaceViewPointDir(float3 ws_vertex) {
-        return SafeNormalizeVec3(worldSpaceViewPointPos() - ws_vertex);
+        // ビューポイント方向(正規化されたベクトル)
+        return SafeNormalizeVec3(worldSpaceViewPointVector(ws_vertex));
     }
 
     float3 worldSpaceViewDirStereoLerp(float3 ws_vertex, float x) {
@@ -270,59 +283,13 @@
     }
 
     ////////////////////////////
-    // Lightmap Sampler
-    ////////////////////////////
-
-    float3 pickLightmap(float2 uv_lmap) {
-        float3 color = ZERO_VEC3;
-        #ifdef LIGHTMAP_ON
-        {
-            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-            float4 lmap_tex = PICK_MAIN_TEX2D(unity_Lightmap, uv);
-            float3 lmap_color = DecodeLightmap(lmap_tex);
-            color += lmap_color;
-        }
-        #endif
-        #ifdef DYNAMICLIGHTMAP_ON
-        {
-            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-            float4 lmap_tex = PICK_MAIN_TEX2D(unity_DynamicLightmap, uv);
-            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
-            color += lmap_color;
-        }
-        #endif
-        return color;
-    }
-
-    float3 pickLightmapLod(float2 uv_lmap) {
-        float3 color = ZERO_VEC3;
-        #ifdef PICK_MAIN_TEX2D_LOD
-            #ifdef LIGHTMAP_ON
-            {
-                float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
-                float4 lmap_tex = PICK_MAIN_TEX2D_LOD(unity_Lightmap, uv, 0);
-                float3 lmap_color = DecodeLightmap(lmap_tex);
-                color += lmap_color;
-            }
-            #endif
-            #ifdef DYNAMICLIGHTMAP_ON
-            {
-                float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
-                float4 lmap_tex = PICK_MAIN_TEX2D_LOD(unity_DynamicLightmap, uv, 0);
-                float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
-                color += lmap_color;
-            }
-            #endif
-        #else
-            color = ONE_VEC3;
-        #endif
-        return color;
-    }
-
-    ////////////////////////////
     // ReflectionProbe Sampler
     ////////////////////////////
 
+    #define pickReflectionCubemap(cubemap, hdrInst, ws_vertex, ws_normal, lod)  \
+        ( DecodeHDR( PICK_MAIN_TEXCUBE_LOD(cubemap, reflect(-worldSpaceCameraDir(ws_vertex), ws_normal), lod ), hdrInst) )
+
+/*
     float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ws_normal, float lod) {
         float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
@@ -330,5 +297,6 @@
         float4 color = texCUBElod(cubemap, float4(reflect_dir, lod) );
         return DecodeHDR(color, cubemap_HDR);
     }
+*/
 
 #endif

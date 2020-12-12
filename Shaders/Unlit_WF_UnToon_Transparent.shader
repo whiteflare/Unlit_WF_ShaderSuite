@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -110,8 +110,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
-        [PowerSlider(4.0)]
-            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
+            _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
@@ -128,6 +128,28 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+
+        // ラメ
+        [WFHeaderToggle(Lame)]
+            _LM_Enable              ("[LM] Enable", Float) = 0
+        [HDR]
+            _LM_Color               ("[LM] Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _LM_Texture             ("[LM] Texture", 2D) = "white" {}
+        [HDR]
+            _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
+        [Enum(POLYGON,0,POINT,1)]
+            _LM_Shape               ("[LM] Shape", Float) = 0
+            _LM_Scale               ("[LM] Scale", Range(0, 1)) = 0.5
+            _LM_Dencity             ("[LM] Dencity", Range(0, 1)) = 0.5
+            _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5
+            _LM_MinDist             ("[LM] Dist Fade Start", Range(0, 5)) = 2.0
+            _LM_Spot                ("[LM] Spot Fade Strength", Range(0, 16)) = 2.0
+            _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
+        [NoScaleOffset]
+            _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _LM_InvMaskVal          ("[LM] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -260,17 +282,22 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_FACE_BACK
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
+            #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -295,19 +322,21 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
+
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
+            #define _LM_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -328,7 +357,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
+
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 
@@ -341,14 +371,17 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
+            #define _WF_ALPHA_BLEND
+
             #define _VC_ENABLE
+
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

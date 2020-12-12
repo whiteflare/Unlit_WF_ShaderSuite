@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -60,8 +60,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GR_Cubemap             ("[GR] CubeMap", Cube) = "" {}
             _GR_Brightness          ("[GR] Brightness", Range(0, 1)) = 0
             _GR_Monochrome          ("[GR] Monochrome Reflection", Range(0, 1)) = 1
-        [PowerSlider(4.0)]
-            _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 16)) = 1
+            _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 2)) = 1
+            _GR_CubemapHighCut      ("[GR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
             _GR_BlendNormal         ("[GR] Blend Normal", Range(0, 1)) = 0.1
 
         // Alpha
@@ -128,11 +128,12 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             #pragma target 3.0
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_FACE_BACK
+            #define _WF_MOBILE
+
             #define _NM_ENABLE
             #define _VC_ENABLE
-            #define _WF_MOBILE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -158,11 +159,11 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             #pragma target 3.0
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_MOBILE
+
             #define _NM_ENABLE
             #define _VC_ENABLE
-            #define _WF_MOBILE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

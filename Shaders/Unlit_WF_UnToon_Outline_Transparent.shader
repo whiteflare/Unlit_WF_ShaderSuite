@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -129,8 +129,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
-        [PowerSlider(4.0)]
-            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
+            _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
@@ -147,6 +147,28 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+
+        // ラメ
+        [WFHeaderToggle(Lame)]
+            _LM_Enable              ("[LM] Enable", Float) = 0
+        [HDR]
+            _LM_Color               ("[LM] Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _LM_Texture             ("[LM] Texture", 2D) = "white" {}
+        [HDR]
+            _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
+        [Enum(POLYGON,0,POINT,1)]
+            _LM_Shape               ("[LM] Shape", Float) = 0
+            _LM_Scale               ("[LM] Scale", Range(0, 1)) = 0.5
+            _LM_Dencity             ("[LM] Dencity", Range(0, 1)) = 0.5
+            _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5
+            _LM_MinDist             ("[LM] Dist Fade Start", Range(0, 5)) = 2.0
+            _LM_Spot                ("[LM] Spot Fade Strength", Range(0, 16)) = 2.0
+            _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
+        [NoScaleOffset]
+            _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _LM_InvMaskVal          ("[LM] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -284,9 +306,11 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _AL_ENABLE
+            #define _WF_ALPHA_BLEND
+
             #define _TL_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

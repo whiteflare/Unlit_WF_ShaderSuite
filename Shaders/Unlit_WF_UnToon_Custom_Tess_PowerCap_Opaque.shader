@@ -18,7 +18,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -304,18 +304,22 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
             #pragma target 5.0
 
+            #define _WF_UNTOON_TESS
+            #define _WF_UNTOON_POWERCAP
+
             #define _CH_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_UnToon_PowerCap.cginc"
             #include "WF_UnToon_Tessellation.cginc"
+            #include "WF_UnToon_PowerCap.cginc"
 
             ENDCG
         }

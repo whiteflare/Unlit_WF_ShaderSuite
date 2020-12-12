@@ -18,7 +18,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -278,15 +278,17 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_UPPER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_UPPER
+            #define _WF_UNTOON_POWERCAP
+
             #define _CH_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -311,14 +313,16 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_LOWER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_LOWER
+
             #define _CH_ENABLE
+            #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -343,15 +347,17 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _AL_ENABLE
-            #define _AL_FRESNEL_ENABLE
-            #define _AL_CUTOUT_LOWER
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUT_LOWER
+            #define _WF_UNTOON_POWERCAP
+
             #define _CH_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing

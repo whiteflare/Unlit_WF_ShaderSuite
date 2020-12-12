@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     ////////////////////////////
@@ -125,6 +125,8 @@
 #ifdef _VC_ENABLE
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
 
         // カラーマスク
         affect3chColorMask(uv_main, color);
@@ -146,9 +148,11 @@
         float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 
         // メタリック
-        affectMetallic(i, ws_view_dir, uv_main, ws_normal, ws_bump_normal, color);
+        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
         affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax).xy, uv_main, color);
+        // ラメ
+        affectLame(i, uv_main, ws_normal, color);
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
@@ -163,8 +167,8 @@
         // Ambient Occlusion
         affectOcclusion(i, uv_main, color);
 
-        // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, ws_view_dir, color);
+        // フレネル
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
         // Outline Alpha
         affectOutlineAlpha(uv_main, color);
         // EmissiveScroll

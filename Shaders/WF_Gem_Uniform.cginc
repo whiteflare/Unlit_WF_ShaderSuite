@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     #include "WF_UnToon_Uniform.cginc"
@@ -29,7 +29,7 @@
     // Texture & Sampler
     ////////////////////////////
 
-    samplerCUBE     _GR_Cubemap;
+    DECL_MAIN_TEXCUBE(_GR_Cubemap);
 
     ////////////////////////////
     // Other uniform variable
@@ -50,6 +50,7 @@
     float           _GR_Monochrome;
     float4          _GR_Cubemap_HDR;
     float           _GR_CubemapPower;
+    float           _GR_CubemapHighCut;
     float           _GR_BlendNormal;
 
     float           _AlphaFront;

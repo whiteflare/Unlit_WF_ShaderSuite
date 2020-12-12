@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     ////////////////////////////
@@ -67,6 +67,13 @@
 
     #ifndef WF_TEX2D_MATCAP_MASK
         #define WF_TEX2D_MATCAP_MASK(uv)        SAMPLE_MASK_VALUE(_HL_MaskTex, uv, _HL_InvMaskVal).rgb
+    #endif
+
+    #ifndef WF_TEX2D_LAME_TEX
+        #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LM_Texture, _MainTex, uv).rgb
+    #endif
+    #ifndef WF_TEX2D_LAME_MASK
+        #define WF_TEX2D_LAME_MASK(uv)          SAMPLE_MASK_VALUE(_LM_MaskTex, uv, _LM_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_SHADE_BASE
@@ -129,87 +136,77 @@
     // Alpha Transparent
     ////////////////////////////
 
+    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_FRESNEL) || defined(_WF_ALPHA_CUT_UPPER) || defined(_WF_ALPHA_CUT_LOWER)
+        #ifndef _WF_ALPHA_BLEND
+            #define _WF_ALPHA_BLEND
+        #endif
+    #endif
+
+    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_CUTOUT)
+        #ifndef _AL_ENABLE
+            #define _AL_ENABLE
+        #endif
+    #endif
+
     #ifdef _AL_ENABLE
         #ifndef _AL_CustomValue
             #define _AL_CustomValue 1
         #endif
 
         inline float pickAlpha(float2 uv, float alpha) {
-            if (_AL_Source == 1) {
-                return WF_TEX2D_ALPHA_MASK_RED(uv);
-            }
-            else if (_AL_Source == 2) {
-                return WF_TEX2D_ALPHA_MASK_ALPHA(uv);
-            }
-            else {
-                return WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
-            }
+            return _AL_Source == 1 ? WF_TEX2D_ALPHA_MASK_RED(uv)
+                 : _AL_Source == 2 ? WF_TEX2D_ALPHA_MASK_ALPHA(uv)
+                 : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        inline void affectAlpha(float2 uv, inout float4 color) {
+        inline float affectAlphaMask(float2 uv, inout float4 color) {
             float baseAlpha = pickAlpha(uv, color.a);
+            float alpha = baseAlpha;
 
-            #if defined(_AL_CUTOUT)
-                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
-                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
+            /*
+             * カットアウト処理
+             * cutoutに使うものは、pickAlpha と _AL_CustomValue の値。
+             * 一方、Fresnel は cutout には巻き込まない。
+             * _AL_CustomValue を使っている MaskOut_Blend は cutout を使わない。
+             */
+
+            #if defined(_WF_ALPHA_CUTOUT)
+                alpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, alpha);
+                if (TGL_OFF(_AL_AlphaToMask) && alpha < 0.5) {
                     discard;
                 }
-            #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _Cutoff) {
+            #elif defined(_WF_ALPHA_CUT_UPPER)
+                if (alpha < _Cutoff) {
                     discard;
                 } else {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
+                    alpha *= _AL_Power;
                 }
-            #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _Cutoff) {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
+            #elif defined(_WF_ALPHA_CUT_LOWER)
+                if (alpha < _Cutoff) {
+                    alpha *= _AL_Power;
                 } else {
                     discard;
                 }
             #else
-                baseAlpha *= _AL_Power * _AL_CustomValue;
+                alpha *= _AL_Power * _AL_CustomValue;
             #endif
 
-            color.a = baseAlpha;
+            color.a = alpha;
+
+            return baseAlpha; // ベースアルファを返却する
         }
 
-        inline void affectAlphaWithFresnel(float2 uv, float3 ws_normal, float3 ws_viewdir, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a);
-
-            #if defined(_AL_CUTOUT)
-                baseAlpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, baseAlpha);
-                if (TGL_OFF(_AL_AlphaToMask) && baseAlpha < 0.5) {
-                    discard;
-                }
-            #elif defined(_AL_CUTOUT_UPPER)
-                if (baseAlpha < _Cutoff) {
-                    discard;
-                } else {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                }
-            #elif defined(_AL_CUTOUT_LOWER)
-                if (baseAlpha < _Cutoff) {
-                    baseAlpha *= _AL_Power * _AL_CustomValue;
-                } else {
-                    discard;
-                }
-            #else
-                baseAlpha *= _AL_Power * _AL_CustomValue;
-            #endif
-
-            #ifndef _AL_FRESNEL_ENABLE
-                // ベースアルファ
-                color.a = baseAlpha;
-            #else
+        inline void affectFresnelAlpha(float2 uv, float3 ws_normal, float3 ws_viewdir, float baseAlpha, inout float4 color) {
+            #ifdef _WF_ALPHA_FRESNEL
                 // フレネルアルファ
-                float maxValue = max( pickAlpha(uv, color.a) * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
+                float maxValue = max( baseAlpha * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
                 float fa = 1 - abs( dot( ws_normal, ws_viewdir ) );
-                color.a = lerp( baseAlpha, maxValue, fa * fa * fa * fa );
+                color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
             #endif
         }
     #else
-        #define affectAlpha(uv, color)                                      color.a = 1.0
-        #define affectAlphaWithFresnel(uv, ws_normal, ws_viewdir, color)    color.a = 1.0
+        #define affectAlphaMask(uv, color)                                      color.a = 1.0
+        #define affectFresnelAlpha(uv, ws_normal, ws_viewdir, baseAlpha, color)	color.a = 1.0
     #endif
 
     ////////////////////////////
@@ -388,7 +385,7 @@
                     lerp(color.rgb, es_color, waving),
                     es_power);
 
-                #if !defined(_ES_SIMPLE_ENABLE) && !defined(_AL_CUTOUT)
+                #if !defined(_ES_SIMPLE_ENABLE) && !defined(_WF_ALPHA_CUTOUT)
                     #ifdef _ES_FORCE_ALPHASCROLL
                         color.a = max(color.a, waving * _EmissionColor.a * es_power);
                     #else
@@ -458,6 +455,13 @@
     // Metallic
     ////////////////////////////
 
+    float smoothnessToSpecularPower(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float smoothness) {
+        float roughness     = (1 - smoothness) * (1 - smoothness);
+        float3 halfVL       = normalize(ws_camera_dir + ws_light_dir);
+        float NdotH         = max(0, dot( ws_normal, halfVL ));
+        return max(0, GGXTerm(NdotH, roughness));
+    }
+
     #ifdef _MT_ENABLE
 
         inline float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
@@ -472,20 +476,15 @@
             }
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
-                color += pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod) * _MT_CubemapPower;
+                float3 cubemap = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
+                color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
             }
             return color;
 #endif
         }
 
         inline float3 pickSpecular(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
-            float roughness         = (1 - smoothness) * (1 - smoothness);
-
-            float3 halfVL           = normalize(ws_camera_dir + ws_light_dir);
-            float NdotH             = max(0, dot( ws_normal, halfVL ));
-            float3 specular         = spec_color * GGXTerm(NdotH, roughness);
-
-            return max(ZERO_VEC3, specular);
+            return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
         }
 
         inline void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
@@ -526,7 +525,7 @@
             if (TGL_ON(_HL_Enable)) {
                 // matcap サンプリング
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
-                float3 matcap_color = tex2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+                float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
                 // マスク参照
                 float3 matcap_mask = WF_TEX2D_MATCAP_MASK(uv_main);
                 // 色合成
@@ -550,6 +549,81 @@
         }
     #else
         #define affectMatcapColor(matcapVector, uv_main, color)
+    #endif
+
+    ////////////////////////////
+    // Lame
+    ////////////////////////////
+
+    #ifdef _LM_ENABLE
+
+        float random1(float2 st) {  // float2 -> float [0-1)
+            return frac(sin(dot(st ,float2(12.9898, 78.233))) * 43758.5453);
+        }
+
+        float2 random2(float2 st) { // float2 -> float2 [0-1)
+            float2 ret = 0;
+            ret.x = random1(st);
+            ret.y = random1(st + ret);
+            return ret;
+        }
+
+        float3 random3(float2 st) { // float2 -> float3 [0-1)
+            float3 ret = 0;
+            ret.x = random1(st);
+            ret.y = random1(st + ret.xy);
+            ret.z = random1(st + ret.xy);
+            return ret;
+        }
+
+        void affectLame(v2f i, float2 uv_main, float3 ws_normal, inout float4 color) {
+            if (TGL_ON(_LM_Enable)) {
+                float power = WF_TEX2D_LAME_MASK(uv_main);
+                if (0 < power) {
+                    float   scale = NON_ZERO_FLOAT(_LM_Scale) / 100;
+                    float2  st = uv_main / scale;
+
+                    float2  ist = floor(st);
+                    float2  fst = frac(st);
+                    float3  min_pos = float3(0, 0, 5);
+
+                    for (int y = -1; y <= 1; y++) {
+                        for (int x = -1; x <= 1; x++) {
+                            float2 neighbor = float2(x, y);
+                            float3 pos;
+                            pos.xy  = 0.5 + 0.5 * sin( random2((ist + neighbor) * scale) * 2 - 1 );
+                            pos.z   = length(neighbor + pos.xy - fst);
+                            min_pos = pos.z < min_pos.z ? pos : min_pos;
+                        }
+                    }
+
+                    float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
+
+                    // アニメーション項
+                    power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
+                    // Glitter項
+                    power = lerp(power, max(power, pow(power + 0.1, 32)), _LM_Glitter);
+                    // 密度項
+                    power *= step(1 - _LM_Dencity / 4, abs(min_pos.x));
+                    // フレークのばらつき項
+                    power *= random1(min_pos.xy);
+                    // 距離フェード項
+                    power *= 1 - smoothstep(_LM_MinDist, _LM_MinDist + 1, length(ws_camera_vec));
+                    // NdotV起因の強度項
+                    power *= pow(abs(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LM_Spot));
+                    // 形状
+                    power *= _LM_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
+
+                    float3 lame_color = _LM_Color.rgb;
+                    lame_color *= WF_TEX2D_LAME_TEX(uv_main);
+                    lame_color += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
+
+                    color.rgb += max(ZERO_VEC3, lame_color) * power;
+                }
+            }
+        }
+    #else
+        #define affectLame(i, uv_main, ws_normal, color)
     #endif
 
     ////////////////////////////
@@ -604,6 +678,10 @@
                 calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
                 // 2影
                 calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                // 3影
+#ifdef _TS_TRISHADE_ENABLE
+                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
+#endif
                 // 乗算
                 color.rgb *= shadow_color;
             }
@@ -684,7 +762,7 @@
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
                 float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
-                color.rgb = blendOverlayColor(color.rgb, tex2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
+                color.rgb = blendOverlayColor(color.rgb, PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
             }
         }
     #else
@@ -716,7 +794,7 @@
         }
 
         inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
-            #ifndef _AL_CUTOUT
+            #ifndef _WF_ALPHA_CUTOUT
                 if (TGL_ON(_TL_Enable)) {
                     #ifndef _TL_MASK_APPLY_LEGACY
                         // マスクをシフト時に太さに反映する場合
@@ -827,6 +905,24 @@
     // Fog
     ////////////////////////////
 
+    #ifdef _FG_ENABLE
+
+        inline void affectToonFog(v2f i, float3 ws_view_dir, inout float4 color) {
+            if (TGL_ON(_FG_Enable)) {
+                float3 ws_base_position = UnityObjectToWorldPos(_FG_BaseOffset);
+                float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
+                float power = 
+                    // 原点からの距離の判定
+                    smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_offset_vertex ))
+                    // 前後の判定
+                    * smoothstep(0, 0.2, -dot(ws_view_dir.xz, ws_offset_vertex.xz))
+                    // カメラと原点の水平距離の判定
+                    * smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
+                color.rgb = lerp(color.rgb, _FG_Color.rgb * i.light_color, _FG_Color.a * pow(power, _FG_Exponential));
+            }
+        }
+    #else
         #define affectToonFog(i, ws_view_dir, color)
+    #endif
 
 #endif

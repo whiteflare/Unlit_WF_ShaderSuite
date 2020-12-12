@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     ////////////////////////////
@@ -84,7 +84,7 @@
         // アルファ計算
         #ifdef _AL_ENABLE
             float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
-            affectAlpha(i.uv, color);
+            affectAlphaMask(i.uv, color);
             if (color.a < 0.5) {
                 discard;
                 return float4(0, 0, 0, 0);

@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
@@ -32,8 +32,28 @@
 #endif
 
     ////////////////////////////
+    // Texture Definition
+    ////////////////////////////
+
+    #define DECL_MAIN_TEX2D(name)                       TEXTURE2D(name); SAMPLER(sampler##name)
+    #define PICK_MAIN_TEX2D(tex, uv)                    SAMPLE_TEXTURE2D(tex, sampler##tex, uv)
+
+    #define DECL_SUB_TEX2D(name)                        TEXTURE2D(name)
+    #define PICK_SUB_TEX2D(tex, name, uv)               SAMPLE_TEXTURE2D(tex, sampler##name, uv)
+
+    #define DECL_MAIN_TEXCUBE(name)                     TEXTURECUBE(name); SAMPLER(sampler##name)
+    #define PICK_MAIN_TEXCUBE_LOD(tex, dir, lod)        SAMPLE_TEXTURECUBE_LOD(tex, sampler##tex, dir, lod)
+
+    #define PICK_SUB_TEXCUBE_LOD(tex, name, dir, lod)   SAMPLE_TEXTURECUBE_LOD(tex, sampler##name, dir, lod)
+
+    #define DECL_VERT_TEX2D(name)                       TEXTURE2D(name); SAMPLER(sampler##name)
+    #define PICK_VERT_TEX2D_LOD(tex, uv, lod)           SAMPLE_TEXTURE2D_LOD(tex, sampler##tex, uv, lod)
+
+    ////////////////////////////
     // Compatible
     ////////////////////////////
+
+    // Unity BuiltinRP で定義されていた関数を LightweightRP で定義しなおして差異を吸収する
 
     float IsGammaSpace() {
         #ifdef UNITY_COLORSPACE_GAMMA
@@ -42,18 +62,6 @@
             return 0;
         #endif
     }
-
-#ifndef _WF_FORCE_USE_SAMPLER
-    // 通常版
-    #define DECL_MAIN_TEX2D(name)           TEXTURE2D(name); SAMPLER(sampler##name)
-    #define DECL_SUB_TEX2D(name)            TEXTURE2D(name)
-    #define PICK_MAIN_TEX2D(tex, uv)        SAMPLE_TEXTURE2D(tex, sampler##tex, uv)
-    #define PICK_SUB_TEX2D(tex, name, uv)   SAMPLE_TEXTURE2D(tex, sampler##name, uv)
-    #define PICK_MAIN_TEX2D_LOD(tex, uv, lod)        SAMPLE_TEXTURE2D_LOD(tex, sampler##tex, uv, lod)
-    #define PICK_SUB_TEX2D_LOD(tex, name, uv, lod)   SAMPLE_TEXTURE2D_LOD(tex, sampler##name, uv, lod)
-#endif
-
-// Unity BuiltinRP で定義されていた関数を LightweightRP で定義しなおして差異を吸収する
 
     #define UnityObjectToClipPos        TransformObjectToHClip
     #define UnityWorldToClipPos         TransformWorldToHClip
@@ -74,6 +82,7 @@
 
     #define GammaToLinearSpace          SRGBToLinear
     #define LinearToGammaSpace          LinearToSRGB
+    #define UNITY_TWO_PI                6.28318530718f
     #define UNITY_INV_TWO_PI            0.15915494309f
     #define UnpackScaleNormal           UnpackNormalScale
     #define BlendNormals                BlendNormal
@@ -152,18 +161,55 @@
     }
 
     ////////////////////////////
+    // Lightmap Sampler
+    ////////////////////////////
+
+    float3 pickLightmap(float2 uv_lmap) {
+        float3 color = float3(0, 0, 0);
+        #ifdef LIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+            float4 lmap_tex = PICK_MAIN_TEX2D(unity_Lightmap, uv);
+            float3 lmap_color = DecodeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        #ifdef DYNAMICLIGHTMAP_ON
+        {
+            float2 uv = uv_lmap.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+            float4 lmap_tex = PICK_MAIN_TEX2D(unity_DynamicLightmap, uv);
+            float3 lmap_color = DecodeRealtimeLightmap(lmap_tex);
+            color += lmap_color;
+        }
+        #endif
+        return color;
+    }
+
+    float3 pickLightmapLod(float2 uv_lmap) {
+        return float3(1, 1, 1);
+        // SRP Batcher を有効にするために、vertシェーダとfragシェーダの両方から読むことを諦め、fragシェーダの方を生かす。vertでは白色を返す。
+    }
+
+    ////////////////////////////
     // ReflectionProbe Sampler
     ////////////////////////////
 
     float4 pickReflectionProbe(float3 ws_vertex, float3 ws_normal, float lod) {
+        float4 color0 = float4(0, 0, 0, 1);
+
+#if !defined(_ENVIRONMENTREFLECTIONS_OFF)
         float3 ws_camera_dir = normalize(_WorldSpaceCameraPos - ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float3 dir0 = reflect_dir;
 
-        float4 color0 = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
+        color0 = UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, dir0, lod);
 
+#if !defined(UNITY_USE_NATIVE_HDR)
         color0.rgb = DecodeHDR(color0, unity_SpecCube0_HDR);
+#endif
+
+#endif
 
         return color0;
     }

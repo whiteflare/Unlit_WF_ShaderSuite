@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     ////////////////////////////
@@ -138,7 +138,7 @@
 #ifdef _VC_ENABLE
             color *= i.vertex_color;
 #endif
-            affectAlpha(i.uv, color);
+            affectAlphaMask(i.uv, color);
             if (color.a < 0.5) {
                 discard;
                 return float4(0, 0, 0, 0);

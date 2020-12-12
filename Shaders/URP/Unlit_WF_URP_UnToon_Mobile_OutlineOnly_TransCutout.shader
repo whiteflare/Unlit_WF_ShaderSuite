@@ -18,7 +18,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -104,11 +104,10 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
             #pragma target 3.0
 
-            #define _WF_PLATFORM_LWRP
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
             #define _TL_ENABLE
             #define _VC_ENABLE
 
@@ -151,11 +150,10 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             #pragma vertex vert_outline
             #pragma fragment frag
 
-            #define _WF_PLATFORM_LWRP
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
 
-            #define _AL_ENABLE
-            #define _AL_CUTOUT
             #define _TL_ENABLE
             #define _VC_ENABLE
 

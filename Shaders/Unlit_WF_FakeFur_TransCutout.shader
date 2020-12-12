@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -155,6 +155,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #define _HL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 

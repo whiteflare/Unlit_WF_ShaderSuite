@@ -18,7 +18,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -119,8 +119,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
-        [PowerSlider(4.0)]
-            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 16)) = 1
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
+            _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
@@ -279,6 +279,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -290,7 +291,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             v2f vert_custom(in appdata v) {
                 v2f o;
                 o = vert(v);
-                o.vs_vertex = shiftDepthVertex(o.ws_vertex, max(0, -_Z_Shift));
+                o.vs_vertex = shiftDepthVertex(o.ws_vertex, -_Z_Shift);
                 return o;
             }
 

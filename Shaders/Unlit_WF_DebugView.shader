@@ -18,7 +18,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
     /*
      * authors:
-     *      ver:2020/08/30 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -35,8 +35,11 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         _ModeUV     ("show UV", Float)              = 0
 
         [Header(Normal and Tangent)]
-        [Enum(OFF,0,NORMAL,1,TANGENT,2)]
+        [Enum(OFF,0,NORMAL_LS,1,TANGENT_LS,2,BITANGENT_LS,3,NORMAL_WS,4,TANGENT_WS,5,BITANGENT_LS,6)]
         _ModeNormal ("show Normal", Float)          = 0
+
+        [Enum(OFF,0,VIEW_PARA_NORMAL,1)]
+        _ModeParaNormal ("show Parallel Normal", Float) = 0
 
         [Header(Lighting)]
         [Enum(OFF,0,LIGHT_0,1,LIGHT_4,2,SHADE_SH9,3)]
@@ -98,8 +101,9 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 float2 uv2          : TEXCOORD3;
                 float2 uv3          : TEXCOORD4;
                 float2 uv4          : TEXCOORD5;
-                float3 normal       : NORMAL;
-                float3 tangent      : TANGENT;
+                float3 normal       : TEXCOORD6;
+                float3 tangent      : TEXCOORD7;
+                float3 bitangent    : TEXCOORD8;
             };
 
             v2f vert (appdata v)
@@ -114,7 +118,8 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 o.uv3       = v.uv3;
                 o.uv4       = v.uv4;
                 o.normal    = v.normal;
-                o.tangent   = v.tangent.xyz * v.tangent.w;
+                o.tangent   = v.tangent.xyz;
+                o.bitangent = cross(o.normal, o.tangent) * v.tangent.w;
                 return o;
             }
 
@@ -122,6 +127,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
             int _ModePos;
             int _ModeUV;
             int _ModeNormal;
+            int _ModeParaNormal;
             int _ModeLight;
             int _ModeLightMap;
             int _ModeSpecCube;
@@ -228,6 +234,25 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                         break;
                     case 2:
                         color.rgb = saturate(normalize(i.tangent.xyz) + 0.5);
+                        break;
+                    case 3:
+                        color.rgb = saturate(normalize(i.bitangent.xyz) + 0.5);
+                        break;
+                    case 4:
+                        color.rgb = saturate(UnityObjectToWorldNormal(i.normal.xyz) + 0.5);
+                        break;
+                    case 5:
+                        color.rgb = saturate(UnityObjectToWorldNormal(i.tangent.xyz) + 0.5);
+                        break;
+                    case 6:
+                        color.rgb = saturate(UnityObjectToWorldNormal(i.bitangent.xyz) + 0.5);
+                        break;
+                    default:
+                        break;
+                }
+                switch(_ModeParaNormal) {
+                    case 1:
+                        color.rgb = saturate( pow( abs( dot(UnityObjectToWorldNormal(i.normal.xyz), UnityObjectToWorldNormal(i.tangent.xyz)) ), 100));
                         break;
                     default:
                         break;

@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     #include "WF_INPUT_FakeFur.cginc"
@@ -107,7 +107,7 @@
 #ifndef _FR_DISABLE_NORMAL_MAP
         // NormalMap Fur Vector 計算
         float2 uv_main = TRANSFORM_TEX(v[i].uv, _MainTex);
-        float3 vec_map = UnpackNormal(tex2Dlod(_FG_BumpMap, float4(uv_main.x, uv_main.y, 0, 0)));
+        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FG_BumpMap, uv_main, 0) );
         vec_fur = BlendNormals(vec_fur, vec_map);
 #endif
 
@@ -174,6 +174,8 @@
         // メイン
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
+        // アルファマスク適用
+        affectAlphaMask(uv_main, color);
 
         // 色変換
         affectColorChange(color);
@@ -185,19 +187,16 @@
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
-
-        // Alpha
-        affectAlpha(uv_main, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
-        float4 maskTex = tex2D(_FR_MaskTex, uv_main);
+        float4 maskTex = PICK_SUB_TEX2D(_FR_MaskTex, _MainTex, uv_main);
         if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
             discard;
         }
 
         // ファーノイズを追加
-        float3 noise = tex2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).rgb;
+        float3 noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).rgb;
         color = saturate( float4( color - (1 - noise) * _FR_ShadowPower, calcBrightness(noise) - pow(gi.height, 4)) );
 
         return color;

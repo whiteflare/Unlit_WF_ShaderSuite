@@ -18,7 +18,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -104,7 +104,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
             CGPROGRAM
 
@@ -112,6 +112,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
             #pragma fragment frag_meta_black
 
             #define _VC_ENABLE
+
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #include "WF_UnToon_Meta.cginc"

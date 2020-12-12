@@ -18,7 +18,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
     /*
      * authors:
-     *      ver:2020/09/18 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -152,6 +152,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #define _HL_ENABLE
             #define _TR_ENABLE
             #define _TS_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
 

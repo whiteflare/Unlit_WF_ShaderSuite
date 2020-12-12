@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     #include "WF_UnToon.cginc"
@@ -31,20 +31,11 @@
 
     #ifdef _HL_ENABLE
 
-        #define WF_POWERCAP_DECL(id)                                                                                                    \
-            float       _HL_Enable_##id;                                                                                                \
-            uint        _HL_CapType_##id;                                                                                               \
-            sampler2D   _HL_MatcapTex_##id;                                                                                             \
-            float3      _HL_MatcapColor_##id;                                                                                           \
-            float       _HL_Power_##id;                                                                                                 \
-            float       _HL_BlendNormal_##id;                                                                                           \
-            float       _HL_Parallax_##id;                                                                                              \
-            DECL_SUB_TEX2D(_HL_MaskTex_##id);                                                                                           \
-            float       _HL_InvMaskVal_##id;                                                                                            \
+        #define WF_POWERCAP_FUNC(id)                                                                                                    \
             void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
                 if (TGL_ON(_HL_Enable_##id)) {                                                                                          \
                     float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;                                                                     \
-                    float3 matcap_color = tex2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                           \
+                    float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                 \
                     float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, uv_main, _HL_InvMaskVal_##id).rgb;                         \
                     if (_HL_CapType_##id == 1) {                                                                                        \
                         float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor_##id) * 2);                   \
@@ -66,18 +57,18 @@
 
     #else
 
-        #define WF_POWERCAP_DECL(id)
+        #define WF_POWERCAP_FUNC(id)
         #define WF_POWERCAP_AFFECT(id)
 
     #endif
 
-    WF_POWERCAP_DECL(1)
-    WF_POWERCAP_DECL(2)
-    WF_POWERCAP_DECL(3)
-    WF_POWERCAP_DECL(4)
-    WF_POWERCAP_DECL(5)
-    WF_POWERCAP_DECL(6)
-    WF_POWERCAP_DECL(7)
+    WF_POWERCAP_FUNC(1)
+    WF_POWERCAP_FUNC(2)
+    WF_POWERCAP_FUNC(3)
+    WF_POWERCAP_FUNC(4)
+    WF_POWERCAP_FUNC(5)
+    WF_POWERCAP_FUNC(6)
+    WF_POWERCAP_FUNC(7)
 
     ////////////////////////////
     // vertex&fragment shader
@@ -94,6 +85,8 @@
 #ifdef _VC_ENABLE
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;
@@ -129,8 +122,8 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
-        // Alpha
-        affectAlphaWithFresnel(i.uv, ws_normal, ws_view_dir, color);
+        // フレネル
+        affectFresnelAlpha(i.uv, ws_normal, ws_view_dir, alpha, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

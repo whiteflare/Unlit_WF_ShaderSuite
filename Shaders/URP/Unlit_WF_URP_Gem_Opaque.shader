@@ -18,7 +18,7 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     Properties {
@@ -51,8 +51,8 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
             _GR_Cubemap             ("[GR] CubeMap", Cube) = "" {}
             _GR_Brightness          ("[GR] Brightness", Range(0, 1)) = 0
             _GR_Monochrome          ("[GR] Monochrome Reflection", Range(0, 1)) = 1
-        [PowerSlider(4.0)]
-            _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 16)) = 1
+            _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 2)) = 1
+            _GR_CubemapHighCut      ("[GR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
             _GR_BlendNormal         ("[GR] Blend Normal", Range(0, 1)) = 0.1
 
         // 法線マップ
@@ -105,8 +105,8 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
 
             #pragma target 3.0
 
-            #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
 
             #define _NM_ENABLE
             #define _VC_ENABLE
@@ -150,8 +150,8 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
-            #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
 
             #define _VC_ENABLE
 

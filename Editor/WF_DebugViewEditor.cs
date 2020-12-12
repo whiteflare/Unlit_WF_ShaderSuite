@@ -168,8 +168,15 @@ namespace UnlitWF
                 new DebugMode("Dynamic Lightmap UV", "_ModeUV", 6),
             }),
             new DebugModeSection("Show Normals", new List<DebugMode>(){
-                new DebugMode("Normal", "_ModeNormal", 1),
-                new DebugMode("Tangent", "_ModeNormal", 2),
+                new DebugMode("Normal (local space)", "_ModeNormal", 1),
+                new DebugMode("Tangent (local space)", "_ModeNormal", 2),
+                new DebugMode("BiTangent (local space)", "_ModeNormal", 3),
+                new DebugMode("Normal (world space)", "_ModeNormal", 4),
+                new DebugMode("Tangent (world space)", "_ModeNormal", 5),
+                new DebugMode("BiTangent (world space)", "_ModeNormal", 6),
+            }),
+            new DebugModeSection("Show Parallel Normals", new List<DebugMode>(){
+                new DebugMode("view Parallel Normal and Tangent", "_ModeParaNormal", 1),
             }),
             new DebugModeSection("Show Lightings", new List<DebugMode>(){
                 new DebugMode("Light 0", "_ModeLight", 1),

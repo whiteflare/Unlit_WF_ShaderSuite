@@ -20,7 +20,7 @@
 
     /*
      * authors:
-     *      ver:2020/11/19 whiteflare,
+     *      ver:2020/12/13 whiteflare,
      */
 
     #include "WF_INPUT_Gem.cginc"
@@ -56,7 +56,8 @@
     void affectGemReflection(v2f i, float3 ws_normal, inout float4 color) {
         if (TGL_ON(_GR_Enable)) {
             // リフレクション
-            float3 reflection = pickReflectionCubemap(_GR_Cubemap, _GR_Cubemap_HDR, i.ws_vertex, ws_normal, 0) * _GR_CubemapPower; // smoothnessは1固定
+            float3 cubemap = pickReflectionCubemap(_GR_Cubemap, _GR_Cubemap_HDR, i.ws_vertex, ws_normal, 0); // smoothnessは1固定
+            float3 reflection = lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _GR_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _GR_CubemapPower;
             reflection = lerp(reflection, calcBrightness(reflection), _GR_Monochrome);
 
             // 合成
@@ -82,6 +83,9 @@
 #ifdef _VC_ENABLE
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
+
 #ifdef _AL_ENABLE
         color *= TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
         color.a *= _AlphaBack;
@@ -107,9 +111,8 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
-        // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, ws_view_dir, color);
-
+        // フレネル
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
@@ -131,6 +134,9 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
         color *= _Color;
+        // アルファマスク適用
+        float alpha = affectAlphaMask(uv_main, color);
+
 #ifdef _AL_ENABLE
         color.rgb *= color.a;
         color.a = _AlphaFront;
@@ -155,9 +161,8 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
-        // Alpha
-        affectAlphaWithFresnel(uv_main, ws_normal, ws_view_dir, color);
-
+        // フレネル
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
