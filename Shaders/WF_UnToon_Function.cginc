@@ -742,18 +742,18 @@
             return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OL_CustomParam1));
         }
 
-        inline float3 blendOverlayColor(float3 color, float4 ov_color, float3 power) {
+        inline float3 blendOverlayColor(float3 base, float4 decal, float3 power) {
             float3 rgb = 
-                _OL_BlendType == 0 ? ov_color.rgb                           // ブレンド
-                : _OL_BlendType == 1 ? color + ov_color.rgb                 // 加算
-                : _OL_BlendType == 2 ? color * ov_color.rgb                 // 乗算
-                : _OL_BlendType == 3 ? color + ov_color.rgb - MEDIAN_GRAY   // 加減算
-                : _OL_BlendType == 4 ? 1 - (1 - color) * (1 - ov_color.rgb) // スクリーン
-                : _OL_BlendType == 5 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(color), 0.5))   // オーバーレイ
-                : _OL_BlendType == 6 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(ov_color.rgb), 0.5))   // オーバーレイ
-                : color                                                     // 何もしない
+                _OL_BlendType == 0 ? decal.rgb                           // ブレンド
+                : _OL_BlendType == 1 ? base + decal.rgb                 // 加算
+                : _OL_BlendType == 2 ? base * decal.rgb                 // 乗算
+                : _OL_BlendType == 3 ? base + decal.rgb - MEDIAN_GRAY   // 加減算
+                : _OL_BlendType == 4 ? 1 - (1 - base) * (1 - decal.rgb) // スクリーン
+                : _OL_BlendType == 5 ? lerp(2 * base * decal.rgb, 1 - 2 * (1 - base) * (1 - decal.rgb), step(calcBrightness(base), 0.5))   // オーバーレイ
+                : _OL_BlendType == 6 ? lerp(2 * base * decal.rgb, 1 - 2 * (1 - base) * (1 - decal.rgb), step(calcBrightness(decal.rgb), 0.5))   // オーバーレイ
+                : base                                                     // 何もしない
                 ;
-            return lerp(color, rgb, ov_color.a * power);
+            return lerp(base, rgb, decal.a * power);
         }
 
         inline void affectOverlayTexture(v2f i, float2 uv_main, float3 vs_normal, inout float4 color) {
