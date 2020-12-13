@@ -177,6 +177,7 @@ ModelImporter:
     100342: Tail16
     100344: Tail17
     100346: Tail17_end
+    100348: cloak_tail
     400000: //RootNode
     400002: Armature
     400004: BackCloth1
@@ -351,12 +352,14 @@ ModelImporter:
     400342: Tail16
     400344: Tail17
     400346: Tail17_end
+    400348: cloak_tail
     2100000: tex_hair
     2100002: tex_face
     2100004: tex_faceoption
     2100006: tex_body
     2100008: tex_armor
     2100010: tex_photon
+    2100012: tex_cloak
     4300000: Body
     4300002: Body_armor_back
     4300004: Body_armor_boots
@@ -371,6 +374,7 @@ ModelImporter:
     4300022: Body_armor_head
     4300024: Body_armor_neck
     4300026: Body.001
+    4300028: cloak_tail
     9500000: //RootNode
     13700000: Body
     13700002: Body.001
@@ -386,6 +390,7 @@ ModelImporter:
     13700022: Body_armor_uparm
     13700024: cloak_back
     13700026: cloak_front
+    13700028: cloak_tail
   externalObjects: {}
   materials:
     importMaterials: 1

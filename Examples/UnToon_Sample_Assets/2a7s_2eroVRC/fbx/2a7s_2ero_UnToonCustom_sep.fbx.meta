@@ -174,6 +174,10 @@ ModelImporter:
     100336: Tail16
     100338: Tail17
     100340: Tail17_end
+    100342: Body.001
+    100344: Body_armor_head
+    100346: Body_armor_neck
+    100348: cloak_tail
     400000: //RootNode
     400002: Armature
     400004: BackCloth1
@@ -345,12 +349,17 @@ ModelImporter:
     400336: Tail16
     400338: Tail17
     400340: Tail17_end
+    400342: Body.001
+    400344: Body_armor_head
+    400346: Body_armor_neck
+    400348: cloak_tail
     2100000: tex_hair
     2100002: tex_face
     2100004: tex_faceoption
     2100006: tex_body
     2100008: tex_armor
     2100010: tex_photon
+    2100012: tex_cloak
     4300000: Body
     4300002: Body_armor_back
     4300004: Body_armor_boots
@@ -362,6 +371,10 @@ ModelImporter:
     4300016: Body_armor_uparm
     4300018: cloak_back
     4300020: cloak_front
+    4300022: Body_armor_head
+    4300024: Body_armor_neck
+    4300026: Body.001
+    4300028: cloak_tail
     9500000: //RootNode
     13700000: Body
     13700002: Body_armor_back
@@ -374,6 +387,10 @@ ModelImporter:
     13700016: Body_armor_uparm
     13700018: cloak_back
     13700020: cloak_front
+    13700022: Body.001
+    13700024: Body_armor_head
+    13700026: Body_armor_neck
+    13700028: cloak_tail
   externalObjects:
   - first:
       type: UnityEngine:Material
@@ -385,6 +402,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: tex_body
     second: {fileID: 2100000, guid: 8b15ad46734538841955a43f514e9eeb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tex_cloak
+    second: {fileID: 2100000, guid: 87becb86f20ba0e419af2c5c8a436ba4, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule

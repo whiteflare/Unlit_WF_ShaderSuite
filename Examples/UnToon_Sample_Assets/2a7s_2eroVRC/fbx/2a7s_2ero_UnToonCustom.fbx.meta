@@ -207,6 +207,18 @@ ModelImporter:
     100402: RightMiddleDistal_end
     100404: RightRingDistal_end
     100406: RightThumbDistal_end
+    100408: Body_armor_back
+    100410: Body_armor_boots
+    100412: Body_armor_head
+    100414: Body_armor_horn
+    100416: Body_armor_leg
+    100418: Body_armor_loarm
+    100420: Body_armor_neck
+    100422: Body_armor_tail
+    100424: Body_armor_tie
+    100426: Body_armor_uparm
+    100428: cloak_back
+    100430: cloak_front
     400000: //RootNode
     400002: Armature
     400004: BackCloth1
@@ -411,21 +423,58 @@ ModelImporter:
     400402: RightMiddleDistal_end
     400404: RightRingDistal_end
     400406: RightThumbDistal_end
+    400408: Body_armor_back
+    400410: Body_armor_boots
+    400412: Body_armor_head
+    400414: Body_armor_horn
+    400416: Body_armor_leg
+    400418: Body_armor_loarm
+    400420: Body_armor_neck
+    400422: Body_armor_tail
+    400424: Body_armor_tie
+    400426: Body_armor_uparm
+    400428: cloak_back
+    400430: cloak_front
     2100000: tex_body
     2100002: tex_photon
     2100004: tex_armor
     2100006: tex_hair
     2100008: tex_face
     2100010: tex_faceoption
+    2100012: tex_cloak
     2300000: Body.001
     3300000: Body.001
     4300000: Body
     4300002: cloak
     4300004: Body.001
+    4300006: Body_armor_back
+    4300008: Body_armor_boots
+    4300010: Body_armor_horn
+    4300012: Body_armor_leg
+    4300014: Body_armor_loarm
+    4300016: Body_armor_tail
+    4300018: Body_armor_tie
+    4300020: Body_armor_uparm
+    4300022: cloak_back
+    4300024: cloak_front
+    4300026: Body_armor_head
+    4300028: Body_armor_neck
     9500000: //RootNode
     13700000: Body
     13700002: cloak
     13700004: Body.001
+    13700006: Body_armor_back
+    13700008: Body_armor_boots
+    13700010: Body_armor_head
+    13700012: Body_armor_horn
+    13700014: Body_armor_leg
+    13700016: Body_armor_loarm
+    13700018: Body_armor_neck
+    13700020: Body_armor_tail
+    13700022: Body_armor_tie
+    13700024: Body_armor_uparm
+    13700026: cloak_back
+    13700028: cloak_front
     2186277476908879412: ImportLogs
   externalObjects:
   - first:
@@ -438,6 +487,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: tex_body
     second: {fileID: 2100000, guid: 8b15ad46734538841955a43f514e9eeb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tex_cloak
+    second: {fileID: 2100000, guid: 87becb86f20ba0e419af2c5c8a436ba4, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule

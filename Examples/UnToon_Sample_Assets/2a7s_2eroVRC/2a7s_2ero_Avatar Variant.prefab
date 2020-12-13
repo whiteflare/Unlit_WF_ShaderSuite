@@ -1020,7 +1020,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_Name
-      value: 2a7s_2ero_Avatar
+      value: 2a7s_2ero_Avatar Variant
       objectReference: {fileID: 0}
     - target: {fileID: 100378, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_Name
@@ -1072,19 +1072,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400342, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.84800845
+      value: 0.9879509
       objectReference: {fileID: 0}
     - target: {fileID: 400342, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.52998275
+      value: 0.15476741
       objectReference: {fileID: 0}
     - target: {fileID: 400342, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.0000000026457372
+      value: 0.000000028405342
       objectReference: {fileID: 0}
     - target: {fileID: 400342, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.000000087376144
+      value: 0.00000005960465
       objectReference: {fileID: 0}
     - target: {fileID: 400342, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1092,7 +1092,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400342, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -21.894989
+      value: -17.807007
       objectReference: {fileID: 0}
     - target: {fileID: 400342, guid: 294a186fb5f0bdf49a1a11378bd8f4d9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
