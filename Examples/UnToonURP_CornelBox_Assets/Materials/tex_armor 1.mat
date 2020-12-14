@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: tex_faceoption(Clone)_asset5
-  m_Shader: {fileID: 4800000, guid: 4985065d0e1d0424f8734ca60206aeec, type: 3}
+  m_Name: tex_armor 1
+  m_Shader: {fileID: 4800000, guid: f009b607188be344fac9370b2d7176c1, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AL_MaskTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: f8ac13ff4d61a2749b99f8679d818bd9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AO_MaskTex:
@@ -48,15 +48,23 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HL_MatcapTex:
+        m_Texture: {fileID: 2800000, guid: 42aefa086f04a0c4da493cba5f967800, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LM_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LM_Texture:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MT_Cubemap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 8900000, guid: 05ff7cbb74648c2419d2eb2755729aca, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: c4b124e9cad9e8a49ab86cde822a5723, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6ad2bcf19007e9d48a7761cf7d060a33, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -83,6 +91,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TL_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TR_MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -104,11 +116,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AL_Fresnel: 0
+    - _AL_AlphaToMask: 0
     - _AL_InvMaskVal: 0
     - _AL_Power: 1
-    - _AL_Source: 0
-    - _AL_ZWrite: 0
+    - _AL_Source: 1
     - _AO_Brightness: 0
     - _AO_Contrast: 1
     - _AO_Enable: 0
@@ -122,6 +133,7 @@ Material:
     - _CL_Enable: 0
     - _CL_Monochrome: 0
     - _CullMode: 0
+    - _Cutoff: 0.5
     - _DetailNormalMapScale: 0.4
     - _ES_AlphaScroll: 0
     - _ES_BakeIntensity: 1
@@ -133,15 +145,15 @@ Material:
     - _ES_Sharpness: 1
     - _ES_Speed: 2
     - _GL_BlendPower: 0.8
-    - _GL_CastShadow: 0
+    - _GL_CastShadow: 1
     - _GL_CustomAltitude: 45
-    - _GL_CustomAzimuth: 270
-    - _GL_DisableBackLit: 0
+    - _GL_CustomAzimuth: 0
+    - _GL_DisableBackLit: 1
     - _GL_DisableBasePos: 0
-    - _GL_Level: 0
+    - _GL_Level: 97
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
-    - _GL_LightMode: 3
+    - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
     - _HL_CapType: 0
     - _HL_Enable: 0
@@ -149,16 +161,26 @@ Material:
     - _HL_Parallax: 0.75
     - _HL_Power: 1
     - _HL_Range: 1
+    - _LM_AnimSpeed: 0.2
+    - _LM_Dencity: 0.5
+    - _LM_Enable: 0
+    - _LM_Glitter: 0.5
+    - _LM_InvMaskVal: 0
+    - _LM_MinDist: 2
+    - _LM_Scale: 0.5
+    - _LM_Shape: 0
+    - _LM_Spot: 2
     - _MT_BlendNormal: 0.1
-    - _MT_Brightness: 0
+    - _MT_Brightness: 0.2
+    - _MT_CubemapHighCut: 0.5
     - _MT_CubemapPower: 1
-    - _MT_CubemapType: 0
-    - _MT_Enable: 0
+    - _MT_CubemapType: 2
+    - _MT_Enable: 1
     - _MT_InvMaskVal: 0
     - _MT_InvRoughnessMaskVal: 0
-    - _MT_Metallic: 0.5
+    - _MT_Metallic: 0.7
     - _MT_Monochrome: 1
-    - _MT_ReflSmooth: 0.5
+    - _MT_ReflSmooth: 0.95
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_2ndType: 0
@@ -172,6 +194,10 @@ Material:
     - _OL_InvMaskVal: 0
     - _OL_Power: 1
     - _OL_UVType: 0
+    - _TL_Enable: 0
+    - _TL_InvMaskVal: 0
+    - _TL_LineWidth: 0.05
+    - _TL_Z_Shift: 0.5
     - _TR_BlendNormal: 0
     - _TR_BlendType: 0
     - _TR_Enable: 0
@@ -184,7 +210,7 @@ Material:
     - _TS_BlendNormal: 0.1
     - _TS_Enable: 1
     - _TS_Feather: 0.05
-    - _TS_InvMaskVal: 1
+    - _TS_InvMaskVal: 0
     - _TS_Power: 1
     - _UseVertexColor: 0
     - _WF_DebugView: 0
@@ -196,8 +222,11 @@ Material:
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _LM_Color: {r: 1, g: 1, b: 1, a: 1}
+    - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1, a: 1}
+    - _TL_LineColor: {r: 0, g: 0, b: 0, a: 0.8}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-    - _TS_1stColor: {r: 0.7529412, g: 0.5921569, b: 0.46666667, a: 1}
-    - _TS_2ndColor: {r: 0.6431373, g: 0.47843137, b: 0.34901962, a: 1}
-    - _TS_BaseColor: {r: 0.8745098, g: 0.74509805, b: 0.5764706, a: 1}
+    - _TS_1stColor: {r: 0.81, g: 0.81, b: 0.9, a: 1}
+    - _TS_2ndColor: {r: 0.68, g: 0.68, b: 0.8, a: 1}
+    - _TS_BaseColor: {r: 1, g: 1, b: 1, a: 1}
