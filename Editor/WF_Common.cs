@@ -474,6 +474,7 @@ namespace UnlitWF
             { "[LM] Texture", "[LM] ラメ色テクスチャ" },
             { "[LM] Random Color", "[LM] ランダム色パラメタ" },
             { "[LM] Change Alpha Transparency", "[LM] 透明度も反映する" },
+            { "[LM] UV Type", "[LM] UVタイプ" },
             { "[LM] Shape", "[LM] 形状" },
             { "[LM] Scale", "[LM] スケール" },
             { "[LM] Dencity", "[LM] 密度" },

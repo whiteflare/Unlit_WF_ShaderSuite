@@ -168,6 +168,7 @@
     float4          _LM_Texture_ST;
     float4          _LM_Color;
     float3          _LM_RandColor;
+    uint            _LM_UVType;
     uint            _LM_Shape;
     float           _LM_Scale;
     float           _LM_Dencity;

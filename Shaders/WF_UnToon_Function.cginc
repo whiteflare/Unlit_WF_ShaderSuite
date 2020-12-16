@@ -582,8 +582,11 @@
             if (TGL_ON(_LM_Enable)) {
                 float power = WF_TEX2D_LAME_MASK(uv_main);
                 if (0 < power) {
+                    float2 uv_lame = _LM_UVType == 1 ? i.uv_lmap : i.uv;
+                    uv_lame = TRANSFORM_TEX(uv_lame, _MainTex);
+
                     float   scale = NON_ZERO_FLOAT(_LM_Scale) / 100;
-                    float2  st = uv_main / scale;
+                    float2  st = uv_lame / scale;
 
                     float2  ist = floor(st);
                     float2  fst = frac(st);
@@ -616,7 +619,7 @@
                     // 形状
                     power *= _LM_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
 
-                    float4 lame_color = _LM_Color * WF_TEX2D_LAME_TEX(uv_main);
+                    float4 lame_color = _LM_Color * WF_TEX2D_LAME_TEX(uv_lame);
                     lame_color.rgb += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
 
                     color.rgb += max(ZERO_VEC3, lame_color.rgb) * power;
