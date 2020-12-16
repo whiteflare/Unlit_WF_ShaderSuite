@@ -3463,6 +3463,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2a7s_2ero_A
       objectReference: {fileID: 0}
+    - target: {fileID: 5336665284678107402, guid: c4e26fbda77a59649b7dd72bc276672e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5336665284683320334, guid: c4e26fbda77a59649b7dd72bc276672e,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[27]
@@ -6240,6 +6245,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: 2a7s_2ero_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336665284678107402, guid: c4e26fbda77a59649b7dd72bc276672e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5336665284683320334, guid: c4e26fbda77a59649b7dd72bc276672e,
         type: 3}
