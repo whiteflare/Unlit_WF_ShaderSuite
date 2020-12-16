@@ -749,6 +749,7 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Outline", "Transparent_MaskOut_Blend",  "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend"),
             new WFShaderName("UnToon", "Outline", "LineOnly_Opaque",            "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque"),
             new WFShaderName("UnToon", "Outline", "LineOnly_TransCutout",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
+            new WFShaderName("UnToon", "Outline", "LineOnly_Transparent",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent"),
 
             new WFShaderName("UnToon", "PowerCap", "Opaque",                    "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque"),
             new WFShaderName("UnToon", "PowerCap", "TransCutout",               "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout"),
