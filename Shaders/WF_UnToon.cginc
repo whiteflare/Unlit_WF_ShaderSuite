@@ -265,19 +265,32 @@
     sampler2D _TL_CANCEL_GRAB_TEXTURE;
 
     struct v2f_canceller {
-        float4      vertex  : SV_POSITION;
-        float4      uv_grab : TEXCOORD0;
+        float4      vs_vertex  	: SV_POSITION;
+        float4      uv_grab 	: TEXCOORD0;
+        float3      ws_vertex  	: TEXCOORD1;
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+        UNITY_VERTEX_OUTPUT_STEREO
     };
 
     v2f_canceller vert_outline_canceller(appdata v) {
         v2f_canceller o;
-        o.vertex = UnityObjectToClipPos(v.vertex);
-        o.uv_grab = o.vertex;
-        o.uv_grab.xy = ComputeGrabScreenPos(o.vertex);
+
+        UNITY_SETUP_INSTANCE_ID(v);
+        UNITY_INITIALIZE_OUTPUT(v2f_canceller, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+        o.ws_vertex 	= UnityObjectToWorldPos(v.vertex.xyz);
+        o.vs_vertex 	= UnityObjectToClipPos(v.vertex);
+        o.uv_grab 		= o.vs_vertex;
+        o.uv_grab.xy 	= ComputeGrabScreenPos(o.vs_vertex);
+
         return o;
     }
 
     float4 frag_outline_canceller(v2f_canceller i) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
         return tex2Dproj(_TL_CANCEL_GRAB_TEXTURE, UNITY_PROJ_COORD(i.uv_grab));
     }
 

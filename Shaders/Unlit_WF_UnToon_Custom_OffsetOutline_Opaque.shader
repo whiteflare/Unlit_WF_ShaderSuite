@@ -31,7 +31,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             _CullMode               ("Cull Mode", int) = 2
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
-            _Z_Shift                ("Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+            _Z_Shift                ("Z-shift (tweak)", Range(-0.5, 0.5)) = 0
 
         // アウトライン
         [HideInInspector]

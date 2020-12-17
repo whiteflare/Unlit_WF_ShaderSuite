@@ -604,6 +604,8 @@
 
                     float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
 
+                    min_pos.xy = round(min_pos.xy * 10) / 10; // ◆◇◆ ちらつき低減のテスト中 ◆◇◆
+
                     // アニメーション項
                     power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
                     // Glitter項
