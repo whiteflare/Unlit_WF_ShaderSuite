@@ -35,9 +35,9 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
         [NoScaleOffset]
         [Normal]
-            _FG_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
+            _FR_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
         [Toggle(_)]
-            _FG_FlipTangent         ("[FR] Flip Tangent", Float) = 0
+            _FR_FlipTangent         ("[FR] Flip Tangent", Float) = 0
         [IntRange]
             _FR_Repeat              ("[FR] Fur Repeat", Range(1, 8)) = 3
             _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0

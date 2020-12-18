@@ -30,7 +30,7 @@
     ////////////////////////////
 
     DECL_MAIN_TEX2D (_FR_NoiseTex);
-    DECL_VERT_TEX2D (_FG_BumpMap);
+    DECL_VERT_TEX2D (_FR_BumpMap);
     DECL_SUB_TEX2D  (_FR_MaskTex);
 
     ////////////////////////////
@@ -40,7 +40,7 @@
     float4          _FR_NoiseTex_ST;
     float           _FR_Height;
     float4          _FR_Vector;
-    float           _FG_FlipTangent;
+    float           _FR_FlipTangent;
 
     uint            _FR_Repeat;
     float           _FR_ShadowPower;

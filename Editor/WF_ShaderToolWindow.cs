@@ -339,21 +339,7 @@ namespace UnlitWF
     {
         public Material materialSource = null;
         public Material[] materialDestination = { null };
-        public bool copyAlpha = false;
-        public bool copyColorChange = false;
-        public bool copyNormal = false;
-        public bool copyMetallic = false;
-        public bool copyMatcap = false;
-        public bool copyLame = false;
-        public bool copyToonShade = false;
-        public bool copyRimLight = false;
-        public bool copyDecal = false;
-        public bool copyEmissive = false;
-        public bool copyOcclusion = false;
-        public bool copyOutline = false;
-        public bool copyToonFog = false;
-        public bool copyLit = false;
-        public bool copyTessellation = false;
+        public string[] functions = { };
     }
 
     public class ToolCopyWindow : EditorWindow
@@ -402,8 +388,6 @@ namespace UnlitWF
             var so = new SerializedObject(param);
             so.Update();
 
-            SerializedProperty prop;
-
             // タイトル
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("UnlitWF / Copy material property", styleTitle);
@@ -419,15 +403,6 @@ namespace UnlitWF
             scroll = EditorGUILayout.BeginScrollView(scroll);
 
             // マテリアルリスト
-            EditorGUILayout.LabelField("source materials", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(so.FindProperty("materialSource"), new GUIContent("material"), true);
-            EditorGUILayout.Space();
-
-            if (ToolCommon.IsNotUnlitWFMaterial(param.materialSource)) {
-                EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                EditorGUILayout.Space();
-            }
-
             EditorGUILayout.LabelField("destination materials", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(so.FindProperty("materialDestination"), new GUIContent("list"), true);
             EditorGUILayout.Space();
@@ -445,44 +420,35 @@ namespace UnlitWF
             }
             EditorGUILayout.Space();
 
-            // 対象
-            EditorGUILayout.LabelField("copy target", EditorStyles.boldLabel);
-
-            prop = so.FindProperty("copyAlpha");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Transparent Alpha");
-            prop = so.FindProperty("copyColorChange");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Color Change");
-            prop = so.FindProperty("copyNormal");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::NormalMap");
-            prop = so.FindProperty("copyMetallic");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Metallic");
-            prop = so.FindProperty("copyMatcap");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Light Matcap");
-            prop = so.FindProperty("copyLame");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Lame");
-            prop = so.FindProperty("copyToonShade");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::ToonShade");
-            prop = so.FindProperty("copyRimLight");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::RimLight");
-            prop = so.FindProperty("copyDecal");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Decal Texture");
-            prop = so.FindProperty("copyEmissive");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Emission");
-            prop = so.FindProperty("copyOcclusion");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Ambient Occlusion");
-            prop = so.FindProperty("copyOutline");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Outline");
-            prop = so.FindProperty("copyToonFog");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Toon Fog");
-            prop = so.FindProperty("copyLit");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Lit & Lit Advance");
-            prop = so.FindProperty("copyTessellation");
-            prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnToon::Tessellation");
-
+            EditorGUILayout.LabelField("source materials", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(so.FindProperty("materialSource"), new GUIContent("material"), true);
             EditorGUILayout.Space();
+
+            if (ToolCommon.IsNotUnlitWFMaterial(param.materialSource)) {
+                EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
+                EditorGUILayout.Space();
+            }
 
             so.ApplyModifiedPropertiesWithoutUndo();
             so.SetIsDifferentCacheDirty();
+
+            // 対象
+            EditorGUILayout.LabelField("copy target functions", EditorStyles.boldLabel);
+
+            var updatedFunctions = new List<string>();
+            foreach (var func in WFShaderDictionary.ShaderFuncList) {
+                if (func.Contains(param.materialSource)) {
+                    bool value = param.functions.Contains(func.Label);
+                    if (GUILayout.Toggle(value, func.Name)) {
+                        updatedFunctions.Add(func.Label);
+                    }
+                }
+            }
+            if (!updatedFunctions.SequenceEqual(param.functions)) {
+                param.functions = updatedFunctions.ToArray();
+            }
+
+            EditorGUILayout.Space();
 
             // UnlitWF 以外のマテリアルを除去
             if (removeOther) {
@@ -492,8 +458,10 @@ namespace UnlitWF
                 param.materialDestination = newlist.ToArray();
             }
 
-            if (GUILayout.Button("Copy Values")) {
-                new WFMaterialEditUtility().CopyProperties(param);
+            using (new EditorGUI.DisabledGroupScope(param.functions.Length == 0)) {
+                if (GUILayout.Button("Copy Values")) {
+                    new WFMaterialEditUtility().CopyProperties(param);
+                }
             }
             EditorGUILayout.Space();
 
@@ -618,27 +586,6 @@ namespace UnlitWF
 
     internal class WFMaterialEditUtility
     {
-        /// <summary>
-        /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
-        /// </summary>
-        private readonly Dictionary<string, string> MIGRATION_PROP_RENAME = new Dictionary<string, string>() {
-            { "_AL_CutOff", "_Cutoff" },
-            { "_CutOffLevel", "_Cutoff" },
-            { "_ES_Color", "_EmissionColor" },
-            { "_ES_MaskTex", "_EmissionMap" },
-            { "_FurHeight", "_FR_Height" },
-            { "_FurMaskTex", "_FR_MaskTex" },
-            { "_FurNoiseTex", "_FR_NoiseTex" },
-            { "_FurRepeat", "_FR_Repeat" },
-            { "_FurShadowPower", "_FR_ShadowPower" },
-            // { "_FurVector", "_FR_Vector" }, // FurVectorの値は再設定が必要なので変換しない
-            { "_GL_BrendPower", "_GL_BlendPower" },
-            { "_MT_BlendType", "_MT_Brightness" },
-            { "_MT_MaskTex", "_MetallicGlossMap" },
-            { "_MT_Smoothness", "_MT_ReflSmooth" },
-            { "_MT_Smoothness2", "_MT_SpecSmooth" },
-        };
-
         #region マイグレーション
 
         public bool ExistsOldNameProperty(params UnityEngine.Object[] objlist) {
@@ -677,7 +624,7 @@ namespace UnlitWF
                     continue;
                 }
                 var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var pair in MIGRATION_PROP_RENAME) {
+                foreach (var pair in WFShaderDictionary.OldPropNameToNewPropNameMap) {
                     var before = props.GetValueOrNull(pair.Key);
                     if (before != null) {
                         result[before] = props.GetValueOrNull(pair.Value);
@@ -698,22 +645,7 @@ namespace UnlitWF
             }
             var src_props = new List<ShaderMaterialProperty>();
 
-            var copy_target = new List<string>();
-            if (param.copyAlpha) { copy_target.Add("AL"); }
-            if (param.copyColorChange) { copy_target.Add("CL"); }
-            if (param.copyDecal) { copy_target.Add("OL"); }
-            if (param.copyEmissive) { copy_target.Add("ES"); }
-            if (param.copyLit) { copy_target.Add("GL"); }
-            if (param.copyMatcap) { copy_target.Add("HL"); }
-            if (param.copyLame) { copy_target.Add("LM"); }
-            if (param.copyMetallic) { copy_target.Add("MT"); }
-            if (param.copyNormal) { copy_target.Add("NM"); }
-            if (param.copyOcclusion) { copy_target.Add("AO"); }
-            if (param.copyOutline) { copy_target.Add("TL"); }
-            if (param.copyRimLight) { copy_target.Add("TR"); }
-            if (param.copyToonShade) { copy_target.Add("TS"); }
-            if (param.copyToonFog) { copy_target.Add("FG"); }
-            if (param.copyTessellation) { copy_target.Add("TE"); }
+            var copy_target = WFShaderFunction.LabelToPrefix(param.functions.ToList());
 
             foreach (var src_prop in ShaderMaterialProperty.AsList(param.materialSource)) {
                 string label = WFCommonUtility.GetPrefixFromPropName(src_prop.Name);
@@ -731,7 +663,7 @@ namespace UnlitWF
 
             for (int i = 0; i < param.materialDestination.Length; i++) {
                 var dst = param.materialDestination[i];
-                if (dst == null) {
+                if (dst == null || dst == param.materialSource) { // コピー先とコピー元が同じ時もコピーしない
                     continue;
                 }
                 var dst_props = ShaderMaterialProperty.AsDict(dst);

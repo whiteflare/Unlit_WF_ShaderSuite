@@ -65,7 +65,7 @@
 
         o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex);
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FG_FlipTangent);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipTangent);
 
         return o;
     }
@@ -107,7 +107,7 @@
 #ifndef _FR_DISABLE_NORMAL_MAP
         // NormalMap Fur Vector 計算
         float2 uv_main = TRANSFORM_TEX(v[i].uv, _MainTex);
-        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FG_BumpMap, uv_main, 0) );
+        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FR_BumpMap, uv_main, 0) );
         vec_fur = BlendNormals(vec_fur, vec_map);
 #endif
 
