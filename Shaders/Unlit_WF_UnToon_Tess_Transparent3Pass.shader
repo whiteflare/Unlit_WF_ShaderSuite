@@ -148,8 +148,10 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _LM_UVType              ("[LM] UV Type", Float) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LM_Shape               ("[LM] Shape", Float) = 0
-            _LM_Scale               ("[LM] Scale", Range(0, 1)) = 0.5
-            _LM_Dencity             ("[LM] Dencity", Range(0, 1)) = 0.5
+        [PowerSlider(4.0)]
+            _LM_Scale               ("[LM] Scale", Range(0, 4)) = 0.5
+        [PowerSlider(4.0)]
+            _LM_Dencity             ("[LM] Dencity", Range(0.3, 4)) = 0.5
             _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5
             _LM_MinDist             ("[LM] Dist Fade Start", Range(0, 5)) = 2.0
             _LM_Spot                ("[LM] Spot Fade Strength", Range(0, 16)) = 2.0
