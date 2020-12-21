@@ -35,6 +35,14 @@
     #include "WF_Common_BuiltinRP.cginc"
 #endif
 
+#ifdef _WF_FORCE_USE_SAMPLER
+    // サンプラーを強制的に使用する場合は、_SUB_ 側を undef して MAIN 側を使うように置き換える
+    #undef  DECL_SUB_TEX2D
+    #define DECL_SUB_TEX2D(name)            DECL_MAIN_TEX2D(name)
+    #undef  PICK_SUB_TEX2D
+    #define PICK_SUB_TEX2D(tex, name, uv)   PICK_MAIN_TEX2D(tex, uv)
+#endif
+
     ////////////////////////////
     // Common Utility
     ////////////////////////////
