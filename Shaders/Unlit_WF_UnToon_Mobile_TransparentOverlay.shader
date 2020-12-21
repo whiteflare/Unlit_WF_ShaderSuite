@@ -98,12 +98,13 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
             CGPROGRAM
 
-            #pragma vertex vert_with_zoffset
+            #pragma vertex vert
             #pragma fragment frag
 
             #pragma target 3.0
 
             #define _WF_ALPHA_FRESNEL
+            #define _WF_MAIN_Z_SHIFT    (_AL_Z_Offset)
             #define _WF_MOBILE
 
             #define _AO_ENABLE

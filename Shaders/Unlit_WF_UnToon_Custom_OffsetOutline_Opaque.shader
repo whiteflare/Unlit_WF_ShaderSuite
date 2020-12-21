@@ -263,10 +263,12 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
 
             CGPROGRAM
 
-            #pragma vertex vert_custom
+            #pragma vertex vert
             #pragma fragment frag
 
             #pragma target 4.5
+
+            #define _WF_MAIN_Z_SHIFT    (-_Z_Shift)
 
             #define _AO_ENABLE
             #define _CH_ENABLE
@@ -285,15 +287,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             #pragma multi_compile_instancing
 
             #include "WF_UnToon.cginc"
-
-            float _Z_Shift;
-
-            v2f vert_custom(in appdata v) {
-                v2f o;
-                o = vert(v);
-                o.vs_vertex = shiftDepthVertex(o.ws_vertex, -_Z_Shift);
-                return o;
-            }
 
             ENDCG
         }

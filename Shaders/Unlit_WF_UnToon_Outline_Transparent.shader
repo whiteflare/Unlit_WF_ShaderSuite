@@ -344,7 +344,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
             #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineCancel
 
-            #include "WF_UnToon.cginc"
+            #include "WF_UnToon_LineCanceller.cginc"
 
             ENDCG
         }

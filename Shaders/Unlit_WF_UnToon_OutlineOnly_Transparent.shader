@@ -130,7 +130,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
             CGPROGRAM
 
-            #pragma vertex vert_custom
+            #pragma vertex vert_outline_canceller
             #pragma fragment frag_outline_canceller
 
             #pragma target 4.5
@@ -139,18 +139,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
+            #define _WF_MAIN_Z_SHIFT    (-_Z_Shift)
             #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineOnlyCancel
 
-            #include "WF_UnToon.cginc"
-
-            float _Z_Shift;
-
-            v2f_canceller vert_custom(in appdata v) {
-                v2f_canceller o;
-                o = vert_outline_canceller(v);
-                o.vs_vertex = shiftDepthVertex(o.ws_vertex, -_Z_Shift);
-                return o;
-            }
+            #include "WF_UnToon_LineCanceller.cginc"
 
             ENDCG
         }

@@ -86,6 +86,7 @@
     float4          _Color;
     float           _Cutoff;
     float           _UseVertexColor;
+    float           _Z_Shift;
 
     uint            _AL_Source;
     float           _AL_Power;

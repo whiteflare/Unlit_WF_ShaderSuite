@@ -88,7 +88,11 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
+#ifndef _WF_MAIN_Z_SHIFT
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);   // 通常の ToClipPos を使う
+#else
+        o.vs_vertex = shiftDepthVertex(o.ws_vertex, _WF_MAIN_Z_SHIFT);      // Zシフトした値を使う
+#endif
 #ifdef _VC_ENABLE
         o.vertex_color = v.vertex_color;
 #endif
@@ -257,46 +261,6 @@
 #endif
 
     ////////////////////////////
-    // アウトラインキャンセラ用 vertex&fragment shader
-    ////////////////////////////
-
-#ifdef _TL_CANCEL_GRAB_TEXTURE
-
-    sampler2D _TL_CANCEL_GRAB_TEXTURE;
-
-    struct v2f_canceller {
-        float4      vs_vertex  	: SV_POSITION;
-        float4      uv_grab 	: TEXCOORD0;
-        float3      ws_vertex  	: TEXCOORD1;
-        UNITY_VERTEX_INPUT_INSTANCE_ID
-        UNITY_VERTEX_OUTPUT_STEREO
-    };
-
-    v2f_canceller vert_outline_canceller(appdata v) {
-        v2f_canceller o;
-
-        UNITY_SETUP_INSTANCE_ID(v);
-        UNITY_INITIALIZE_OUTPUT(v2f_canceller, o);
-        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-
-        o.ws_vertex 	= UnityObjectToWorldPos(v.vertex.xyz);
-        o.vs_vertex 	= UnityObjectToClipPos(v.vertex);
-        o.uv_grab 		= o.vs_vertex;
-        o.uv_grab.xy 	= ComputeGrabScreenPos(o.vs_vertex);
-
-        return o;
-    }
-
-    float4 frag_outline_canceller(v2f_canceller i) : SV_Target {
-        UNITY_SETUP_INSTANCE_ID(i);
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-
-        return tex2Dproj(_TL_CANCEL_GRAB_TEXTURE, UNITY_PROJ_COORD(i.uv_grab));
-    }
-
-#endif
-
-    ////////////////////////////
     // EmissiveScroll専用パス用 vertex&fragment shader
     ////////////////////////////
 
@@ -348,19 +312,5 @@
 
         return color;
     }
-
-    ////////////////////////////
-    // ZOffset 付き vertex shader
-    ////////////////////////////
-
-    v2f vert_with_zoffset(appdata v) {
-        // 通常の vert を使う
-        v2f o = vert(v);
-        // SV_POSITION を上書き
-        o.vs_vertex = shiftDepthVertex(o.ws_vertex, _AL_Z_Offset);
-
-        return o;
-    }
-
 
 #endif
