@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_COMMON_LIGHTWEIGHT_RP
 #define INC_UNLIT_WF_COMMON_LIGHTWEIGHT_RP
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
 #if UNITY_VERSION < 201904

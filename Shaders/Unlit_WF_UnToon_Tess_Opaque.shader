@@ -16,11 +16,6 @@
  */
 Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     Properties {
         // 基本
         [WFHeader(Base)]

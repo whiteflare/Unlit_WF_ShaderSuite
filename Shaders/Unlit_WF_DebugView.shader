@@ -16,11 +16,6 @@
  */
 Shader "UnlitWF/Debug/WF_DebugView" {
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     Properties {
         [Header(Base)]
         [Enum(OFF,0,WHITE,1,BLACK,2,MAGENTA,3,DISCARD,4,VERTEX,5)]

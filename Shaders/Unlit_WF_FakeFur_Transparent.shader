@@ -16,11 +16,6 @@
  */
 Shader "UnlitWF/WF_FakeFur_Transparent" {
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     Properties {
         // 基本
         [WFHeader(Base)]

@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_UNTOON_TESSELLATION
 #define INC_UNLIT_WF_UNTOON_TESSELLATION
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     #include "WF_UnToon.cginc"
     #include "Tessellation.cginc"
 

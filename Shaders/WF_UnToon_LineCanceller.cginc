@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_UNTOON_LINE_CANCELLER
 #define INC_UNLIT_WF_UNTOON_LINE_CANCELLER
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     ////////////////////////////
     // uniform variable
     ////////////////////////////

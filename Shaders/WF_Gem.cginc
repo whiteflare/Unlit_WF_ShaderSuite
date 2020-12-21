@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_GEM
 #define INC_UNLIT_WF_GEM
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     #include "WF_INPUT_Gem.cginc"
     #include "WF_UnToon.cginc"
 

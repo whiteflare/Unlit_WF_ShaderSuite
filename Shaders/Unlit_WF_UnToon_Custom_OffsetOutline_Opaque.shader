@@ -16,11 +16,6 @@
  */
 Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     Properties {
         // 基本
         [WFHeader(Base)]

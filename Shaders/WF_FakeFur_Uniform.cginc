@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_FAKEFUR_UNIFORM
 #define INC_UNLIT_WF_FAKEFUR_UNIFORM
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     #include "WF_UnToon_Uniform.cginc"
 
     ////////////////////////////

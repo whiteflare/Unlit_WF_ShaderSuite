@@ -16,11 +16,6 @@
  */
 Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     Properties {
         // 基本
         [WFHeader(Base)]

@@ -16,11 +16,6 @@
  */
 Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     Properties {
         // 基本
         [WFHeader(Base)]

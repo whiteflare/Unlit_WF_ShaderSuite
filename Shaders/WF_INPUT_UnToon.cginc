@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_INPUT_UNTOON
 #define INC_UNLIT_WF_INPUT_UNTOON
 
-    /*
-     * authors:
-     *      ver:2020/11/19 whiteflare,
-     */
-
     #include "WF_Common.cginc"
 
     #ifndef WF_DEFINED_UNIFORM

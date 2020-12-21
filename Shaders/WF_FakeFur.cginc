@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_FAKEFUR
 #define INC_UNLIT_WF_FAKEFUR
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     #include "WF_INPUT_FakeFur.cginc"
     #include "WF_UnToon.cginc"
 

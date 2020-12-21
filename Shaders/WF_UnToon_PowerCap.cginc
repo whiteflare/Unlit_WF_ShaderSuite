@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_UNTOON_POWERCAP
 #define INC_UNLIT_WF_UNTOON_POWERCAP
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     #include "WF_UnToon.cginc"
 
     ////////////////////////////

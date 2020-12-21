@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_UNTOON
 #define INC_UNLIT_WF_UNTOON
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     ////////////////////////////
     // uniform variable
     ////////////////////////////

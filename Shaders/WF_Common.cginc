@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_COMMON
 #define INC_UNLIT_WF_COMMON
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     ////////////////////////////
     // Platform Glue
     ////////////////////////////

@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_UNTOON_UNIFORM
 #define INC_UNLIT_WF_UNTOON_UNIFORM
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     ////////////////////////////
     // Texture & Sampler
     ////////////////////////////

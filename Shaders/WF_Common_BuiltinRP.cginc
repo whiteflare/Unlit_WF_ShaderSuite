@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_COMMON_BUILTIN_RP
 #define INC_UNLIT_WF_COMMON_BUILTIN_RP
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     #include "UnityCG.cginc"
     #include "Lighting.cginc"
 
