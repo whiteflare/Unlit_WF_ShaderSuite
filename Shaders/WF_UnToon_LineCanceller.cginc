@@ -65,12 +65,12 @@
         UNITY_INITIALIZE_OUTPUT(v2f_canceller, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+        o.ws_vertex     = UnityObjectToWorldPos(v.vertex.xyz);
 #ifndef _WF_MAIN_Z_SHIFT
         o.vs_vertex     = UnityObjectToClipPos(v.vertex);   // 通常の ToClipPos を使う
 #else
         o.vs_vertex     = shiftDepthVertex(o.ws_vertex, _WF_MAIN_Z_SHIFT);     // Zシフトした値を使う
 #endif
-        o.ws_vertex     = UnityObjectToWorldPos(v.vertex.xyz);
         o.uv_grab       = o.vs_vertex;
         o.uv_grab.xy    = ComputeGrabScreenPos(o.vs_vertex);
 
