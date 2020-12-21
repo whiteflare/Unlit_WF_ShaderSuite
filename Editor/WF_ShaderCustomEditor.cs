@@ -208,10 +208,6 @@ namespace UnlitWF
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
 
-            if (EditorGUILayout.Popup("Change DebugView shader", 0, new string[] { "OFF", "DEBUG" }) == 1) {
-                WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, WFCommonUtility.AsMaterials(materialEditor.targets));
-            }
-
             // 不要なシェーダキーワードは削除
             foreach (object t in materialEditor.targets) {
                 Material mm = t as Material;
@@ -231,6 +227,16 @@ namespace UnlitWF
             rect.y += 2;
             GUI.Label(rect, "Current Shader", EditorStyles.boldLabel);
             GUILayout.Label(new Regex(@".*/").Replace(mat.shader.name, ""));
+
+            for (int idx = ShaderUtil.GetPropertyCount(mat.shader) - 1; 0 <= idx; idx--) {
+                if ("_CurrentVersion" == ShaderUtil.GetPropertyName(mat.shader, idx)) {
+                    rect = EditorGUILayout.GetControlRect();
+                    rect.y += 2;
+                    GUI.Label(rect, "Current Version", EditorStyles.boldLabel);
+                    GUILayout.Label(ShaderUtil.GetPropertyDescription(mat.shader, idx));
+                    break;
+                }
+            }
 
             // シェーダ切り替えボタン
             var snm = WFShaderNameDictionary.TryFindFromName(mat.shader.name);

@@ -57,6 +57,10 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         [IntRange]
         _GridScale  ("grid scale", Range(0,8))      = 4
         _GridFactor ("grid factor", Range(0, 1))    = 0.5
+
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _CurrentVersion         ("2020/12/13", Float) = 0
     }
 
     SubShader

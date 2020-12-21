@@ -259,6 +259,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _CurrentVersion         ("2020/12/13", Float) = 0
     }
 
     SubShader {

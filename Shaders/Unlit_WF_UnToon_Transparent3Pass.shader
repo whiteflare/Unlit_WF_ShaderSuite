@@ -267,6 +267,10 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _CurrentVersion         ("2020/12/13", Float) = 0
     }
 
     SubShader {
