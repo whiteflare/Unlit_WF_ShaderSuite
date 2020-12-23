@@ -295,6 +295,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #define _AO_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
+            #define _ES_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE
