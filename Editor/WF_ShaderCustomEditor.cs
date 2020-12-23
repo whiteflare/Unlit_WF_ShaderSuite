@@ -40,6 +40,7 @@ namespace UnlitWF
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
             { "_LM_Color", "_LM_Texture" },
+            { "_TL_LineColor", "_TL_CustomColorTex" }
         };
 
         delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
@@ -366,7 +367,7 @@ namespace UnlitWF
             return hur;
         }
 
-        public static void DrawShurikenStyleHeader(Rect position, string text, MaterialProperty prop) {
+        public static void DrawShurikenStyleHeader(Rect position, string text, MaterialProperty prop = null, bool alwaysOn = false) {
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             style.font = EditorStyles.boldLabel.font;
@@ -378,24 +379,31 @@ namespace UnlitWF
             GUI.Box(position, text, style);
 
             if (prop != null) {
-                // Toggle
-                Rect r = EditorGUILayout.GetControlRect(true, 0, EditorStyles.layerMaskField);
-                r.y -= 25;
-                r.height = MaterialEditor.GetDefaultPropertyHeight(prop);
-
-                bool value = 0.001f < Math.Abs(prop.floatValue);
-                EditorGUI.showMixedValue = prop.hasMixedValue;
-                EditorGUI.BeginChangeCheck();
-                value = EditorGUI.Toggle(r, " ", value);
-                if (EditorGUI.EndChangeCheck()) {
-                    prop.floatValue = value ? 1.0f : 0.0f;
+                if (alwaysOn) {
+                    if (prop.hasMixedValue || prop.floatValue == 0.0f) {
+                        prop.floatValue = 1.0f;
+                    }
                 }
-                EditorGUI.showMixedValue = false;
+                else {
+                    // Toggle
+                    Rect r = EditorGUILayout.GetControlRect(true, 0, EditorStyles.layerMaskField);
+                    r.y -= 25;
+                    r.height = MaterialEditor.GetDefaultPropertyHeight(prop);
 
-                // ▼
-                var toggleRect = new Rect(position.x + 4f, position.y + 2f, 13f, 13f);
-                if (Event.current.type == EventType.Repaint) {
-                    EditorStyles.foldout.Draw(toggleRect, false, false, value, false);
+                    bool value = 0.001f < Math.Abs(prop.floatValue);
+                    EditorGUI.showMixedValue = prop.hasMixedValue;
+                    EditorGUI.BeginChangeCheck();
+                    value = EditorGUI.Toggle(r, " ", value);
+                    if (EditorGUI.EndChangeCheck()) {
+                        prop.floatValue = value ? 1.0f : 0.0f;
+                    }
+                    EditorGUI.showMixedValue = false;
+
+                    // ▼
+                    var toggleRect = new Rect(position.x + 4f, position.y + 2f, 13f, 13f);
+                    if (Event.current.type == EventType.Repaint) {
+                        EditorStyles.foldout.Draw(toggleRect, false, false, value, false);
+                    }
                 }
             }
         }
@@ -414,7 +422,7 @@ namespace UnlitWF
         }
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
-            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, null);
+            ShaderCustomEditor.DrawShurikenStyleHeader(position, text);
         }
     }
 
@@ -435,6 +443,22 @@ namespace UnlitWF
         }
     }
 
+    internal class MaterialWFHeaderAlwaysOnDrawer : MaterialPropertyDrawer
+    {
+        public readonly string text;
+
+        public MaterialWFHeaderAlwaysOnDrawer(string text) {
+            this.text = text;
+        }
+
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return 32;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
+            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, prop, true);
+        }
+    }
     internal class MaterialFixFloatDrawer : MaterialPropertyDrawer
     {
         public readonly float value;

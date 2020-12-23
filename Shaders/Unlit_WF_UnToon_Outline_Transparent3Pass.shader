@@ -40,16 +40,14 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         // アウトライン
-        [HideInInspector]
-        [FixFloat(1.0)]
-            _TL_Enable              ("[LI] Enable", Float) = 0
-        [WFHeader(Outline)]
+        [WFHeaderAlwaysOn(Outline)]
+            _TL_Enable              ("[LI] Enable", Float) = 1
             _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+        [NoScaleOffset]
+            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
         [Enum(NORMAL,0,EDGE,1)]
             _TL_LineType            ("[LI] Line Type", Float) = 0
-        [NoScaleOffset]
-            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
