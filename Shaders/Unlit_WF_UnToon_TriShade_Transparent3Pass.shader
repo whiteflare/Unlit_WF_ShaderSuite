@@ -195,15 +195,14 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-        [Enum(OFF,0,FRONT,1,BACK,2)]
-            _ES_CullMode            ("[ES] Cull Mode", int) = 0
-            _ES_Z_Shift             ("[ES] Z-shift", Range(0, 1)) = 0
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -280,6 +279,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _WF_ALPHA_CUT_UPPER
 
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
@@ -319,6 +319,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _FG_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
@@ -355,6 +356,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _WF_ALPHA_CUT_LOWER
 
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
@@ -363,36 +365,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
-            #define _VC_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "EMISSIVE_SCROLL"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull [_ES_CullMode]
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert_emissiveScroll
-            #pragma fragment frag_emissiveScroll
-
-            #pragma target 4.5
-
-            #define _WF_ALPHA_BLEND
-            #define _ES_ENABLE
-            #define _ES_FORCE_ALPHASCROLL
-            #define _FG_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
