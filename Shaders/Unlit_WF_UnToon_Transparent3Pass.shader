@@ -290,7 +290,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_UPPER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
 
             #define _AO_ENABLE
             #define _CH_ENABLE
@@ -330,7 +330,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_LOWER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
@@ -371,7 +371,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_LOWER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
 
             #define _AO_ENABLE
             #define _CH_ENABLE

@@ -131,7 +131,7 @@
     // Alpha Transparent
     ////////////////////////////
 
-    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_FRESNEL) || defined(_WF_ALPHA_CUT_UPPER) || defined(_WF_ALPHA_CUT_LOWER)
+    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_FRESNEL) || defined(_WF_ALPHA_CUSTOM)
         #ifndef _WF_ALPHA_BLEND
             #define _WF_ALPHA_BLEND
         #endif
@@ -155,7 +155,7 @@
         }
 
         inline void affectAlphaMask(float2 uv, inout float4 color) {
-            float alpha = pickAlpha(uv, color.a);
+            float alpha = pickAlpha(uv, color.a) * _AL_CustomValue;
 
             /*
              * カットアウト処理
@@ -164,25 +164,15 @@
              * _AL_CustomValue を使っている MaskOut_Blend は cutout を使わない。
              */
 
-            #if defined(_WF_ALPHA_CUTOUT)
+            #if defined(_WF_ALPHA_CUSTOM)
+                _WF_ALPHA_CUSTOM
+            #elif defined(_WF_ALPHA_CUTOUT)
                 alpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, alpha);
                 if (TGL_OFF(_AL_AlphaToMask) && alpha < 0.5) {
                     discard;
                 }
-            #elif defined(_WF_ALPHA_CUT_UPPER)
-                if (alpha < _Cutoff) {
-                    discard;
-                } else {
-                    alpha *= _AL_Power;
-                }
-            #elif defined(_WF_ALPHA_CUT_LOWER)
-                if (alpha < _Cutoff) {
-                    alpha *= _AL_Power;
-                } else {
-                    discard;
-                }
             #else
-                alpha *= _AL_Power * _AL_CustomValue;
+                alpha *= _AL_Power;
             #endif
 
             color.a = alpha;

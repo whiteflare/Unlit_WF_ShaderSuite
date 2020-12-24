@@ -214,6 +214,7 @@
     float           _TL_BlendBase;
     float           _TL_BlendCustom;
     float           _TL_InvMaskVal;
+    float           _TL_UseCutout;
 
     float           _AO_Enable;
     float           _AO_UseLightMap;
