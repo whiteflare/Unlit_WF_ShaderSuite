@@ -49,7 +49,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
 
         [HideInInspector]
         [FixFloat(0.0)]
-            _CurrentVersion         ("2020/12/13", Float) = 0
+            _CurrentVersion         ("2021/01/01", Float) = 0
     }
 
     SubShader {

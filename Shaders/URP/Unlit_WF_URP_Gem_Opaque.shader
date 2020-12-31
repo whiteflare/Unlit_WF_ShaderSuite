@@ -79,7 +79,7 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
 
         [HideInInspector]
         [FixFloat(0.0)]
-            _CurrentVersion         ("2020/12/13", Float) = 0
+            _CurrentVersion         ("2021/01/01", Float) = 0
     }
 
     SubShader {
