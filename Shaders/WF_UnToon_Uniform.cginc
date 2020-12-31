@@ -122,7 +122,6 @@
     float           _ES_Speed;
     float           _ES_AlphaScroll;
     float           _ES_BakeIntensity;
-    float           _ES_Z_Shift;
 
     float           _NM_Enable;
     float           _BumpScale;

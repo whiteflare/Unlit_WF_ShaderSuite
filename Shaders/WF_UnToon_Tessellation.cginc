@@ -134,13 +134,4 @@
         return o;
     }
 
-    [domain("tri")]
-    v2f domain_emissiveScroll(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
-        v2f o = domainCore(hsConst, i, bary);
-        // SV_POSITION を上書き
-        o.vs_vertex = shiftEmissiveScrollVertex(o);
-
-        return o;
-    }
-
 #endif
