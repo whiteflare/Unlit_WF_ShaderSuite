@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,11 +17,6 @@
 
 #ifndef INC_UNLIT_WF_UNTOON
 #define INC_UNLIT_WF_UNTOON
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     ////////////////////////////
     // uniform variable
@@ -88,7 +83,11 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
+#ifndef _WF_MAIN_Z_SHIFT
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);   // 通常の ToClipPos を使う
+#else
+        o.vs_vertex = shiftDepthVertex(o.ws_vertex, _WF_MAIN_Z_SHIFT);      // Zシフトした値を使う
+#endif
 #ifdef _VC_ENABLE
         o.vertex_color = v.vertex_color;
 #endif
@@ -126,7 +125,7 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
         // アルファマスク適用
-        float alpha = affectAlphaMask(uv_main, color);
+        affectAlphaMask(uv_main, color);
 
         // カラーマスク
         affect3chColorMask(uv_main, color);
@@ -167,15 +166,13 @@
         // Ambient Occlusion
         affectOcclusion(i, uv_main, color);
 
-        // フレネル
-        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, alpha, color);
-        // Outline Alpha
-        affectOutlineAlpha(uv_main, color);
         // EmissiveScroll
         affectEmissiveScroll(i.ws_vertex, uv_main, color);
         // ToonFog
         affectToonFog(i, ws_view_dir, color);
 
+        // フレネル
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
@@ -257,99 +254,5 @@
         #endif
     }
 #endif
-
-    ////////////////////////////
-    // アウトラインキャンセラ用 vertex&fragment shader
-    ////////////////////////////
-
-#ifdef _TL_CANCEL_GRAB_TEXTURE
-
-    sampler2D _TL_CANCEL_GRAB_TEXTURE;
-
-    struct v2f_canceller {
-        float4      vertex  : SV_POSITION;
-        float4      uv_grab : TEXCOORD0;
-    };
-
-    v2f_canceller vert_outline_canceller(appdata v) {
-        v2f_canceller o;
-        o.vertex = UnityObjectToClipPos(v.vertex);
-        o.uv_grab = o.vertex;
-        o.uv_grab.xy = ComputeGrabScreenPos(o.vertex);
-        return o;
-    }
-
-    float4 frag_outline_canceller(v2f_canceller i) : SV_Target {
-        return tex2Dproj(_TL_CANCEL_GRAB_TEXTURE, UNITY_PROJ_COORD(i.uv_grab));
-    }
-
-#endif
-
-    ////////////////////////////
-    // EmissiveScroll専用パス用 vertex&fragment shader
-    ////////////////////////////
-
-    float4 shiftEmissiveScrollVertex(inout v2f o) {
-        #ifdef _ES_ENABLE
-        if (TGL_ON(_ES_Enable)) {
-            return shiftDepthVertex(o.ws_vertex, _ES_Z_Shift);
-        } else {
-            return UnityObjectToClipPos( ZERO_VEC3 );
-        }
-        #else
-            return UnityObjectToClipPos( ZERO_VEC3 );
-        #endif
-    }
-
-    v2f vert_emissiveScroll(appdata v) {
-        // 通常の vert を使う
-        v2f o = vert(v);
-        // SV_POSITION を上書き
-        o.vs_vertex = shiftEmissiveScrollVertex(o);
-
-        return o;
-    }
-
-    float4 frag_emissiveScroll(v2f i) : SV_Target {
-        float4 color = float4(0, 0, 0, 0);
-
-        #ifdef _ES_ENABLE
-        if (TGL_ON(_ES_Enable)) {
-
-            // メイン
-            float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-            color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color / 256;  // _EmissionMapを参照するために_MainTexに手を付けておく
-
-            // EmissiveScroll
-            affectEmissiveScroll(i.ws_vertex, uv_main, color);
-
-            // Alpha は 0-1 にクランプ
-            color.a = saturate(color.a);
-
-        } else {
-            // 無効のときはクリッピングする
-            discard;
-        }
-        #else
-            // 無効のときはクリッピングする
-            discard;
-        #endif
-
-        return color;
-    }
-
-    ////////////////////////////
-    // ZOffset 付き vertex shader
-    ////////////////////////////
-
-    v2f vert_with_zoffset(appdata v) {
-        // 通常の vert を使う
-        v2f o = vert(v);
-        // SV_POSITION を上書き
-        o.vs_vertex = shiftDepthVertex(o.ws_vertex, _AL_Z_Offset);
-
-        return o;
-    }
-
 
 #endif

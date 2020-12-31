@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -15,11 +15,6 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 Shader "UnlitWF/Debug/WF_DebugView" {
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     Properties {
         [Header(Base)]
@@ -57,6 +52,10 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         [IntRange]
         _GridScale  ("grid scale", Range(0,8))      = 4
         _GridFactor ("grid factor", Range(0, 1))    = 0.5
+
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _CurrentVersion         ("2021/01/01", Float) = 0
     }
 
     SubShader

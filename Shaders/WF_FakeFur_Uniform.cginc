@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_FAKEFUR_UNIFORM
 #define INC_UNLIT_WF_FAKEFUR_UNIFORM
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     #include "WF_UnToon_Uniform.cginc"
 
     ////////////////////////////
@@ -30,7 +25,7 @@
     ////////////////////////////
 
     DECL_MAIN_TEX2D (_FR_NoiseTex);
-    DECL_VERT_TEX2D (_FG_BumpMap);
+    DECL_VERT_TEX2D (_FR_BumpMap);
     DECL_SUB_TEX2D  (_FR_MaskTex);
 
     ////////////////////////////
@@ -40,7 +35,7 @@
     float4          _FR_NoiseTex_ST;
     float           _FR_Height;
     float4          _FR_Vector;
-    float           _FG_FlipTangent;
+    float           _FR_FlipTangent;
 
     uint            _FR_Repeat;
     float           _FR_ShadowPower;

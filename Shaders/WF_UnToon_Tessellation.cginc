@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,11 +17,6 @@
 
 #ifndef INC_UNLIT_WF_UNTOON_TESSELLATION
 #define INC_UNLIT_WF_UNTOON_TESSELLATION
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     #include "WF_UnToon.cginc"
     #include "Tessellation.cginc"
@@ -87,12 +82,17 @@
 
         #define MUL_BARY(array, member)   (bary.x * array[0].member + bary.y * array[1].member + bary.z * array[2].member)
 
-        o.ws_vertex     = MUL_BARY(i, ws_vertex);
 #ifdef _VC_ENABLE
         o.vertex_color  = MUL_BARY(i, vertex_color);
 #endif
+        o.light_color   = MUL_BARY(i, light_color);
+#ifdef _TS_ENABLE
+        o.shadow_power  = MUL_BARY(i, shadow_power);
+#endif
         o.uv            = MUL_BARY(i, uv);
         o.uv_lmap       = MUL_BARY(i, uv_lmap);
+        o.ws_vertex     = MUL_BARY(i, ws_vertex);
+        o.ws_light_dir  = MUL_BARY(i, ws_light_dir);
         o.normal        = normalize( MUL_BARY(i, normal) );
 #ifdef _NM_ENABLE
         o.tangent   = normalize( MUL_BARY(i, tangent) );
@@ -107,9 +107,11 @@
         o.ws_vertex.xyz += MUL_BARY(phg, xyz) * _Smoothing / 2.0;
 
         // Displacement HeightMap
+#ifdef _WF_LEGACY_TE_USE_DISPMAP
         float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
         float disp = PICK_VERT_TEX2D_LOD(_DispMap, uv_main, 0).r * _DispMapScale - _DispMapLevel;
         o.ws_vertex.xyz += o.normal * disp * 0.01;
+#endif
 
         #undef MUL_BARY
 
@@ -128,15 +130,6 @@
         v2f o = domainCore(hsConst, i, bary);
         // SV_POSITION を上書き
         o.vs_vertex = shiftOutlineVertex(o);
-
-        return o;
-    }
-
-    [domain("tri")]
-    v2f domain_emissiveScroll(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
-        v2f o = domainCore(hsConst, i, bary);
-        // SV_POSITION を上書き
-        o.vs_vertex = shiftEmissiveScrollVertex(o);
 
         return o;
     }

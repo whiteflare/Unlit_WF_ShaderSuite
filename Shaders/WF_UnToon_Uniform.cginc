@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,11 +17,6 @@
 
 #ifndef INC_UNLIT_WF_UNTOON_UNIFORM
 #define INC_UNLIT_WF_UNTOON_UNIFORM
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     ////////////////////////////
     // Texture & Sampler
@@ -53,7 +48,7 @@
     DECL_SUB_TEX2D      (_LM_Texture);
     DECL_SUB_TEX2D      (_LM_MaskTex);
 #endif
-#ifdef _TL_MASK_APPLY_LEGACY    // マスクをfragmentでアルファに反映する場合
+#ifdef _WF_LEGACY_TL_MASK    // マスクをfragmentでアルファに反映する場合
     DECL_SUB_TEX2D      (_TL_MaskTex);
 #endif
 
@@ -69,11 +64,13 @@
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
 
-#ifndef _TL_MASK_APPLY_LEGACY   // マスクをシフト時に太さに反映する場合
+#ifndef _WF_LEGACY_TL_MASK   // マスクをシフト時に太さに反映する場合
     DECL_VERT_TEX2D     (_TL_MaskTex);
 #endif
 #ifdef _WF_UNTOON_TESS
+#ifdef _WF_LEGACY_TE_USE_DISPMAP
     DECL_VERT_TEX2D     (_DispMap);
+#endif
 #endif
 
     ////////////////////////////
@@ -84,6 +81,7 @@
     float4          _Color;
     float           _Cutoff;
     float           _UseVertexColor;
+    float           _Z_Shift;
 
     uint            _AL_Source;
     float           _AL_Power;
@@ -115,7 +113,7 @@
 
     float           _ES_Enable;
     float4          _EmissionColor;
-    float           _ES_BlendType;
+    uint            _ES_BlendType;
     uint            _ES_Shape;
     uint            _ES_DirType;
     float4          _ES_Direction;
@@ -124,7 +122,6 @@
     float           _ES_Speed;
     float           _ES_AlphaScroll;
     float           _ES_BakeIntensity;
-    float           _ES_Z_Shift;
 
     float           _NM_Enable;
     float           _BumpScale;
@@ -164,8 +161,9 @@
 
     float           _LM_Enable;
     float4          _LM_Texture_ST;
-    float3          _LM_Color;
+    float4          _LM_Color;
     float3          _LM_RandColor;
+    uint            _LM_UVType;
     uint            _LM_Shape;
     float           _LM_Scale;
     float           _LM_Dencity;
@@ -173,6 +171,7 @@
     float           _LM_MinDist;
     float           _LM_Spot;
     float           _LM_AnimSpeed;
+    float           _LM_ChangeAlpha;
     float           _LM_InvMaskVal;
 
     float           _TS_Enable;
@@ -214,6 +213,7 @@
     float           _TL_BlendBase;
     float           _TL_BlendCustom;
     float           _TL_InvMaskVal;
+    float           _TL_UseCutout;
 
     float           _AO_Enable;
     float           _AO_UseLightMap;
@@ -232,8 +232,10 @@
     uint            _TessType;
     float           _TessFactor;
     float           _Smoothing;
+#ifdef _WF_LEGACY_TE_USE_DISPMAP
     float           _DispMapScale;
     float           _DispMapLevel;
+#endif
 #endif
 
 #ifdef _WF_UNTOON_POWERCAP

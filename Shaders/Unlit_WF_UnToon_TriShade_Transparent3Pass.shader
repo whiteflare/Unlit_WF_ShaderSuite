@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -15,11 +15,6 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     Properties {
         // 基本
@@ -43,6 +38,25 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
+
+        // アウトライン
+        [WFHeaderToggle(Outline)]
+            _TL_Enable              ("[LI] Enable", Float) = 0
+            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+        [NoScaleOffset]
+            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
+            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
+        [Enum(NORMAL,0,EDGE,1)]
+            _TL_LineType            ("[LI] Line Type", Float) = 0
+        [Toggle(_)]
+            _TL_UseCutout           ("[LI] Use Cutout", Float) = 0
+            _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
+            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
+            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -151,23 +165,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
-        // アウトライン
-        [WFHeaderToggle(Outline)]
-            _TL_Enable              ("[LI] Enable", Float) = 0
-            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 0.5)) = 0.05
-        [Enum(NORMAL,0,EDGE,1)]
-            _TL_LineType            ("[LI] Line Type", Float) = 0
-        [NoScaleOffset]
-            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
-            _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
-            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
-
         // Decal Texture
         [WFHeaderToggle(Decal Texture)]
             _OL_Enable              ("[OL] Enable", Float) = 0
@@ -192,7 +189,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
-        [Enum(ADD,0,ALPHA,1)]
+        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
         [PowerSlider(4.0)]
             _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
@@ -200,15 +197,14 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-        [Enum(OFF,0,FRONT,1,BACK,2)]
-            _ES_CullMode            ("[ES] Cull Mode", int) = 0
-            _ES_Z_Shift             ("[ES] Z-shift", Range(0, 1)) = 0
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -249,6 +245,10 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _CurrentVersion         ("2021/01/01", Float) = 0
     }
 
     SubShader {
@@ -259,7 +259,39 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
         }
 
         GrabPass { "_UnToonOutlineCancel" }
-        UsePass "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent/OUTLINE"
+
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma geometry geom_outline
+            #pragma fragment frag
+
+            #pragma target 4.5
+            #pragma require geometry
+
+            #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
+
+            #define _FG_ENABLE
+            #define _TL_ENABLE
+            #define _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
         UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
 
         Pass {
@@ -278,9 +310,10 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_UPPER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
 
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
@@ -316,10 +349,11 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_LOWER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _FG_ENABLE
             #define _MT_ENABLE
             #define _NM_ENABLE
@@ -353,9 +387,10 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_LOWER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
 
             #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
@@ -364,36 +399,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
-            #define _VC_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "EMISSIVE_SCROLL"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull [_ES_CullMode]
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert_emissiveScroll
-            #pragma fragment frag_emissiveScroll
-
-            #pragma target 4.5
-
-            #define _WF_ALPHA_BLEND
-            #define _ES_ENABLE
-            #define _ES_FORCE_ALPHASCROLL
-            #define _FG_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase

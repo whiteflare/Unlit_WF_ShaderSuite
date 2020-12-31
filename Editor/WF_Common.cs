@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -69,34 +69,12 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// プレフィックス名のついてない特殊なプロパティ名の対応辞書
-        /// </summary>
-        private static readonly Dictionary<string, string> SPECIAL_PROP_NAME = new Dictionary<string, string>() {
-            { "_Cutoff", "AL" },
-            { "_BumpMap", "NM" },
-            { "_BumpScale", "NM" },
-            { "_DetailNormalMap", "NM" },
-            { "_DetailNormalMapScale", "NM" },
-            { "_MetallicGlossMap", "MT" },
-            { "_SpecGlossMap", "MT" },
-            { "_EmissionColor", "ES" },
-            { "_EmissionMap", "ES" },
-            { "_OcclusionMap", "AO" },
-            { "_TessType", "TE" },
-            { "_TessFactor", "TE" },
-            { "_Smoothing", "TE" },
-            { "_DispMap", "TE" },
-            { "_DispMapScale", "TE" },
-            { "_DispMapLevel", "TE" },
-        };
-
-        /// <summary>
         /// プロパティ物理名からラベル文字列を抽出する。特殊な名称は辞書を参照してラベル文字列を返却する。
         /// </summary>
         /// <param name="prop_name"></param>
         /// <returns></returns>
         public static string GetPrefixFromPropName(string prop_name) {
-            string label = SPECIAL_PROP_NAME.GetValueOrNull(prop_name);
+            string label = WFShaderDictionary.SpecialPropNameToLabelMap.GetValueOrNull(prop_name);
             if (label != null) {
                 return label;
             }
@@ -156,429 +134,66 @@ namespace UnlitWF
         }
     }
 
-    internal class ShaderMaterialProperty
+    public class WFShaderFunction
     {
-        public readonly Material Material;
-        private readonly Shader shader;
-        private readonly int index;
+        private static List<string> uniqueLabel = new List<string>();
 
-        ShaderMaterialProperty(Material material, Shader shader, int index) {
-            this.Material = material;
-            this.shader = shader;
-            this.index = index;
-        }
+        public readonly string Label;
+        public readonly string Prefix;
+        public readonly string Name;
+        private readonly Func<WFShaderFunction, Material, bool> _contains;
 
-        /// <summary>
-        /// プロパティの物理名
-        /// </summary>
-        public string Name { get { return ShaderUtil.GetPropertyName(shader, index); } }
-        /// <summary>
-        /// プロパティの説明文
-        /// </summary>
-        public string Description { get { return ShaderUtil.GetPropertyDescription(shader, index); } }
-        /// <summary>
-        /// プロパティの型
-        /// </summary>
-        public ShaderUtil.ShaderPropertyType Type { get { return ShaderUtil.GetPropertyType(shader, index); } }
-
-        public bool CopyTo(ShaderMaterialProperty dst) {
-            var srcType = Type;
-            var dstType = dst.Type;
-            if (srcType == dstType) {
-                switch (srcType) {
-                    case ShaderUtil.ShaderPropertyType.Color:
-                        dst.Material.SetColor(dst.Name, this.Material.GetColor(Name));
-                        return true;
-                    case ShaderUtil.ShaderPropertyType.Float:
-                    case ShaderUtil.ShaderPropertyType.Range:
-                        dst.Material.SetFloat(dst.Name, this.Material.GetFloat(Name));
-                        return true;
-                    case ShaderUtil.ShaderPropertyType.Vector:
-                        dst.Material.SetVector(dst.Name, this.Material.GetVector(Name));
-                        return true;
-                    case ShaderUtil.ShaderPropertyType.TexEnv:
-                        dst.Material.SetTexture(dst.Name, this.Material.GetTexture(Name));
-                        dst.Material.SetTextureOffset(dst.Name, this.Material.GetTextureOffset(Name));
-                        dst.Material.SetTextureScale(dst.Name, this.Material.GetTextureScale(Name));
-                        return true;
-                    default:
-                        break;
-                }
-            }
-            return false;
-        }
-
-        public static List<ShaderMaterialProperty> AsList(Material material) {
-            var shader = material.shader;
-            int cnt = ShaderUtil.GetPropertyCount(shader);
-            var result = new List<ShaderMaterialProperty>();
-            for (int i = 0; i < cnt; i++) {
-                result.Add(new ShaderMaterialProperty(material, shader, i));
-            }
-            return result;
-        }
-
-        public static Dictionary<string, ShaderMaterialProperty> AsDict(Material material) {
-            var result = new Dictionary<string, ShaderMaterialProperty>();
-            foreach (var p in AsList(material)) {
-                result.Add(p.Name, p);
-            }
-            return result;
-        }
-    }
-
-    internal class ShaderSerializedProperty
-    {
-        public readonly string name;
-        public readonly ShaderMaterialProperty materialProperty;
-        private readonly SerializedObject serialObject;
-        private readonly SerializedProperty parent;
-        private readonly SerializedProperty property;
-        private readonly SerializedProperty value;
-
-        ShaderSerializedProperty(string name, ShaderMaterialProperty matProp, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property) {
-            this.name = name;
-            this.materialProperty = matProp;
-            this.serialObject = serialObject;
-            this.parent = parent;
-            this.property = property;
-
-            this.value = property.FindPropertyRelative("second");
-        }
-
-        private static string GetSerializedName(SerializedProperty p) {
-            SerializedProperty first = p.FindPropertyRelative("first");
-            return first != null ? first.stringValue : null;
-        }
-
-        private static SerializedProperty GetSerializedValue(SerializedProperty p) {
-            return p.FindPropertyRelative("second");
-        }
-
-        public bool HasPropertyInShader
-        {
-            get { return materialProperty != null;  }
-        }
-
-        public ShaderUtil.ShaderPropertyType Type { get { return materialProperty.Type; } }
-
-        public string ParentName { get { return parent.name; } }
-
-        public float FloatValue { get { return value.floatValue; } set { this.value.floatValue = value; } }
-        public Color ColorValue { get { return value.colorValue; } set { this.value.colorValue = value; } }
-        public Vector4 VectorValue { get { return value.vector4Value; } set { this.value.vector4Value = value; } }
-
-        public void Rename(string newName) {
-            property.FindPropertyRelative("first").stringValue = newName;
-        }
-
-        private static void TryCopyValue(SerializedProperty src, SerializedProperty dst) {
-            if (src == null || dst == null) {
-                return;
-            }
-
-            switch (src.propertyType) {
-                case SerializedPropertyType.Generic:
-                    // テクスチャ系の子をコピーする
-                    TryCopyValue(src.FindPropertyRelative("m_Texture"), dst.FindPropertyRelative("m_Texture"));
-                    TryCopyValue(src.FindPropertyRelative("m_Scale"), dst.FindPropertyRelative("m_Scale"));
-                    TryCopyValue(src.FindPropertyRelative("m_Offset"), dst.FindPropertyRelative("m_Offset"));
-                    break;
-                case SerializedPropertyType.Float:
-                    dst.floatValue = src.floatValue;
-                    break;
-                case SerializedPropertyType.Color:
-                    dst.colorValue = src.colorValue;
-                    break;
-                case SerializedPropertyType.ObjectReference:
-                    dst.objectReferenceValue = src.objectReferenceValue;
-                    break;
-                case SerializedPropertyType.Integer:
-                    dst.intValue = src.intValue;
-                    break;
-                case SerializedPropertyType.Boolean:
-                    dst.boolValue = src.boolValue;
-                    break;
-                case SerializedPropertyType.Enum:
-                    dst.enumValueIndex = src.enumValueIndex;
-                    break;
-                case SerializedPropertyType.Vector2:
-                    dst.vector2Value = src.vector2Value;
-                    break;
-                case SerializedPropertyType.Vector3:
-                    dst.vector3Value = src.vector3Value;
-                    break;
-                case SerializedPropertyType.Vector4:
-                    dst.vector4Value = src.vector4Value;
-                    break;
-                case SerializedPropertyType.Vector2Int:
-                    dst.vector2IntValue = src.vector2IntValue;
-                    break;
-                case SerializedPropertyType.Vector3Int:
-                    dst.vector3IntValue = src.vector3IntValue;
-                    break;
-            }
-        }
-
-        public void CopyTo(ShaderSerializedProperty other) {
-            TryCopyValue(this.value, other.value);
-        }
-
-        public void Remove() {
-            for (int i = parent.arraySize - 1; 0 <= i; i--) {
-                var prop = parent.GetArrayElementAtIndex(i);
-                if (GetSerializedName(prop) == this.name) {
-                    parent.DeleteArrayElementAtIndex(i);
-                }
-            }
-        }
-
-        public static void AllApplyPropertyChange(IEnumerable<ShaderSerializedProperty> props) {
-            foreach (var so in GetUniqueSerialObject(props)) {
-                so.ApplyModifiedProperties();
-            }
-        }
-
-        public static HashSet<SerializedObject> GetUniqueSerialObject(IEnumerable<ShaderSerializedProperty> props) {
-            var ret = new HashSet<SerializedObject>();
-            foreach (var prop in props) {
-                if (prop != null && prop.serialObject != null) {
-                    ret.Add(prop.serialObject);
-                }
-            }
-            return ret;
-        }
-
-        public static Dictionary<string, ShaderSerializedProperty> AsDict(Material material) {
-            var result = new Dictionary<string, ShaderSerializedProperty>();
-            foreach(var prop in AsList(material)) {
-                result[prop.name] = prop;
-            }
-            return result;
-        }
-
-        public static List<ShaderSerializedProperty> AsList(IEnumerable<Material> matlist) {
-            var result = new List<ShaderSerializedProperty>();
-            foreach (Material mat in matlist) {
-                result.AddRange(AsList(mat));
-            }
-            return result;
-        }
-
-        public static List<ShaderSerializedProperty> AsList(Material material) {
-            var matProps = ShaderMaterialProperty.AsDict(material);
-            SerializedObject so = new SerializedObject(material);
-            so.Update();
-            var result = new List<ShaderSerializedProperty>();
-            var m_SavedProperties = so.FindProperty("m_SavedProperties");
-            if (m_SavedProperties != null) {
-                result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_Floats"), matProps));
-                result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_Colors"), matProps));
-                result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_TexEnvs"), matProps));
-            }
-            return result;
-        }
-
-        private static List<ShaderSerializedProperty> AsList(Material material, SerializedObject so, SerializedProperty parent, Dictionary<string, ShaderMaterialProperty> matProps) {
-            var result = new List<ShaderSerializedProperty>();
-            if (parent != null) {
-                for (int i = 0; i < parent.arraySize; i++) {
-                    var prop = parent.GetArrayElementAtIndex(i);
-                    var name = GetSerializedName(prop);
-                    if (name != null) {
-                        result.Add(new ShaderSerializedProperty(name, matProps.GetValueOrNull(name), so, parent, prop));
+        internal WFShaderFunction(string label, string prefix, string name) : this(label, prefix, name,
+                (self, mat) => {
+                    var nm = "_" + self.Prefix + "_Enable";
+                    if (mat.HasProperty(nm)) {
+                        return mat.GetInt(nm) != 0;
                     }
+                    return false;
                 }
+            ) {
+        }
+
+        internal WFShaderFunction(string label, string prefix, string name, Func<WFShaderFunction, Material, bool> contains) {
+            Label = label;
+            Prefix = prefix;
+            Name = name;
+            _contains = contains;
+
+            if (uniqueLabel.Contains(Label)) {
+                Debug.LogWarningFormat("UnlitWF WFShaderFunction duplicate Label: " + Label);
             }
-            return result;
+            else {
+                uniqueLabel.Add(Label);
+            }
+        }
+
+        public bool Contains(Material mat) {
+            if (mat == null || !mat.shader.name.Contains("UnlitWF")) {
+                return false;
+            }
+            return _contains(this, mat);
+        }
+
+        public static List<string> LabelToPrefix(List<string> labelList) {
+            return labelList.Select(LabelToPrefix).Where(prefix => prefix != null).Distinct().ToList();
+        }
+
+        public static string LabelToPrefix(string label) {
+            return WFShaderDictionary.ShaderFuncList.Where(func => func.Label == label).Select(func => func.Prefix).FirstOrDefault();
         }
     }
 
-    internal static class CollectionUtility
+    internal enum EditorLanguage
     {
-        public static T GetValueOrNull<K, T>(this Dictionary<K, T> dict, K key) where T : class {
-            T value;
-            if (dict.TryGetValue(key, out value)) {
-                return value;
-            }
-            return null;
-        }
-
+        English, 日本語
     }
 
     internal static class WFI18N
     {
         private static readonly string KEY_EDITOR_LANG = "UnlitWF.ShaderEditor/Lang";
-
         private static readonly Dictionary<string, string> EN = new Dictionary<string, string>();
-
-        private static readonly Dictionary<string, string> JA = new Dictionary<string, string>() {
-            // Common
-            { "Enable", "有効" },
-            { "Invert Mask Value", "マスク反転" },
-            { "Blend Normal", "ノーマルマップ強度" },
-            // Lit
-            { "Anti-Glare", "まぶしさ防止" },
-            { "Darken (min value)", "暗さの最小値" },
-            { "Lighten (max value)", "明るさの最大値" },
-            { "Blend Light Color", "ライト色の混合強度" },
-            { "Cast Shadows", "他の物体に影を落とす" },
-            // Alpha
-            { "[AL] Alpha Source", "[AL] アルファソース" },
-            { "[AL] Alpha Mask Texture", "[AL] アルファマスク" },
-            { "[AL] Power", "[AL] アルファ強度" },
-            { "[AL] Fresnel Power", "[AL] フレネル強度" },
-            { "[AL] Cutoff Threshold", "[AL] カットアウトしきい値" },
-            // Tessellation
-            { "Tess Type", "Tessタイプ" },
-            { "Tess Factor", "Tess分割強度" },
-            { "Smoothing", "Phongスムージング" },
-            { "Displacement HeightMap", "ハイトマップ" },
-            { "HeightMap Scale", "ハイトマップのスケール" },
-            { "HeightMap Level", "ハイトマップのゼロ点調整" },
-            // Color Change
-            { "[CL] monochrome", "[CL] 単色化" },
-            { "[CL] Hur", "[CL] 色相" },
-            { "[CL] Saturation", "[CL] 彩度" },
-            { "[CL] Brightness", "[CL] 明度" },
-            // Normal
-            { "[NM] NormalMap Texture", "[NM] ノーマルマップ" },
-            { "[NM] Bump Scale", "[NM] 凹凸スケール" },
-            { "[NM] Shadow Power", "[NM] 影の濃さ" },
-            { "[NM] Flip Tangent", "[NM] タンジェント反転" },
-            { "[NM] 2nd Normal Blend", "[NM] 2ndマップの混合タイプ" },
-            { "[NM] 2nd NormalMap Texture", "[NM] 2ndノーマルマップ" },
-            { "[NM] 2nd Bump Scale", "[NM] 凹凸スケール" },
-            { "[NM] 2nd NormalMap Mask Texture", "[NM] 2ndノーマルのマスク" },
-            // Metallic
-            { "[MT] Metallic", "[MT] メタリック強度" },
-            { "[MT] Smoothness", "[MT] 滑らかさ" },
-            { "[MT] Brightness", "[MT] 明るさ" },
-            { "[MT] Monochrome Reflection", "[MT] モノクロ反射" },
-            { "[MT] Specular", "[MT] スペキュラ反射" },
-            { "[MT] MetallicMap Texture", "[MT] MetallicSmoothnessマップ" },
-            { "[MT] MetallicSmoothnessMap Texture", "[MT] MetallicSmoothnessマップ" },
-            { "[MT] RoughnessMap Texture", "[MT] Roughnessマップ" },
-            { "[MT] 2nd CubeMap Blend", "[MT] キューブマップ混合タイプ" },
-            { "[MT] 2nd CubeMap", "[MT] キューブマップ" },
-            { "[MT] 2nd CubeMap Power", "[MT] キューブマップ強度" },
-            // Light Matcap
-            { "[HL] Matcap Type", "[HL] matcapタイプ" },
-            { "[HL] Matcap Sampler", "[HL] matcapサンプラ" },
-            { "[HL] Matcap Color", "[HL] matcap色調整" },
-            { "[HL] Parallax", "[HL] 視差(Parallax)" },
-            { "[HL] Power", "[HL] matcap強度" },
-            { "[HL] Mask Texture", "[HL] マスクテクスチャ" },
-            // Lame
-            { "[LM] Color", "[LM] ラメ色" },
-            { "[LM] Texture", "[LM] ラメ色テクスチャ" },
-            { "[LM] Random Color", "[LM] ランダム色パラメタ" },
-            { "[LM] Shape", "[LM] 形状" },
-            { "[LM] Scale", "[LM] スケール" },
-            { "[LM] Dencity", "[LM] 密度" },
-            { "[LM] Glitter", "[LM] きらきら" },
-            { "[LM] Dist Fade Start", "[LM] 距離フェード開始" },
-            { "[LM] Spot Fade Strength", "[LM] スポットフェード強度" },
-            { "[LM] Anim Speed", "[LM] アニメ速度" },
-            { "[LM] Mask Texture", "[LM] マスクテクスチャ" },
-            // ToonShade
-            { "[SH] Base Color", "[SH] ベース色" },
-            { "[SH] Base Shade Texture", "[SH] ベース色テクスチャ" },
-            { "[SH] 1st Shade Color", "[SH] 1影色" },
-            { "[SH] 1st Shade Texture", "[SH] 1影色テクスチャ" },
-            { "[SH] 2nd Shade Color", "[SH] 2影色" },
-            { "[SH] 2nd Shade Texture", "[SH] 2影色テクスチャ" },
-            { "[SH] 3rd Shade Color", "[SH] 3影色" },
-            { "[SH] 3rd Shade Texture", "[SH] 3影色テクスチャ" },
-            { "[SH] Shade Power", "[SH] 影の強度" },
-            { "[SH] 1st Border", "[SH] 1影の境界位置" },
-            { "[SH] 2nd Border", "[SH] 2影の境界位置" },
-            { "[SH] 3rd Border", "[SH] 3影の境界位置" },
-            { "[SH] Feather", "[SH] 境界のぼかし強度" },
-            { "[SH] Anti-Shadow Mask Texture", "[SH] アンチシャドウマスク" },
-            { "[SH] Shade Color Suggest", "[SH] 影色を自動設定する" },
-            // RimLight
-            { "[RM] Rim Color", "[RM] リムライト色" },
-            { "[RM] Blend Type", "[RM] 混合タイプ" },
-            { "[RM] Power Top", "[RM] 強度(上)" },
-            { "[RM] Power Side", "[RM] 強度(横)" },
-            { "[RM] Power Bottom", "[RM] 強度(下)" },
-            { "[RM] RimLight Mask Texture", "[RM] マスクテクスチャ" },
-            // Decal
-            { "[OL] UV Type", "[OL] UVタイプ" },
-            { "[OL] Decal Color", "[OL] Decal色" },
-            { "[OL] Decal Texture", "[OL] Decalテクスチャ" },
-            { "[OL] Texture", "[OL] テクスチャ" },
-            { "[OL] Blend Type", "[OL] 混合タイプ" },
-            { "[OL] Blend Power", "[OL] 混合の強度" },
-            { "[OL] Decal Mask Texture", "[OL] マスクテクスチャ" },
-            // EmissiveScroll
-            { "[ES] Emission", "[ES] Emission" },
-            { "[ES] Blend Type", "[ES] 混合タイプ" },
-            { "[ES] Mask Texture", "[ES] マスクテクスチャ" },
-            { "[ES] Wave Type", "[ES] 波形" },
-            { "[ES] Direction", "[ES] 方向" },
-            { "[ES] Direction Type", "[ES] 方向の種類" },
-            { "[ES] LevelOffset", "[ES] ゼロ点調整" },
-            { "[ES] Sharpness", "[ES] 鋭さ" },
-            { "[ES] ScrollSpeed", "[ES] スピード" },
-            { "[ES] Cull Mode", "[ES] カリングモード" },
-            { "[ES] Z-shift", "[ES] カメラに近づける" },
-            // Outline
-            { "[LI] Line Color", "[LI] 線の色" },
-            { "[LI] Line Width", "[LI] 線の太さ" },
-            { "[LI] Line Type", "[LI] 線の種類" },
-            { "[LI] Custom Color Texture", "[LI] 線色テクスチャ" },
-            { "[LI] Blend Custom Color Texture", "[LI] 線色テクスチャとブレンド" },
-            { "[LI] Blend Base Color", "[LI] ベース色とブレンド" },
-            { "[LI] Outline Mask Texture", "[LI] マスクテクスチャ" },
-            { "[LI] Z-shift (tweak)", "[LI] カメラから遠ざける" },
-            // Ambient Occlusion
-            { "[AO] Occlusion Map", "[AO] オクルージョンマップ" },
-            { "[AO] Use LightMap", "[AO] ライトマップも使用する" },
-            { "[AO] Contrast", "[AO] コントラスト" },
-            { "[AO] Brightness", "[AO] 明るさ" },
-            { "[AO] Occlusion Mask Texture", "[AO] マスクテクスチャ" },
-            // Toon Fog
-            { "[FG] Color", "[FG] フォグの色" },
-            { "[FG] Fog Min Distance", "[FG] フォグが効き始める距離" },
-            { "[FG] Fog Max Distance", "[FG] フォグが最大になる距離" },
-            { "[FG] Exponential", "[FG] 変化の鋭さ" },
-            { "[FG] Base Offset", "[FG] フォグ原点の位置(オフセット)" },
-            { "[FG] Scale", "[FG] フォグ範囲のスケール" },
-            // Lit Advance
-            { "Sun Source", "太陽光のモード" },
-            { "Custom Sun Azimuth", "カスタム太陽の方角" },
-            { "Custom Sun Altitude", "カスタム太陽の高度" },
-            { "Disable BackLit", "逆光補正しない" },
-            { "Disable ObjectBasePos", "メッシュ原点を取得しない" },
-            // DebugMode
-            { "Debug View", "デバッグ表示" },
-            // Gem Background
-            { "[GB] Background Color", "[GR] 背景色 (裏面色)" },
-            // Gem Reflection
-            { "[GR] Blend Power", "[GR] ブレンド強度" },
-            { "[GR] CubeMap", "[GR] キューブマップ" },
-            { "[GR] Brightness", "[GR] 明るさ" },
-            { "[GR] Monochrome Reflection", "[GR] モノクロ反射" },
-            { "[GR] 2nd CubeMap Power", "[GR] キューブマップ強度" },
-            // Gem Flake
-            { "[GF] Flake Size (front)", "[GF] 大きさ (表面)" },
-            { "[GF] Flake Size (back)", "[GF] 大きさ (裏面)" },
-            { "[GF] Shear", "[GF] シア" },
-            { "[GF] Brighten", "[GF] 明るさ" },
-            { "[GF] Darken", "[GF] 暗さ" },
-            { "[GF] Twinkle", "[GF] またたき" },
-            // Fake Fur
-            { "[FR] Fur Noise Texture", "[FR] ノイズテクスチャ" },
-            { "[FR] Fur Height", "[FR] 高さ" },
-            { "[FR] Fur Vector", "[FR] 方向" },
-            { "[FR] NormalMap Texture", "[FR] ノーマルマップ" },
-            { "[FR] Flip Tangent", "[FR] タンジェント反転" },
-            { "[FR] Fur Repeat", "[FR] ファーの枚数" },
-            { "[FR] Fur ShadowPower", "[FR] 影の強さ" },
-            { "[FR] Fur Mask Texture", "[FR] マスクテクスチャ" },
-        };
+        private static readonly Dictionary<string, string> JA = WFShaderDictionary.LangEnToJa;
 
         private static EditorLanguage? langMode = null;
 
@@ -655,57 +270,6 @@ namespace UnlitWF
         }
     }
 
-    internal enum EditorLanguage
-    {
-        English, 日本語
-    }
-
-    internal class WeakRefCache<T> where T : class
-    {
-        private readonly List<WeakReference> refs = new List<WeakReference>();
-
-        public bool Contains(T target) {
-            lock (refs) {
-                // 終了しているものは全て削除
-                refs.RemoveAll(r => !r.IsAlive);
-
-                // 参照が存在しているならばtrue
-                foreach (var r in refs) {
-                    if (r.Target == target) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }
-
-        public void Add(T target) {
-            lock (refs) {
-                if (Contains(target)) {
-                    return;
-                }
-                refs.Add(new WeakReference(target));
-            }
-        }
-
-        public void Remove(T target) {
-            RemoveAll(target);
-        }
-
-        public void RemoveAll(params object[] targets) {
-            lock (refs) {
-                // 終了しているものは全て削除
-                refs.RemoveAll(r => !r.IsAlive);
-
-                // 一致しているものを全て削除
-                refs.RemoveAll(r => {
-                    var tgt = r.Target as T;
-                    return tgt != null && targets.Contains(tgt);
-                });
-            }
-        }
-    }
-
     internal class WFShaderName
     {
         public string Familly { get; private set; }
@@ -723,90 +287,22 @@ namespace UnlitWF
 
     internal static class WFShaderNameDictionary
     {
-        private static readonly List<WFShaderName> ShaderNameList = new List<WFShaderName>() {
-            new WFShaderName("UnToon", "Basic", "Opaque",                       "UnlitWF/WF_UnToon_Opaque"),
-            new WFShaderName("UnToon", "Basic", "TransCutout",                  "UnlitWF/WF_UnToon_TransCutout"),
-            new WFShaderName("UnToon", "Basic", "Transparent",                  "UnlitWF/WF_UnToon_Transparent"),
-            new WFShaderName("UnToon", "Basic", "Transparent3Pass",             "UnlitWF/WF_UnToon_Transparent3Pass"),
-            new WFShaderName("UnToon", "Basic", "Transparent_Mask",             "UnlitWF/WF_UnToon_Transparent_Mask"),
-            new WFShaderName("UnToon", "Basic", "Transparent_MaskOut",          "UnlitWF/WF_UnToon_Transparent_MaskOut"),
-            new WFShaderName("UnToon", "Basic", "Transparent_MaskOut_Blend",    "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
-
-            new WFShaderName("UnToon", "Mobile", "Opaque",                      "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
-            new WFShaderName("UnToon", "Mobile", "TransCutout",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
-            new WFShaderName("UnToon", "Mobile", "Transparent",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
-            new WFShaderName("UnToon", "Mobile", "TransparentOverlay",          "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
-            new WFShaderName("UnToon", "Mobile", "LineOnly_Opaque",             "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
-            new WFShaderName("UnToon", "Mobile", "LineOnly_TransCutout",        "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
-
-            new WFShaderName("UnToon", "Outline", "Opaque",                     "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
-            new WFShaderName("UnToon", "Outline", "TransCutout",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
-            new WFShaderName("UnToon", "Outline", "Transparent",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent"),
-            new WFShaderName("UnToon", "Outline", "Transparent3Pass",           "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass"),
-            new WFShaderName("UnToon", "Outline", "Transparent_MaskOut",        "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut"),
-            new WFShaderName("UnToon", "Outline", "Transparent_MaskOut_Blend",  "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend"),
-            new WFShaderName("UnToon", "Outline", "LineOnly_Opaque",            "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque"),
-            new WFShaderName("UnToon", "Outline", "LineOnly_TransCutout",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
-
-            new WFShaderName("UnToon", "PowerCap", "Opaque",                    "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque"),
-            new WFShaderName("UnToon", "PowerCap", "TransCutout",               "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout"),
-            new WFShaderName("UnToon", "PowerCap", "Transparent",               "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent"),
-            new WFShaderName("UnToon", "PowerCap", "Transparent3Pass",          "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass"),
-
-            new WFShaderName("UnToon", "Tessellation", "Opaque",                "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque"),
-            new WFShaderName("UnToon", "Tessellation", "TransCutout",           "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout"),
-            new WFShaderName("UnToon", "Tessellation", "Transparent",           "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
-            new WFShaderName("UnToon", "Tessellation", "Transparent3Pass",      "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
-
-            new WFShaderName("UnToon", "TriShade", "Opaque",                    "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque"),
-            new WFShaderName("UnToon", "TriShade", "TransCutout",               "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout"),
-            new WFShaderName("UnToon", "TriShade", "Transparent",               "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent"),
-            new WFShaderName("UnToon", "TriShade", "Transparent3Pass",          "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass"),
-            new WFShaderName("UnToon", "TriShade", "Transparent_Mask",          "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask"),
-            new WFShaderName("UnToon", "TriShade", "Transparent_MaskOut",       "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut"),
-            new WFShaderName("UnToon", "TriShade", "Transparent_MaskOut_Blend", "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend"),
-
-            new WFShaderName("FakeFur", "Basic", "TransCutout",                 "UnlitWF/WF_FakeFur_TransCutout"),
-            new WFShaderName("FakeFur", "Basic", "Transparent",                 "UnlitWF/WF_FakeFur_Transparent"),
-
-            new WFShaderName("Gem", "Basic", "Opaque",                          "UnlitWF/WF_Gem_Opaque"),
-            new WFShaderName("Gem", "Basic", "Transparent",                     "UnlitWF/WF_Gem_Transparent"),
-
-            new WFShaderName("UnToon(URP)", "Basic", "Opaque",                  "UnlitWF_URP/WF_UnToon_Opaque"),
-            new WFShaderName("UnToon(URP)", "Basic", "TransCutout",             "UnlitWF_URP/WF_UnToon_TransCutout"),
-            new WFShaderName("UnToon(URP)", "Basic", "Transparent",             "UnlitWF_URP/WF_UnToon_Transparent"),
-            new WFShaderName("UnToon(URP)", "Basic", "Transparent_Mask",        "UnlitWF_URP/WF_UnToon_Transparent_Mask"),
-            new WFShaderName("UnToon(URP)", "Basic", "Transparent_MaskOut",     "UnlitWF_URP/WF_UnToon_Transparent_MaskOut"),
-
-            new WFShaderName("UnToon(URP)", "Mobile", "Opaque",                 "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
-            new WFShaderName("UnToon(URP)", "Mobile", "TransCutout",            "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
-            new WFShaderName("UnToon(URP)", "Mobile", "Transparent",            "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
-            new WFShaderName("UnToon(URP)", "Mobile", "LineOnly_Opaque",        "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
-            new WFShaderName("UnToon(URP)", "Mobile", "LineOnly_TransCutout",   "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
-
-            new WFShaderName("UnToon(URP)", "Outline", "LineOnly_Opaque",       "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque"),
-            new WFShaderName("UnToon(URP)", "Outline", "LineOnly_TransCutout",  "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
-
-            new WFShaderName("Gem(URP)", "Basic", "Opaque",                     "UnlitWF_URP/WF_Gem_Opaque"),
-            new WFShaderName("Gem(URP)", "Basic", "Transparent",                "UnlitWF_URP/WF_Gem_Transparent"),
-        };
-
         public static WFShaderName TryFindFromName(string name) {
-            return ShaderNameList.Where(nm => nm.Name == name).FirstOrDefault();
+            return WFShaderDictionary.ShaderNameList.Where(nm => nm.Name == name).FirstOrDefault();
         }
 
         public static List<WFShaderName> GetVariantList(WFShaderName name) {
             if (name == null) {
                 return new List<WFShaderName>();
             }
-            return ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.RenderType == name.RenderType).ToList();
+            return WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.RenderType == name.RenderType).ToList();
         }
 
         public static List<WFShaderName> GetRenderTypeList(WFShaderName name) {
             if (name == null) {
                 return new List<WFShaderName>();
             }
-            return ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.Variant == name.Variant).ToList();
+            return WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.Variant == name.Variant).ToList();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,11 +17,6 @@
 
 #ifndef INC_UNLIT_WF_UNTOON_POWERCAP
 #define INC_UNLIT_WF_UNTOON_POWERCAP
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     #include "WF_UnToon.cginc"
 
@@ -86,7 +81,7 @@
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
         // アルファマスク適用
-        float alpha = affectAlphaMask(uv_main, color);
+        affectAlphaMask(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;
@@ -123,7 +118,7 @@
         color.rgb *= i.light_color;
 
         // フレネル
-        affectFresnelAlpha(i.uv, ws_normal, ws_view_dir, alpha, color);
+        affectFresnelAlpha(i.uv, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

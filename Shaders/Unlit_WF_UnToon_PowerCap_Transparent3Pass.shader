@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -15,11 +15,6 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     Properties {
         // 基本
@@ -254,6 +249,10 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _CurrentVersion         ("2021/01/01", Float) = 0
     }
 
     SubShader {
@@ -279,7 +278,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_UPPER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
             #define _WF_UNTOON_POWERCAP
 
             #define _CH_ENABLE
@@ -314,7 +313,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_LOWER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
 
             #define _CH_ENABLE
             #define _HL_ENABLE
@@ -348,7 +347,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUT_LOWER
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
             #define _WF_UNTOON_POWERCAP
 
             #define _CH_ENABLE

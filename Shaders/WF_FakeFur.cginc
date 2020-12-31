@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,11 +17,6 @@
 
 #ifndef INC_UNLIT_WF_FAKEFUR
 #define INC_UNLIT_WF_FAKEFUR
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     #include "WF_INPUT_FakeFur.cginc"
     #include "WF_UnToon.cginc"
@@ -65,7 +60,7 @@
 
         o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex);
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FG_FlipTangent);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipTangent);
 
         return o;
     }
@@ -107,7 +102,7 @@
 #ifndef _FR_DISABLE_NORMAL_MAP
         // NormalMap Fur Vector 計算
         float2 uv_main = TRANSFORM_TEX(v[i].uv, _MainTex);
-        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FG_BumpMap, uv_main, 0) );
+        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FR_BumpMap, uv_main, 0) );
         vec_fur = BlendNormals(vec_fur, vec_map);
 #endif
 

@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,11 +18,6 @@
 #ifndef INC_UNLIT_WF_COMMON
 #define INC_UNLIT_WF_COMMON
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     ////////////////////////////
     // Platform Glue
     ////////////////////////////
@@ -33,6 +28,14 @@
 #else
     // Builtin RP 向け定義
     #include "WF_Common_BuiltinRP.cginc"
+#endif
+
+#ifdef _WF_FORCE_USE_SAMPLER
+    // サンプラーを強制的に使用する場合は、_SUB_ 側を undef して MAIN 側を使うように置き換える
+    #undef  DECL_SUB_TEX2D
+    #define DECL_SUB_TEX2D(name)            DECL_MAIN_TEX2D(name)
+    #undef  PICK_SUB_TEX2D
+    #define PICK_SUB_TEX2D(tex, name, uv)   PICK_MAIN_TEX2D(tex, uv)
 #endif
 
     ////////////////////////////

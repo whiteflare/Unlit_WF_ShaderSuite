@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -16,11 +16,6 @@
  */
 Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
-
     Properties {
         // 基本
         [WFHeader(Base)]
@@ -33,16 +28,14 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // アウトライン
-        [HideInInspector]
-        [FixFloat(1.0)]
-            _TL_Enable              ("[LI] Enable", Float) = 0
-        [WFHeader(Outline)]
+        [WFHeaderAlwaysOn(Outline)]
+            _TL_Enable              ("[LI] Enable", Float) = 1
             _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+        [NoScaleOffset]
+            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
         [Enum(NORMAL,0,EDGE,1)]
             _TL_LineType            ("[LI] Line Type", Float) = 0
-        [NoScaleOffset]
-            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -146,10 +139,14 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             _LM_Texture             ("[LM] Texture", 2D) = "white" {}
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
+        [Enum(UV1,0,UV2,1)]
+            _LM_UVType              ("[LM] UV Type", Float) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LM_Shape               ("[LM] Shape", Float) = 0
-            _LM_Scale               ("[LM] Scale", Range(0, 1)) = 0.5
-            _LM_Dencity             ("[LM] Dencity", Range(0, 1)) = 0.5
+        [PowerSlider(4.0)]
+            _LM_Scale               ("[LM] Scale", Range(0, 4)) = 0.5
+        [PowerSlider(4.0)]
+            _LM_Dencity             ("[LM] Dencity", Range(0.3, 4)) = 0.5
             _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5
             _LM_MinDist             ("[LM] Dist Fade Start", Range(0, 5)) = 2.0
             _LM_Spot                ("[LM] Spot Fade Strength", Range(0, 16)) = 2.0
@@ -221,7 +218,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
-        [Enum(ADD,0,ALPHA,1)]
+        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
         [PowerSlider(4.0)]
             _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
@@ -265,6 +262,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+
+        [HideInInspector]
+        [FixFloat(0.0)]
+            _CurrentVersion         ("2021/01/01", Float) = 0
     }
 
     SubShader {

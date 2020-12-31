@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2020 whiteflare.
+ *  Copyright 2018-2021 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,11 +17,6 @@
 
 #ifndef INC_UNLIT_WF_UNTOON_FUNCTION
 #define INC_UNLIT_WF_UNTOON_FUNCTION
-
-    /*
-     * authors:
-     *      ver:2020/12/13 whiteflare,
-     */
 
     ////////////////////////////
     // Textureピックアップ関数
@@ -44,7 +39,7 @@
     #endif
 
     #ifndef WF_TEX2D_EMISSION
-        #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgb
+        #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgba
     #endif
 
     #ifndef WF_TEX2D_NORMAL
@@ -70,7 +65,7 @@
     #endif
 
     #ifndef WF_TEX2D_LAME_TEX
-        #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LM_Texture, _MainTex, uv).rgb
+        #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LM_Texture, _MainTex, uv).rgba
     #endif
     #ifndef WF_TEX2D_LAME_MASK
         #define WF_TEX2D_LAME_MASK(uv)          SAMPLE_MASK_VALUE(_LM_MaskTex, uv, _LM_InvMaskVal).r
@@ -121,7 +116,7 @@
     #endif
 
     #ifndef WF_TEX2D_OUTLINE_MASK
-        #ifndef _TL_MASK_APPLY_LEGACY
+        #ifndef _WF_LEGACY_TL_MASK
             #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv, _TL_InvMaskVal).r
         #else
             #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE(_TL_MaskTex, uv, _TL_InvMaskVal).r
@@ -136,7 +131,7 @@
     // Alpha Transparent
     ////////////////////////////
 
-    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_FRESNEL) || defined(_WF_ALPHA_CUT_UPPER) || defined(_WF_ALPHA_CUT_LOWER)
+    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_FRESNEL) || defined(_WF_ALPHA_CUSTOM)
         #ifndef _WF_ALPHA_BLEND
             #define _WF_ALPHA_BLEND
         #endif
@@ -159,9 +154,8 @@
                  : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        inline float affectAlphaMask(float2 uv, inout float4 color) {
-            float baseAlpha = pickAlpha(uv, color.a);
-            float alpha = baseAlpha;
+        inline void affectAlphaMask(float2 uv, inout float4 color) {
+            float alpha = pickAlpha(uv, color.a) * _AL_CustomValue;
 
             /*
              * カットアウト処理
@@ -170,43 +164,31 @@
              * _AL_CustomValue を使っている MaskOut_Blend は cutout を使わない。
              */
 
-            #if defined(_WF_ALPHA_CUTOUT)
+            #if defined(_WF_ALPHA_CUSTOM)
+                _WF_ALPHA_CUSTOM
+            #elif defined(_WF_ALPHA_CUTOUT)
                 alpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, alpha);
                 if (TGL_OFF(_AL_AlphaToMask) && alpha < 0.5) {
                     discard;
                 }
-            #elif defined(_WF_ALPHA_CUT_UPPER)
-                if (alpha < _Cutoff) {
-                    discard;
-                } else {
-                    alpha *= _AL_Power;
-                }
-            #elif defined(_WF_ALPHA_CUT_LOWER)
-                if (alpha < _Cutoff) {
-                    alpha *= _AL_Power;
-                } else {
-                    discard;
-                }
             #else
-                alpha *= _AL_Power * _AL_CustomValue;
+                alpha *= _AL_Power;
             #endif
 
             color.a = alpha;
-
-            return baseAlpha; // ベースアルファを返却する
         }
 
-        inline void affectFresnelAlpha(float2 uv, float3 ws_normal, float3 ws_viewdir, float baseAlpha, inout float4 color) {
+        inline void affectFresnelAlpha(float2 uv, float3 ws_normal, float3 ws_viewdir, inout float4 color) {
             #ifdef _WF_ALPHA_FRESNEL
                 // フレネルアルファ
-                float maxValue = max( baseAlpha * _AL_Power, _AL_Fresnel ) * _AL_CustomValue;
+                float maxValue = max(color.a, _AL_Fresnel * _AL_CustomValue);
                 float fa = 1 - abs( dot( ws_normal, ws_viewdir ) );
                 color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
             #endif
         }
     #else
-        #define affectAlphaMask(uv, color)                                      color.a = 1.0
-        #define affectFresnelAlpha(uv, ws_normal, ws_viewdir, baseAlpha, color)	color.a = 1.0
+        #define affectAlphaMask(uv, color)                              color.a = 1.0
+        #define affectFresnelAlpha(uv, ws_normal, ws_viewdir, color)
     #endif
 
     ////////////////////////////
@@ -376,21 +358,26 @@
 
         inline void affectEmissiveScroll(float3 ws_vertex, float2 mask_uv, inout float4 color) {
             if (TGL_ON(_ES_Enable)) {
-                float waving    = calcEmissiveWaving(ws_vertex);
-                float3 es_mask  = WF_TEX2D_EMISSION(mask_uv);
-                float es_power  = MAX_RGB(es_mask);
-                float3 es_color = _EmissionColor.rgb * es_mask.rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
+                float4 es_mask  = WF_TEX2D_EMISSION(mask_uv);
+                float4 es_color = _EmissionColor * es_mask;
+                float waving    = calcEmissiveWaving(ws_vertex) * es_color.a;
 
-                color.rgb = lerp(color.rgb,
-                    lerp(color.rgb, es_color, waving),
-                    es_power);
+                // RGB側の合成
+                color.rgb =
+                    // 加算合成
+                    _ES_BlendType == 0 ? color.rgb + es_color.rgb * waving :
+                    // 旧形式のブレンド
+                    _ES_BlendType == 1 ? lerp(color.rgb, es_color.rgb, waving * MAX_RGB(es_mask.rgb)) :
+                    // ブレンド
+                    lerp(color.rgb, es_color.rgb, waving);
 
-                #if !defined(_ES_SIMPLE_ENABLE) && !defined(_WF_ALPHA_CUTOUT)
+                // Alpha側の合成
+                #if defined(_WF_ALPHA_BLEND) && !defined(_ES_SIMPLE_ENABLE)
                     #ifdef _ES_FORCE_ALPHASCROLL
-                        color.a = max(color.a, waving * _EmissionColor.a * es_power);
+                        color.a = max(color.a, waving);
                     #else
                         if (TGL_ON(_ES_AlphaScroll)) {
-                            color.a = max(color.a, waving * _EmissionColor.a * es_power);
+                            color.a = max(color.a, waving);
                         }
                     #endif
                 #endif
@@ -580,8 +567,11 @@
             if (TGL_ON(_LM_Enable)) {
                 float power = WF_TEX2D_LAME_MASK(uv_main);
                 if (0 < power) {
+                    float2 uv_lame = _LM_UVType == 1 ? i.uv_lmap : i.uv;
+                    uv_lame = TRANSFORM_TEX(uv_lame, _MainTex);
+
                     float   scale = NON_ZERO_FLOAT(_LM_Scale) / 100;
-                    float2  st = uv_main / scale;
+                    float2  st = uv_lame / scale;
 
                     float2  ist = floor(st);
                     float2  fst = frac(st);
@@ -599,6 +589,8 @@
 
                     float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
 
+                    min_pos.xy = round(min_pos.xy * 10) / 10; // ◆◇◆ ちらつき低減のテスト中 ◆◇◆
+
                     // アニメーション項
                     power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
                     // Glitter項
@@ -614,11 +606,13 @@
                     // 形状
                     power *= _LM_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
 
-                    float3 lame_color = _LM_Color.rgb;
-                    lame_color *= WF_TEX2D_LAME_TEX(uv_main);
-                    lame_color += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
+                    float4 lame_color = _LM_Color * WF_TEX2D_LAME_TEX(uv_lame);
+                    lame_color.rgb += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
 
-                    color.rgb += max(ZERO_VEC3, lame_color) * power;
+                    color.rgb += max(ZERO_VEC3, lame_color.rgb) * power;
+                    #ifdef _WF_ALPHA_BLEND
+                        color.a = max(color.a, lerp(color.a, lame_color.a, saturate(power * _LM_ChangeAlpha)));
+                    #endif
                 }
             }
         }
@@ -738,18 +732,18 @@
             return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OL_CustomParam1));
         }
 
-        inline float3 blendOverlayColor(float3 color, float4 ov_color, float3 power) {
+        inline float3 blendOverlayColor(float3 base, float4 decal, float3 power) {
             float3 rgb = 
-                _OL_BlendType == 0 ? ov_color.rgb                           // ブレンド
-                : _OL_BlendType == 1 ? color + ov_color.rgb                 // 加算
-                : _OL_BlendType == 2 ? color * ov_color.rgb                 // 乗算
-                : _OL_BlendType == 3 ? color + ov_color.rgb - MEDIAN_GRAY   // 加減算
-                : _OL_BlendType == 4 ? 1 - (1 - color) * (1 - ov_color.rgb) // スクリーン
-                : _OL_BlendType == 5 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(color), 0.5))   // オーバーレイ
-                : _OL_BlendType == 6 ? lerp(2 * color * ov_color.rgb, 1 - 2 * (1 - color) * (1 - ov_color.rgb), step(calcBrightness(ov_color.rgb), 0.5))   // オーバーレイ
-                : color                                                     // 何もしない
+                _OL_BlendType == 0 ? decal.rgb                           // ブレンド
+                : _OL_BlendType == 1 ? base + decal.rgb                 // 加算
+                : _OL_BlendType == 2 ? base * decal.rgb                 // 乗算
+                : _OL_BlendType == 3 ? base + decal.rgb - MEDIAN_GRAY   // 加減算
+                : _OL_BlendType == 4 ? 1 - (1 - base) * (1 - decal.rgb) // スクリーン
+                : _OL_BlendType == 5 ? lerp(2 * base * decal.rgb, 1 - 2 * (1 - base) * (1 - decal.rgb), step(calcBrightness(base), 0.5))   // オーバーレイ
+                : _OL_BlendType == 6 ? lerp(2 * base * decal.rgb, 1 - 2 * (1 - base) * (1 - decal.rgb), step(calcBrightness(decal.rgb), 0.5))   // オーバーレイ
+                : base                                                     // 何もしない
                 ;
-            return lerp(color, rgb, ov_color.a * power);
+            return lerp(base, rgb, decal.a * power);
         }
 
         inline void affectOverlayTexture(v2f i, float2 uv_main, float3 vs_normal, inout float4 color) {
@@ -776,9 +770,11 @@
     #ifdef _TL_ENABLE
 
         inline float getOutlineShiftWidth(float2 uv_main) {
-            #ifndef _TL_MASK_APPLY_LEGACY
+            #ifndef _WF_LEGACY_TL_MASK
+                // マスクをシフト時に太さに反映する場合
                 float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
             #else
+                // マスクをfragmentでアルファに反映する場合
                 float mask = 1;
             #endif
             return _TL_LineWidth * 0.01 * mask;
@@ -790,19 +786,12 @@
                 float3 line_color = lerp(_TL_LineColor.rgb, WF_TEX2D_OUTLINE_COLOR(uv_main), _TL_BlendCustom);
                 // アウトライン色をベースと合成
                 color.rgb = lerp(line_color, color.rgb, _TL_BlendBase);
-            }
-        }
 
-        inline void affectOutlineAlpha(float2 uv_main, inout float4 color) {
-            #ifndef _WF_ALPHA_CUTOUT
-                if (TGL_ON(_TL_Enable)) {
-                    #ifndef _TL_MASK_APPLY_LEGACY
+                // アウトラインアルファを反映
+                #ifdef _WF_ALPHA_BLEND
+                    #ifndef _WF_LEGACY_TL_MASK
                         // マスクをシフト時に太さに反映する場合
-                        #ifdef _AL_ENABLE
-                            color.a = _TL_LineColor.a;
-                        #else
-                            color.a = 1;
-                        #endif
+                        color.a = _TL_LineColor.a;
                     #else
                         // マスクをfragmentでアルファに反映する場合
                         float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
@@ -810,20 +799,15 @@
                             color.a = 0;
                             discard;
                         } else {
-                            #ifdef _AL_ENABLE
-                                color.a = _TL_LineColor.a * mask;
-                            #else
-                                color.a = 1;
-                            #endif
+                            color.a = _TL_LineColor.a * mask;
                         }
                     #endif
-                }
-            #endif
+                #endif
+            }
         }
 
     #else
         #define affectOutline(uv_main, color)
-        #define affectOutlineAlpha(uv_main, color)
     #endif
 
     float4 shiftDepthVertex(float3 ws_vertex, float width) { // これは複数箇所から使うので _TL_ENABLE には入れない
