@@ -254,18 +254,14 @@
         return TGL_ON(-lightType) ? samplePoint1LightColor(ws_vertex) : sampleMainLightColor();
     }
 
-    inline void affectAntiGlare(float glLevel, inout float4 color) {
-        color.rgb = saturate(color.rgb * glLevel);
-    }
-
     inline float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
         float3 lightColorMain = sampleMainLightColor();
         float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
 
-        float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
-        float power = AVE_RGB(color);                                       // 明度
-        color = lerp( power.xxx, color, _GL_BlendPower);                    // 色の混合
-        color = saturate( color / AVE_RGB(color) );                         // 正規化
+        float3 color = lightColorMain + lightColorSub4 + ambientColor;   // 合成
+        float power = MAX_RGB(color);                       // 明度
+        color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
+        color /= NON_ZERO_FLOAT(power);                     // 正規化
         color = color * lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // アンチグレア
         return color;
     }
