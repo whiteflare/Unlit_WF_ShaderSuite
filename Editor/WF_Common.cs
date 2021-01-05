@@ -132,6 +132,10 @@ namespace UnlitWF
         public static Material[] AsMaterials(params UnityEngine.Object[] array) {
             return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
         }
+
+        public static bool IsSupportedShader(Shader shader) {
+            return shader != null && shader.name.Contains("UnlitWF");
+        }
     }
 
     public class WFShaderFunction
@@ -169,7 +173,7 @@ namespace UnlitWF
         }
 
         public bool Contains(Material mat) {
-            if (mat == null || !mat.shader.name.Contains("UnlitWF")) {
+            if (mat == null || !WFCommonUtility.IsSupportedShader(mat.shader)) {
                 return false;
             }
             return _contains(this, mat);
