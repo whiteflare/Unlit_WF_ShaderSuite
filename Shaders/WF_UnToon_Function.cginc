@@ -262,7 +262,7 @@
         float power = MAX_RGB(color);                       // 明度
         color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
         color /= NON_ZERO_FLOAT(power);                     // 正規化
-        color = color * lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // アンチグレア
+        color *= lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // 明度のsaturateと書き戻し
         return color;
     }
 
