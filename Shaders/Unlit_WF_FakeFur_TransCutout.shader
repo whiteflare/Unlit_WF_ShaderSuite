@@ -30,6 +30,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [WFHeader(Fake Fur)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
             _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
+        [WF_Vector3]
             _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
         [NoScaleOffset]
         [Normal]

@@ -244,6 +244,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _ES_Shape               ("[ES] Wave Type", Float) = 3
         [Toggle(_)]
             _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
+        [WF_Vector3]
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0

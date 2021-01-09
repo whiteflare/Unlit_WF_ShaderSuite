@@ -183,6 +183,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [WF_Vector3]
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
@@ -207,7 +208,9 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             _FG_MinDist             ("[FG] Fog Min Distance", Float) = 0.5
             _FG_MaxDist             ("[FG] Fog Max Distance", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
+        [WF_Vector3]
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
+        [WF_Vector3]
             _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
 
         // Lit

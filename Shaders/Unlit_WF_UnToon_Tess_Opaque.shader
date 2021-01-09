@@ -234,6 +234,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [WF_Vector3]
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
