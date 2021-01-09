@@ -53,13 +53,13 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
 
         // Alpha
         [WFHeader(Transparent Alpha)]
-        [FixNoTexture]
+        [WF_FixNoTexture]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [HideInInspector]
-        [FixFloat(0.0)]
+        [WF_FixFloat(0.0)]
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [HideInInspector]
-        [FixFloat(0.0)]
+        [WF_FixFloat(0.0)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 0.8
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
@@ -94,7 +94,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
-        [FixFloat(0.0)]
+        [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/01/01", Float) = 0
     }
 

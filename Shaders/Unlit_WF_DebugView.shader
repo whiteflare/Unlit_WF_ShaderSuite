@@ -54,7 +54,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         _GridFactor ("grid factor", Range(0, 1))    = 0.5
 
         [HideInInspector]
-        [FixFloat(0.0)]
+        [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/01/01", Float) = 0
     }
 

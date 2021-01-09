@@ -25,7 +25,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
         // ラメ
         [WFHeader(Lame)]
-        [FixFloat(1.0)]
+        [WF_FixFloat(1.0)]
             _LM_Enable              ("[LM] Enable", Float) = 1
         [HDR]
             _LM_Color               ("[LM] Color", Color) = (1, 1, 1, 1)
@@ -34,7 +34,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
         [HideInInspector]
-        [FixFloat(1.0)]
+        [WF_FixFloat(1.0)]
             _LM_ChangeAlpha         ("[LM] Change Alpha Transparency", Range(0, 1)) = 1
         [Enum(UV1,0,UV2,1)]
             _LM_UVType              ("[LM] UV Type", Float) = 0
@@ -74,7 +74,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
-        [FixFloat(0.0)]
+        [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/01/01", Float) = 0
     }
 

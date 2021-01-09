@@ -266,7 +266,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
-        [FixFloat(0.0)]
+        [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/01/01", Float) = 0
     }
 

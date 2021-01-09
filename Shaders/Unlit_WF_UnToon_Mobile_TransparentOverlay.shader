@@ -76,7 +76,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
-        [FixFloat(0.0)]
+        [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/01/01", Float) = 0
     }
 
