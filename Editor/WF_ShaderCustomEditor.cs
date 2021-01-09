@@ -41,6 +41,7 @@ namespace UnlitWF
             { "_EmissionColor", "_EmissionMap" },
             { "_LM_Color", "_LM_Texture" },
             { "_TL_LineColor", "_TL_CustomColorTex" },
+            { "_OL_Color", "_OL_OverlayTex" },
         };
 
         /// <summary>
