@@ -32,7 +32,7 @@ namespace UnlitWF
         /// <summary>
         /// テクスチャとカラーを1行で表示するやつのプロパティ名辞書
         /// </summary>
-        private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
+        private readonly Dictionary<string, string> COMBI_COLOR_TEX = new Dictionary<string, string>() {
             { "_TS_BaseColor", "_TS_BaseTex" },
             { "_TS_1stColor", "_TS_1stTex" },
             { "_TS_2ndColor", "_TS_2ndTex" },
@@ -40,7 +40,13 @@ namespace UnlitWF
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
             { "_LM_Color", "_LM_Texture" },
-            { "_TL_LineColor", "_TL_CustomColorTex" }
+            { "_TL_LineColor", "_TL_CustomColorTex" },
+        };
+
+        /// <summary>
+        /// MinMaxSliderを使って1行で表示するやつのプロパティ名辞書
+        /// </summary>
+        private readonly Dictionary<string, string> COMBI_MIN_MAX = new Dictionary<string, string>() {
         };
 
         delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
@@ -168,29 +174,7 @@ namespace UnlitWF
                 EditorGUI.BeginChangeCheck();
 
                 // 描画
-                GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
-                if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
-                    // テクスチャとカラーを1行で表示するものにマッチした場合
-                    MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties, false);
-                    if (propTex != null) {
-                        materialEditor.TexturePropertySingleLine(guiContent, propTex, prop);
-                        if (!propTex.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
-                            using (new EditorGUI.IndentLevelScope()) {
-                                materialEditor.TextureScaleOffsetProperty(propTex);
-                                EditorGUILayout.Space();
-                            }
-                        }
-                    }
-                    else {
-                        materialEditor.ShaderProperty(prop, guiContent);
-                    }
-                }
-                else if (COLOR_TEX_COBINATION.ContainsValue(prop.name)) {
-                    // nop
-                }
-                else {
-                    materialEditor.ShaderProperty(prop, guiContent);
-                }
+                OnGuiSub_ShaderProperty(materialEditor, properties, prop);
 
                 // 更新監視
                 if (EditorGUI.EndChangeCheck()) {
@@ -227,6 +211,91 @@ namespace UnlitWF
                         }
                     }
                 }
+            }
+        }
+
+        private void OnGuiSub_ShaderProperty(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop) {
+            // GUIContent 作成
+            GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
+
+            // テクスチャとカラーを1行で表示する
+            if (COMBI_COLOR_TEX.ContainsKey(prop.name)) {
+                MaterialProperty another = FindProperty(COMBI_COLOR_TEX[prop.name], properties, false);
+                if (another != null) {
+                    DoSingleLineTextureProperty(materialEditor, guiContent, prop, another);
+                    return;
+                }
+            }
+            else if (COMBI_COLOR_TEX.ContainsValue(prop.name)) {
+                return; // 相方の側は何もしない
+            }
+
+            // MinMaxSlider
+            if (COMBI_MIN_MAX.ContainsKey(prop.name)) {
+                MaterialProperty another = FindProperty(COMBI_MIN_MAX[prop.name], properties, false);
+                if (another != null) {
+                    DoMinMaxProperty(materialEditor, guiContent, prop, another);
+                    return;
+                }
+            }
+            else if (COMBI_MIN_MAX.ContainsValue(prop.name)) {
+                return; // 相方の側は何もしない
+            }
+
+            materialEditor.ShaderProperty(prop, guiContent);
+        }
+
+        private static void DoSingleLineTextureProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propColor, MaterialProperty propTexture) {
+            // 1行テクスチャプロパティ
+            materialEditor.TexturePropertySingleLine(label, propTexture, propColor);
+
+            // もし NoScaleOffset がないなら ScaleOffset も追加で表示する
+            if (!propTexture.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
+                using (new EditorGUI.IndentLevelScope()) {
+                    materialEditor.TextureScaleOffsetProperty(propTexture);
+                    EditorGUILayout.Space();
+                }
+            }
+        }
+
+        private static void DoMinMaxProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propMin, MaterialProperty propMax) {
+            Vector2 propMinLimit = propMin.type == MaterialProperty.PropType.Range ? propMin.rangeLimits : new Vector2(0, 1);
+            Vector2 propMaxLimit = propMax.type == MaterialProperty.PropType.Range ? propMax.rangeLimits : propMinLimit;
+
+            float minValue = propMin.floatValue;
+            float maxValue = propMax.floatValue;
+            float minLimit = Mathf.Min(propMinLimit.x, propMaxLimit.x);
+            float maxLimit = Mathf.Max(propMinLimit.y, propMaxLimit.y);
+
+            var rect = EditorGUILayout.GetControlRect();
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+
+            EditorGUI.BeginChangeCheck();
+
+            // MinMaxSlider
+
+            rect.width -= EditorGUIUtility.fieldWidth + 5;
+            EditorGUI.showMixedValue = propMin.hasMixedValue || propMax.hasMixedValue;
+            EditorGUI.MinMaxSlider(rect, label, ref minValue, ref maxValue, minLimit, maxLimit);
+
+            // propMin の FloatField
+
+            rect.width = EditorGUIUtility.fieldWidth / 2 - 1;
+            rect.x += oldLabelWidth;
+            EditorGUI.FloatField(rect, minValue);
+
+            // propMax の FloatField
+
+            rect.x += EditorGUIUtility.fieldWidth / 2 + 1;
+            EditorGUI.FloatField(rect, maxValue);
+
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+
+            if (EditorGUI.EndChangeCheck()) {
+                propMin.floatValue = Mathf.Clamp(minValue, propMinLimit.x, propMinLimit.y);
+                propMax.floatValue = Mathf.Clamp(maxValue, propMaxLimit.x, propMaxLimit.y);
             }
         }
 
@@ -467,15 +536,26 @@ namespace UnlitWF
             ShaderCustomEditor.DrawShurikenStyleHeader(position, text, prop, true);
         }
     }
-    internal class MaterialFixFloatDrawer : MaterialPropertyDrawer
+
+    [Obsolete]
+    internal class MaterialFixFloatDrawer : MaterialWF_FixFloatDrawer
+    {
+        public MaterialFixFloatDrawer() : base() {
+        }
+
+        public MaterialFixFloatDrawer(float value) : base(value) {
+        }
+    }
+
+    internal class MaterialWF_FixFloatDrawer : MaterialPropertyDrawer
     {
         public readonly float value;
 
-        public MaterialFixFloatDrawer() {
+        public MaterialWF_FixFloatDrawer() {
             this.value = 0;
         }
 
-        public MaterialFixFloatDrawer(float value) {
+        public MaterialWF_FixFloatDrawer(float value) {
             this.value = value;
         }
 
@@ -488,15 +568,65 @@ namespace UnlitWF
         }
     }
 
-    internal class MaterialFixNoTextureDrawer : MaterialPropertyDrawer
+    [Obsolete]
+    internal class MaterialFixNoTextureDrawer : MaterialWF_FixNoTextureDrawer
     {
+    }
 
+    internal class MaterialWF_FixNoTextureDrawer : MaterialPropertyDrawer
+    {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
             return 0;
         }
 
         public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
             prop.textureValue = null;
+        }
+    }
+
+    internal class MaterialWF_Vector2Drawer : MaterialPropertyDrawer
+    {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return base.GetPropertyHeight(prop, label, editor) * 2;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+
+            Vector2 value = prop.vectorValue;
+            EditorGUI.BeginChangeCheck();
+            value = EditorGUI.Vector2Field(position, label, value);
+            if (EditorGUI.EndChangeCheck()) {
+                prop.vectorValue = new Vector4(value.x, value.y, 0, 0);
+            }
+
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+        }
+    }
+
+    internal class MaterialWF_Vector3Drawer : MaterialPropertyDrawer
+    {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return base.GetPropertyHeight(prop, label, editor) * 2;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+
+            Vector3 value = prop.vectorValue;
+            EditorGUI.BeginChangeCheck();
+            value = EditorGUI.Vector3Field(position, label, value);
+            if (EditorGUI.EndChangeCheck()) {
+                prop.vectorValue = new Vector4(value.x, value.y, value.z, 0);
+            }
+
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
         }
     }
 }
