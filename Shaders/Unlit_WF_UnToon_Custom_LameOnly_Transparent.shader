@@ -24,8 +24,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             _Z_Shift                ("Z-shift (tweak)", Range(-0.5, 0.5)) = 0
 
         // ラメ
-        [WFHeader(Lame)]
-        [WF_FixFloat(1.0)]
+        [WFHeaderAlwaysOn(Lame)]
             _LM_Enable              ("[LM] Enable", Float) = 1
         [HDR]
             _LM_Color               ("[LM] Color", Color) = (1, 1, 1, 1)
