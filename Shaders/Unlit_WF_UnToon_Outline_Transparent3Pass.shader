@@ -147,16 +147,15 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
         // ラメ
         [WFHeaderToggle(Lame)]
             _LM_Enable              ("[LM] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _LM_UVType              ("[LM] UV Type", Float) = 0
         [HDR]
             _LM_Color               ("[LM] Color", Color) = (1, 1, 1, 1)
-        [NoScaleOffset]
             _LM_Texture             ("[LM] Texture", 2D) = "white" {}
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
         [Toggle(_)]
             _LM_ChangeAlpha         ("[LM] Change Alpha Transparency", Range(0, 1)) = 0
-        [Enum(UV1,0,UV2,1)]
-            _LM_UVType              ("[LM] UV Type", Float) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LM_Shape               ("[LM] Shape", Float) = 0
         [PowerSlider(4.0)]

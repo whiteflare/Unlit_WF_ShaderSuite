@@ -26,17 +26,16 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
         // ラメ
         [WFHeaderAlwaysOn(Lame)]
             _LM_Enable              ("[LM] Enable", Float) = 1
+        [Enum(UV1,0,UV2,1)]
+            _LM_UVType              ("[LM] UV Type", Float) = 0
         [HDR]
             _LM_Color               ("[LM] Color", Color) = (1, 1, 1, 1)
-        [NoScaleOffset]
             _LM_Texture             ("[LM] Texture", 2D) = "white" {}
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
         [HideInInspector]
         [WF_FixFloat(1.0)]
             _LM_ChangeAlpha         ("[LM] Change Alpha Transparency", Range(0, 1)) = 1
-        [Enum(UV1,0,UV2,1)]
-            _LM_UVType              ("[LM] UV Type", Float) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LM_Shape               ("[LM] Shape", Float) = 0
         [PowerSlider(4.0)]
@@ -47,7 +46,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             _LM_MinDist             ("[LM] Dist Fade Start", Range(0, 5)) = 2.0
             _LM_Spot                ("[LM] Spot Fade Strength", Range(0, 16)) = 2.0
             _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
-        [NoScaleOffset]
             _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _LM_InvMaskVal          ("[LM] Invert Mask Value", Range(0, 1)) = 0
@@ -110,11 +108,13 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
             #include "WF_UnToon.cginc"
 
+            float4 _LM_MaskTex_ST;
+
             float4 frag_lameonly(v2f i) : SV_Target {
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-                float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+                float2 uv_main = TRANSFORM_TEX(i.uv, _LM_MaskTex);
 
                 // メイン
                 float4 color = float4(0, 0, 0, 0);

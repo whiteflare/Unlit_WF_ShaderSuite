@@ -564,7 +564,7 @@
                 float power = WF_TEX2D_LAME_MASK(uv_main);
                 if (0 < power) {
                     float2 uv_lame = _LM_UVType == 1 ? i.uv_lmap : i.uv;
-                    uv_lame = TRANSFORM_TEX(uv_lame, _MainTex);
+                    uv_lame = TRANSFORM_TEX(uv_lame, _LM_Texture);
 
                     float   scale = NON_ZERO_FLOAT(_LM_Scale) / 100;
                     float2  st = uv_lame / scale;
