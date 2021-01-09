@@ -252,7 +252,10 @@ namespace UnlitWF
             // もし NoScaleOffset がないなら ScaleOffset も追加で表示する
             if (!propTexture.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
                 using (new EditorGUI.IndentLevelScope()) {
+                    float oldLabelWidth = EditorGUIUtility.labelWidth;
+                    EditorGUIUtility.labelWidth = 0f;
                     materialEditor.TextureScaleOffsetProperty(propTexture);
+                    EditorGUIUtility.labelWidth = oldLabelWidth;
                     EditorGUILayout.Space();
                 }
             }
