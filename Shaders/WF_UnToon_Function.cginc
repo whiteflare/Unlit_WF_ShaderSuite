@@ -687,21 +687,41 @@
 
     #ifdef _TR_ENABLE
 
+        float calcRimLightPower(float3 vs_normal) {
+            float side      = _TR_Power * _TR_PowerSide;
+            float top       = _TR_Power * _TR_PowerTop;
+            float bottom    = _TR_Power * _TR_PowerBottom;
+
+            float3x3 mat = 0;
+            mat[0][0] = side + 1;
+            mat[1][1] = (top + bottom) / 2 + 1;
+            mat[1][2] = (top - bottom) / 2;
+
+            float2 rim_uv = mul(mat, float3(vs_normal.xy, 1)).xy;
+
+            return smoothstep(-NZF, _TR_Feather, length(rim_uv) - 1);
+        }
+
+        float3 calcRimLightColor(float3 color) {
+            float3 rimColor = _TR_Color.rgb - (
+                    _TR_BlendType == 0 ? MEDIAN_GRAY    // ADD_AND_SUB
+                    : _TR_BlendType == 1 ? color        // ALPHA
+                    : ZERO_VEC3                         // ADD
+                );
+            return rimColor;
+        }
+
         inline void affectRimLight(v2f i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TR_Enable)) {
                 if (isInMirror()) {
                     angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
                 }
-                // vs_normalからリムライト範囲を計算
-                float2 rim_uv = vs_normal.xy;
-                rim_uv.x *= _TR_PowerSide + 1;
-                rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
-                rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
                 // 順光の場合はリムライトを暗くする
                 float3 rimPower = saturate(0.8 - angle_light_camera) * WF_TEX2D_RIM_MASK(uv_main);
                 // 色計算
-                float3 rimColor = _TR_Color.rgb - (TGL_OFF(_TR_BlendType) ? MEDIAN_GRAY : color.rgb);
-                color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, smoothstep(1, 1.05, length(rim_uv)) );
+                float3 rimColor = calcRimLightColor(color.rgb);
+                // 合成
+                color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, calcRimLightPower(vs_normal));
             }
         }
     #else

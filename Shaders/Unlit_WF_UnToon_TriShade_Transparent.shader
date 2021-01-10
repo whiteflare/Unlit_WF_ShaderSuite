@@ -151,16 +151,19 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             _TR_Enable              ("[RM] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [Enum(ADD,0,ALPHA,1)]
+        [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
             _TR_BlendType           ("[RM] Blend Type", Float) = 0
-            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
-            _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
-            _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+            _TR_Power               ("[RM] Power", Range(0, 2)) = 1
+            _TR_Feather             ("[RM] Feather", Range(0, 1)) = 0.05
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
+        [Header(RimLight Advance)]
+            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
+            _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
+            _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
         // Decal Texture
         [WFHeaderToggle(Decal Texture)]

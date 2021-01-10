@@ -189,12 +189,14 @@
 
     float           _TR_Enable;
     float3          _TR_Color;
-    float           _TR_BlendType;
+    uint            _TR_BlendType;
+    float           _TR_Power;
+    float           _TR_Feather;
+    float           _TR_InvMaskVal;
+    float           _TR_BlendNormal;
     float           _TR_PowerTop;
     float           _TR_PowerSide;
     float           _TR_PowerBottom;
-    float           _TR_InvMaskVal;
-    float           _TR_BlendNormal;
 
     float           _OL_Enable;
     uint            _OL_UVType;
