@@ -209,7 +209,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
-        // EmissiveScroll
+        // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
