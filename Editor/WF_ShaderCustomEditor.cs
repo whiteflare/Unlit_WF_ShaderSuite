@@ -48,6 +48,7 @@ namespace UnlitWF
         /// MinMaxSliderを使って1行で表示するやつのプロパティ名辞書
         /// </summary>
         private readonly Dictionary<string, string> COMBI_MIN_MAX = new Dictionary<string, string>() {
+            { "_FG_MinDist", "_FG_MaxDist" }
         };
 
         delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
@@ -269,7 +270,7 @@ namespace UnlitWF
             float minValue = propMin.floatValue;
             float maxValue = propMax.floatValue;
             float minLimit = Mathf.Min(propMinLimit.x, propMaxLimit.x);
-            float maxLimit = Mathf.Max(propMinLimit.y, propMaxLimit.y);
+            float maxLimit = Mathf.Max(propMinLimit.y, propMaxLimit.y, minValue, maxValue);
 
             var rect = EditorGUILayout.GetControlRect();
             float oldLabelWidth = EditorGUIUtility.labelWidth;
@@ -287,19 +288,29 @@ namespace UnlitWF
 
             rect.width = EditorGUIUtility.fieldWidth / 2 - 1;
             rect.x += oldLabelWidth;
-            EditorGUI.FloatField(rect, minValue);
+            minValue = EditorGUI.FloatField(rect, minValue);
 
             // propMax の FloatField
 
             rect.x += EditorGUIUtility.fieldWidth / 2 + 1;
-            EditorGUI.FloatField(rect, maxValue);
+            maxValue = EditorGUI.FloatField(rect, maxValue);
 
             EditorGUI.showMixedValue = false;
             EditorGUIUtility.labelWidth = oldLabelWidth;
 
             if (EditorGUI.EndChangeCheck()) {
-                propMin.floatValue = Mathf.Clamp(minValue, propMinLimit.x, propMinLimit.y);
-                propMax.floatValue = Mathf.Clamp(maxValue, propMaxLimit.x, propMaxLimit.y);
+                if (propMin.type == MaterialProperty.PropType.Range) {
+                    propMin.floatValue = Mathf.Clamp(minValue, propMinLimit.x, propMinLimit.y);
+                }
+                else {
+                    propMin.floatValue = minValue;
+                }
+                if (propMax.type == MaterialProperty.PropType.Range) {
+                    propMax.floatValue = Mathf.Clamp(maxValue, propMaxLimit.x, propMaxLimit.y);
+                }
+                else {
+                    propMax.floatValue = maxValue;
+                }
             }
         }
 
