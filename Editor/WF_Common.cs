@@ -197,7 +197,7 @@ namespace UnlitWF
     {
         public readonly string Before;
         public readonly string After;
-        public readonly string Tag;
+        private readonly HashSet<string> Tags = new HashSet<string>();
 
         public WFI18NTranslation(string before, string after) : this(null, before, after) {
         }
@@ -205,7 +205,24 @@ namespace UnlitWF
         public WFI18NTranslation(string tag, string before, string after) {
             Before = before;
             After = after;
-            Tag = tag;
+            AddTag(tag);
+        }
+
+        public WFI18NTranslation AddTag(params string[] tags) {
+            foreach(var tag in tags) {
+                if (tag != null) {
+                    Tags.Add(tag);
+                }
+            }
+            return this;
+        }
+
+        public bool ContainsTag(string tag) {
+            return tag != null && Tags.Contains(tag);
+        }
+
+        public bool HasNoTag() {
+            return Tags.Count == 0;
         }
     }
 
@@ -266,12 +283,12 @@ namespace UnlitWF
             // text がラベルとテキストに分割できるならば
             if (WFCommonUtility.FormatDispName(text, out string label, out string name2, out ret)) {
                 // ラベルとテキストが両方とも一致するものを最初に検索する
-                ret = current.Where(t => t.Tag == label && t.Before == name2).Select(t => t.After).FirstOrDefault();
+                ret = current.Where(t => t.ContainsTag(label) && t.Before == name2).Select(t => t.After).FirstOrDefault();
                 if (ret != null) {
                     return "[" + label + "] " + ret;
                 }
                 // ラベルなしでテキストが一致するものを検索する
-                ret = current.Where(t => t.Tag == null && t.Before == name2).Select(t => t.After).FirstOrDefault();
+                ret = current.Where(t => t.HasNoTag() && t.Before == name2).Select(t => t.After).FirstOrDefault();
                 if (ret != null) {
                     return "[" + label + "] " + ret;
                 }
@@ -282,7 +299,7 @@ namespace UnlitWF
                 //}
             } else {
                 // ラベルなしでテキストが一致するものを検索する
-                ret = current.Where(t => t.Tag == null && t.Before == text).Select(t => t.After).FirstOrDefault();
+                ret = current.Where(t => t.HasNoTag() && t.Before == text).Select(t => t.After).FirstOrDefault();
                 if (ret != null) {
                     return ret;
                 }

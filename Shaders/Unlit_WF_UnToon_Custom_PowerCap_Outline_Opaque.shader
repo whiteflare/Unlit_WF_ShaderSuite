@@ -39,7 +39,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+            _TL_MaskTex             ("[LI] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
@@ -54,7 +54,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [HDR]
             _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CH_ColorB              ("[CH] B chl Color", Color) = (1, 1, 1, 1)
+            _CH_ColorB              ("[CH] B ch Color", Color) = (1, 1, 1, 1)
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -231,7 +231,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 

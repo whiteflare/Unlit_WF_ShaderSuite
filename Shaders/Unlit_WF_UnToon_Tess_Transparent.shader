@@ -41,10 +41,10 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
         // Tessellation
         [WFHeader(Tessellation)]
         [Enum(DISTANCE,0,EDGE_LENGTH,1,FIXED,2)]
-            _TessType               ("Tess Type", Float) = 0
+            _TessType               ("[TE] Tess Type", Float) = 0
         [IntRange]
-            _TessFactor             ("Tess Factor", Range(1, 16)) = 4
-            _Smoothing              ("Smoothing", Range(0, 2)) = 1.0
+            _TessFactor             ("[TE] Tess Factor", Range(1, 16)) = 4
+            _Smoothing              ("[TE] Smoothing", Range(0, 2)) = 1.0
 
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
@@ -56,7 +56,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
         [HDR]
             _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CH_ColorB              ("[CH] B chl Color", Color) = (1, 1, 1, 1)
+            _CH_ColorB              ("[CH] B ch Color", Color) = (1, 1, 1, 1)
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -193,7 +193,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -210,7 +210,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
+            _OL_MaskTex             ("[OL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
@@ -220,7 +220,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
         [HDR]
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
+            _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
         [PowerSlider(4.0)]

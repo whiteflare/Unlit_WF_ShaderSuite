@@ -100,7 +100,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -110,7 +110,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         [HDR]
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
+            _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
         [PowerSlider(4.0)]

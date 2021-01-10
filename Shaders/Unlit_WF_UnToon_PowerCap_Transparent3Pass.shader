@@ -49,7 +49,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
         [HDR]
             _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CH_ColorB              ("[CH] B chl Color", Color) = (1, 1, 1, 1)
+            _CH_ColorB              ("[CH] B ch Color", Color) = (1, 1, 1, 1)
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -226,7 +226,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 

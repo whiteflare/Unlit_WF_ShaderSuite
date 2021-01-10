@@ -41,7 +41,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _FR_Repeat              ("[FR] Fur Repeat", Range(1, 8)) = 3
             _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
         [NoScaleOffset]
-            _FR_MaskTex             ("[FR] Fur Mask Texture", 2D) = "white" {}
+            _FR_MaskTex             ("[FR] Mask Texture", 2D) = "white" {}
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -102,7 +102,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
