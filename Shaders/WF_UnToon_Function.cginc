@@ -638,9 +638,9 @@
             }
         }
 
-        inline void calcShadowColor(float4 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
+        inline void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
             shadow_color = lerp( 
-                lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power * color.a),
+                lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power),
                 shadow_color,
                 smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
         }
@@ -698,7 +698,7 @@
                 rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
                 rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
                 // 順光の場合はリムライトを暗くする
-                float3 rimPower = saturate(0.8 - angle_light_camera) * _TR_Color.a * WF_TEX2D_RIM_MASK(uv_main);
+                float3 rimPower = saturate(0.8 - angle_light_camera) * WF_TEX2D_RIM_MASK(uv_main);
                 // 色計算
                 float3 rimColor = _TR_Color.rgb - (TGL_OFF(_TR_BlendType) ? MEDIAN_GRAY : color.rgb);
                 color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, smoothstep(1, 1.05, length(rim_uv)) );

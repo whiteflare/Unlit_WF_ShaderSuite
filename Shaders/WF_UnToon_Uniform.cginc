@@ -175,10 +175,10 @@
     float           _LM_InvMaskVal;
 
     float           _TS_Enable;
-    float4          _TS_BaseColor;
-    float4          _TS_1stColor;
-    float4          _TS_2ndColor;
-    float4          _TS_3rdColor;
+    float3          _TS_BaseColor;
+    float3          _TS_1stColor;
+    float3          _TS_2ndColor;
+    float3          _TS_3rdColor;
     float           _TS_Power;
     float           _TS_1stBorder;
     float           _TS_2ndBorder;
@@ -188,7 +188,7 @@
     float           _TS_InvMaskVal;
 
     float           _TR_Enable;
-    float4          _TR_Color;
+    float3          _TR_Color;
     float           _TR_BlendType;
     float           _TR_PowerTop;
     float           _TR_PowerSide;
