@@ -298,8 +298,8 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "フォグの色"),
-            new WFI18NTranslation("FG", "Fog Min Distance", "フォグが効き始める距離"),
-            new WFI18NTranslation("FG", "Fog Max Distance", "フォグが最大になる距離"),
+            new WFI18NTranslation("FG", "FeedOut Distance (Near)", "フェードアウト距離"),
+            new WFI18NTranslation("FG", "FeedOut Distance (Far)", "フェードアウト距離"),
             new WFI18NTranslation("FG", "Exponential", "変化の鋭さ"),
             new WFI18NTranslation("FG", "Base Offset", "フォグ原点の位置(オフセット)"),
             new WFI18NTranslation("FG", "Scale", "フォグ範囲のスケール"),
@@ -344,6 +344,8 @@ namespace UnlitWF
             new WFI18NTranslation("HeightMap Level", "ハイトマップのゼロ点調整"),
             new WFI18NTranslation("ES", "Cull Mode", "カリングモード"),
             new WFI18NTranslation("ES", "Z-shift", "カメラに近づける"),
+            new WFI18NTranslation("FG", "Fog Min Distance", "フォグが効き始める距離"),
+            new WFI18NTranslation("FG", "Fog Max Distance", "フォグが最大になる距離"),
         };
     }
 }
