@@ -94,7 +94,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
         [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
             _TR_BlendType           ("[RM] Blend Type", Float) = 0
             _TR_Power               ("[RM] Power", Range(0, 2)) = 1
-            _TR_Feather             ("[RM] Feather", Range(0, 1)) = 0.05
+            _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}

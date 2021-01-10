@@ -269,6 +269,8 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "Shade Color Suggest", "影色を自動設定する"),
             // RimLight
             new WFI18NTranslation("RM", "Rim Color", "リムライト色"),
+            new WFI18NTranslation("RM", "Power", "強度(マスター)"),
+            new WFI18NTranslation("RM", "Feather", "境界のぼかし強度"),
             new WFI18NTranslation("RM", "Power Top", "強度(上)"),
             new WFI18NTranslation("RM", "Power Side", "強度(横)"),
             new WFI18NTranslation("RM", "Power Bottom", "強度(下)"),
