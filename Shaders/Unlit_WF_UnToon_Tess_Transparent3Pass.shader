@@ -48,8 +48,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _TE_SmoothPowerTex      ("[TE] Smoothing Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TE_InvMaskVal          ("[TE] Invert Mask Value", Float) = 0
-            _TE_MinDist             ("[TE] FeedOut Distance (Near)", Range(0, 4)) = 1
-            _TE_MaxDist             ("[TE] FeedOut Distance (Far)", Range(0, 4)) = 3
+            _TE_MinDist             ("[TE] FeedOut Distance (Near)", Range(0, 4)) = 0.5
+            _TE_MaxDist             ("[TE] FeedOut Distance (Far)", Range(0, 4)) = 2
 
         // アウトライン
         [WFHeaderToggle(Outline)]
