@@ -68,9 +68,7 @@
     DECL_VERT_TEX2D     (_TL_MaskTex);
 #endif
 #ifdef _WF_UNTOON_TESS
-#ifdef _WF_LEGACY_TE_USE_DISPMAP
-    DECL_VERT_TEX2D     (_DispMap);
-#endif
+    DECL_VERT_TEX2D     (_TE_SmoothPowerTex);
 #endif
 
     ////////////////////////////
@@ -231,13 +229,11 @@
     float3          _FG_Scale;
 
 #ifdef _WF_UNTOON_TESS
-    uint            _TessType;
-    float           _TessFactor;
-    float           _Smoothing;
-#ifdef _WF_LEGACY_TE_USE_DISPMAP
-    float           _DispMapScale;
-    float           _DispMapLevel;
-#endif
+    float           _TE_Factor;
+    float           _TE_MinDist;
+    float           _TE_MaxDist;
+    float           _TE_SmoothPower;
+    float           _TE_InvMaskVal;
 #endif
 
 #ifdef _WF_UNTOON_POWERCAP

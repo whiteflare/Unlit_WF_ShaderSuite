@@ -48,7 +48,8 @@ namespace UnlitWF
         /// MinMaxSliderを使って1行で表示するやつのプロパティ名辞書
         /// </summary>
         private readonly Dictionary<string, string> COMBI_MIN_MAX = new Dictionary<string, string>() {
-            { "_FG_MinDist", "_FG_MaxDist" }
+            { "_TE_MinDist", "_TE_MaxDist" },
+            { "_FG_MinDist", "_FG_MaxDist" },
         };
 
         delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);

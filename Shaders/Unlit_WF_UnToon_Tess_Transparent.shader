@@ -40,11 +40,15 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
 
         // Tessellation
         [WFHeader(Tessellation)]
-        [Enum(DISTANCE,0,EDGE_LENGTH,1,FIXED,2)]
-            _TessType               ("[TE] Tess Type", Float) = 0
         [IntRange]
-            _TessFactor             ("[TE] Tess Factor", Range(1, 16)) = 4
-            _Smoothing              ("[TE] Smoothing", Range(0, 2)) = 1.0
+            _TE_Factor              ("[TE] Tess Factor", Range(1, 16)) = 4
+            _TE_SmoothPower         ("[TE] Smoothing", Range(0, 2)) = 1.0
+        [NoScaleOffset]
+            _TE_SmoothPowerTex      ("[TE] Smoothing Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TE_InvMaskVal          ("[TE] Invert Mask Value", Float) = 0
+            _TE_MinDist             ("[TE] FeedOut Distance (Near)", Range(0, 4)) = 1
+            _TE_MaxDist             ("[TE] FeedOut Distance (Far)", Range(0, 4)) = 3
 
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]

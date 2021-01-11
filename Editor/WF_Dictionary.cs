@@ -172,6 +172,8 @@ namespace UnlitWF
             { "_MT_MaskTex", "_MetallicGlossMap" },
             { "_MT_Smoothness", "_MT_ReflSmooth" },
             { "_MT_Smoothness2", "_MT_SpecSmooth" },
+            { "_TessFactor", "_TE_Factor" },
+            { "_Smoothing", "_TE_SmoothPower" },
         };
 
         /// <summary>
@@ -207,10 +209,6 @@ namespace UnlitWF
             new WFI18NTranslation("AL", "Power", "アルファ強度"),
             new WFI18NTranslation("AL", "Fresnel Power", "フレネル強度"),
             new WFI18NTranslation("AL", "Cutoff Threshold", "カットアウトしきい値"),
-            // Tessellation
-            new WFI18NTranslation("TE", "Tess Type", "Tessタイプ"),
-            new WFI18NTranslation("TE", "Tess Factor", "Tess分割強度"),
-            new WFI18NTranslation("TE", "Smoothing", "Phongスムージング"),
             // Color Change
             new WFI18NTranslation("CL", "monochrome", "単色化"),
             new WFI18NTranslation("CL", "Hur", "色相"),
@@ -305,6 +303,12 @@ namespace UnlitWF
             new WFI18NTranslation("FG", "Exponential", "変化の鋭さ"),
             new WFI18NTranslation("FG", "Base Offset", "フォグ原点の位置(オフセット)"),
             new WFI18NTranslation("FG", "Scale", "フォグ範囲のスケール"),
+            // Tessellation
+            new WFI18NTranslation("TE", "Tess Factor", "分割数"),
+            new WFI18NTranslation("TE", "Smoothing", "スムーズ"),
+            new WFI18NTranslation("TE", "Smoothing Mask Texture", "スムーズマスク"),
+            new WFI18NTranslation("TE", "FeedOut Distance (Near)", "フェードアウト距離"),
+            new WFI18NTranslation("TE", "FeedOut Distance (Far)", "フェードアウト距離"),
             // Lit Advance
             new WFI18NTranslation("Sun Source", "太陽光のモード"),
             new WFI18NTranslation("Custom Sun Azimuth", "カスタム太陽の方角"),
@@ -348,6 +352,7 @@ namespace UnlitWF
             new WFI18NTranslation("ES", "Z-shift", "カメラに近づける"),
             new WFI18NTranslation("FG", "Fog Min Distance", "フォグが効き始める距離"),
             new WFI18NTranslation("FG", "Fog Max Distance", "フォグが最大になる距離"),
+            new WFI18NTranslation("TE", "Tess Type", "Tessタイプ"),
         };
     }
 }

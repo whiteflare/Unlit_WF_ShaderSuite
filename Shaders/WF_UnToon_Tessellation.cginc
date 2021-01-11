@@ -21,13 +21,14 @@
     #include "WF_UnToon.cginc"
     #include "Tessellation.cginc"
 
+    #ifndef WF_TEX2D_SMOOTH_MASK_TEX
+        #define WF_TEX2D_SMOOTH_MASK_TEX(uv)    SAMPLE_MASK_VALUE_LOD(_TE_SmoothPowerTex, uv, _TE_InvMaskVal).r
+    #endif
+
     struct HsConstantOutput {
         float tessFact[3]    : SV_TessFactor;
         float insideTessFact : SV_InsideTessFactor;
     };
-
-    #define _TESS_MIN_DIST 0
-    #define _TESS_MAX_DIST 2
 
     [domain("tri")]
     [partitioning("integer")]
@@ -40,31 +41,16 @@
 
     float4 worldDistanceBasedTess(float3 ws_vertex, float minDist, float maxDist, float tess) {
         float dist = distance(ws_vertex, worldSpaceViewPointPos());
-        float f = clamp(1.0 - (dist - minDist) / (maxDist - minDist), 0.01, 1.0) * tess;
+        float f = clamp(1.0 - (dist - minDist) / NON_ZERO_FLOAT(maxDist - minDist), 0.01, 1.0) * tess;
         return UnityCalcTriEdgeTessFactors(f.xxx);
-    }
-
-    float4 worldEdgeLengthBasedTess(float3 ws_vertex0, float3 ws_vertex1, float3 ws_vertex2, float edgeLength) {
-        float4 tess;
-        tess.x = UnityCalcEdgeTessFactor(ws_vertex1, ws_vertex2, edgeLength);
-        tess.y = UnityCalcEdgeTessFactor(ws_vertex2, ws_vertex0, edgeLength);
-        tess.z = UnityCalcEdgeTessFactor(ws_vertex0, ws_vertex1, edgeLength);
-        tess.w = (tess.x + tess.y + tess.z) / 3.0f;
-        return tess;
     }
 
     HsConstantOutput hullConst(InputPatch<v2f, 3> i) {
         UNITY_SETUP_INSTANCE_ID(i[0]);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i[0]);
 
-        // 2～16 の値域をもつ _TessFactor から tessFactor を計算する
-        float4 tessFactor =
-            // DISTANCE
-            _TessType < 0.5 ? worldDistanceBasedTess(calcWorldSpaceBasePos(i[0].ws_vertex), _TESS_MIN_DIST, _TESS_MAX_DIST, _TessFactor)
-                // EDGE_LENGTH
-                : _TessType < 1.5 ? worldEdgeLengthBasedTess(i[0].ws_vertex, i[1].ws_vertex, i[2].ws_vertex, 64 / _TessFactor)
-                // FIXED
-                : _TessFactor.xxxx;
+        // 2～16 の値域をもつ _TE_Factor から SV_TessFactor を計算する
+        float4 tessFactor = worldDistanceBasedTess(calcWorldSpaceBasePos(i[0].ws_vertex), _TE_MinDist, _TE_MaxDist, _TE_Factor);
 
         HsConstantOutput o = (HsConstantOutput) 0;
         o.tessFact[0] = tessFactor.x;
@@ -104,14 +90,9 @@
         for (int a = 0; a < 3; a++) {
             phg[a] = i[a].normal * (dot( i[a].ws_vertex.xyz, i[a].normal ) - dot(o.ws_vertex.xyz, i[a].normal));
         }
-        o.ws_vertex.xyz += MUL_BARY(phg, xyz) * _Smoothing / 2.0;
-
-        // Displacement HeightMap
-#ifdef _WF_LEGACY_TE_USE_DISPMAP
         float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
-        float disp = PICK_VERT_TEX2D_LOD(_DispMap, uv_main, 0).r * _DispMapScale - _DispMapLevel;
-        o.ws_vertex.xyz += o.normal * disp * 0.01;
-#endif
+        float smmoth = max(0, _TE_SmoothPower * WF_TEX2D_SMOOTH_MASK_TEX(uv_main)) / 2.0;
+        o.ws_vertex.xyz += MUL_BARY(phg, xyz) * smmoth;
 
         #undef MUL_BARY
 
