@@ -888,14 +888,12 @@
     inline float3 calcAmbientColorVertex(float2 uv_lmap) {
         // ライトマップもしくは環境光を取得
         #ifdef _LMAP_ENABLE
-            float3 color = pickLightmapLod(uv_lmap);
             #if defined(_AO_ENABLE)
-            if (TGL_ON(_AO_Enable)) {
-                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので明るさだけ取得する
-                return AVE_RGB(color).xxx;
-            }
+                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので固定値を返す
+                return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
+            #else
+                return pickLightmapLod(uv_lmap);
             #endif
-            return color;
         #else
             return sampleSHLightColor();
         #endif
