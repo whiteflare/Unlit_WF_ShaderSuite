@@ -141,6 +141,8 @@ namespace UnlitWF
                 OnGuiSub_ShowCurrentShaderName(materialEditor, mat);
                 // マイグレーションHelpBox
                 OnGUISub_MigrationHelpBox(materialEditor);
+                // Batching Static対策HelpBox
+                OnGUISub_BatchingStaticHelpBox(materialEditor);
             }
 
             // 現在無効なラベルを保持するリスト
@@ -369,17 +371,53 @@ namespace UnlitWF
             var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
             if (IsOldMaterial(mats)) {
-                var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
+
+                var message = WFI18N.LangMode == EditorLanguage.日本語 ?
                     "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
                     "This Material may have been created in an older version. Convert to new version?";
-                if (materialEditor.HelpBoxWithButton(
-                                    new GUIContent(tex),
-                                    new GUIContent("Fix Now"))) {
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message), new GUIContent("Fix Now"))) {
                     var editor = new WFMaterialEditUtility();
                     // 名称を全て変更
                     editor.RenameOldNameProperties(mats);
                     // リセット
                     ResetOldMaterialTable(mats);
+                }
+            }
+        }
+
+        private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor) {
+            // 現在編集中のマテリアルの配列
+            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
+            // 現在編集中のマテリアルのうち、Batching Static のときにオンにしたほうがいい設定がオフになっているマテリアル
+            var allNonStaticMaterials = mats.Where(mat => mat.GetInt("_GL_DisableBackLit") == 0 || mat.GetInt("_GL_DisableBasePos") == 0).ToArray();
+
+            if (allNonStaticMaterials.Length == 0) {
+                return;
+            }
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            // 現在のシーンにある BatchingStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
+            var allStaticMaterialsInScene = scene.GetRootGameObjects()
+                .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
+                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.BatchingStatic))
+                .SelectMany(mf => mf.sharedMaterials)
+                .Where(mat => mat != null && IsSupportedShader(mat.shader))
+                .ToArray();
+
+            // Batching Static の付いているマテリアルがあるならば警告
+            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat))) {
+
+                var message = WFI18N.LangMode == EditorLanguage.日本語 ? 
+                    "このマテリアルは Batching Static な MeshRenderer から使われているようです。Batching Static 用の設定へ変更しますか？" :
+                    "This material seems to be used by the Batching Static MeshRenderer. Do you want to change the settings for Batching Static?";
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message), new GUIContent("Fix Now"))) {
+                    // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
+                    foreach (var mat in allNonStaticMaterials) {
+                        mat.SetInt("_GL_DisableBackLit", 1);
+                        mat.SetInt("_GL_DisableBasePos", 1);
+                    }
                 }
             }
         }
