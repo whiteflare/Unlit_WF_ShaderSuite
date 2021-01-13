@@ -94,6 +94,12 @@ namespace UnlitWF
             "_ALPHAPREMULTIPLY_ON",
         };
 
+        static class Styles
+        {
+            public static readonly Texture2D infoIcon = EditorGUIUtility.Load("icons/console.infoicon.png") as Texture2D;
+            public static readonly Texture2D warnIcon = EditorGUIUtility.Load("icons/console.warnicon.png") as Texture2D;
+        }
+
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
             PreChangeShader(material, oldShader, newShader);
 
@@ -376,7 +382,7 @@ namespace UnlitWF
                     "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
                     "This Material may have been created in an older version. Convert to new version?";
 
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message), new GUIContent("Fix Now"))) {
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now"))) {
                     var editor = new WFMaterialEditUtility();
                     // 名称を全て変更
                     editor.RenameOldNameProperties(mats);
@@ -387,10 +393,22 @@ namespace UnlitWF
         }
 
         private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor) {
+            // 現在のシェーダが DisableBatching == False のとき以外は何もしない (Batching されないので)
+            var target = materialEditor.target as Material;
+            if (target == null || !target.GetTag("DisableBatching", false, "False").Equals("False", StringComparison.OrdinalIgnoreCase)) {
+                return;
+            }
+            // ターゲットが設定用プロパティをどちらも持っていないならば何もしない
+            if (!target.HasProperty("_GL_DisableBackLit") && !target.HasProperty("_GL_DisableBasePos")) {
+                return;
+            }
+            // 現在のシェーダ
+            var shader = target.shader;
+
             // 現在編集中のマテリアルの配列
-            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
+            var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
             // 現在編集中のマテリアルのうち、Batching Static のときにオンにしたほうがいい設定がオフになっているマテリアル
-            var allNonStaticMaterials = mats.Where(mat => mat.GetInt("_GL_DisableBackLit") == 0 || mat.GetInt("_GL_DisableBasePos") == 0).ToArray();
+            var allNonStaticMaterials = targets.Where(mat => mat.GetInt("_GL_DisableBackLit") == 0 || mat.GetInt("_GL_DisableBasePos") == 0).ToArray();
 
             if (allNonStaticMaterials.Length == 0) {
                 return;
@@ -402,17 +420,17 @@ namespace UnlitWF
                 .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
                 .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.BatchingStatic))
                 .SelectMany(mf => mf.sharedMaterials)
-                .Where(mat => mat != null && IsSupportedShader(mat.shader))
+                .Where(mat => mat != null && mat.shader == shader)
                 .ToArray();
 
-            // Batching Static の付いているマテリアルがあるならば警告
+            // Batching Static の付いているマテリアルが targets 内にあるならば警告
             if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat))) {
 
                 var message = WFI18N.LangMode == EditorLanguage.日本語 ? 
                     "このマテリアルは Batching Static な MeshRenderer から使われているようです。Batching Static 用の設定へ変更しますか？" :
                     "This material seems to be used by the Batching Static MeshRenderer. Do you want to change the settings for Batching Static?";
 
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message), new GUIContent("Fix Now"))) {
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now"))) {
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
                     foreach (var mat in allNonStaticMaterials) {
                         mat.SetInt("_GL_DisableBackLit", 1);
