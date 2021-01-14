@@ -258,6 +258,12 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Light Bake Arrangement)]
+            _GI_Enable              ("[GI] Enable", Float) = 0
+            _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
+            _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1
+            _GI_IndirectDesaturate  ("[GI] Indirect Desaturate", Range(0, 1)) = 0
+
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/01/01", Float) = 0

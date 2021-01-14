@@ -83,20 +83,36 @@
         return o;
     }
 
+    float _GI_Enable;
+    float _GI_IndirectDesaturate;
+    float _GI_IndirectMultiplier;
+    float _GI_EmissionMultiplier;
+
     float4 frag_meta(v2f_meta i) : SV_Target {
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
-        float4 color    = _Color * PICK_MAIN_TEX2D(_MainTex, i.uv);
+        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+
+        float4 color    = _Color * PICK_MAIN_TEX2D(_MainTex, uv_main);
 #ifdef _VC_ENABLE
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
 
-        o.Albedo        = color.rgb * color.a;
-        o.SpecularColor = o.Albedo.rgb;
+        // 単色化
+        color.rgb = lerp(color.rgb, AVE_RGB(color.rgb).xxx, lerp(0, _GI_IndirectDesaturate, _GI_Enable));
 
-        float3 emission = _EmissionColor.rgb * PICK_SUB_TEX2D(_EmissionMap, _MainTex, i.uv).rgb + lerp(color.rgb, ZERO_VEC3, _ES_BlendType);
-        o.Emission      = emission * _ES_Enable * _ES_BakeIntensity;
+        o.Albedo        = color.rgb * lerp(1, _GI_IndirectMultiplier, _GI_Enable);
+        o.SpecularColor = o.Albedo;
+
+        float3 emission;
+        if (TGL_ON(_ES_Enable)) {
+            float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv_main).rgba;
+            float4 es_color = _EmissionColor * es_mask;
+            o.Emission  = es_color.rgb * es_color.a * lerp(1, _GI_EmissionMultiplier, _GI_Enable);
+        } else {
+            o.Emission  = ZERO_VEC3;
+        }
 
 #ifdef EDITOR_VISUALIZATION
         o.VizUV         = i.vizUV;
