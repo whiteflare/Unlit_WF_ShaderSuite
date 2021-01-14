@@ -83,11 +83,6 @@
         return o;
     }
 
-    float _GI_Enable;
-    float _GI_IndirectDesaturate;
-    float _GI_IndirectMultiplier;
-    float _GI_EmissionMultiplier;
-
     float4 frag_meta(v2f_meta i) : SV_Target {
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);

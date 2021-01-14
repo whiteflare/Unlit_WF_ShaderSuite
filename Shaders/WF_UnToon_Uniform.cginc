@@ -98,6 +98,11 @@
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
 
+    float           _GI_Enable;
+    float           _GI_IndirectDesaturate;
+    float           _GI_IndirectMultiplier;
+    float           _GI_EmissionMultiplier;
+
     float           _CH_Enable;
     float4          _CH_ColorR;
     float4          _CH_ColorG;
