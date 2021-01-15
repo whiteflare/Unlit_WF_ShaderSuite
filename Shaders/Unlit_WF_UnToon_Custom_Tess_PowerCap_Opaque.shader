@@ -279,7 +279,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Light Bake Arrangement)]
+        [WFHeaderToggle(Light Bake Effects)]
             _GI_Enable              ("[GI] Enable", Float) = 0
             _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
             _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1

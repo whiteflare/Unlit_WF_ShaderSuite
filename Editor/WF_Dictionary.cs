@@ -127,6 +127,7 @@ namespace UnlitWF
                 new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
                 new WFShaderFunction("FG", "FG", "ToonFog"),
                 new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
+                new WFShaderFunction("GI", "GI", "Light Bake Effects"),
             };
 
         /// <summary>
@@ -315,6 +316,10 @@ namespace UnlitWF
             new WFI18NTranslation("Custom Sun Altitude", "カスタム太陽の高度"),
             new WFI18NTranslation("Disable BackLit", "逆光補正しない"),
             new WFI18NTranslation("Disable ObjectBasePos", "メッシュ原点を取得しない"),
+            // Light Bake Effects
+            new WFI18NTranslation("GI", "Indirect Multiplier", "間接光の倍率"),
+            new WFI18NTranslation("GI", "Emission Multiplier", "Emissionの倍率"),
+            new WFI18NTranslation("GI", "Indirect Chroma", "間接光の彩度"),
             // Gem Background
             new WFI18NTranslation("GB", "Background Color", "背景色 (裏面色)"),
             // Gem Reflection
