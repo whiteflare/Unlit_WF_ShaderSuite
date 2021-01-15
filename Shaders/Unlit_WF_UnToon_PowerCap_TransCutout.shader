@@ -257,7 +257,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _GI_Enable              ("[GI] Enable", Float) = 0
             _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
             _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1
-            _GI_IndirectDesaturate  ("[GI] Indirect Desaturate", Range(0, 1)) = 0
+            _GI_IndirectChroma      ("[GI] Indirect Chroma", Range(0, 2)) = 1
 
         [HideInInspector]
         [WF_FixFloat(0.0)]

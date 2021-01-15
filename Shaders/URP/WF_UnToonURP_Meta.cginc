@@ -90,7 +90,7 @@
 #endif
 
         // 単色化
-        color.rgb = lerp(color.rgb, AVE_RGB(color.rgb).xxx, lerp(0, _GI_IndirectDesaturate, _GI_Enable));
+        color.rgb = max(ZERO_VEC3, lerp(AVE_RGB(color.rgb).xxx, color.rgb, lerp(1, _GI_IndirectChroma, _GI_Enable)));
 
         o.Albedo        = color.rgb * lerp(1, _GI_IndirectMultiplier, _GI_Enable);
         o.SpecularColor = o.Albedo;

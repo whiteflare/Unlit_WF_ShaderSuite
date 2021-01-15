@@ -99,7 +99,7 @@
     float           _GL_DisableBasePos;
 
     float           _GI_Enable;
-    float           _GI_IndirectDesaturate;
+    float           _GI_IndirectChroma;
     float           _GI_IndirectMultiplier;
     float           _GI_EmissionMultiplier;
 
