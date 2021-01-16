@@ -258,10 +258,10 @@
         float3 lightColorMain = sampleMainLightColor();
         float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
 
-        float3 color = lightColorMain + lightColorSub4 + ambientColor;   // 合成
+        float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
         float power = MAX_RGB(color);                       // 明度
         color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
-        color /= NON_ZERO_FLOAT(power);                     // 正規化
+        color /= power;                                     // 正規化(colorはゼロではないのでpowerが0除算になることはない)
         color *= lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // 明度のsaturateと書き戻し
         return color;
     }

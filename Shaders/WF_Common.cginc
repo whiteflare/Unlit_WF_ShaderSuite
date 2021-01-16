@@ -57,7 +57,7 @@
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( PICK_VERT_TEX2D_LOD(tex, uv, 0), inv )
 
-    #define NZF                                     0.00390625
+    #define NZF                                     0.0001
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)
     #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
     #define ZERO_VEC3                               float3(0, 0, 0)
@@ -71,7 +71,7 @@
 
     float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
-        if (lenSq < 0.0001) {
+        if (lenSq < NZF) {
             return float2(0, 0);
         }
         return in_vec * rsqrt(lenSq);
@@ -79,7 +79,7 @@
 
     float3 SafeNormalizeVec3(float3 in_vec) {
         float lenSq = dot(in_vec, in_vec);
-        if (lenSq < 0.0001) {
+        if (lenSq < NZF) {
             return float3(0, 0, 0);
         }
         return in_vec * rsqrt(lenSq);
@@ -87,7 +87,7 @@
 
     float3 SafeNormalizeVec3Normal(float3 in_vec) {
         float lenSq = dot(in_vec, in_vec);
-        if (lenSq < 0.0001) {
+        if (lenSq < NZF) {
             return float3(0, 0, 1);
         }
         return in_vec * rsqrt(lenSq);
