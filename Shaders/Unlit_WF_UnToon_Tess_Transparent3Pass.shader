@@ -58,8 +58,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
         [NoScaleOffset]
             _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
-        [Enum(NORMAL,0,EDGE,1)]
-            _TL_LineType            ("[LI] Line Type", Float) = 0
         [Toggle(_)]
             _TL_UseCutout           ("[LI] Use Cutout", Float) = 0
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
