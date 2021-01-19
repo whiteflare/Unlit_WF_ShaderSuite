@@ -75,9 +75,15 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Light Bake Effects)]
+            _GI_Enable              ("[GI] Enable", Float) = 0
+            _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
+            _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1
+            _GI_IndirectChroma      ("[GI] Indirect Chroma", Range(0, 2)) = 1
+
         [HideInInspector]
-        [FixFloat(0.0)]
-            _CurrentVersion         ("2021/01/01", Float) = 0
+        [WF_FixFloat(0.0)]
+            _CurrentVersion         ("2021/01/20", Float) = 0
     }
 
     SubShader {

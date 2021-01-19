@@ -32,7 +32,7 @@ namespace UnlitWF
         /// <summary>
         /// テクスチャとカラーを1行で表示するやつのプロパティ名辞書
         /// </summary>
-        private readonly Dictionary<string, string> COLOR_TEX_COBINATION = new Dictionary<string, string>() {
+        private readonly Dictionary<string, string> COMBI_COLOR_TEX = new Dictionary<string, string>() {
             { "_TS_BaseColor", "_TS_BaseTex" },
             { "_TS_1stColor", "_TS_1stTex" },
             { "_TS_2ndColor", "_TS_2ndTex" },
@@ -40,7 +40,16 @@ namespace UnlitWF
             { "_ES_Color", "_ES_MaskTex" },
             { "_EmissionColor", "_EmissionMap" },
             { "_LM_Color", "_LM_Texture" },
-            { "_TL_LineColor", "_TL_CustomColorTex" }
+            { "_TL_LineColor", "_TL_CustomColorTex" },
+            { "_OL_Color", "_OL_OverlayTex" },
+        };
+
+        /// <summary>
+        /// MinMaxSliderを使って1行で表示するやつのプロパティ名辞書
+        /// </summary>
+        private readonly Dictionary<string, string> COMBI_MIN_MAX = new Dictionary<string, string>() {
+            { "_TE_MinDist", "_TE_MaxDist" },
+            { "_FG_MinDist", "_FG_MaxDist" },
         };
 
         delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
@@ -85,6 +94,12 @@ namespace UnlitWF
             "_ALPHAPREMULTIPLY_ON",
         };
 
+        static class Styles
+        {
+            public static readonly Texture2D infoIcon = EditorGUIUtility.Load("icons/console.infoicon.png") as Texture2D;
+            public static readonly Texture2D warnIcon = EditorGUIUtility.Load("icons/console.warnicon.png") as Texture2D;
+        }
+
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
             PreChangeShader(material, oldShader, newShader);
 
@@ -108,11 +123,19 @@ namespace UnlitWF
                         material.DisableKeyword(key);
                     }
                 }
+                // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
+                if (!WFCommonUtility.IsSupportedShader(oldShader) && material.HasProperty("_EmissionColor")) {
+                    var em = material.GetColor("_EmissionColor");
+                    if (em.a < 1e-4) {
+                        em.a = 1.0f;
+                        material.SetColor("_EmissionColor", em);
+                    }
+                }
             }
         }
 
         public static bool IsSupportedShader(Shader shader) {
-            return shader != null && shader.name.Contains("UnlitWF/") && !shader.name.Contains("WF_DebugView");
+            return WFCommonUtility.IsSupportedShader(shader) && !shader.name.Contains("WF_DebugView");
         }
 
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
@@ -124,6 +147,8 @@ namespace UnlitWF
                 OnGuiSub_ShowCurrentShaderName(materialEditor, mat);
                 // マイグレーションHelpBox
                 OnGUISub_MigrationHelpBox(materialEditor);
+                // Batching Static対策HelpBox
+                OnGUISub_BatchingStaticHelpBox(materialEditor);
             }
 
             // 現在無効なラベルを保持するリスト
@@ -160,29 +185,7 @@ namespace UnlitWF
                 EditorGUI.BeginChangeCheck();
 
                 // 描画
-                GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
-                if (COLOR_TEX_COBINATION.ContainsKey(prop.name)) {
-                    // テクスチャとカラーを1行で表示するものにマッチした場合
-                    MaterialProperty propTex = FindProperty(COLOR_TEX_COBINATION[prop.name], properties, false);
-                    if (propTex != null) {
-                        materialEditor.TexturePropertySingleLine(guiContent, propTex, prop);
-                        if (!propTex.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
-                            using (new EditorGUI.IndentLevelScope()) {
-                                materialEditor.TextureScaleOffsetProperty(propTex);
-                                EditorGUILayout.Space();
-                            }
-                        }
-                    }
-                    else {
-                        materialEditor.ShaderProperty(prop, guiContent);
-                    }
-                }
-                else if (COLOR_TEX_COBINATION.ContainsValue(prop.name)) {
-                    // nop
-                }
-                else {
-                    materialEditor.ShaderProperty(prop, guiContent);
-                }
+                OnGuiSub_ShaderProperty(materialEditor, properties, prop);
 
                 // 更新監視
                 if (EditorGUI.EndChangeCheck()) {
@@ -218,6 +221,104 @@ namespace UnlitWF
                             mm.DisableKeyword(key);
                         }
                     }
+                }
+            }
+        }
+
+        private void OnGuiSub_ShaderProperty(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop) {
+            // GUIContent 作成
+            GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
+
+            // テクスチャとカラーを1行で表示する
+            if (COMBI_COLOR_TEX.ContainsKey(prop.name)) {
+                MaterialProperty another = FindProperty(COMBI_COLOR_TEX[prop.name], properties, false);
+                if (another != null) {
+                    DoSingleLineTextureProperty(materialEditor, guiContent, prop, another);
+                    return;
+                }
+            }
+            else if (COMBI_COLOR_TEX.ContainsValue(prop.name)) {
+                return; // 相方の側は何もしない
+            }
+
+            // MinMaxSlider
+            if (COMBI_MIN_MAX.ContainsKey(prop.name)) {
+                MaterialProperty another = FindProperty(COMBI_MIN_MAX[prop.name], properties, false);
+                if (another != null) {
+                    DoMinMaxProperty(materialEditor, guiContent, prop, another);
+                    return;
+                }
+            }
+            else if (COMBI_MIN_MAX.ContainsValue(prop.name)) {
+                return; // 相方の側は何もしない
+            }
+
+            materialEditor.ShaderProperty(prop, guiContent);
+        }
+
+        private static void DoSingleLineTextureProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propColor, MaterialProperty propTexture) {
+            // 1行テクスチャプロパティ
+            materialEditor.TexturePropertySingleLine(label, propTexture, propColor);
+
+            // もし NoScaleOffset がないなら ScaleOffset も追加で表示する
+            if (!propTexture.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
+                using (new EditorGUI.IndentLevelScope()) {
+                    float oldLabelWidth = EditorGUIUtility.labelWidth;
+                    EditorGUIUtility.labelWidth = 0f;
+                    materialEditor.TextureScaleOffsetProperty(propTexture);
+                    EditorGUIUtility.labelWidth = oldLabelWidth;
+                    EditorGUILayout.Space();
+                }
+            }
+        }
+
+        private static void DoMinMaxProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propMin, MaterialProperty propMax) {
+            Vector2 propMinLimit = propMin.type == MaterialProperty.PropType.Range ? propMin.rangeLimits : new Vector2(0, 1);
+            Vector2 propMaxLimit = propMax.type == MaterialProperty.PropType.Range ? propMax.rangeLimits : propMinLimit;
+
+            float minValue = propMin.floatValue;
+            float maxValue = propMax.floatValue;
+            float minLimit = Mathf.Min(propMinLimit.x, propMaxLimit.x);
+            float maxLimit = Mathf.Max(propMinLimit.y, propMaxLimit.y, minValue, maxValue);
+
+            var rect = EditorGUILayout.GetControlRect();
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+
+            EditorGUI.BeginChangeCheck();
+
+            // MinMaxSlider
+
+            rect.width -= EditorGUIUtility.fieldWidth + 5;
+            EditorGUI.showMixedValue = propMin.hasMixedValue || propMax.hasMixedValue;
+            EditorGUI.MinMaxSlider(rect, label, ref minValue, ref maxValue, minLimit, maxLimit);
+
+            // propMin の FloatField
+
+            rect.width = EditorGUIUtility.fieldWidth / 2 - 1;
+            rect.x += oldLabelWidth;
+            minValue = EditorGUI.FloatField(rect, minValue);
+
+            // propMax の FloatField
+
+            rect.x += EditorGUIUtility.fieldWidth / 2 + 1;
+            maxValue = EditorGUI.FloatField(rect, maxValue);
+
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+
+            if (EditorGUI.EndChangeCheck()) {
+                if (propMin.type == MaterialProperty.PropType.Range) {
+                    propMin.floatValue = Mathf.Clamp(minValue, propMinLimit.x, propMinLimit.y);
+                }
+                else {
+                    propMin.floatValue = minValue;
+                }
+                if (propMax.type == MaterialProperty.PropType.Range) {
+                    propMax.floatValue = Mathf.Clamp(maxValue, propMaxLimit.x, propMaxLimit.y);
+                }
+                else {
+                    propMax.floatValue = maxValue;
                 }
             }
         }
@@ -276,17 +377,65 @@ namespace UnlitWF
             var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
             if (IsOldMaterial(mats)) {
-                var tex = WFI18N.LangMode == EditorLanguage.日本語 ?
+
+                var message = WFI18N.LangMode == EditorLanguage.日本語 ?
                     "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
                     "This Material may have been created in an older version. Convert to new version?";
-                if (materialEditor.HelpBoxWithButton(
-                                    new GUIContent(tex),
-                                    new GUIContent("Fix Now"))) {
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now"))) {
                     var editor = new WFMaterialEditUtility();
                     // 名称を全て変更
                     editor.RenameOldNameProperties(mats);
                     // リセット
                     ResetOldMaterialTable(mats);
+                }
+            }
+        }
+
+        private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor) {
+            // 現在のシェーダが DisableBatching == False のとき以外は何もしない (Batching されないので)
+            var target = materialEditor.target as Material;
+            if (target == null || !target.GetTag("DisableBatching", false, "False").Equals("False", StringComparison.OrdinalIgnoreCase)) {
+                return;
+            }
+            // ターゲットが設定用プロパティをどちらも持っていないならば何もしない
+            if (!target.HasProperty("_GL_DisableBackLit") && !target.HasProperty("_GL_DisableBasePos")) {
+                return;
+            }
+            // 現在のシェーダ
+            var shader = target.shader;
+
+            // 現在編集中のマテリアルの配列
+            var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
+            // 現在編集中のマテリアルのうち、Batching Static のときにオンにしたほうがいい設定がオフになっているマテリアル
+            var allNonStaticMaterials = targets.Where(mat => mat.GetInt("_GL_DisableBackLit") == 0 || mat.GetInt("_GL_DisableBasePos") == 0).ToArray();
+
+            if (allNonStaticMaterials.Length == 0) {
+                return;
+            }
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            // 現在のシーンにある BatchingStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
+            var allStaticMaterialsInScene = scene.GetRootGameObjects()
+                .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
+                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.BatchingStatic))
+                .SelectMany(mf => mf.sharedMaterials)
+                .Where(mat => mat != null && mat.shader == shader)
+                .ToArray();
+
+            // Batching Static の付いているマテリアルが targets 内にあるならば警告
+            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat))) {
+
+                var message = WFI18N.LangMode == EditorLanguage.日本語 ? 
+                    "このマテリアルは Batching Static な MeshRenderer から使われているようです。Batching Static 用の設定へ変更しますか？" :
+                    "This material seems to be used by the Batching Static MeshRenderer. Do you want to change the settings for Batching Static?";
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now"))) {
+                    // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
+                    foreach (var mat in allNonStaticMaterials) {
+                        mat.SetInt("_GL_DisableBackLit", 1);
+                        mat.SetInt("_GL_DisableBasePos", 1);
+                    }
                 }
             }
         }
@@ -459,15 +608,26 @@ namespace UnlitWF
             ShaderCustomEditor.DrawShurikenStyleHeader(position, text, prop, true);
         }
     }
-    internal class MaterialFixFloatDrawer : MaterialPropertyDrawer
+
+    [Obsolete]
+    internal class MaterialFixFloatDrawer : MaterialWF_FixFloatDrawer
+    {
+        public MaterialFixFloatDrawer() : base() {
+        }
+
+        public MaterialFixFloatDrawer(float value) : base(value) {
+        }
+    }
+
+    internal class MaterialWF_FixFloatDrawer : MaterialPropertyDrawer
     {
         public readonly float value;
 
-        public MaterialFixFloatDrawer() {
+        public MaterialWF_FixFloatDrawer() {
             this.value = 0;
         }
 
-        public MaterialFixFloatDrawer(float value) {
+        public MaterialWF_FixFloatDrawer(float value) {
             this.value = value;
         }
 
@@ -480,15 +640,65 @@ namespace UnlitWF
         }
     }
 
-    internal class MaterialFixNoTextureDrawer : MaterialPropertyDrawer
+    [Obsolete]
+    internal class MaterialFixNoTextureDrawer : MaterialWF_FixNoTextureDrawer
     {
+    }
 
+    internal class MaterialWF_FixNoTextureDrawer : MaterialPropertyDrawer
+    {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
             return 0;
         }
 
         public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
             prop.textureValue = null;
+        }
+    }
+
+    internal class MaterialWF_Vector2Drawer : MaterialPropertyDrawer
+    {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return base.GetPropertyHeight(prop, label, editor) * 2;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+
+            Vector2 value = prop.vectorValue;
+            EditorGUI.BeginChangeCheck();
+            value = EditorGUI.Vector2Field(position, label, value);
+            if (EditorGUI.EndChangeCheck()) {
+                prop.vectorValue = new Vector4(value.x, value.y, 0, 0);
+            }
+
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+        }
+    }
+
+    internal class MaterialWF_Vector3Drawer : MaterialPropertyDrawer
+    {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+            return base.GetPropertyHeight(prop, label, editor) * 2;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+
+            Vector3 value = prop.vectorValue;
+            EditorGUI.BeginChangeCheck();
+            value = EditorGUI.Vector3Field(position, label, value);
+            if (EditorGUI.EndChangeCheck()) {
+                prop.vectorValue = new Vector4(value.x, value.y, value.z, 0);
+            }
+
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
         }
     }
 }

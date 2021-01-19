@@ -67,7 +67,7 @@ namespace UnlitWF
         }
 
         public static bool IsSupportedShader(Shader shader) {
-            return shader != null && shader.name.Contains("UnlitWF/") && shader.name.Contains("WF_DebugView");
+            return WFCommonUtility.IsSupportedShader(shader) && shader.name.Contains("WF_DebugView");
         }
 
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {

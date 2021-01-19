@@ -68,9 +68,7 @@
     DECL_VERT_TEX2D     (_TL_MaskTex);
 #endif
 #ifdef _WF_UNTOON_TESS
-#ifdef _WF_LEGACY_TE_USE_DISPMAP
-    DECL_VERT_TEX2D     (_DispMap);
-#endif
+    DECL_VERT_TEX2D     (_TE_SmoothPowerTex);
 #endif
 
     ////////////////////////////
@@ -100,6 +98,11 @@
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
 
+    float           _GI_Enable;
+    float           _GI_IndirectChroma;
+    float           _GI_IndirectMultiplier;
+    float           _GI_EmissionMultiplier;
+
     float           _CH_Enable;
     float4          _CH_ColorR;
     float4          _CH_ColorG;
@@ -121,7 +124,6 @@
     float           _ES_Sharpness;
     float           _ES_Speed;
     float           _ES_AlphaScroll;
-    float           _ES_BakeIntensity;
 
     float           _NM_Enable;
     float           _BumpScale;
@@ -175,10 +177,10 @@
     float           _LM_InvMaskVal;
 
     float           _TS_Enable;
-    float4          _TS_BaseColor;
-    float4          _TS_1stColor;
-    float4          _TS_2ndColor;
-    float4          _TS_3rdColor;
+    float3          _TS_BaseColor;
+    float3          _TS_1stColor;
+    float3          _TS_2ndColor;
+    float3          _TS_3rdColor;
     float           _TS_Power;
     float           _TS_1stBorder;
     float           _TS_2ndBorder;
@@ -188,13 +190,15 @@
     float           _TS_InvMaskVal;
 
     float           _TR_Enable;
-    float4          _TR_Color;
-    float           _TR_BlendType;
+    float3          _TR_Color;
+    uint            _TR_BlendType;
+    float           _TR_Power;
+    float           _TR_Feather;
+    float           _TR_InvMaskVal;
+    float           _TR_BlendNormal;
     float           _TR_PowerTop;
     float           _TR_PowerSide;
     float           _TR_PowerBottom;
-    float           _TR_InvMaskVal;
-    float           _TR_BlendNormal;
 
     float           _OL_Enable;
     uint            _OL_UVType;
@@ -229,13 +233,11 @@
     float3          _FG_Scale;
 
 #ifdef _WF_UNTOON_TESS
-    uint            _TessType;
-    float           _TessFactor;
-    float           _Smoothing;
-#ifdef _WF_LEGACY_TE_USE_DISPMAP
-    float           _DispMapScale;
-    float           _DispMapLevel;
-#endif
+    float           _TE_Factor;
+    float           _TE_MinDist;
+    float           _TE_MaxDist;
+    float           _TE_SmoothPower;
+    float           _TE_InvMaskVal;
 #endif
 
 #ifdef _WF_UNTOON_POWERCAP

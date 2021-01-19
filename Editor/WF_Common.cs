@@ -132,6 +132,10 @@ namespace UnlitWF
         public static Material[] AsMaterials(params UnityEngine.Object[] array) {
             return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
         }
+
+        public static bool IsSupportedShader(Shader shader) {
+            return shader != null && shader.name.Contains("UnlitWF");
+        }
     }
 
     public class WFShaderFunction
@@ -169,7 +173,7 @@ namespace UnlitWF
         }
 
         public bool Contains(Material mat) {
-            if (mat == null || !mat.shader.name.Contains("UnlitWF")) {
+            if (mat == null || !WFCommonUtility.IsSupportedShader(mat.shader)) {
                 return false;
             }
             return _contains(this, mat);
@@ -189,11 +193,44 @@ namespace UnlitWF
         English, 日本語
     }
 
+    internal class WFI18NTranslation
+    {
+        public readonly string Before;
+        public readonly string After;
+        private readonly HashSet<string> Tags = new HashSet<string>();
+
+        public WFI18NTranslation(string before, string after) : this(null, before, after) {
+        }
+
+        public WFI18NTranslation(string tag, string before, string after) {
+            Before = before;
+            After = after;
+            AddTag(tag);
+        }
+
+        public WFI18NTranslation AddTag(params string[] tags) {
+            foreach(var tag in tags) {
+                if (tag != null) {
+                    Tags.Add(tag);
+                }
+            }
+            return this;
+        }
+
+        public bool ContainsTag(string tag) {
+            return tag != null && Tags.Contains(tag);
+        }
+
+        public bool HasNoTag() {
+            return Tags.Count == 0;
+        }
+    }
+
     internal static class WFI18N
     {
         private static readonly string KEY_EDITOR_LANG = "UnlitWF.ShaderEditor/Lang";
-        private static readonly Dictionary<string, string> EN = new Dictionary<string, string>();
-        private static readonly Dictionary<string, string> JA = WFShaderDictionary.LangEnToJa;
+        private static readonly List<WFI18NTranslation> EN = new List<WFI18NTranslation>();
+        private static readonly List<WFI18NTranslation> JA = WFShaderDictionary.LangEnToJa;
 
         private static EditorLanguage? langMode = null;
 
@@ -226,7 +263,7 @@ namespace UnlitWF
             }
         }
 
-        static Dictionary<string, string> GetDict() {
+        static List<WFI18NTranslation> GetDict() {
             switch (LangMode) {
                 case EditorLanguage.日本語:
                     return JA;
@@ -237,18 +274,40 @@ namespace UnlitWF
 
         public static string GetDisplayName(string text) {
             text = text ?? "";
-            Dictionary<string, string> current = GetDict();
-            if (current != null) {
-                string ret = current.GetValueOrNull(text);
+            var current = GetDict();
+            if (current == null) {
+                return text; // 無いなら変換しない
+            }
+            string ret;
+
+            // text がラベルとテキストに分割できるならば
+            if (WFCommonUtility.FormatDispName(text, out string label, out string name2, out ret)) {
+                // ラベルとテキストが両方とも一致するものを最初に検索する
+                ret = current.Where(t => t.ContainsTag(label) && t.Before == name2).Select(t => t.After).FirstOrDefault();
+                if (ret != null) {
+                    return "[" + label + "] " + ret;
+                }
+                // ラベルなしでテキストが一致するものを検索する
+                ret = current.Where(t => t.HasNoTag() && t.Before == name2).Select(t => t.After).FirstOrDefault();
+                if (ret != null) {
+                    return "[" + label + "] " + ret;
+                }
+                //// ラベル問わずテキストが一致するものを検索する
+                //ret = current.Where(t => t.Before == name2).Select(t => t.After).FirstOrDefault();
+                //if (ret != null) {
+                //    return "[" + label + "] " + ret;
+                //}
+            } else {
+                // ラベルなしでテキストが一致するものを検索する
+                ret = current.Where(t => t.HasNoTag() && t.Before == text).Select(t => t.After).FirstOrDefault();
                 if (ret != null) {
                     return ret;
                 }
-                if (WFCommonUtility.FormatDispName(text, out string label, out string name2, out ret)) {
-                    ret = current.GetValueOrNull(name2);
-                    if (ret != null) {
-                        return "[" + label + "] " + ret;
-                    }
-                }
+                ////// ラベル問わずテキストが一致するものを検索する
+                //ret = current.Where(t => t.Before == text).Select(t => t.After).FirstOrDefault();
+                //if (ret != null) {
+                //    return ret;
+                //}
             }
             return text;
         }

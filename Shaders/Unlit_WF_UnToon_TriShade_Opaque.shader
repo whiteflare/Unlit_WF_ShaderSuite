@@ -39,7 +39,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+            _TL_MaskTex             ("[LI] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
@@ -140,16 +140,19 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             _TR_Enable              ("[RM] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [Enum(ADD,0,ALPHA,1)]
+        [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
             _TR_BlendType           ("[RM] Blend Type", Float) = 0
+            _TR_Power               ("[RM] Power", Range(0, 2)) = 1
+            _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
+            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
+        [Header(RimLight Advance)]
             _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
-            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // Decal Texture
         [WFHeaderToggle(Decal Texture)]
@@ -164,25 +167,24 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
+            _OL_MaskTex             ("[OL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
-        // EmissiveScroll
+        // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
+            _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
-        [PowerSlider(4.0)]
-            _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
 
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [WF_Vector3]
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
@@ -204,10 +206,12 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
             _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] Fog Min Distance", Float) = 0.5
-            _FG_MaxDist             ("[FG] Fog Max Distance", Float) = 0.8
+            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
+        [WF_Vector3]
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
+        [WF_Vector3]
             _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
 
         // Lit
@@ -230,9 +234,15 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Light Bake Effects)]
+            _GI_Enable              ("[GI] Enable", Float) = 0
+            _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
+            _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1
+            _GI_IndirectChroma      ("[GI] Indirect Chroma", Range(0, 2)) = 1
+
         [HideInInspector]
-        [FixFloat(0.0)]
-            _CurrentVersion         ("2021/01/01", Float) = 0
+        [WF_FixFloat(0.0)]
+            _CurrentVersion         ("2021/01/20", Float) = 0
     }
 
     SubShader {

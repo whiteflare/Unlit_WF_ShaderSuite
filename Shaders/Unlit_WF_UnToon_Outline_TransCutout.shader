@@ -51,7 +51,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Outline Mask Texture", 2D) = "white" {}
+            _TL_MaskTex             ("[LI] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
@@ -66,7 +66,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         [HDR]
             _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CH_ColorB              ("[CH] B chl Color", Color) = (1, 1, 1, 1)
+            _CH_ColorB              ("[CH] B ch Color", Color) = (1, 1, 1, 1)
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -145,14 +145,13 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         // ラメ
         [WFHeaderToggle(Lame)]
             _LM_Enable              ("[LM] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _LM_UVType              ("[LM] UV Type", Float) = 0
         [HDR]
             _LM_Color               ("[LM] Color", Color) = (1, 1, 1, 1)
-        [NoScaleOffset]
             _LM_Texture             ("[LM] Texture", 2D) = "white" {}
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
-        [Enum(UV1,0,UV2,1)]
-            _LM_UVType              ("[LM] UV Type", Float) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LM_Shape               ("[LM] Shape", Float) = 0
         [PowerSlider(4.0)]
@@ -202,7 +201,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -219,25 +218,24 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] Decal Mask Texture", 2D) = "white" {}
+            _OL_MaskTex             ("[OL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
-        // EmissiveScroll
+        // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
+            _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
-        [PowerSlider(4.0)]
-            _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
 
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [WF_Vector3]
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
@@ -275,9 +273,15 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Light Bake Effects)]
+            _GI_Enable              ("[GI] Enable", Float) = 0
+            _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
+            _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1
+            _GI_IndirectChroma      ("[GI] Indirect Chroma", Range(0, 2)) = 1
+
         [HideInInspector]
-        [FixFloat(0.0)]
-            _CurrentVersion         ("2021/01/01", Float) = 0
+        [WF_FixFloat(0.0)]
+            _CurrentVersion         ("2021/01/20", Float) = 0
     }
 
     SubShader {

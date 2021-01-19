@@ -439,7 +439,7 @@ namespace UnlitWF
             foreach (var func in WFShaderDictionary.ShaderFuncList) {
                 if (func.Contains(param.materialSource)) {
                     bool value = param.functions.Contains(func.Label);
-                    if (GUILayout.Toggle(value, func.Name)) {
+                    if (GUILayout.Toggle(value, string.Format("[{0}] {1}", func.Label, func.Name))) {
                         updatedFunctions.Add(func.Label);
                     }
                 }

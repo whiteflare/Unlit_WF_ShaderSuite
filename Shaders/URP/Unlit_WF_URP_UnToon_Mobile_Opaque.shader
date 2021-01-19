@@ -91,16 +91,19 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             _TR_Enable              ("[RM] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [Enum(ADD,0,ALPHA,1)]
+        [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
             _TR_BlendType           ("[RM] Blend Type", Float) = 0
+            _TR_Power               ("[RM] Power", Range(0, 2)) = 1
+            _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
+            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
+        [Header(RimLight Advance)]
             _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
-            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _TR_MaskTex             ("[RM] RimLight Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
 
         // Emission
         [WFHeaderToggle(Emission)]
@@ -108,11 +111,9 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
         [HDR]
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _EmissionMap            ("[ES] Mask Texture", 2D) = "white" {}
+            _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
         [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
-        [PowerSlider(4.0)]
-            _ES_BakeIntensity       ("[ES] Bake Intensity", Range(0, 16)) = 1
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -142,9 +143,15 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
         [Toggle(_)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Light Bake Effects)]
+            _GI_Enable              ("[GI] Enable", Float) = 0
+            _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
+            _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1
+            _GI_IndirectChroma      ("[GI] Indirect Chroma", Range(0, 2)) = 1
+
         [HideInInspector]
-        [FixFloat(0.0)]
-            _CurrentVersion         ("2021/01/01", Float) = 0
+        [WF_FixFloat(0.0)]
+            _CurrentVersion         ("2021/01/20", Float) = 0
     }
 
     SubShader {

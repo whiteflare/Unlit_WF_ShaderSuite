@@ -254,19 +254,15 @@
         return TGL_ON(-lightType) ? samplePoint1LightColor(ws_vertex) : sampleMainLightColor();
     }
 
-    inline void affectAntiGlare(float glLevel, inout float4 color) {
-        color.rgb = saturate(color.rgb * glLevel);
-    }
-
     inline float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
         float3 lightColorMain = sampleMainLightColor();
         float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
 
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
-        float power = AVE_RGB(color);                                       // 明度
-        color = lerp( power.xxx, color, _GL_BlendPower);                    // 色の混合
-        color = saturate( color / AVE_RGB(color) );                         // 正規化
-        color = color * lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // アンチグレア
+        float power = MAX_RGB(color);                       // 明度
+        color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
+        color /= power;                                     // 正規化(colorはゼロではないのでpowerが0除算になることはない)
+        color *= lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // 明度のsaturateと書き戻し
         return color;
     }
 
@@ -568,7 +564,7 @@
                 float power = WF_TEX2D_LAME_MASK(uv_main);
                 if (0 < power) {
                     float2 uv_lame = _LM_UVType == 1 ? i.uv_lmap : i.uv;
-                    uv_lame = TRANSFORM_TEX(uv_lame, _MainTex);
+                    uv_lame = TRANSFORM_TEX(uv_lame, _LM_Texture);
 
                     float   scale = NON_ZERO_FLOAT(_LM_Scale) / 100;
                     float2  st = uv_lame / scale;
@@ -642,9 +638,9 @@
             }
         }
 
-        inline void calcShadowColor(float4 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
+        inline void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
             shadow_color = lerp( 
-                lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power * color.a),
+                lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power),
                 shadow_color,
                 smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
         }
@@ -691,21 +687,41 @@
 
     #ifdef _TR_ENABLE
 
+        float calcRimLightPower(float3 vs_normal) {
+            float side      = _TR_Power * _TR_PowerSide;
+            float top       = _TR_Power * _TR_PowerTop;
+            float bottom    = _TR_Power * _TR_PowerBottom;
+
+            float3x3 mat = 0;
+            mat[0][0] = side + 1;
+            mat[1][1] = (top + bottom) / 2 + 1;
+            mat[1][2] = (top - bottom) / 2;
+
+            float2 rim_uv = mul(mat, float3(vs_normal.xy, 1)).xy;
+
+            return smoothstep(-NZF, _TR_Feather, length(rim_uv) - 1);
+        }
+
+        float3 calcRimLightColor(float3 color) {
+            float3 rimColor = _TR_Color.rgb - (
+                    _TR_BlendType == 0 ? MEDIAN_GRAY    // ADD_AND_SUB
+                    : _TR_BlendType == 1 ? color        // ALPHA
+                    : ZERO_VEC3                         // ADD
+                );
+            return rimColor;
+        }
+
         inline void affectRimLight(v2f i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TR_Enable)) {
                 if (isInMirror()) {
                     angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
                 }
-                // vs_normalからリムライト範囲を計算
-                float2 rim_uv = vs_normal.xy;
-                rim_uv.x *= _TR_PowerSide + 1;
-                rim_uv.y *= (_TR_PowerTop + _TR_PowerBottom) / 2 + 1;
-                rim_uv.y += (_TR_PowerTop - _TR_PowerBottom) / 2;
                 // 順光の場合はリムライトを暗くする
-                float3 rimPower = saturate(0.8 - angle_light_camera) * _TR_Color.a * WF_TEX2D_RIM_MASK(uv_main);
+                float3 rimPower = saturate(0.8 - angle_light_camera) * WF_TEX2D_RIM_MASK(uv_main);
                 // 色計算
-                float3 rimColor = _TR_Color.rgb - (TGL_OFF(_TR_BlendType) ? MEDIAN_GRAY : color.rgb);
-                color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, smoothstep(1, 1.05, length(rim_uv)) );
+                float3 rimColor = calcRimLightColor(color.rgb);
+                // 合成
+                color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, calcRimLightPower(vs_normal));
             }
         }
     #else
@@ -872,14 +888,12 @@
     inline float3 calcAmbientColorVertex(float2 uv_lmap) {
         // ライトマップもしくは環境光を取得
         #ifdef _LMAP_ENABLE
-            float3 color = pickLightmapLod(uv_lmap);
             #if defined(_AO_ENABLE)
-            if (TGL_ON(_AO_Enable)) {
-                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので明るさだけ取得する
-                return AVE_RGB(color).xxx;
-            }
+                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので固定値を返す
+                return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
+            #else
+                return pickLightmapLod(uv_lmap);
             #endif
-            return color;
         #else
             return sampleSHLightColor();
         #endif

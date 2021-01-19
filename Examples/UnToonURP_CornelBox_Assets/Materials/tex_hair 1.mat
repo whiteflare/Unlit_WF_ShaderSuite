@@ -68,7 +68,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: f6a48352392a79e4fb6bb2fe1dc3da35, type: 3}
+        m_Texture: {fileID: 2800000, guid: 97620b56aa1502940aaf4f99e09aaddc, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -137,6 +137,7 @@ Material:
     - _CL_Enable: 0
     - _CL_Monochrome: 0
     - _CullMode: 0
+    - _CurrentVersion: 0
     - _DetailNormalMapScale: 0.4
     - _DispLevel: 0
     - _DispMapLevel: 0
@@ -151,12 +152,16 @@ Material:
     - _ES_Shape: 0
     - _ES_Sharpness: 1
     - _ES_Speed: 2
+    - _GI_EmissionMultiplier: 1
+    - _GI_Enable: 0
+    - _GI_IndirectChroma: 1
+    - _GI_IndirectMultiplier: 1
     - _GL_BlendPower: 0.8
     - _GL_CastShadow: 1
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
-    - _GL_DisableBackLit: 0
-    - _GL_DisableBasePos: 0
+    - _GL_DisableBackLit: 1
+    - _GL_DisableBasePos: 1
     - _GL_Level: 97
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
@@ -177,6 +182,7 @@ Material:
     - _LM_Scale: 0.5
     - _LM_Shape: 0
     - _LM_Spot: 2
+    - _LM_UVType: 0
     - _MT_BlendNormal: 0.1
     - _MT_Brightness: 0
     - _MT_CubemapHighCut: 0
@@ -203,7 +209,6 @@ Material:
     - _OL_InvMaskVal: 0
     - _OL_Power: 1
     - _OL_UVType: 0
-    - _Smoothing: 1
     - _TL_BlendBase: 0
     - _TL_BlendCustom: 0
     - _TL_Enable: 0
@@ -213,7 +218,9 @@ Material:
     - _TR_BlendNormal: 0
     - _TR_BlendType: 0
     - _TR_Enable: 1
+    - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
+    - _TR_Power: 1
     - _TR_PowerBottom: 0
     - _TR_PowerSide: 0.05
     - _TR_PowerTop: 0.01
@@ -224,7 +231,6 @@ Material:
     - _TS_Feather: 0.05
     - _TS_InvMaskVal: 0
     - _TS_Power: 1
-    - _TessFactor: 4
     - _TessType: 0
     - _UseVertexColor: 0
     - _WF_DebugView: 0
