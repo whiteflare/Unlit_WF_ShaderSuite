@@ -31,6 +31,14 @@ namespace UnlitWF
         private static readonly Regex PAT_DISP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
         private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+?)(?<suffix>(?:_\d+)?)$");
 
+        /// <summary>
+        /// プロパティのディスプレイ名から、Prefixと名前を分割する。
+        /// </summary>
+        /// <param name="text">ディスプレイ名</param>
+        /// <param name="label">Prefix</param>
+        /// <param name="name">名前</param>
+        /// <param name="dispName">ディスプレイ文字列</param>
+        /// <returns></returns>
         public static bool FormatDispName(string text, out string label, out string name, out string dispName) {
             var mm = PAT_DISP_NAME.Match(text ?? "");
             if (mm.Success) {
@@ -83,16 +91,32 @@ namespace UnlitWF
             return label;
         }
 
+        /// <summary>
+        /// プロパティ名からEnableトグルかどうか判定する。
+        /// </summary>
+        /// <param name="prop_name"></param>
+        /// <returns></returns>
         public static bool IsEnableToggleFromPropName(string prop_name) {
             string label, name;
             WFCommonUtility.FormatPropName(prop_name, out label, out name);
             return IsEnableToggle(label, name);
         }
 
+        /// <summary>
+        /// Enableトグルかどうか判定する。
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static bool IsEnableToggle(string label, string name) {
             return label != null && name.ToLower() == "enable";
         }
 
+        /// <summary>
+        /// マテリアルのシェーダを指定のものに変更する。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="mats"></param>
         public static void ChangeShader(string name, params Material[] mats) {
             if (string.IsNullOrWhiteSpace(name) || mats.Length == 0) {
                 return; // なにもしない
@@ -129,12 +153,76 @@ namespace UnlitWF
             }
         }
 
+        /// <summary>
+        /// Object[] -> Material[] のユーティリティ関数。
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
         public static Material[] AsMaterials(params UnityEngine.Object[] array) {
             return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
         }
 
+        /// <summary>
+        /// ShaderがUnlitWFでサポートされるものかどうか判定する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
         public static bool IsSupportedShader(Shader shader) {
             return shader != null && shader.name.Contains("UnlitWF");
+        }
+
+        /// <summary>
+        /// 最新リリースのVersionInfo
+        /// </summary>
+        private static WFVersionInfo LatestVersion = null;
+
+        /// <summary>
+        /// 最新リリースのVersionInfoを返却する。不明のときはnullを返却する。
+        /// </summary>
+        /// <returns></returns>
+        public static WFVersionInfo GetLatestVersion() {
+            return LatestVersion;
+        }
+
+        /// <summary>
+        /// 最新リリースのVersionInfoを設定する。
+        /// </summary>
+        /// <param name="ver"></param>
+        public static void SetLatestVersion(WFVersionInfo ver) {
+            LatestVersion = ver != null && ver.HasValue() ? ver : null;
+        }
+
+        /// <summary>
+        /// 指定のバージョン文字列が最新リリースよりも古いかどうか判定する。不明のときはfalseを返す。
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public static bool IsOlderShaderVersion(string version) {
+            if (LatestVersion == null || version == null) {
+                return false;
+            }
+            return version.CompareTo(LatestVersion.latestVersion) < 0;
+        }
+
+        /// <summary>
+        /// 最新リリースのダウンロードページを開く。
+        /// </summary>
+        public static void OpenDownloadPage() {
+            if (LatestVersion == null) {
+                return;
+            }
+            Application.OpenURL(LatestVersion.downloadPage);
+        }
+    }
+
+    [Serializable]
+    public class WFVersionInfo
+    {
+        public string latestVersion;
+        public string downloadPage;
+
+        public bool HasValue() {
+            return latestVersion != null && downloadPage != null;
         }
     }
 

@@ -323,6 +323,19 @@ namespace UnlitWF
             }
         }
 
+        private static string GetShaderCurrentVersion(Shader shader) {
+            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--) {
+                if ("_CurrentVersion" == ShaderUtil.GetPropertyName(shader, idx)) {
+                    return ShaderUtil.GetPropertyDescription(shader, idx);
+                }
+            }
+            return null;
+        }
+
+        private static string GetShaderCurrentVersion(Material mat) {
+            return mat == null ? null : GetShaderCurrentVersion(mat.shader);
+        }
+
         private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, Material mat) {
             // シェーダ名の表示
             var rect = EditorGUILayout.GetControlRect();
@@ -330,18 +343,26 @@ namespace UnlitWF
             GUI.Label(rect, "Current Shader", EditorStyles.boldLabel);
             GUILayout.Label(new Regex(@".*/").Replace(mat.shader.name, ""));
 
-            for (int idx = ShaderUtil.GetPropertyCount(mat.shader) - 1; 0 <= idx; idx--) {
-                if ("_CurrentVersion" == ShaderUtil.GetPropertyName(mat.shader, idx)) {
-                    rect = EditorGUILayout.GetControlRect();
-                    rect.y += 2;
-                    GUI.Label(rect, "Current Version", EditorStyles.boldLabel);
-                    GUILayout.Label(ShaderUtil.GetPropertyDescription(mat.shader, idx));
-                    break;
+            // シェーダ名辞書を参照
+            var snm = WFShaderNameDictionary.TryFindFromName(mat.shader.name);
+
+            // CurrentVersion プロパティがあるなら表示
+            var currentVersion = GetShaderCurrentVersion(mat);
+            if (!string.IsNullOrWhiteSpace(currentVersion)) {
+                rect = EditorGUILayout.GetControlRect();
+                rect.y += 2;
+                GUI.Label(rect, "Current Version", EditorStyles.boldLabel);
+                GUILayout.Label(currentVersion);
+
+                // もしシェーダ名辞書にあって新しいバージョンがリリースされているならばボタンを表示
+                if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion)) {
+                    if (GUILayout.Button("新しいバージョンがリリースされています")) {
+                        WFCommonUtility.OpenDownloadPage();
+                    }
                 }
             }
 
             // シェーダ切り替えボタン
-            var snm = WFShaderNameDictionary.TryFindFromName(mat.shader.name);
             if (snm != null) {
                 var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
 
