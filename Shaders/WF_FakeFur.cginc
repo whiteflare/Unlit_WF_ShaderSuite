@@ -65,7 +65,7 @@
         return o;
     }
 
-    inline g2f initGeomOutput(v2g p) {
+    g2f initGeomOutput(v2g p) {
         g2f o;
         UNITY_INITIALIZE_OUTPUT(g2f, o);
         UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(g2f, o);
@@ -75,13 +75,13 @@
         return o;
     }
 
-    inline void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
+    void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
         o.ws_vertex = lerp(vb, vu, height);
         o.vertex = UnityWorldToClipPos( o.ws_vertex );
         o.height = height;
     }
 
-    inline v2g lerp_v2g(v2g x, v2g y, float div) {
+    v2g lerp_v2g(v2g x, v2g y, float div) {
         v2g o;
         UNITY_INITIALIZE_OUTPUT(v2g, o);
         o.uv                = lerp(x.uv,            y.uv,               div);
