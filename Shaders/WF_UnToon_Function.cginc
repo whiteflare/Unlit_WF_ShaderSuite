@@ -478,7 +478,7 @@
                 if (0.01 < metallic) {
                     // リフレクション
                     float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
-                    reflection = lerp(reflection, calcBrightness(reflection), _MT_Monochrome);
+                    reflection = lerp(reflection, calcBrightness(reflection).xxx, _MT_Monochrome);
 
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
@@ -514,19 +514,19 @@
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
-                    float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2);
-                    color.rgb += matcap_color * lightcap_power * _HL_Power;
+                    matcap_color *= saturate(matcap_mask * _HL_MatcapColor * 2);
+                    color.rgb = blendColor_Add(color.rgb, matcap_color, _HL_Power);
                 } else if(_HL_CapType == 2) {
                     // 乗算合成
-                    float3 lightcap_power = saturate(matcap_mask * LinearToGammaSpace(_HL_MatcapColor) * 2);
-                    color.rgb *= ONE_VEC3 + (matcap_color * lightcap_power - ONE_VEC3) * _HL_Power * MAX_RGB(matcap_mask);
+                    matcap_color *= saturate(matcap_mask * _HL_MatcapColor * 2);
+                    color.rgb = blendColor_Mul(color.rgb, matcap_color, _HL_Power * MAX_RGB(matcap_mask));
                 } else {
                     // 中間色合成
-                    float3 lightcap_power = saturate(matcap_mask * _HL_MatcapColor * 2);
-                    float3 shadecap_power = (1 - lightcap_power) * MAX_RGB(matcap_mask);
-                    float3 lightcap_color = saturate( (matcap_color - MEDIAN_GRAY) * lightcap_power );
-                    float3 shadecap_color = saturate( (MEDIAN_GRAY - matcap_color) * shadecap_power );
-                    color.rgb += (lightcap_color - shadecap_color) * _HL_Power;
+                    matcap_color -= MEDIAN_GRAY;
+                    float3 lighten_color = max(ZERO_VEC3, matcap_color);
+                    float3 darken_color  = min(ZERO_VEC3, matcap_color);
+                    matcap_color = lerp( darken_color, lighten_color, saturate(matcap_mask * _HL_MatcapColor * 2) );
+                    color.rgb = blendColor_Add(color.rgb, matcap_color, _HL_Power * MAX_RGB(matcap_mask));
                 }
             }
         }
@@ -749,17 +749,17 @@
         }
 
         float3 blendOverlayColor(float3 base, float4 decal, float3 power) {
-            float3 rgb = 
-                _OL_BlendType == 0 ? decal.rgb                           // ブレンド
-                : _OL_BlendType == 1 ? base + decal.rgb                 // 加算
-                : _OL_BlendType == 2 ? base * decal.rgb                 // 乗算
-                : _OL_BlendType == 3 ? base + decal.rgb - MEDIAN_GRAY   // 加減算
-                : _OL_BlendType == 4 ? 1 - (1 - base) * (1 - decal.rgb) // スクリーン
-                : _OL_BlendType == 5 ? lerp(2 * base * decal.rgb, 1 - 2 * (1 - base) * (1 - decal.rgb), step(calcBrightness(base), 0.5))   // オーバーレイ
-                : _OL_BlendType == 6 ? lerp(2 * base * decal.rgb, 1 - 2 * (1 - base) * (1 - decal.rgb), step(calcBrightness(decal.rgb), 0.5))   // オーバーレイ
-                : base                                                     // 何もしない
+            power *= decal.a;
+            return
+                  _OL_BlendType == 0 ? blendColor_Alpha(base, decal.rgb, power)
+                : _OL_BlendType == 1 ? blendColor_Add(base, decal.rgb, power)
+                : _OL_BlendType == 2 ? blendColor_Mul(base, decal.rgb, power)
+                : _OL_BlendType == 3 ? blendColor_AddAndSub(base, decal.rgb, power)
+                : _OL_BlendType == 4 ? blendColor_Screen(base, decal.rgb, power)
+                : _OL_BlendType == 5 ? blendColor_Overlay(base, decal.rgb, power)
+                : _OL_BlendType == 6 ? blendColor_HardLight(base, decal.rgb, power)
+                : base  // 何もしない
                 ;
-            return lerp(base, rgb, decal.a * power);
         }
 
         void affectOverlayTexture(v2f i, float2 uv_main, float3 vs_normal, inout float4 color) {

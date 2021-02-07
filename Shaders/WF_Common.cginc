@@ -202,6 +202,60 @@
     }
 
     ////////////////////////////
+    // Color Utility
+    ////////////////////////////
+
+    inline float3 blendColor_Alpha(float3 base, float3 over, float power) {
+        // アルファブレンド
+        float3 c = over;
+        return lerp(base, c, power);
+    }
+
+    inline float3 blendColor_Add(float3 base, float3 over, float power) {
+        // 加算
+        float3 c = base + over;
+        return lerp(base, c, power);
+    }
+
+    inline float3 blendColor_Mul(float3 base, float3 over, float power) {
+        // 乗算
+        float3 c = base * over;
+        return lerp(base, c, power);
+    }
+
+    inline float3 blendColor_AddAndSub(float3 base, float3 over, float power) {
+        // 半加算
+        float3 c = base + over - MEDIAN_GRAY;
+        return lerp(base, c, power);
+    }
+
+    inline float3 blendColor_Screen(float3 base, float3 over, float power) {
+        // スクリーン
+        float3 c = 1 - (1 - base) * (1 - over);
+        return lerp(base, c, power);
+    }
+
+    inline float3 blendColor_Overlay(float3 base, float3 over, float power) {
+        // オーバーレイ
+        float3 c = lerp(
+                2 * base * over,
+                1 - 2 * (1 - base) * (1 - over.rgb),
+                step(AVE_RGB(base), 0.5)
+            );
+        return lerp(base, c, power);
+    }
+
+    inline float3 blendColor_HardLight(float3 base, float3 over, float power) {
+        // ハードライト
+        float3 c = lerp(
+                2 * base * over,
+                1 - 2 * (1 - base) * (1 - over.rgb),
+                step(AVE_RGB(over), 0.5)
+            );
+        return lerp(base, c, power);
+    }
+
+    ////////////////////////////
     // Matcap
     ////////////////////////////
 
