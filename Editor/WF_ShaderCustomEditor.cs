@@ -33,14 +33,12 @@ namespace UnlitWF
         /// </summary>
         private readonly List<IPropertyHook> HOOKS = new List<IPropertyHook>() {
             // _TS_1stColor の直後に影色設定ボタンを追加する
-            new CustomPropertyHook((materialEditor, properties, prop, guiContent) => {
-                if (prop.name == "_TS_1stColor") {
-                    Rect position = EditorGUILayout.GetControlRect(true, 24);
-                    Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
-                    fieldpos.height = 20;
-                    if (GUI.Button(fieldpos, "APPLY")) {
-                        SuggestShadowColor(WFCommonUtility.AsMaterials(materialEditor.targets));
-                    }
+            new CustomPropertyHook("_TS_1stColor", ctx => {
+                Rect position = EditorGUILayout.GetControlRect(true, 24);
+                Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
+                fieldpos.height = 20;
+                if (GUI.Button(fieldpos, "APPLY")) {
+                    SuggestShadowColor(WFCommonUtility.AsMaterials(ctx.editor.targets));
                 }
                 return false;
             } , null),
@@ -60,32 +58,42 @@ namespace UnlitWF
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
             new MinMaxSliderPropertyHook("_FG_MinDist", "_FG_MaxDist"),
 
+            // 条件付きHide
+            new ConditionHidePropertyHook("_OL_CustomParam1", ctx => {
+                var target = FindProperty("_OL_UVType", ctx.all, false);
+                return target != null && target.floatValue != 3; // ANGEL_RINGではないときに隠す
+            }),
+
             // 値を設定したら他プロパティの値を自動で設定する
-            new DefValueSetPropertyHook("_DetailNormalMap", (p, all) => {
-                if (p.name == "_DetailNormalMap" && p.textureValue != null) {
-                    var target = FindProperty("_NM_2ndType", all, false);
-                    if (target != null && target.floatValue == 0) { // OFF
-                        target.floatValue = 1; // BLEND
-                    }
+            new DefValueSetPropertyHook("_DetailNormalMap", ctx => {
+                if (ctx.current.textureValue != null) {
+                    CompareAndSet(ctx.all, "_NM_2ndType", 0, 1); // OFF -> BLEND
                 }
             }),
-            new DefValueSetPropertyHook("_MT_Cubemap", (p, all) => {
-                if (p.name == "_MT_Cubemap" && p.textureValue != null) {
-                    var target = FindProperty("_MT_CubemapType", all, false);
-                    if (target != null && target.floatValue == 0) { // OFF
-                        target.floatValue = 2; // ONLY_SECOND_MAP
-                    }
+            new DefValueSetPropertyHook("_MT_Cubemap", ctx => {
+                if (ctx.current.textureValue != null) {
+                    CompareAndSet(ctx.all, "_MT_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP
                 }
             }),
-            new DefValueSetPropertyHook("_AL_MaskTex", (p, all) => {
-                if (p.name == "_AL_MaskTex" && p.textureValue != null) {
-                    var target = FindProperty("_AL_Source", all, false);
-                    if (target != null && target.floatValue == 0) { // MAIN_TEX_ALPHA
-                        target.floatValue = 1; // MASK_TEX_RED
-                    }
+            new DefValueSetPropertyHook("_AL_MaskTex", ctx => {
+                if (ctx.current.textureValue != null) {
+                    CompareAndSet(ctx.all, "_AL_Source", 0, 1); // MAIN_TEX_ALPHA -> MASK_TEX_RED
                 }
             }),
         };
+
+        public static bool CompareAndSet(MaterialProperty[] prop, string name, int before, int after) {
+            var target = FindProperty(name, prop, false);
+            if (target != null) {
+                if (target.type == MaterialProperty.PropType.Float || target.type == MaterialProperty.PropType.Range) {
+                    if (Mathf.RoundToInt(target.floatValue) == before) {
+                        target.floatValue = after;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         /// <summary>
         /// 見つけ次第削除するシェーダキーワード
@@ -175,7 +183,9 @@ namespace UnlitWF
                 // }
 
                 // 描画
-                OnGuiSub_ShaderProperty(materialEditor, properties, prop);
+                var context = new PropertyGUIContext(materialEditor, properties, prop);
+                context.guiContent = WFI18N.GetGUIContent(prop.displayName);
+                OnGuiSub_ShaderProperty(context);
 
                 // ラベルが指定されていてenableならば有効無効をリストに追加
                 // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
@@ -208,22 +218,19 @@ namespace UnlitWF
             }
         }
 
-        private void OnGuiSub_ShaderProperty(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop) {
-            // GUIContent 作成
-            GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
-
+        private void OnGuiSub_ShaderProperty(PropertyGUIContext context) {
             // 更新チェック
             EditorGUI.BeginChangeCheck();
 
             // フック
             bool customProperty = false;
             foreach (var hook in HOOKS) {
-                customProperty |= hook.OnBefore(materialEditor, properties, prop, guiContent);
+                customProperty |= hook.OnBefore(context);
             }
 
             // プロパティ表示
             if (!customProperty) {
-                materialEditor.ShaderProperty(prop, guiContent);
+                context.editor.ShaderProperty(context.current, context.guiContent);
             }
 
             // チェック終了
@@ -231,7 +238,7 @@ namespace UnlitWF
 
             // フック
             foreach (var hook in HOOKS) {
-                hook.OnAfter(materialEditor, properties, prop, guiContent, changed);
+                hook.OnAfter(context, changed);
             }
         }
 
@@ -584,108 +591,149 @@ namespace UnlitWF
 
         #region PropertyHook
 
+        class PropertyGUIContext
+        {
+            public readonly MaterialEditor editor;
+            public readonly MaterialProperty[] all;
+            public readonly MaterialProperty current;
+            public GUIContent guiContent = null;
+
+            public PropertyGUIContext(MaterialEditor editor, MaterialProperty[] all, MaterialProperty current) {
+                this.editor = editor;
+                this.all = all;
+                this.current = current;
+            }
+        }
+
         /// <summary>
         /// プロパティの前後に実行されるフック処理のインタフェース
         /// </summary>
         interface IPropertyHook
         {
-            bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent);
+            bool OnBefore(PropertyGUIContext context);
 
-            void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed);
+            void OnAfter(PropertyGUIContext context, bool changed);
+        }
+
+        abstract class AbstractPropertyHook : IPropertyHook
+        {
+            protected readonly string name;
+            protected readonly HashSet<string> names = new HashSet<string>();
+
+            protected AbstractPropertyHook(string name, params string[] other) {
+                this.name = name;
+                this.names.Add(name);
+                foreach (var nm in other) {
+                    this.names.Add(nm);
+                }
+            }
+
+            public bool OnBefore(PropertyGUIContext context) {
+                if (names.Contains(context.current.name)) {
+                    return OnBeforeProp(context);
+                }
+                return false;
+            }
+
+            public void OnAfter(PropertyGUIContext context, bool changed) {
+                if (names.Contains(context.current.name)) {
+                    OnAfterProp(context, changed);
+                }
+            }
+
+            protected virtual bool OnBeforeProp(PropertyGUIContext context) {
+                return false;
+            }
+
+            protected virtual void OnAfterProp(PropertyGUIContext context, bool changed) {
+
+            }
         }
 
         /// <summary>
         /// テクスチャとカラーを1行のプロパティで表示する
         /// </summary>
-        private class SingleLineTexPropertyHook : IPropertyHook
+        class SingleLineTexPropertyHook : AbstractPropertyHook
         {
-            private readonly string colorName;
             private readonly string texName;
 
-            public SingleLineTexPropertyHook(string colorName, string texName) {
-                this.colorName = colorName;
+            public SingleLineTexPropertyHook(string colorName, string texName) : base(colorName, texName) {
                 this.texName = texName;
             }
 
-            public bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent) {
-                if (colorName == prop.name) {
+            protected override bool OnBeforeProp(PropertyGUIContext context) {
+                if (name == context.current.name) {
                     // テクスチャとカラーを1行で表示する
-                    MaterialProperty another = FindProperty(texName, properties, false);
+                    MaterialProperty another = FindProperty(texName, context.all, false);
                     if (another != null) {
-                        DrawSingleLineTextureProperty(materialEditor, guiContent, prop, another);
-                        return true;
+                        DrawSingleLineTextureProperty(context.editor, context.guiContent, context.current, another);
                     }
-                    return false;
                 }
-                if (texName == prop.name) {
-                    // 相方の側は何もしない
-                    return true;
-                }
-                return false;
-            }
-
-            public void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed) {
-                // nop
+                // 相方の側は何もしない
+                return true;
             }
         }
 
         /// <summary>
         /// MinとMaxを1行のMinMaxSliderで表示する
         /// </summary>
-        private class MinMaxSliderPropertyHook : IPropertyHook
+        class MinMaxSliderPropertyHook : AbstractPropertyHook
         {
-            private readonly string minName;
             private readonly string maxName;
 
-            public MinMaxSliderPropertyHook(string minName, string maxName) {
-                this.minName = minName;
+            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName, maxName) {
                 this.maxName = maxName;
             }
 
-            public bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent) {
-                if (minName == prop.name) {
+            protected override bool OnBeforeProp(PropertyGUIContext context) {
+                if (name == context.current.name) {
                     // MinMaxSlider
-                    MaterialProperty another = FindProperty(maxName, properties, false);
+                    MaterialProperty another = FindProperty(maxName, context.all, false);
                     if (another != null) {
-                        DrawMinMaxProperty(materialEditor, guiContent, prop, another);
-                        return true;
+                        DrawMinMaxProperty(context.editor, context.guiContent, context.current, another);
                     }
-                    return false;
                 }
-                if (maxName == prop.name) {
-                    // 相方の側は何もしない
-                    return true;
-                }
-                return false;
-            }
-
-            public void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed) {
-                // nop
+                // 相方の側は何もしない
+                return true;
             }
         }
 
         /// <summary>
         /// 特定のプロパティが変更されたときに、他のプロパティのデフォルト値を設定する
         /// </summary>
-        private class DefValueSetPropertyHook : IPropertyHook
+        class DefValueSetPropertyHook : AbstractPropertyHook
         {
-            public delegate void DefValueSetDelegate(MaterialProperty prop, MaterialProperty[] properties);
+            public delegate void DefValueSetDelegate(PropertyGUIContext context);
 
-            private readonly string name;
             private readonly DefValueSetDelegate setter;
 
-            public DefValueSetPropertyHook(string name, DefValueSetDelegate setter) {
-                this.name = name;
+            public DefValueSetPropertyHook(string name, DefValueSetDelegate setter) : base(name) {
                 this.setter = setter;
             }
 
-            public void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed) {
-                if (changed && name == prop.name) {
-                    setter(prop, properties);
+            protected override void OnAfterProp(PropertyGUIContext context, bool changed) {
+                if (changed) {
+                    setter(context);
                 }
             }
+        }
 
-            public bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent) {
+        /// <summary>
+        /// 指定の条件でプロパティを隠す
+        /// </summary>
+        class ConditionHidePropertyHook : AbstractPropertyHook
+        {
+            private readonly Predicate<PropertyGUIContext> pred;
+
+            public ConditionHidePropertyHook(string name, Predicate<PropertyGUIContext> pred) : base(name) {
+                this.pred = pred;
+            }
+
+            protected override bool OnBeforeProp(PropertyGUIContext context) {
+                if (pred(context)) {
+                    // 条件に合致した場合は、何も描画しない状態で true を返すことによりスキップする
+                    return true;
+                }
                 return false;
             }
         }
@@ -693,29 +741,29 @@ namespace UnlitWF
         /// <summary>
         /// デリゲートでカスタマイズ可能な PropertyHook オブジェクト
         /// </summary>
-        private class CustomPropertyHook : IPropertyHook
+        class CustomPropertyHook : AbstractPropertyHook
         {
-            public delegate bool OnBeforeDelegate(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent);
-            public delegate void OnAfterDelegate(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed);
+            public delegate bool OnBeforeDelegate(PropertyGUIContext context);
+            public delegate void OnAfterDelegate(PropertyGUIContext context, bool changed);
 
             private readonly OnBeforeDelegate before;
             private readonly OnAfterDelegate after;
 
-            public CustomPropertyHook(OnBeforeDelegate before, OnAfterDelegate after) {
+            public CustomPropertyHook(string name, OnBeforeDelegate before, OnAfterDelegate after) : base(name) {
                 this.before = before;
                 this.after = after;
             }
 
-            public bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent) {
+            protected override bool OnBeforeProp(PropertyGUIContext context) {
                 if (before != null) {
-                    return before(materialEditor, properties, prop, guiContent);
+                    return before(context);
                 }
                 return false;
             }
 
-            public void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed) {
+            protected override void OnAfterProp(PropertyGUIContext context, bool changed) {
                 if (after != null) {
-                    after(materialEditor, properties, prop, guiContent, changed);
+                    after(context, changed);
                 }
             }
         }
