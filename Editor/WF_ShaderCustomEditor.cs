@@ -283,7 +283,8 @@ namespace UnlitWF
 
                 // もしシェーダ名辞書にあって新しいバージョンがリリースされているならばボタンを表示
                 if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion)) {
-                    if (GUILayout.Button(WFI18N.Translate(WFMessageText.NewerVersion))) {
+                    var message = WFI18N.Translate(WFMessageText.NewerVersion) + WFCommonUtility.GetLatestVersion()?.latestVersion;
+                    if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Go"))) {
                         WFCommonUtility.OpenDownloadPage();
                     }
                 }
