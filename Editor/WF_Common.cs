@@ -360,7 +360,7 @@ namespace UnlitWF
             }
         }
 
-        public static string GetDisplayName(string before) {
+        public static string Translate(string before) {
             before = before ?? "";
 
             var current = GetDict();
@@ -368,43 +368,58 @@ namespace UnlitWF
                 return before; // 無いなら変換しない
             }
 
-            // text がラベルとテキストに分割できるならば
-            if (WFCommonUtility.FormatDispName(before, out var label, out var text, out var _)) {
-                // テキストと一致する変換のなかからラベルも一致するものを翻訳にする
-                if (current.TryGetValue(text, out var list)) {
-                    var after = list.Where(t => t.ContainsTag(label)).Select(t => t.After).FirstOrDefault();
-                    if (after != null) {
-                        return "[" + label + "] " + after;
-                    }
-                }
-            } else {
-                // ラベルなしでテキストが一致するものを検索する
-                if (current.TryGetValue(before, out var list)) {
-                    var after = list.Where(t => t.HasNoTag()).Select(t => t.After).FirstOrDefault();
-                    if (after != null) {
-                        return after;
-                    }
+            // ラベルなしでテキストが一致するものを検索する
+            if (current.TryGetValue(before, out var list)) {
+                var after = list.Where(t => t.HasNoTag()).Select(t => t.After).FirstOrDefault();
+                if (after != null) {
+                    return after;
                 }
             }
-
             // マッチするものがないなら変換しない
             return before;
         }
 
-        public static GUIContent GetGUIContent(string text) {
-            return GetGUIContent(text, null);
+        public static string Translate(string label, string before) {
+            before = before ?? "";
+
+            var current = GetDict();
+            if (current == null || current.Count == 0) {
+                return before; // 無いなら変換しない
+            }
+
+            // テキストと一致する変換のなかからラベルも一致するものを翻訳にする
+            if (current.TryGetValue(before, out var list)) {
+                var after = list.Where(t => t.ContainsTag(label)).Select(t => t.After).FirstOrDefault();
+                if (after != null) {
+                    return after;
+                }
+            }
+            // マッチするものがないなら変換しない
+            return before;
         }
 
-        public static GUIContent GetGUIContent(string text, string tooltip) {
-            text = text ?? "";
-            string disp = GetDisplayName(text);
-            if (text != disp) {
-                if (tooltip == null) {
-                    tooltip = text;
-                }
-                text = disp;
+        private static string SplitAndTranslate(string before) {
+            if (WFCommonUtility.FormatDispName(before, out var label, out var text, out var _)) {
+                // text がラベルとテキストに分割できるならば
+                return "[" + label + "] " + Translate(label, text);
+            } else {
+                // そうでなければ
+                return Translate(before);
             }
-            return new GUIContent(text, tooltip);
+        }
+
+        public static GUIContent GetGUIContent(string text) {
+            var localized = SplitAndTranslate(text);
+            var tooltip = text != localized ? text : null;
+            return new GUIContent(localized, tooltip);
+        }
+
+        public static GUIContent GetGUIContent(string label, string text, string tooltip = null) {
+            string localized = Translate(label, text);
+            if (text != localized && tooltip == null) {
+                tooltip = text;
+            }
+            return new GUIContent("[" + label + "] " + localized, tooltip);
         }
 
         private static Dictionary<string, List<WFI18NTranslation>> ToDict(List<WFI18NTranslation> from) {

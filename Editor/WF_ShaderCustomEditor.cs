@@ -35,7 +35,7 @@ namespace UnlitWF
             // _TS_1stColor の直後に影色設定ボタンを追加する
             new CustomPropertyHook("_TS_1stColor", ctx => {
                 Rect position = EditorGUILayout.GetControlRect(true, 24);
-                Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
+                Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("SH", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
                 fieldpos.height = 20;
                 if (GUI.Button(fieldpos, "APPLY")) {
                     SuggestShadowColor(WFCommonUtility.AsMaterials(ctx.editor.targets));
@@ -63,6 +63,14 @@ namespace UnlitWF
                 var target = FindProperty("_OL_UVType", ctx.all, false);
                 return target != null && target.floatValue != 3; // ANGEL_RINGではないときに隠す
             }),
+            // _OL_CustomParam1のディスプレイ名をカスタマイズ
+            new CustomPropertyHook("_OL_CustomParam1", ctx => {
+                var target = FindProperty("_OL_UVType", ctx.all, false);
+                if (target != null && target.floatValue == 3) {
+                    ctx.guiContent = WFI18N.GetGUIContent("OL", "UV2.y <-> Normal.y");
+                }
+                return false;
+            }, null),
 
             // 値を設定したら他プロパティの値を自動で設定する
             new DefValueSetPropertyHook("_DetailNormalMap", ctx => {
@@ -275,7 +283,7 @@ namespace UnlitWF
 
                 // もしシェーダ名辞書にあって新しいバージョンがリリースされているならばボタンを表示
                 if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion)) {
-                    if (GUILayout.Button(WFI18N.GetGUIContent(WFMessageText.NewerVersion))) {
+                    if (GUILayout.Button(WFI18N.Translate(WFMessageText.NewerVersion))) {
                         WFCommonUtility.OpenDownloadPage();
                     }
                 }
@@ -317,7 +325,7 @@ namespace UnlitWF
             var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
             if (IsOldMaterial(mats)) {
-                var message = WFI18N.GetDisplayName(WFMessageText.PlzMigration);
+                var message = WFI18N.Translate(WFMessageText.PlzMigration);
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now"))) {
                     var editor = new WFMaterialEditUtility();
@@ -363,7 +371,7 @@ namespace UnlitWF
             // Batching Static の付いているマテリアルが targets 内にあるならば警告
             if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat))) {
 
-                var message = WFI18N.GetDisplayName(WFMessageText.PlzBatchingStatic);
+                var message = WFI18N.Translate(WFMessageText.PlzBatchingStatic);
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now"))) {
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
