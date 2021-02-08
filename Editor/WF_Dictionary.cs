@@ -341,6 +341,12 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Flip Tangent", "タンジェント反転"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
+
+            // その他のテキスト
+            new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています"),
+            new WFI18NTranslation(WFMessageText.PlzMigration, "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？"),
+            new WFI18NTranslation(WFMessageText.PlzBatchingStatic, "このマテリアルは Batching Static な MeshRenderer から使われているようです。Batching Static 用の設定へ変更しますか？"),
+
             // 今は使っていないはずの項目
             new WFI18NTranslation("Anti-Glare", "まぶしさ防止"),
             new WFI18NTranslation("Debug View", "デバッグ表示"),
@@ -359,6 +365,13 @@ namespace UnlitWF
             new WFI18NTranslation("FG", "Fog Max Distance", "フォグが最大になる距離"),
             new WFI18NTranslation("TE", "Tess Type", "Tessタイプ"),
         };
+    }
+
+    internal static class WFMessageText
+    {
+        public static readonly string NewerVersion = "A newer version is available now!";
+        public static readonly string PlzMigration = "This Material may have been created in an older version. Convert to new version?";
+        public static readonly string PlzBatchingStatic = "This material seems to be used by the Batching Static MeshRenderer. Do you want to change the settings for Batching Static?";
     }
 }
 

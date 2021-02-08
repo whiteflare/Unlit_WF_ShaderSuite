@@ -275,7 +275,7 @@ namespace UnlitWF
 
                 // もしシェーダ名辞書にあって新しいバージョンがリリースされているならばボタンを表示
                 if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion)) {
-                    if (GUILayout.Button("新しいバージョンがリリースされています")) {
+                    if (GUILayout.Button(WFI18N.GetGUIContent(WFMessageText.NewerVersion))) {
                         WFCommonUtility.OpenDownloadPage();
                     }
                 }
@@ -317,10 +317,7 @@ namespace UnlitWF
             var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
             if (IsOldMaterial(mats)) {
-
-                var message = WFI18N.LangMode == EditorLanguage.日本語 ?
-                    "このマテリアルは古いバージョンで作成されたようです。最新版に変換しますか？" :
-                    "This Material may have been created in an older version. Convert to new version?";
+                var message = WFI18N.GetDisplayName(WFMessageText.PlzMigration);
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now"))) {
                     var editor = new WFMaterialEditUtility();
@@ -366,9 +363,7 @@ namespace UnlitWF
             // Batching Static の付いているマテリアルが targets 内にあるならば警告
             if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat))) {
 
-                var message = WFI18N.LangMode == EditorLanguage.日本語 ? 
-                    "このマテリアルは Batching Static な MeshRenderer から使われているようです。Batching Static 用の設定へ変更しますか？" :
-                    "This material seems to be used by the Batching Static MeshRenderer. Do you want to change the settings for Batching Static?";
+                var message = WFI18N.GetDisplayName(WFMessageText.PlzBatchingStatic);
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now"))) {
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
