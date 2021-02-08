@@ -26,62 +26,65 @@ using UnityEngine;
 
 namespace UnlitWF
 {
-
     public class ShaderCustomEditor : ShaderGUI
     {
         /// <summary>
-        /// テクスチャとカラーを1行で表示するやつのプロパティ名辞書
+        /// プロパティの前後に実行されるフック処理
         /// </summary>
-        private readonly Dictionary<string, string> COMBI_COLOR_TEX = new Dictionary<string, string>() {
-            { "_TS_BaseColor", "_TS_BaseTex" },
-            { "_TS_1stColor", "_TS_1stTex" },
-            { "_TS_2ndColor", "_TS_2ndTex" },
-            { "_TS_3rdColor", "_TS_3rdTex" },
-            { "_ES_Color", "_ES_MaskTex" },
-            { "_EmissionColor", "_EmissionMap" },
-            { "_LM_Color", "_LM_Texture" },
-            { "_TL_LineColor", "_TL_CustomColorTex" },
-            { "_OL_Color", "_OL_OverlayTex" },
-        };
+        private readonly List<IPropertyHook> HOOKS = new List<IPropertyHook>() {
+            // _TS_1stColor の直後に影色設定ボタンを追加する
+            new CustomPropertyHook((materialEditor, properties, prop, guiContent) => {
+                if (prop.name == "_TS_1stColor") {
+                    Rect position = EditorGUILayout.GetControlRect(true, 24);
+                    Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
+                    fieldpos.height = 20;
+                    if (GUI.Button(fieldpos, "APPLY")) {
+                        SuggestShadowColor(WFCommonUtility.AsMaterials(materialEditor.targets));
+                    }
+                }
+                return false;
+            } , null),
 
-        /// <summary>
-        /// MinMaxSliderを使って1行で表示するやつのプロパティ名辞書
-        /// </summary>
-        private readonly Dictionary<string, string> COMBI_MIN_MAX = new Dictionary<string, string>() {
-            { "_TE_MinDist", "_TE_MaxDist" },
-            { "_FG_MinDist", "_FG_MaxDist" },
-        };
+            // テクスチャとカラーを1行で表示する
+            new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
+            new SingleLineTexPropertyHook( "_TS_1stColor", "_TS_1stTex" ),
+            new SingleLineTexPropertyHook( "_TS_2ndColor", "_TS_2ndTex" ),
+            new SingleLineTexPropertyHook( "_TS_3rdColor", "_TS_3rdTex" ),
+            new SingleLineTexPropertyHook( "_ES_Color", "_ES_MaskTex" ),
+            new SingleLineTexPropertyHook( "_EmissionColor", "_EmissionMap" ),
+            new SingleLineTexPropertyHook( "_LM_Color", "_LM_Texture" ),
+            new SingleLineTexPropertyHook( "_TL_LineColor", "_TL_CustomColorTex" ),
+            new SingleLineTexPropertyHook( "_OL_Color", "_OL_OverlayTex" ),
 
-        delegate void DefaultValueSetter(MaterialProperty prop, MaterialProperty[] properties);
+            // MinMaxSlider
+            new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
+            new MinMaxSliderPropertyHook("_FG_MinDist", "_FG_MaxDist"),
 
-        /// <summary>
-        /// 値を設定したら他プロパティの値を自動で設定するやつ
-        /// </summary>
-        private readonly List<DefaultValueSetter> DEF_VALUE_SETTER = new List<DefaultValueSetter>() {
-            (p, all) => {
+            // 値を設定したら他プロパティの値を自動で設定する
+            new DefValueSetPropertyHook("_DetailNormalMap", (p, all) => {
                 if (p.name == "_DetailNormalMap" && p.textureValue != null) {
                     var target = FindProperty("_NM_2ndType", all, false);
                     if (target != null && target.floatValue == 0) { // OFF
                         target.floatValue = 1; // BLEND
                     }
                 }
-            },
-            (p, all) => {
+            }),
+            new DefValueSetPropertyHook("_MT_Cubemap", (p, all) => {
                 if (p.name == "_MT_Cubemap" && p.textureValue != null) {
                     var target = FindProperty("_MT_CubemapType", all, false);
                     if (target != null && target.floatValue == 0) { // OFF
                         target.floatValue = 2; // ONLY_SECOND_MAP
                     }
                 }
-            },
-            (p, all) => {
+            }),
+            new DefValueSetPropertyHook("_AL_MaskTex", (p, all) => {
                 if (p.name == "_AL_MaskTex" && p.textureValue != null) {
                     var target = FindProperty("_AL_Source", all, false);
                     if (target != null && target.floatValue == 0) { // MAIN_TEX_ALPHA
                         target.floatValue = 1; // MASK_TEX_RED
                     }
                 }
-            },
+            }),
         };
 
         /// <summary>
@@ -164,16 +167,6 @@ namespace UnlitWF
                     continue;
                 }
 
-                // _TS_1stColorの直前にボタンを追加する
-                if (prop.name == "_TS_1stColor") {
-                    Rect position = EditorGUILayout.GetControlRect(true, 24);
-                    Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("[SH] Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
-                    fieldpos.height = 20;
-                    if (GUI.Button(fieldpos, "APPLY")) {
-                        SuggestShadowColor(WFCommonUtility.AsMaterials(materialEditor.targets));
-                    }
-                }
-
                 // HideInInspectorをこのタイミングで除外するとFix*Drawerが動作しないのでそのまま通す
                 // 非表示はFix*Drawerが担当
                 // Fix*Drawerと一緒にHideInInspectorを付けておけば、このcsが無い環境でも非表示のまま変わらないはず
@@ -181,18 +174,8 @@ namespace UnlitWF
                 //     continue;
                 // }
 
-                // 更新監視
-                EditorGUI.BeginChangeCheck();
-
                 // 描画
                 OnGuiSub_ShaderProperty(materialEditor, properties, prop);
-
-                // 更新監視
-                if (EditorGUI.EndChangeCheck()) {
-                    foreach (var setter in DEF_VALUE_SETTER) {
-                        setter(prop, properties);
-                    }
-                }
 
                 // ラベルが指定されていてenableならば有効無効をリストに追加
                 // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
@@ -229,97 +212,26 @@ namespace UnlitWF
             // GUIContent 作成
             GUIContent guiContent = WFI18N.GetGUIContent(prop.displayName);
 
-            // テクスチャとカラーを1行で表示する
-            if (COMBI_COLOR_TEX.ContainsKey(prop.name)) {
-                MaterialProperty another = FindProperty(COMBI_COLOR_TEX[prop.name], properties, false);
-                if (another != null) {
-                    DoSingleLineTextureProperty(materialEditor, guiContent, prop, another);
-                    return;
-                }
-            }
-            else if (COMBI_COLOR_TEX.ContainsValue(prop.name)) {
-                return; // 相方の側は何もしない
-            }
-
-            // MinMaxSlider
-            if (COMBI_MIN_MAX.ContainsKey(prop.name)) {
-                MaterialProperty another = FindProperty(COMBI_MIN_MAX[prop.name], properties, false);
-                if (another != null) {
-                    DoMinMaxProperty(materialEditor, guiContent, prop, another);
-                    return;
-                }
-            }
-            else if (COMBI_MIN_MAX.ContainsValue(prop.name)) {
-                return; // 相方の側は何もしない
-            }
-
-            materialEditor.ShaderProperty(prop, guiContent);
-        }
-
-        private static void DoSingleLineTextureProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propColor, MaterialProperty propTexture) {
-            // 1行テクスチャプロパティ
-            materialEditor.TexturePropertySingleLine(label, propTexture, propColor);
-
-            // もし NoScaleOffset がないなら ScaleOffset も追加で表示する
-            if (!propTexture.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
-                using (new EditorGUI.IndentLevelScope()) {
-                    float oldLabelWidth = EditorGUIUtility.labelWidth;
-                    EditorGUIUtility.labelWidth = 0f;
-                    materialEditor.TextureScaleOffsetProperty(propTexture);
-                    EditorGUIUtility.labelWidth = oldLabelWidth;
-                    EditorGUILayout.Space();
-                }
-            }
-        }
-
-        private static void DoMinMaxProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propMin, MaterialProperty propMax) {
-            Vector2 propMinLimit = propMin.type == MaterialProperty.PropType.Range ? propMin.rangeLimits : new Vector2(0, 1);
-            Vector2 propMaxLimit = propMax.type == MaterialProperty.PropType.Range ? propMax.rangeLimits : propMinLimit;
-
-            float minValue = propMin.floatValue;
-            float maxValue = propMax.floatValue;
-            float minLimit = Mathf.Min(propMinLimit.x, propMaxLimit.x);
-            float maxLimit = Mathf.Max(propMinLimit.y, propMaxLimit.y, minValue, maxValue);
-
-            var rect = EditorGUILayout.GetControlRect();
-            float oldLabelWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth = 0f;
-
+            // 更新チェック
             EditorGUI.BeginChangeCheck();
 
-            // MinMaxSlider
+            // フック
+            bool customProperty = false;
+            foreach (var hook in HOOKS) {
+                customProperty |= hook.OnBefore(materialEditor, properties, prop, guiContent);
+            }
 
-            rect.width -= EditorGUIUtility.fieldWidth + 5;
-            EditorGUI.showMixedValue = propMin.hasMixedValue || propMax.hasMixedValue;
-            EditorGUI.MinMaxSlider(rect, label, ref minValue, ref maxValue, minLimit, maxLimit);
+            // プロパティ表示
+            if (!customProperty) {
+                materialEditor.ShaderProperty(prop, guiContent);
+            }
 
-            // propMin の FloatField
+            // チェック終了
+            bool changed = EditorGUI.EndChangeCheck();
 
-            rect.width = EditorGUIUtility.fieldWidth / 2 - 1;
-            rect.x += oldLabelWidth;
-            minValue = EditorGUI.FloatField(rect, minValue);
-
-            // propMax の FloatField
-
-            rect.x += EditorGUIUtility.fieldWidth / 2 + 1;
-            maxValue = EditorGUI.FloatField(rect, maxValue);
-
-            EditorGUI.showMixedValue = false;
-            EditorGUIUtility.labelWidth = oldLabelWidth;
-
-            if (EditorGUI.EndChangeCheck()) {
-                if (propMin.type == MaterialProperty.PropType.Range) {
-                    propMin.floatValue = Mathf.Clamp(minValue, propMinLimit.x, propMinLimit.y);
-                }
-                else {
-                    propMin.floatValue = minValue;
-                }
-                if (propMax.type == MaterialProperty.PropType.Range) {
-                    propMax.floatValue = Mathf.Clamp(maxValue, propMaxLimit.x, propMaxLimit.y);
-                }
-                else {
-                    propMax.floatValue = maxValue;
-                }
+            // フック
+            foreach (var hook in HOOKS) {
+                hook.OnAfter(materialEditor, properties, prop, guiContent, changed);
             }
         }
 
@@ -497,7 +409,7 @@ namespace UnlitWF
             newMaterialVersionCache.RemoveAll(mats);
         }
 
-        private void SuggestShadowColor(Material[] mats) {
+        private static void SuggestShadowColor(Material[] mats) {
             foreach (var m in mats) {
                 Undo.RecordObject(m, "shade color change");
                 // ベース色を取得
@@ -537,6 +449,15 @@ namespace UnlitWF
             return hur;
         }
 
+        #region GUI部品
+
+        /// <summary>
+        /// Shurikenスタイルのヘッダを表示する
+        /// </summary>
+        /// <param name="position">位置</param>
+        /// <param name="text">テキスト</param>
+        /// <param name="prop">EnableトグルのProperty(またはnull)</param>
+        /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
         public static void DrawShurikenStyleHeader(Rect position, string text, MaterialProperty prop = null, bool alwaysOn = false) {
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
@@ -577,8 +498,236 @@ namespace UnlitWF
                 }
             }
         }
+
+        /// <summary>
+        /// テクスチャとカラーを1行で表示する。
+        /// </summary>
+        /// <param name="materialEditor"></param>
+        /// <param name="label"></param>
+        /// <param name="propColor"></param>
+        /// <param name="propTexture"></param>
+        public static void DrawSingleLineTextureProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propColor, MaterialProperty propTexture) {
+            // 1行テクスチャプロパティ
+            materialEditor.TexturePropertySingleLine(label, propTexture, propColor);
+
+            // もし NoScaleOffset がないなら ScaleOffset も追加で表示する
+            if (!propTexture.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
+                using (new EditorGUI.IndentLevelScope()) {
+                    float oldLabelWidth = EditorGUIUtility.labelWidth;
+                    EditorGUIUtility.labelWidth = 0f;
+                    materialEditor.TextureScaleOffsetProperty(propTexture);
+                    EditorGUIUtility.labelWidth = oldLabelWidth;
+                    EditorGUILayout.Space();
+                }
+            }
+        }
+
+        /// <summary>
+        /// MinMaxSliderを表示する。
+        /// </summary>
+        /// <param name="materialEditor"></param>
+        /// <param name="label"></param>
+        /// <param name="propMin"></param>
+        /// <param name="propMax"></param>
+        public static void DrawMinMaxProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propMin, MaterialProperty propMax) {
+            Vector2 propMinLimit = propMin.type == MaterialProperty.PropType.Range ? propMin.rangeLimits : new Vector2(0, 1);
+            Vector2 propMaxLimit = propMax.type == MaterialProperty.PropType.Range ? propMax.rangeLimits : propMinLimit;
+
+            float minValue = propMin.floatValue;
+            float maxValue = propMax.floatValue;
+            float minLimit = Mathf.Min(propMinLimit.x, propMaxLimit.x);
+            float maxLimit = Mathf.Max(propMinLimit.y, propMaxLimit.y, minValue, maxValue);
+
+            var rect = EditorGUILayout.GetControlRect();
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+
+            EditorGUI.BeginChangeCheck();
+
+            // MinMaxSlider
+
+            rect.width -= EditorGUIUtility.fieldWidth + 5;
+            EditorGUI.showMixedValue = propMin.hasMixedValue || propMax.hasMixedValue;
+            EditorGUI.MinMaxSlider(rect, label, ref minValue, ref maxValue, minLimit, maxLimit);
+
+            // propMin の FloatField
+
+            rect.width = EditorGUIUtility.fieldWidth / 2 - 1;
+            rect.x += oldLabelWidth;
+            minValue = EditorGUI.FloatField(rect, minValue);
+
+            // propMax の FloatField
+
+            rect.x += EditorGUIUtility.fieldWidth / 2 + 1;
+            maxValue = EditorGUI.FloatField(rect, maxValue);
+
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+
+            if (EditorGUI.EndChangeCheck()) {
+                if (propMin.type == MaterialProperty.PropType.Range) {
+                    propMin.floatValue = Mathf.Clamp(minValue, propMinLimit.x, propMinLimit.y);
+                }
+                else {
+                    propMin.floatValue = minValue;
+                }
+                if (propMax.type == MaterialProperty.PropType.Range) {
+                    propMax.floatValue = Mathf.Clamp(maxValue, propMaxLimit.x, propMaxLimit.y);
+                }
+                else {
+                    propMax.floatValue = maxValue;
+                }
+            }
+        }
+
+        #endregion
+
+        #region PropertyHook
+
+        /// <summary>
+        /// プロパティの前後に実行されるフック処理のインタフェース
+        /// </summary>
+        interface IPropertyHook
+        {
+            bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent);
+
+            void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed);
+        }
+
+        /// <summary>
+        /// テクスチャとカラーを1行のプロパティで表示する
+        /// </summary>
+        private class SingleLineTexPropertyHook : IPropertyHook
+        {
+            private readonly string colorName;
+            private readonly string texName;
+
+            public SingleLineTexPropertyHook(string colorName, string texName) {
+                this.colorName = colorName;
+                this.texName = texName;
+            }
+
+            public bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent) {
+                if (colorName == prop.name) {
+                    // テクスチャとカラーを1行で表示する
+                    MaterialProperty another = FindProperty(texName, properties, false);
+                    if (another != null) {
+                        DrawSingleLineTextureProperty(materialEditor, guiContent, prop, another);
+                        return true;
+                    }
+                    return false;
+                }
+                if (texName == prop.name) {
+                    // 相方の側は何もしない
+                    return true;
+                }
+                return false;
+            }
+
+            public void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed) {
+                // nop
+            }
+        }
+
+        /// <summary>
+        /// MinとMaxを1行のMinMaxSliderで表示する
+        /// </summary>
+        private class MinMaxSliderPropertyHook : IPropertyHook
+        {
+            private readonly string minName;
+            private readonly string maxName;
+
+            public MinMaxSliderPropertyHook(string minName, string maxName) {
+                this.minName = minName;
+                this.maxName = maxName;
+            }
+
+            public bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent) {
+                if (minName == prop.name) {
+                    // MinMaxSlider
+                    MaterialProperty another = FindProperty(maxName, properties, false);
+                    if (another != null) {
+                        DrawMinMaxProperty(materialEditor, guiContent, prop, another);
+                        return true;
+                    }
+                    return false;
+                }
+                if (maxName == prop.name) {
+                    // 相方の側は何もしない
+                    return true;
+                }
+                return false;
+            }
+
+            public void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed) {
+                // nop
+            }
+        }
+
+        /// <summary>
+        /// 特定のプロパティが変更されたときに、他のプロパティのデフォルト値を設定する
+        /// </summary>
+        private class DefValueSetPropertyHook : IPropertyHook
+        {
+            public delegate void DefValueSetDelegate(MaterialProperty prop, MaterialProperty[] properties);
+
+            private readonly string name;
+            private readonly DefValueSetDelegate setter;
+
+            public DefValueSetPropertyHook(string name, DefValueSetDelegate setter) {
+                this.name = name;
+                this.setter = setter;
+            }
+
+            public void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed) {
+                if (changed && name == prop.name) {
+                    setter(prop, properties);
+                }
+            }
+
+            public bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent) {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// デリゲートでカスタマイズ可能な PropertyHook オブジェクト
+        /// </summary>
+        private class CustomPropertyHook : IPropertyHook
+        {
+            public delegate bool OnBeforeDelegate(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent);
+            public delegate void OnAfterDelegate(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed);
+
+            private readonly OnBeforeDelegate before;
+            private readonly OnAfterDelegate after;
+
+            public CustomPropertyHook(OnBeforeDelegate before, OnAfterDelegate after) {
+                this.before = before;
+                this.after = after;
+            }
+
+            public bool OnBefore(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent) {
+                if (before != null) {
+                    return before(materialEditor, properties, prop, guiContent);
+                }
+                return false;
+            }
+
+            public void OnAfter(MaterialEditor materialEditor, MaterialProperty[] properties, MaterialProperty prop, GUIContent guiContent, bool changed) {
+                if (after != null) {
+                    after(materialEditor, properties, prop, guiContent, changed);
+                }
+            }
+        }
+
+        #endregion
     }
 
+    #region MaterialPropertyDrawer
+
+    /// <summary>
+    /// Shurikenヘッダを表示する
+    /// </summary>
     internal class MaterialWFHeaderDecorator : MaterialPropertyDrawer
     {
         public readonly string text;
@@ -596,6 +745,9 @@ namespace UnlitWF
         }
     }
 
+    /// <summary>
+    /// Enableトグル付きのShurikenヘッダを表示する
+    /// </summary>
     internal class MaterialWFHeaderToggleDrawer : MaterialPropertyDrawer
     {
         public readonly string text;
@@ -613,6 +765,9 @@ namespace UnlitWF
         }
     }
 
+    /// <summary>
+    /// 常時trueなEnableトグル付きのShurikenヘッダを表示する
+    /// </summary>
     internal class MaterialWFHeaderAlwaysOnDrawer : MaterialPropertyDrawer
     {
         public readonly string text;
@@ -640,6 +795,9 @@ namespace UnlitWF
         }
     }
 
+    /// <summary>
+    /// 常に指定のfloat値にプロパティを固定する、非表示のPropertyDrawer
+    /// </summary>
     internal class MaterialWF_FixFloatDrawer : MaterialPropertyDrawer
     {
         public readonly float value;
@@ -666,6 +824,9 @@ namespace UnlitWF
     {
     }
 
+    /// <summary>
+    /// 常にテクスチャNoneにプロパティを固定する、非表示のPropertyDrawer
+    /// </summary>
     internal class MaterialWF_FixNoTextureDrawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
@@ -677,6 +838,9 @@ namespace UnlitWF
         }
     }
 
+    /// <summary>
+    /// 入力欄が2個あるVectorのPropertyDrawer
+    /// </summary>
     internal class MaterialWF_Vector2Drawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
@@ -700,6 +864,9 @@ namespace UnlitWF
         }
     }
 
+    /// <summary>
+    /// 入力欄が3個あるVectorのPropertyDrawer
+    /// </summary>
     internal class MaterialWF_Vector3Drawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
@@ -722,6 +889,8 @@ namespace UnlitWF
             EditorGUIUtility.labelWidth = oldLabelWidth;
         }
     }
+
+    #endregion
 }
 
 #endif
