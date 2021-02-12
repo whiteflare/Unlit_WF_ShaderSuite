@@ -177,6 +177,7 @@
     float           _LM_InvMaskVal;
 
     float           _TS_Enable;
+    uint            _TS_Steps;
     float3          _TS_BaseColor;
     float3          _TS_1stColor;
     float3          _TS_2ndColor;

@@ -31,6 +31,14 @@ namespace UnlitWF
         private static readonly Regex PAT_DISP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
         private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+?)(?<suffix>(?:_\d+)?)$");
 
+        /// <summary>
+        /// プロパティのディスプレイ名から、Prefixと名前を分割する。
+        /// </summary>
+        /// <param name="text">ディスプレイ名</param>
+        /// <param name="label">Prefix</param>
+        /// <param name="name">名前</param>
+        /// <param name="dispName">ディスプレイ文字列</param>
+        /// <returns></returns>
         public static bool FormatDispName(string text, out string label, out string name, out string dispName) {
             var mm = PAT_DISP_NAME.Match(text ?? "");
             if (mm.Success) {
@@ -83,16 +91,32 @@ namespace UnlitWF
             return label;
         }
 
+        /// <summary>
+        /// プロパティ名からEnableトグルかどうか判定する。
+        /// </summary>
+        /// <param name="prop_name"></param>
+        /// <returns></returns>
         public static bool IsEnableToggleFromPropName(string prop_name) {
             string label, name;
             WFCommonUtility.FormatPropName(prop_name, out label, out name);
             return IsEnableToggle(label, name);
         }
 
+        /// <summary>
+        /// Enableトグルかどうか判定する。
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static bool IsEnableToggle(string label, string name) {
             return label != null && name.ToLower() == "enable";
         }
 
+        /// <summary>
+        /// マテリアルのシェーダを指定のものに変更する。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="mats"></param>
         public static void ChangeShader(string name, params Material[] mats) {
             if (string.IsNullOrWhiteSpace(name) || mats.Length == 0) {
                 return; // なにもしない
@@ -129,12 +153,76 @@ namespace UnlitWF
             }
         }
 
+        /// <summary>
+        /// Object[] -> Material[] のユーティリティ関数。
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
         public static Material[] AsMaterials(params UnityEngine.Object[] array) {
             return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
         }
 
+        /// <summary>
+        /// ShaderがUnlitWFでサポートされるものかどうか判定する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
         public static bool IsSupportedShader(Shader shader) {
             return shader != null && shader.name.Contains("UnlitWF");
+        }
+
+        /// <summary>
+        /// 最新リリースのVersionInfo
+        /// </summary>
+        private static WFVersionInfo LatestVersion = null;
+
+        /// <summary>
+        /// 最新リリースのVersionInfoを返却する。不明のときはnullを返却する。
+        /// </summary>
+        /// <returns></returns>
+        public static WFVersionInfo GetLatestVersion() {
+            return LatestVersion;
+        }
+
+        /// <summary>
+        /// 最新リリースのVersionInfoを設定する。
+        /// </summary>
+        /// <param name="ver"></param>
+        public static void SetLatestVersion(WFVersionInfo ver) {
+            LatestVersion = ver != null && ver.HasValue() ? ver : null;
+        }
+
+        /// <summary>
+        /// 指定のバージョン文字列が最新リリースよりも古いかどうか判定する。不明のときはfalseを返す。
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public static bool IsOlderShaderVersion(string version) {
+            if (LatestVersion == null || version == null) {
+                return false;
+            }
+            return version.CompareTo(LatestVersion.latestVersion) < 0;
+        }
+
+        /// <summary>
+        /// 最新リリースのダウンロードページを開く。
+        /// </summary>
+        public static void OpenDownloadPage() {
+            if (LatestVersion == null) {
+                return;
+            }
+            Application.OpenURL(LatestVersion.downloadPage);
+        }
+    }
+
+    [Serializable]
+    public class WFVersionInfo
+    {
+        public string latestVersion;
+        public string downloadPage;
+
+        public bool HasValue() {
+            return latestVersion != null && downloadPage != null;
         }
     }
 
@@ -218,7 +306,7 @@ namespace UnlitWF
         }
 
         public bool ContainsTag(string tag) {
-            return tag != null && Tags.Contains(tag);
+            return tag != null && (Tags.Count == 0 || Tags.Contains(tag));
         }
 
         public bool HasNoTag() {
@@ -229,8 +317,8 @@ namespace UnlitWF
     internal static class WFI18N
     {
         private static readonly string KEY_EDITOR_LANG = "UnlitWF.ShaderEditor/Lang";
-        private static readonly List<WFI18NTranslation> EN = new List<WFI18NTranslation>();
-        private static readonly List<WFI18NTranslation> JA = WFShaderDictionary.LangEnToJa;
+        private static readonly Dictionary<string, List<WFI18NTranslation>> EN = new Dictionary<string, List<WFI18NTranslation>>();
+        private static readonly Dictionary<string, List<WFI18NTranslation>> JA = ToDict(WFShaderDictionary.LangEnToJa);
 
         private static EditorLanguage? langMode = null;
 
@@ -263,7 +351,7 @@ namespace UnlitWF
             }
         }
 
-        static List<WFI18NTranslation> GetDict() {
+        static Dictionary<string, List<WFI18NTranslation>> GetDict() {
             switch (LangMode) {
                 case EditorLanguage.日本語:
                     return JA;
@@ -272,60 +360,76 @@ namespace UnlitWF
             }
         }
 
-        public static string GetDisplayName(string text) {
-            text = text ?? "";
-            var current = GetDict();
-            if (current == null) {
-                return text; // 無いなら変換しない
-            }
-            string ret;
+        public static string Translate(string before) {
+            before = before ?? "";
 
-            // text がラベルとテキストに分割できるならば
-            if (WFCommonUtility.FormatDispName(text, out string label, out string name2, out ret)) {
-                // ラベルとテキストが両方とも一致するものを最初に検索する
-                ret = current.Where(t => t.ContainsTag(label) && t.Before == name2).Select(t => t.After).FirstOrDefault();
-                if (ret != null) {
-                    return "[" + label + "] " + ret;
-                }
-                // ラベルなしでテキストが一致するものを検索する
-                ret = current.Where(t => t.HasNoTag() && t.Before == name2).Select(t => t.After).FirstOrDefault();
-                if (ret != null) {
-                    return "[" + label + "] " + ret;
-                }
-                //// ラベル問わずテキストが一致するものを検索する
-                //ret = current.Where(t => t.Before == name2).Select(t => t.After).FirstOrDefault();
-                //if (ret != null) {
-                //    return "[" + label + "] " + ret;
-                //}
-            } else {
-                // ラベルなしでテキストが一致するものを検索する
-                ret = current.Where(t => t.HasNoTag() && t.Before == text).Select(t => t.After).FirstOrDefault();
-                if (ret != null) {
-                    return ret;
-                }
-                ////// ラベル問わずテキストが一致するものを検索する
-                //ret = current.Where(t => t.Before == text).Select(t => t.After).FirstOrDefault();
-                //if (ret != null) {
-                //    return ret;
-                //}
+            var current = GetDict();
+            if (current == null || current.Count == 0) {
+                return before; // 無いなら変換しない
             }
-            return text;
+
+            // ラベルなしでテキストが一致するものを検索する
+            if (current.TryGetValue(before, out var list)) {
+                var after = list.Where(t => t.HasNoTag()).Select(t => t.After).FirstOrDefault();
+                if (after != null) {
+                    return after;
+                }
+            }
+            // マッチするものがないなら変換しない
+            return before;
+        }
+
+        public static string Translate(string label, string before) {
+            before = before ?? "";
+
+            var current = GetDict();
+            if (current == null || current.Count == 0) {
+                return before; // 無いなら変換しない
+            }
+
+            // テキストと一致する変換のなかからラベルも一致するものを翻訳にする
+            if (current.TryGetValue(before, out var list)) {
+                var after = list.Where(t => t.ContainsTag(label)).Select(t => t.After).FirstOrDefault();
+                if (after != null) {
+                    return after;
+                }
+            }
+            // マッチするものがないなら変換しない
+            return before;
+        }
+
+        private static string SplitAndTranslate(string before) {
+            if (WFCommonUtility.FormatDispName(before, out var label, out var text, out var _)) {
+                // text がラベルとテキストに分割できるならば
+                return "[" + label + "] " + Translate(label, text);
+            } else {
+                // そうでなければ
+                return Translate(before);
+            }
         }
 
         public static GUIContent GetGUIContent(string text) {
-            return GetGUIContent(text, null);
+            var localized = SplitAndTranslate(text);
+            var tooltip = text != localized ? text : null;
+            return new GUIContent(localized, tooltip);
         }
 
-        public static GUIContent GetGUIContent(string text, string tooltip) {
-            text = text ?? "";
-            string disp = GetDisplayName(text);
-            if (text != disp) {
-                if (tooltip == null) {
-                    tooltip = text;
-                }
-                text = disp;
+        public static GUIContent GetGUIContent(string label, string text, string tooltip = null) {
+            string localized = Translate(label, text);
+            if (text != localized && tooltip == null) {
+                tooltip = text;
             }
-            return new GUIContent(text, tooltip);
+            return new GUIContent("[" + label + "] " + localized, tooltip);
+        }
+
+        private static Dictionary<string, List<WFI18NTranslation>> ToDict(List<WFI18NTranslation> from) {
+            var result = new Dictionary<string, List<WFI18NTranslation>>();
+
+            foreach (var group in from.GroupBy(t => t.Before)) {
+                result[group.Key] = new List<WFI18NTranslation>(group.OrderBy(t => t.HasNoTag()));
+            }
+
+            return result;
         }
     }
 
