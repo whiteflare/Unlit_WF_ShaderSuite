@@ -108,7 +108,7 @@
     #endif
 
     #ifndef WF_TEX2D_SCREEN_MASK
-        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).rgb
+        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_OUTLINE_COLOR
@@ -664,14 +664,23 @@
                 // 影色計算
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
                 float3 shadow_color = ONE_VEC3;
-                // 1影
-                calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
-                // 2影
-                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
-                // 3影
-#ifdef _TS_TRISHADE_ENABLE
-                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
-#endif
+
+                if (_TS_Steps == 1) {
+                    // 1影まで
+                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+                }
+                else if (_TS_Steps == 3) {
+                    // 3影まで
+                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+                    calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                    calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
+                }
+                else {
+                    // 2影まで
+                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+                    calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                }
+
                 // 乗算
                 color.rgb *= shadow_color;
             }
@@ -748,7 +757,7 @@
             return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OL_CustomParam1));
         }
 
-        float3 blendOverlayColor(float3 base, float4 decal, float3 power) {
+        float3 blendOverlayColor(float3 base, float4 decal, float power) {
             power *= decal.a;
             return
                   _OL_BlendType == 0 ? blendColor_Alpha(base, decal.rgb, power)
@@ -771,7 +780,7 @@
                     : i.uv                                                                      // UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
-                float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
+                float power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
                 color.rgb = blendOverlayColor(color.rgb, PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
             }
         }
@@ -909,7 +918,7 @@
             if (TGL_ON(_FG_Enable)) {
                 float3 ws_base_position = UnityObjectToWorldPos(_FG_BaseOffset);
                 float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
-                float power = 
+                float power =
                     // 原点からの距離の判定
                     smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_offset_vertex ))
                     // 前後の判定
