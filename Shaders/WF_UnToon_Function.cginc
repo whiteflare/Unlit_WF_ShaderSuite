@@ -108,7 +108,7 @@
     #endif
 
     #ifndef WF_TEX2D_SCREEN_MASK
-        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).rgb
+        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_OUTLINE_COLOR
@@ -757,7 +757,7 @@
             return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OL_CustomParam1));
         }
 
-        float3 blendOverlayColor(float3 base, float4 decal, float3 power) {
+        float3 blendOverlayColor(float3 base, float4 decal, float power) {
             power *= decal.a;
             return
                   _OL_BlendType == 0 ? blendColor_Alpha(base, decal.rgb, power)
@@ -780,7 +780,7 @@
                     : i.uv                                                                      // UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
-                float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
+                float power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
                 color.rgb = blendOverlayColor(color.rgb, PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
             }
         }
