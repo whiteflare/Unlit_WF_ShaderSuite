@@ -251,6 +251,7 @@ namespace UnlitWF
             new WFI18NTranslation("LM", "Spot Fade Strength", "スポットフェード強度"),
             new WFI18NTranslation("LM", "Anim Speed", "アニメ速度"),
             // ToonShade
+            new WFI18NTranslation("SH", "Steps", "繰り返し数"),
             new WFI18NTranslation("SH", "Base Color", "ベース色"),
             new WFI18NTranslation("SH", "Base Shade Texture", "ベース色テクスチャ"),
             new WFI18NTranslation("SH", "1st Shade Color", "1影色"),

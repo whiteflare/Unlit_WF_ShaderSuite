@@ -32,16 +32,41 @@ namespace UnlitWF
         /// プロパティの前後に実行されるフック処理
         /// </summary>
         private readonly List<IPropertyHook> HOOKS = new List<IPropertyHook>() {
-            // _TS_1stColor の直後に影色設定ボタンを追加する
+            // _TS_1stColor の直前に影色設定ボタンを追加する
             new CustomPropertyHook("_TS_1stColor", ctx => {
-                Rect position = EditorGUILayout.GetControlRect(true, 24);
+                // Mobile では _TS_BaseTex が無いので、_TS_BaseTex の直後ではなく _TS_1stColor の直前に設置する
+                Rect position = EditorGUILayout.GetControlRect(true, 20);
+                position.y += 1;
                 Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("SH", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
-                fieldpos.height = 20;
+                fieldpos.y -= 2;
+                fieldpos.height = 18;
                 if (GUI.Button(fieldpos, "APPLY")) {
                     SuggestShadowColor(WFCommonUtility.AsMaterials(ctx.editor.targets));
                 }
                 return false;
             } , null),
+
+            // 条件付きHide
+            new ConditionHidePropertyHook("_TS_2ndColor", ctx => {
+                var target = FindProperty("_TS_Steps", ctx.all, false);
+                return target != null && (target.floatValue == 0 || target.floatValue < 2);
+            }),
+            new ConditionHidePropertyHook("_TS_3rdColor", ctx => {
+                var target = FindProperty("_TS_Steps", ctx.all, false);
+                return target != null && target.floatValue < 3;
+            }),
+            new ConditionHidePropertyHook("_TS_2ndBorder", ctx => {
+                var target = FindProperty("_TS_Steps", ctx.all, false);
+                return target != null && (target.floatValue == 0 || target.floatValue < 2);
+            }),
+            new ConditionHidePropertyHook("_TS_3rdBorder", ctx => {
+                var target = FindProperty("_TS_Steps", ctx.all, false);
+                return target != null && target.floatValue < 3;
+            }),
+            new ConditionHidePropertyHook("_OL_CustomParam1", ctx => {
+                var target = FindProperty("_OL_UVType", ctx.all, false);
+                return target != null && target.floatValue != 3; // ANGEL_RINGではないときに隠す
+            }),
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
@@ -58,11 +83,6 @@ namespace UnlitWF
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
             new MinMaxSliderPropertyHook("_FG_MinDist", "_FG_MaxDist"),
 
-            // 条件付きHide
-            new ConditionHidePropertyHook("_OL_CustomParam1", ctx => {
-                var target = FindProperty("_OL_UVType", ctx.all, false);
-                return target != null && target.floatValue != 3; // ANGEL_RINGではないときに隠す
-            }),
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
             new CustomPropertyHook("_OL_CustomParam1", ctx => {
                 var target = FindProperty("_OL_UVType", ctx.all, false);
@@ -231,13 +251,12 @@ namespace UnlitWF
             EditorGUI.BeginChangeCheck();
 
             // フック
-            bool customProperty = false;
             foreach (var hook in HOOKS) {
-                customProperty |= hook.OnBefore(context);
+                hook.OnBefore(context);
             }
 
             // プロパティ表示
-            if (!customProperty) {
+            if (!context.hidden && !context.custom) {
                 context.editor.ShaderProperty(context.current, context.guiContent);
             }
 
@@ -601,6 +620,8 @@ namespace UnlitWF
             public readonly MaterialProperty[] all;
             public readonly MaterialProperty current;
             public GUIContent guiContent = null;
+            public bool hidden = false;
+            public bool custom = false;
 
             public PropertyGUIContext(MaterialEditor editor, MaterialProperty[] all, MaterialProperty current) {
                 this.editor = editor;
@@ -614,7 +635,7 @@ namespace UnlitWF
         /// </summary>
         interface IPropertyHook
         {
-            bool OnBefore(PropertyGUIContext context);
+            void OnBefore(PropertyGUIContext context);
 
             void OnAfter(PropertyGUIContext context, bool changed);
         }
@@ -632,11 +653,10 @@ namespace UnlitWF
                 }
             }
 
-            public bool OnBefore(PropertyGUIContext context) {
+            public void OnBefore(PropertyGUIContext context) {
                 if (names.Contains(context.current.name)) {
-                    return OnBeforeProp(context);
+                    OnBeforeProp(context);
                 }
-                return false;
             }
 
             public void OnAfter(PropertyGUIContext context, bool changed) {
@@ -645,8 +665,8 @@ namespace UnlitWF
                 }
             }
 
-            protected virtual bool OnBeforeProp(PropertyGUIContext context) {
-                return false;
+            protected virtual void OnBeforeProp(PropertyGUIContext context) {
+
             }
 
             protected virtual void OnAfterProp(PropertyGUIContext context, bool changed) {
@@ -665,7 +685,10 @@ namespace UnlitWF
                 this.texName = texName;
             }
 
-            protected override bool OnBeforeProp(PropertyGUIContext context) {
+            protected override void OnBeforeProp(PropertyGUIContext context) {
+                if (context.hidden) {
+                    return;
+                }
                 if (name == context.current.name) {
                     // テクスチャとカラーを1行で表示する
                     MaterialProperty another = FindProperty(texName, context.all, false);
@@ -673,8 +696,8 @@ namespace UnlitWF
                         DrawSingleLineTextureProperty(context.editor, context.guiContent, context.current, another);
                     }
                 }
+                context.custom = true;
                 // 相方の側は何もしない
-                return true;
             }
         }
 
@@ -689,7 +712,10 @@ namespace UnlitWF
                 this.maxName = maxName;
             }
 
-            protected override bool OnBeforeProp(PropertyGUIContext context) {
+            protected override void OnBeforeProp(PropertyGUIContext context) {
+                if (context.hidden) {
+                    return;
+                }
                 if (name == context.current.name) {
                     // MinMaxSlider
                     MaterialProperty another = FindProperty(maxName, context.all, false);
@@ -697,8 +723,8 @@ namespace UnlitWF
                         DrawMinMaxProperty(context.editor, context.guiContent, context.current, another);
                     }
                 }
+                context.custom = true;
                 // 相方の側は何もしない
-                return true;
             }
         }
 
@@ -733,12 +759,10 @@ namespace UnlitWF
                 this.pred = pred;
             }
 
-            protected override bool OnBeforeProp(PropertyGUIContext context) {
+            protected override void OnBeforeProp(PropertyGUIContext context) {
                 if (pred(context)) {
-                    // 条件に合致した場合は、何も描画しない状態で true を返すことによりスキップする
-                    return true;
+                    context.hidden = true;
                 }
-                return false;
             }
         }
 
@@ -758,11 +782,10 @@ namespace UnlitWF
                 this.after = after;
             }
 
-            protected override bool OnBeforeProp(PropertyGUIContext context) {
+            protected override void OnBeforeProp(PropertyGUIContext context) {
                 if (before != null) {
-                    return before(context);
+                    before(context);
                 }
-                return false;
             }
 
             protected override void OnAfterProp(PropertyGUIContext context, bool changed) {
