@@ -188,6 +188,8 @@ namespace UnlitWF
                 OnGUISub_MigrationHelpBox(materialEditor);
                 // Batching Static対策HelpBox
                 OnGUISub_BatchingStaticHelpBox(materialEditor);
+                // Lightmap Static対策HelpBox
+                OnGUISub_LightmapStaticHelpBox(materialEditor);
             }
 
             // 現在無効なラベルを保持するリスト
@@ -398,6 +400,49 @@ namespace UnlitWF
                     foreach (var mat in allNonStaticMaterials) {
                         mat.SetInt("_GL_DisableBackLit", 1);
                         mat.SetInt("_GL_DisableBasePos", 1);
+                    }
+                }
+            }
+        }
+
+        private static void OnGUISub_LightmapStaticHelpBox(MaterialEditor materialEditor) {
+            var target = materialEditor.target as Material;
+            // ターゲットが設定用プロパティを持っていないならば何もしない
+            if (!target.HasProperty("_AO_Enable") || !target.HasProperty("_AO_UseLightMap")) {
+                return;
+            }
+            // 現在のシェーダ
+            var shader = target.shader;
+
+            // 現在編集中のマテリアルの配列
+            var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
+            // 現在編集中のマテリアルのうち、Lightmap Static のときにオンにしたほうがいい設定がオフになっているマテリアル
+            var allNonStaticMaterials = targets.Where(mat => mat.GetInt("_AO_Enable") == 0 || mat.GetInt("_AO_UseLightMap") == 0).ToArray();
+
+            if (allNonStaticMaterials.Length == 0) {
+                return;
+            }
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            // 現在のシーンにある LightmapStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
+            var allStaticMaterialsInScene = scene.GetRootGameObjects()
+                .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
+                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.LightmapStatic))
+                // .Where(mf => 0 < mf.scaleInLightmap) // Unity2018では見えない
+                .SelectMany(mf => mf.sharedMaterials)
+                .Where(mat => mat != null && mat.shader == shader)
+                .ToArray();
+
+            // Lightmap Static の付いているマテリアルが targets 内にあるならば警告
+            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat))) {
+
+                var message = WFI18N.Translate(WFMessageText.PlzLightmapStatic);
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now"))) {
+                    // _AO_Enable と _AO_UseLightMap をオンにする
+                    foreach (var mat in allNonStaticMaterials) {
+                        mat.SetInt("_AO_Enable", 1);
+                        mat.SetInt("_AO_UseLightMap", 1);
                     }
                 }
             }
