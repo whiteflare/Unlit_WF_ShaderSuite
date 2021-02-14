@@ -31,7 +31,7 @@ namespace UnlitWF
         /// <summary>
         /// バージョンチェック用JSONファイルのURI
         /// </summary>
-        private const string URI_VERSION_JSON = URI_HEAD + "/raw/dev/version.json";
+        private const string URI_VERSION_JSON = URI_HEAD + "/raw/master/version.json";
         /// <summary>
         /// ローカルテスト用JSONデータ。テストが終わったらnullにする。
         /// </summary>
