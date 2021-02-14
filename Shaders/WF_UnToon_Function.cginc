@@ -108,7 +108,7 @@
     #endif
 
     #ifndef WF_TEX2D_SCREEN_MASK
-        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).rgb
+        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_OUTLINE_COLOR
@@ -522,7 +522,7 @@
                     color.rgb = blendColor_Mul(color.rgb, matcap_color, _HL_Power * MAX_RGB(matcap_mask));
                 } else {
                     // 中間色合成
-                    matcap_color -= MEDIAN_GRAY;
+                    matcap_color -= _HL_MedianColor;
                     float3 lighten_color = max(ZERO_VEC3, matcap_color);
                     float3 darken_color  = min(ZERO_VEC3, matcap_color);
                     matcap_color = lerp( darken_color, lighten_color, saturate(matcap_mask * _HL_MatcapColor * 2) );
@@ -640,7 +640,7 @@
 
         void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
             shadow_color = lerp( 
-                lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power),
+                max(ZERO_VEC3, lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power)),
                 shadow_color,
                 smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
         }
@@ -757,7 +757,7 @@
             return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OL_CustomParam1));
         }
 
-        float3 blendOverlayColor(float3 base, float4 decal, float3 power) {
+        float3 blendOverlayColor(float3 base, float4 decal, float power) {
             power *= decal.a;
             return
                   _OL_BlendType == 0 ? blendColor_Alpha(base, decal.rgb, power)
@@ -780,7 +780,7 @@
                     : i.uv                                                                      // UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
-                float3 power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
+                float power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
                 color.rgb = blendOverlayColor(color.rgb, PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
             }
         }

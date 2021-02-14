@@ -32,41 +32,28 @@ namespace UnlitWF
         /// プロパティの前後に実行されるフック処理
         /// </summary>
         private readonly List<IPropertyHook> HOOKS = new List<IPropertyHook>() {
-            // _TS_1stColor の直前に影色設定ボタンを追加する
-            new CustomPropertyHook("_TS_1stColor", ctx => {
-                // Mobile では _TS_BaseTex が無いので、_TS_BaseTex の直後ではなく _TS_1stColor の直前に設置する
-                Rect position = EditorGUILayout.GetControlRect(true, 20);
-                position.y += 1;
-                Rect fieldpos = EditorGUI.PrefixLabel(position, WFI18N.GetGUIContent("SH", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します"));
-                fieldpos.y -= 2;
-                fieldpos.height = 18;
-                if (GUI.Button(fieldpos, "APPLY")) {
+            // _TS_Power の直前に設定ボタンを追加する
+            new CustomPropertyHook("_TS_Power", ctx => {
+                var guiContent = WFI18N.GetGUIContent("SH", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します");
+                if (DrawButtonFieldProperty(guiContent, "APPLY")) {
                     SuggestShadowColor(WFCommonUtility.AsMaterials(ctx.editor.targets));
                 }
-                return false;
+            } , null),
+            // _TS_Feather の直前に設定ボタンを追加する
+            new CustomPropertyHook("_TS_Feather", ctx => {
+                var guiContent = WFI18N.GetGUIContent("SH", "Align the boundaries equally", "影の境界線を等間隔に整列します");
+                if (DrawButtonFieldProperty(guiContent, "APPLY")) {
+                    SuggestShadowBorder(WFCommonUtility.AsMaterials(ctx.editor.targets));
+                }
             } , null),
 
             // 条件付きHide
-            new ConditionHidePropertyHook("_TS_2ndColor", ctx => {
-                var target = FindProperty("_TS_Steps", ctx.all, false);
-                return target != null && (target.floatValue == 0 || target.floatValue < 2);
-            }),
-            new ConditionHidePropertyHook("_TS_3rdColor", ctx => {
-                var target = FindProperty("_TS_Steps", ctx.all, false);
-                return target != null && target.floatValue < 3;
-            }),
-            new ConditionHidePropertyHook("_TS_2ndBorder", ctx => {
-                var target = FindProperty("_TS_Steps", ctx.all, false);
-                return target != null && (target.floatValue == 0 || target.floatValue < 2);
-            }),
-            new ConditionHidePropertyHook("_TS_3rdBorder", ctx => {
-                var target = FindProperty("_TS_Steps", ctx.all, false);
-                return target != null && target.floatValue < 3;
-            }),
-            new ConditionHidePropertyHook("_OL_CustomParam1", ctx => {
-                var target = FindProperty("_OL_UVType", ctx.all, false);
-                return target != null && target.floatValue != 3; // ANGEL_RINGではないときに隠す
-            }),
+            new ConditionVisiblePropertyHook("_TS_2ndColor|_TS_2ndBorder", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
+            new ConditionVisiblePropertyHook("_TS_3rdColor|_TS_3rdBorder", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
+            new ConditionVisiblePropertyHook("_OL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)), // ANGEL_RING
+            new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
+            new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
@@ -85,11 +72,9 @@ namespace UnlitWF
 
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
             new CustomPropertyHook("_OL_CustomParam1", ctx => {
-                var target = FindProperty("_OL_UVType", ctx.all, false);
-                if (target != null && target.floatValue == 3) {
+                if (IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)) {
                     ctx.guiContent = WFI18N.GetGUIContent("OL", "UV2.y <-> Normal.y");
                 }
-                return false;
             }, null),
 
             // 値を設定したら他プロパティの値を自動で設定する
@@ -109,6 +94,14 @@ namespace UnlitWF
                 }
             }),
         };
+
+        private static bool IsAnyIntValue(PropertyGUIContext ctx, string name, Predicate<int> pred) {
+            var mats = WFCommonUtility.AsMaterials(ctx.editor.targets).Where(mat => mat.HasProperty(name)).ToArray();
+            if (mats.Length == 0) {
+                return true; // もしプロパティを持つマテリアルがないなら、trueを返却する
+            }
+            return mats.Any(mat => pred(mat.GetInt(name)));
+        }
 
         public static bool CompareAndSet(MaterialProperty[] prop, string name, int before, int after) {
             var target = FindProperty(name, prop, false);
@@ -271,19 +264,6 @@ namespace UnlitWF
             }
         }
 
-        private static string GetShaderCurrentVersion(Shader shader) {
-            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--) {
-                if ("_CurrentVersion" == ShaderUtil.GetPropertyName(shader, idx)) {
-                    return ShaderUtil.GetPropertyDescription(shader, idx);
-                }
-            }
-            return null;
-        }
-
-        private static string GetShaderCurrentVersion(Material mat) {
-            return mat == null ? null : GetShaderCurrentVersion(mat.shader);
-        }
-
         private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, Material mat) {
             // シェーダ名の表示
             var rect = EditorGUILayout.GetControlRect();
@@ -343,6 +323,19 @@ namespace UnlitWF
             }
         }
 
+        private static string GetShaderCurrentVersion(Shader shader) {
+            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--) {
+                if ("_CurrentVersion" == ShaderUtil.GetPropertyName(shader, idx)) {
+                    return ShaderUtil.GetPropertyDescription(shader, idx);
+                }
+            }
+            return null;
+        }
+
+        private static string GetShaderCurrentVersion(Material mat) {
+            return mat == null ? null : GetShaderCurrentVersion(mat.shader);
+        }
+
         private void OnGUISub_MigrationHelpBox(MaterialEditor materialEditor) {
             var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
@@ -357,6 +350,42 @@ namespace UnlitWF
                     ResetOldMaterialTable(mats);
                 }
             }
+        }
+
+        static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
+        static WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
+
+        private static bool IsOldMaterial(params object[] mats) {
+            var editor = new WFMaterialEditUtility();
+
+            bool result = false;
+            foreach (Material mat in mats) {
+                if (mat == null) {
+                    continue;
+                }
+                if (newMaterialVersionCache.Contains(mat)) {
+                    continue;
+                }
+                if (oldMaterialVersionCache.Contains(mat)) {
+                    result |= true;
+                    return true;
+                }
+                bool old = editor.ExistsOldNameProperty(mat);
+                if (old) {
+                    oldMaterialVersionCache.Add(mat);
+                }
+                else {
+                    newMaterialVersionCache.Add(mat);
+                }
+                result |= old;
+            }
+            return result;
+        }
+
+        public static void ResetOldMaterialTable(params object[] values) {
+            var mats = values.Select(mat => mat as Material).Where(mat => mat != null).ToArray();
+            oldMaterialVersionCache.RemoveAll(mats);
+            newMaterialVersionCache.RemoveAll(mats);
         }
 
         private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor) {
@@ -448,42 +477,6 @@ namespace UnlitWF
             }
         }
 
-        static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
-        static WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
-
-        private static bool IsOldMaterial(params object[] mats) {
-            var editor = new WFMaterialEditUtility();
-
-            bool result = false;
-            foreach (Material mat in mats) {
-                if (mat == null) {
-                    continue;
-                }
-                if (newMaterialVersionCache.Contains(mat)) {
-                    continue;
-                }
-                if (oldMaterialVersionCache.Contains(mat)) {
-                    result |= true;
-                    return true;
-                }
-                bool old = editor.ExistsOldNameProperty(mat);
-                if (old) {
-                    oldMaterialVersionCache.Add(mat);
-                }
-                else {
-                    newMaterialVersionCache.Add(mat);
-                }
-                result |= old;
-            }
-            return result;
-        }
-
-        public static void ResetOldMaterialTable(params object[] values) {
-            var mats = values.Select(mat => mat as Material).Where(mat => mat != null).ToArray();
-            oldMaterialVersionCache.RemoveAll(mats);
-            newMaterialVersionCache.RemoveAll(mats);
-        }
-
         private static void SuggestShadowColor(Material[] mats) {
             foreach (var m in mats) {
                 Undo.RecordObject(m, "shade color change");
@@ -491,21 +484,62 @@ namespace UnlitWF
                 Color baseColor = m.GetColor("_TS_BaseColor");
                 float hur, sat, val;
                 Color.RGBToHSV(baseColor, out hur, out sat, out val);
-                // 影1
-                if (m.HasProperty("_TS_1stColor")) {
-                    Color shade1Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f);
-                    m.SetColor("_TS_1stColor", shade1Color);
-                }
-                // 影2
-                if (m.HasProperty("_TS_2ndColor")) {
-                    Color shade2Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f);
-                    m.SetColor("_TS_2ndColor", shade2Color);
-                }
-                if (m.HasProperty("_TS_3rdColor")) {
-                    Color shade3Color = Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.7f);
-                    m.SetColor("_TS_3rdColor", shade3Color);
+
+                // 段数を取得
+                var steps = GetShadowStepsFromMaterial(m);
+                switch(steps) {
+                    case 1:
+                        if (m.HasProperty("_TS_1stColor")) {
+                            m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
+                        }
+                        break;
+                    case 3:
+                        if (m.HasProperty("_TS_1stColor")) {
+                            m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
+                        }
+                        if (m.HasProperty("_TS_2ndColor")) {
+                            m.SetColor("_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
+                        }
+                        if (m.HasProperty("_TS_3rdColor")) {
+                            m.SetColor("_TS_3rdColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.7f));
+                        }
+                        break;
+                    default:
+                        if (m.HasProperty("_TS_1stColor")) {
+                            m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
+                        }
+                        if (m.HasProperty("_TS_2ndColor")) {
+                            m.SetColor("_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
+                        }
+                        break;
                 }
             }
+        }
+
+        private static void SuggestShadowBorder(Material[] mats) {
+            foreach (var m in mats) {
+                Undo.RecordObject(m, "shade border change");
+                // 段数を取得
+                var steps = GetShadowStepsFromMaterial(m);
+                // 1影
+                var pos1 = m.GetFloat("_TS_1stBorder");
+                // 2影
+                if (2 <= steps && m.HasProperty("_TS_2ndBorder")) {
+                    m.SetFloat("_TS_2ndBorder", pos1 * (steps - 1.0f) / steps);
+                }
+                // 3影
+                if (2 <= steps && m.HasProperty("_TS_3rdBorder")) {
+                    m.SetFloat("_TS_3rdBorder", pos1 * (steps - 2.0f) / steps);
+                }
+            }
+        }
+
+        private static int GetShadowStepsFromMaterial(Material mat) {
+            var steps = mat.HasProperty("_TS_Steps") ? mat.GetInt("_TS_Steps") : 0;
+            if (steps <= 0) {
+                return 2; // _TS_Stepsが無いとき、あっても初期値のときは2段
+            }
+            return steps;
         }
 
         private static float ShiftHur(float hur, float sat, float mul) {
@@ -655,6 +689,15 @@ namespace UnlitWF
             }
         }
 
+        private static bool DrawButtonFieldProperty(GUIContent label, string buttonText) {
+            Rect position = EditorGUILayout.GetControlRect(true, 20);
+            position.y += 1;
+            Rect fieldpos = EditorGUI.PrefixLabel(position, label);
+            fieldpos.y -= 2;
+            fieldpos.height = 18;
+            return GUI.Button(fieldpos, buttonText);
+        }
+
         #endregion
 
         #region PropertyHook
@@ -687,25 +730,24 @@ namespace UnlitWF
 
         abstract class AbstractPropertyHook : IPropertyHook
         {
-            protected readonly string name;
-            protected readonly HashSet<string> names = new HashSet<string>();
+            protected readonly Regex matcher;
 
-            protected AbstractPropertyHook(string name, params string[] other) {
-                this.name = name;
-                this.names.Add(name);
-                foreach (var nm in other) {
-                    this.names.Add(nm);
-                }
+            protected AbstractPropertyHook(Regex matcher) {
+                this.matcher = matcher;
+            }
+
+            protected AbstractPropertyHook(string pattern) {
+                this.matcher = new Regex(pattern, RegexOptions.Compiled);
             }
 
             public void OnBefore(PropertyGUIContext context) {
-                if (names.Contains(context.current.name)) {
+                if (matcher.IsMatch(context.current.name)) {
                     OnBeforeProp(context);
                 }
             }
 
             public void OnAfter(PropertyGUIContext context, bool changed) {
-                if (names.Contains(context.current.name)) {
+                if (matcher.IsMatch(context.current.name)) {
                     OnAfterProp(context, changed);
                 }
             }
@@ -724,9 +766,11 @@ namespace UnlitWF
         /// </summary>
         class SingleLineTexPropertyHook : AbstractPropertyHook
         {
+            private readonly string colName;
             private readonly string texName;
 
-            public SingleLineTexPropertyHook(string colorName, string texName) : base(colorName, texName) {
+            public SingleLineTexPropertyHook(string colName, string texName) : base(colName + "|" + texName) {
+                this.colName = colName;
                 this.texName = texName;
             }
 
@@ -734,7 +778,7 @@ namespace UnlitWF
                 if (context.hidden) {
                     return;
                 }
-                if (name == context.current.name) {
+                if (colName == context.current.name) {
                     // テクスチャとカラーを1行で表示する
                     MaterialProperty another = FindProperty(texName, context.all, false);
                     if (another != null) {
@@ -751,9 +795,11 @@ namespace UnlitWF
         /// </summary>
         class MinMaxSliderPropertyHook : AbstractPropertyHook
         {
+            private readonly string minName;
             private readonly string maxName;
 
-            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName, maxName) {
+            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName + "|" + maxName) {
+                this.minName = minName;
                 this.maxName = maxName;
             }
 
@@ -761,7 +807,7 @@ namespace UnlitWF
                 if (context.hidden) {
                     return;
                 }
-                if (name == context.current.name) {
+                if (minName == context.current.name) {
                     // MinMaxSlider
                     MaterialProperty another = FindProperty(maxName, context.all, false);
                     if (another != null) {
@@ -794,18 +840,18 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// 指定の条件でプロパティを隠す
+        /// 指定の条件でプロパティを表示する
         /// </summary>
-        class ConditionHidePropertyHook : AbstractPropertyHook
+        class ConditionVisiblePropertyHook : AbstractPropertyHook
         {
             private readonly Predicate<PropertyGUIContext> pred;
 
-            public ConditionHidePropertyHook(string name, Predicate<PropertyGUIContext> pred) : base(name) {
+            public ConditionVisiblePropertyHook(string pattern, Predicate<PropertyGUIContext> pred) : base(pattern) {
                 this.pred = pred;
             }
 
             protected override void OnBeforeProp(PropertyGUIContext context) {
-                if (pred(context)) {
+                if (!pred(context)) {
                     context.hidden = true;
                 }
             }
@@ -816,13 +862,13 @@ namespace UnlitWF
         /// </summary>
         class CustomPropertyHook : AbstractPropertyHook
         {
-            public delegate bool OnBeforeDelegate(PropertyGUIContext context);
+            public delegate void OnBeforeDelegate(PropertyGUIContext context);
             public delegate void OnAfterDelegate(PropertyGUIContext context, bool changed);
 
             private readonly OnBeforeDelegate before;
             private readonly OnAfterDelegate after;
 
-            public CustomPropertyHook(string name, OnBeforeDelegate before, OnAfterDelegate after) : base(name) {
+            public CustomPropertyHook(string pattern, OnBeforeDelegate before, OnAfterDelegate after) : base(pattern) {
                 this.before = before;
                 this.after = after;
             }
