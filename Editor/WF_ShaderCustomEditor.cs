@@ -48,11 +48,12 @@ namespace UnlitWF
             } , null),
 
             // 条件付きHide
-            new ConditionVisiblePropertyHook("_TS_2ndColor", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
-            new ConditionVisiblePropertyHook("_TS_2ndBorder", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
-            new ConditionVisiblePropertyHook("_TS_3rdColor", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
-            new ConditionVisiblePropertyHook("_TS_3rdBorder", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
+            new ConditionVisiblePropertyHook("_TS_2ndColor|_TS_2ndBorder", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
+            new ConditionVisiblePropertyHook("_TS_3rdColor|_TS_3rdBorder", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
             new ConditionVisiblePropertyHook("_OL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)), // ANGEL_RING
+            new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
+            new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
@@ -732,25 +733,24 @@ namespace UnlitWF
 
         abstract class AbstractPropertyHook : IPropertyHook
         {
-            protected readonly string name;
-            protected readonly HashSet<string> names = new HashSet<string>();
+            protected readonly Regex matcher;
 
-            protected AbstractPropertyHook(string name, params string[] other) {
-                this.name = name;
-                this.names.Add(name);
-                foreach (var nm in other) {
-                    this.names.Add(nm);
-                }
+            protected AbstractPropertyHook(Regex matcher) {
+                this.matcher = matcher;
+            }
+
+            protected AbstractPropertyHook(string pattern) {
+                this.matcher = new Regex(pattern, RegexOptions.Compiled);
             }
 
             public void OnBefore(PropertyGUIContext context) {
-                if (names.Contains(context.current.name)) {
+                if (matcher.IsMatch(context.current.name)) {
                     OnBeforeProp(context);
                 }
             }
 
             public void OnAfter(PropertyGUIContext context, bool changed) {
-                if (names.Contains(context.current.name)) {
+                if (matcher.IsMatch(context.current.name)) {
                     OnAfterProp(context, changed);
                 }
             }
@@ -769,9 +769,11 @@ namespace UnlitWF
         /// </summary>
         class SingleLineTexPropertyHook : AbstractPropertyHook
         {
+            private readonly string colName;
             private readonly string texName;
 
-            public SingleLineTexPropertyHook(string colorName, string texName) : base(colorName, texName) {
+            public SingleLineTexPropertyHook(string colName, string texName) : base(colName + "|" + texName) {
+                this.colName = colName;
                 this.texName = texName;
             }
 
@@ -779,7 +781,7 @@ namespace UnlitWF
                 if (context.hidden) {
                     return;
                 }
-                if (name == context.current.name) {
+                if (colName == context.current.name) {
                     // テクスチャとカラーを1行で表示する
                     MaterialProperty another = FindProperty(texName, context.all, false);
                     if (another != null) {
@@ -796,9 +798,11 @@ namespace UnlitWF
         /// </summary>
         class MinMaxSliderPropertyHook : AbstractPropertyHook
         {
+            private readonly string minName;
             private readonly string maxName;
 
-            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName, maxName) {
+            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName + "|" + maxName) {
+                this.minName = minName;
                 this.maxName = maxName;
             }
 
@@ -806,7 +810,7 @@ namespace UnlitWF
                 if (context.hidden) {
                     return;
                 }
-                if (name == context.current.name) {
+                if (minName == context.current.name) {
                     // MinMaxSlider
                     MaterialProperty another = FindProperty(maxName, context.all, false);
                     if (another != null) {
@@ -845,7 +849,7 @@ namespace UnlitWF
         {
             private readonly Predicate<PropertyGUIContext> pred;
 
-            public ConditionVisiblePropertyHook(string name, Predicate<PropertyGUIContext> pred) : base(name) {
+            public ConditionVisiblePropertyHook(string pattern, Predicate<PropertyGUIContext> pred) : base(pattern) {
                 this.pred = pred;
             }
 
@@ -867,7 +871,7 @@ namespace UnlitWF
             private readonly OnBeforeDelegate before;
             private readonly OnAfterDelegate after;
 
-            public CustomPropertyHook(string name, OnBeforeDelegate before, OnAfterDelegate after) : base(name) {
+            public CustomPropertyHook(string pattern, OnBeforeDelegate before, OnAfterDelegate after) : base(pattern) {
                 this.before = before;
                 this.after = after;
             }

@@ -522,7 +522,7 @@
                     color.rgb = blendColor_Mul(color.rgb, matcap_color, _HL_Power * MAX_RGB(matcap_mask));
                 } else {
                     // 中間色合成
-                    matcap_color -= MEDIAN_GRAY;
+                    matcap_color -= _HL_MedianColor;
                     float3 lighten_color = max(ZERO_VEC3, matcap_color);
                     float3 darken_color  = min(ZERO_VEC3, matcap_color);
                     matcap_color = lerp( darken_color, lighten_color, saturate(matcap_mask * _HL_MatcapColor * 2) );
