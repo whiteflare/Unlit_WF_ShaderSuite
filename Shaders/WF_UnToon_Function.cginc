@@ -640,7 +640,7 @@
 
         void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
             shadow_color = lerp( 
-                lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power),
+                max(ZERO_VEC3, lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power)),
                 shadow_color,
                 smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
         }

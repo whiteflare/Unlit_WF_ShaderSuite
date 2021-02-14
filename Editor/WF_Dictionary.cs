@@ -267,6 +267,7 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "Feather", "境界のぼかし強度"),
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture", "アンチシャドウマスク"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "影色を自動設定する"),
+            new WFI18NTranslation("SH", "Align the boundaries equally", "境界を等間隔に整列"),
             // RimLight
             new WFI18NTranslation("RM", "Rim Color", "リムライト色"),
             new WFI18NTranslation("RM", "Power", "強度(マスター)"),
