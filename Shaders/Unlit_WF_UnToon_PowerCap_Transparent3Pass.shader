@@ -78,6 +78,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor         ("[HL] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_MatcapColor         ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
@@ -93,6 +94,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_1       ("[HA] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_MatcapColor_1       ("[HA] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
@@ -108,6 +110,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_CapType_2           ("[HB] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_2         ("[HB] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_2       ("[HB] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_MatcapColor_2       ("[HB] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_2             ("[HB] Power", Range(0, 2)) = 1
             _HL_BlendNormal_2       ("[HB] Blend Normal", Range(0, 1)) = 0.1
@@ -123,6 +126,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_CapType_3           ("[HC] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_3         ("[HC] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_3       ("[HC] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_MatcapColor_3       ("[HC] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_3             ("[HC] Power", Range(0, 2)) = 1
             _HL_BlendNormal_3       ("[HC] Blend Normal", Range(0, 1)) = 0.1
@@ -138,6 +142,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_CapType_4           ("[HD] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_4         ("[HD] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_4       ("[HD] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_MatcapColor_4       ("[HD] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_4             ("[HD] Power", Range(0, 2)) = 1
             _HL_BlendNormal_4       ("[HD] Blend Normal", Range(0, 1)) = 0.1
@@ -153,6 +158,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_CapType_5           ("[HE] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_5         ("[HE] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_5       ("[HE] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_MatcapColor_5       ("[HE] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_5             ("[HE] Power", Range(0, 2)) = 1
             _HL_BlendNormal_5       ("[HE] Blend Normal", Range(0, 1)) = 0.1
@@ -168,6 +174,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_CapType_6           ("[HF] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_6         ("[HF] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_6       ("[HF] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_MatcapColor_6       ("[HF] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_6             ("[HF] Power", Range(0, 2)) = 1
             _HL_BlendNormal_6       ("[HF] Blend Normal", Range(0, 1)) = 0.1
@@ -183,6 +190,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_CapType_7           ("[HG] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_7         ("[HG] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_7       ("[HG] Median Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_MatcapColor_7       ("[HG] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_7             ("[HG] Power", Range(0, 2)) = 1
             _HL_BlendNormal_7       ("[HG] Blend Normal", Range(0, 1)) = 0.1

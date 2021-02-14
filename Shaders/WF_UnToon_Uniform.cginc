@@ -155,6 +155,7 @@
 
     float           _HL_Enable;
     uint            _HL_CapType;
+    float3          _HL_MedianColor;
     float3          _HL_MatcapColor;
     float           _HL_Power;
     float           _HL_BlendNormal;
@@ -246,6 +247,7 @@
         float       _HL_Enable_##id;            \
         uint        _HL_CapType_##id;           \
         DECL_MAIN_TEX2D(_HL_MatcapTex_##id);    \
+        float3      _HL_MedianColor_##id;       \
         float3      _HL_MatcapColor_##id;       \
         float       _HL_Power_##id;             \
         float       _HL_BlendNormal_##id;       \
