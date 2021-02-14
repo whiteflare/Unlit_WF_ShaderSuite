@@ -96,14 +96,11 @@ namespace UnlitWF
         };
 
         private static bool IsAnyIntValue(PropertyGUIContext ctx, string name, Predicate<int> pred) {
-            foreach (var mat in WFCommonUtility.AsMaterials(ctx.editor.targets)) {
-                if (mat.HasProperty(name)) {
-                    if (pred(mat.GetInt(name))) {
-                        return true;
-                    }
-                }
+            var mats = WFCommonUtility.AsMaterials(ctx.editor.targets).Where(mat => mat.HasProperty(name)).ToArray();
+            if (mats.Length == 0) {
+                return true; // もしプロパティを持つマテリアルがないなら、trueを返却する
             }
-            return false;
+            return mats.Any(mat => pred(mat.GetInt(name)));
         }
 
         public static bool CompareAndSet(MaterialProperty[] prop, string name, int before, int after) {
