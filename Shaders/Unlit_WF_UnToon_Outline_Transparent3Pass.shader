@@ -269,6 +269,18 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
+        // Fog
+        [WFHeaderToggle(Fog)]
+            _FG_Enable              ("[FG] Enable", Float) = 0
+            _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
+            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
+        [WF_Vector3]
+            _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
+        [WF_Vector3]
+            _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -328,6 +340,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
             #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
 
+            #define _FG_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
 
@@ -342,9 +355,130 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
         UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
 
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_OPAQUE"
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_BACK"
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/MAIN_FRONT"
+        Pass {
+            Name "MAIN_OPAQUE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite ON
+            Blend Off
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 4.5
+
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
+
+            #define _AO_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _FG_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "MAIN_BACK"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 4.5
+
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
+            #define _WF_FACE_BACK
+
+            #define _AO_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _FG_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "MAIN_FRONT"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull BACK
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 4.5
+
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
+
+            #define _AO_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _FG_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
         UsePass "UnlitWF/WF_UnToon_Transparent3Pass/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
