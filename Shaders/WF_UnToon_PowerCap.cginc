@@ -117,6 +117,9 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
+        // ToonFog
+        affectToonFog(i, ws_view_dir, color);
+
         // フレネル
         affectFresnelAlpha(i.uv, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
