@@ -237,7 +237,8 @@ namespace UnlitWF
             // Light Matcap
             new WFI18NTranslation("HL", "Matcap Type", "matcapタイプ").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Matcap Sampler", "matcapサンプラ").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
-            new WFI18NTranslation("HL", "Matcap Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Matcap Base Color", "matcapベース色").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Matcap Tint Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Parallax", "視差(Parallax)").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Power", "matcap強度").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             // Lame
@@ -353,6 +354,7 @@ namespace UnlitWF
             // 今は使っていないはずの項目
             new WFI18NTranslation("Anti-Glare", "まぶしさ防止"),
             new WFI18NTranslation("Debug View", "デバッグ表示"),
+            new WFI18NTranslation("HL", "Matcap Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("RM", "RimLight Mask Texture", "マスクテクスチャ"),
             new WFI18NTranslation("LI", "Outline Mask Texture", "マスクテクスチャ"),
             new WFI18NTranslation("AO", "Occlusion Mask Texture", "マスクテクスチャ"),
