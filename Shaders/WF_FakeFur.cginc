@@ -191,8 +191,8 @@
         }
 
         // ファーノイズを追加
-        float3 noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).rgb;
-        color = saturate( float4( color - (1 - noise) * _FR_ShadowPower, calcBrightness(noise) - pow(gi.height, 4)) );
+        float noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).r;
+        color = float4(color.rgb * saturate(1 - (1 - noise) * _FR_ShadowPower), saturate(noise - pow(gi.height, 4)));
 
         return color;
     }
