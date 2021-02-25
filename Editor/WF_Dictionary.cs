@@ -17,12 +17,7 @@
 
 #if UNITY_EDITOR
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
-using System.Text.RegularExpressions;
-using UnityEngine;
 
 namespace UnlitWF
 {
@@ -186,6 +181,7 @@ namespace UnlitWF
             new WFI18NTranslation("Color", "マテリアルカラー"),
             new WFI18NTranslation("Cull Mode", "カリングモード"),
             new WFI18NTranslation("Use Vertex Color", "頂点カラーを乗算する"),
+            new WFI18NTranslation("Alpha CutOff Level", "カットアウトしきい値"),
             // Common
             new WFI18NTranslation("Enable", "有効"),
             new WFI18NTranslation("Texture", "テクスチャ"),
@@ -199,6 +195,8 @@ namespace UnlitWF
             new WFI18NTranslation("Shape", "形状"),
             new WFI18NTranslation("Scale", "スケール"),
             new WFI18NTranslation("Direction", "方向"),
+            new WFI18NTranslation("Roughen", "粗くする"),
+            new WFI18NTranslation("Finer", "細かくする"),
             // Lit
             new WFI18NTranslation("Darken (min value)", "暗さの最小値"),
             new WFI18NTranslation("Lighten (max value)", "明るさの最大値"),
