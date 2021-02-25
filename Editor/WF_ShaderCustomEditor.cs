@@ -41,6 +41,9 @@ namespace UnlitWF
             } , null),
             // _TS_Feather の直前に設定ボタンを追加する
             new CustomPropertyHook("_TS_Feather", ctx => {
+                if (GetShadowStepsFromMaterial(WFCommonUtility.AsMaterials(ctx.editor.targets)) < 2) {
+                    return;
+                }
                 var guiContent = WFI18N.GetGUIContent("SH", "Align the boundaries equally", "影の境界線を等間隔に整列します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
                     SuggestShadowBorder(WFCommonUtility.AsMaterials(ctx.editor.targets));
@@ -555,6 +558,13 @@ namespace UnlitWF
                     m.SetFloat("_TS_3rdBorder", pos1 * (steps - 2.0f) / steps);
                 }
             }
+        }
+
+        private static int GetShadowStepsFromMaterial(Material[] mat) {
+            if (mat.Length < 1) {
+                return 2;
+            }
+            return mat.Select(GetShadowStepsFromMaterial).Max();
         }
 
         private static int GetShadowStepsFromMaterial(Material mat) {
