@@ -31,7 +31,7 @@ namespace UnlitWF
         /// <summary>
         /// プロパティの前後に実行されるフック処理
         /// </summary>
-        private readonly List<IPropertyHook> HOOKS = new List<IPropertyHook>() {
+        private static readonly List<IPropertyHook> HOOKS = new List<IPropertyHook>() {
             // _TS_Power の直前に設定ボタンを追加する
             new CustomPropertyHook("_TS_Power", ctx => {
                 var guiContent = WFI18N.GetGUIContent("SH", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します");
@@ -92,6 +92,29 @@ namespace UnlitWF
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_AL_Source", 0, 1); // MAIN_TEX_ALPHA -> MASK_TEX_RED
                 }
+            }),
+
+            // _DetailNormalMap と _FR_NoiseTex の直後に設定ボタンを追加する
+            new CustomPropertyHook("_DetailNormalMap|_FR_NoiseTex", null, (ctx, changed) => {
+                if (ctx.current.textureValue == null) {
+                    return;
+                }
+                var rect = EditorGUILayout.GetControlRect();
+                rect.width = rect.width / 2 - 2;
+                if (GUI.Button(rect, WFI18N.GetGUIContent("Roughen"))) {
+                    var so = ctx.current.textureScaleAndOffset;
+                    so.x /= 2;
+                    so.y /= 2;
+                    ctx.current.textureScaleAndOffset = so;
+                }
+                rect.x += rect.width + 4;
+                if (GUI.Button(rect, WFI18N.GetGUIContent("Finer"))) {
+                    var so = ctx.current.textureScaleAndOffset;
+                    so.x *= 2;
+                    so.y *= 2;
+                    ctx.current.textureScaleAndOffset = so;
+                }
+                EditorGUILayout.Space();
             }),
         };
 
@@ -732,12 +755,8 @@ namespace UnlitWF
         {
             protected readonly Regex matcher;
 
-            protected AbstractPropertyHook(Regex matcher) {
-                this.matcher = matcher;
-            }
-
             protected AbstractPropertyHook(string pattern) {
-                this.matcher = new Regex(pattern, RegexOptions.Compiled);
+                this.matcher = new Regex(@"^(" + pattern + @")$", RegexOptions.Compiled);
             }
 
             public void OnBefore(PropertyGUIContext context) {
