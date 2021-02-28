@@ -100,7 +100,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor         ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -112,6 +113,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
         // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[SH] Enable", Float) = 0
+        [WF_FixFloat(3.0)]
+            _TS_Steps               ("[SH] Steps", Range(1, 3)) = 3
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
@@ -242,7 +245,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/01/20", Float) = 0
+            _CurrentVersion         ("2021/02/28", Float) = 0
     }
 
     SubShader {

@@ -145,7 +145,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor         ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -184,6 +185,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
         // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[SH] Enable", Float) = 0
+        [IntRange]
+            _TS_Steps               ("[SH] Steps", Range(1, 3)) = 2
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
@@ -193,9 +196,13 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
         [NoScaleOffset]
             _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
+            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.5, 0.5, 0.7, 1)
+        [NoScaleOffset]
+            _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
+            _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
@@ -272,6 +279,18 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
+        // Fog
+        [WFHeaderToggle(Fog)]
+            _FG_Enable              ("[FG] Enable", Float) = 0
+            _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
+            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
+        [WF_Vector3]
+            _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
+        [WF_Vector3]
+            _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -300,7 +319,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/01/20", Float) = 0
+            _CurrentVersion         ("2021/02/28", Float) = 0
     }
 
     SubShader {
@@ -332,6 +351,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
             #define _WF_UNTOON_TESS
 
+            #define _FG_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
 
@@ -371,6 +391,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _FG_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE
@@ -415,6 +436,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _FG_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE
@@ -458,6 +480,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
+            #define _FG_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE

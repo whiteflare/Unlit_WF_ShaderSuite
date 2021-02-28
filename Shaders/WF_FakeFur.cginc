@@ -65,7 +65,7 @@
         return o;
     }
 
-    inline g2f initGeomOutput(v2g p) {
+    g2f initGeomOutput(v2g p) {
         g2f o;
         UNITY_INITIALIZE_OUTPUT(g2f, o);
         UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(g2f, o);
@@ -75,13 +75,13 @@
         return o;
     }
 
-    inline void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
+    void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
         o.ws_vertex = lerp(vb, vu, height);
         o.vertex = UnityWorldToClipPos( o.ws_vertex );
         o.height = height;
     }
 
-    inline v2g lerp_v2g(v2g x, v2g y, float div) {
+    v2g lerp_v2g(v2g x, v2g y, float div) {
         v2g o;
         UNITY_INITIALIZE_OUTPUT(v2g, o);
         o.uv                = lerp(x.uv,            y.uv,               div);
@@ -191,8 +191,8 @@
         }
 
         // ファーノイズを追加
-        float3 noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).rgb;
-        color = saturate( float4( color - (1 - noise) * _FR_ShadowPower, calcBrightness(noise) - pow(gi.height, 4)) );
+        float noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).r;
+        color = float4(color.rgb * saturate(1 - (1 - noise) * _FR_ShadowPower), saturate(noise - pow(gi.height, 4)));
 
         return color;
     }

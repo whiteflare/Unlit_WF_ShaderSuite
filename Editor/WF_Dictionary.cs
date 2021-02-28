@@ -17,12 +17,7 @@
 
 #if UNITY_EDITOR
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
-using System.Text.RegularExpressions;
-using UnityEngine;
 
 namespace UnlitWF
 {
@@ -186,6 +181,7 @@ namespace UnlitWF
             new WFI18NTranslation("Color", "マテリアルカラー"),
             new WFI18NTranslation("Cull Mode", "カリングモード"),
             new WFI18NTranslation("Use Vertex Color", "頂点カラーを乗算する"),
+            new WFI18NTranslation("Alpha CutOff Level", "カットアウトしきい値"),
             // Common
             new WFI18NTranslation("Enable", "有効"),
             new WFI18NTranslation("Texture", "テクスチャ"),
@@ -199,6 +195,8 @@ namespace UnlitWF
             new WFI18NTranslation("Shape", "形状"),
             new WFI18NTranslation("Scale", "スケール"),
             new WFI18NTranslation("Direction", "方向"),
+            new WFI18NTranslation("Roughen", "粗くする"),
+            new WFI18NTranslation("Finer", "細かくする"),
             // Lit
             new WFI18NTranslation("Darken (min value)", "暗さの最小値"),
             new WFI18NTranslation("Lighten (max value)", "明るさの最大値"),
@@ -237,7 +235,8 @@ namespace UnlitWF
             // Light Matcap
             new WFI18NTranslation("HL", "Matcap Type", "matcapタイプ").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Matcap Sampler", "matcapサンプラ").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
-            new WFI18NTranslation("HL", "Matcap Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Matcap Base Color", "matcapベース色").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Matcap Tint Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Parallax", "視差(Parallax)").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Power", "matcap強度").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             // Lame
@@ -251,6 +250,7 @@ namespace UnlitWF
             new WFI18NTranslation("LM", "Spot Fade Strength", "スポットフェード強度"),
             new WFI18NTranslation("LM", "Anim Speed", "アニメ速度"),
             // ToonShade
+            new WFI18NTranslation("SH", "Steps", "繰り返し数"),
             new WFI18NTranslation("SH", "Base Color", "ベース色"),
             new WFI18NTranslation("SH", "Base Shade Texture", "ベース色テクスチャ"),
             new WFI18NTranslation("SH", "1st Shade Color", "1影色"),
@@ -266,6 +266,7 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "Feather", "境界のぼかし強度"),
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture", "アンチシャドウマスク"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "影色を自動設定する"),
+            new WFI18NTranslation("SH", "Align the boundaries equally", "境界を等間隔に整列"),
             // RimLight
             new WFI18NTranslation("RM", "Rim Color", "リムライト色"),
             new WFI18NTranslation("RM", "Power", "強度(マスター)"),
@@ -341,9 +342,17 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Flip Tangent", "タンジェント反転"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
+
+            // その他のテキスト
+            new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
+            new WFI18NTranslation(WFMessageText.PlzMigration, "このマテリアルは古いバージョンで作成されたようです。\n最新版に変換しますか？"),
+            new WFI18NTranslation(WFMessageText.PlzBatchingStatic, "このマテリアルは Batching Static な MeshRenderer から使われているようです。\nBatching Static 用の設定へ変更しますか？"),
+            new WFI18NTranslation(WFMessageText.PlzLightmapStatic, "このマテリアルは Lightmap Static な MeshRenderer から使われているようです。\nライトマップを有効にしますか？"),
+
             // 今は使っていないはずの項目
             new WFI18NTranslation("Anti-Glare", "まぶしさ防止"),
             new WFI18NTranslation("Debug View", "デバッグ表示"),
+            new WFI18NTranslation("HL", "Matcap Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("RM", "RimLight Mask Texture", "マスクテクスチャ"),
             new WFI18NTranslation("LI", "Outline Mask Texture", "マスクテクスチャ"),
             new WFI18NTranslation("AO", "Occlusion Mask Texture", "マスクテクスチャ"),
@@ -359,6 +368,14 @@ namespace UnlitWF
             new WFI18NTranslation("FG", "Fog Max Distance", "フォグが最大になる距離"),
             new WFI18NTranslation("TE", "Tess Type", "Tessタイプ"),
         };
+    }
+
+    internal static class WFMessageText
+    {
+        public static readonly string NewerVersion = "A newer version is available now!\nLatest version: ";
+        public static readonly string PlzMigration = "This Material may have been created in an older version.\nConvert to new version?";
+        public static readonly string PlzBatchingStatic = "This material seems to be used by the Batching Static MeshRenderer.\nDo you want to change the settings for Batching Static?";
+        public static readonly string PlzLightmapStatic = "This material seems to be used by the Lightmap Static MeshRenderer.\nDo you want to enable Lightmap?";
     }
 }
 

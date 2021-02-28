@@ -77,7 +77,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor         ("[HL] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -92,7 +93,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_1       ("[HA] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
@@ -107,7 +109,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_CapType_2           ("[HB] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_2         ("[HB] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_2       ("[HB] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor_2       ("[HB] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor_2       ("[HB] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_2             ("[HB] Power", Range(0, 2)) = 1
             _HL_BlendNormal_2       ("[HB] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_2          ("[HB] Parallax", Range(0, 1)) = 0.75
@@ -122,7 +125,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_CapType_3           ("[HC] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_3         ("[HC] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_3       ("[HC] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor_3       ("[HC] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor_3       ("[HC] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_3             ("[HC] Power", Range(0, 2)) = 1
             _HL_BlendNormal_3       ("[HC] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_3          ("[HC] Parallax", Range(0, 1)) = 0.75
@@ -137,7 +141,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_CapType_4           ("[HD] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_4         ("[HD] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_4       ("[HD] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor_4       ("[HD] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor_4       ("[HD] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_4             ("[HD] Power", Range(0, 2)) = 1
             _HL_BlendNormal_4       ("[HD] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_4          ("[HD] Parallax", Range(0, 1)) = 0.75
@@ -152,7 +157,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_CapType_5           ("[HE] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_5         ("[HE] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_5       ("[HE] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor_5       ("[HE] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor_5       ("[HE] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_5             ("[HE] Power", Range(0, 2)) = 1
             _HL_BlendNormal_5       ("[HE] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_5          ("[HE] Parallax", Range(0, 1)) = 0.75
@@ -167,7 +173,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_CapType_6           ("[HF] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_6         ("[HF] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_6       ("[HF] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor_6       ("[HF] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor_6       ("[HF] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_6             ("[HF] Power", Range(0, 2)) = 1
             _HL_BlendNormal_6       ("[HF] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_6          ("[HF] Parallax", Range(0, 1)) = 0.75
@@ -182,7 +189,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_CapType_7           ("[HG] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_7         ("[HG] Matcap Sampler", 2D) = "gray" {}
-            _HL_MatcapColor_7       ("[HG] Matcap Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MedianColor_7       ("[HG] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_MatcapColor_7       ("[HG] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_7             ("[HG] Power", Range(0, 2)) = 1
             _HL_BlendNormal_7       ("[HG] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_7          ("[HG] Parallax", Range(0, 1)) = 0.75
@@ -194,6 +202,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
         // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[SH] Enable", Float) = 0
+        [IntRange]
+            _TS_Steps               ("[SH] Steps", Range(1, 3)) = 2
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
@@ -203,9 +213,13 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
         [NoScaleOffset]
             _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
+            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.5, 0.5, 0.7, 1)
+        [NoScaleOffset]
+            _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
+            _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
@@ -231,6 +245,18 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+
+        // Fog
+        [WFHeaderToggle(Fog)]
+            _FG_Enable              ("[FG] Enable", Float) = 0
+            _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
+            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
+        [WF_Vector3]
+            _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
+        [WF_Vector3]
+            _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
 
         // Lit
         [WFHeader(Lit)]
@@ -260,7 +286,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/01/20", Float) = 0
+            _CurrentVersion         ("2021/02/28", Float) = 0
     }
 
     SubShader {
@@ -288,6 +314,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #define _WF_ALPHA_FRESNEL
 
             #define _CH_ENABLE
+            #define _FG_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
@@ -322,6 +349,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #define _WF_UNTOON_POWERCAP
 
             #define _CH_ENABLE
+            #define _FG_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE
             #define _TR_ENABLE
