@@ -139,6 +139,7 @@ namespace UnlitWF
             { "_EmissionColor", "ES" },
             { "_EmissionMap", "ES" },
             { "_OcclusionMap", "AO" },
+            // 今は使っていないはずの項目
             { "_TessType", "TE" },
             { "_TessFactor", "TE" },
             { "_Smoothing", "TE" },
@@ -197,6 +198,8 @@ namespace UnlitWF
             new WFI18NTranslation("Direction", "方向"),
             new WFI18NTranslation("Roughen", "粗くする"),
             new WFI18NTranslation("Finer", "細かくする"),
+            new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離"),
+            new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離"),
             // Lit
             new WFI18NTranslation("Darken (min value)", "暗さの最小値"),
             new WFI18NTranslation("Lighten (max value)", "明るさの最大値"),
@@ -246,8 +249,7 @@ namespace UnlitWF
             new WFI18NTranslation("LM", "Change Alpha Transparency", "透明度も反映する"),
             new WFI18NTranslation("LM", "Dencity", "密度"),
             new WFI18NTranslation("LM", "Glitter", "きらきら"),
-            new WFI18NTranslation("LM", "Dist Fade Start", "距離フェード開始"),
-            new WFI18NTranslation("LM", "Spot Fade Strength", "スポットフェード強度"),
+            new WFI18NTranslation("LM", "FadeOut Angle", "フェードアウト角度"),
             new WFI18NTranslation("LM", "Anim Speed", "アニメ速度"),
             // ToonShade
             new WFI18NTranslation("SH", "Steps", "繰り返し数"),
@@ -300,8 +302,6 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "フォグの色"),
-            new WFI18NTranslation("FG", "FeedOut Distance (Near)", "フェードアウト距離"),
-            new WFI18NTranslation("FG", "FeedOut Distance (Far)", "フェードアウト距離"),
             new WFI18NTranslation("FG", "Exponential", "変化の鋭さ"),
             new WFI18NTranslation("FG", "Base Offset", "フォグ原点の位置(オフセット)"),
             new WFI18NTranslation("FG", "Scale", "フォグ範囲のスケール"),
@@ -309,8 +309,6 @@ namespace UnlitWF
             new WFI18NTranslation("TE", "Tess Factor", "分割数"),
             new WFI18NTranslation("TE", "Smoothing", "スムーズ"),
             new WFI18NTranslation("TE", "Smoothing Mask Texture", "スムーズマスク"),
-            new WFI18NTranslation("TE", "FeedOut Distance (Near)", "フェードアウト距離"),
-            new WFI18NTranslation("TE", "FeedOut Distance (Far)", "フェードアウト距離"),
             // Lit Advance
             new WFI18NTranslation("Sun Source", "太陽光のモード"),
             new WFI18NTranslation("Custom Sun Azimuth", "カスタム太陽の方角"),
@@ -367,6 +365,10 @@ namespace UnlitWF
             new WFI18NTranslation("FG", "Fog Min Distance", "フォグが効き始める距離"),
             new WFI18NTranslation("FG", "Fog Max Distance", "フォグが最大になる距離"),
             new WFI18NTranslation("TE", "Tess Type", "Tessタイプ"),
+            new WFI18NTranslation("LM", "Dist Fade Start", "フェードアウト距離"),
+            new WFI18NTranslation("LM", "Spot Fade Strength", "フェードアウト角度"),
+            new WFI18NTranslation("FeedOut Distance (Near)", "フェードアウト距離"),
+            new WFI18NTranslation("FeedOut Distance (Far)", "フェードアウト距離"),
         };
     }
 

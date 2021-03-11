@@ -596,7 +596,7 @@
                     // フレークのばらつき項
                     power *= random1(min_pos.xy);
                     // 距離フェード項
-                    power *= 1 - smoothstep(_LM_MinDist, _LM_MinDist + 1, length(ws_camera_vec));
+                    power *= 1 - smoothstep(_LM_MinDist, max(_LM_MinDist + NZF, _LM_MaxDist), length(ws_camera_vec));
                     // NdotV起因の強度項
                     power *= pow(abs(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LM_Spot));
                     // 形状
@@ -920,11 +920,11 @@
                 float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
                 float power =
                     // 原点からの距離の判定
-                    smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_offset_vertex ))
+                    smoothstep(_FG_MinDist, max(_FG_MinDist + NZF, _FG_MaxDist), length( ws_offset_vertex ))
                     // 前後の判定
                     * smoothstep(0, 0.2, -dot(ws_view_dir.xz, ws_offset_vertex.xz))
                     // カメラと原点の水平距離の判定
-                    * smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
+                    * smoothstep(_FG_MinDist, max(_FG_MinDist + NZF, _FG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
                 color.rgb = lerp(color.rgb, _FG_Color.rgb * i.light_color, _FG_Color.a * pow(power, _FG_Exponential));
             }
         }
