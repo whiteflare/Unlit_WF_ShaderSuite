@@ -588,51 +588,68 @@ namespace UnlitWF
     {
         #region マイグレーション
 
-        public bool ExistsOldNameProperty(params UnityEngine.Object[] objlist) {
-            return 0 < CreateOldNamePropertyList(objlist).Count;
+        public bool ExistsOldNameProperty(params Material[] mats) {
+            return 0 < CreateOldNamePropertyList(mats).Count;
         }
 
         public bool RenameOldNameProperties(MigrationParameter param) {
             return RenameOldNameProperties(param.materials);
         }
 
-        public bool RenameOldNameProperties(UnityEngine.Object[] objlist) {
-            var oldPropList = CreateOldNamePropertyList(objlist);
+        public bool RenameOldNameProperties(Material[] mats) {
+            var oldPropList = CreateOldNamePropertyList(mats);
             // 名称を全て変更
             foreach (var propPair in oldPropList) {
-                if (propPair.Value != null) {
-                    propPair.Key.CopyTo(propPair.Value);
+                if (propPair.after != null) {
+                    propPair.before.CopyTo(propPair.after);
+                    propPair.onAfterCopy(propPair.after);
                 }
             }
             // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Values);
+            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Select(p => p.after));
             // 旧プロパティは全て削除
-            foreach (var prop in oldPropList.Keys) {
+            foreach (var prop in oldPropList.Select(p => p.before)) {
                 prop.Remove();
             }
             // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Keys);
+            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Select(p => p.before));
             return 0 < oldPropList.Count;
         }
 
-        private Dictionary<ShaderSerializedProperty, ShaderSerializedProperty> CreateOldNamePropertyList(UnityEngine.Object[] objlist) { // ShaderCustomEditor側から呼び出されるのでobject[]
-            var result = new Dictionary<ShaderSerializedProperty, ShaderSerializedProperty>();
+        private List<OldNameProperty> CreateOldNamePropertyList(Material[] mats) {
+            var result = new List<OldNameProperty>();
 
-            foreach (var mat in WFCommonUtility.AsMaterials(objlist)) {
+            foreach (var mat in mats) {
                 if (mat.shader.name.Contains("MatcapShadows")) {
                     // MatcapShadowsは古いので対象にしない
                     continue;
                 }
                 var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var pair in WFShaderDictionary.OldPropNameToNewPropNameMap) {
-                    var before = props.GetValueOrNull(pair.Key);
+                foreach (var pair in WFShaderDictionary.OldPropNameToNewPropNameList) {
+                    var before = props.GetValueOrNull(pair.beforeName);
                     if (before != null) {
-                        result[before] = props.GetValueOrNull(pair.Value);
+                        result.Add(new OldNameProperty(before, props.GetValueOrNull(pair.afterName), pair.onAfterCopy));
                     }
                 }
             }
 
             return result;
+        }
+
+        public struct OldNameProperty
+        {
+            public readonly ShaderSerializedProperty before;
+            public readonly ShaderSerializedProperty after;
+            public readonly Action<ShaderSerializedProperty> onAfterCopy;
+
+            public OldNameProperty(ShaderSerializedProperty before, ShaderSerializedProperty after, Action<ShaderSerializedProperty> onAfterCopy) {
+                this.before = before;
+                this.after = after;
+                this.onAfterCopy = onAfterCopy ?? (p => { });
+            }
+
+            public OldNameProperty(ShaderSerializedProperty before, ShaderSerializedProperty after) : this(before, after, null) {
+            }
         }
 
         #endregion
