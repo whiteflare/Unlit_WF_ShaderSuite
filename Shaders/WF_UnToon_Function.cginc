@@ -647,6 +647,10 @@
 
         void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
+                if (isInMirror()) {
+                    angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
+                }
+
                 // 陰用法線とライト方向から Harf-Lambert
                 float3 ws_shade_normal = normalize(lerp(ws_normal, ws_bump_normal, _TS_BlendNormal));
                 float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
@@ -654,10 +658,6 @@
                 // アンチシャドウマスク加算
                 float anti_shade = WF_TEX2D_SHADE_MASK(uv_main);
                 brightness = lerp(brightness, lerp(brightness, 1, 0.5), anti_shade);
-                if (isInMirror()) {
-                    angle_light_camera *= anti_shade;
-                }
-
                 // ビュー相対位置シフト
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
 
