@@ -142,6 +142,7 @@
     float           _MT_BlendNormal;
     float           _MT_Brightness;
     float           _MT_Monochrome;
+    uint            _MT_MetallicMapType;
     float           _MT_Specular;
     float           _MT_SpecSmooth;
     float           _MT_InvMaskVal;

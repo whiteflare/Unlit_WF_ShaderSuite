@@ -54,9 +54,9 @@
 
     #ifndef WF_TEX2D_METAL_GLOSS
         #ifndef _WF_MOBILE
-            #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra * float2(1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
+            #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba * float4(1, 1, 1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
         #else
-            #define WF_TEX2D_METAL_GLOSS(uv)    SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra
+            #define WF_TEX2D_METAL_GLOSS(uv)    SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba
         #endif
     #endif
 
@@ -472,18 +472,32 @@
 
         void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
-                float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
-                float2 metallicSmoothness = WF_TEX2D_METAL_GLOSS(uv_main);
-                float metallic = _MT_Metallic * metallicSmoothness.x;
+                float metallic = _MT_Metallic;
+                float monochrome = _MT_Monochrome;
+                float4 metalGlossMap = WF_TEX2D_METAL_GLOSS(uv_main);
+
+                // MetallicSmoothness をパラメータに反映
+                if (_MT_MetallicMapType == 0) {
+                    // Metallic強度に反映する方式
+                    metallic *= metalGlossMap.r;
+                }
+                else if (_MT_MetallicMapType == 1) {
+                    // Metallic強度を固定して、モノクロ反射に反映する方式
+                    monochrome = saturate(1 - (1 - monochrome) * metalGlossMap.r);
+                }
+
+                // Metallic描画
                 if (0.01 < metallic) {
+                float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
+
                     // リフレクション
-                    float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
-                    reflection = lerp(reflection, calcBrightness(reflection).xxx, _MT_Monochrome);
+                    float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, metalGlossMap.a * _MT_ReflSmooth);
+                    reflection = lerp(reflection, calcBrightness(reflection).xxx, monochrome);
 
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir.xyz, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
+                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir.xyz, i.light_color.rgb * color.rgb, metalGlossMap.a * _MT_SpecSmooth);
                     }
 
                     // 合成

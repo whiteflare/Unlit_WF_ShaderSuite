@@ -94,6 +94,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [Enum(MASK,0,METALLIC,1)]
+            _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]
