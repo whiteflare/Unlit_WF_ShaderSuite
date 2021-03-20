@@ -231,6 +231,7 @@ namespace UnlitWF
             new WFI18NTranslation("MT", "Smoothness", "滑らかさ"),
             new WFI18NTranslation("MT", "Monochrome Reflection", "モノクロ反射"),
             new WFI18NTranslation("MT", "Specular", "スペキュラ反射"),
+            new WFI18NTranslation("MT", "MetallicMap Type", "Metallicマップの種類"),
             new WFI18NTranslation("MT", "MetallicSmoothnessMap Texture", "MetallicSmoothnessマップ"),
             new WFI18NTranslation("MT", "RoughnessMap Texture", "Roughnessマップ"),
             new WFI18NTranslation("MT", "2nd CubeMap Blend", "キューブマップ混合タイプ"),
