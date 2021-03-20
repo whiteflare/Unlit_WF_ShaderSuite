@@ -210,7 +210,7 @@
 
     // geometry シェーダでアウトラインメッシュを張るタイプ。NORMALとEDGEをどちらもサポートする。
 #if SHADER_TARGET >= 40
-    [maxvertexcount(10)]
+    [maxvertexcount(15)]
     void geom_outline(triangle v2f v[3], inout TriangleStream<v2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
@@ -249,7 +249,15 @@
                 triStream.Append(n1);
                 triStream.Append(p2);
                 triStream.Append(n2);
+                // 折り返すことで裏面まで描画する
+                triStream.Append(p1);
+                triStream.Append(n1);
+                triStream.Append(p0);
+                triStream.Append(n0);
+                triStream.Append(p2);
             }
+
+            triStream.RestartStrip();
         }
         #endif
     }
