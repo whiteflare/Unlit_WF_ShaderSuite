@@ -17,6 +17,7 @@
 
 #if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 
 namespace UnlitWF
@@ -139,6 +140,7 @@ namespace UnlitWF
             { "_EmissionColor", "ES" },
             { "_EmissionMap", "ES" },
             { "_OcclusionMap", "AO" },
+            // 今は使っていないはずの項目
             { "_TessType", "TE" },
             { "_TessFactor", "TE" },
             { "_Smoothing", "TE" },
@@ -150,26 +152,26 @@ namespace UnlitWF
         /// <summary>
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
-        public static readonly Dictionary<string, string> OldPropNameToNewPropNameMap = new Dictionary<string, string>() {
-            { "_AL_CutOff", "_Cutoff" },
-            { "_CutOffLevel", "_Cutoff" },
-            { "_ES_Color", "_EmissionColor" },
-            { "_ES_MaskTex", "_EmissionMap" },
-            { "_FurHeight", "_FR_Height" },
-            { "_FurMaskTex", "_FR_MaskTex" },
-            { "_FurNoiseTex", "_FR_NoiseTex" },
-            { "_FurRepeat", "_FR_Repeat" },
-            { "_FurShadowPower", "_FR_ShadowPower" },
-            // { "_FurVector", "_FR_Vector" }, // FurVectorの値は再設定が必要なので変換しない
-            { "_FG_BumpMap", "_FR_BumpMap" },
-            { "_FG_FlipTangent", "_FR_FlipTangent" },
-            { "_GL_BrendPower", "_GL_BlendPower" },
-            { "_MT_BlendType", "_MT_Brightness" },
-            { "_MT_MaskTex", "_MetallicGlossMap" },
-            { "_MT_Smoothness", "_MT_ReflSmooth" },
-            { "_MT_Smoothness2", "_MT_SpecSmooth" },
-            { "_TessFactor", "_TE_Factor" },
-            { "_Smoothing", "_TE_SmoothPower" },
+        public static readonly List<OldPropertyReplacement> OldPropNameToNewPropNameList = new List<OldPropertyReplacement>() {
+            new OldPropertyReplacement("_AL_CutOff", "_Cutoff"),
+            new OldPropertyReplacement("_CutOffLevel", "_Cutoff"),
+            new OldPropertyReplacement("_ES_Color", "_EmissionColor"),
+            new OldPropertyReplacement("_ES_MaskTex", "_EmissionMap"),
+            new OldPropertyReplacement("_FurHeight", "_FR_Height"),
+            new OldPropertyReplacement("_FurMaskTex", "_FR_MaskTex"),
+            new OldPropertyReplacement("_FurNoiseTex", "_FR_NoiseTex"),
+            new OldPropertyReplacement("_FurRepeat", "_FR_Repeat"),
+            new OldPropertyReplacement("_FurShadowPower", "_FR_ShadowPower"),
+            new OldPropertyReplacement("_FG_BumpMap", "_FR_BumpMap"),
+            new OldPropertyReplacement("_FG_FlipTangent", "_FR_FlipTangent"),
+            new OldPropertyReplacement("_GL_BrendPower", "_GL_BlendPower"),
+            new OldPropertyReplacement("_MT_BlendType", "_MT_Brightness"),
+            new OldPropertyReplacement("_MT_MaskTex", "_MetallicGlossMap"),
+            new OldPropertyReplacement("_MT_Smoothness", "_MT_ReflSmooth"),
+            new OldPropertyReplacement("_MT_Smoothness2", "_MT_SpecSmooth"),
+            new OldPropertyReplacement("_TessFactor", "_TE_Factor"),
+            new OldPropertyReplacement("_Smoothing", "_TE_SmoothPower"),
+            // new OldPropertyReplacement("_FurVector", "_FR_Vector"), // FurVectorの値は再設定が必要なので変換しない
         };
 
         /// <summary>
@@ -197,6 +199,8 @@ namespace UnlitWF
             new WFI18NTranslation("Direction", "方向"),
             new WFI18NTranslation("Roughen", "粗くする"),
             new WFI18NTranslation("Finer", "細かくする"),
+            new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離"),
+            new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離"),
             // Lit
             new WFI18NTranslation("Darken (min value)", "暗さの最小値"),
             new WFI18NTranslation("Lighten (max value)", "明るさの最大値"),
@@ -227,6 +231,7 @@ namespace UnlitWF
             new WFI18NTranslation("MT", "Smoothness", "滑らかさ"),
             new WFI18NTranslation("MT", "Monochrome Reflection", "モノクロ反射"),
             new WFI18NTranslation("MT", "Specular", "スペキュラ反射"),
+            new WFI18NTranslation("MT", "MetallicMap Type", "Metallicマップの種類"),
             new WFI18NTranslation("MT", "MetallicSmoothnessMap Texture", "MetallicSmoothnessマップ"),
             new WFI18NTranslation("MT", "RoughnessMap Texture", "Roughnessマップ"),
             new WFI18NTranslation("MT", "2nd CubeMap Blend", "キューブマップ混合タイプ"),
@@ -246,8 +251,7 @@ namespace UnlitWF
             new WFI18NTranslation("LM", "Change Alpha Transparency", "透明度も反映する"),
             new WFI18NTranslation("LM", "Dencity", "密度"),
             new WFI18NTranslation("LM", "Glitter", "きらきら"),
-            new WFI18NTranslation("LM", "Dist Fade Start", "距離フェード開始"),
-            new WFI18NTranslation("LM", "Spot Fade Strength", "スポットフェード強度"),
+            new WFI18NTranslation("LM", "FadeOut Angle", "フェードアウト角度"),
             new WFI18NTranslation("LM", "Anim Speed", "アニメ速度"),
             // ToonShade
             new WFI18NTranslation("SH", "Steps", "繰り返し数"),
@@ -300,8 +304,6 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "フォグの色"),
-            new WFI18NTranslation("FG", "FeedOut Distance (Near)", "フェードアウト距離"),
-            new WFI18NTranslation("FG", "FeedOut Distance (Far)", "フェードアウト距離"),
             new WFI18NTranslation("FG", "Exponential", "変化の鋭さ"),
             new WFI18NTranslation("FG", "Base Offset", "フォグ原点の位置(オフセット)"),
             new WFI18NTranslation("FG", "Scale", "フォグ範囲のスケール"),
@@ -309,8 +311,6 @@ namespace UnlitWF
             new WFI18NTranslation("TE", "Tess Factor", "分割数"),
             new WFI18NTranslation("TE", "Smoothing", "スムーズ"),
             new WFI18NTranslation("TE", "Smoothing Mask Texture", "スムーズマスク"),
-            new WFI18NTranslation("TE", "FeedOut Distance (Near)", "フェードアウト距離"),
-            new WFI18NTranslation("TE", "FeedOut Distance (Far)", "フェードアウト距離"),
             // Lit Advance
             new WFI18NTranslation("Sun Source", "太陽光のモード"),
             new WFI18NTranslation("Custom Sun Azimuth", "カスタム太陽の方角"),
@@ -367,6 +367,10 @@ namespace UnlitWF
             new WFI18NTranslation("FG", "Fog Min Distance", "フォグが効き始める距離"),
             new WFI18NTranslation("FG", "Fog Max Distance", "フォグが最大になる距離"),
             new WFI18NTranslation("TE", "Tess Type", "Tessタイプ"),
+            new WFI18NTranslation("LM", "Dist Fade Start", "フェードアウト距離"),
+            new WFI18NTranslation("LM", "Spot Fade Strength", "フェードアウト角度"),
+            new WFI18NTranslation("FeedOut Distance (Near)", "フェードアウト距離"),
+            new WFI18NTranslation("FeedOut Distance (Far)", "フェードアウト距離"),
         };
     }
 

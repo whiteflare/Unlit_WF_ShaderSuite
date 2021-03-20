@@ -117,6 +117,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [Enum(MASK,0,METALLIC,1)]
+            _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -174,8 +176,9 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
         [PowerSlider(4.0)]
             _LM_Dencity             ("[LM] Dencity", Range(0.3, 4)) = 0.5
             _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5
-            _LM_MinDist             ("[LM] Dist Fade Start", Range(0, 5)) = 2.0
-            _LM_Spot                ("[LM] Spot Fade Strength", Range(0, 16)) = 2.0
+            _LM_MinDist             ("[LM] FadeOut Distance (Near)", Range(0, 5)) = 2.0
+            _LM_MaxDist             ("[LM] FadeOut Distance (Far)", Range(0, 5)) = 4.0
+            _LM_Spot                ("[LM] FadeOut Angle", Range(0, 16)) = 2.0
             _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
             _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}

@@ -142,6 +142,7 @@
     float           _MT_BlendNormal;
     float           _MT_Brightness;
     float           _MT_Monochrome;
+    uint            _MT_MetallicMapType;
     float           _MT_Specular;
     float           _MT_SpecSmooth;
     float           _MT_InvMaskVal;
@@ -172,6 +173,7 @@
     float           _LM_Dencity;
     float           _LM_Glitter;
     float           _LM_MinDist;
+    float           _LM_MaxDist;
     float           _LM_Spot;
     float           _LM_AnimSpeed;
     float           _LM_ChangeAlpha;
