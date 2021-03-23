@@ -66,7 +66,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/02/28", Float) = 0
+            _CurrentVersion         ("2021/03/28", Float) = 0
     }
 
     SubShader {
