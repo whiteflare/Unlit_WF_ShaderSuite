@@ -794,8 +794,16 @@
                     : i.uv                                                                      // UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
-                float power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
-                color.rgb = blendOverlayColor(color.rgb, PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
+                float4 ov_color = PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color;
+                float ov_power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
+
+                // 頂点カラーを加味
+#ifdef _VC_ENABLE
+                ov_color *= lerp(ONE_VEC4, i.vertex_color, _OL_VertColToDecal);
+                ov_power *= lerp(1, saturate(TGL_OFF(_OL_InvMaskVal) ? i.vertex_color.r : 1 - i.vertex_color.r), _OL_VertColToMask);
+#endif
+
+                color.rgb = blendOverlayColor(color.rgb, ov_color, ov_power);
             }
         }
     #else
