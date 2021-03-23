@@ -212,6 +212,8 @@
     float           _OL_Power;
     float           _OL_CustomParam1;
     float           _OL_InvMaskVal;
+    float           _OL_VertColToDecal;
+    float           _OL_VertColToMask;
 
     float           _TL_Enable;
     float           _TL_LineWidth;
