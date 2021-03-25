@@ -26,7 +26,6 @@
 
     #ifdef _HL_ENABLE
 
-
         #define WF_POWERCAP_FUNC(id)                                                                                                    \
             void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
                 if (TGL_ON(_HL_Enable_##id)) {                                                                                          \
@@ -34,12 +33,12 @@
                     float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                 \
                     float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, uv_main, _HL_InvMaskVal_##id).rgb;                         \
                     float power = _HL_Power_##id * MAX_RGB(matcap_mask);                                                                \
-                    float3 matcap_mask_color = LinearToGammaSpace(matcap_mask * _HL_MatcapColor_##id * 2);                              \
+                    float3 matcap_mask_color = matcap_mask * _HL_MatcapColor_##id * 2;                                                  \
                     if (_HL_CapType_##id == 1) {                                                                                        \
-                        matcap_color *= matcap_mask_color;                                                                              \
+                        matcap_color *= LinearToGammaSpace(matcap_mask_color);                                                          \
                         color.rgb = blendColor_Add(color.rgb, matcap_color, power);                                                     \
                     } else if(_HL_CapType_##id == 2) {                                                                                  \
-                        matcap_color *= matcap_mask_color;                                                                              \
+                        matcap_color *= LinearToGammaSpace(matcap_mask_color);                                                          \
                         color.rgb = blendColor_Mul(color.rgb, matcap_color, power);                                                     \
                     } else {                                                                                                            \
                         matcap_color -= _HL_MedianColor_##id;                                                                           \
