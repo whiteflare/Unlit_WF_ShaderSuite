@@ -523,24 +523,30 @@
                 // matcap サンプリング
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
                 float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+
                 // マスク参照
                 float3 matcap_mask = WF_TEX2D_MATCAP_MASK(uv_main);
+                // 色調整前のマスクを元に強度を計算
+                float power = _HL_Power * MAX_RGB(matcap_mask);
+                // マスク色調整
+                float3 matcap_mask_color = LinearToGammaSpace(matcap_mask * _HL_MatcapColor * 2);
+
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
-                    matcap_color *= saturate(matcap_mask * _HL_MatcapColor * 2);
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, _HL_Power);
+                    matcap_color *= matcap_mask_color;
+                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);
                 } else if(_HL_CapType == 2) {
                     // 乗算合成
-                    matcap_color *= saturate(matcap_mask * _HL_MatcapColor * 2);
-                    color.rgb = blendColor_Mul(color.rgb, matcap_color, _HL_Power * MAX_RGB(matcap_mask));
+                    matcap_color *= matcap_mask_color;
+                    color.rgb = blendColor_Mul(color.rgb, matcap_color, power);
                 } else {
                     // 中間色合成
                     matcap_color -= _HL_MedianColor;
                     float3 lighten_color = max(ZERO_VEC3, matcap_color);
                     float3 darken_color  = min(ZERO_VEC3, matcap_color);
-                    matcap_color = lerp( darken_color, lighten_color, saturate(matcap_mask * _HL_MatcapColor * 2) );
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, _HL_Power * MAX_RGB(matcap_mask));
+                    matcap_color = lerp(darken_color, lighten_color, matcap_mask_color);
+                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);
                 }
             }
         }
