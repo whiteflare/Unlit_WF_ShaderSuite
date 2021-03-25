@@ -103,7 +103,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -111,6 +110,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         [WFHeaderToggle(Light Matcap 2)]
             _HL_Enable_1            ("[HA] Enable", Float) = 0
@@ -119,7 +119,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
@@ -127,6 +126,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         [WFHeaderToggle(Light Matcap 3)]
             _HL_Enable_2            ("[HB] Enable", Float) = 0
@@ -135,7 +135,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex_2         ("[HB] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_2       ("[HB] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor_2       ("[HB] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_2             ("[HB] Power", Range(0, 2)) = 1
             _HL_BlendNormal_2       ("[HB] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_2          ("[HB] Parallax", Range(0, 1)) = 0.75
@@ -143,6 +142,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _HL_MaskTex_2           ("[HB] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_2        ("[HB] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_2       ("[HB] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         [WFHeaderToggle(Light Matcap 4)]
             _HL_Enable_3            ("[HC] Enable", Float) = 0
@@ -151,7 +151,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex_3         ("[HC] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_3       ("[HC] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor_3       ("[HC] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_3             ("[HC] Power", Range(0, 2)) = 1
             _HL_BlendNormal_3       ("[HC] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_3          ("[HC] Parallax", Range(0, 1)) = 0.75
@@ -159,6 +158,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _HL_MaskTex_3           ("[HC] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_3        ("[HC] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_3       ("[HC] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         [WFHeaderToggle(Light Matcap 5)]
             _HL_Enable_4            ("[HD] Enable", Float) = 0
@@ -167,7 +167,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex_4         ("[HD] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_4       ("[HD] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor_4       ("[HD] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_4             ("[HD] Power", Range(0, 2)) = 1
             _HL_BlendNormal_4       ("[HD] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_4          ("[HD] Parallax", Range(0, 1)) = 0.75
@@ -175,6 +174,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _HL_MaskTex_4           ("[HD] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_4        ("[HD] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_4       ("[HD] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         [WFHeaderToggle(Light Matcap 6)]
             _HL_Enable_5            ("[HE] Enable", Float) = 0
@@ -183,7 +183,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex_5         ("[HE] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_5       ("[HE] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor_5       ("[HE] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_5             ("[HE] Power", Range(0, 2)) = 1
             _HL_BlendNormal_5       ("[HE] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_5          ("[HE] Parallax", Range(0, 1)) = 0.75
@@ -191,6 +190,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _HL_MaskTex_5           ("[HE] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_5        ("[HE] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_5       ("[HE] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         [WFHeaderToggle(Light Matcap 7)]
             _HL_Enable_6            ("[HF] Enable", Float) = 0
@@ -199,7 +199,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex_6         ("[HF] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_6       ("[HF] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor_6       ("[HF] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_6             ("[HF] Power", Range(0, 2)) = 1
             _HL_BlendNormal_6       ("[HF] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_6          ("[HF] Parallax", Range(0, 1)) = 0.75
@@ -207,6 +206,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _HL_MaskTex_6           ("[HF] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_6        ("[HF] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_6       ("[HF] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         [WFHeaderToggle(Light Matcap 8)]
             _HL_Enable_7            ("[HG] Enable", Float) = 0
@@ -215,7 +215,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex_7         ("[HG] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_7       ("[HG] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor_7       ("[HG] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_7             ("[HG] Power", Range(0, 2)) = 1
             _HL_BlendNormal_7       ("[HG] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_7          ("[HG] Parallax", Range(0, 1)) = 0.75
@@ -223,6 +222,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _HL_MaskTex_7           ("[HG] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_7        ("[HG] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_7       ("[HG] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
