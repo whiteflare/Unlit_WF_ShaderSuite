@@ -529,16 +529,16 @@
                 // 色調整前のマスクを元に強度を計算
                 float power = _HL_Power * MAX_RGB(matcap_mask);
                 // マスク色調整
-                float3 matcap_mask_color = LinearToGammaSpace(matcap_mask * _HL_MatcapColor * 2);
+                float3 matcap_mask_color = matcap_mask * _HL_MatcapColor * 2;
 
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
-                    matcap_color *= matcap_mask_color;
+                    matcap_color *= LinearToGammaSpace(matcap_mask_color);
                     color.rgb = blendColor_Add(color.rgb, matcap_color, power);
                 } else if(_HL_CapType == 2) {
                     // 乗算合成
-                    matcap_color *= matcap_mask_color;
+                    matcap_color *= LinearToGammaSpace(matcap_mask_color);
                     color.rgb = blendColor_Mul(color.rgb, matcap_color, power);
                 } else {
                     // 中間色合成
@@ -550,6 +550,7 @@
                 }
             }
         }
+
     #else
         #define affectMatcapColor(matcapVector, uv_main, color)
     #endif
