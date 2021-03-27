@@ -76,6 +76,8 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [Enum(MASK,0,METALLIC,1)]
+            _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -105,7 +107,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -113,6 +114,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         // ラメ
         [WFHeaderToggle(Lame)]
@@ -131,8 +133,9 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [PowerSlider(4.0)]
             _LM_Dencity             ("[LM] Dencity", Range(0.3, 4)) = 0.5
             _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5
-            _LM_MinDist             ("[LM] Dist Fade Start", Range(0, 5)) = 2.0
-            _LM_Spot                ("[LM] Spot Fade Strength", Range(0, 16)) = 2.0
+            _LM_MinDist             ("[LM] FadeOut Distance (Near)", Range(0, 5)) = 2.0
+            _LM_MaxDist             ("[LM] FadeOut Distance (Far)", Range(0, 5)) = 4.0
+            _LM_Spot                ("[LM] FadeOut Angle", Range(0, 16)) = 2.0
             _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
             _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}
@@ -194,12 +197,16 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [HDR]
             _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
             _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _OL_VertColToDecal      ("[OL] Multiply VertexColor To Decal Texture", Range(0, 1)) = 0
         [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
             _OL_BlendType           ("[OL] Blend Type", Float) = 0
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
             _OL_MaskTex             ("[OL] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _OL_VertColToMask       ("[OL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
@@ -262,7 +269,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/02/28", Float) = 0
+            _CurrentVersion         ("2021/03/28", Float) = 0
     }
 
     SubShader {

@@ -468,6 +468,22 @@ namespace UnlitWF
             return WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.Variant == name.Variant).ToList();
         }
     }
+
+    internal class OldPropertyReplacement
+    {
+        public readonly string beforeName;
+        public readonly string afterName;
+        public readonly Action<ShaderSerializedProperty> onAfterCopy;
+
+        public OldPropertyReplacement(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy) {
+            this.beforeName = beforeName;
+            this.afterName = afterName;
+            this.onAfterCopy = onAfterCopy ?? (p => { });
+        }
+
+        public OldPropertyReplacement(string beforeName, string afterName) : this(beforeName, afterName, null) {
+        }
+    }
 }
 
 #endif

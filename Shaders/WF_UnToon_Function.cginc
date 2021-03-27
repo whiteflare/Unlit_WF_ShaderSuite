@@ -54,9 +54,9 @@
 
     #ifndef WF_TEX2D_METAL_GLOSS
         #ifndef _WF_MOBILE
-            #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra * float2(1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
+            #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba * float4(1, 1, 1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
         #else
-            #define WF_TEX2D_METAL_GLOSS(uv)    SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).ra
+            #define WF_TEX2D_METAL_GLOSS(uv)    SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba
         #endif
     #endif
 
@@ -472,18 +472,32 @@
 
         void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
             if (TGL_ON(_MT_Enable)) {
-                float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
-                float2 metallicSmoothness = WF_TEX2D_METAL_GLOSS(uv_main);
-                float metallic = _MT_Metallic * metallicSmoothness.x;
+                float metallic = _MT_Metallic;
+                float monochrome = _MT_Monochrome;
+                float4 metalGlossMap = WF_TEX2D_METAL_GLOSS(uv_main);
+
+                // MetallicSmoothness をパラメータに反映
+                if (_MT_MetallicMapType == 0) {
+                    // Metallic強度に反映する方式
+                    metallic *= metalGlossMap.r;
+                }
+                else if (_MT_MetallicMapType == 1) {
+                    // Metallic強度を固定して、モノクロ反射に反映する方式
+                    monochrome = saturate(1 - (1 - monochrome) * metalGlossMap.r);
+                }
+
+                // Metallic描画
                 if (0.01 < metallic) {
+                float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
+
                     // リフレクション
-                    float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, metallicSmoothness.y * _MT_ReflSmooth);
-                    reflection = lerp(reflection, calcBrightness(reflection).xxx, _MT_Monochrome);
+                    float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, metalGlossMap.a * _MT_ReflSmooth);
+                    reflection = lerp(reflection, calcBrightness(reflection).xxx, monochrome);
 
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir.xyz, i.light_color.rgb * color.rgb, metallicSmoothness.y * _MT_SpecSmooth);
+                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir.xyz, i.light_color.rgb * color.rgb, metalGlossMap.a * _MT_SpecSmooth);
                     }
 
                     // 合成
@@ -509,27 +523,34 @@
                 // matcap サンプリング
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
                 float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+
                 // マスク参照
                 float3 matcap_mask = WF_TEX2D_MATCAP_MASK(uv_main);
+                // 色調整前のマスクを元に強度を計算
+                float power = _HL_Power * MAX_RGB(matcap_mask);
+                // マスク色調整
+                float3 matcap_mask_color = matcap_mask * _HL_MatcapColor * 2;
+
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
-                    matcap_color *= saturate(matcap_mask * _HL_MatcapColor * 2);
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, _HL_Power);
+                    matcap_color *= LinearToGammaSpace(matcap_mask_color);
+                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);
                 } else if(_HL_CapType == 2) {
                     // 乗算合成
-                    matcap_color *= saturate(matcap_mask * _HL_MatcapColor * 2);
-                    color.rgb = blendColor_Mul(color.rgb, matcap_color, _HL_Power * MAX_RGB(matcap_mask));
+                    matcap_color *= LinearToGammaSpace(matcap_mask_color);
+                    color.rgb = blendColor_Mul(color.rgb, matcap_color, power);
                 } else {
                     // 中間色合成
                     matcap_color -= _HL_MedianColor;
                     float3 lighten_color = max(ZERO_VEC3, matcap_color);
                     float3 darken_color  = min(ZERO_VEC3, matcap_color);
-                    matcap_color = lerp( darken_color, lighten_color, saturate(matcap_mask * _HL_MatcapColor * 2) );
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, _HL_Power * MAX_RGB(matcap_mask));
+                    matcap_color = lerp(darken_color, lighten_color, matcap_mask_color);
+                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);
                 }
             }
         }
+
     #else
         #define affectMatcapColor(matcapVector, uv_main, color)
     #endif
@@ -596,7 +617,7 @@
                     // フレークのばらつき項
                     power *= random1(min_pos.xy);
                     // 距離フェード項
-                    power *= 1 - smoothstep(_LM_MinDist, _LM_MinDist + 1, length(ws_camera_vec));
+                    power *= 1 - smoothstep(_LM_MinDist, max(_LM_MinDist + NZF, _LM_MaxDist), length(ws_camera_vec));
                     // NdotV起因の強度項
                     power *= pow(abs(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LM_Spot));
                     // 形状
@@ -647,6 +668,10 @@
 
         void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
             if (TGL_ON(_TS_Enable)) {
+                if (isInMirror()) {
+                    angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
+                }
+
                 // 陰用法線とライト方向から Harf-Lambert
                 float3 ws_shade_normal = normalize(lerp(ws_normal, ws_bump_normal, _TS_BlendNormal));
                 float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
@@ -654,10 +679,6 @@
                 // アンチシャドウマスク加算
                 float anti_shade = WF_TEX2D_SHADE_MASK(uv_main);
                 brightness = lerp(brightness, lerp(brightness, 1, 0.5), anti_shade);
-                if (isInMirror()) {
-                    angle_light_camera *= anti_shade;
-                }
-
                 // ビュー相対位置シフト
                 brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
 
@@ -780,8 +801,16 @@
                     : i.uv                                                                      // UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
-                float power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
-                color.rgb = blendOverlayColor(color.rgb, PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color, power);
+                float4 ov_color = PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color;
+                float ov_power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
+
+                // 頂点カラーを加味
+#ifdef _VC_ENABLE
+                ov_color *= lerp(ONE_VEC4, i.vertex_color, _OL_VertColToDecal);
+                ov_power *= lerp(1, saturate(TGL_OFF(_OL_InvMaskVal) ? i.vertex_color.r : 1 - i.vertex_color.r), _OL_VertColToMask);
+#endif
+
+                color.rgb = blendOverlayColor(color.rgb, ov_color, ov_power);
             }
         }
     #else
@@ -920,11 +949,11 @@
                 float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
                 float power =
                     // 原点からの距離の判定
-                    smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_offset_vertex ))
+                    smoothstep(_FG_MinDist, max(_FG_MinDist + NZF, _FG_MaxDist), length( ws_offset_vertex ))
                     // 前後の判定
                     * smoothstep(0, 0.2, -dot(ws_view_dir.xz, ws_offset_vertex.xz))
                     // カメラと原点の水平距離の判定
-                    * smoothstep(_FG_MinDist, max(_FG_MinDist + 0.0001, _FG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
+                    * smoothstep(_FG_MinDist, max(_FG_MinDist + NZF, _FG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
                 color.rgb = lerp(color.rgb, _FG_Color.rgb * i.light_color, _FG_Color.a * pow(power, _FG_Exponential));
             }
         }

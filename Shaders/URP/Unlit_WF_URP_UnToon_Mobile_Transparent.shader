@@ -48,6 +48,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [Enum(MASK,0,METALLIC,1)]
+            _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -65,7 +67,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -73,6 +74,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -172,7 +174,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/02/28", Float) = 0
+            _CurrentVersion         ("2021/03/28", Float) = 0
     }
 
     SubShader {
