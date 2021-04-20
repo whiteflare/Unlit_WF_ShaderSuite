@@ -99,7 +99,7 @@
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir);
 
-        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
+        WFMatcapVector matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 
         // Highlight
         affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax), uv_main, color);
@@ -118,6 +118,8 @@
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
+        // Ambient Occlusion
+        affectOcclusion(i, uv_main, color);
 
         // ToonFog
         affectToonFog(i, ws_view_dir, color);

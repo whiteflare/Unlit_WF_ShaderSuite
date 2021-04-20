@@ -252,6 +252,16 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -307,6 +317,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
 
             #define _WF_UNTOON_POWERCAP
 
+            #define _AO_ENABLE
             #define _CH_ENABLE
             #define _HL_ENABLE
             #define _NM_ENABLE

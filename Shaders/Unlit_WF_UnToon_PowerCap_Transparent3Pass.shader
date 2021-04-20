@@ -247,6 +247,16 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         // Fog
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
@@ -316,6 +326,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
             #define _WF_UNTOON_POWERCAP
 
+            #define _AO_ENABLE
             #define _CH_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
@@ -351,6 +362,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
 
+            #define _AO_ENABLE
             #define _CH_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
@@ -387,6 +399,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
             #define _WF_UNTOON_POWERCAP
 
+            #define _AO_ENABLE
             #define _CH_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE

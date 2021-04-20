@@ -259,6 +259,13 @@
     // Matcap
     ////////////////////////////
 
+    struct WFMatcapVector {
+        float3 vs_normal_center;
+        float3 vs_bump_normal_center;
+        float3 vs_normal_side;
+        float3 vs_bump_normal_side;
+    };
+
     float3 matcapViewCorrect(float3 vs_normal, float3 ws_view_dir) {
         float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
         float3 detail = vs_normal.xyz * float3(-1, -1, 1);
@@ -288,34 +295,31 @@
         return normalize( vs_normal );
     }
 
-    float4x4 calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+    WFMatcapVector calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+        WFMatcapVector result;
+
         // ワールド法線をビュー法線に変換
         float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
         float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
 
         // カメラ位置にて補正する
-        float3 vs_normal_center         = matcapViewCorrect(vs_normal, ws_view_dir);
-        float3 vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir);
-        float3 vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_view_dir);
-        float3 vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir);
+        result.vs_normal_center         = matcapViewCorrect(vs_normal, ws_view_dir);
+        result.vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir);
+        result.vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_view_dir);
+        result.vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir);
 
         // 真上を揃える
         float2x2 rotate = matcapRotateCorrectMatrix();
-        vs_normal_center.xy         = mul( vs_normal_center.xy, rotate );
-        vs_normal_side.xy           = mul( vs_normal_side.xy, rotate );
-        vs_bump_normal_center.xy    = mul( vs_bump_normal_center.xy, rotate );
-        vs_bump_normal_side.xy      = mul( vs_bump_normal_side.xy, rotate );
+        result.vs_normal_center.xy         = mul( result.vs_normal_center.xy, rotate );
+        result.vs_normal_side.xy           = mul( result.vs_normal_side.xy, rotate );
+        result.vs_bump_normal_center.xy    = mul( result.vs_bump_normal_center.xy, rotate );
+        result.vs_bump_normal_side.xy      = mul( result.vs_bump_normal_side.xy, rotate );
 
-        float4x4 matcapVector;
-        matcapVector[0] = float4( normalize(vs_normal_center), 0 );
-        matcapVector[1] = float4( normalize(vs_bump_normal_center), 0 );
-        matcapVector[2] = float4( normalize(vs_normal_side), 0 );
-        matcapVector[3] = float4( normalize(vs_bump_normal_side), 0 );
-        return matcapVector;
+        return result;
     }
 
-    float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
-        return lerp( lerp(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerp(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax);
+    float3 calcMatcapVector(WFMatcapVector vec, float normal, float parallax) {
+        return lerp( lerp(vec.vs_normal_center, vec.vs_normal_side, normal), lerp(vec.vs_bump_normal_center, vec.vs_bump_normal_side, normal), parallax);
     }
 
     ////////////////////////////

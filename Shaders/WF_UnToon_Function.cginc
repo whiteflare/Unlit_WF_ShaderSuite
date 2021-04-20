@@ -43,10 +43,10 @@
     #endif
 
     #ifndef WF_TEX2D_NORMAL
-        #define WF_TEX2D_NORMAL(uv)             UnpackScaleNormal( PICK_MAIN_TEX2D(_BumpMap, uv), _BumpScale ).xyz
+        #define WF_TEX2D_NORMAL(uv)             PICK_MAIN_TEX2D(_BumpMap, uv)
     #endif
     #ifndef WF_TEX2D_NORMAL_DTL
-        #define WF_TEX2D_NORMAL_DTL(uv)         UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv), _DetailNormalMapScale ).xyz
+        #define WF_TEX2D_NORMAL_DTL(uv)         PICK_MAIN_TEX2D(_DetailNormalMap, uv)
     #endif
     #ifndef WF_TEX2D_NORMAL_DTL_MASK
         #define WF_TEX2D_NORMAL_DTL_MASK(uv)    SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv, _NM_InvMaskVal).r
@@ -389,34 +389,51 @@
     // Normal Map
     ////////////////////////////
 
+	struct UnToonNormalVector {
+		float3 ws_normal;
+		float3 ws_bump_normal;
+		float3 ws_bump_normal_shadow;
+	};
+
     #ifdef _NM_ENABLE
         float3 calcBumpNormal(v2f i, float2 uv_main) {
+        	UnToonNormalVector result;
+        	result.ws_normal = result.ws_bump_normal = result.ws_bump_normal_shadow = i.normal;
+
             if (TGL_ON(_NM_Enable)) {
-                // 1st NormalMap
-                float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
-
-#ifndef _WF_MOBILE
-                // 2nd NormalMap
-                float2 uv_dtl = TRANSFORM_TEX(i.uv, _DetailNormalMap);
-                if (_NM_2ndType == 1) { // BLEND
-                    float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-                    float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL(uv_dtl);
-                    normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
-                }
-                else if (_NM_2ndType == 2) { // SWITCH
-                    float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-                    float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL(uv_dtl);
-                    normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
-                }
-#endif
-
                 // 法線計算
                 float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のworld法線空間
-                return mul( normalTangent, tangentTransform);
+
+                // sample NormalMap
+                float4 rgba_1st			= WF_TEX2D_NORMAL(uv_main);
+                float3 ts_normal_1st 	= UnpackScaleNormal( rgba_1st, _BumpScale ).xyz;
+
+				#ifndef _WF_MOBILE
+
+					float3 ts_bump_normal = ts_normal_1st;
+					if (_NM_2ndType != 0) {
+		                float dtl_power	= WF_TEX2D_NORMAL_DTL_MASK(uv_main);
+		                float2 uv_dtl	= TRANSFORM_TEX(i.uv, _DetailNormalMap);
+						float4 rgba_2nd = WF_TEX2D_NORMAL_DTL(uv_dtl);
+
+		                float3 ts_normal_2nd 	= UnpackScaleNormal( rgba_2nd, _DetailNormalMapScale ).xyz;
+		                ts_normal_2nd =
+		                	_NM_2ndType == 1 ? BlendNormals(ts_normal_1st, ts_normal_2nd)	// BLEND
+		                	: ts_normal_2nd;	// SWITCH
+
+		        		ts_bump_normal = normalize(lerp(ts_normal_1st, ts_normal_2nd, dtl_power));
+					}
+
+	            #else
+
+	            	float3 ts_bump_normal = ts_normal_1st;
+
+				#endif
+
+				result.ws_bump_normal = mul(ts_bump_normal, tangentTransform);
             }
-            else {
-                return i.normal;
-            }
+
+            return result.ws_bump_normal;
         }
 
         void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
