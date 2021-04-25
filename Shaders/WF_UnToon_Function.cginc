@@ -488,16 +488,26 @@
 
                 // Metallic描画
                 if (0.01 < metallic) {
-                float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
+                    float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
+                    float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
+                    float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
+
+                    if (TGL_ON(_MT_GeomSpecAA)) {
+                        float3 normal_ddx = ddx(ws_metal_normal);
+                        float3 normal_ddy = ddy(ws_metal_normal);
+                        float geom_roughness = pow(saturate(max(dot(normal_ddx, normal_ddx), dot(normal_ddy, normal_ddy))), 0.333);
+                        reflSmooth = min(reflSmooth, 1.0 - geom_roughness);
+                        specSmooth = min(specSmooth, 1.0 - geom_roughness);
+                    }
 
                     // リフレクション
-                    float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, metalGlossMap.a * _MT_ReflSmooth);
+                    float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, reflSmooth);
                     reflection = lerp(reflection, calcBrightness(reflection).xxx, monochrome);
 
                     // スペキュラ
                     float3 specular = ZERO_VEC3;
                     if (0.01 < _MT_Specular) {
-                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir.xyz, i.light_color.rgb * color.rgb, metalGlossMap.a * _MT_SpecSmooth);
+                        specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir.xyz, i.light_color.rgb * color.rgb, specSmooth);
                     }
 
                     // 合成
@@ -908,6 +918,7 @@
                 float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
                 occlusion *= WF_TEX2D_OCCLUSION(uv_main);
+                occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
                 #ifdef _LMAP_ENABLE
                 if (TGL_ON(_AO_UseLightMap)) {
