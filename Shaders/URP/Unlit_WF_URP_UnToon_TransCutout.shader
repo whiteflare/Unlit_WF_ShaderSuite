@@ -88,6 +88,8 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [Toggle(_)]
+            _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
         [Enum(MASK,0,METALLIC,1)]
             _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
@@ -248,6 +250,7 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             _AO_Enable              ("[AO] Enable", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+            _AO_TintColor           ("[AO] Tint Color", Color) = (1, 1, 1, 1)
         [Toggle(_)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
@@ -281,7 +284,7 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/03/28", Float) = 0
+            _CurrentVersion         ("2021/05/01", Float) = 0
     }
 
     SubShader {
