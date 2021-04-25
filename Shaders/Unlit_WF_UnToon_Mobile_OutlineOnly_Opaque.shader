@@ -64,7 +64,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/03/28", Float) = 0
+            _CurrentVersion         ("2021/05/01", Float) = 0
     }
 
     SubShader {
