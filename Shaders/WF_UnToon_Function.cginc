@@ -918,6 +918,7 @@
                 float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
                 occlusion *= WF_TEX2D_OCCLUSION(uv_main);
+                occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
                 #ifdef _LMAP_ENABLE
                 if (TGL_ON(_AO_UseLightMap)) {

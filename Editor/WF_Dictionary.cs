@@ -199,6 +199,7 @@ namespace UnlitWF
             new WFI18NTranslation("Direction", "方向"),
             new WFI18NTranslation("Roughen", "粗くする"),
             new WFI18NTranslation("Finer", "細かくする"),
+            new WFI18NTranslation("Tint Color", "色調整"),
             new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離"),
             new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離"),
             // Lit

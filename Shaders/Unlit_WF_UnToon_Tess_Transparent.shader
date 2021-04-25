@@ -265,6 +265,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             _AO_Enable              ("[AO] Enable", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+            _AO_TintColor           ("[AO] Tint Color", Color) = (1, 1, 1, 1)
         [Toggle(_)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1

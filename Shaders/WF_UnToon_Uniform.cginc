@@ -230,6 +230,7 @@
     float           _AO_UseLightMap;
     float           _AO_Contrast;
     float           _AO_Brightness;
+    float4          _AO_TintColor;
 
     float           _FG_Enable;
     float4          _FG_Color;
