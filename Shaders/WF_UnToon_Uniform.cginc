@@ -103,16 +103,20 @@
     float           _GI_IndirectMultiplier;
     float           _GI_EmissionMultiplier;
 
+#ifndef _WF_MOBILE
     float           _CH_Enable;
     float4          _CH_ColorR;
     float4          _CH_ColorG;
     float4          _CH_ColorB;
+#endif
 
+#ifndef _WF_MOBILE
     float           _CL_Enable;
     float           _CL_DeltaH;
     float           _CL_DeltaS;
     float           _CL_DeltaV;
     float           _CL_Monochrome;
+#endif
 
     float           _ES_Enable;
     float4          _EmissionColor;
@@ -164,6 +168,7 @@
     float           _HL_Parallax;
     float           _HL_InvMaskVal;
 
+#ifndef _WF_MOBILE
     float           _LM_Enable;
     float4          _LM_Texture_ST;
     float4          _LM_Color;
@@ -179,6 +184,7 @@
     float           _LM_AnimSpeed;
     float           _LM_ChangeAlpha;
     float           _LM_InvMaskVal;
+#endif
 
     float           _TS_Enable;
     uint            _TS_Steps;
@@ -205,6 +211,7 @@
     float           _TR_PowerSide;
     float           _TR_PowerBottom;
 
+#ifndef _WF_MOBILE
     float           _OL_Enable;
     uint            _OL_UVType;
     float4          _OL_Color;
@@ -215,6 +222,7 @@
     float           _OL_InvMaskVal;
     float           _OL_VertColToDecal;
     float           _OL_VertColToMask;
+#endif
 
     float           _TL_Enable;
     float           _TL_LineWidth;
@@ -232,6 +240,7 @@
     float           _AO_Brightness;
     float4          _AO_TintColor;
 
+#ifndef _WF_MOBILE
     float           _FG_Enable;
     float4          _FG_Color;
     float           _FG_MinDist;
@@ -239,6 +248,7 @@
     float           _FG_Exponential;
     float3          _FG_BaseOffset;
     float3          _FG_Scale;
+#endif
 
 #ifdef _WF_UNTOON_TESS
     float           _TE_Factor;
