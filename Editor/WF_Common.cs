@@ -448,6 +448,46 @@ namespace UnlitWF
         }
     }
 
+    internal class WFShaderNameVariantComparer : IEqualityComparer<WFShaderName>
+    {
+        public bool Equals(WFShaderName x, WFShaderName y) {
+            if (System.Object.ReferenceEquals(x, y)) {
+                return true;
+            }
+            if (x == null || y == null) {
+                return false;
+            }
+            return x.Familly == y.Familly && x.Variant == y.Variant;
+        }
+
+        public int GetHashCode(WFShaderName x) {
+            if (System.Object.ReferenceEquals(x, null)) {
+                return 0;
+            }
+            return x.Familly.GetHashCode() ^ x.Variant.GetHashCode();
+        }
+    }
+
+    internal class WFShaderNameRenderTypeComparer : IEqualityComparer<WFShaderName>
+    {
+        public bool Equals(WFShaderName x, WFShaderName y) {
+            if (System.Object.ReferenceEquals(x, y)) {
+                return true;
+            }
+            if (x == null || y == null) {
+                return false;
+            }
+            return x.Familly == y.Familly && x.RenderType == y.RenderType;
+        }
+
+        public int GetHashCode(WFShaderName x) {
+            if (System.Object.ReferenceEquals(x, null)) {
+                return 0;
+            }
+            return x.Familly.GetHashCode() ^ x.RenderType.GetHashCode();
+        }
+    }
+
     internal static class WFShaderNameDictionary
     {
         public static WFShaderName TryFindFromName(string name) {
@@ -461,11 +501,35 @@ namespace UnlitWF
             return WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.RenderType == name.RenderType).ToList();
         }
 
+        public static List<WFShaderName> GetVariantList(WFShaderName name, out List<WFShaderName> other) {
+            var result = GetVariantList(name);
+            var items = result.Select(p => p.Variant).ToList();
+
+            // 異なるVariantのShaderNameをotherに詰める
+            other = new List<WFShaderName>();
+            other.AddRange(WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly));
+            other.RemoveAll(a => items.Contains(a.Variant));
+
+            return result;
+        }
+
         public static List<WFShaderName> GetRenderTypeList(WFShaderName name) {
             if (name == null) {
                 return new List<WFShaderName>();
             }
             return WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.Variant == name.Variant).ToList();
+        }
+
+        public static List<WFShaderName> GetRenderTypeList(WFShaderName name, out List<WFShaderName> other) {
+            var result = GetRenderTypeList(name);
+            var items = result.Select(p => p.RenderType).ToList();
+
+            // 異なるRenderTypeのShaderNameをotherに詰める
+            other = new List<WFShaderName>();
+            other.AddRange(WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly));
+            other.RemoveAll(a => items.Contains(a.RenderType));
+
+            return result;
         }
     }
 
