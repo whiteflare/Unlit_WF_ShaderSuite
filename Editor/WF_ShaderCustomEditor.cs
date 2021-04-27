@@ -327,9 +327,18 @@ namespace UnlitWF
                 GUI.Label(rect, "Current Shader Variants", EditorStyles.boldLabel);
                 // バリアント
                 {
-                    var variants = WFShaderNameDictionary.GetVariantList(snm);
-                    var labels = variants.Select(nm => nm.Variant).ToArray();
+                    // 同じ Variant のシェーダをリストに
+                    var variants = WFShaderNameDictionary.GetVariantList(snm, out var other);
+                    // その他の Variant もリストに追加する
+                    if (0 < other.Count) {
+                        variants.Add(null);
+                        variants.AddRange(other.Distinct(new WFShaderNameVariantComparer()));
+                    }
+
+                    // ラベル文字列を作成
+                    var labels = variants.Select(nm => nm == null ? "" : nm.Variant).ToArray();
                     int idx = Array.IndexOf(labels, snm.Variant);
+
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("Variant", idx, labels);
                     if (EditorGUI.EndChangeCheck() && idx != select) {
@@ -338,9 +347,17 @@ namespace UnlitWF
                 }
                 // Render Type
                 {
-                    var variants = WFShaderNameDictionary.GetRenderTypeList(snm);
-                    var labels = variants.Select(nm => nm.RenderType).ToArray();
+                    // 同じ RenderType のシェーダをリストに
+                    var variants = WFShaderNameDictionary.GetRenderTypeList(snm, out List<WFShaderName> other);
+                    // その他の RenderType もリストに追加する
+                    if (0 < other.Count) {
+                        variants.Add(null);
+                        variants.AddRange(other.Distinct(new WFShaderNameRenderTypeComparer()));
+                    }
+
+                    var labels = variants.Select(nm => nm == null ? "" : nm.RenderType).ToArray();
                     int idx = Array.IndexOf(labels, snm.RenderType);
+
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("RenderType", idx, labels);
                     if (EditorGUI.EndChangeCheck() && idx != select) {
