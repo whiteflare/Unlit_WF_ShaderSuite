@@ -48,6 +48,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [Toggle(_)]
+            _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
         [Enum(MASK,0,METALLIC,1)]
             _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
@@ -172,7 +174,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/03/28", Float) = 0
+            _CurrentVersion         ("2021/05/01", Float) = 0
     }
 
     SubShader {

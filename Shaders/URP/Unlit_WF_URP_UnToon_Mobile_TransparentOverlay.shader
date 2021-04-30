@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
+Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
     Properties {
         // 基本
@@ -90,18 +90,21 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Overlay"
+            "RenderPipeline" = "LightweightPipeline"
         }
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "ForwardBase" }
+            Tags { "LightMode" = "LightweightForward" }
 
             Cull [_CullMode]
             ZTest [_AL_ZTest]
             ZWrite [_AL_ZWrite]
             Blend [_AL_SrcAlpha] [_AL_DstAlpha]
 
-            CGPROGRAM
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
 
             #pragma vertex vert
             #pragma fragment frag
@@ -111,23 +114,93 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_MAIN_Z_SHIFT    (_AL_Z_Offset)
             #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
 
             #define _AO_ENABLE
             #define _VC_ENABLE
 
-            #pragma multi_compile_fwdbase
+            // -------------------------------------
+            // Lightweight Pipeline keywords
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile _ _SHADOWS_SOFT
+            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+
+            // -------------------------------------
+            // Unity defined keywords
+            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
+            #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile_fog
+
+            //--------------------------------------
+            #pragma multi_compile_instancing
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
+
+            ENDHLSL
+        }
+
+        Pass {
+            Name "DepthOnly"
+            Tags{"LightMode" = "DepthOnly"}
+
+            ZWrite On
+            ColorMask 0
+            Cull[_CullMode]
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert_depth
+            #pragma fragment frag_depth
+
+            #define _WF_ALPHA_BLEND
+            #define _WF_MAIN_Z_SHIFT    (_AL_Z_Offset)
+            #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
+
+            #define _VC_ENABLE
+
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "WF_UnToon.cginc"
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon_DepthOnly.cginc"
 
-            ENDCG
+            ENDHLSL
         }
 
-        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent/META"
+        Pass {
+            Name "META"
+            Tags { "LightMode" = "Meta" }
+
+            Cull Off
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta
+
+            #define _WF_ALPHA_BLEND
+            #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
+
+            #define _VC_ENABLE
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "WF_UnToonURP_Meta.cginc"
+
+            ENDHLSL
+        }
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "Hidden/InternalErrorShader"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

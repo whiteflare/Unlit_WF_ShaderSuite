@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
+Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
 
     Properties {
         // 基本
@@ -24,6 +24,22 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
+            _Z_Shift                ("Z-shift (tweak)", Range(-0.5, 0.5)) = 0
+
+        // StencilMask
+        [WFHeader(Stencil Mask)]
+        [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
+            _StencilMaskID          ("ID", int) = 8
+
+        // Alpha
+        [WFHeader(Transparent Alpha)]
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
+        [NoScaleOffset]
+            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
+            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
 
         // アウトライン
         [WFHeaderAlwaysOn(Outline)]
@@ -41,6 +57,18 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+
+        // Fog
+        [WFHeaderToggle(Fog)]
+            _FG_Enable              ("[FG] Enable", Float) = 0
+            _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
+            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
+        [WF_Vector3]
+            _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
+        [WF_Vector3]
+            _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
 
         // Lit
         [WFHeader(Lit)]
@@ -69,24 +97,39 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent+100"
             "DisableBatching" = "True"
         }
+
+        GrabPass { "_UnToonOutlineOnlyCancel" }
 
         Pass {
             Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
 
             CGPROGRAM
 
-            #pragma vertex vert_outline
+            #pragma vertex vert
+            #pragma geometry geom_outline
             #pragma fragment frag
 
-            #pragma target 3.0
+            #pragma target 4.5
+            #pragma require geometry
 
+            #define _WF_ALPHA_BLEND
+
+            #define _FG_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
 
@@ -95,6 +138,38 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             #pragma multi_compile_instancing
 
             #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "OUTLINE_CANCELLER"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert_outline_canceller
+            #pragma fragment frag_outline_canceller
+
+            #pragma target 4.5
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #define _WF_MAIN_Z_SHIFT    (-_Z_Shift)
+            #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineOnlyCancel
+
+            #include "WF_UnToon_LineCanceller.cginc"
 
             ENDCG
         }
