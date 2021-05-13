@@ -38,7 +38,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [Toggle(_)]
             _FR_FlipTangent         ("[FR] Flip Tangent", Float) = 0
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 8)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
             _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
         [NoScaleOffset]
             _FR_MaskTex             ("[FR] Mask Texture", 2D) = "white" {}
