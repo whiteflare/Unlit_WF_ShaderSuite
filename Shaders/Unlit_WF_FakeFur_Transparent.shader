@@ -35,7 +35,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [Toggle(_)]
             _FR_FlipTangent         ("[FR] Flip Tangent", Float) = 0
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 8)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
             _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
         [NoScaleOffset]
             _FR_MaskTex             ("[FR] Mask Texture", 2D) = "white" {}
@@ -135,7 +135,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/05/01", Float) = 0
+            _CurrentVersion         ("2021/05/15", Float) = 0
     }
 
     SubShader {

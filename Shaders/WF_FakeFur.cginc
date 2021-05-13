@@ -35,16 +35,26 @@
         float3 ws_normal        : TEXCOORD2;
         float3 ws_tangent       : TEXCOORD3;
         float3 ws_bitangent     : TEXCOORD4;
+        float3 light_color      : COLOR1;
+#ifdef _TS_ENABLE
+        float shadow_power      : COLOR2;
+#endif
+        float4 ws_light_dir     : TEXCOORD5;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
     struct g2f {
+        float4 vertex           : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float3 ws_vertex        : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
+        float  height           : COLOR0;
+        float3 light_color      : COLOR1;
+#ifdef _TS_ENABLE
+        float shadow_power      : COLOR2;
+#endif
+        float4 ws_light_dir     : TEXCOORD3;
         UNITY_VERTEX_OUTPUT_STEREO
-        float height            : COLOR0;
-        float4 vertex           : SV_POSITION;
     };
 
     ////////////////////////////
@@ -60,7 +70,16 @@
 
         o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex);
+        o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipTangent);
+
+        // 環境光取得
+        float3 ambientColor = sampleSHLightColor();
+        // 影コントラスト
+        calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
+        // Anti-Glare とライト色ブレンドを同時に計算
+        o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
         return o;
     }
@@ -69,9 +88,14 @@
         g2f o;
         UNITY_INITIALIZE_OUTPUT(g2f, o);
         UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(g2f, o);
-        o.uv                = p.uv;
-        o.ws_vertex         = p.ws_vertex;
-        o.ws_normal         = p.ws_normal;
+        o.uv            = p.uv;
+        o.ws_vertex     = p.ws_vertex;
+        o.ws_normal     = p.ws_normal;
+        o.light_color   = p.light_color;
+#ifdef _TS_ENABLE
+        o.shadow_power  = p.shadow_power;
+#endif
+        o.ws_light_dir  = p.ws_light_dir;
         return o;
     }
 
@@ -89,6 +113,11 @@
         o.ws_normal         = lerp(x.ws_normal,     y.ws_normal,        div);
         o.ws_tangent        = lerp(x.ws_tangent,    y.ws_tangent,       div);
         o.ws_bitangent      = lerp(x.ws_bitangent,  y.ws_bitangent,     div);
+        o.light_color       = lerp(x.light_color,   y.light_color,      div);
+#ifdef _TS_ENABLE
+        o.shadow_power      = lerp(x.shadow_power,  y.shadow_power,     div);
+#endif
+        o.ws_light_dir      = lerp(x.ws_light_dir,  y.ws_light_dir,     div);
         return o;
     }
 
@@ -133,7 +162,7 @@
         }
     }
 
-    [maxvertexcount(64)]
+    [maxvertexcount(48)]
     void geom_fakefur(triangle v2g v[3], inout TriangleStream<g2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
@@ -153,18 +182,14 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         v2f i = (v2f) 0;
-        i.uv = gi.uv;
-        i.ws_vertex = gi.ws_vertex;
-        i.normal = gi.ws_normal;
-
-        i.ws_light_dir = calcWorldSpaceLightDir(i.ws_vertex);
-
-        // 環境光取得
-        float3 ambientColor = sampleSHLightColor();
-        // 影コントラスト
-        calcToonShadeContrast(i.ws_vertex, i.ws_light_dir, ambientColor, i.shadow_power);
-        // Anti-Glare とライト色ブレンドを同時に計算
-        i.light_color = calcLightColorVertex(i.ws_vertex, ambientColor);
+        i.uv            = gi.uv;
+        i.ws_vertex     = gi.ws_vertex;
+        i.normal        = gi.ws_normal;
+        i.light_color   = gi.light_color;
+#ifdef _TS_ENABLE
+        i.shadow_power  = gi.shadow_power;
+#endif
+        i.ws_light_dir  = gi.ws_light_dir;
 
         // メイン
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
