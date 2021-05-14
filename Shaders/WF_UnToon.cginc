@@ -124,11 +124,11 @@
 #ifdef _VC_ENABLE
         color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
 #endif
+        // カラーマスク
+        affect3chColorMask(uv_main, color);
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
 
-        // カラーマスク
-        affect3chColorMask(uv_main, color);
         // 色変換
         affectColorChange(color);
         // BumpMap
