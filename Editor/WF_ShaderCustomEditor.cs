@@ -830,10 +830,17 @@ namespace UnlitWF
                     MaterialProperty another = FindProperty(texName, context.all, false);
                     if (another != null) {
                         DrawSingleLineTextureProperty(context.editor, context.guiContent, context.current, another);
+                        context.custom = true;
+                    }
+                    else {
+                        // 相方がいない場合は単独で表示する (Mobile系の_TS_1stColorなどで発生)
+                        context.custom = false;
                     }
                 }
-                context.custom = true;
-                // 相方の側は何もしない
+                else {
+                    // 相方の側は何もしない
+                    context.custom = true;
+                }
             }
         }
 
