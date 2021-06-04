@@ -148,7 +148,12 @@
         {
             for (uint i = 0; i < 3; i++) {
                 // 法線 * ファー高さぶんだけ頂点移動
-                vu[i].xyz += calcFurVector(v, i) * _FR_Height;
+                vu[i].xyz += calcFurVector(v, i)
+                    #ifdef _FR_HEIGHT_PARAM
+                        * _FR_HEIGHT_PARAM ;
+                    #else
+                        * _FR_Height ;
+                    #endif
             }
         }
         // ファーを増殖
