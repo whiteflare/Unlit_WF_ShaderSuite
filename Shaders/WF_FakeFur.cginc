@@ -72,7 +72,7 @@
         o.ws_vertex = UnityObjectToWorldPos(v.vertex);
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipTangent);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipMirror & 1, _FR_FlipMirror & 2);
 
         // 環境光取得
         float3 ambientColor = sampleSHLightColor();

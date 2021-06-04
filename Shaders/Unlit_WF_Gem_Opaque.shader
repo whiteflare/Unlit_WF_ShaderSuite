@@ -56,8 +56,8 @@ Shader "UnlitWF/WF_Gem_Opaque" {
         [NoScaleOffset]
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
             _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
-        [Toggle(_)]
-            _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
+        [Enum(NONE,0,X,1,Y,2,XY,3)]
+            _NM_FlipMirror          ("[NM] Flip Mirror", Float) = 0
 
         // Lit
         [WFHeader(Lit)]

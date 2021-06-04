@@ -132,7 +132,7 @@
     float           _NM_Enable;
     float           _BumpScale;
     float           _NM_Power;
-    float           _NM_FlipTangent;
+    uint            _NM_FlipMirror;
 #ifndef _WF_MOBILE
     uint            _NM_2ndType;
     float4          _DetailNormalMap_ST;
