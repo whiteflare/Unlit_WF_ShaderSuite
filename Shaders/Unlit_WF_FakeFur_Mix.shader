@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2021 ma1on.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -14,7 +15,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_FakeFur_TransCutout" {
+Shader "UnlitWF/WF_FakeFur_Mix" {
 
     Properties {
         // 基本
@@ -30,6 +31,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [WFHeader(Fake Fur)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
             _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
+            _FR_Height2             ("[FR] Fur Height 2", Range(0, 0.2)) = 0.05
         [WF_Vector3]
             _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
         [NoScaleOffset]
@@ -143,8 +145,8 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
     SubShader {
         Tags {
-            "RenderType" = "TransparentCutout"
-            "Queue" = "AlphaTest"
+            "RenderType" = "Transparent"
+            "Queue" = "Transparent"
             "DisableBatching" = "True"
         }
 
@@ -199,7 +201,36 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        Pass {
+            Name "FUR2"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            CGPROGRAM
+
+            #pragma vertex vert_fakefur
+            #pragma geometry geom_fakefur
+            #pragma fragment frag_fakefur
+
+            #define _CL_ENABLE
+            #define _TS_ENABLE
+
+            float _FR_Height2;
+            #define _FR_HEIGHT_PARAM _FR_Height2
+
+            #pragma target 5.0
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+
+            #include "WF_FakeFur.cginc"
+
+            ENDCG
+        }
+
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
     }
 
     FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"

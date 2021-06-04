@@ -79,6 +79,7 @@ namespace UnlitWF
 
             new WFShaderName("FakeFur", "Basic", "TransCutout",                 "UnlitWF/WF_FakeFur_TransCutout"),
             new WFShaderName("FakeFur", "Basic", "Transparent",                 "UnlitWF/WF_FakeFur_Transparent"),
+            new WFShaderName("FakeFur", "Basic", "Mix",                         "UnlitWF/WF_FakeFur_Mix"),
 
             new WFShaderName("Gem", "Basic", "Opaque",                          "UnlitWF/WF_Gem_Opaque"),
             new WFShaderName("Gem", "Basic", "Transparent",                     "UnlitWF/WF_Gem_Transparent"),
@@ -224,10 +225,10 @@ namespace UnlitWF
             new WFI18NTranslation("CL", "Saturation", "彩度"),
             new WFI18NTranslation("CL", "Brightness", "明度"),
             // Normal
-            new WFI18NTranslation("NM", "NormalMap Texture", "ノーマルマップ"),
+            new WFI18NTranslation("NM", "NormalMap Texture", "ノーマルマップ").AddTag("FR"),
             new WFI18NTranslation("NM", "Bump Scale", "凹凸スケール"),
             new WFI18NTranslation("NM", "Shadow Power", "影の濃さ"),
-            new WFI18NTranslation("NM", "Flip Tangent", "タンジェント反転"),
+            new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("FR"),
             new WFI18NTranslation("NM", "2nd Normal Blend", "2ndマップの混合タイプ"),
             new WFI18NTranslation("NM", "2nd NormalMap Texture", "2ndノーマルマップ"),
             new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
@@ -345,9 +346,8 @@ namespace UnlitWF
             // Fake Fur
             new WFI18NTranslation("FR", "Fur Noise Texture", "ノイズテクスチャ"),
             new WFI18NTranslation("FR", "Fur Height", "高さ"),
+            new WFI18NTranslation("FR", "Fur Height 2", "高さ 2"),
             new WFI18NTranslation("FR", "Fur Vector", "方向"),
-            new WFI18NTranslation("FR", "NormalMap Texture", "ノーマルマップ"),
-            new WFI18NTranslation("FR", "Flip Tangent", "タンジェント反転"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
 
@@ -379,6 +379,8 @@ namespace UnlitWF
             new WFI18NTranslation("LM", "Spot Fade Strength", "フェードアウト角度"),
             new WFI18NTranslation("FeedOut Distance (Near)", "フェードアウト距離"),
             new WFI18NTranslation("FeedOut Distance (Far)", "フェードアウト距離"),
+            new WFI18NTranslation("NM", "Flip Tangent", "タンジェント反転"),
+            new WFI18NTranslation("FR", "Flip Tangent", "タンジェント反転"),
         };
     }
 
