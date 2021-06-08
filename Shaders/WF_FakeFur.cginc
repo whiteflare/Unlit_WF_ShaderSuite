@@ -72,7 +72,7 @@
         o.ws_vertex = UnityObjectToWorldPos(v.vertex);
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipTangent);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipMirror & 1, _FR_FlipMirror & 2);
 
         // 環境光取得
         float3 ambientColor = sampleSHLightColor();
@@ -148,7 +148,12 @@
         {
             for (uint i = 0; i < 3; i++) {
                 // 法線 * ファー高さぶんだけ頂点移動
-                vu[i].xyz += calcFurVector(v, i) * _FR_Height;
+                vu[i].xyz += calcFurVector(v, i)
+                    #ifdef _FR_HEIGHT_PARAM
+                        * _FR_HEIGHT_PARAM ;
+                    #else
+                        * _FR_Height ;
+                    #endif
             }
         }
         // ファーを増殖

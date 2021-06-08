@@ -35,7 +35,7 @@
     float4          _FR_NoiseTex_ST;
     float           _FR_Height;
     float4          _FR_Vector;
-    float           _FR_FlipTangent;
+    uint            _FR_FlipMirror;
 
     uint            _FR_Repeat;
     float           _FR_ShadowPower;
