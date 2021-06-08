@@ -319,7 +319,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/05/15", Float) = 0
+            _CurrentVersion         ("2021/06/11", Float) = 0
     }
 
     SubShader {
