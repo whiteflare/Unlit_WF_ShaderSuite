@@ -96,7 +96,7 @@
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
         #ifdef _NM_ENABLE
-            localNormalToWorldTangentSpace(v.normal, v.tangent, o.normal, o.tangent, o.bitangent, _NM_FlipTangent);
+            localNormalToWorldTangentSpace(v.normal, v.tangent, o.normal, o.tangent, o.bitangent, _NM_FlipMirror & 1, _NM_FlipMirror & 2);
         #else
             localNormalToWorldTangentSpace(v.normal, o.normal);
         #endif

@@ -101,20 +101,28 @@
         out_normal = UnityObjectToWorldNormal(normal);
     }
 
-    void localNormalToWorldTangentSpace(float3 normal, float4 tangent, out float3 out_normal, out float3 out_tangent, out float3 out_bitangent, float flipTangent) {
+    void localNormalToWorldTangentSpace(float3 normal, float4 tangent, out float3 out_normal, out float3 out_tangent, out float3 out_bitangent, float flipMirrorX, float flipMirrorY) {
         // Normalは普通に計算
         localNormalToWorldTangentSpace(normal, out_normal);
 
         float tan_sign = step(0, tangent.w) * 2 - 1;
-        if (TGL_OFF(flipTangent)) {
-            // 通常のtangent算出
-            out_tangent = UnityObjectToWorldNormal(tangent.xyz);
-            out_bitangent = cross(out_normal, out_tangent) * tan_sign;
-        } else {
-            // tangentフリップ版
-            out_tangent = UnityObjectToWorldNormal(tangent.xyz) * tan_sign;
-            out_bitangent = cross(out_normal, out_tangent);
+        tan_sign *= unity_WorldTransformParams.w;
+
+        out_tangent = UnityObjectToWorldDir(tangent.xyz);
+        out_bitangent = cross(out_normal, out_tangent) * tan_sign;
+
+        if (0 < tan_sign) {
+            if (TGL_ON(flipMirrorX)) {
+                out_tangent = -out_tangent;
+            }
+            if (TGL_ON(flipMirrorY)) {
+                out_bitangent = -out_bitangent;
+            }
         }
+    }
+
+    void localNormalToWorldTangentSpace(float3 normal, float4 tangent, out float3 out_normal, out float3 out_tangent, out float3 out_bitangent, float flipTangent) {
+        localNormalToWorldTangentSpace(normal, tangent, out_normal, out_tangent, out_bitangent, flipTangent, flipTangent);
     }
 
     ////////////////////////////

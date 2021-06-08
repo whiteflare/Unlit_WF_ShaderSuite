@@ -23,3 +23,15 @@ These matcap are created by Tiasti @tiastias9 (https://twitter.com/tiastias9/sta
 
 lcap_WF_ラバー光沢8.png, lcap_WF_ラバー光沢9.png
 These matcap are created by 空々こん @kuukuukon (https://twitter.com/kuukuukon/status/1315614559491645440)
+
+lcap_WF_ラバー光沢10.png
+These matcap are created by 白砂ヌゥ @heiwa_ze (https://twitter.com/heiwa_ze/status/1346419831696834560)
+
+lcap_WF_ラバー光沢11.png, lcap_WF_ラバー光沢12.png
+These matcap are created by 白砂ヌゥ @heiwa_ze (https://twitter.com/heiwa_ze/status/1362806368600694789)
+
+lcap_WF_ラバー光沢13.png, lcap_WF_ラバー光沢14.png
+These matcap are created by 白砂ヌゥ @heiwa_ze (https://twitter.com/heiwa_ze/status/1376539154805231616)
+
+lcap_WF_ラバー光沢15.png, lcap_WF_ラバー光沢16.png
+These matcap are created by 白砂ヌゥ @heiwa_ze (https://twitter.com/heiwa_ze/status/1376537008789626883)

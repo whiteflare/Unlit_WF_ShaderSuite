@@ -62,8 +62,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
             _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
-        [Toggle(_)]
-            _NM_FlipTangent         ("[NM] Flip Tangent", Float) = 0
+        [Enum(NONE,0,X,1,Y,2,XY,3)]
+            _NM_FlipMirror          ("[NM] Flip Mirror", Float) = 0
 
         [Header(NormalMap Secondary)]
         [Enum(OFF,0,BLEND,1,SWITCH,2)]
@@ -267,7 +267,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/05/15", Float) = 0
+            _CurrentVersion         ("2021/06/11", Float) = 0
     }
 
     SubShader {
