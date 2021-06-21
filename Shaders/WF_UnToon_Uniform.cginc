@@ -25,6 +25,9 @@
     // _MainTex ================================================
 
     DECL_MAIN_TEX2D     (_MainTex);
+#ifndef _WF_MOBILE
+    DECL_MAIN_TEX2D     (_BK_BackTex);
+#endif
 
     // _MainTex の Sampler で参照するサブテクスチャ ============
 
@@ -80,6 +83,12 @@
     float           _Cutoff;
     float           _UseVertexColor;
     float           _Z_Shift;
+
+#ifndef _WF_MOBILE
+    float           _BK_Enable;
+    float4          _BK_BackTex_ST;
+    float4          _BK_BackColor;
+#endif
 
     uint            _AL_Source;
     float           _AL_Power;

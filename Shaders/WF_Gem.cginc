@@ -71,21 +71,20 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        float4 color = TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
+        float2 uv_main;
 
         // メイン
-        float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main);
-#ifdef _VC_ENABLE
-        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
-#endif
+        affectMainTex(i.uv, uv_main, color);
+        // 頂点カラー
+        affectVertexColor(i.vertex_color, color);
+
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
 
 #ifdef _AL_ENABLE
-        color *= TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
         color.a *= _AlphaBack;
 #else
-        color *= _Color;
         color.a = 1;
 #endif
 
@@ -121,14 +120,14 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        float4 color = _Color;
+        float2 uv_main;
 
         // メイン
-        float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main);
-#ifdef _VC_ENABLE
-        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
-#endif
-        color *= _Color;
+        affectMainTex(i.uv, uv_main, color);
+        // 頂点カラー
+        affectVertexColor(i.vertex_color, color);
+
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
 

@@ -128,6 +128,42 @@
     #endif
 
     ////////////////////////////
+    // Base Color
+    ////////////////////////////
+
+    void affectMainTex(float2 uv, out float2 uv_main, inout float4 color) {
+        uv_main = TRANSFORM_TEX(uv, _MainTex);
+        color *= PICK_MAIN_TEX2D(_MainTex, uv_main);
+    }
+
+    #ifdef _BK_ENABLE
+        void affectBackTex(float2 uv, uint facing, inout float4 color) {
+            if (TGL_ON(_BK_Enable) && !facing) {
+                float2 uv_back = TRANSFORM_TEX(uv, _BK_BackTex);
+                color = PICK_MAIN_TEX2D(_BK_BackTex, uv_back) * _BK_BackColor;
+            }
+        }
+    #else
+        #define affectBackTex(uv, facing, color)
+    #endif
+
+    void affectBaseColor(float2 uv, uint facing, out float2 uv_main, out float4 color) {
+        color = _Color;
+        // メイン
+        affectMainTex(uv, uv_main, color);
+        // バック
+        affectBackTex(uv, facing, color);
+    }
+
+    #ifdef _VC_ENABLE
+        void affectVertexColor(float4 vertex_color, inout float4 color) {
+            color *= lerp(ONE_VEC4, vertex_color, _UseVertexColor);
+        }
+    #else
+        #define affectVertexColor(vertex_color, color)
+    #endif
+
+    ////////////////////////////
     // Alpha Transparent
     ////////////////////////////
 

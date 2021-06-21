@@ -39,6 +39,13 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
+        // 裏面テクスチャ
+        [WFHeaderToggle(BackFace Texture)]
+            _BK_Enable              ("[BK] Enable", Float) = 0
+            _BK_BackTex             ("[BK] Back Texture", 2D) = "white" {}
+        [HDR]
+            _BK_BackColor           ("[BK] Back Color", Color) = (1, 1, 1, 1)
+
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
             _CH_Enable              ("[CH] Enable", Float) = 0
@@ -316,6 +323,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
             #define _WF_UNTOON_POWERCAP
 
+            #define _BK_ENABLE
             #define _CH_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
@@ -351,6 +359,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
 
+            #define _BK_ENABLE
             #define _CH_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE
@@ -387,6 +396,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
             #define _WF_UNTOON_POWERCAP
 
+            #define _BK_ENABLE
             #define _CH_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE

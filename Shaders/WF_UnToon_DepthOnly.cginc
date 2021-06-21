@@ -78,17 +78,23 @@
         return o;
     }
 
-    float4 frag_depth(v2f_depth i) : SV_Target {
+    float4 frag_depth(v2f_depth i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         // アルファ計算
         #ifdef _AL_ENABLE
-            float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
-#ifdef _VC_ENABLE
-            color *= i.vertex_color;
-#endif
-            affectAlphaMask(i.uv, color);
+            float4 color;
+            float2 uv_main;
+
+            // メイン
+            affectBaseColor(i.uv, facing, uv_main, color);
+            // 頂点カラー
+            affectVertexColor(i.vertex_color, color);
+
+            // アルファマスク
+            affectAlphaMask(uv_main, color);
+
             if (color.a < 0.5) {
                 discard;
                 return ZERO_VEC4;

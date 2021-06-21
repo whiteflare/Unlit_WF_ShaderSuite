@@ -27,6 +27,13 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
+        // 裏面テクスチャ
+        [WFHeaderToggle(BackFace Texture)]
+            _BK_Enable              ("[BK] Enable", Float) = 0
+            _BK_BackTex             ("[BK] Back Texture", 2D) = "white" {}
+        [HDR]
+            _BK_BackColor           ("[BK] Back Color", Color) = (1, 1, 1, 1)
+
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
             _CH_Enable              ("[CH] Enable", Float) = 0
@@ -300,6 +307,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             #define _WF_PLATFORM_LWRP
 
             #define _AO_ENABLE
+            #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE

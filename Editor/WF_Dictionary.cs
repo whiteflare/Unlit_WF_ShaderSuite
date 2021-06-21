@@ -115,6 +115,7 @@ namespace UnlitWF
                 new WFShaderFunction("GF", "GF", "Gem Flake"),
                 new WFShaderFunction("GR", "GR", "Gem Reflection"),
                 new WFShaderFunction("FR", "FR", "Fake Fur", (self, mat) => mat.shader.name.Contains("Fur")),
+                new WFShaderFunction("BK", "BK", "BackFace Texture"),
                 new WFShaderFunction("CH", "CH", "3ch Color Mask"),
                 new WFShaderFunction("CL", "CL", "Color Change"),
                 new WFShaderFunction("NM", "NM", "NormalMap"),
@@ -219,6 +220,9 @@ namespace UnlitWF
             new WFI18NTranslation("AL", "Power", "アルファ強度"),
             new WFI18NTranslation("AL", "Fresnel Power", "フレネル強度"),
             new WFI18NTranslation("AL", "Cutoff Threshold", "カットアウトしきい値"),
+            // BackFace Texture
+            new WFI18NTranslation("BK", "Back Texture", "裏面テクスチャ"),
+            new WFI18NTranslation("BK", "Back Color", "裏面色"),
             // Color Change
             new WFI18NTranslation("CL", "monochrome", "単色化"),
             new WFI18NTranslation("CL", "Hur", "色相"),
