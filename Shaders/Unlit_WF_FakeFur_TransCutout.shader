@@ -22,7 +22,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
-            _Cutoff                 ("Alpha CutOff Level", Range(0, 1)) = 0.5
+            _Cutoff                 ("Alpha CutOff Level", Range(0, 1)) = 0.2
         [Toggle(_)]
             _AL_AlphaToMask         ("Alpha-To-Coverage (use MSAA)", Float) = 0
 

@@ -186,12 +186,23 @@ namespace UnlitWF
                         material.DisableKeyword(key);
                     }
                 }
-                // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
-                if (!WFCommonUtility.IsSupportedShader(oldShader) && material.HasProperty("_EmissionColor")) {
-                    var em = material.GetColor("_EmissionColor");
-                    if (em.a < 1e-4) {
-                        em.a = 1.0f;
-                        material.SetColor("_EmissionColor", em);
+                // 他シェーダからの切替時に動作
+                if (!WFCommonUtility.IsSupportedShader(oldShader)) {
+                    // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
+                    if (material.HasProperty("_EmissionColor")) {
+                        var val = material.GetColor("_EmissionColor");
+                        if (val.a < 1e-4) {
+                            val.a = 1.0f;
+                            material.SetColor("_EmissionColor", val);
+                        }
+                    }
+                    // もし FakeFur への切り替えかつ _Cutoff が 0.5 だったら 0.2 を設定しちゃう
+                    if (newShader.name.Contains("FakeFur") && material.HasProperty("_Cutoff")) {
+                        var val = material.GetFloat("_Cutoff");
+                        if (Mathf.Abs(val - 0.5f) < Mathf.Epsilon) {
+                            val = 0.2f;
+                            material.SetFloat("_Cutoff", val);
+                        }
                     }
                 }
             }
