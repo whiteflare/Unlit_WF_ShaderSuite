@@ -27,6 +27,13 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
+        // 裏面テクスチャ
+        [WFHeaderToggle(BackFace Texture)]
+            _BK_Enable              ("[BK] Enable", Float) = 0
+            _BK_BackTex             ("[BK] Back Texture", 2D) = "white" {}
+        [HDR]
+            _BK_BackColor           ("[BK] Back Color", Color) = (1, 1, 1, 1)
+
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
             _CH_Enable              ("[CH] Enable", Float) = 0
@@ -275,7 +282,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/06/11", Float) = 0
+            _CurrentVersion         ("2021/07/03", Float) = 0
     }
 
     SubShader {
@@ -300,6 +307,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
             #define _WF_UNTOON_POWERCAP
 
+            #define _BK_ENABLE
             #define _CH_ENABLE
             #define _FG_ENABLE
             #define _HL_ENABLE

@@ -36,6 +36,13 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
 
+        // 裏面テクスチャ
+        [WFHeaderToggle(BackFace Texture)]
+            _BK_Enable              ("[BK] Enable", Float) = 0
+            _BK_BackTex             ("[BK] Back Texture", 2D) = "white" {}
+        [HDR]
+            _BK_BackColor           ("[BK] Back Color", Color) = (1, 1, 1, 1)
+
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
             _CH_Enable              ("[CH] Enable", Float) = 0
@@ -257,7 +264,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/06/11", Float) = 0
+            _CurrentVersion         ("2021/07/03", Float) = 0
     }
 
     SubShader {
@@ -292,6 +299,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _WF_FACE_BACK
 
             #define _AO_ENABLE
+            #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
@@ -330,6 +338,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _WF_ALPHA_FRESNEL
 
             #define _AO_ENABLE
+            #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
             #define _ES_ENABLE
