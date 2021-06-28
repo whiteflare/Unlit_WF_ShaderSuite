@@ -120,6 +120,10 @@ namespace UnlitWF
                 }
                 EditorGUILayout.Space();
             }),
+            // _TS_InvMaskVal の後に説明文を追加する
+            new CustomPropertyHook("_TS_InvMaskVal", null, (ctx, changed) => {
+                EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info);
+            }),
         };
 
         private static bool IsAnyIntValue(PropertyGUIContext ctx, string name, Predicate<int> pred) {
