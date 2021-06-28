@@ -128,6 +128,42 @@
     #endif
 
     ////////////////////////////
+    // Base Color
+    ////////////////////////////
+
+    void affectMainTex(float2 uv, out float2 uv_main, inout float4 color) {
+        uv_main = TRANSFORM_TEX(uv, _MainTex);
+        color *= PICK_MAIN_TEX2D(_MainTex, uv_main);
+    }
+
+    #ifdef _BK_ENABLE
+        void affectBackTex(float2 uv, uint facing, inout float4 color) {
+            if (TGL_ON(_BK_Enable) && !facing) {
+                float2 uv_back = TRANSFORM_TEX(uv, _BK_BackTex);
+                color = PICK_MAIN_TEX2D(_BK_BackTex, uv_back) * _BK_BackColor;
+            }
+        }
+    #else
+        #define affectBackTex(uv, facing, color)
+    #endif
+
+    void affectBaseColor(float2 uv, uint facing, out float2 uv_main, out float4 color) {
+        color = _Color;
+        // メイン
+        affectMainTex(uv, uv_main, color);
+        // バック
+        affectBackTex(uv, facing, color);
+    }
+
+    #ifdef _VC_ENABLE
+        void affectVertexColor(float4 vertex_color, inout float4 color) {
+            color *= lerp(ONE_VEC4, vertex_color, _UseVertexColor);
+        }
+    #else
+        #define affectVertexColor(vertex_color, color)
+    #endif
+
+    ////////////////////////////
     // Alpha Transparent
     ////////////////////////////
 
@@ -449,9 +485,6 @@
 
         float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
-#ifdef _WF_MOBILE
-            return pickReflectionProbe(ws_vertex, ws_normal, metal_lod).rgb;
-#else
             float3 color = ZERO_VEC3;
             // ONLYでなければ PROBE を加算
             if (_MT_CubemapType != 2) {
@@ -463,7 +496,6 @@
                 color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
             }
             return color;
-#endif
         }
 
         float3 pickSpecular(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
