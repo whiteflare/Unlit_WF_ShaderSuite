@@ -279,7 +279,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/06/11", Float) = 0
+            _CurrentVersion         ("2021/07/03", Float) = 0
     }
 
     SubShader {
