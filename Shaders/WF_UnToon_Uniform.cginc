@@ -162,11 +162,11 @@
     float           _MT_InvMaskVal;
 #ifndef _WF_MOBILE
     float           _MT_InvRoughnessMaskVal;
+#endif
     uint            _MT_CubemapType;
     float4          _MT_Cubemap_HDR;
     float           _MT_CubemapPower;
     float           _MT_CubemapHighCut;
-#endif
 
     float           _HL_Enable;
     uint            _HL_CapType;

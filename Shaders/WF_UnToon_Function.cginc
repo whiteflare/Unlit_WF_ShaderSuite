@@ -485,9 +485,6 @@
 
         float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
-#ifdef _WF_MOBILE
-            return pickReflectionProbe(ws_vertex, ws_normal, metal_lod).rgb;
-#else
             float3 color = ZERO_VEC3;
             // ONLYでなければ PROBE を加算
             if (_MT_CubemapType != 2) {
@@ -499,7 +496,6 @@
                 color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
             }
             return color;
-#endif
         }
 
         float3 pickSpecular(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
