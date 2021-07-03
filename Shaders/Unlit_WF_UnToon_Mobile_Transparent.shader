@@ -61,6 +61,14 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
             _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
 
+        [Header(Metallic Secondary)]
+        [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
+            _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
+        [NoScaleOffset]
+            _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
+            _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
+
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
@@ -174,7 +182,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/06/11", Float) = 0
+            _CurrentVersion         ("2021/07/03", Float) = 0
     }
 
     SubShader {

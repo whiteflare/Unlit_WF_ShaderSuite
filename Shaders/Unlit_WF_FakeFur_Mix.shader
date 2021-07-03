@@ -23,7 +23,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
-            _Cutoff                 ("Alpha CutOff Level", Range(0, 1)) = 0.5
+            _Cutoff                 ("Alpha CutOff Level", Range(0, 1)) = 0.2
         [Toggle(_)]
             _AL_AlphaToMask         ("Alpha-To-Coverage (use MSAA)", Float) = 0
 
@@ -140,7 +140,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/06/11", Float) = 0
+            _CurrentVersion         ("2021/07/03", Float) = 0
     }
 
     SubShader {

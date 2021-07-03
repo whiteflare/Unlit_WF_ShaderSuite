@@ -115,6 +115,7 @@ namespace UnlitWF
                 new WFShaderFunction("GF", "GF", "Gem Flake"),
                 new WFShaderFunction("GR", "GR", "Gem Reflection"),
                 new WFShaderFunction("FR", "FR", "Fake Fur", (self, mat) => mat.shader.name.Contains("Fur")),
+                new WFShaderFunction("BK", "BK", "BackFace Texture"),
                 new WFShaderFunction("CH", "CH", "3ch Color Mask"),
                 new WFShaderFunction("CL", "CL", "Color Change"),
                 new WFShaderFunction("NM", "NM", "NormalMap"),
@@ -219,6 +220,9 @@ namespace UnlitWF
             new WFI18NTranslation("AL", "Power", "アルファ強度"),
             new WFI18NTranslation("AL", "Fresnel Power", "フレネル強度"),
             new WFI18NTranslation("AL", "Cutoff Threshold", "カットアウトしきい値"),
+            // BackFace Texture
+            new WFI18NTranslation("BK", "Back Texture", "裏面テクスチャ"),
+            new WFI18NTranslation("BK", "Back Color", "裏面色"),
             // Color Change
             new WFI18NTranslation("CL", "monochrome", "単色化"),
             new WFI18NTranslation("CL", "Hur", "色相"),
@@ -356,6 +360,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PlzMigration, "このマテリアルは古いバージョンで作成されたようです。\n最新版に変換しますか？"),
             new WFI18NTranslation(WFMessageText.PlzBatchingStatic, "このマテリアルは Batching Static な MeshRenderer から使われているようです。\nBatching Static 用の設定へ変更しますか？"),
             new WFI18NTranslation(WFMessageText.PlzLightmapStatic, "このマテリアルは Lightmap Static な MeshRenderer から使われているようです。\nライトマップを有効にしますか？"),
+            new WFI18NTranslation(WFMessageText.PsAntiShadowMask, "アンチシャドウマスクにはアバターの顔を白く塗ったマスクテクスチャを指定してください。マスク反転をチェックすることでマテリアル全体を顔とみなすこともできます。"),
 
             // 今は使っていないはずの項目
             new WFI18NTranslation("Anti-Glare", "まぶしさ防止"),
@@ -390,6 +395,7 @@ namespace UnlitWF
         public static readonly string PlzMigration = "This Material may have been created in an older version.\nConvert to new version?";
         public static readonly string PlzBatchingStatic = "This material seems to be used by the Batching Static MeshRenderer.\nDo you want to change the settings for Batching Static?";
         public static readonly string PlzLightmapStatic = "This material seems to be used by the Lightmap Static MeshRenderer.\nDo you want to enable Lightmap?";
+        public static readonly string PsAntiShadowMask = "In the Anti-Shadow Mask field, specify a mask texture with the avatar face painted white. You can also check the InvertMask checkbox to make the entire material a face.";
     }
 }
 

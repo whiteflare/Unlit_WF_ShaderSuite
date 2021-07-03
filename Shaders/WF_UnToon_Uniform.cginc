@@ -25,6 +25,9 @@
     // _MainTex ================================================
 
     DECL_MAIN_TEX2D     (_MainTex);
+#ifndef _WF_MOBILE
+    DECL_MAIN_TEX2D     (_BK_BackTex);
+#endif
 
     // _MainTex の Sampler で参照するサブテクスチャ ============
 
@@ -80,6 +83,12 @@
     float           _Cutoff;
     float           _UseVertexColor;
     float           _Z_Shift;
+
+#ifndef _WF_MOBILE
+    float           _BK_Enable;
+    float4          _BK_BackTex_ST;
+    float4          _BK_BackColor;
+#endif
 
     uint            _AL_Source;
     float           _AL_Power;
@@ -153,11 +162,11 @@
     float           _MT_InvMaskVal;
 #ifndef _WF_MOBILE
     float           _MT_InvRoughnessMaskVal;
+#endif
     uint            _MT_CubemapType;
     float4          _MT_Cubemap_HDR;
     float           _MT_CubemapPower;
     float           _MT_CubemapHighCut;
-#endif
 
     float           _HL_Enable;
     uint            _HL_CapType;

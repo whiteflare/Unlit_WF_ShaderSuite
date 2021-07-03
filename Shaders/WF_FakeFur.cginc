@@ -33,13 +33,12 @@
         float2 uv               : TEXCOORD0;
         float3 ws_vertex        : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
-        float3 ws_tangent       : TEXCOORD3;
-        float3 ws_bitangent     : TEXCOORD4;
+        float4 ws_light_dir     : TEXCOORD3;
+        float3 ws_fur_vector    : TEXCOORD4;
         float3 light_color      : COLOR1;
 #ifdef _TS_ENABLE
         float shadow_power      : COLOR2;
 #endif
-        float4 ws_light_dir     : TEXCOORD5;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -61,6 +60,23 @@
     // vertex & fragment shader
     ////////////////////////////
 
+    float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
+        // Tangent Transform 計算
+        float3x3 tangentTransform = float3x3(ws_tangent, ws_bitangent, ws_normal);
+
+        // Static Fur Vector 計算
+        float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
+
+#ifndef _FR_DISABLE_NORMAL_MAP
+        // NormalMap Fur Vector 計算
+        float2 uv_main = TRANSFORM_TEX(uv, _MainTex);
+        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FR_BumpMap, uv_main, 0) );
+        vec_fur = BlendNormals(vec_fur, vec_map);
+#endif
+
+        return mul(vec_fur , tangentTransform);
+    }
+
     v2g vert_fakefur(appdata_fur v) {
         v2g o;
 
@@ -72,7 +88,9 @@
         o.ws_vertex = UnityObjectToWorldPos(v.vertex);
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipMirror & 1, _FR_FlipMirror & 2);
+        float3 ws_tangent;
+        float3 ws_bitangent;
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, ws_tangent, ws_bitangent, _FR_FlipMirror & 1, _FR_FlipMirror & 2);
 
         // 環境光取得
         float3 ambientColor = sampleSHLightColor();
@@ -80,6 +98,14 @@
         calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
+
+        // ファーを伸ばす方向を計算
+        o.ws_fur_vector = calcFurVector(ws_tangent, ws_bitangent, o.ws_normal, o.uv)
+            #ifdef _FR_HEIGHT_PARAM
+                * _FR_HEIGHT_PARAM ;
+            #else
+                * _FR_Height ;
+            #endif
 
         return o;
     }
@@ -111,31 +137,13 @@
         o.uv                = lerp(x.uv,            y.uv,               div);
         o.ws_vertex         = lerp(x.ws_vertex,     y.ws_vertex,        div);
         o.ws_normal         = lerp(x.ws_normal,     y.ws_normal,        div);
-        o.ws_tangent        = lerp(x.ws_tangent,    y.ws_tangent,       div);
-        o.ws_bitangent      = lerp(x.ws_bitangent,  y.ws_bitangent,     div);
         o.light_color       = lerp(x.light_color,   y.light_color,      div);
 #ifdef _TS_ENABLE
         o.shadow_power      = lerp(x.shadow_power,  y.shadow_power,     div);
 #endif
         o.ws_light_dir      = lerp(x.ws_light_dir,  y.ws_light_dir,     div);
+        o.ws_fur_vector     = lerp(x.ws_fur_vector, y.ws_fur_vector,    div);
         return o;
-    }
-
-    float3 calcFurVector(v2g v[3], uint i) {
-        // Tangent Transform 計算
-        float3x3 tangentTransform = float3x3(v[i].ws_tangent, v[i].ws_bitangent, v[i].ws_normal);
-
-        // Static Fur Vector 計算
-        float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
-
-#ifndef _FR_DISABLE_NORMAL_MAP
-        // NormalMap Fur Vector 計算
-        float2 uv_main = TRANSFORM_TEX(v[i].uv, _MainTex);
-        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FR_BumpMap, uv_main, 0) );
-        vec_fur = BlendNormals(vec_fur, vec_map);
-#endif
-
-        return mul(vec_fur , tangentTransform);
     }
 
     void fakefur(v2g v[3], inout TriangleStream<g2f> triStream) {
@@ -147,13 +155,8 @@
         // normal方向に従ってfurを伸ばす
         {
             for (uint i = 0; i < 3; i++) {
-                // 法線 * ファー高さぶんだけ頂点移動
-                vu[i].xyz += calcFurVector(v, i)
-                    #ifdef _FR_HEIGHT_PARAM
-                        * _FR_HEIGHT_PARAM ;
-                    #else
-                        * _FR_Height ;
-                    #endif
+                // 頂点移動
+                vu[i].xyz += v[i].ws_fur_vector;
             }
         }
         // ファーを増殖
