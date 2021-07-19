@@ -597,6 +597,8 @@ namespace UnlitWF
         }
 
         public bool RenameOldNameProperties(Material[] mats) {
+            Undo.RecordObjects(mats, "WF Migration materials");
+
             var oldPropList = CreateOldNamePropertyList(mats);
             // 名称を全て変更
             foreach (var propPair in oldPropList) {
@@ -613,6 +615,9 @@ namespace UnlitWF
             }
             // 保存
             ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Select(p => p.before));
+            // シェーダキーワードを整理
+            WFCommonUtility.SetupShaderKeyword(mats);
+
             return 0 < oldPropList.Count;
         }
 
@@ -678,6 +683,8 @@ namespace UnlitWF
                 return;
             }
 
+            Undo.RecordObjects(param.materialDestination, "WF copy materials");
+
             for (int i = 0; i < param.materialDestination.Length; i++) {
                 var dst = param.materialDestination[i];
                 if (dst == null || dst == param.materialSource) { // コピー先とコピー元が同じ時もコピーしない
@@ -687,6 +694,9 @@ namespace UnlitWF
 
                 // コピー
                 if (CopyProperties(src_props, dst_props)) {
+                    // キーワードを整理する
+                    WFCommonUtility.SetupShaderKeyword(dst);
+                    // ダーティフラグを付ける
                     EditorUtility.SetDirty(dst);
                 }
             }
@@ -709,6 +719,8 @@ namespace UnlitWF
         #region リセット・クリーンナップ
 
         public void CleanUpProperties(CleanUpParameter param) {
+            Undo.RecordObjects(param.materials, "WF cleanup materials");
+
             foreach (Material material in param.materials) {
                 if (material == null) {
                     continue;
@@ -748,11 +760,16 @@ namespace UnlitWF
                     }
                 }
 
+                // キーワードを整理する
+                WFCommonUtility.SetupShaderKeyword(material);
+                // 反映
                 EditorUtility.SetDirty(material);
             }
         }
 
         public void ResetProperties(ResetParameter param) {
+            Undo.RecordObjects(param.materials, "WF reset materials");
+
             foreach (Material material in param.materials) {
                 if (material == null) {
                     continue;
@@ -799,6 +816,8 @@ namespace UnlitWF
                     }
                 }
 
+                // キーワードを整理する
+                WFCommonUtility.SetupShaderKeyword(material);
                 // 反映
                 EditorUtility.SetDirty(material);
             }

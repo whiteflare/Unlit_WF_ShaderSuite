@@ -92,7 +92,7 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// プロパティ名からEnableトグルかどうか判定する。
+        /// プロパティ物理名から Enable トグルかどうかを判定する。
         /// </summary>
         /// <param name="prop_name"></param>
         /// <returns></returns>
@@ -103,7 +103,7 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// Enableトグルかどうか判定する。
+        /// ラベル＋プロパティ名から Enable トグルかどうかを判定する。
         /// </summary>
         /// <param name="label"></param>
         /// <param name="name"></param>
@@ -113,7 +113,51 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// マテリアルのシェーダを指定のものに変更する。
+        /// 見つけ次第削除するシェーダキーワード
+        /// </summary>
+        private static readonly List<string> DELETE_KEYWORD = new List<string>() {
+            "_",
+            "_ALPHATEST_ON",
+            "_ALPHABLEND_ON",
+            "_ALPHAPREMULTIPLY_ON",
+        };
+
+        /// <summary>
+        /// 各マテリアルのEnableキーワードを設定する
+        /// </summary>
+        /// <param name="mats"></param>
+        public static void SetupShaderKeyword(params Material[] mats) {
+            // 不要なシェーダキーワードは削除
+            foreach (var mat in mats) {
+                foreach (var key in DELETE_KEYWORD) {
+                    if (mat.IsKeywordEnabled(key)) {
+                        mat.DisableKeyword(key);
+                    }
+                }
+            }
+            // Enableキーワードを整理する
+#if UNITY_2019_1_OR_NEWER
+            foreach (var mat in mats) {
+                for (int idx = 0; idx < mat.shader.GetPropertyCount(); idx++) {
+                    var prop_name = mat.shader.GetPropertyName(idx);
+                    if (IsEnableToggleFromPropName(prop_name)) {
+                        var value = 0.001f < Math.Abs(mat.GetFloat(prop_name));
+                        var kwd = prop_name.ToUpper();
+                        if (mat.IsKeywordEnabled(kwd) != value) {
+                            if (value) {
+                                mat.EnableKeyword(kwd);
+                            } else {
+                                mat.DisableKeyword(kwd);
+                            }
+                        }
+                    }
+                }
+            }
+#endif
+        }
+
+        /// <summary>
+        /// マテリアルの shader を指定の名前のものに変更する。
         /// </summary>
         /// <param name="name"></param>
         /// <param name="mats"></param>

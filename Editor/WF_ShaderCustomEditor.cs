@@ -147,16 +147,6 @@ namespace UnlitWF
             return false;
         }
 
-        /// <summary>
-        /// 見つけ次第削除するシェーダキーワード
-        /// </summary>
-        private static readonly List<string> DELETE_KEYWORD = new List<string>() {
-            "_",
-            "_ALPHATEST_ON",
-            "_ALPHABLEND_ON",
-            "_ALPHAPREMULTIPLY_ON",
-        };
-
         static class Styles
         {
             public static readonly Texture2D infoIcon = EditorGUIUtility.Load("icons/console.infoicon.png") as Texture2D;
@@ -180,12 +170,8 @@ namespace UnlitWF
             if (material != null) {
                 // DebugViewの保存に使っているタグはクリア
                 WF_DebugViewEditor.ClearDebugOverrideTag(material);
-                // 不要なシェーダキーワードは削除
-                foreach (var key in DELETE_KEYWORD) {
-                    if (material.IsKeywordEnabled(key)) {
-                        material.DisableKeyword(key);
-                    }
-                }
+                // シェーダキーワードを整理する
+                WFCommonUtility.SetupShaderKeyword(material);
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader)) {
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
@@ -270,17 +256,8 @@ namespace UnlitWF
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
 
-            // 不要なシェーダキーワードは削除
-            foreach (object t in materialEditor.targets) {
-                Material mm = t as Material;
-                if (mm != null) {
-                    foreach (var key in DELETE_KEYWORD) {
-                        if (mm.IsKeywordEnabled(key)) {
-                            mm.DisableKeyword(key);
-                        }
-                    }
-                }
-            }
+            // シェーダキーワードを整理する
+            WFCommonUtility.SetupShaderKeyword(WFCommonUtility.AsMaterials(materialEditor.targets));
         }
 
         private void OnGuiSub_ShaderProperty(PropertyGUIContext context) {
@@ -515,8 +492,13 @@ namespace UnlitWF
             // 現在のシーンにある LightmapStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
             var allStaticMaterialsInScene = scene.GetRootGameObjects()
                 .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
+#if UNITY_2019_1_OR_NEWER
+                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.ContributeGI))
+                .Where(mf => mf.receiveGI == ReceiveGI.Lightmaps)
+                .Where(mf => 0 < mf.scaleInLightmap) // Unity2018では見えない
+#else
                 .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.LightmapStatic))
-                // .Where(mf => 0 < mf.scaleInLightmap) // Unity2018では見えない
+#endif
                 .SelectMany(mf => mf.sharedMaterials)
                 .Where(mat => mat != null && mat.shader == shader)
                 .ToArray();
