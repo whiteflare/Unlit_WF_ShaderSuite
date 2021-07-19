@@ -216,7 +216,9 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
         #ifdef _TL_ENABLE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_ON(_TL_Enable)) {
+#endif
             float width0 = getOutlineShiftWidth(TRANSFORM_TEX(v[0].uv, _MainTex));
             float width1 = getOutlineShiftWidth(TRANSFORM_TEX(v[1].uv, _MainTex));
             float width2 = getOutlineShiftWidth(TRANSFORM_TEX(v[2].uv, _MainTex));
@@ -259,7 +261,9 @@
             }
 
             triStream.RestartStrip();
+#ifdef _WF_LEGACY_FEATURE_SWITCH
         }
+#endif
         #endif
     }
 #endif

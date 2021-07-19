@@ -101,13 +101,17 @@
         o.SpecularColor = o.Albedo;
 
         float3 emission;
+#ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_ON(_ES_Enable)) {
+#endif
             float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv_main).rgba;
             float4 es_color = _EmissionColor * es_mask;
             o.Emission  = es_color.rgb * es_color.a * lerp(1, _GI_EmissionMultiplier, _GI_Enable);
+#ifdef _WF_LEGACY_FEATURE_SWITCH
         } else {
             o.Emission  = ZERO_VEC3;
         }
+#endif
 
 #ifdef EDITOR_VISUALIZATION
         o.VizUV         = i.vizUV;
