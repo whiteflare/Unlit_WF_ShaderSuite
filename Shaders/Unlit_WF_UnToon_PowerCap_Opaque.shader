@@ -307,14 +307,14 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
             #define _WF_UNTOON_POWERCAP
 
-            #define _BK_ENABLE
-            #define _CH_ENABLE
-            #define _FG_ENABLE
-            #define _HL_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _CH_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

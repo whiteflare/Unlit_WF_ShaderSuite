@@ -103,8 +103,8 @@ Shader "UnlitWF/WF_Gem_Opaque" {
 
             #define _WF_MOBILE
 
-            #define _NM_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
