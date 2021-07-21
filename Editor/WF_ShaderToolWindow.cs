@@ -832,7 +832,7 @@ namespace UnlitWF
             if (0 < del_names.Count) {
                 var names = new List<string>(del_names);
                 names.Sort();
-                UnityEngine.Debug.Log("UnlitWF/MaterialTools deleted property: " + string.Join(", ", names.ToArray()));
+                UnityEngine.Debug.Log("[WF][Tool] Deleted Property: " + string.Join(", ", names.ToArray()));
             }
             ShaderSerializedProperty.AllApplyPropertyChange(props);
         }
@@ -842,7 +842,7 @@ namespace UnlitWF
             if (prop == null || string.IsNullOrEmpty(prop.stringValue)) {
                 return;
             }
-            UnityEngine.Debug.Log("UnlitWF/MaterialTools deleted shaderkeyword: " + prop.stringValue);
+            UnityEngine.Debug.Log("[WF][Tool] Deleted Shaderkeyword: " + prop.stringValue);
             prop.stringValue = "";
             so.ApplyModifiedProperties();
         }

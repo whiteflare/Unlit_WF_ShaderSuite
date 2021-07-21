@@ -30,6 +30,7 @@ namespace UnlitWF
     {
         private static readonly Regex PAT_DISP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
         private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+?)(?<suffix>(?:_\d+)?)$");
+        private static readonly Regex PAT_ENABLE_KEYWORD = new Regex("^_([A-Z][A-Z0-9])_ENABLE$", RegexOptions.Compiled);
 
         /// <summary>
         /// プロパティのディスプレイ名から、Prefixと名前を分割する。
@@ -100,6 +101,15 @@ namespace UnlitWF
             string label, name;
             WFCommonUtility.FormatPropName(prop_name, out label, out name);
             return IsEnableToggle(label, name);
+        }
+
+        /// <summary>
+        /// キーワード文字列が Enable キーワードかどうかを判定する。
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        public static bool IsEnableKeyword(string keyword) {
+            return PAT_ENABLE_KEYWORD.IsMatch(keyword);
         }
 
         /// <summary>
@@ -193,7 +203,7 @@ namespace UnlitWF
                 }
             }
             else {
-                Debug.LogErrorFormat("Shader Not Found in this projects: {0}", name);
+                Debug.LogErrorFormat("[WF][Common] Shader Not Found in this projects: {0}", name);
             }
         }
 
@@ -297,7 +307,7 @@ namespace UnlitWF
             _contains = contains;
 
             if (uniqueLabel.Contains(Label)) {
-                Debug.LogWarningFormat("UnlitWF WFShaderFunction duplicate Label: " + Label);
+                Debug.LogWarningFormat("[WF][Common] WFShaderFunction duplicate Label: " + Label);
             }
             else {
                 uniqueLabel.Add(Label);
