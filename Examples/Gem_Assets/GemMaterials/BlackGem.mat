@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: BlackGem
   m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _GB_ENABLE _GF_ENABLE _GR_ENABLE
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -37,6 +37,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AL_Fresnel: 1
+    - _AL_InvMaskVal: 0
     - _AL_Power: 1
     - _AL_Source: 0
     - _AL_ZWrite: 0
@@ -44,6 +45,8 @@ Material:
     - _AlphaFront: 0.5
     - _BumpScale: 1
     - _CullMode: 2
+    - _CurrentVersion: 0
+    - _GB_BackCulllMode: 1
     - _GB_Enable: 1
     - _GF_BlendNormal: 0.1
     - _GF_Enable: 1
@@ -63,12 +66,15 @@ Material:
     - _GL_LightMode: 0
     - _GR_BlendNormal: 0.1
     - _GR_Brightness: 0
+    - _GR_CubemapHighCut: 0
     - _GR_CubemapPower: 1
     - _GR_Enable: 1
     - _GR_Monochrome: 1
     - _GR_Power: 1
     - _NM_Enable: 0
+    - _NM_FlipMirror: 0
     - _NM_FlipTangent: 0
+    - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 0.045542486, g: 0.04282353, b: 0.050980393, a: 1}
     - _GB_ColorBack: {r: 0.01, g: 0.01, b: 0.01, a: 1}
