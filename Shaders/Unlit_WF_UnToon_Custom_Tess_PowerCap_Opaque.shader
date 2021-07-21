@@ -316,7 +316,35 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque/OUTLINE"
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma hull hull
+            #pragma domain domain_outline
+
+            #pragma target 5.0
+
+            #define _WF_UNTOON_TESS
+
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon_Tessellation.cginc"
+
+            ENDCG
+        }
 
         Pass {
             Name "MAIN"

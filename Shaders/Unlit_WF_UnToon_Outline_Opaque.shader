@@ -318,7 +318,33 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque/OUTLINE"
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma geometry geom_outline
+            #pragma fragment frag
+
+            #pragma target 4.5
+            #pragma require geometry
+
+            #pragma shader_feature_local _FG_ENABLE
+            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
 
         Pass {
             Name "MAIN"

@@ -328,7 +328,36 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             ENDCG
         }
 
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut/OUTLINE_CANCELLER"
+        Pass {
+            Name "OUTLINE_CANCELLER"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert_outline_canceller
+            #pragma fragment frag_outline_canceller
+
+            #pragma target 4.5
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineCancelLater
+
+            #include "WF_UnToon_LineCanceller.cginc"
+
+            ENDCG
+        }
 
         Pass {
             Name "MAIN_BACK"

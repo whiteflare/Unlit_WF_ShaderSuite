@@ -339,11 +339,164 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
         }
 
         GrabPass { "_UnToonOutlineCancel" }
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut/OUTLINE"
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/OUTLINE_CANCELLER"
 
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut/MAIN_BACK"
-        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut/MAIN_FRONT"
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma geometry geom_outline
+            #pragma fragment frag
+
+            #pragma target 4.5
+            #pragma require geometry
+
+            #define _WF_ALPHA_BLEND
+
+            #pragma shader_feature_local _FG_ENABLE
+            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "OUTLINE_CANCELLER"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull OFF
+            ZWrite OFF
+
+            CGPROGRAM
+
+            #pragma vertex vert_outline_canceller
+            #pragma fragment frag_outline_canceller
+
+            #pragma target 4.5
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineCancel
+
+            #include "WF_UnToon_LineCanceller.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "MAIN_BACK"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+            ZWrite OFF
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 4.5
+
+            #define _WF_ALPHA_FRESNEL
+            #define _WF_FACE_BACK
+
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _CH_ENABLE
+            #pragma shader_feature_local _CL_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _LM_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _OL_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "MAIN_FRONT"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull BACK
+            ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma target 4.5
+
+            #define _WF_ALPHA_FRESNEL
+
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _CH_ENABLE
+            #pragma shader_feature_local _CL_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _LM_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _OL_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
 
         Pass {
             Name "MAIN_BACK"
