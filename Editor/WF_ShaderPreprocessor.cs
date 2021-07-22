@@ -16,6 +16,7 @@
  */
 
 // #define WF_STRIP_DISABLE
+#define WF_STRIP_LOG_RESULT
 // #define WF_STRIP_LOG_TRACE
 // #define WF_STRIP_LOG_VERBOSE
 
@@ -63,7 +64,7 @@ namespace UnlitWF
                 strip += DoStripForwardBasePass(shader, snippet, data);
                 strip += DoStripMetaPass(shader, snippet, data);
 
-#if WF_STRIP_LOG_TRACE
+#if WF_STRIP_LOG_RESULT
                 if (data.Count < before) {
                     Debug.LogFormat("[WF][Preprocess] shader stripping: {0}/{1} at {2}/{3}/{4}", strip, before, shader.name, snippet.passName, snippet.shaderType);
                 }
@@ -90,9 +91,21 @@ namespace UnlitWF
             for (int i = data.Count - 1; 0 <= i; i--) {
                 var d = data[i];
 
+                if (ContainsShaderVariant(settings.alwaysIncludeShaders, shader, snippet, d)) {
+#if WF_STRIP_LOG_VERBOSE
+                        Debug.LogFormat("[WF][Preprocess] always include: {0}/{1}/{2}/{3} ({4})", 
+                            shader.name, 
+                            snippet.passName, 
+                            snippet.shaderType,
+                            d.shaderCompilerPlatform,
+                            string.Join(", ", ToKeywordArray(shader, d.shaderKeywordSet)));
+#endif
+                    continue;
+                }
+
                 if (usedShaderVariantList.Any(v => v.IsMatchVariant(shader, existingKwds, d))) {
 #if WF_STRIP_LOG_VERBOSE
-                        Debug.LogFormat("[WF][Preprocess] pass: {0}/{1}/{2}/{3} ({4})", 
+                        Debug.LogFormat("[WF][Preprocess] match variant: {0}/{1}/{2}/{3} ({4})", 
                             shader.name, 
                             snippet.passName, 
                             snippet.shaderType,
@@ -108,6 +121,13 @@ namespace UnlitWF
             }
 
             return count;
+        }
+
+        private bool ContainsShaderVariant(ShaderVariantCollection collection, Shader shader, ShaderSnippetData snippet, ShaderCompilerData data) {
+            if (collection == null) {
+                return false;
+            }
+            return collection.Contains(new ShaderVariantCollection.ShaderVariant(shader, snippet.passType, ToKeywordArray(shader, data.shaderKeywordSet)));
         }
 
         protected int DoStripMetaPass(Shader shader, ShaderSnippetData snippet, IList<ShaderCompilerData> data) {
@@ -161,8 +181,12 @@ namespace UnlitWF
             }
 
             // EditorSettings から UsedShaderVariant を回収
-            foreach (var mat in WFEditorSetting.GetAllSettings().SelectMany(set => set.alwaysIncludeMaterials).Where(mat => mat != null)) {
-                AppendUsedShaderVariant(used, mat, mat.shader);
+            if (settings.alwaysIncludeMaterials != null) {
+                foreach (var mat in settings.alwaysIncludeMaterials) {
+                    if (mat != null) {
+                        AppendUsedShaderVariant(used, mat, mat.shader);
+                    }
+                }
             }
 
             usedShaderVariantList = used.Distinct().ToList();

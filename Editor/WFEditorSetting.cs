@@ -32,6 +32,7 @@ namespace UnlitWF
         public bool enableStripping = true;
         public bool stripFallback = true;
         public bool stripMetaPass = true;
+        public ShaderVariantCollection alwaysIncludeShaders = null;
         public Material[] alwaysIncludeMaterials = { };
 
         public static WFEditorSetting GetOneOfSettings() {
