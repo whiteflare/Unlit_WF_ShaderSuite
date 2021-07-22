@@ -100,7 +100,7 @@
         o.Albedo        = color.rgb * lerp(1, _GI_IndirectMultiplier, _GI_Enable);
         o.SpecularColor = o.Albedo;
 
-        float3 emission;
+#ifdef _ES_ENABLE
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_ON(_ES_Enable)) {
 #endif
@@ -111,6 +111,7 @@
         } else {
             o.Emission  = ZERO_VEC3;
         }
+#endif
 #endif
 
 #ifdef EDITOR_VISUALIZATION
