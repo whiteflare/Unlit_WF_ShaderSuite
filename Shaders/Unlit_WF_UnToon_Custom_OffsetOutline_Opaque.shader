@@ -325,7 +325,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             #pragma target 4.5
             #pragma require geometry
 
-            #pragma shader_feature_local _FG_ENABLE
             #define _TL_ENABLE // 常にオン
             #pragma shader_feature_local _VC_ENABLE
 

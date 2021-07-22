@@ -336,7 +336,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
             #define _WF_UNTOON_TESS
 
-            #pragma shader_feature_local _FG_ENABLE
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
@@ -369,7 +368,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
             #pragma shader_feature_local _BK_ENABLE
             #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
             #pragma shader_feature_local _HL_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _TR_ENABLE
