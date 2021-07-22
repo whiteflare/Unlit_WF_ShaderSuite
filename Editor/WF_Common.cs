@@ -30,7 +30,7 @@ namespace UnlitWF
     {
         private static readonly Regex PAT_DISP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
         private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+?)(?<suffix>(?:_\d+)?)$");
-        private static readonly Regex PAT_ENABLE_KEYWORD = new Regex("^_([A-Z][A-Z0-9])_ENABLE$", RegexOptions.Compiled);
+        private static readonly Regex PAT_ENABLE_KEYWORD = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_ENABLE(?<suffix>(?:_\d+)?)$", RegexOptions.Compiled);
 
         /// <summary>
         /// プロパティのディスプレイ名から、Prefixと名前を分割する。
@@ -150,20 +150,35 @@ namespace UnlitWF
             foreach (var mat in mats) {
                 for (int idx = 0; idx < mat.shader.GetPropertyCount(); idx++) {
                     var prop_name = mat.shader.GetPropertyName(idx);
+
+                    // 対応するキーワードが指定されているならばそれを設定する
+                    var kwd = WFShaderDictionary.SpecialPropNameToKeywordMap.GetValueOrNull(prop_name);
+                    if (kwd != null) {
+                        var value = 0.001f < Math.Abs(mat.GetFloat(prop_name));
+                        SetEnableKeyword(mat, kwd, value);
+                        continue;
+                    }
+
+                    // Enableプロパティならば、それに対応するキーワードを設定する
                     if (IsEnableToggleFromPropName(prop_name)) {
                         var value = 0.001f < Math.Abs(mat.GetFloat(prop_name));
-                        var kwd = prop_name.ToUpper();
-                        if (mat.IsKeywordEnabled(kwd) != value) {
-                            if (value) {
-                                mat.EnableKeyword(kwd);
-                            } else {
-                                mat.DisableKeyword(kwd);
-                            }
-                        }
+                        SetEnableKeyword(mat, prop_name.ToUpper(), value);
+                        continue;
                     }
                 }
             }
 #endif
+        }
+
+        private static void SetEnableKeyword(Material mat, string kwd, bool value) {
+            if (mat.IsKeywordEnabled(kwd) != value) {
+                if (value) {
+                    mat.EnableKeyword(kwd);
+                }
+                else {
+                    mat.DisableKeyword(kwd);
+                }
+            }
         }
 
         /// <summary>

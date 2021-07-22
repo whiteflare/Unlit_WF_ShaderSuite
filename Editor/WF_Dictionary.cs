@@ -156,6 +156,13 @@ namespace UnlitWF
         };
 
         /// <summary>
+        /// ENABLEキーワードに対応していない特殊なプロパティ名 → キーワードの変換マップ。
+        /// </summary>
+        public static readonly Dictionary<string, string> SpecialPropNameToKeywordMap = new Dictionary<string, string>() {
+            { "_UseVertexColor", "_VC_ENABLE" },
+        };
+
+        /// <summary>
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
         public static readonly List<OldPropertyReplacement> OldPropNameToNewPropNameList = new List<OldPropertyReplacement>() {

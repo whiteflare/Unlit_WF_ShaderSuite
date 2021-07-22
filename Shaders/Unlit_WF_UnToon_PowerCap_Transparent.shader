@@ -332,6 +332,14 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
+            #pragma shader_feature_local _HL_ENABLE_1
+            #pragma shader_feature_local _HL_ENABLE_2
+            #pragma shader_feature_local _HL_ENABLE_3
+            #pragma shader_feature_local _HL_ENABLE_4
+            #pragma shader_feature_local _HL_ENABLE_5
+            #pragma shader_feature_local _HL_ENABLE_6
+            #pragma shader_feature_local _HL_ENABLE_7
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -367,6 +375,14 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+
+            #pragma shader_feature_local _HL_ENABLE_1
+            #pragma shader_feature_local _HL_ENABLE_2
+            #pragma shader_feature_local _HL_ENABLE_3
+            #pragma shader_feature_local _HL_ENABLE_4
+            #pragma shader_feature_local _HL_ENABLE_5
+            #pragma shader_feature_local _HL_ENABLE_6
+            #pragma shader_feature_local _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
