@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Outline
   m_Shader: {fileID: 4800000, guid: 7b5fa5f4b3dd38c46b3d8c60a7e9a3b0, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _TL_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0

@@ -215,13 +215,13 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _AO_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             // -------------------------------------
             // Lightweight Pipeline keywords
@@ -266,7 +266,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -294,7 +294,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #define _WF_PLATFORM_LWRP
             #define _WF_MOBILE
 
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_instancing
 
@@ -321,7 +321,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_Meta.cginc"
