@@ -150,7 +150,19 @@ namespace UnlitWF
         }
 
         private static bool IsStripTargetShader(Shader shader) {
-            return shader != null && WFCommonUtility.IsSupportedShader(shader) && !shader.name.Contains("WF_DebugView");
+            if (shader == null) {
+                return false;
+            }
+            if (!WFCommonUtility.IsSupportedShader(shader)) {
+                return false;
+            }
+            if (shader.name.Contains("WF_DebugView")) {
+                return false;
+            }
+            if (shader.name.Contains("WF_UnToon_Hidden")) {
+                return false;
+            }
+            return true;
         }
 
         private string[] GetExistingShaderKeywords(Shader shader, IList<ShaderCompilerData> data) {
