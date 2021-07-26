@@ -30,6 +30,8 @@ using UnityEditor.SceneManagement;
 
 namespace UnlitWF
 {
+#if UNITY_2019_1_OR_NEWER
+
     public class WF_ShaderPreprocessor : IPreprocessShaders
     {
         private bool initialized = false;
@@ -291,4 +293,5 @@ namespace UnlitWF
         }
 
     }
+#endif
 }
