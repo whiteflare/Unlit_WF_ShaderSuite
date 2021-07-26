@@ -110,7 +110,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta_black
 
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

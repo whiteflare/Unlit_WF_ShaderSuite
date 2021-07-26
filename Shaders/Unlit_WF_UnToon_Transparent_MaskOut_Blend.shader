@@ -335,19 +335,19 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _LM_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _AO_ENABLE
+            #define _BK_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -381,19 +381,19 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _LM_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _AO_ENABLE
+            #define _BK_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -428,19 +428,19 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _LM_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _AO_ENABLE
+            #define _BK_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -477,19 +477,19 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _LM_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _AO_ENABLE
+            #define _BK_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

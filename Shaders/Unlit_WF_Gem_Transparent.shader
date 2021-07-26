@@ -134,8 +134,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #define _WF_FACE_BACK
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _NM_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -164,8 +164,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _NM_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
