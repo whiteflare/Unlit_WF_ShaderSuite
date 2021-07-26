@@ -50,7 +50,7 @@ namespace UnlitWF
                     yield return req.SendWebRequest();
 
                     if (req.isHttpError || req.isNetworkError) {
-                        Debug.LogWarningFormat("UnlitWF, An NetworkError was occured in version checking: {0}", req.error);
+                        Debug.LogWarningFormat("[WF][Version] An NetworkError was occured in version checking: {0}", req.error);
                         yield break;
                     }
                     rawText = req.downloadHandler.text;
@@ -66,7 +66,7 @@ namespace UnlitWF
             if (version.HasValue()) {
                 version.downloadPage = URI_HEAD + version.downloadPage;
                 WFCommonUtility.SetLatestVersion(version);
-                Debug.LogFormat("UnlitWF, VersionCheck Succeed, LatestVersion is {0}", version.latestVersion);
+                Debug.LogFormat("[WF][Version] VersionCheck Succeed, LatestVersion is {0}", version.latestVersion);
             }
         }
     }
