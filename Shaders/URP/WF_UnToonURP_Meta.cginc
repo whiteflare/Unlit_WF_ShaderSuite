@@ -112,4 +112,15 @@
         return MetaFragment(o);
     }
 
+    float4 frag_meta_black(v2f_meta i) : SV_Target {
+        MetaInput o;
+        UNITY_INITIALIZE_OUTPUT(MetaInput, o);
+
+        o.Albedo        = ZERO_VEC3;
+        o.SpecularColor = ZERO_VEC3;
+        o.Emission      = ZERO_VEC3;
+
+        return MetaFragment(o);
+    }
+
 #endif

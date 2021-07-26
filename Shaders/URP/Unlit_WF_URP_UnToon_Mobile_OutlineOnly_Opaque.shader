@@ -152,7 +152,29 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             ENDHLSL
         }
 
-        UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
+        Pass {
+            Name "META"
+            Tags { "LightMode" = "Meta" }
+
+            Cull Off
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta_black
+
+            #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
+
+            #pragma shader_feature_local _VC_ENABLE
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "WF_UnToonURP_Meta.cginc"
+
+            ENDHLSL
+        }
     }
 
     FallBack "Hidden/InternalErrorShader"
