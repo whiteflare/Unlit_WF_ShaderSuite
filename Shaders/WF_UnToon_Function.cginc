@@ -138,7 +138,11 @@
 
     #ifdef _BK_ENABLE
         void affectBackTex(float2 uv, uint facing, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_BK_Enable) && !facing) {
+#else
+            if (!facing) {
+#endif
                 float2 uv_back = TRANSFORM_TEX(uv, _BK_BackTex);
                 color = PICK_MAIN_TEX2D(_BK_BackTex, uv_back) * _BK_BackColor;
             }
@@ -319,7 +323,9 @@
 
     #ifdef _CL_ENABLE
         void affectColorChange(inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_CL_Enable)) {
+#endif
                 if (TGL_ON(_CL_Monochrome)) {
                     color.r += color.g + color.b;
                     color.g = (color.r - 1) / 2;
@@ -329,7 +335,9 @@
                 hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
                 hsv.r = frac(hsv.r);
                 color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
 
     #else
@@ -344,7 +352,9 @@
     #ifdef _CH_ENABLE
 
         void affect3chColorMask(float2 mask_uv, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_CH_Enable)) {
+#endif
                 float3 mask  = WF_TEX2D_3CH_MASK(mask_uv);
                 float4 c1 = color * _CH_ColorR;
                 float4 c2 = color * _CH_ColorG;
@@ -352,7 +362,9 @@
                 color = lerp(color, c1, mask.r);
                 color = lerp(color, c2, mask.g);
                 color = lerp(color, c3, mask.b);
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
 
     #else
@@ -389,7 +401,9 @@
     #endif
 
         void affectEmissiveScroll(float3 ws_vertex, float2 mask_uv, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_ES_Enable)) {
+#endif
                 float4 es_mask  = WF_TEX2D_EMISSION(mask_uv);
                 float4 es_color = _EmissionColor * es_mask;
                 float waving    = calcEmissiveWaving(ws_vertex) * es_color.a;
@@ -413,7 +427,9 @@
                         }
                     #endif
                 #endif
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
 
     #else
@@ -427,7 +443,9 @@
 
     #ifdef _NM_ENABLE
         float3 calcBumpNormal(v2f i, float2 uv_main) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_NM_Enable)) {
+#endif
                 // 1st NormalMap
                 float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
 
@@ -449,21 +467,27 @@
                 // 法線計算
                 float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のworld法線空間
                 return mul( normalTangent, tangentTransform);
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
             else {
                 return i.normal;
             }
+#endif
         }
 
         void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
             // bump_normal 計算
             ws_bump_normal = calcBumpNormal(i, uv_main);
             
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_NM_Enable)) {
+#endif
                 // NormalMap は陰影として描画する
                 // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を加算することで明暗を付ける
                 color.rgb += (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(i.normal, i.ws_light_dir.xyz)) * _NM_Power;
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
     #else
         #define calcBumpNormal(i, uv_main) i.normal
@@ -503,7 +527,9 @@
         }
 
         void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_MT_Enable)) {
+#endif
                 float metallic = _MT_Metallic;
                 float monochrome = _MT_Monochrome;
                 float4 metalGlossMap = WF_TEX2D_METAL_GLOSS(uv_main);
@@ -548,7 +574,9 @@
                         lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_Brightness) + specular.rgb * _MT_Specular,
                         metallic);
                 }
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
     #else
         #define affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color)
@@ -561,7 +589,9 @@
     #ifdef _HL_ENABLE
 
         void affectMatcapColor(float2 matcapVector, float2 uv_main, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_HL_Enable)) {
+#endif
                 // matcap サンプリング
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
                 float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
@@ -590,7 +620,9 @@
                     matcap_color = lerp(darken_color, lighten_color, matcap_mask_color);
                     color.rgb = blendColor_Add(color.rgb, matcap_color, power);
                 }
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
 
     #else
@@ -623,7 +655,9 @@
         }
 
         void affectLame(v2f i, float2 uv_main, float3 ws_normal, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_LM_Enable)) {
+#endif
                 float power = WF_TEX2D_LAME_MASK(uv_main);
                 if (0 < power) {
                     float2 uv_lame = _LM_UVType == 1 ? i.uv_lmap : i.uv;
@@ -673,7 +707,9 @@
                         color.a = max(color.a, lerp(color.a, lame_color.a, saturate(power * _LM_ChangeAlpha)));
                     #endif
                 }
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
     #else
         #define affectLame(i, uv_main, ws_normal, color)
@@ -686,7 +722,9 @@
     #ifdef _TS_ENABLE
 
         void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_TS_Enable)) {
+#endif
                 float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
                 float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
 
@@ -696,9 +734,11 @@
                 shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
                 shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
                 shadow_power = min( shadow_power, 1 - saturate(ambient) * 0.5 );
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             } else {
                 shadow_power = 0;
             }
+#endif
         }
 
         void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
@@ -709,7 +749,9 @@
         }
 
         void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_TS_Enable)) {
+#endif
                 if (isInMirror()) {
                     angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
                 }
@@ -746,7 +788,9 @@
 
                 // 乗算
                 color.rgb *= shadow_color;
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
     #else
         #define calcToonShadeContrast(ws_vertex, ws_light_dir, ambientColor, shadow_power)
@@ -784,7 +828,9 @@
         }
 
         void affectRimLight(v2f i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_TR_Enable)) {
+#endif
                 if (isInMirror()) {
                     angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
                 }
@@ -794,7 +840,9 @@
                 float3 rimColor = calcRimLightColor(color.rgb);
                 // 合成
                 color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, calcRimLightPower(vs_normal));
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
     #else
         #define affectRimLight(i, uv_main, vs_normal, angle_light_camera, color)
@@ -835,7 +883,9 @@
         }
 
         void affectOverlayTexture(v2f i, float2 uv_main, float3 vs_normal, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_OL_Enable)) {
+#endif
                 float2 uv_overlay =
                     _OL_UVType == 1 ? i.uv_lmap                                                 // UV2
                     : _OL_UVType == 2 ? computeOverlayTex(i.ws_vertex)                          // SKYBOX
@@ -853,7 +903,9 @@
 #endif
 
                 color.rgb = blendOverlayColor(color.rgb, ov_color, ov_power);
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
     #else
         #define affectOverlayTexture(i, uv_main, vs_normal, color)
@@ -877,7 +929,9 @@
         }
 
         void affectOutline(float2 uv_main, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_TL_Enable)) {
+#endif
                 // アウトライン色をカスタムカラーと合成
                 float3 line_color = lerp(_TL_LineColor.rgb, WF_TEX2D_OUTLINE_COLOR(uv_main), _TL_BlendCustom);
                 // アウトライン色をベースと合成
@@ -899,7 +953,9 @@
                         }
                     #endif
                 #endif
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
 
     #else
@@ -926,14 +982,18 @@
 
     float4 shiftOutlineVertex(inout float3 ws_vertex, float3 ws_normal, float width, float shift) {
         #ifdef _TL_ENABLE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_ON(_TL_Enable)) {
+#endif
             // 外側にシフトする
             ws_vertex.xyz += ws_normal * width;
             // Zシフト
             return shiftDepthVertex(ws_vertex, shift);
+#ifdef _WF_LEGACY_FEATURE_SWITCH
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
         }
+#endif
         #else
             return UnityObjectToClipPos( ZERO_VEC3 );
         #endif
@@ -946,7 +1006,9 @@
     #ifdef _AO_ENABLE
 
         void affectOcclusion(v2f i, float2 uv_main, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_AO_Enable)) {
+#endif
                 float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
                 occlusion *= WF_TEX2D_OCCLUSION(uv_main);
@@ -960,7 +1022,9 @@
                 occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BlendPower); // 色の混合
                 occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
                 color.rgb *= max(ZERO_VEC3, occlusion.rgb);
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
     #else
         #define affectOcclusion(i, uv_main, color)
@@ -971,7 +1035,11 @@
         #ifdef _LMAP_ENABLE
             #if defined(_AO_ENABLE)
                 // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので固定値を返す
+#ifdef _WF_LEGACY_FEATURE_SWITCH
                 return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
+#else
+                return TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
+#endif
             #else
                 return pickLightmapLod(uv_lmap);
             #endif
@@ -987,7 +1055,9 @@
     #ifdef _FG_ENABLE
 
         void affectToonFog(v2f i, float3 ws_view_dir, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_FG_Enable)) {
+#endif
                 float3 ws_base_position = UnityObjectToWorldPos(_FG_BaseOffset);
                 float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
                 float power =
@@ -998,7 +1068,9 @@
                     // カメラと原点の水平距離の判定
                     * smoothstep(_FG_MinDist, max(_FG_MinDist + NZF, _FG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
                 color.rgb = lerp(color.rgb, _FG_Color.rgb * i.light_color, _FG_Color.a * pow(power, _FG_Exponential));
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
         }
     #else
         #define affectToonFog(i, ws_view_dir, color)

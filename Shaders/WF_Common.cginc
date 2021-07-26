@@ -22,6 +22,8 @@
     // Platform Glue
     ////////////////////////////
 
+#define _WF_LEGACY_FEATURE_SWITCH
+
 #ifdef _WF_PLATFORM_LWRP
     // Lightweight RP 向け定義
     #include "WF_Common_LightweightRP.cginc"

@@ -295,6 +295,9 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/07/03", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
     }
 
     SubShader {
@@ -329,6 +332,14 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
+            #define _HL_ENABLE_1
+            #define _HL_ENABLE_2
+            #define _HL_ENABLE_3
+            #define _HL_ENABLE_4
+            #define _HL_ENABLE_5
+            #define _HL_ENABLE_6
+            #define _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

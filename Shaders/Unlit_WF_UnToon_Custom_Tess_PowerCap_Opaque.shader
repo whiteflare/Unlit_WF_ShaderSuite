@@ -307,6 +307,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/07/03", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _FallBack               ("UnlitWF/WF_UnToon_Opaque", Float) = 0
     }
 
     SubShader {
@@ -316,7 +319,34 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque/OUTLINE"
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma hull hull
+            #pragma domain domain_outline
+
+            #pragma target 5.0
+
+            #define _WF_UNTOON_TESS
+
+            #define _TL_ENABLE
+            #define _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon_Tessellation.cginc"
+
+            ENDCG
+        }
 
         Pass {
             Name "MAIN"
@@ -343,6 +373,14 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
+            #define _HL_ENABLE_1
+            #define _HL_ENABLE_2
+            #define _HL_ENABLE_3
+            #define _HL_ENABLE_4
+            #define _HL_ENABLE_5
+            #define _HL_ENABLE_6
+            #define _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

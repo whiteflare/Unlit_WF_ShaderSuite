@@ -17,7 +17,6 @@
 
 #if UNITY_EDITOR
 
-using System;
 using System.Collections.Generic;
 
 namespace UnlitWF
@@ -154,6 +153,13 @@ namespace UnlitWF
             { "_DispMap", "TE" },
             { "_DispMapScale", "TE" },
             { "_DispMapLevel", "TE" },
+        };
+
+        /// <summary>
+        /// ENABLEキーワードに対応していない特殊なプロパティ名 → キーワードの変換マップ。
+        /// </summary>
+        public static readonly Dictionary<string, string> SpecialPropNameToKeywordMap = new Dictionary<string, string>() {
+            { "_UseVertexColor", "_VC_ENABLE" },
         };
 
         /// <summary>

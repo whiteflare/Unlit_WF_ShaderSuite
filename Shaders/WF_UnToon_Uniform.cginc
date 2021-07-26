@@ -85,7 +85,9 @@
     float           _Z_Shift;
 
 #ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _BK_Enable;
+#endif
     float4          _BK_BackTex_ST;
     float4          _BK_BackColor;
 #endif
@@ -113,21 +115,27 @@
     float           _GI_EmissionMultiplier;
 
 #ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _CH_Enable;
+#endif
     float4          _CH_ColorR;
     float4          _CH_ColorG;
     float4          _CH_ColorB;
 #endif
 
 #ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _CL_Enable;
+#endif
     float           _CL_DeltaH;
     float           _CL_DeltaS;
     float           _CL_DeltaV;
     float           _CL_Monochrome;
 #endif
 
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _ES_Enable;
+#endif
     float4          _EmissionColor;
     uint            _ES_BlendType;
     uint            _ES_Shape;
@@ -149,7 +157,9 @@
     float           _NM_InvMaskVal;
 #endif
 
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _MT_Enable;
+#endif
     float           _MT_Metallic;
     float           _MT_ReflSmooth;
     float           _MT_BlendNormal;
@@ -178,7 +188,9 @@
     float           _HL_InvMaskVal;
 
 #ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _LM_Enable;
+#endif
     float4          _LM_Texture_ST;
     float4          _LM_Color;
     float3          _LM_RandColor;
@@ -195,7 +207,9 @@
     float           _LM_InvMaskVal;
 #endif
 
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _TS_Enable;
+#endif
     uint            _TS_Steps;
     float3          _TS_BaseColor;
     float3          _TS_1stColor;
@@ -209,7 +223,9 @@
     float           _TS_BlendNormal;
     float           _TS_InvMaskVal;
 
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _TR_Enable;
+#endif
     float3          _TR_Color;
     uint            _TR_BlendType;
     float           _TR_Power;
@@ -221,7 +237,9 @@
     float           _TR_PowerBottom;
 
 #ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _OL_Enable;
+#endif
     uint            _OL_UVType;
     float4          _OL_Color;
     float4          _OL_OverlayTex_ST;
@@ -233,7 +251,9 @@
     float           _OL_VertColToMask;
 #endif
 
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _TL_Enable;
+#endif
     float           _TL_LineWidth;
     uint            _TL_LineType;
     float           _TL_Z_Shift;
@@ -243,14 +263,18 @@
     float           _TL_InvMaskVal;
     float           _TL_UseCutout;
 
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _AO_Enable;
+#endif
     float           _AO_UseLightMap;
     float           _AO_Contrast;
     float           _AO_Brightness;
     float4          _AO_TintColor;
 
 #ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _FG_Enable;
+#endif
     float4          _FG_Color;
     float           _FG_MinDist;
     float           _FG_MaxDist;
