@@ -139,6 +139,9 @@ namespace UnlitWF
         public static void SetupShaderKeyword(params Material[] mats) {
             // 不要なシェーダキーワードは削除
             foreach (var mat in mats) {
+                if (!IsSupportedShader(mat)) {
+                    continue;
+                }
                 foreach (var key in DELETE_KEYWORD) {
                     if (mat.IsKeywordEnabled(key)) {
                         mat.DisableKeyword(key);
@@ -148,6 +151,9 @@ namespace UnlitWF
             // Enableキーワードを整理する
 #if UNITY_2019_1_OR_NEWER
             foreach (var mat in mats) {
+                if (!IsSupportedShader(mat)) {
+                    continue;
+                }
                 for (int idx = 0; idx < mat.shader.GetPropertyCount(); idx++) {
                     var prop_name = mat.shader.GetPropertyName(idx);
 
@@ -241,6 +247,15 @@ namespace UnlitWF
         }
 
         /// <summary>
+        /// ShaderがUnlitWFでサポートされるものかどうか判定する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static bool IsSupportedShader(Material mat) {
+            return mat != null && IsSupportedShader(mat.shader);
+        }
+
+        /// <summary>
         /// 最新リリースのVersionInfo
         /// </summary>
         private static WFVersionInfo LatestVersion = null;
@@ -330,7 +345,7 @@ namespace UnlitWF
         }
 
         public bool Contains(Material mat) {
-            if (mat == null || !WFCommonUtility.IsSupportedShader(mat.shader)) {
+            if (!WFCommonUtility.IsSupportedShader(mat)) {
                 return false;
             }
             return _contains(this, mat);
