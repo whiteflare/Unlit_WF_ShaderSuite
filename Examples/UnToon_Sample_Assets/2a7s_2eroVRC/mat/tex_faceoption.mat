@@ -68,7 +68,6 @@ Material:
     - _CullMode: 0
     - _CurrentVersion: 0
     - _ES_AlphaScroll: 0
-    - _ES_BakeIntensity: 1
     - _ES_BlendType: 0
     - _ES_DirType: 0
     - _ES_Enable: 0
