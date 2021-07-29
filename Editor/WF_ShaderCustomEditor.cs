@@ -256,6 +256,9 @@ namespace UnlitWF
             //materialEditor.DoubleSidedGIField();
             WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
 
+            // ユーティリティボタン
+            OnGUISub_Utilities(materialEditor);
+
             // シェーダキーワードを整理する
             WFCommonUtility.SetupShaderKeyword(WFCommonUtility.AsMaterials(materialEditor.targets));
         }
@@ -386,6 +389,31 @@ namespace UnlitWF
                     ResetOldMaterialTable(mats);
                 }
             }
+        }
+
+        private static void OnGUISub_Utilities(MaterialEditor materialEditor) {
+            EditorGUILayout.Space();
+            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Utility", null);
+
+            // cleanup
+            if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageText.BtCleanup), new string[] { "Open Cleanup Utility" }, idx => {
+                switch(idx) {
+                    case 0:
+                        ToolCreanUpWindow.OpenWindowFromShaderGUI(WFCommonUtility.AsMaterials(materialEditor.targets));
+                        break;
+                    default:
+                        break;
+                }
+            })) {
+                var editor = new WFMaterialEditUtility();
+                var param = new CleanUpParameter();
+                param.materials = WFCommonUtility.AsMaterials(materialEditor.targets);
+                param.resetKeywords = true;
+                param.resetUnused = true;
+                editor.CleanUpProperties(param);
+            }
+
+            EditorGUILayout.Space();
         }
 
         static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
@@ -744,6 +772,28 @@ namespace UnlitWF
             fieldpos.y -= 2;
             fieldpos.height = 18;
             return GUI.Button(fieldpos, buttonText);
+        }
+
+        internal static bool ButtonWithDropdownList(GUIContent content, string[] buttonNames, GenericMenu.MenuFunction2 callback) {
+            var style = new GUIStyle("DropDownButton");
+            var rect = GUILayoutUtility.GetRect(content, style);
+
+            var dropDownRect = rect;
+            const float kDropDownButtonWidth = 20f;
+            dropDownRect.xMin = dropDownRect.xMax - kDropDownButtonWidth;
+
+            if (Event.current.type == EventType.MouseDown && dropDownRect.Contains(Event.current.mousePosition)) {
+                var menu = new GenericMenu();
+                for (int i = 0; i != buttonNames.Length; i++)
+                    menu.AddItem(new GUIContent(buttonNames[i]), false, callback, i);
+
+                menu.DropDown(rect);
+                Event.current.Use();
+
+                return false;
+            }
+
+            return GUI.Button(rect, content, style);
         }
 
         #endregion

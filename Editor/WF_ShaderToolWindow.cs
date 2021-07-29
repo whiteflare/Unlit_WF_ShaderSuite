@@ -90,6 +90,12 @@ namespace UnlitWF
             return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
+        internal static void OpenWindowFromShaderGUI(Material[] mats) {
+            arguments.Clear();
+            arguments.AddRange(mats);
+            GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
+        }
+
         private static readonly List<Material> arguments = new List<Material>();
 
         private GUIStyle styleTitle;

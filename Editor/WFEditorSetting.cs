@@ -23,7 +23,7 @@ using UnityEditor;
 
 namespace UnlitWF
 {
-    [CreateAssetMenu(menuName = "UnlitWF/EditorSettingAsset")]
+//    [CreateAssetMenu(menuName = "UnlitWF/EditorSettingAsset")]
     public class WFEditorSetting : ScriptableObject
     {
         public int settingPriority = 0;
