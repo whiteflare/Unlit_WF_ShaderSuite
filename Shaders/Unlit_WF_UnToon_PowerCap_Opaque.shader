@@ -282,7 +282,10 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/03", Float) = 0
+            _CurrentVersion         ("2021/07/31", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
     }
 
     SubShader {
@@ -307,14 +310,22 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
             #define _WF_UNTOON_POWERCAP
 
-            #define _BK_ENABLE
-            #define _CH_ENABLE
-            #define _FG_ENABLE
-            #define _HL_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _CH_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma shader_feature_local _HL_ENABLE_1
+            #pragma shader_feature_local _HL_ENABLE_2
+            #pragma shader_feature_local _HL_ENABLE_3
+            #pragma shader_feature_local _HL_ENABLE_4
+            #pragma shader_feature_local _HL_ENABLE_5
+            #pragma shader_feature_local _HL_ENABLE_6
+            #pragma shader_feature_local _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

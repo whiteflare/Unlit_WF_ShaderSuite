@@ -138,7 +138,10 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/03", Float) = 0
+            _CurrentVersion         ("2021/07/31", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
     }
 
     SubShader {
@@ -161,10 +164,10 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
             #pragma target 4.5
 
-            #define _CL_ENABLE
-            #define _HL_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
+            #pragma shader_feature_local _CL_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -187,8 +190,8 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
-            #define _CL_ENABLE
-            #define _TS_ENABLE
+            #pragma shader_feature_local _CL_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase

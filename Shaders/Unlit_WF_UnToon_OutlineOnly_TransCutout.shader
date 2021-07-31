@@ -88,7 +88,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/03", Float) = 0
+            _CurrentVersion         ("2021/07/31", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout", Float) = 0
     }
 
     SubShader {
@@ -116,9 +119,9 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
             #define _WF_ALPHA_CUTOUT
 
-            #define _FG_ENABLE
-            #define _TL_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

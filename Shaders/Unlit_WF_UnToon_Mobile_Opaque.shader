@@ -166,7 +166,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/03", Float) = 0
+            _CurrentVersion         ("2021/07/31", Float) = 0
     }
 
     SubShader {
@@ -190,15 +190,15 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
             #define _WF_MOBILE
 
-            #define _AO_ENABLE
-            #define _ES_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -220,7 +220,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

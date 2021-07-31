@@ -92,7 +92,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/03", Float) = 0
+            _CurrentVersion         ("2021/07/31", Float) = 0
     }
 
     SubShader {
@@ -129,9 +129,9 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
 
             #define _WF_ALPHA_BLEND
 
-            #define _FG_ENABLE
-            #define _TL_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

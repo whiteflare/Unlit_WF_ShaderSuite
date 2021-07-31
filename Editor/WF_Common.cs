@@ -30,6 +30,7 @@ namespace UnlitWF
     {
         private static readonly Regex PAT_DISP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
         private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+?)(?<suffix>(?:_\d+)?)$");
+        private static readonly Regex PAT_ENABLE_KEYWORD = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_ENABLE(?<suffix>(?:_\d+)?)$", RegexOptions.Compiled);
 
         /// <summary>
         /// プロパティのディスプレイ名から、Prefixと名前を分割する。
@@ -92,7 +93,7 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// プロパティ名からEnableトグルかどうか判定する。
+        /// プロパティ物理名から Enable トグルかどうかを判定する。
         /// </summary>
         /// <param name="prop_name"></param>
         /// <returns></returns>
@@ -103,7 +104,16 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// Enableトグルかどうか判定する。
+        /// キーワード文字列が Enable キーワードかどうかを判定する。
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        public static bool IsEnableKeyword(string keyword) {
+            return PAT_ENABLE_KEYWORD.IsMatch(keyword);
+        }
+
+        /// <summary>
+        /// ラベル＋プロパティ名から Enable トグルかどうかを判定する。
         /// </summary>
         /// <param name="label"></param>
         /// <param name="name"></param>
@@ -113,7 +123,72 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// マテリアルのシェーダを指定のものに変更する。
+        /// 見つけ次第削除するシェーダキーワード
+        /// </summary>
+        private static readonly List<string> DELETE_KEYWORD = new List<string>() {
+            "_",
+            "_ALPHATEST_ON",
+            "_ALPHABLEND_ON",
+            "_ALPHAPREMULTIPLY_ON",
+        };
+
+        /// <summary>
+        /// 各マテリアルのEnableキーワードを設定する
+        /// </summary>
+        /// <param name="mats"></param>
+        public static void SetupShaderKeyword(params Material[] mats) {
+            // 不要なシェーダキーワードは削除
+            foreach (var mat in mats) {
+                if (!IsSupportedShader(mat)) {
+                    continue;
+                }
+                foreach (var key in DELETE_KEYWORD) {
+                    if (mat.IsKeywordEnabled(key)) {
+                        mat.DisableKeyword(key);
+                    }
+                }
+            }
+            // Enableキーワードを整理する
+#if UNITY_2019_1_OR_NEWER
+            foreach (var mat in mats) {
+                if (!IsSupportedShader(mat)) {
+                    continue;
+                }
+                for (int idx = 0; idx < mat.shader.GetPropertyCount(); idx++) {
+                    var prop_name = mat.shader.GetPropertyName(idx);
+
+                    // 対応するキーワードが指定されているならばそれを設定する
+                    var kwd = WFShaderDictionary.SpecialPropNameToKeywordMap.GetValueOrNull(prop_name);
+                    if (kwd != null) {
+                        var value = 0.001f < Math.Abs(mat.GetFloat(prop_name));
+                        SetEnableKeyword(mat, kwd, value);
+                        continue;
+                    }
+
+                    // Enableプロパティならば、それに対応するキーワードを設定する
+                    if (IsEnableToggleFromPropName(prop_name)) {
+                        var value = 0.001f < Math.Abs(mat.GetFloat(prop_name));
+                        SetEnableKeyword(mat, prop_name.ToUpper(), value);
+                        continue;
+                    }
+                }
+            }
+#endif
+        }
+
+        private static void SetEnableKeyword(Material mat, string kwd, bool value) {
+            if (mat.IsKeywordEnabled(kwd) != value) {
+                if (value) {
+                    mat.EnableKeyword(kwd);
+                }
+                else {
+                    mat.DisableKeyword(kwd);
+                }
+            }
+        }
+
+        /// <summary>
+        /// マテリアルの shader を指定の名前のものに変更する。
         /// </summary>
         /// <param name="name"></param>
         /// <param name="mats"></param>
@@ -149,7 +224,7 @@ namespace UnlitWF
                 }
             }
             else {
-                Debug.LogErrorFormat("Shader Not Found in this projects: {0}", name);
+                Debug.LogErrorFormat("[WF][Common] Shader Not Found in this projects: {0}", name);
             }
         }
 
@@ -169,6 +244,15 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool IsSupportedShader(Shader shader) {
             return shader != null && shader.name.Contains("UnlitWF");
+        }
+
+        /// <summary>
+        /// ShaderがUnlitWFでサポートされるものかどうか判定する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static bool IsSupportedShader(Material mat) {
+            return mat != null && IsSupportedShader(mat.shader);
         }
 
         /// <summary>
@@ -253,7 +337,7 @@ namespace UnlitWF
             _contains = contains;
 
             if (uniqueLabel.Contains(Label)) {
-                Debug.LogWarningFormat("UnlitWF WFShaderFunction duplicate Label: " + Label);
+                Debug.LogWarningFormat("[WF][Common] WFShaderFunction duplicate Label: " + Label);
             }
             else {
                 uniqueLabel.Add(Label);
@@ -261,7 +345,7 @@ namespace UnlitWF
         }
 
         public bool Contains(Material mat) {
-            if (mat == null || !WFCommonUtility.IsSupportedShader(mat.shader)) {
+            if (!WFCommonUtility.IsSupportedShader(mat)) {
                 return false;
             }
             return _contains(this, mat);

@@ -78,7 +78,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/03", Float) = 0
+            _CurrentVersion         ("2021/07/31", Float) = 0
     }
 
     SubShader {
@@ -107,8 +107,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _TL_ENABLE
-            #define _VC_ENABLE
+            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _VC_ENABLE
 
             // -------------------------------------
             // Lightweight Pipeline keywords
@@ -153,8 +153,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _TL_ENABLE
-            #define _VC_ENABLE
+            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -166,7 +166,29 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             ENDHLSL
         }
 
-        UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
+        Pass {
+            Name "META"
+            Tags { "LightMode" = "Meta" }
+
+            Cull Off
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta_black
+
+            #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
+
+            #pragma shader_feature_local _VC_ENABLE
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "WF_UnToonURP_Meta.cginc"
+
+            ENDHLSL
+        }
     }
 
     FallBack "Hidden/InternalErrorShader"

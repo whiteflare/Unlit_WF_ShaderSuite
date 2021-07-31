@@ -83,7 +83,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/03", Float) = 0
+            _CurrentVersion         ("2021/07/31", Float) = 0
     }
 
     SubShader {
@@ -116,8 +116,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _AO_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             // -------------------------------------
             // Lightweight Pipeline keywords
@@ -163,7 +163,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
@@ -191,7 +191,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #include "../WF_INPUT_UnToon.cginc"
             #include "WF_UnToonURP_Meta.cginc"

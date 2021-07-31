@@ -306,7 +306,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/03", Float) = 0
+            _CurrentVersion         ("2021/07/31", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _FallBack               ("UnlitWF/WF_UnToon_Opaque", Float) = 0
     }
 
     SubShader {
@@ -316,7 +319,34 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             "DisableBatching" = "True"
         }
 
-        UsePass "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque/OUTLINE"
+        Pass {
+            Name "OUTLINE"
+            Tags { "LightMode" = "ForwardBase" }
+
+            Cull FRONT
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma hull hull
+            #pragma domain domain_outline
+
+            #pragma target 5.0
+
+            #define _WF_UNTOON_TESS
+
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_UnToon_Tessellation.cginc"
+
+            ENDCG
+        }
 
         Pass {
             Name "MAIN"
@@ -336,13 +366,21 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             #define _WF_UNTOON_TESS
             #define _WF_UNTOON_POWERCAP
 
-            #define _BK_ENABLE
-            #define _CH_ENABLE
-            #define _HL_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _CH_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma shader_feature_local _HL_ENABLE_1
+            #pragma shader_feature_local _HL_ENABLE_2
+            #pragma shader_feature_local _HL_ENABLE_3
+            #pragma shader_feature_local _HL_ENABLE_4
+            #pragma shader_feature_local _HL_ENABLE_5
+            #pragma shader_feature_local _HL_ENABLE_6
+            #pragma shader_feature_local _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
