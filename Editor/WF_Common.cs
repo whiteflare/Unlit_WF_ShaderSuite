@@ -88,7 +88,7 @@ namespace UnlitWF
                 return label;
             }
             string name;
-            WFCommonUtility.FormatPropName(prop_name, out label, out name);
+            FormatPropName(prop_name, out label, out name);
             return label;
         }
 
@@ -99,7 +99,7 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool IsEnableToggleFromPropName(string prop_name) {
             string label, name;
-            WFCommonUtility.FormatPropName(prop_name, out label, out name);
+            FormatPropName(prop_name, out label, out name);
             return IsEnableToggle(label, name);
         }
 
@@ -494,14 +494,13 @@ namespace UnlitWF
 
         public static GUIContent GetGUIContent(string text) {
             var localized = SplitAndTranslate(text);
-            var tooltip = text != localized ? text : null;
-            return new GUIContent(localized, tooltip);
+            return new GUIContent(localized);
         }
 
         public static GUIContent GetGUIContent(string label, string text, string tooltip = null) {
             string localized = Translate(label, text);
-            if (text != localized && tooltip == null) {
-                tooltip = text;
+            if (string.IsNullOrWhiteSpace(tooltip)) {
+                return new GUIContent("[" + label + "] " + localized);
             }
             return new GUIContent("[" + label + "] " + localized, tooltip);
         }
