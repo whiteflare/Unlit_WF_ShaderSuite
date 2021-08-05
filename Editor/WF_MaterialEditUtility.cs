@@ -31,7 +31,7 @@ namespace UnlitWF
 
         public static MigrationParameter Create() {
             var result = ScriptableObject.CreateInstance<MigrationParameter>();
-            result.hideFlags = HideFlags.HideAndDontSave;
+            result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
             return result;
         }
     }
@@ -46,7 +46,7 @@ namespace UnlitWF
 
         public static CopyPropParameter Create() {
             var result = ScriptableObject.CreateInstance<CopyPropParameter>();
-            result.hideFlags = HideFlags.HideAndDontSave;
+            result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
             return result;
         }
     }
@@ -59,7 +59,7 @@ namespace UnlitWF
 
         public static CleanUpParameter Create() {
             var result = ScriptableObject.CreateInstance<CleanUpParameter>();
-            result.hideFlags = HideFlags.HideAndDontSave;
+            result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
             return result;
         }
     }
@@ -78,7 +78,7 @@ namespace UnlitWF
 
         public static ResetParameter Create() {
             var result = ScriptableObject.CreateInstance<ResetParameter>();
-            result.hideFlags = HideFlags.HideAndDontSave;
+            result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
             return result;
         }
     }
