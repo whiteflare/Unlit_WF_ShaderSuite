@@ -124,6 +124,18 @@ namespace UnlitWF
             new CustomPropertyHook("_TS_InvMaskVal", null, (ctx, changed) => {
                 EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info);
             }),
+            // _HL_MatcapColor の後に説明文を追加する
+            new CustomPropertyHook("_HL_MatcapColor", null, (ctx, changed) => {
+                if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 0)) {
+                    EditorGUILayout.HelpBox("MEDIAN_CAPは灰色を基準とした加算＆減算合成を行うmatcapです", MessageType.Info);
+                }
+                if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 1)) {
+                    EditorGUILayout.HelpBox("LIGHT_CAPは黒色を基準とした加算合成を行うmatcapです", MessageType.Info);
+                }
+                if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 2)) {
+                    EditorGUILayout.HelpBox("SHADE_CAPは白色を基準とした乗算合成を行うmatcapです", MessageType.Info);
+                }
+            }),
         };
 
         private static bool IsAnyIntValue(PropertyGUIContext ctx, string name, Predicate<int> pred) {
@@ -151,6 +163,15 @@ namespace UnlitWF
         {
             public static readonly Texture2D infoIcon = EditorGUIUtility.Load("icons/console.infoicon.png") as Texture2D;
             public static readonly Texture2D warnIcon = EditorGUIUtility.Load("icons/console.warnicon.png") as Texture2D;
+            public static readonly Texture2D menuTex = LoadTextureByFileName("wf_icon_menu");
+        }
+
+        private static Texture2D LoadTextureByFileName(string search_name) {
+            string[] guids = AssetDatabase.FindAssets(search_name + " t:texture");
+            if (guids.Length == 0) {
+                return Texture2D.whiteTexture;
+            }
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath(guids[0]));
         }
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
@@ -250,7 +271,7 @@ namespace UnlitWF
                 }
             }
 
-            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Advanced Options", null);
+            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Advanced Options");
             materialEditor.RenderQueueField();
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
@@ -382,9 +403,8 @@ namespace UnlitWF
                 var message = WFI18N.Translate(WFMessageText.PlzMigration);
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now"))) {
-                    var editor = new WFMaterialEditUtility();
                     // 名称を全て変更
-                    editor.RenameOldNameProperties(mats);
+                    WFMaterialEditUtility.RenameOldNameProperties(mats);
                     // リセット
                     ResetOldMaterialTable(mats);
                 }
@@ -393,11 +413,11 @@ namespace UnlitWF
 
         private static void OnGUISub_Utilities(MaterialEditor materialEditor) {
             EditorGUILayout.Space();
-            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Utility", null);
+            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Utility");
 
             // cleanup
             if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageText.BtCleanup), new string[] { "Open Cleanup Utility" }, idx => {
-                switch(idx) {
+                switch (idx) {
                     case 0:
                         ToolCreanUpWindow.OpenWindowFromShaderGUI(WFCommonUtility.AsMaterials(materialEditor.targets));
                         break;
@@ -405,12 +425,11 @@ namespace UnlitWF
                         break;
                 }
             })) {
-                var editor = new WFMaterialEditUtility();
                 var param = new CleanUpParameter();
                 param.materials = WFCommonUtility.AsMaterials(materialEditor.targets);
                 param.resetKeywords = true;
                 param.resetUnused = true;
-                editor.CleanUpProperties(param);
+                WFMaterialEditUtility.CleanUpProperties(param);
             }
 
             EditorGUILayout.Space();
@@ -420,8 +439,6 @@ namespace UnlitWF
         static WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
 
         private static bool IsOldMaterial(params object[] mats) {
-            var editor = new WFMaterialEditUtility();
-
             bool result = false;
             foreach (Material mat in mats) {
                 if (mat == null) {
@@ -434,7 +451,7 @@ namespace UnlitWF
                     result |= true;
                     return true;
                 }
-                bool old = editor.ExistsOldNameProperty(mat);
+                bool old = WFMaterialEditUtility.ExistsOldNameProperty(mat);
                 if (old) {
                     oldMaterialVersionCache.Add(mat);
                 }
@@ -556,7 +573,7 @@ namespace UnlitWF
 
                 // 段数を取得
                 var steps = GetShadowStepsFromMaterial(m);
-                switch(steps) {
+                switch (steps) {
                     case 1:
                         if (m.HasProperty("_TS_1stColor")) {
                             m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
@@ -643,7 +660,7 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static void DrawShurikenStyleHeader(Rect position, string text, MaterialProperty prop = null, bool alwaysOn = false) {
+        public static void DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null) {
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             style.font = EditorStyles.boldLabel.font;
@@ -654,32 +671,71 @@ namespace UnlitWF
             position = EditorGUI.IndentedRect(position);
             GUI.Box(position, text, style);
 
-            if (prop != null) {
-                if (alwaysOn) {
-                    if (prop.hasMixedValue || prop.floatValue == 0.0f) {
-                        prop.floatValue = 1.0f;
-                    }
+            if (menu != null) {
+                var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
+                if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel)) {
+                    Event.current.Use();
+                    menu.DropDown(rect);
                 }
-                else {
-                    // Toggle
-                    Rect r = EditorGUILayout.GetControlRect(true, 0, EditorStyles.layerMaskField);
-                    r.y -= 25;
-                    r.height = MaterialEditor.GetDefaultPropertyHeight(prop);
+            }
+        }
 
-                    bool value = 0.001f < Math.Abs(prop.floatValue);
+        /// <summary>
+        /// Shurikenスタイルのヘッダを表示する
+        /// </summary>
+        /// <param name="position">位置</param>
+        /// <param name="text">テキスト</param>
+        /// <param name="prop">EnableトグルのProperty(またはnull)</param>
+        /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
+        public static void DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, GenericMenu menu = null) {
+            // SurikenStyleHeader
+            var style = new GUIStyle("ShurikenModuleTitle");
+            style.font = EditorStyles.boldLabel.font;
+            style.fixedHeight = 20;
+            style.contentOffset = new Vector2(20, -2);
+            // Draw
+            position.y += 8;
+            position = EditorGUI.IndentedRect(position);
+            GUI.Box(position, text, style);
+
+            if (alwaysOn) {
+                if (prop.hasMixedValue || prop.floatValue == 0.0f) {
+                    prop.floatValue = 1.0f;
+                }
+            }
+            else {
+                bool value = 0.001f < Math.Abs(prop.floatValue);
+
+                // Toggle
+                {
+                    Rect rect = EditorGUILayout.GetControlRect(true, 0, EditorStyles.layerMaskField);
+                    rect.y -= 25;
+                    rect.width -= 40;
+                    rect.height = MaterialEditor.GetDefaultPropertyHeight(prop);
+
                     EditorGUI.showMixedValue = prop.hasMixedValue;
                     EditorGUI.BeginChangeCheck();
-                    value = EditorGUI.Toggle(r, " ", value);
+                    value = EditorGUI.Toggle(rect, " ", value);
                     if (EditorGUI.EndChangeCheck()) {
                         prop.floatValue = value ? 1.0f : 0.0f;
                     }
                     EditorGUI.showMixedValue = false;
+                }
 
-                    // ▼
-                    var toggleRect = new Rect(position.x + 4f, position.y + 2f, 13f, 13f);
+                // ▼
+                {
+                    var rect = new Rect(position.x + 4f, position.y + 2f, 13f, 13f);
                     if (Event.current.type == EventType.Repaint) {
-                        EditorStyles.foldout.Draw(toggleRect, false, false, value, false);
+                        EditorStyles.foldout.Draw(rect, false, false, value, false);
                     }
+                }
+            }
+
+            if (menu != null) {
+                var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
+                if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel)) {
+                    Event.current.Use();
+                    menu.DropDown(rect);
                 }
             }
         }
@@ -992,6 +1048,56 @@ namespace UnlitWF
 
     #region MaterialPropertyDrawer
 
+    internal static class WFHeaderMenuController
+    {
+        private static Material copiedMaterial = null;
+
+        public static GenericMenu GenerateMenuOrNull(MaterialEditor editor, MaterialProperty prop) {
+            var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
+            if (string.IsNullOrWhiteSpace(prefix)) {
+                return null;
+            }
+
+            var menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Copy material"), false, () => {
+                if (editor.target is Material) {
+                    copiedMaterial = new Material((Material) editor.target);
+                } else {
+                    copiedMaterial = null;
+                }
+            });
+            if (copiedMaterial != null) {
+                menu.AddItem(new GUIContent("Paste value"), false, () => {
+                    var param = CopyPropParameter.Create();
+                    param.materialSource = copiedMaterial;
+                    param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
+                    param.prefixs = new string[] { prefix };
+                    WFMaterialEditUtility.CopyProperties(param);
+                });
+                menu.AddItem(new GUIContent("Paste (without Textures)"), false, () => {
+                    var param = CopyPropParameter.Create();
+                    param.materialSource = copiedMaterial;
+                    param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
+                    param.prefixs = new string[] { prefix };
+                    WFMaterialEditUtility.CopyProperties(param);
+                });
+            }
+            else {
+                menu.AddDisabledItem(new GUIContent("Paste value"));
+                menu.AddDisabledItem(new GUIContent("Paste (without Textures)"));
+            }
+            menu.AddSeparator("");
+            menu.AddItem(new GUIContent("Reset"), false, () => {
+                var param = ResetParameter.Create();
+                param.materials = WFCommonUtility.AsMaterials(editor.targets);
+                param.resetPrefixs = new string[] { prefix };
+                WFMaterialEditUtility.ResetProperties(param);
+            });
+
+            return menu;
+        }
+    }
+
     /// <summary>
     /// Shurikenヘッダを表示する
     /// </summary>
@@ -1008,7 +1114,7 @@ namespace UnlitWF
         }
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
-            ShaderCustomEditor.DrawShurikenStyleHeader(position, text);
+            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
         }
     }
 
@@ -1028,7 +1134,7 @@ namespace UnlitWF
         }
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
-            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, prop);
+            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, false, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
         }
     }
 
@@ -1048,7 +1154,7 @@ namespace UnlitWF
         }
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
-            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, prop, true);
+            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, true, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
         }
     }
 
