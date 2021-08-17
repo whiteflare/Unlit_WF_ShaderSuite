@@ -32,19 +32,26 @@ namespace UnlitWF
 
         public const string TOOLS_CREANUP = PATH_TOOLS + "CleanUp material property";
         public const string ASSETS_CREANUP = PATH_ASSETS + "CleanUp material property";
-
-        public const string TOOLS_RESET = PATH_TOOLS + "Reset material property";
-        public const string ASSETS_RESET = PATH_ASSETS + "Reset material property";
+        public const int PRI_CREANUP = 101;
 
         public const string TOOLS_COPY = PATH_TOOLS + "Copy material property";
         public const string ASSETS_COPY = PATH_ASSETS + "Copy material property";
+        public const int PRI_COPY = 102;
+
+        public const string TOOLS_RESET = PATH_TOOLS + "Reset material property";
+        public const string ASSETS_RESET = PATH_ASSETS + "Reset material property";
+        public const int PRI_RESET = 103;
 
         public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration material";
         public const string ASSETS_MIGRATION = PATH_ASSETS + "Migration material";
+        public const int PRI_MIGRATION = 104;
 
-        public const string TOOLS_DEBUGVIEW = PATH_TOOLS + "Switch DebugView shader";
         public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "Switch DebugView shader";
         public const string MATERIAL_DEBUGVIEW = "CONTEXT/Material/Switch WF_DebugView shader";
+        public const int PRI_DEBUGVIEW = 201;
+
+        public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
+        public const int PRI_TEMPLATE = 301;
     }
 
     internal static class ToolCommon
@@ -69,8 +76,8 @@ namespace UnlitWF
     public class ToolCreanUpWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_CREANUP)]
-        [MenuItem(MenuPathString.ASSETS_CREANUP)]
+        [MenuItem(MenuPathString.TOOLS_CREANUP, priority = MenuPathString.PRI_CREANUP)]
+        [MenuItem(MenuPathString.ASSETS_CREANUP, priority = MenuPathString.PRI_CREANUP)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
@@ -189,8 +196,8 @@ namespace UnlitWF
     public class ToolResetWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_RESET)]
-        [MenuItem(MenuPathString.ASSETS_RESET)]
+        [MenuItem(MenuPathString.TOOLS_RESET, priority = MenuPathString.PRI_RESET)]
+        [MenuItem(MenuPathString.ASSETS_RESET, priority = MenuPathString.PRI_RESET)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
@@ -324,8 +331,8 @@ namespace UnlitWF
     public class ToolCopyWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_COPY)]
-        [MenuItem(MenuPathString.ASSETS_COPY)]
+        [MenuItem(MenuPathString.TOOLS_COPY, priority = MenuPathString.PRI_COPY)]
+        [MenuItem(MenuPathString.ASSETS_COPY, priority = MenuPathString.PRI_COPY)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
@@ -452,8 +459,8 @@ namespace UnlitWF
 
     public class ToolMigrationWindow : EditorWindow
     {
-        [MenuItem(MenuPathString.TOOLS_MIGRATION)]
-        [MenuItem(MenuPathString.ASSETS_MIGRATION)]
+        [MenuItem(MenuPathString.TOOLS_MIGRATION, priority = MenuPathString.PRI_MIGRATION)]
+        [MenuItem(MenuPathString.ASSETS_MIGRATION, priority = MenuPathString.PRI_MIGRATION)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
