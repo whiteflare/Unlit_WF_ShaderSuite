@@ -43,6 +43,7 @@ namespace UnlitWF
         public string[] labels = { };
         public string[] prefixs = { };
         public bool withoutTextures = false;
+        public bool onlyOverrideBuiltinTextures = false;
 
         public static CopyPropParameter Create() {
             var result = ScriptableObject.CreateInstance<CopyPropParameter>();
@@ -161,6 +162,12 @@ namespace UnlitWF
         #region コピー
 
         public static void CopyProperties(CopyPropParameter param) {
+            copyProperties(param, true);
+        }
+        public static void CopyPropertiesWithoutUndo(CopyPropParameter param) {
+            copyProperties(param, false);
+        }
+        public static void copyProperties(CopyPropParameter param, bool undo) {
             if (param.materialSource == null) {
                 return;
             }
@@ -186,7 +193,9 @@ namespace UnlitWF
                 return;
             }
 
-            Undo.RecordObjects(param.materialDestination, "WF copy materials");
+            if (undo) {
+                Undo.RecordObjects(param.materialDestination, "WF copy materials");
+            }
 
             for (int i = 0; i < param.materialDestination.Length; i++) {
                 var dst = param.materialDestination[i];
@@ -196,7 +205,7 @@ namespace UnlitWF
                 var dst_props = ShaderMaterialProperty.AsDict(dst);
 
                 // コピー
-                if (CopyProperties(src_props, dst_props)) {
+                if (CopyProperties(src_props, dst_props, param.onlyOverrideBuiltinTextures)) {
                     // キーワードを整理する
                     WFCommonUtility.SetupShaderKeyword(dst);
                     // ダーティフラグを付ける
@@ -206,11 +215,23 @@ namespace UnlitWF
             AssetDatabase.SaveAssets();
         }
 
-        private static bool CopyProperties(List<ShaderMaterialProperty> src, Dictionary<string, ShaderMaterialProperty> dst) {
+        private static bool CopyProperties(List<ShaderMaterialProperty> src, Dictionary<string, ShaderMaterialProperty> dst, bool onlyOverrideBuiltinTextures) {
             var changed = false;
             foreach (var src_prop in src) {
                 ShaderMaterialProperty dst_prop;
                 if (dst.TryGetValue(src_prop.Name, out dst_prop)) {
+
+                    // もしテクスチャがAssetsフォルダ内にある場合は上書きしない
+                    if (onlyOverrideBuiltinTextures) {
+                        if (dst_prop.Type == ShaderUtil.ShaderPropertyType.TexEnv) {
+                            var tex = dst_prop.Material.GetTexture(dst_prop.Name);
+                            if (!string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex))) {
+                                continue;
+                            }
+                        }
+                    }
+
+                    // コピー
                     changed |= src_prop.CopyTo(dst_prop);
                 }
             }

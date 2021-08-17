@@ -1,0 +1,247 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &-8278621911147306581
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UnlitWF/WF_UnToon_Opaque
+  m_Shader: {fileID: 4800000, guid: a3678756e883b9349ac22fce33313139, type: 3}
+  m_ShaderKeywords: _MT_ENABLE _TS_ENABLE
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BK_BackTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CH_3chMaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HL_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HL_MatcapTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LM_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LM_Texture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MT_Cubemap:
+        m_Texture: {fileID: 8900000, guid: 80b684ec03e5e1c40943d9eb0e0d32f4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NM_2ndMaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OL_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OL_OverlayTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TR_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_1stTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_2ndTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_3rdTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_BaseTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AO_Brightness: 0
+    - _AO_Contrast: 1
+    - _AO_Enable: 0
+    - _AO_UseLightMap: 1
+    - _BK_Enable: 0
+    - _BumpScale: 1
+    - _CH_Enable: 0
+    - _CL_DeltaH: 0
+    - _CL_DeltaS: 0
+    - _CL_DeltaV: 0
+    - _CL_Enable: 0
+    - _CL_Monochrome: 0
+    - _CullMode: 2
+    - _CurrentVersion: 0
+    - _DetailNormalMapScale: 0.4
+    - _ES_BlendType: 0
+    - _ES_DirType: 0
+    - _ES_Enable: 0
+    - _ES_LevelOffset: 0
+    - _ES_Shape: 3
+    - _ES_Sharpness: 1
+    - _ES_Speed: 2
+    - _FallBack: 0
+    - _GI_EmissionMultiplier: 1
+    - _GI_Enable: 0
+    - _GI_IndirectChroma: 1
+    - _GI_IndirectMultiplier: 1
+    - _GL_BlendPower: 0.8
+    - _GL_CastShadow: 1
+    - _GL_CustomAltitude: 45
+    - _GL_CustomAzimuth: 0
+    - _GL_DisableBackLit: 0
+    - _GL_DisableBasePos: 0
+    - _GL_LevelMax: 0.8
+    - _GL_LevelMin: 0.12499995
+    - _GL_LightMode: 0
+    - _HL_BlendNormal: 0.1
+    - _HL_CapType: 0
+    - _HL_Enable: 0
+    - _HL_InvMaskVal: 0
+    - _HL_Parallax: 0.75
+    - _HL_Power: 1
+    - _LM_AnimSpeed: 0.2
+    - _LM_Dencity: 0.5
+    - _LM_Enable: 0
+    - _LM_Glitter: 0.5
+    - _LM_InvMaskVal: 0
+    - _LM_MaxDist: 4
+    - _LM_MinDist: 2
+    - _LM_Scale: 0.5
+    - _LM_Shape: 0
+    - _LM_Spot: 2
+    - _LM_UVType: 0
+    - _MT_BlendNormal: 0.1
+    - _MT_Brightness: 0.2
+    - _MT_CubemapHighCut: 0.2
+    - _MT_CubemapPower: 1
+    - _MT_CubemapType: 2
+    - _MT_Enable: 1
+    - _MT_GeomSpecAA: 1
+    - _MT_InvMaskVal: 0
+    - _MT_InvRoughnessMaskVal: 0
+    - _MT_Metallic: 1
+    - _MT_MetallicMapType: 0
+    - _MT_Monochrome: 0
+    - _MT_ReflSmooth: 1
+    - _MT_SpecSmooth: 0.8
+    - _MT_Specular: 0.3
+    - _NM_2ndType: 0
+    - _NM_Enable: 0
+    - _NM_FlipMirror: 0
+    - _NM_InvMaskVal: 0
+    - _NM_Power: 0.25
+    - _OL_BlendType: 0
+    - _OL_CustomParam1: 0
+    - _OL_Enable: 0
+    - _OL_InvMaskVal: 0
+    - _OL_Power: 1
+    - _OL_UVType: 0
+    - _OL_VertColToDecal: 0
+    - _OL_VertColToMask: 0
+    - _TR_BlendNormal: 0
+    - _TR_BlendType: 0
+    - _TR_Enable: 0
+    - _TR_Feather: 0.05
+    - _TR_InvMaskVal: 0
+    - _TR_Power: 1
+    - _TR_PowerBottom: 0.1
+    - _TR_PowerSide: 0.1
+    - _TR_PowerTop: 0.1
+    - _TS_1stBorder: 0.4
+    - _TS_2ndBorder: 0.2
+    - _TS_3rdBorder: 0.1
+    - _TS_BlendNormal: 0.1
+    - _TS_Enable: 1
+    - _TS_Feather: 0.05
+    - _TS_InvMaskVal: 0
+    - _TS_Power: 1
+    - _TS_Steps: 2
+    - _UseVertexColor: 0
+    m_Colors:
+    - _AO_TintColor: {r: 0, g: 0, b: 0, a: 1}
+    - _BK_BackColor: {r: 1, g: 1, b: 1, a: 1}
+    - _CH_ColorB: {r: 1, g: 1, b: 1, a: 1}
+    - _CH_ColorG: {r: 1, g: 1, b: 1, a: 1}
+    - _CH_ColorR: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _LM_Color: {r: 1, g: 1, b: 1, a: 1}
+    - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
+    - _OL_Color: {r: 1, g: 1, b: 1, a: 1}
+    - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    - _TS_1stColor: {r: 0.81, g: 0.81, b: 0.9, a: 1}
+    - _TS_2ndColor: {r: 0.68, g: 0.68, b: 0.8, a: 1}
+    - _TS_3rdColor: {r: 0.5, g: 0.5, b: 0.7, a: 1}
+    - _TS_BaseColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e2b056a1e7bff1489e0ce6676d2ac92, type: 3}
+  m_Name: "wf21_Metallic_\u91D1\u5C5E"
+  m_EditorClassIdentifier: 
+  memo: "\u91D1\u5C5E\u5149\u6CA2\u3092\u30A4\u30E1\u30FC\u30B8\u3057\u305F\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
+  material: {fileID: -8278621911147306581}

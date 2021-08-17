@@ -1,0 +1,141 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &-8874921283336520688
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UnlitWF/WF_FakeFur_Mix
+  m_Shader: {fileID: 4800000, guid: f19f31eb9bfd5154ba2c1a41c54a908b, type: 3}
+  m_ShaderKeywords: _TS_ENABLE
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _FR_BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FR_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FR_NoiseTex:
+        m_Texture: {fileID: 2800000, guid: 0c90f262b70f7634ea0fb53f2912f537, type: 3}
+        m_Scale: {x: 4, y: 4}
+        m_Offset: {x: 0, y: 0}
+    - _HL_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HL_MatcapTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TR_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_1stTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_2ndTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_3rdTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_BaseTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TS_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AL_AlphaToMask: 0
+    - _CL_DeltaH: 0
+    - _CL_DeltaS: 0
+    - _CL_DeltaV: 0
+    - _CL_Enable: 0
+    - _CL_Monochrome: 0
+    - _CurrentVersion: 0
+    - _Cutoff: 0.2
+    - _FR_FlipMirror: 0
+    - _FR_Height: 0.02
+    - _FR_Height2: 0.03
+    - _FR_Repeat: 3
+    - _FR_ShadowPower: 0.05
+    - _FallBack: 0
+    - _GL_BlendPower: 0.8
+    - _GL_CastShadow: 1
+    - _GL_CustomAltitude: 45
+    - _GL_CustomAzimuth: 0
+    - _GL_DisableBackLit: 0
+    - _GL_DisableBasePos: 0
+    - _GL_LevelMax: 0.8
+    - _GL_LevelMin: 0.12499998
+    - _GL_LightMode: 0
+    - _HL_BlendNormal: 0.1
+    - _HL_CapType: 0
+    - _HL_Enable: 0
+    - _HL_InvMaskVal: 0
+    - _HL_Parallax: 0.75
+    - _HL_Power: 1
+    - _TR_BlendNormal: 0
+    - _TR_BlendType: 0
+    - _TR_Enable: 0
+    - _TR_Feather: 0.05
+    - _TR_InvMaskVal: 0
+    - _TR_Power: 1
+    - _TR_PowerBottom: 0.1
+    - _TR_PowerSide: 0.1
+    - _TR_PowerTop: 0.1
+    - _TS_1stBorder: 0.4
+    - _TS_2ndBorder: 0.2
+    - _TS_3rdBorder: 0.1
+    - _TS_BlendNormal: 0.1
+    - _TS_Enable: 1
+    - _TS_Feather: 0.05
+    - _TS_InvMaskVal: 0
+    - _TS_Power: 1
+    - _TS_Steps: 2
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _FR_Vector: {r: 0, g: 0, b: 1, a: 0}
+    - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    - _TS_1stColor: {r: 0.9, g: 0.72933966, b: 0.72933966, a: 1}
+    - _TS_2ndColor: {r: 0.8, g: 0.60830194, b: 0.60830194, a: 1}
+    - _TS_3rdColor: {r: 0.5, g: 0.5, b: 0.7, a: 1}
+    - _TS_BaseColor: {r: 1, g: 0.9103774, b: 0.9103774, a: 1}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e2b056a1e7bff1489e0ce6676d2ac92, type: 3}
+  m_Name: "wf23_Fur_\u30D5\u30A1\u30FC"
+  m_EditorClassIdentifier: 
+  memo: "\u30D5\u30A1\u30FC\u3092\u7528\u3044\u305F\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
+  material: {fileID: -8874921283336520688}
