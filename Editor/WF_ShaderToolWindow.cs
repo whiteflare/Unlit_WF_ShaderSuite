@@ -52,6 +52,9 @@ namespace UnlitWF
 
         public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
         public const int PRI_TEMPLATE = 301;
+
+        public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials";
+        public const int PRI_KEEPMAT = 401;
     }
 
     internal static class ToolCommon
@@ -68,6 +71,26 @@ namespace UnlitWF
                 return !IsUnlitWFMaterial(mm);
             }
             return false;
+        }
+    }
+
+    public class ToolMaterialKeeper
+    {
+        [MenuItem(MenuPathString.ASSETS_KEEPMAT, priority = MenuPathString.PRI_KEEPMAT)]
+        private static void KeepMaterialInScene() {
+            var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
+
+            var go = new GameObject("MaterialKeeper");
+            go.transform.Reset();
+            go.tag = "EditorOnly";
+            var mr = go.AddComponent<MeshRenderer>();
+            mr.enabled = false;
+            mr.materials = mats.ToArray();
+        }
+
+        [MenuItem(MenuPathString.ASSETS_KEEPMAT, validate = true)]
+        private static bool OpenWindowFromMenuValidation() {
+            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
     }
 
