@@ -415,12 +415,10 @@ namespace UnlitWF
             EditorGUILayout.LabelField("copy target functions", EditorStyles.boldLabel);
 
             var updatedFunctions = new List<string>();
-            foreach (var func in WFShaderDictionary.ShaderFuncList) {
-                if (func.Contains(param.materialSource)) {
-                    bool value = param.labels.Contains(func.Label);
-                    if (GUILayout.Toggle(value, string.Format("[{0}] {1}", func.Label, func.Name))) {
-                        updatedFunctions.Add(func.Label);
-                    }
+            foreach (var func in WFShaderFunction.GetEnableFunctionList(param.materialSource)) {
+                bool value = param.labels.Contains(func.Label);
+                if (GUILayout.Toggle(value, string.Format("[{0}] {1}", func.Label, func.Name))) {
+                    updatedFunctions.Add(func.Label);
                 }
             }
             if (!updatedFunctions.SequenceEqual(param.labels)) {

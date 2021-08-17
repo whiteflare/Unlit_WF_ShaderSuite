@@ -222,17 +222,14 @@ namespace UnlitWF
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
             materialEditor.SetDefaultGUIWidths();
 
-            Material mat = materialEditor.target as Material;
-            if (mat != null) {
-                // CurrentShader
-                OnGuiSub_ShowCurrentShaderName(materialEditor, mat);
-                // マイグレーションHelpBox
-                OnGUISub_MigrationHelpBox(materialEditor);
-                // Batching Static対策HelpBox
-                OnGUISub_BatchingStaticHelpBox(materialEditor);
-                // Lightmap Static対策HelpBox
-                OnGUISub_LightmapStaticHelpBox(materialEditor);
-            }
+            // 情報(トップ)
+            OnGuiSub_ShowCurrentShaderName(materialEditor, false);
+            // マイグレーションHelpBox
+            OnGUISub_MigrationHelpBox(materialEditor);
+            // Batching Static対策HelpBox
+            OnGUISub_BatchingStaticHelpBox(materialEditor);
+            // Lightmap Static対策HelpBox
+            OnGUISub_LightmapStaticHelpBox(materialEditor);
 
             // 現在無効なラベルを保持するリスト
             var disable = new HashSet<string>();
@@ -271,12 +268,13 @@ namespace UnlitWF
                 }
             }
 
-            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Advanced Options");
+            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Material Options");
             materialEditor.RenderQueueField();
             materialEditor.EnableInstancingField();
             //materialEditor.DoubleSidedGIField();
-            WFI18N.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFI18N.LangMode);
 
+            // 情報(ボトム)
+            OnGuiSub_ShowCurrentShaderName(materialEditor, true);
             // ユーティリティボタン
             OnGUISub_Utilities(materialEditor);
 
@@ -307,7 +305,18 @@ namespace UnlitWF
             }
         }
 
-        private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, Material mat) {
+        private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, bool isBottom) {
+            var mat = materialEditor.target as Material;
+            if (mat == null) {
+                return;
+            }
+            if (isBottom != WFEditorPrefs.MenuToBottom) {
+                return;
+            }
+            if (isBottom) {
+                DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Information");
+            }
+
             // シェーダ名の表示
             var rect = EditorGUILayout.GetControlRect();
             rect.y += 2;
@@ -411,9 +420,53 @@ namespace UnlitWF
             }
         }
 
+        private struct GuidAndPath
+        {
+            public string guid;
+            public string path;
+            public string name;
+
+            public GuidAndPath(string guid) {
+                this.guid = guid;
+                this.path = AssetDatabase.GUIDToAssetPath(guid) ?? "";
+                this.name = string.IsNullOrWhiteSpace(path) ? "" : new Regex(@"^.*/|\.[^\.]+$").Replace(this.path, "");
+            }
+        }
+
         private static void OnGUISub_Utilities(MaterialEditor materialEditor) {
             EditorGUILayout.Space();
             DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Utility");
+
+
+            var rect = EditorGUILayout.GetControlRect();
+            if (GUI.Button(rect, new GUIContent("テンプレートから適用"))) {
+                // WFMaterialTemplate を検索
+                var guids = AssetDatabase.FindAssets("t:" + typeof(WFMaterialTemplate))
+                    .Select(guid => new GuidAndPath(guid))
+                    .Where(guid => !string.IsNullOrWhiteSpace(guid.path))
+                    .OrderBy(guid => guid.name);
+                // メニュー作成
+                var menu = new GenericMenu();
+                foreach (var guid in guids) {
+                    menu.AddItem(new GUIContent(guid.name), false, () => {
+                        var temp = AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(guid.path);
+                        if (temp != null) {
+                            temp.ApplyToMaterial(WFCommonUtility.AsMaterials(materialEditor.targets));
+                        }
+                    });
+                }
+                menu.AddSeparator("");
+                if (materialEditor.targets.Length <= 1) {
+                    menu.AddItem(new GUIContent("テンプレートとして保存"), false, () => {
+                        WFMaterialTemplate.CreateAsset(materialEditor.target as Material);
+                    });
+                }
+                else {
+                    menu.AddDisabledItem(new GUIContent("テンプレートとして保存"));
+                }
+
+                menu.DropDown(rect);
+            }
 
             // cleanup
             if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageText.BtCleanup), new string[] { "Open Cleanup Utility" }, idx => {
@@ -433,6 +486,9 @@ namespace UnlitWF
             }
 
             EditorGUILayout.Space();
+
+            WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
+            WFEditorPrefs.MenuToBottom = EditorGUILayout.Toggle("Menu To Bottom", WFEditorPrefs.MenuToBottom);
         }
 
         static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
@@ -516,9 +572,9 @@ namespace UnlitWF
         }
 
         private static void OnGUISub_LightmapStaticHelpBox(MaterialEditor materialEditor) {
-            var target = materialEditor.target as Material;
             // ターゲットが設定用プロパティを持っていないならば何もしない
-            if (!target.HasProperty("_AO_Enable") || !target.HasProperty("_AO_UseLightMap")) {
+            var target = materialEditor.target as Material;
+            if (target == null || !target.HasProperty("_AO_Enable") || !target.HasProperty("_AO_UseLightMap")) {
                 return;
             }
             // 現在のシェーダ
@@ -822,34 +878,39 @@ namespace UnlitWF
         }
 
         private static bool DrawButtonFieldProperty(GUIContent label, string buttonText) {
-            Rect position = EditorGUILayout.GetControlRect(true, 20);
-            position.y += 1;
-            Rect fieldpos = EditorGUI.PrefixLabel(position, label);
-            fieldpos.y -= 2;
-            fieldpos.height = 18;
-            return GUI.Button(fieldpos, buttonText);
+            Rect rect = EditorGUILayout.GetControlRect(true, 20);
+            rect.y += 1;
+            rect = EditorGUI.PrefixLabel(rect, label);
+            rect.y -= 2;
+            rect.height = 18;
+            return GUI.Button(rect, buttonText);
         }
 
-        internal static bool ButtonWithDropdownList(GUIContent content, string[] buttonNames, GenericMenu.MenuFunction2 callback) {
+        internal static bool ButtonWithDropdownList(GUIContent content, Action<Rect> openMenuCallback) {
             var style = new GUIStyle("DropDownButton");
-            var rect = GUILayoutUtility.GetRect(content, style);
+            var rect = EditorGUILayout.GetControlRect(false, 20, style);
 
             var dropDownRect = rect;
             const float kDropDownButtonWidth = 20f;
             dropDownRect.xMin = dropDownRect.xMax - kDropDownButtonWidth;
 
             if (Event.current.type == EventType.MouseDown && dropDownRect.Contains(Event.current.mousePosition)) {
-                var menu = new GenericMenu();
-                for (int i = 0; i != buttonNames.Length; i++)
-                    menu.AddItem(new GUIContent(buttonNames[i]), false, callback, i);
-
-                menu.DropDown(rect);
+                openMenuCallback(rect);
                 Event.current.Use();
-
                 return false;
             }
 
             return GUI.Button(rect, content, style);
+        }
+
+        internal static bool ButtonWithDropdownList(GUIContent content, string[] buttonNames, GenericMenu.MenuFunction2 selectMenuCallback) {
+            return ButtonWithDropdownList(content, rect => {
+                var menu = new GenericMenu();
+                for (int i = 0; i != buttonNames.Length; i++) {
+                    menu.AddItem(new GUIContent(buttonNames[i]), false, selectMenuCallback, i);
+                }
+                menu.DropDown(rect);
+            });
         }
 
         #endregion
