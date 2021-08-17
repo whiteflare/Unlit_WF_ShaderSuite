@@ -223,11 +223,6 @@ namespace UnlitWF
                     .SelectMany(go => go.GetComponentsInChildren<Renderer>(true))
                     .SelectMany(mf => mf.sharedMaterials)
                     .Where(mat => mat != null));
-                // WFMaterialHolder
-                result.AddRange(scene.GetRootGameObjects()
-                    .SelectMany(go => go.GetComponentsInChildren<WFMaterialHolder>(true))
-                    .SelectMany(mf => mf.keepMaterials)
-                    .Where(mat => mat != null));
             }
             return result.Distinct().ToArray();
         }

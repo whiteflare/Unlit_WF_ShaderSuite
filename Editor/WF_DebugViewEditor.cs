@@ -37,12 +37,16 @@ namespace UnlitWF
             WFCommonUtility.ChangeShader(SHADER_NAME_DEBUGVIEW, cmd.context as Material);
         }
 
-        [MenuItem(MenuPathString.TOOLS_DEBUGVIEW)]
-        [MenuItem(MenuPathString.ASSETS_DEBUGVIEW)]
+        [MenuItem(MenuPathString.ASSETS_DEBUGVIEW, priority = MenuPathString.PRI_DEBUGVIEW)]
         private static void ChangeFromMenu() {
             foreach(var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
                 WFCommonUtility.ChangeShader(SHADER_NAME_DEBUGVIEW, mat);
             }
+        }
+
+        [MenuItem(MenuPathString.ASSETS_DEBUGVIEW, validate = true)]
+        private static bool ChangeFromMenuValidation() {
+            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
