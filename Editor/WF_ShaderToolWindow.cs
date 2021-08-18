@@ -849,7 +849,11 @@ namespace UnlitWF
         }
 
         private static bool IsURP() {
+#if UNITY_2019_1_OR_NEWER
             return UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
+#else
+            return false;
+#endif
         }
     }
 }
