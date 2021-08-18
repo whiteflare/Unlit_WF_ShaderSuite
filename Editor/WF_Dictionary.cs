@@ -165,25 +165,25 @@ namespace UnlitWF
         /// <summary>
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
-        public static readonly List<OldPropertyReplacement> OldPropNameToNewPropNameList = new List<OldPropertyReplacement>() {
-            new OldPropertyReplacement("_AL_CutOff", "_Cutoff"),
-            new OldPropertyReplacement("_CutOffLevel", "_Cutoff"),
-            new OldPropertyReplacement("_ES_Color", "_EmissionColor"),
-            new OldPropertyReplacement("_ES_MaskTex", "_EmissionMap"),
-            new OldPropertyReplacement("_FurHeight", "_FR_Height"),
-            new OldPropertyReplacement("_FurMaskTex", "_FR_MaskTex"),
-            new OldPropertyReplacement("_FurNoiseTex", "_FR_NoiseTex"),
-            new OldPropertyReplacement("_FurRepeat", "_FR_Repeat"),
-            new OldPropertyReplacement("_FurShadowPower", "_FR_ShadowPower"),
-            new OldPropertyReplacement("_FG_BumpMap", "_FR_BumpMap"),
-            new OldPropertyReplacement("_FG_FlipTangent", "_FR_FlipTangent"),
-            new OldPropertyReplacement("_GL_BrendPower", "_GL_BlendPower"),
-            new OldPropertyReplacement("_MT_BlendType", "_MT_Brightness"),
-            new OldPropertyReplacement("_MT_MaskTex", "_MetallicGlossMap"),
-            new OldPropertyReplacement("_MT_Smoothness", "_MT_ReflSmooth"),
-            new OldPropertyReplacement("_MT_Smoothness2", "_MT_SpecSmooth"),
-            new OldPropertyReplacement("_TessFactor", "_TE_Factor"),
-            new OldPropertyReplacement("_Smoothing", "_TE_SmoothPower"),
+        public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
+            new PropertyNameReplacement("_AL_CutOff", "_Cutoff"),
+            new PropertyNameReplacement("_CutOffLevel", "_Cutoff"),
+            new PropertyNameReplacement("_ES_Color", "_EmissionColor"),
+            new PropertyNameReplacement("_ES_MaskTex", "_EmissionMap"),
+            new PropertyNameReplacement("_FurHeight", "_FR_Height"),
+            new PropertyNameReplacement("_FurMaskTex", "_FR_MaskTex"),
+            new PropertyNameReplacement("_FurNoiseTex", "_FR_NoiseTex"),
+            new PropertyNameReplacement("_FurRepeat", "_FR_Repeat"),
+            new PropertyNameReplacement("_FurShadowPower", "_FR_ShadowPower"),
+            new PropertyNameReplacement("_FG_BumpMap", "_FR_BumpMap"),
+            new PropertyNameReplacement("_FG_FlipTangent", "_FR_FlipTangent"),
+            new PropertyNameReplacement("_GL_BrendPower", "_GL_BlendPower"),
+            new PropertyNameReplacement("_MT_BlendType", "_MT_Brightness"),
+            new PropertyNameReplacement("_MT_MaskTex", "_MetallicGlossMap"),
+            new PropertyNameReplacement("_MT_Smoothness", "_MT_ReflSmooth"),
+            new PropertyNameReplacement("_MT_Smoothness2", "_MT_SpecSmooth"),
+            new PropertyNameReplacement("_TessFactor", "_TE_Factor"),
+            new PropertyNameReplacement("_Smoothing", "_TE_SmoothPower"),
             // new OldPropertyReplacement("_FurVector", "_FR_Vector"), // FurVectorの値は再設定が必要なので変換しない
         };
 
