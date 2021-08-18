@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,21 +31,34 @@ namespace UnlitWF
         public const string PATH_TOOLS = "Tools/UnlitWF/";
         public const string PATH_ASSETS = "Assets/UnlitWF Material Tools/";
 
+        public const string ASSETS_AUTOCNV = PATH_ASSETS + "Convert UnToon material";
+        public const int PRI_AUTOCNV = 1;
+
         public const string TOOLS_CREANUP = PATH_TOOLS + "CleanUp material property";
         public const string ASSETS_CREANUP = PATH_ASSETS + "CleanUp material property";
-
-        public const string TOOLS_RESET = PATH_TOOLS + "Reset material property";
-        public const string ASSETS_RESET = PATH_ASSETS + "Reset material property";
+        public const int PRI_CREANUP = 101;
 
         public const string TOOLS_COPY = PATH_TOOLS + "Copy material property";
         public const string ASSETS_COPY = PATH_ASSETS + "Copy material property";
+        public const int PRI_COPY = 102;
+
+        public const string TOOLS_RESET = PATH_TOOLS + "Reset material property";
+        public const string ASSETS_RESET = PATH_ASSETS + "Reset material property";
+        public const int PRI_RESET = 103;
 
         public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration material";
         public const string ASSETS_MIGRATION = PATH_ASSETS + "Migration material";
+        public const int PRI_MIGRATION = 104;
 
-        public const string TOOLS_DEBUGVIEW = PATH_TOOLS + "Switch DebugView shader";
         public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "Switch DebugView shader";
         public const string MATERIAL_DEBUGVIEW = "CONTEXT/Material/Switch WF_DebugView shader";
+        public const int PRI_DEBUGVIEW = 201;
+
+        public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
+        public const int PRI_TEMPLATE = 301;
+
+        public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials in the Scene";
+        public const int PRI_KEEPMAT = 401;
     }
 
     internal static class ToolCommon
@@ -64,13 +78,33 @@ namespace UnlitWF
         }
     }
 
+    public class ToolMaterialKeeper
+    {
+        [MenuItem(MenuPathString.ASSETS_KEEPMAT, priority = MenuPathString.PRI_KEEPMAT)]
+        private static void KeepMaterialInScene() {
+            var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
+
+            var go = new GameObject("MaterialKeeper");
+            go.transform.Reset();
+            go.tag = "EditorOnly";
+            var mr = go.AddComponent<MeshRenderer>();
+            mr.enabled = false;
+            mr.materials = mats.ToArray();
+        }
+
+        [MenuItem(MenuPathString.ASSETS_KEEPMAT, validate = true)]
+        private static bool OpenWindowFromMenuValidation() {
+            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
+        }
+    }
+
     #region クリンナップ系
 
     public class ToolCreanUpWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_CREANUP)]
-        [MenuItem(MenuPathString.ASSETS_CREANUP)]
+        [MenuItem(MenuPathString.TOOLS_CREANUP, priority = MenuPathString.PRI_CREANUP)]
+        [MenuItem(MenuPathString.ASSETS_CREANUP, priority = MenuPathString.PRI_CREANUP)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
@@ -189,8 +223,8 @@ namespace UnlitWF
     public class ToolResetWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_RESET)]
-        [MenuItem(MenuPathString.ASSETS_RESET)]
+        [MenuItem(MenuPathString.TOOLS_RESET, priority = MenuPathString.PRI_RESET)]
+        [MenuItem(MenuPathString.ASSETS_RESET, priority = MenuPathString.PRI_RESET)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
@@ -324,8 +358,8 @@ namespace UnlitWF
     public class ToolCopyWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_COPY)]
-        [MenuItem(MenuPathString.ASSETS_COPY)]
+        [MenuItem(MenuPathString.TOOLS_COPY, priority = MenuPathString.PRI_COPY)]
+        [MenuItem(MenuPathString.ASSETS_COPY, priority = MenuPathString.PRI_COPY)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
@@ -452,8 +486,8 @@ namespace UnlitWF
 
     public class ToolMigrationWindow : EditorWindow
     {
-        [MenuItem(MenuPathString.TOOLS_MIGRATION)]
-        [MenuItem(MenuPathString.ASSETS_MIGRATION)]
+        [MenuItem(MenuPathString.TOOLS_MIGRATION, priority = MenuPathString.PRI_MIGRATION)]
+        [MenuItem(MenuPathString.ASSETS_MIGRATION, priority = MenuPathString.PRI_MIGRATION)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
@@ -556,6 +590,272 @@ namespace UnlitWF
 
     #endregion
 
+    public class ToolAutoConvertMaterials
+    {
+        [MenuItem(MenuPathString.ASSETS_AUTOCNV, priority = MenuPathString.PRI_AUTOCNV)]
+        private static void OpenWindowFromMenu() {
+            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
+                ExecAutoConvert(mat);
+            }
+        }
+
+        [MenuItem(MenuPathString.ASSETS_AUTOCNV, validate = true)]
+        private static bool OpenWindowFromMenuValidation() {
+            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
+        }
+
+        private static bool IsMatchShaderName(ConvertContext ctx, string name) {
+            return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(ctx.oldMaterial.shader.name);
+        }
+
+        private static readonly List<Func<ConvertContext, bool>> selectShader = new List<Func<ConvertContext, bool>>() {
+            ctx => {
+                // アウトライン有無を判定する
+                if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {
+                    ctx.outline = true;
+                }
+                else if (HasCustomValueTexture(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler")) {
+                    ctx.outline = true;
+                }
+                else if (HasCustomValueFloat(ctx, "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
+                    ctx.outline = true;
+                }
+                return false; // まだ決まっていない
+            },
+            ctx => {
+                // シェーダ名からシェーダタイプを判定する
+                if (ctx.renderType == ShaderType.NoMatch) {
+                    if (IsMatchShaderName(ctx, "opaque") || IsMatchShaderName(ctx, "texture")) {
+                        ctx.renderType = ShaderType.Opaque;
+                    }
+                    else if (IsMatchShaderName(ctx, "cutout")) {
+                        ctx.renderType = ShaderType.Cutout;
+                    }
+                    else if (IsMatchShaderName(ctx, "trans")) {
+                        ctx.renderType = ShaderType.Transparent;
+                    }
+                }
+                return false;
+            },
+            ctx => {
+                // RenderQueue からシェーダタイプを判定する
+                if (ctx.renderType == ShaderType.NoMatch) {
+                    var queue = ctx.oldMaterial.renderQueue;
+                    if (queue < 0) {
+                        queue = ctx.oldMaterial.shader.renderQueue;
+                    }
+                    if (queue < 2450) {
+                        ctx.renderType = ShaderType.Opaque;
+                    } else if (queue < 2500) {
+                        ctx.renderType = ShaderType.Cutout;
+                    } else {
+                        ctx.renderType = ShaderType.Transparent;
+                    }
+                }
+                return false;
+            },
+            ctx => {
+                if (IsURP()) {
+                    switch(ctx.renderType) {
+                        case ShaderType.Transparent:
+                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Transparent", ctx.target);
+                            break;
+                        case ShaderType.Cutout:
+                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_TransCutout", ctx.target);
+                            break;
+                        default:
+                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Opaque", ctx.target);
+                            break;
+                    }
+                }
+                else if (ctx.outline) {
+                    switch(ctx.renderType) {
+                        case ShaderType.Transparent:
+                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", ctx.target);
+                            break;
+                        case ShaderType.Cutout:
+                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout", ctx.target);
+                            break;
+                        default:
+                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", ctx.target);
+                            break;
+                    }
+                } else {
+                    switch(ctx.renderType) {
+                        case ShaderType.Transparent:
+                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Transparent", ctx.target);
+                            break;
+                        case ShaderType.Cutout:
+                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_TransCutout", ctx.target);
+                            break;
+                        default:
+                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Opaque", ctx.target);
+                            break;
+                    }
+                }
+                return true;
+            },
+        };
+
+        private static readonly List<Action<ConvertContext>> selectFeature = new List<Action<ConvertContext>>() {
+            ctx => {
+                // アルファマスク
+                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                    new PropertyNameReplacement("_AlphaMask", "_AL_MaskTex"),
+                    new PropertyNameReplacement("_ClippingMask", "_AL_MaskTex"));
+                if (HasCustomValueTexture(ctx, "_AL_MaskTex")) {
+                    ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
+                }
+            },
+            ctx => {
+                // ノーマルマップ
+                if (HasCustomValueTexture(ctx, "_BumpMap", "_DetailNormalMap")) {
+                    ctx.target.SetInt("_NM_Enable", 1);
+                }
+            },
+            ctx => {
+                // メタリック
+                if (HasCustomValueTexture(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
+                    ctx.target.SetInt("_MT_Enable", 1);
+                }
+            },
+            ctx => {
+                // AO
+                if (HasCustomValueTexture(ctx, "_OcclusionMap")) {
+                    ctx.target.SetInt("_AO_Enable", 1);
+                }
+            },
+            ctx => {
+                // Emission
+                if (HasCustomValueTexture(ctx, "_EmissionMap") || HasCustomValueFloat(ctx, "_UseEmission", "_EmissionEnable")) {
+                    ctx.target.SetInt("_ES_Enable", 1);
+                }
+            },
+            ctx => {
+                // Toon影
+                ctx.target.SetInt("_TS_Enable", 1);
+                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                    // 1影
+                    new PropertyNameReplacement("_1st_ShadeMap", "_TS_1stTex"),
+                    new PropertyNameReplacement("_ShadowColorTex", "_TS_1stTex"),
+                    new PropertyNameReplacement("_1st_ShadeColor", "_TS_1stColor"),
+                    new PropertyNameReplacement("_ShadowColor", "_TS_1stColor"),
+                    // 2影
+                    new PropertyNameReplacement("_2nd_ShadeMap", "_TS_2ndTex"),
+                    new PropertyNameReplacement("_Shadow2ndColorTex", "_TS_2ndTex"),
+                    new PropertyNameReplacement("_2nd_ShadeColor", "_TS_2ndColor"),
+                    new PropertyNameReplacement("_Shadow2ndColor", "_TS_2ndColor")
+                    );
+            },
+            ctx => {
+                // リムライト
+                if (HasCustomValueFloat(ctx, "_UseRim", "_RimLight", "_RimLitEnable")) {
+                    ctx.target.SetInt("_TR_Enable", 1);
+                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                        new PropertyNameReplacement("_RimColor", "_TR_Color"),
+                        new PropertyNameReplacement("_RimLitColor", "_TR_Color"),
+                        new PropertyNameReplacement("_RimLightColor", "_TR_Color"),
+                        new PropertyNameReplacement("_RimLitMask", "_TR_MaskTex"),
+                        new PropertyNameReplacement("_RimBlendMask", "_TR_MaskTex"),
+                        new PropertyNameReplacement("_Set_RimLightMask", "_TR_Color")
+                        );
+                }
+            },
+            ctx => {
+                // アウトライン
+                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                    new PropertyNameReplacement("_OutlineColor", "_TL_LineColor"),
+                    new PropertyNameReplacement("_Outline_Color", "_TL_LineColor"),
+                    new PropertyNameReplacement("_OutLineColor", "_TL_LineColor"),
+                    // ColorTex
+                    new PropertyNameReplacement("_OutlineTex", "_TL_CustomColorTex"),
+                    new PropertyNameReplacement("_OutLineTexture", "_TL_CustomColorTex"),
+                    new PropertyNameReplacement("_OutlineTexture", "_TL_CustomColorTex"),
+                    // MaskTex
+                    new PropertyNameReplacement("_OutlineWidthMask", "_TL_MaskTex"),
+                    new PropertyNameReplacement("_Outline_Sampler", "_TL_MaskTex"),
+                    new PropertyNameReplacement("_OutlineMask", "_TL_MaskTex"),
+                    new PropertyNameReplacement("_OutLineMask", "_TL_MaskTex")
+                    );
+            },
+            ctx => {
+                // アルファをリセットし、キーワードを整理する
+                var resetParam = new ResetParameter();
+                resetParam.materials = new Material[]{ ctx.target };
+                resetParam.resetColorAlpha = true;
+                WFMaterialEditUtility.ResetPropertiesWithoutUndo(resetParam);
+            },
+        };
+
+        public static void ExecAutoConvert(Material mat) {
+            if (mat == null || mat.shader.name.Contains("UnlitWF")) {
+                return;
+            }
+
+            var ctx = new ConvertContext();
+            ctx.target = mat;
+            ctx.oldMaterial = new Material(mat);
+            ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
+
+            foreach (var cnv in selectShader) {
+                if (cnv(ctx)) {
+                    foreach (var act in selectFeature) {
+                        act(ctx);
+                    }
+                    Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+                    return;
+                }
+            }
+        }
+
+        private class ConvertContext
+        {
+            public Material target;
+            public Material oldMaterial;
+            public Dictionary<string, ShaderSerializedProperty> oldProps;
+
+            public ShaderType renderType = ShaderType.NoMatch;
+            public bool outline = false;
+        }
+
+        private enum ShaderType
+        {
+            NoMatch, Opaque, Cutout, Transparent
+        }
+
+        private static bool HasCustomValueFloat(ConvertContext ctx, params string[] names) {
+            foreach (var name in names) {
+                if (ctx.oldProps.TryGetValue(name, out var prop)) {
+                    if (prop.Type == ShaderUtil.ShaderPropertyType.Float || prop.Type == ShaderUtil.ShaderPropertyType.Range) {
+                        return 0.001f < Mathf.Abs(prop.FloatValue);
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static bool HasCustomValueTexture(ConvertContext ctx, params string[] names) {
+            foreach (var name in names) {
+                if (ctx.oldProps.TryGetValue(name, out var prop)) {
+                    if (prop.Type == ShaderUtil.ShaderPropertyType.TexEnv) {
+                        var tex = prop.TextureValue;
+                        if (tex != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static bool IsURP() {
+#if UNITY_2019_1_OR_NEWER
+            return UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
+#else
+            return false;
+#endif
+        }
+    }
 }
 
 #endif

@@ -15,7 +15,6 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,13 +24,12 @@ using UnityEditor;
 
 namespace UnlitWF
 {
-
     public class WFMaterialTemplate : ScriptableObject
     {
         public string memo;
         public Material material;
 
-        [MenuItem(UnlitWF.MenuPathString.PATH_ASSETS + "Create MaterialTemplate")]
+        [MenuItem(MenuPathString.ASSETS_TEMPLATE, priority = MenuPathString.PRI_TEMPLATE)]
         public static void CreateAsset() {
             var mat = new Material(Shader.Find("UnlitWF/WF_UnToon_Opaque"));
             CreateAsset(mat);

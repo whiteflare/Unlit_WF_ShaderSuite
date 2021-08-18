@@ -84,12 +84,24 @@ namespace UnlitWF
         }
     }
 
-    public static class WFMaterialEditUtility
+    public class PropertyNameReplacement
     {
+        public readonly string beforeName;
+        public readonly string afterName;
+        public readonly Action<ShaderSerializedProperty> onAfterCopy;
+
+        public PropertyNameReplacement(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null) {
+            this.beforeName = beforeName;
+            this.afterName = afterName;
+            this.onAfterCopy = onAfterCopy ?? (p => { });
+        }
+    }
+
+    public static class WFMaterialEditUtility {
         #region マイグレーション
 
         public static bool ExistsOldNameProperty(params Material[] mats) {
-            return 0 < CreateOldNamePropertyList(mats).Count;
+            return 0 < CreateRelacePropertyList(mats.Where(m => !m.shader.name.Contains("MatcapShadows")).ToArray()).Count;
         }
 
         public static bool RenameOldNameProperties(MigrationParameter param) {
@@ -99,41 +111,58 @@ namespace UnlitWF
         public static bool RenameOldNameProperties(Material[] mats) {
             Undo.RecordObjects(mats, "WF Migration materials");
 
-            var oldPropList = CreateOldNamePropertyList(mats);
+            mats = mats.Where(m => !m.shader.name.Contains("MatcapShadows")).ToArray();
+            var oldPropList = CreateRelacePropertyList(mats);
+            return RenamePropNameWithoutUndo(mats, oldPropList);
+        }
+
+        public static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement) {
+            var mats = new Material[] { mat };
+            return RenamePropNameWithoutUndo(mats, CreateReplacePropertyList(mats, replacement));
+        }
+
+        public static bool ReplacePropertyNamesWithoutUndo(Material[] mats, params PropertyNameReplacement[] replacement) {
+            return RenamePropNameWithoutUndo(mats, CreateReplacePropertyList(mats, replacement));
+        }
+
+        private static bool RenamePropNameWithoutUndo(Material[] mats, List<RelacePropertyName> replaceList) {
+            if (replaceList.Count == 0) {
+                return false;
+            }
+
             // 名称を全て変更
-            foreach (var propPair in oldPropList) {
+            foreach (var propPair in replaceList) {
                 if (propPair.after != null) {
                     propPair.before.CopyTo(propPair.after);
                     propPair.onAfterCopy(propPair.after);
                 }
             }
             // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Select(p => p.after));
+            ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.after));
             // 旧プロパティは全て削除
-            foreach (var prop in oldPropList.Select(p => p.before)) {
+            foreach (var prop in replaceList.Select(p => p.before)) {
                 prop.Remove();
             }
             // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Select(p => p.before));
+            ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.before));
             // シェーダキーワードを整理
             WFCommonUtility.SetupShaderKeyword(mats);
 
-            return 0 < oldPropList.Count;
+            return true;
         }
 
-        private static List<OldNameProperty> CreateOldNamePropertyList(Material[] mats) {
-            var result = new List<OldNameProperty>();
+        private static List<RelacePropertyName> CreateRelacePropertyList(Material[] mats) {
+            return CreateReplacePropertyList(mats, WFShaderDictionary.OldPropNameToNewPropNameList);
+        }
 
+        private static List<RelacePropertyName> CreateReplacePropertyList(Material[] mats, IEnumerable<PropertyNameReplacement> replacement) {
+            var result = new List<RelacePropertyName>();
             foreach (var mat in mats) {
-                if (mat.shader.name.Contains("MatcapShadows")) {
-                    // MatcapShadowsは古いので対象にしない
-                    continue;
-                }
                 var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var pair in WFShaderDictionary.OldPropNameToNewPropNameList) {
+                foreach (var pair in replacement) {
                     var before = props.GetValueOrNull(pair.beforeName);
                     if (before != null) {
-                        result.Add(new OldNameProperty(before, props.GetValueOrNull(pair.afterName), pair.onAfterCopy));
+                        result.Add(new RelacePropertyName(before, props.GetValueOrNull(pair.afterName), pair.onAfterCopy));
                     }
                 }
             }
@@ -141,19 +170,16 @@ namespace UnlitWF
             return result;
         }
 
-        struct OldNameProperty
+        struct RelacePropertyName
         {
             public readonly ShaderSerializedProperty before;
             public readonly ShaderSerializedProperty after;
             public readonly Action<ShaderSerializedProperty> onAfterCopy;
 
-            public OldNameProperty(ShaderSerializedProperty before, ShaderSerializedProperty after, Action<ShaderSerializedProperty> onAfterCopy) {
+            public RelacePropertyName(ShaderSerializedProperty before, ShaderSerializedProperty after, Action<ShaderSerializedProperty> onAfterCopy = null) {
                 this.before = before;
                 this.after = after;
                 this.onAfterCopy = onAfterCopy ?? (p => { });
-            }
-
-            public OldNameProperty(ShaderSerializedProperty before, ShaderSerializedProperty after) : this(before, after, null) {
             }
         }
 
@@ -293,7 +319,10 @@ namespace UnlitWF
 
         public static void ResetProperties(ResetParameter param) {
             Undo.RecordObjects(param.materials, "WF reset materials");
+            ResetPropertiesWithoutUndo(param);
+        }
 
+        public static void ResetPropertiesWithoutUndo(ResetParameter param) {
             foreach (Material material in param.materials) {
                 if (material == null) {
                     continue;
@@ -530,6 +559,13 @@ namespace UnlitWF
         public float FloatValue { get { return value.floatValue; } set { this.value.floatValue = value; } }
         public Color ColorValue { get { return value.colorValue; } set { this.value.colorValue = value; } }
         public Vector4 VectorValue { get { return value.vector4Value; } set { this.value.vector4Value = value; } }
+        public Texture TextureValue
+        {
+            get {
+                var child = value.FindPropertyRelative("m_Texture");
+                return child == null ? null : child.objectReferenceValue as Texture;
+            }
+        }
 
         public void Rename(string newName) {
             property.FindPropertyRelative("first").stringValue = newName;
