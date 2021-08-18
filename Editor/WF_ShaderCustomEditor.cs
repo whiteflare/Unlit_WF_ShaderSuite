@@ -127,13 +127,13 @@ namespace UnlitWF
             // _HL_MatcapColor の後に説明文を追加する
             new CustomPropertyHook("_HL_MatcapColor", null, (ctx, changed) => {
                 if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 0)) {
-                    EditorGUILayout.HelpBox("MEDIAN_CAPは灰色を基準とした加算＆減算合成を行うmatcapです", MessageType.Info);
+                    EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeMedian), MessageType.Info);
                 }
                 if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 1)) {
-                    EditorGUILayout.HelpBox("LIGHT_CAPは黒色を基準とした加算合成を行うmatcapです", MessageType.Info);
+                    EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeLight), MessageType.Info);
                 }
                 if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 2)) {
-                    EditorGUILayout.HelpBox("SHADE_CAPは白色を基準とした乗算合成を行うmatcapです", MessageType.Info);
+                    EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeShade), MessageType.Info);
                 }
             }),
         };
@@ -439,7 +439,7 @@ namespace UnlitWF
 
 
             var rect = EditorGUILayout.GetControlRect();
-            if (GUI.Button(rect, new GUIContent("テンプレートから適用"))) {
+            if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate))) {
                 // WFMaterialTemplate を検索
                 var guids = AssetDatabase.FindAssets("t:" + typeof(WFMaterialTemplate))
                     .Select(guid => new GuidAndPath(guid))
@@ -457,19 +457,19 @@ namespace UnlitWF
                 }
                 menu.AddSeparator("");
                 if (materialEditor.targets.Length <= 1) {
-                    menu.AddItem(new GUIContent("テンプレートとして保存"), false, () => {
+                    menu.AddItem(WFI18N.GetGUIContent(WFMessageButton.SaveTemplate), false, () => {
                         WFMaterialTemplate.CreateAsset(materialEditor.target as Material);
                     });
                 }
                 else {
-                    menu.AddDisabledItem(new GUIContent("テンプレートとして保存"));
+                    menu.AddDisabledItem(WFI18N.GetGUIContent(WFMessageButton.SaveTemplate));
                 }
 
                 menu.DropDown(rect);
             }
 
             // cleanup
-            if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageText.BtCleanup), new string[] { "Open Cleanup Utility" }, idx => {
+            if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageButton.Cleanup), new string[] { "Open Cleanup Utility" }, idx => {
                 switch (idx) {
                     case 0:
                         ToolCreanUpWindow.OpenWindowFromShaderGUI(WFCommonUtility.AsMaterials(materialEditor.targets));

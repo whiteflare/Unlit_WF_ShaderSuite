@@ -367,7 +367,14 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PlzBatchingStatic, "このマテリアルは Batching Static な MeshRenderer から使われているようです。\nBatching Static 用の設定へ変更しますか？"),
             new WFI18NTranslation(WFMessageText.PlzLightmapStatic, "このマテリアルは Lightmap Static な MeshRenderer から使われているようです。\nライトマップを有効にしますか？"),
             new WFI18NTranslation(WFMessageText.PsAntiShadowMask, "アンチシャドウマスクにはアバターの顔を白く塗ったマスクテクスチャを指定してください。マスク反転をチェックすることでマテリアル全体を顔とみなすこともできます。"),
-            new WFI18NTranslation(WFMessageText.BtCleanup, "マテリアルから不要データを削除"),
+
+            new WFI18NTranslation(WFMessageText.PsCapTypeMedian, "MEDIAN_CAPは灰色を基準とした加算＆減算合成を行うmatcapです"),
+            new WFI18NTranslation(WFMessageText.PsCapTypeLight, "LIGHT_CAPは黒色を基準とした加算合成を行うmatcapです"),
+            new WFI18NTranslation(WFMessageText.PsCapTypeShade, "SHADE_CAPは白色を基準とした乗算合成を行うmatcapです"),
+
+            new WFI18NTranslation(WFMessageButton.Cleanup, "マテリアルから不要データを削除"),
+            new WFI18NTranslation(WFMessageButton.ApplyTemplate, "テンプレートから適用"),
+            new WFI18NTranslation(WFMessageButton.SaveTemplate, "テンプレートとして保存"),
 
             // 今は使っていないはずの項目
             new WFI18NTranslation("Anti-Glare", "まぶしさ防止"),
@@ -403,7 +410,16 @@ namespace UnlitWF
         public static readonly string PlzBatchingStatic = "This material seems to be used by the Batching Static MeshRenderer.\nDo you want to change the settings for Batching Static?";
         public static readonly string PlzLightmapStatic = "This material seems to be used by the Lightmap Static MeshRenderer.\nDo you want to enable Lightmap?";
         public static readonly string PsAntiShadowMask = "In the Anti-Shadow Mask field, specify a mask texture with the avatar face painted white. You can also check the InvertMask checkbox to make the entire material a face.";
-        public static readonly string BtCleanup = "Remove unused properties from Materials";
+        public static readonly string PsCapTypeMedian = "MEDIAN_CAP is a matcap that performs gray-based additive and subtractive blending.";
+        public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";
+        public static readonly string PsCapTypeShade = "SHADE_CAP is a matcap that performs white-based multiply blending.";
+    }
+
+    internal static class WFMessageButton
+    {
+        public static readonly string Cleanup = "Remove unused properties from Materials";
+        public static readonly string ApplyTemplate = "Apply from Template";
+        public static readonly string SaveTemplate = "Save as Template";
     }
 }
 
