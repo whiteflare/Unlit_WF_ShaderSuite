@@ -228,7 +228,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e2b056a1e7bff1489e0ce6676d2ac92, type: 3}
-  m_Name: "wf24_Ghost_\u5E7D\u970A"
+  m_Name: "wf25_Ghost_\u5E7D\u970A"
   m_EditorClassIdentifier: 
   memo: "\u5E7D\u970A\u306E\u3088\u3046\u306B\u534A\u900F\u660E\u306B\u3057\u305F\u4E0D\u900F\u660E\u30DE\u30C6\u30EA\u30A2\u30EB\u306E\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: -3833280127741941228}

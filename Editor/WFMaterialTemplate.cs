@@ -29,7 +29,7 @@ namespace UnlitWF
         public string memo;
         public Material material;
 
-        [MenuItem(MenuPathString.ASSETS_TEMPLATE, priority = MenuPathString.PRI_TEMPLATE)]
+        [MenuItem(WFMenu.ASSETS_TEMPLATE, priority = WFMenu.PRI_ASSETS_TEMPLATE)]
         public static void CreateAsset() {
             var mat = new Material(Shader.Find("UnlitWF/WF_UnToon_Opaque"));
             CreateAsset(mat);
