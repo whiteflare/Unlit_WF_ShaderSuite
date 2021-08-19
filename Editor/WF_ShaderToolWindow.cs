@@ -91,7 +91,6 @@ namespace UnlitWF
             var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
 
             var go = new GameObject("MaterialKeeper");
-            go.transform.Reset();
             go.tag = "EditorOnly";
             var mr = go.AddComponent<MeshRenderer>();
             mr.enabled = false;
