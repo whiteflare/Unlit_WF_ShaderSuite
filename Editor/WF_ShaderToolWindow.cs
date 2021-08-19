@@ -26,39 +26,106 @@ using UnityEngine;
 
 namespace UnlitWF
 {
-    internal static class MenuPathString
+    internal static class WFMenu
     {
-        public const string PATH_TOOLS = "Tools/UnlitWF/";
         public const string PATH_ASSETS = "Assets/UnlitWF Material Tools/";
 
-        public const string ASSETS_AUTOCNV = PATH_ASSETS + "Convert UnToon material";
-        public const int PRI_AUTOCNV = 1;
+        public const string ASSETS_AUTOCNV = PATH_ASSETS + "Convert UnlitWF material";
+        public const string ASSETS_CREANUP = PATH_ASSETS + "CleanUp material property";
+        public const string ASSETS_COPY = PATH_ASSETS + "Copy material property";
+        public const string ASSETS_RESET = PATH_ASSETS + "Reset material property";
+        public const string ASSETS_MIGRATION = PATH_ASSETS + "Migration material";
+        public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "Switch DebugView shader";
+        public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
+        public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials in the Scene";
+
+        public const int PRI_ASSETS_AUTOCNV = 2201;
+        public const int PRI_ASSETS_CREANUP = 2301;
+        public const int PRI_ASSETS_COPY = 2302;
+        public const int PRI_ASSETS_RESET = 2303;
+        public const int PRI_ASSETS_MIGRATION = 2304;
+        public const int PRI_ASSETS_DEBUGVIEW = 2401;
+        public const int PRI_ASSETS_TEMPLATE = 2501;
+        public const int PRI_ASSETS_KEEPMAT = 2601;
+
+        public const string PATH_TOOLS = "Tools/UnlitWF/";
 
         public const string TOOLS_CREANUP = PATH_TOOLS + "CleanUp material property";
-        public const string ASSETS_CREANUP = PATH_ASSETS + "CleanUp material property";
-        public const int PRI_CREANUP = 101;
-
         public const string TOOLS_COPY = PATH_TOOLS + "Copy material property";
-        public const string ASSETS_COPY = PATH_ASSETS + "Copy material property";
-        public const int PRI_COPY = 102;
-
         public const string TOOLS_RESET = PATH_TOOLS + "Reset material property";
-        public const string ASSETS_RESET = PATH_ASSETS + "Reset material property";
-        public const int PRI_RESET = 103;
-
         public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration material";
-        public const string ASSETS_MIGRATION = PATH_ASSETS + "Migration material";
-        public const int PRI_MIGRATION = 104;
 
-        public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "Switch DebugView shader";
-        public const string MATERIAL_DEBUGVIEW = "CONTEXT/Material/Switch WF_DebugView shader";
-        public const int PRI_DEBUGVIEW = 201;
+        public const int PRI_TOOLS_CREANUP = 101;
+        public const int PRI_TOOLS_COPY = 102;
+        public const int PRI_TOOLS_RESET = 103;
+        public const int PRI_TOOLS_MIGRATION = 104;
 
-        public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
-        public const int PRI_TEMPLATE = 301;
+        public const string PATH_MATERIAL = "CONTEXT/Material/";
 
-        public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials in the Scene";
-        public const int PRI_KEEPMAT = 401;
+        public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "Convert UnlitWF material";
+        public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView shader";
+
+        public const int PRI_MATERIAL_AUTOCNV = 1654;
+        public const int PRI_MATERIAL_DEBUGVIEW = 1655;
+
+        #region Convert UnlitWF material
+
+        [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
+        private static void Menu_AutoConvertMaterial() {
+            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
+                WFMaterialAutoConvertUtility.ExecAutoConvert(mat);
+            }
+        }
+
+        [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
+        private static void ContextMenu_AutoConvertMaterial(MenuCommand cmd) {
+            WFMaterialAutoConvertUtility.ExecAutoConvert(cmd.context as Material);
+        }
+
+        #endregion
+
+        #region Keep materials
+
+        [MenuItem(WFMenu.ASSETS_KEEPMAT, priority = WFMenu.PRI_ASSETS_KEEPMAT)]
+        private static void Menu_KeepMaterialInScene() {
+            var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
+
+            var go = new GameObject("MaterialKeeper");
+            go.tag = "EditorOnly";
+            var mr = go.AddComponent<MeshRenderer>();
+            mr.enabled = false;
+            mr.materials = mats.ToArray();
+        }
+
+        #endregion
+
+        #region DebugView
+
+        [MenuItem(WFMenu.MATERIAL_DEBUGVIEW, priority = WFMenu.PRI_MATERIAL_DEBUGVIEW)]
+        private static void ContextMenu_DebugView(MenuCommand cmd) {
+            WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, cmd.context as Material);
+        }
+
+        [MenuItem(WFMenu.ASSETS_DEBUGVIEW, priority = WFMenu.PRI_ASSETS_DEBUGVIEW)]
+        private static void Menu_DebugView() {
+            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
+                WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, mat);
+            }
+        }
+
+        #endregion
+
+        [MenuItem(WFMenu.ASSETS_AUTOCNV, validate = true)]
+        [MenuItem(WFMenu.ASSETS_CREANUP, validate = true)]
+        [MenuItem(WFMenu.ASSETS_RESET, validate = true)]
+        [MenuItem(WFMenu.ASSETS_COPY, validate = true)]
+        [MenuItem(WFMenu.ASSETS_MIGRATION, validate = true)]
+        [MenuItem(WFMenu.ASSETS_DEBUGVIEW, validate = true)]
+        [MenuItem(WFMenu.ASSETS_KEEPMAT, validate = true)]
+        private static bool MenuValidation_HasMaterials() {
+            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
+        }
+
     }
 
     internal static class ToolCommon
@@ -78,42 +145,17 @@ namespace UnlitWF
         }
     }
 
-    public class ToolMaterialKeeper
-    {
-        [MenuItem(MenuPathString.ASSETS_KEEPMAT, priority = MenuPathString.PRI_KEEPMAT)]
-        private static void KeepMaterialInScene() {
-            var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
-
-            var go = new GameObject("MaterialKeeper");
-            go.transform.Reset();
-            go.tag = "EditorOnly";
-            var mr = go.AddComponent<MeshRenderer>();
-            mr.enabled = false;
-            mr.materials = mats.ToArray();
-        }
-
-        [MenuItem(MenuPathString.ASSETS_KEEPMAT, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
-        }
-    }
-
     #region クリンナップ系
 
     public class ToolCreanUpWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_CREANUP, priority = MenuPathString.PRI_CREANUP)]
-        [MenuItem(MenuPathString.ASSETS_CREANUP, priority = MenuPathString.PRI_CREANUP)]
+        [MenuItem(WFMenu.TOOLS_CREANUP, priority = WFMenu.PRI_TOOLS_CREANUP)]
+        [MenuItem(WFMenu.ASSETS_CREANUP, priority = WFMenu.PRI_ASSETS_CREANUP)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
-        }
-
-        [MenuItem(MenuPathString.ASSETS_CREANUP, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         internal static void OpenWindowFromShaderGUI(Material[] mats) {
@@ -223,17 +265,12 @@ namespace UnlitWF
     public class ToolResetWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_RESET, priority = MenuPathString.PRI_RESET)]
-        [MenuItem(MenuPathString.ASSETS_RESET, priority = MenuPathString.PRI_RESET)]
+        [MenuItem(WFMenu.TOOLS_RESET, priority = WFMenu.PRI_TOOLS_RESET)]
+        [MenuItem(WFMenu.ASSETS_RESET, priority = WFMenu.PRI_ASSETS_RESET)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolResetWindow>("UnlitWF/Reset material property");
-        }
-
-        [MenuItem(MenuPathString.ASSETS_RESET, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         private static readonly List<Material> arguments = new List<Material>();
@@ -358,17 +395,12 @@ namespace UnlitWF
     public class ToolCopyWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_COPY, priority = MenuPathString.PRI_COPY)]
-        [MenuItem(MenuPathString.ASSETS_COPY, priority = MenuPathString.PRI_COPY)]
+        [MenuItem(WFMenu.TOOLS_COPY, priority = WFMenu.PRI_TOOLS_COPY)]
+        [MenuItem(WFMenu.ASSETS_COPY, priority = WFMenu.PRI_ASSETS_COPY)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolCopyWindow>("UnlitWF/Copy material property");
-        }
-
-        [MenuItem(MenuPathString.ASSETS_COPY, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         private static readonly List<Material> arguments = new List<Material>();
@@ -486,17 +518,12 @@ namespace UnlitWF
 
     public class ToolMigrationWindow : EditorWindow
     {
-        [MenuItem(MenuPathString.TOOLS_MIGRATION, priority = MenuPathString.PRI_MIGRATION)]
-        [MenuItem(MenuPathString.ASSETS_MIGRATION, priority = MenuPathString.PRI_MIGRATION)]
+        [MenuItem(WFMenu.TOOLS_MIGRATION, priority = WFMenu.PRI_TOOLS_MIGRATION)]
+        [MenuItem(WFMenu.ASSETS_MIGRATION, priority = WFMenu.PRI_ASSETS_MIGRATION)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolMigrationWindow>("UnlitWF/Migration material");
-        }
-
-        [MenuItem(MenuPathString.ASSETS_MIGRATION, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         private static readonly List<Material> arguments = new List<Material>();
@@ -590,20 +617,8 @@ namespace UnlitWF
 
     #endregion
 
-    public class ToolAutoConvertMaterials
+    public class WFMaterialAutoConvertUtility
     {
-        [MenuItem(MenuPathString.ASSETS_AUTOCNV, priority = MenuPathString.PRI_AUTOCNV)]
-        private static void OpenWindowFromMenu() {
-            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
-                ExecAutoConvert(mat);
-            }
-        }
-
-        [MenuItem(MenuPathString.ASSETS_AUTOCNV, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
-        }
-
         private static bool IsMatchShaderName(ConvertContext ctx, string name) {
             return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(ctx.oldMaterial.shader.name);
         }

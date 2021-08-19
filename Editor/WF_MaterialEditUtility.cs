@@ -474,7 +474,7 @@ namespace UnlitWF
         public static Dictionary<string, ShaderMaterialProperty> AsDict(Material material) {
             var result = new Dictionary<string, ShaderMaterialProperty>();
             foreach (var p in AsList(material)) {
-                result.Add(p.Name, p);
+                result[p.Name] = p;
             }
             return result;
         }
