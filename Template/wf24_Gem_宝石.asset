@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &-6123224880499273341
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UnlitWF/WF_Gem_Transparent
+  m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
+  m_ShaderKeywords: _GB_ENABLE _GF_ENABLE _GR_ENABLE
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AL_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GR_Cubemap:
+        m_Texture: {fileID: 8900000, guid: bb9610632e748424586247724588439e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AL_Fresnel: 1
+    - _AL_InvMaskVal: 0
+    - _AL_Power: 1
+    - _AL_Source: 0
+    - _AL_ZWrite: 0
+    - _AlphaBack: 0.8
+    - _AlphaFront: 0.5
+    - _BumpScale: 1
+    - _CurrentVersion: 0
+    - _FallBack: 0
+    - _GB_BackCulllMode: 1
+    - _GB_Enable: 1
+    - _GF_BlendNormal: 0.1
+    - _GF_Enable: 1
+    - _GF_FlakeBrighten: 4
+    - _GF_FlakeDarken: 0.2
+    - _GF_FlakeShear: 0.5
+    - _GF_FlakeSizeBack: 0.25
+    - _GF_FlakeSizeFront: 0.1
+    - _GF_Twinkle: 2
+    - _GL_BlendPower: 0.8
+    - _GL_CustomAltitude: 45
+    - _GL_CustomAzimuth: 0
+    - _GL_DisableBackLit: 0
+    - _GL_DisableBasePos: 0
+    - _GL_LevelMax: 0.8
+    - _GL_LevelMin: 0.12499998
+    - _GL_LightMode: 0
+    - _GR_BlendNormal: 0.1
+    - _GR_Brightness: 0
+    - _GR_CubemapHighCut: 0
+    - _GR_CubemapPower: 1
+    - _GR_Enable: 1
+    - _GR_Monochrome: 1
+    - _GR_Power: 1
+    - _NM_Enable: 0
+    - _NM_FlipMirror: 0
+    - _UseVertexColor: 0
+    m_Colors:
+    - _Color: {r: 0.6952468, g: 0.64161134, b: 1, a: 1}
+    - _GB_ColorBack: {r: 0.3948571, g: 0.29400003, b: 1, a: 1}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e2b056a1e7bff1489e0ce6676d2ac92, type: 3}
+  m_Name: "wf24_Gem_\u5B9D\u77F3"
+  m_EditorClassIdentifier: 
+  memo: "\u5C0F\u3055\u306A\u5B9D\u77F3\u306B\u4F7F\u7528\u53EF\u80FD\u306A\u30B8\u30A7\u30E0\u30B7\u30A7\u30FC\u30C0\u306E\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
+  material: {fileID: -6123224880499273341}

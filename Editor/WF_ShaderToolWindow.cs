@@ -20,32 +20,113 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using System.Text.RegularExpressions;
+using UnityEditor;
 using UnityEngine;
 
 namespace UnlitWF
 {
-    internal static class MenuPathString
+    internal static class WFMenu
     {
-        public const string PATH_TOOLS = "Tools/UnlitWF/";
         public const string PATH_ASSETS = "Assets/UnlitWF Material Tools/";
 
-        public const string TOOLS_CREANUP = PATH_TOOLS + "CleanUp material property";
+        public const string ASSETS_AUTOCNV = PATH_ASSETS + "Convert UnlitWF material";
         public const string ASSETS_CREANUP = PATH_ASSETS + "CleanUp material property";
-
-        public const string TOOLS_RESET = PATH_TOOLS + "Reset material property";
-        public const string ASSETS_RESET = PATH_ASSETS + "Reset material property";
-
-        public const string TOOLS_COPY = PATH_TOOLS + "Copy material property";
         public const string ASSETS_COPY = PATH_ASSETS + "Copy material property";
-
-        public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration material";
+        public const string ASSETS_RESET = PATH_ASSETS + "Reset material property";
         public const string ASSETS_MIGRATION = PATH_ASSETS + "Migration material";
-
-        public const string TOOLS_DEBUGVIEW = PATH_TOOLS + "Switch DebugView shader";
         public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "Switch DebugView shader";
-        public const string MATERIAL_DEBUGVIEW = "CONTEXT/Material/Switch WF_DebugView shader";
+        public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
+        public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials in the Scene";
+
+        public const int PRI_ASSETS_AUTOCNV = 2201;
+        public const int PRI_ASSETS_CREANUP = 2301;
+        public const int PRI_ASSETS_COPY = 2302;
+        public const int PRI_ASSETS_RESET = 2303;
+        public const int PRI_ASSETS_MIGRATION = 2304;
+        public const int PRI_ASSETS_DEBUGVIEW = 2401;
+        public const int PRI_ASSETS_TEMPLATE = 2501;
+        public const int PRI_ASSETS_KEEPMAT = 2601;
+
+        public const string PATH_TOOLS = "Tools/UnlitWF/";
+
+        public const string TOOLS_CREANUP = PATH_TOOLS + "CleanUp material property";
+        public const string TOOLS_COPY = PATH_TOOLS + "Copy material property";
+        public const string TOOLS_RESET = PATH_TOOLS + "Reset material property";
+        public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration material";
+
+        public const int PRI_TOOLS_CREANUP = 101;
+        public const int PRI_TOOLS_COPY = 102;
+        public const int PRI_TOOLS_RESET = 103;
+        public const int PRI_TOOLS_MIGRATION = 104;
+
+        public const string PATH_MATERIAL = "CONTEXT/Material/";
+
+        public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "Convert UnlitWF material";
+        public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView shader";
+
+        public const int PRI_MATERIAL_AUTOCNV = 1654;
+        public const int PRI_MATERIAL_DEBUGVIEW = 1655;
+
+        #region Convert UnlitWF material
+
+        [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
+        private static void Menu_AutoConvertMaterial() {
+            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
+                WFMaterialAutoConvertUtility.ExecAutoConvert(mat);
+            }
+        }
+
+        [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
+        private static void ContextMenu_AutoConvertMaterial(MenuCommand cmd) {
+            WFMaterialAutoConvertUtility.ExecAutoConvert(cmd.context as Material);
+        }
+
+        #endregion
+
+        #region Keep materials
+
+        [MenuItem(WFMenu.ASSETS_KEEPMAT, priority = WFMenu.PRI_ASSETS_KEEPMAT)]
+        private static void Menu_KeepMaterialInScene() {
+            var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
+
+            var go = new GameObject("MaterialKeeper");
+            go.transform.Reset();
+            go.tag = "EditorOnly";
+            var mr = go.AddComponent<MeshRenderer>();
+            mr.enabled = false;
+            mr.materials = mats.ToArray();
+        }
+
+        #endregion
+
+        #region DebugView
+
+        [MenuItem(WFMenu.MATERIAL_DEBUGVIEW, priority = WFMenu.PRI_MATERIAL_DEBUGVIEW)]
+        private static void ContextMenu_DebugView(MenuCommand cmd) {
+            WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, cmd.context as Material);
+        }
+
+        [MenuItem(WFMenu.ASSETS_DEBUGVIEW, priority = WFMenu.PRI_ASSETS_DEBUGVIEW)]
+        private static void Menu_DebugView() {
+            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
+                WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, mat);
+            }
+        }
+
+        #endregion
+
+        [MenuItem(WFMenu.ASSETS_AUTOCNV, validate = true)]
+        [MenuItem(WFMenu.ASSETS_CREANUP, validate = true)]
+        [MenuItem(WFMenu.ASSETS_RESET, validate = true)]
+        [MenuItem(WFMenu.ASSETS_COPY, validate = true)]
+        [MenuItem(WFMenu.ASSETS_MIGRATION, validate = true)]
+        [MenuItem(WFMenu.ASSETS_DEBUGVIEW, validate = true)]
+        [MenuItem(WFMenu.ASSETS_KEEPMAT, validate = true)]
+        private static bool MenuValidation_HasMaterials() {
+            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
+        }
+
     }
 
     internal static class ToolCommon
@@ -67,27 +148,15 @@ namespace UnlitWF
 
     #region クリンナップ系
 
-    public class CleanUpParameter : ScriptableObject
-    {
-        public Material[] materials = { null };
-        public bool resetUnused = false;
-        public bool resetKeywords = false;
-    }
-
     public class ToolCreanUpWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_CREANUP)]
-        [MenuItem(MenuPathString.ASSETS_CREANUP)]
+        [MenuItem(WFMenu.TOOLS_CREANUP, priority = WFMenu.PRI_TOOLS_CREANUP)]
+        [MenuItem(WFMenu.ASSETS_CREANUP, priority = WFMenu.PRI_ASSETS_CREANUP)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
-        }
-
-        [MenuItem(MenuPathString.ASSETS_CREANUP, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         internal static void OpenWindowFromShaderGUI(Material[] mats) {
@@ -105,7 +174,7 @@ namespace UnlitWF
 
         private void OnEnable() {
             minSize = new Vector2(480, 640);
-            param = ScriptableObject.CreateInstance<CleanUpParameter>();
+            param = CleanUpParameter.Create();
             if (0 < arguments.Count) {
                 param.materials = arguments.ToArray();
             }
@@ -181,7 +250,7 @@ namespace UnlitWF
             }
 
             if (GUILayout.Button("CleanUp")) {
-                new WFMaterialEditUtility().CleanUpProperties(param);
+                WFMaterialEditUtility.CleanUpProperties(param);
             }
             EditorGUILayout.Space();
 
@@ -194,32 +263,15 @@ namespace UnlitWF
 
     #region リセット系
 
-    internal class ResetParameter : ScriptableObject
-    {
-        public Material[] materials = { null };
-        public bool resetColor = false;
-        public bool resetFloat = false;
-        public bool resetTexture = false;
-        public bool resetColorAlpha = false;
-        public bool resetLit = false;
-        public bool resetUnused = false;
-        public bool resetKeywords = false;
-    }
-
     public class ToolResetWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_RESET)]
-        [MenuItem(MenuPathString.ASSETS_RESET)]
+        [MenuItem(WFMenu.TOOLS_RESET, priority = WFMenu.PRI_TOOLS_RESET)]
+        [MenuItem(WFMenu.ASSETS_RESET, priority = WFMenu.PRI_ASSETS_RESET)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolResetWindow>("UnlitWF/Reset material property");
-        }
-
-        [MenuItem(MenuPathString.ASSETS_RESET, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         private static readonly List<Material> arguments = new List<Material>();
@@ -231,7 +283,7 @@ namespace UnlitWF
 
         private void OnEnable() {
             minSize = new Vector2(480, 640);
-            param = ScriptableObject.CreateInstance<ResetParameter>();
+            param = ResetParameter.Create();
             if (0 < arguments.Count) {
                 param.materials = arguments.ToArray();
             }
@@ -328,7 +380,7 @@ namespace UnlitWF
             }
 
             if (GUILayout.Button("Reset Values")) {
-                new WFMaterialEditUtility().ResetProperties(param);
+                WFMaterialEditUtility.ResetProperties(param);
             }
             EditorGUILayout.Space();
 
@@ -341,27 +393,15 @@ namespace UnlitWF
 
     #region コピー系
 
-    internal class CopyPropParameter : ScriptableObject
-    {
-        public Material materialSource = null;
-        public Material[] materialDestination = { null };
-        public string[] functions = { };
-    }
-
     public class ToolCopyWindow : EditorWindow
     {
 
-        [MenuItem(MenuPathString.TOOLS_COPY)]
-        [MenuItem(MenuPathString.ASSETS_COPY)]
+        [MenuItem(WFMenu.TOOLS_COPY, priority = WFMenu.PRI_TOOLS_COPY)]
+        [MenuItem(WFMenu.ASSETS_COPY, priority = WFMenu.PRI_ASSETS_COPY)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolCopyWindow>("UnlitWF/Copy material property");
-        }
-
-        [MenuItem(MenuPathString.ASSETS_COPY, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         private static readonly List<Material> arguments = new List<Material>();
@@ -373,7 +413,7 @@ namespace UnlitWF
 
         private void OnEnable() {
             minSize = new Vector2(480, 640);
-            param = ScriptableObject.CreateInstance<CopyPropParameter>();
+            param = CopyPropParameter.Create();
             if (0 < arguments.Count) {
                 param.materialDestination = arguments.ToArray();
             }
@@ -442,16 +482,14 @@ namespace UnlitWF
             EditorGUILayout.LabelField("copy target functions", EditorStyles.boldLabel);
 
             var updatedFunctions = new List<string>();
-            foreach (var func in WFShaderDictionary.ShaderFuncList) {
-                if (func.Contains(param.materialSource)) {
-                    bool value = param.functions.Contains(func.Label);
-                    if (GUILayout.Toggle(value, string.Format("[{0}] {1}", func.Label, func.Name))) {
-                        updatedFunctions.Add(func.Label);
-                    }
+            foreach (var func in WFShaderFunction.GetEnableFunctionList(param.materialSource)) {
+                bool value = param.labels.Contains(func.Label);
+                if (GUILayout.Toggle(value, string.Format("[{0}] {1}", func.Label, func.Name))) {
+                    updatedFunctions.Add(func.Label);
                 }
             }
-            if (!updatedFunctions.SequenceEqual(param.functions)) {
-                param.functions = updatedFunctions.ToArray();
+            if (!updatedFunctions.SequenceEqual(param.labels)) {
+                param.labels = updatedFunctions.ToArray();
             }
 
             EditorGUILayout.Space();
@@ -464,9 +502,9 @@ namespace UnlitWF
                 param.materialDestination = newlist.ToArray();
             }
 
-            using (new EditorGUI.DisabledGroupScope(param.functions.Length == 0)) {
+            using (new EditorGUI.DisabledGroupScope(param.labels.Length == 0)) {
                 if (GUILayout.Button("Copy Values")) {
-                    new WFMaterialEditUtility().CopyProperties(param);
+                    WFMaterialEditUtility.CopyProperties(param);
                 }
             }
             EditorGUILayout.Space();
@@ -479,24 +517,14 @@ namespace UnlitWF
 
     #region マイグレーション系
 
-    internal class MigrationParameter : ScriptableObject
-    {
-        public Material[] materials = { null };
-    }
-
     public class ToolMigrationWindow : EditorWindow
     {
-        [MenuItem(MenuPathString.TOOLS_MIGRATION)]
-        [MenuItem(MenuPathString.ASSETS_MIGRATION)]
+        [MenuItem(WFMenu.TOOLS_MIGRATION, priority = WFMenu.PRI_TOOLS_MIGRATION)]
+        [MenuItem(WFMenu.ASSETS_MIGRATION, priority = WFMenu.PRI_ASSETS_MIGRATION)]
         private static void OpenWindowFromMenu() {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolMigrationWindow>("UnlitWF/Migration material");
-        }
-
-        [MenuItem(MenuPathString.ASSETS_MIGRATION, validate = true)]
-        private static bool OpenWindowFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
         private static readonly List<Material> arguments = new List<Material>();
@@ -508,7 +536,7 @@ namespace UnlitWF
 
         private void OnEnable() {
             minSize = new Vector2(480, 640);
-            param = ScriptableObject.CreateInstance<MigrationParameter>();
+            param = MigrationParameter.Create();
             if (0 < arguments.Count) {
                 param.materials = arguments.ToArray();
             }
@@ -573,7 +601,7 @@ namespace UnlitWF
             }
 
             if (GUILayout.Button("Convert")) {
-                if (new WFMaterialEditUtility().RenameOldNameProperties(param)) {
+                if (WFMaterialEditUtility.RenameOldNameProperties(param)) {
                     // ShaderGUI側のマテリアルキャッシュをリセット
                     ShaderCustomEditor.ResetOldMaterialTable();
                     // 変更したマテリアルを保存
@@ -590,270 +618,259 @@ namespace UnlitWF
 
     #endregion
 
-    internal class WFMaterialEditUtility
+    public class WFMaterialAutoConvertUtility
     {
-        #region マイグレーション
-
-        public bool ExistsOldNameProperty(params Material[] mats) {
-            return 0 < CreateOldNamePropertyList(mats).Count;
+        private static bool IsMatchShaderName(ConvertContext ctx, string name) {
+            return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(ctx.oldMaterial.shader.name);
         }
 
-        public bool RenameOldNameProperties(MigrationParameter param) {
-            return RenameOldNameProperties(param.materials);
-        }
-
-        public bool RenameOldNameProperties(Material[] mats) {
-            Undo.RecordObjects(mats, "WF Migration materials");
-
-            var oldPropList = CreateOldNamePropertyList(mats);
-            // 名称を全て変更
-            foreach (var propPair in oldPropList) {
-                if (propPair.after != null) {
-                    propPair.before.CopyTo(propPair.after);
-                    propPair.onAfterCopy(propPair.after);
+        private static readonly List<Func<ConvertContext, bool>> selectShader = new List<Func<ConvertContext, bool>>() {
+            ctx => {
+                // アウトライン有無を判定する
+                if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {
+                    ctx.outline = true;
                 }
-            }
-            // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Select(p => p.after));
-            // 旧プロパティは全て削除
-            foreach (var prop in oldPropList.Select(p => p.before)) {
-                prop.Remove();
-            }
-            // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(oldPropList.Select(p => p.before));
-            // シェーダキーワードを整理
-            WFCommonUtility.SetupShaderKeyword(mats);
-
-            return 0 < oldPropList.Count;
-        }
-
-        private List<OldNameProperty> CreateOldNamePropertyList(Material[] mats) {
-            var result = new List<OldNameProperty>();
-
-            foreach (var mat in mats) {
-                if (mat.shader.name.Contains("MatcapShadows")) {
-                    // MatcapShadowsは古いので対象にしない
-                    continue;
+                else if (HasCustomValueTexture(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler")) {
+                    ctx.outline = true;
                 }
-                var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var pair in WFShaderDictionary.OldPropNameToNewPropNameList) {
-                    var before = props.GetValueOrNull(pair.beforeName);
-                    if (before != null) {
-                        result.Add(new OldNameProperty(before, props.GetValueOrNull(pair.afterName), pair.onAfterCopy));
+                else if (HasCustomValueFloat(ctx, "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
+                    ctx.outline = true;
+                }
+                return false; // まだ決まっていない
+            },
+            ctx => {
+                // シェーダ名からシェーダタイプを判定する
+                if (ctx.renderType == ShaderType.NoMatch) {
+                    if (IsMatchShaderName(ctx, "opaque") || IsMatchShaderName(ctx, "texture")) {
+                        ctx.renderType = ShaderType.Opaque;
+                    }
+                    else if (IsMatchShaderName(ctx, "cutout")) {
+                        ctx.renderType = ShaderType.Cutout;
+                    }
+                    else if (IsMatchShaderName(ctx, "trans")) {
+                        ctx.renderType = ShaderType.Transparent;
                     }
                 }
+                return false;
+            },
+            ctx => {
+                // RenderQueue からシェーダタイプを判定する
+                if (ctx.renderType == ShaderType.NoMatch) {
+                    var queue = ctx.oldMaterial.renderQueue;
+                    if (queue < 0) {
+                        queue = ctx.oldMaterial.shader.renderQueue;
+                    }
+                    if (queue < 2450) {
+                        ctx.renderType = ShaderType.Opaque;
+                    } else if (queue < 2500) {
+                        ctx.renderType = ShaderType.Cutout;
+                    } else {
+                        ctx.renderType = ShaderType.Transparent;
+                    }
+                }
+                return false;
+            },
+            ctx => {
+                if (IsURP()) {
+                    switch(ctx.renderType) {
+                        case ShaderType.Transparent:
+                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Transparent", ctx.target);
+                            break;
+                        case ShaderType.Cutout:
+                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_TransCutout", ctx.target);
+                            break;
+                        default:
+                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Opaque", ctx.target);
+                            break;
+                    }
+                }
+                else if (ctx.outline) {
+                    switch(ctx.renderType) {
+                        case ShaderType.Transparent:
+                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", ctx.target);
+                            break;
+                        case ShaderType.Cutout:
+                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout", ctx.target);
+                            break;
+                        default:
+                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", ctx.target);
+                            break;
+                    }
+                } else {
+                    switch(ctx.renderType) {
+                        case ShaderType.Transparent:
+                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Transparent", ctx.target);
+                            break;
+                        case ShaderType.Cutout:
+                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_TransCutout", ctx.target);
+                            break;
+                        default:
+                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Opaque", ctx.target);
+                            break;
+                    }
+                }
+                return true;
+            },
+        };
+
+        private static readonly List<Action<ConvertContext>> selectFeature = new List<Action<ConvertContext>>() {
+            ctx => {
+                // アルファマスク
+                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                    new PropertyNameReplacement("_AlphaMask", "_AL_MaskTex"),
+                    new PropertyNameReplacement("_ClippingMask", "_AL_MaskTex"));
+                if (HasCustomValueTexture(ctx, "_AL_MaskTex")) {
+                    ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
+                }
+            },
+            ctx => {
+                // ノーマルマップ
+                if (HasCustomValueTexture(ctx, "_BumpMap", "_DetailNormalMap")) {
+                    ctx.target.SetInt("_NM_Enable", 1);
+                }
+            },
+            ctx => {
+                // メタリック
+                if (HasCustomValueTexture(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
+                    ctx.target.SetInt("_MT_Enable", 1);
+                }
+            },
+            ctx => {
+                // AO
+                if (HasCustomValueTexture(ctx, "_OcclusionMap")) {
+                    ctx.target.SetInt("_AO_Enable", 1);
+                }
+            },
+            ctx => {
+                // Emission
+                if (HasCustomValueTexture(ctx, "_EmissionMap") || HasCustomValueFloat(ctx, "_UseEmission", "_EmissionEnable")) {
+                    ctx.target.SetInt("_ES_Enable", 1);
+                }
+            },
+            ctx => {
+                // Toon影
+                ctx.target.SetInt("_TS_Enable", 1);
+                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                    // 1影
+                    new PropertyNameReplacement("_1st_ShadeMap", "_TS_1stTex"),
+                    new PropertyNameReplacement("_ShadowColorTex", "_TS_1stTex"),
+                    new PropertyNameReplacement("_1st_ShadeColor", "_TS_1stColor"),
+                    new PropertyNameReplacement("_ShadowColor", "_TS_1stColor"),
+                    // 2影
+                    new PropertyNameReplacement("_2nd_ShadeMap", "_TS_2ndTex"),
+                    new PropertyNameReplacement("_Shadow2ndColorTex", "_TS_2ndTex"),
+                    new PropertyNameReplacement("_2nd_ShadeColor", "_TS_2ndColor"),
+                    new PropertyNameReplacement("_Shadow2ndColor", "_TS_2ndColor")
+                    );
+            },
+            ctx => {
+                // リムライト
+                if (HasCustomValueFloat(ctx, "_UseRim", "_RimLight", "_RimLitEnable")) {
+                    ctx.target.SetInt("_TR_Enable", 1);
+                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                        new PropertyNameReplacement("_RimColor", "_TR_Color"),
+                        new PropertyNameReplacement("_RimLitColor", "_TR_Color"),
+                        new PropertyNameReplacement("_RimLightColor", "_TR_Color"),
+                        new PropertyNameReplacement("_RimLitMask", "_TR_MaskTex"),
+                        new PropertyNameReplacement("_RimBlendMask", "_TR_MaskTex"),
+                        new PropertyNameReplacement("_Set_RimLightMask", "_TR_Color")
+                        );
+                }
+            },
+            ctx => {
+                // アウトライン
+                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                    new PropertyNameReplacement("_OutlineColor", "_TL_LineColor"),
+                    new PropertyNameReplacement("_Outline_Color", "_TL_LineColor"),
+                    new PropertyNameReplacement("_OutLineColor", "_TL_LineColor"),
+                    // ColorTex
+                    new PropertyNameReplacement("_OutlineTex", "_TL_CustomColorTex"),
+                    new PropertyNameReplacement("_OutLineTexture", "_TL_CustomColorTex"),
+                    new PropertyNameReplacement("_OutlineTexture", "_TL_CustomColorTex"),
+                    // MaskTex
+                    new PropertyNameReplacement("_OutlineWidthMask", "_TL_MaskTex"),
+                    new PropertyNameReplacement("_Outline_Sampler", "_TL_MaskTex"),
+                    new PropertyNameReplacement("_OutlineMask", "_TL_MaskTex"),
+                    new PropertyNameReplacement("_OutLineMask", "_TL_MaskTex")
+                    );
+            },
+            ctx => {
+                // アルファをリセットし、キーワードを整理する
+                var resetParam = new ResetParameter();
+                resetParam.materials = new Material[]{ ctx.target };
+                resetParam.resetColorAlpha = true;
+                WFMaterialEditUtility.ResetPropertiesWithoutUndo(resetParam);
+            },
+        };
+
+        public static void ExecAutoConvert(Material mat) {
+            if (mat == null || mat.shader.name.Contains("UnlitWF")) {
+                return;
             }
 
-            return result;
+            var ctx = new ConvertContext();
+            ctx.target = mat;
+            ctx.oldMaterial = new Material(mat);
+            ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
+
+            foreach (var cnv in selectShader) {
+                if (cnv(ctx)) {
+                    foreach (var act in selectFeature) {
+                        act(ctx);
+                    }
+                    Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+                    return;
+                }
+            }
         }
 
-        public struct OldNameProperty
+        private class ConvertContext
         {
-            public readonly ShaderSerializedProperty before;
-            public readonly ShaderSerializedProperty after;
-            public readonly Action<ShaderSerializedProperty> onAfterCopy;
+            public Material target;
+            public Material oldMaterial;
+            public Dictionary<string, ShaderSerializedProperty> oldProps;
 
-            public OldNameProperty(ShaderSerializedProperty before, ShaderSerializedProperty after, Action<ShaderSerializedProperty> onAfterCopy) {
-                this.before = before;
-                this.after = after;
-                this.onAfterCopy = onAfterCopy ?? (p => { });
-            }
-
-            public OldNameProperty(ShaderSerializedProperty before, ShaderSerializedProperty after) : this(before, after, null) {
-            }
+            public ShaderType renderType = ShaderType.NoMatch;
+            public bool outline = false;
         }
 
-        #endregion
-
-        #region コピー
-
-        public void CopyProperties(CopyPropParameter param) {
-            if (param.materialSource == null) {
-                return;
-            }
-            var src_props = new List<ShaderMaterialProperty>();
-
-            var copy_target = WFShaderFunction.LabelToPrefix(param.functions.ToList());
-
-            foreach (var src_prop in ShaderMaterialProperty.AsList(param.materialSource)) {
-                string label = WFCommonUtility.GetPrefixFromPropName(src_prop.Name);
-                if (label == null) {
-                    continue;
-                }
-                // ラベルの一致判定
-                if (copy_target.Any(label.Contains)) {
-                    src_props.Add(src_prop);
-                }
-            }
-            if (src_props.Count == 0) {
-                return;
-            }
-
-            Undo.RecordObjects(param.materialDestination, "WF copy materials");
-
-            for (int i = 0; i < param.materialDestination.Length; i++) {
-                var dst = param.materialDestination[i];
-                if (dst == null || dst == param.materialSource) { // コピー先とコピー元が同じ時もコピーしない
-                    continue;
-                }
-                var dst_props = ShaderMaterialProperty.AsDict(dst);
-
-                // コピー
-                if (CopyProperties(src_props, dst_props)) {
-                    // キーワードを整理する
-                    WFCommonUtility.SetupShaderKeyword(dst);
-                    // ダーティフラグを付ける
-                    EditorUtility.SetDirty(dst);
-                }
-            }
-            AssetDatabase.SaveAssets();
+        private enum ShaderType
+        {
+            NoMatch, Opaque, Cutout, Transparent
         }
 
-        private bool CopyProperties(List<ShaderMaterialProperty> src, Dictionary<string, ShaderMaterialProperty> dst) {
-            var changed = false;
-            foreach (var src_prop in src) {
-                ShaderMaterialProperty dst_prop;
-                if (dst.TryGetValue(src_prop.Name, out dst_prop)) {
-                    changed |= src_prop.CopyTo(dst_prop);
+        private static bool HasCustomValueFloat(ConvertContext ctx, params string[] names) {
+            foreach (var name in names) {
+                if (ctx.oldProps.TryGetValue(name, out var prop)) {
+                    if (prop.Type == ShaderUtil.ShaderPropertyType.Float || prop.Type == ShaderUtil.ShaderPropertyType.Range) {
+                        return 0.001f < Mathf.Abs(prop.FloatValue);
+                    }
                 }
             }
-            return changed;
+            return false;
         }
 
-        #endregion
-
-        #region リセット・クリーンナップ
-
-        public void CleanUpProperties(CleanUpParameter param) {
-            Undo.RecordObjects(param.materials, "WF cleanup materials");
-
-            foreach (Material material in param.materials) {
-                if (material == null) {
-                    continue;
-                }
-                var props = ShaderSerializedProperty.AsList(material);
-
-                // 無効になってる機能のプレフィックスを集める
-                var delPrefix = new List<string>();
-                foreach (var p in props) {
-                    string label, name;
-                    WFCommonUtility.FormatPropName(p.name, out label, out name);
-                    if (label != null && name.ToLower() == "enable" && p.FloatValue == 0) {
-                        delPrefix.Add(label);
+        private static bool HasCustomValueTexture(ConvertContext ctx, params string[] names) {
+            foreach (var name in names) {
+                if (ctx.oldProps.TryGetValue(name, out var prop)) {
+                    if (prop.Type == ShaderUtil.ShaderPropertyType.TexEnv) {
+                        var tex = prop.TextureValue;
+                        if (tex != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex))) {
+                            return true;
+                        }
                     }
                 }
-
-                var del_props = new HashSet<ShaderSerializedProperty>();
-
-                // プレフィックスに合致する設定値を消去
-                Predicate<ShaderSerializedProperty> predPrefix = p => {
-                    string label = WFCommonUtility.GetPrefixFromPropName(p.name);
-                    return label != null && delPrefix.Contains(label);
-                };
-                props.FindAll(predPrefix)
-                    // ただしEnableToggle自体は初期化しない
-                    .Where(p => !WFCommonUtility.IsEnableToggleFromPropName(p.name)).ToList().ForEach(p => del_props.Add(p));
-                // 未使用の値を削除
-                Predicate<ShaderSerializedProperty> predUnused = p => param.resetUnused && !p.HasPropertyInShader;
-                props.FindAll(predUnused).ForEach(p => del_props.Add(p));
-                // 削除実行
-                DeleteProperties(del_props);
-
-                // キーワードクリア
-                if (param.resetKeywords) {
-                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props)) {
-                        DeleteShaderKeyword(so);
-                    }
-                }
-
-                // キーワードを整理する
-                WFCommonUtility.SetupShaderKeyword(material);
-                // 反映
-                EditorUtility.SetDirty(material);
             }
+            return false;
         }
 
-        public void ResetProperties(ResetParameter param) {
-            Undo.RecordObjects(param.materials, "WF reset materials");
-
-            foreach (Material material in param.materials) {
-                if (material == null) {
-                    continue;
-                }
-
-                var props = ShaderSerializedProperty.AsList(material);
-                var del_props = new HashSet<ShaderSerializedProperty>();
-
-                // ColorのAlphaチャンネルのみ変更
-                foreach (var p in props) {
-                    if (p.HasPropertyInShader && p.Type == ShaderUtil.ShaderPropertyType.Color) {
-                        var c = p.ColorValue;
-                        c.a = 1;
-                        p.ColorValue = c;
-                    }
-                }
-                ShaderSerializedProperty.AllApplyPropertyChange(props);
-
-                // 条件に合致するプロパティを削除
-                foreach (var p in props) {
-                    if (param.resetColor && p.ParentName == "m_Colors") {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetFloat && p.ParentName == "m_Floats") {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetTexture && p.ParentName == "m_TexEnvs") {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetUnused && !p.HasPropertyInShader) {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetLit && p.name.StartsWith("_GL_")) {
-                        del_props.Add(p);
-                    }
-                }
-                // 削除実行
-                DeleteProperties(del_props);
-
-                // キーワードクリア
-                if (param.resetKeywords) {
-                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props)) {
-                        DeleteShaderKeyword(so);
-                    }
-                }
-
-                // キーワードを整理する
-                WFCommonUtility.SetupShaderKeyword(material);
-                // 反映
-                EditorUtility.SetDirty(material);
-            }
+        private static bool IsURP() {
+#if UNITY_2019_1_OR_NEWER
+            return UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
+#else
+            return false;
+#endif
         }
-
-        private void DeleteProperties(IEnumerable<ShaderSerializedProperty> props) {
-            var del_names = new HashSet<string>();
-            foreach (var p in props) {
-                del_names.Add(p.name);
-                p.Remove();
-            }
-            if (0 < del_names.Count) {
-                var names = new List<string>(del_names);
-                names.Sort();
-                UnityEngine.Debug.Log("[WF][Tool] Deleted Property: " + string.Join(", ", names.ToArray()));
-            }
-            ShaderSerializedProperty.AllApplyPropertyChange(props);
-        }
-
-        public void DeleteShaderKeyword(SerializedObject so) {
-            var prop = so.FindProperty("m_ShaderKeywords");
-            if (prop == null || string.IsNullOrEmpty(prop.stringValue)) {
-                return;
-            }
-            UnityEngine.Debug.Log("[WF][Tool] Deleted Shaderkeyword: " + prop.stringValue);
-            prop.stringValue = "";
-            so.ApplyModifiedProperties();
-        }
-
-        #endregion
     }
 }
 
