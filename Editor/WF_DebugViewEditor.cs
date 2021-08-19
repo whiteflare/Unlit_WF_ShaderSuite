@@ -29,25 +29,9 @@ namespace UnlitWF
     public class WF_DebugViewEditor : ShaderGUI
     {
         public const string SHADER_NAME_DEBUGVIEW = "UnlitWF/Debug/WF_DebugView";
+
         public const string TAG_PREV_SHADER = "PrevShader";
         public const string TAG_PREV_QUEUE = "PrevQueue";
-
-        [MenuItem(MenuPathString.MATERIAL_DEBUGVIEW)]
-        public static void ChangeFromMenu(MenuCommand cmd) {
-            WFCommonUtility.ChangeShader(SHADER_NAME_DEBUGVIEW, cmd.context as Material);
-        }
-
-        [MenuItem(MenuPathString.ASSETS_DEBUGVIEW, priority = MenuPathString.PRI_DEBUGVIEW)]
-        private static void ChangeFromMenu() {
-            foreach(var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
-                WFCommonUtility.ChangeShader(SHADER_NAME_DEBUGVIEW, mat);
-            }
-        }
-
-        [MenuItem(MenuPathString.ASSETS_DEBUGVIEW, validate = true)]
-        private static bool ChangeFromMenuValidation() {
-            return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
-        }
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
             PreChangeShader(material, oldShader, newShader);
