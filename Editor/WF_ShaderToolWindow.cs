@@ -623,7 +623,7 @@ namespace UnlitWF
             return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(ctx.oldMaterial.shader.name);
         }
 
-        private static readonly List<Func<ConvertContext, bool>> selectShader = new List<Func<ConvertContext, bool>>() {
+        private static readonly List<Action<ConvertContext>> selectShader = new List<Action<ConvertContext>>() {
             ctx => {
                 // アウトライン有無を判定する
                 if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {
@@ -635,7 +635,6 @@ namespace UnlitWF
                 else if (HasCustomValueFloat(ctx, "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
                     ctx.outline = true;
                 }
-                return false; // まだ決まっていない
             },
             ctx => {
                 // シェーダ名からシェーダタイプを判定する
@@ -650,7 +649,6 @@ namespace UnlitWF
                         ctx.renderType = ShaderType.Transparent;
                     }
                 }
-                return false;
             },
             ctx => {
                 // RenderQueue からシェーダタイプを判定する
@@ -667,7 +665,6 @@ namespace UnlitWF
                         ctx.renderType = ShaderType.Transparent;
                     }
                 }
-                return false;
             },
             ctx => {
                 if (IsURP()) {
@@ -708,11 +705,16 @@ namespace UnlitWF
                             break;
                     }
                 }
-                return true;
             },
         };
 
         private static readonly List<Action<ConvertContext>> selectFeature = new List<Action<ConvertContext>>() {
+            ctx => {
+                if (HasCustomValueTexture(ctx, "_MainTex")) {
+                    // メインテクスチャがあるならば _Color は白にする
+                    ctx.target.SetColor("_Color", Color.white);
+                }
+            },
             ctx => {
                 // アルファマスク
                 WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
@@ -742,7 +744,7 @@ namespace UnlitWF
             },
             ctx => {
                 // Emission
-                if (HasCustomValueTexture(ctx, "_EmissionMap") || HasCustomValueFloat(ctx, "_UseEmission", "_EmissionEnable")) {
+                if (HasCustomValueTexture(ctx, "_EmissionMap") || HasCustomValueFloat(ctx, "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
                     ctx.target.SetInt("_ES_Enable", 1);
                 }
             },
@@ -761,10 +763,14 @@ namespace UnlitWF
                     new PropertyNameReplacement("_2nd_ShadeColor", "_TS_2ndColor"),
                     new PropertyNameReplacement("_Shadow2ndColor", "_TS_2ndColor")
                     );
+                // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
+                if (HasCustomValueTexture(ctx, "_1st_ShadeMap", "_ShadowColorTex", "_2nd_ShadeMap", "_Shadow2ndColorTex")) {
+                    ctx.target.SetTexture("_TS_BaseTex", ctx.target.GetTexture("_MainTex"));
+                }
             },
             ctx => {
                 // リムライト
-                if (HasCustomValueFloat(ctx, "_UseRim", "_RimLight", "_RimLitEnable")) {
+                if (HasCustomValueFloat(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
                     ctx.target.SetInt("_TR_Enable", 1);
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         new PropertyNameReplacement("_RimColor", "_TR_Color"),
@@ -772,7 +778,8 @@ namespace UnlitWF
                         new PropertyNameReplacement("_RimLightColor", "_TR_Color"),
                         new PropertyNameReplacement("_RimLitMask", "_TR_MaskTex"),
                         new PropertyNameReplacement("_RimBlendMask", "_TR_MaskTex"),
-                        new PropertyNameReplacement("_Set_RimLightMask", "_TR_Color")
+                        new PropertyNameReplacement("_Set_RimLightMask", "_TR_Color"),
+                        new PropertyNameReplacement("_RimMask", "_TR_Color")
                         );
                 }
             },
@@ -782,6 +789,7 @@ namespace UnlitWF
                     new PropertyNameReplacement("_OutlineColor", "_TL_LineColor"),
                     new PropertyNameReplacement("_Outline_Color", "_TL_LineColor"),
                     new PropertyNameReplacement("_OutLineColor", "_TL_LineColor"),
+                    new PropertyNameReplacement("_LineColor", "_TL_LineColor"),
                     // ColorTex
                     new PropertyNameReplacement("_OutlineTex", "_TL_CustomColorTex"),
                     new PropertyNameReplacement("_OutLineTexture", "_TL_CustomColorTex"),
@@ -798,6 +806,8 @@ namespace UnlitWF
                 var resetParam = new ResetParameter();
                 resetParam.materials = new Material[]{ ctx.target };
                 resetParam.resetColorAlpha = true;
+                resetParam.resetUnused = true;
+                resetParam.resetKeywords = true;
                 WFMaterialEditUtility.ResetPropertiesWithoutUndo(resetParam);
             },
         };
@@ -813,14 +823,12 @@ namespace UnlitWF
             ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
 
             foreach (var cnv in selectShader) {
-                if (cnv(ctx)) {
-                    foreach (var act in selectFeature) {
-                        act(ctx);
-                    }
-                    Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
-                    return;
-                }
+                cnv(ctx);
             }
+            foreach (var act in selectFeature) {
+                act(ctx);
+            }
+            Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
         }
 
         private class ConvertContext
