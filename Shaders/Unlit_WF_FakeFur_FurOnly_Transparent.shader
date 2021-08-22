@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_FakeFur_Transparent" {
+Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
 
     Properties {
         // 基本
@@ -49,23 +49,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _CL_DeltaS              ("[CL] Saturation", Range(-1, 1)) = 0
             _CL_DeltaV              ("[CL] Brightness", Range(-1, 1)) = 0
 
-        // Matcapハイライト
-        [WFHeaderToggle(Light Matcap)]
-            _HL_Enable              ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
-            _HL_CapType             ("[HL] Matcap Type", Float) = 0
-        [NoScaleOffset]
-            _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
-            _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
-            _HL_Power               ("[HL] Power", Range(0, 2)) = 1
-            _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
-        [NoScaleOffset]
-            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
-            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
-
         // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[SH] Enable", Float) = 0
@@ -94,25 +77,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
-        // リムライト
-        [WFHeaderToggle(RimLight)]
-            _TR_Enable              ("[RM] Enable", Float) = 0
-        [HDR]
-            _TR_Color               ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
-            _TR_BlendType           ("[RM] Blend Type", Float) = 0
-            _TR_Power               ("[RM] Power", Range(0, 2)) = 1
-            _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
-            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
-        [Header(RimLight Advance)]
-            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
-            _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
-            _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
-
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -136,9 +100,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/08/28", Float) = 0
-        [HideInInspector]
-        [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
     }
 
     SubShader {
@@ -146,32 +107,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
-        }
-
-        Pass {
-            Name "MAIN"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #pragma target 4.5
-
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
         }
 
         Pass {
@@ -201,9 +136,10 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         }
 
         UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
+        UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
+    FallBack "Hidden/UnlitWF/WF_UnToon_Hidden"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

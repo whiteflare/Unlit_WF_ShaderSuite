@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
+Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
 
     Properties {
         // 基本
@@ -22,13 +22,10 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _CullMode               ("Cull Mode", int) = 0
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
-
-        // StencilMask
-        [WFHeader(Stencil Mask)]
-        [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
-            _StencilMaskID          ("ID", int) = 8
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -38,19 +35,17 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 1
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+        [Toggle(_)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // アウトライン
-        [WFHeaderToggle(Outline)]
-            _TL_Enable              ("[LI] Enable", Float) = 0
+        [WFHeaderAlwaysOn(Outline)]
+            _TL_Enable              ("[LI] Enable", Float) = 1
             _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
         [NoScaleOffset]
             _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
-        [Enum(NORMAL,0,EDGE,1)]
-            _TL_LineType            ("[LI] Line Type", Float) = 0
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -58,33 +53,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
-
-        // 裏面テクスチャ
-        [WFHeaderToggle(BackFace Texture)]
-            _BK_Enable              ("[BK] Enable", Float) = 0
-            _BK_BackTex             ("[BK] Back Texture", 2D) = "white" {}
-        [HDR]
-            _BK_BackColor           ("[BK] Back Color", Color) = (1, 1, 1, 1)
-
-        // 法線マップ
-        [WFHeaderToggle(NormalMap)]
-            _NM_Enable              ("[NM] Enable", Float) = 0
-        [NoScaleOffset]
-            _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
-            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
-            _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
-        [Enum(NONE,0,X,1,Y,2,XY,3)]
-            _NM_FlipMirror          ("[NM] Flip Mirror", Float) = 0
-
-        [Header(NormalMap Secondary)]
-        [Enum(OFF,0,BLEND,1,SWITCH,2)]
-            _NM_2ndType             ("[NM] 2nd Normal Blend", Float) = 0
-            _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
-            _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
-        [NoScaleOffset]
-            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // メタリックマップ
         [WFHeaderToggle(Metallic)]
@@ -102,10 +70,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [Toggle(_)]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
-        [Toggle(_)]
-            _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
@@ -139,20 +103,12 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
         // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[SH] Enable", Float) = 0
-        [WF_FixFloat(3.0)]
-            _TS_Steps               ("[SH] Steps", Range(1, 3)) = 3
+        [IntRange]
+            _TS_Steps               ("[SH] Steps", Range(1, 3)) = 2
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
-        [NoScaleOffset]
-            _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
             _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
-        [NoScaleOffset]
-            _TS_1stTex              ("[SH] 1st Shade Texture", 2D) = "white" {}
             _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
-        [NoScaleOffset]
-            _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
             _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.5, 0.5, 0.7, 1)
-        [NoScaleOffset]
-            _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
@@ -183,27 +139,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
-        // Decal Texture
-        [WFHeaderToggle(Decal Texture)]
-            _OL_Enable              ("[OL] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1,SKYBOX,2,ANGEL_RING,3)]
-            _OL_UVType              ("[OL] UV Type", Float) = 0
-        [HDR]
-            _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
-            _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _OL_VertColToDecal      ("[OL] Multiply VertexColor To Decal Texture", Range(0, 1)) = 0
-        [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
-            _OL_BlendType           ("[OL] Blend Type", Float) = 0
-            _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
-            _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _OL_MaskTex             ("[OL] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _OL_VertColToMask       ("[OL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
-        [Toggle(_)]
-            _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
-
         // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
@@ -214,41 +149,13 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
         [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
-        [Header(Emissive Scroll)]
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
-            _ES_Shape               ("[ES] Wave Type", Float) = 3
-        [Toggle(_)]
-            _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
-        [WF_Vector3]
-            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
-        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
-            _ES_DirType             ("[ES] Direction Type", Float) = 0
-            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
-            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
-            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
-        [NoScaleOffset]
-            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
-            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
         [Toggle(_)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
-
-        // Fog
-        [WFHeaderToggle(Fog)]
-            _FG_Enable              ("[FG] Enable", Float) = 0
-            _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
-            _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
-        [WF_Vector3]
-            _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
-        [WF_Vector3]
-            _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
 
         // Lit
         [WFHeader(Lit)]
@@ -257,8 +164,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
         [Gamma]
             _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
-        [Toggle(_)]
-            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
@@ -279,47 +184,32 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/08/28", Float) = 0
-        [HideInInspector]
-        [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
     }
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent+1"
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest"
             "DisableBatching" = "True"
         }
-
-        GrabPass { "_UnToonOutlineCancelLater" }
 
         Pass {
             Name "OUTLINE"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            Stencil {
-                Ref [_StencilMaskID]
-                ReadMask 15
-                Comp notEqual
-            }
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 
-            #pragma vertex vert
-            #pragma geometry geom_outline
+            #pragma vertex vert_outline
             #pragma fragment frag
 
-            #pragma target 4.5
-            #pragma require geometry
+            #pragma target 3.0
 
-            #define _WF_ALPHA_BLEND
+            #define _WF_ALPHA_CUTOUT
 
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _TL_ENABLE
+            #define _TL_ENABLE // 常にオン
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -332,114 +222,29 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
         }
 
         Pass {
-            Name "OUTLINE_CANCELLER"
+            Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull OFF
-            ZWrite OFF
-
-            Stencil {
-                Ref [_StencilMaskID]
-                ReadMask 15
-                Comp notEqual
-            }
-
-            CGPROGRAM
-
-            #pragma vertex vert_outline_canceller
-            #pragma fragment frag_outline_canceller
-
-            #pragma target 4.5
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineCancelLater
-
-            #include "WF_UnToon_LineCanceller.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "MAIN_BACK"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull FRONT
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            Stencil {
-                Ref [_StencilMaskID]
-                ReadMask 15
-                Comp notEqual
-            }
+            Cull [_CullMode]
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma target 4.5
+            #pragma target 3.0
 
-            #define _WF_ALPHA_BLEND
-            #define _WF_FACE_BACK
-
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #define _TS_TRISHADE_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "MAIN_FRONT"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull BACK
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            Stencil {
-                Ref [_StencilMaskID]
-                ReadMask 15
-                Comp notEqual
-            }
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #pragma target 4.5
-
-            #define _WF_ALPHA_BLEND
+            #define _WF_ALPHA_CUTOUT
+            #define _WF_MOBILE
 
             #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
             #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
+            #define _ES_SIMPLE_ENABLE
             #pragma shader_feature_local _HL_ENABLE
             #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
             #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
-            #define _TS_TRISHADE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -451,11 +256,30 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Transparent/META"
+        Pass {
+            Name "META"
+            Tags { "LightMode" = "Meta" }
+
+            Cull OFF
+
+            CGPROGRAM
+
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta
+
+            #define _WF_ALPHA_CUTOUT
+
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma shader_feature EDITOR_VISUALIZATION
+
+            #include "WF_UnToon_Meta.cginc"
+
+            ENDCG
+        }
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
+    FallBack "Unlit/Transparent Cutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

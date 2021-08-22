@@ -308,10 +308,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/31", Float) = 0
+            _CurrentVersion         ("2021/08/28", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque", Float) = 0
     }
 
     SubShader {
@@ -390,7 +390,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
         UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
