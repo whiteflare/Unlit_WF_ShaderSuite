@@ -379,15 +379,21 @@
     #ifdef _ES_ENABLE
 
     #ifdef _ES_SIMPLE_ENABLE
-        #define calcEmissiveWaving(ws_vertex)   (1)
+        #define calcEmissiveWaving(i, uv_main)   (1)
     #else
-        float calcEmissiveWaving(float3 ws_vertex) {
+        float calcEmissiveWaving(v2f i, float2 uv_main) {
             if (_ES_Shape == 3) {
                 // 定数
                 return saturate(1 + _ES_LevelOffset);
             }
             // 周期 2PI、値域 [-1, +1] の関数で光量を決める
-            float time = _Time.y * _ES_Speed - dot( _ES_DirType == 0 ? ws_vertex : UnityWorldToObjectPos(ws_vertex), _ES_Direction.xyz);
+            float3 uv =
+                    _ES_DirType == 1 ? UnityWorldToObjectPos(i.ws_vertex)   // ローカル座標
+                    : _ES_DirType == 2 ? float3(uv_main, 0)                 // UV1
+                    : _ES_DirType == 3 ? float3(i.uv_lmap, 0)               // UV2
+                    : i.ws_vertex                                           // ワールド座標
+                    ;
+            float time = _Time.y * _ES_Speed - dot(uv, _ES_Direction.xyz);
             float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
             float waving =
                 // 励起波
@@ -400,13 +406,13 @@
         }
     #endif
 
-        void affectEmissiveScroll(float3 ws_vertex, float2 mask_uv, inout float4 color) {
+        void affectEmissiveScroll(v2f i, float2 uv_main, inout float4 color) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_ES_Enable)) {
 #endif
-                float4 es_mask  = WF_TEX2D_EMISSION(mask_uv);
+                float4 es_mask  = WF_TEX2D_EMISSION(uv_main);
                 float4 es_color = _EmissionColor * es_mask;
-                float waving    = calcEmissiveWaving(ws_vertex) * es_color.a;
+                float waving    = calcEmissiveWaving(i, uv_main) * es_color.a;
 
                 // RGB側の合成
                 color.rgb =
@@ -434,7 +440,7 @@
 
     #else
         // Dummy
-        #define affectEmissiveScroll(ws_vertex, mask_uv, color)
+        #define affectEmissiveScroll(i, uv_main, color)
     #endif
 
     ////////////////////////////

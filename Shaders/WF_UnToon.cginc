@@ -168,7 +168,7 @@
         affectOcclusion(i, uv_main, color);
 
         // EmissiveScroll
-        affectEmissiveScroll(i.ws_vertex, uv_main, color);
+        affectEmissiveScroll(i, uv_main, color);
         // ToonFog
         affectToonFog(i, ws_view_dir, color);
 

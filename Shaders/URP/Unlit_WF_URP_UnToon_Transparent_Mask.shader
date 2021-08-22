@@ -253,10 +253,10 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             _ES_Shape               ("[ES] Wave Type", Float) = 3
         [Toggle(_)]
             _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
         [WF_Vector3]
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
-        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
-            _ES_DirType             ("[ES] Direction Type", Float) = 0
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
@@ -275,10 +275,10 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
         // Lit
         [WFHeader(Lit)]
         [Gamma]
-            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
         [Gamma]
-            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
