@@ -38,11 +38,6 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut",          "UnlitWF/WF_UnToon_Transparent_MaskOut"),
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut_Blend",    "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
 
-            new WFShaderName("UnToon", "Mobile", "Opaque",                      "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
-            new WFShaderName("UnToon", "Mobile", "TransCutout",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
-            new WFShaderName("UnToon", "Mobile", "Transparent",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
-            new WFShaderName("UnToon", "Mobile", "TransparentOverlay",          "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
-
             new WFShaderName("UnToon", "Outline", "Opaque",                     "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
             new WFShaderName("UnToon", "Outline", "TransCutout",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
             new WFShaderName("UnToon", "Outline", "Transparent",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent"),
@@ -54,6 +49,14 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Outline_LineOnly", "TransCutout",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
             new WFShaderName("UnToon", "Outline_LineOnly", "Transparent",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent"),
             new WFShaderName("UnToon", "Outline_LineOnly", "Transparent_MaskOut",   "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut"),
+
+            new WFShaderName("UnToon", "Mobile", "Opaque",                      "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
+            new WFShaderName("UnToon", "Mobile", "TransCutout",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
+            new WFShaderName("UnToon", "Mobile", "Transparent",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
+            new WFShaderName("UnToon", "Mobile", "TransparentOverlay",          "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
+
+            new WFShaderName("UnToon", "Mobile_Outline", "Opaque",              "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"),
+            new WFShaderName("UnToon", "Mobile_Outline", "TransCutout",         "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout"),
 
             new WFShaderName("UnToon", "Mobile_LineOnly", "Opaque",             "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
             new WFShaderName("UnToon", "Mobile_LineOnly", "TransCutout",        "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
