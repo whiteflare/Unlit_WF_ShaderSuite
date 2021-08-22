@@ -38,11 +38,6 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut",          "UnlitWF/WF_UnToon_Transparent_MaskOut"),
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut_Blend",    "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
 
-            new WFShaderName("UnToon", "Mobile", "Opaque",                      "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
-            new WFShaderName("UnToon", "Mobile", "TransCutout",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
-            new WFShaderName("UnToon", "Mobile", "Transparent",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
-            new WFShaderName("UnToon", "Mobile", "TransparentOverlay",          "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
-
             new WFShaderName("UnToon", "Outline", "Opaque",                     "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
             new WFShaderName("UnToon", "Outline", "TransCutout",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
             new WFShaderName("UnToon", "Outline", "Transparent",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent"),
@@ -54,6 +49,14 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Outline_LineOnly", "TransCutout",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
             new WFShaderName("UnToon", "Outline_LineOnly", "Transparent",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent"),
             new WFShaderName("UnToon", "Outline_LineOnly", "Transparent_MaskOut",   "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut"),
+
+            new WFShaderName("UnToon", "Mobile", "Opaque",                      "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
+            new WFShaderName("UnToon", "Mobile", "TransCutout",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
+            new WFShaderName("UnToon", "Mobile", "Transparent",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
+            new WFShaderName("UnToon", "Mobile", "TransparentOverlay",          "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
+
+            new WFShaderName("UnToon", "Mobile_Outline", "Opaque",              "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"),
+            new WFShaderName("UnToon", "Mobile_Outline", "TransCutout",         "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout"),
 
             new WFShaderName("UnToon", "Mobile_LineOnly", "Opaque",             "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
             new WFShaderName("UnToon", "Mobile_LineOnly", "TransCutout",        "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
@@ -79,6 +82,10 @@ namespace UnlitWF
             new WFShaderName("FakeFur", "Basic", "TransCutout",                 "UnlitWF/WF_FakeFur_TransCutout"),
             new WFShaderName("FakeFur", "Basic", "Transparent",                 "UnlitWF/WF_FakeFur_Transparent"),
             new WFShaderName("FakeFur", "Basic", "Mix",                         "UnlitWF/WF_FakeFur_Mix"),
+
+            new WFShaderName("FakeFur", "FurOnly", "TransCutout",               "UnlitWF/WF_FakeFur_FurOnly_TransCutout"),
+            new WFShaderName("FakeFur", "FurOnly", "Transparent",               "UnlitWF/WF_FakeFur_FurOnly_Transparent"),
+            new WFShaderName("FakeFur", "FurOnly", "Mix",                       "UnlitWF/WF_FakeFur_FurOnly_Mix"),
 
             new WFShaderName("Gem", "Basic", "Opaque",                          "UnlitWF/WF_Gem_Opaque"),
             new WFShaderName("Gem", "Basic", "Transparent",                     "UnlitWF/WF_Gem_Transparent"),
@@ -355,8 +362,8 @@ namespace UnlitWF
             new WFI18NTranslation("GF", "Twinkle", "またたき"),
             // Fake Fur
             new WFI18NTranslation("FR", "Fur Noise Texture", "ノイズテクスチャ"),
-            new WFI18NTranslation("FR", "Fur Height", "高さ"),
-            new WFI18NTranslation("FR", "Fur Height 2", "高さ 2"),
+            new WFI18NTranslation("FR", "Fur Height", "高さ (Cutout側)"),
+            new WFI18NTranslation("FR", "Fur Height 2", "高さ (Transparent側)"),
             new WFI18NTranslation("FR", "Fur Vector", "方向"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
