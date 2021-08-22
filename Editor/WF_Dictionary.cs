@@ -80,6 +80,10 @@ namespace UnlitWF
             new WFShaderName("FakeFur", "Basic", "Transparent",                 "UnlitWF/WF_FakeFur_Transparent"),
             new WFShaderName("FakeFur", "Basic", "Mix",                         "UnlitWF/WF_FakeFur_Mix"),
 
+            new WFShaderName("FakeFur", "FurOnly", "TransCutout",               "UnlitWF/WF_FakeFur_FurOnly_TransCutout"),
+            new WFShaderName("FakeFur", "FurOnly", "Transparent",               "UnlitWF/WF_FakeFur_FurOnly_Transparent"),
+            new WFShaderName("FakeFur", "FurOnly", "Mix",                       "UnlitWF/WF_FakeFur_FurOnly_Mix"),
+
             new WFShaderName("Gem", "Basic", "Opaque",                          "UnlitWF/WF_Gem_Opaque"),
             new WFShaderName("Gem", "Basic", "Transparent",                     "UnlitWF/WF_Gem_Transparent"),
 
@@ -355,8 +359,8 @@ namespace UnlitWF
             new WFI18NTranslation("GF", "Twinkle", "またたき"),
             // Fake Fur
             new WFI18NTranslation("FR", "Fur Noise Texture", "ノイズテクスチャ"),
-            new WFI18NTranslation("FR", "Fur Height", "高さ"),
-            new WFI18NTranslation("FR", "Fur Height 2", "高さ 2"),
+            new WFI18NTranslation("FR", "Fur Height", "高さ (Cutout側)"),
+            new WFI18NTranslation("FR", "Fur Height 2", "高さ (Transparent側)"),
             new WFI18NTranslation("FR", "Fur Vector", "方向"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
