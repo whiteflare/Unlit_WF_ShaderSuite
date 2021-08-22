@@ -223,9 +223,9 @@ namespace UnlitWF
             new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離"),
             new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離"),
             // Lit
-            new WFI18NTranslation("Darken (min value)", "暗さの最小値"),
-            new WFI18NTranslation("Lighten (max value)", "明るさの最大値"),
-            new WFI18NTranslation("Blend Light Color", "ライト色の混合強度"),
+            new WFI18NTranslation("Unlit Intensity", "Unlit Intensity (最小明度)"),
+            new WFI18NTranslation("Saturate Intensity", "Saturate Intensity (飽和明度)"),
+            new WFI18NTranslation("Chroma Reaction", "Chroma Reaction (彩度)"),
             new WFI18NTranslation("Cast Shadows", "他の物体に影を落とす"),
             // Alpha
             new WFI18NTranslation("AL", "Alpha Source", "アルファソース"),
@@ -362,8 +362,9 @@ namespace UnlitWF
             new WFI18NTranslation("GF", "Twinkle", "またたき"),
             // Fake Fur
             new WFI18NTranslation("FR", "Fur Noise Texture", "ノイズテクスチャ"),
-            new WFI18NTranslation("FR", "Fur Height", "高さ (Cutout側)"),
-            new WFI18NTranslation("FR", "Fur Height 2", "高さ (Transparent側)"),
+            new WFI18NTranslation("FR", "Fur Height", "高さ"),
+            new WFI18NTranslation("FR", "Fur Height (Cutout)", "高さ (Cutout側)"),
+            new WFI18NTranslation("FR", "Fur Height (Transparent)", "高さ (Transparent側)"),
             new WFI18NTranslation("FR", "Fur Vector", "方向"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
@@ -407,6 +408,10 @@ namespace UnlitWF
             new WFI18NTranslation("FeedOut Distance (Far)", "フェードアウト距離"),
             new WFI18NTranslation("NM", "Flip Tangent", "タンジェント反転"),
             new WFI18NTranslation("FR", "Flip Tangent", "タンジェント反転"),
+            new WFI18NTranslation("Darken (min value)", "暗さの最小値"),
+            new WFI18NTranslation("Lighten (max value)", "明るさの最大値"),
+            new WFI18NTranslation("Blend Light Color", "ライト色の混合強度"),
+            new WFI18NTranslation("FR", "Fur Height 2", "高さ (Transparent側)"),
         };
     }
 
