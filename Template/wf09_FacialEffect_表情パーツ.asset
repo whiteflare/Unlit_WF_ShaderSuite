@@ -45,12 +45,12 @@ Material:
     - _AL_DstAlpha: 10
     - _AL_Fresnel: 0
     - _AL_InvMaskVal: 0
-    - _AL_Power: 0.5
+    - _AL_Power: 1
     - _AL_Source: 0
     - _AL_SrcAlpha: 5
     - _AL_ZTest: 4
     - _AL_ZWrite: 0
-    - _AL_Z_Offset: 0.1
+    - _AL_Z_Offset: 0.01
     - _AO_Brightness: 0
     - _AO_Contrast: 1
     - _AO_Enable: 0
