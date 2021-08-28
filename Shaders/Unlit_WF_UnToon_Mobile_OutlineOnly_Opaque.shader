@@ -32,8 +32,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
         [NoScaleOffset]
             _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
             _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
-        [Enum(NORMAL,0,EDGE,1)]
-            _TL_LineType            ("[LI] Line Type", Float) = 0
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -45,10 +43,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
         // Lit
         [WFHeader(Lit)]
         [Gamma]
-            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
         [Gamma]
-            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
@@ -64,7 +62,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/31", Float) = 0
+            _CurrentVersion         ("2021/08/28", Float) = 0
     }
 
     SubShader {

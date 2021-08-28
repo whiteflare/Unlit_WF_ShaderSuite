@@ -44,8 +44,8 @@ Material:
     - _AlphaBack: 0.8
     - _AlphaFront: 0.5
     - _BumpScale: 1
-    - _CullMode: 2
     - _CurrentVersion: 0
+    - _FallBack: 0
     - _GB_BackCulllMode: 1
     - _GB_Enable: 1
     - _GF_BlendNormal: 0.1
@@ -73,7 +73,6 @@ Material:
     - _GR_Power: 1
     - _NM_Enable: 0
     - _NM_FlipMirror: 0
-    - _NM_FlipTangent: 0
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 0.419708, b: 0.52527535, a: 1}

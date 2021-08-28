@@ -249,10 +249,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
         [WF_Vector3]
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
-        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
-            _ES_DirType             ("[ES] Direction Type", Float) = 0
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
@@ -283,10 +283,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
         // Lit
         [WFHeader(Lit)]
         [Gamma]
-            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
         [Gamma]
-            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
@@ -308,10 +308,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/31", Float) = 0
+            _CurrentVersion         ("2021/08/28", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque", Float) = 0
     }
 
     SubShader {
@@ -390,7 +390,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
         UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

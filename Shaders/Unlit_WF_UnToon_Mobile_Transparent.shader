@@ -140,10 +140,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _ES_Shape               ("[ES] Wave Type", Float) = 3
         [Toggle(_)]
             _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
         [WF_Vector3]
             _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
-        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1)]
-            _ES_DirType             ("[ES] Direction Type", Float) = 0
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
@@ -159,10 +159,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         // Lit
         [WFHeader(Lit)]
         [Gamma]
-            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
         [Gamma]
-            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
@@ -182,7 +182,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/31", Float) = 0
+            _CurrentVersion         ("2021/08/28", Float) = 0
     }
 
     SubShader {

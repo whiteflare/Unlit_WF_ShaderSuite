@@ -62,10 +62,10 @@ Shader "UnlitWF/WF_Gem_Opaque" {
         // Lit
         [WFHeader(Lit)]
         [Gamma]
-            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
         [Gamma]
-            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
@@ -79,7 +79,7 @@ Shader "UnlitWF/WF_Gem_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/31", Float) = 0
+            _CurrentVersion         ("2021/08/28", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0

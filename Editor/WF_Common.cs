@@ -88,7 +88,7 @@ namespace UnlitWF
                 return label;
             }
             string name;
-            WFCommonUtility.FormatPropName(prop_name, out label, out name);
+            FormatPropName(prop_name, out label, out name);
             return label;
         }
 
@@ -99,7 +99,7 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool IsEnableToggleFromPropName(string prop_name) {
             string label, name;
-            WFCommonUtility.FormatPropName(prop_name, out label, out name);
+            FormatPropName(prop_name, out label, out name);
             return IsEnableToggle(label, name);
         }
 
@@ -344,7 +344,7 @@ namespace UnlitWF
             }
         }
 
-        public bool Contains(Material mat) {
+        public bool IsEnable(Material mat) {
             if (!WFCommonUtility.IsSupportedShader(mat)) {
                 return false;
             }
@@ -357,6 +357,16 @@ namespace UnlitWF
 
         public static string LabelToPrefix(string label) {
             return WFShaderDictionary.ShaderFuncList.Where(func => func.Label == label).Select(func => func.Prefix).FirstOrDefault();
+        }
+
+        public static WFShaderFunction[] GetEnableFunctionList(Material mat) {
+            var result = new List<WFShaderFunction>();
+            foreach (var func in WFShaderDictionary.ShaderFuncList) {
+                if (func.IsEnable(mat)) {
+                    result.Add(func);
+                }
+            }
+            return result.OrderBy(f => f.Label).ToArray();
         }
     }
 
@@ -398,13 +408,33 @@ namespace UnlitWF
         }
     }
 
-    internal static class WFI18N
+    internal static class WFEditorPrefs
     {
         private static readonly string KEY_EDITOR_LANG = "UnlitWF.ShaderEditor/Lang";
-        private static readonly Dictionary<string, List<WFI18NTranslation>> EN = new Dictionary<string, List<WFI18NTranslation>>();
-        private static readonly Dictionary<string, List<WFI18NTranslation>> JA = ToDict(WFShaderDictionary.LangEnToJa);
+        private static readonly string KEY_MENU_TO_BOTTOM = "UnlitWF.ShaderEditor/MenuToBottom";
 
+        private static bool? menuToBottom = null;
         private static EditorLanguage? langMode = null;
+
+        public static bool MenuToBottom
+        {
+            get {
+                if (menuToBottom == null) {
+                    menuToBottom = EditorPrefs.GetBool(KEY_MENU_TO_BOTTOM, false);
+                }
+                return menuToBottom.Value;
+            }
+            set {
+                if (menuToBottom != value) {
+                    menuToBottom = value;
+                    if (value) {
+                        EditorPrefs.SetBool(KEY_MENU_TO_BOTTOM, true);
+                    } else {
+                        EditorPrefs.DeleteKey(KEY_MENU_TO_BOTTOM);
+                    }
+                }
+            }
+        }
 
         public static EditorLanguage LangMode
         {
@@ -434,9 +464,15 @@ namespace UnlitWF
                 }
             }
         }
+    }
+
+    internal static class WFI18N
+    {
+        private static readonly Dictionary<string, List<WFI18NTranslation>> EN = new Dictionary<string, List<WFI18NTranslation>>();
+        private static readonly Dictionary<string, List<WFI18NTranslation>> JA = ToDict(WFShaderDictionary.LangEnToJa);
 
         static Dictionary<string, List<WFI18NTranslation>> GetDict() {
-            switch (LangMode) {
+            switch (WFEditorPrefs.LangMode) {
                 case EditorLanguage.日本語:
                     return JA;
                 default:
@@ -494,14 +530,13 @@ namespace UnlitWF
 
         public static GUIContent GetGUIContent(string text) {
             var localized = SplitAndTranslate(text);
-            var tooltip = text != localized ? text : null;
-            return new GUIContent(localized, tooltip);
+            return new GUIContent(localized);
         }
 
         public static GUIContent GetGUIContent(string label, string text, string tooltip = null) {
             string localized = Translate(label, text);
-            if (text != localized && tooltip == null) {
-                tooltip = text;
+            if (string.IsNullOrWhiteSpace(tooltip)) {
+                return new GUIContent("[" + label + "] " + localized);
             }
             return new GUIContent("[" + label + "] " + localized, tooltip);
         }
@@ -614,22 +649,6 @@ namespace UnlitWF
             other.RemoveAll(a => items.Contains(a.RenderType));
 
             return result;
-        }
-    }
-
-    internal class OldPropertyReplacement
-    {
-        public readonly string beforeName;
-        public readonly string afterName;
-        public readonly Action<ShaderSerializedProperty> onAfterCopy;
-
-        public OldPropertyReplacement(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy) {
-            this.beforeName = beforeName;
-            this.afterName = afterName;
-            this.onAfterCopy = onAfterCopy ?? (p => { });
-        }
-
-        public OldPropertyReplacement(string beforeName, string afterName) : this(beforeName, afterName, null) {
         }
     }
 }

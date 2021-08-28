@@ -69,10 +69,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
         // Lit
         [WFHeader(Lit)]
         [Gamma]
-            _GL_LevelMin            ("Darken (min value)", Range(0, 1)) = 0.125
+            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
         [Gamma]
-            _GL_LevelMax            ("Lighten (max value)", Range(0, 1)) = 0.8
-            _GL_BlendPower          ("Blend Light Color", Range(0, 1)) = 0.8
+            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [Toggle(_)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
@@ -88,7 +88,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/07/31", Float) = 0
+            _CurrentVersion         ("2021/08/28", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout", Float) = 0

@@ -127,7 +127,6 @@ Material:
     - _CullMode: 2
     - _CurrentVersion: 0
     - _DetailNormalMapScale: 0.4
-    - _ES_BakeIntensity: 1
     - _ES_BlendType: 0
     - _ES_DirType: 0
     - _ES_Enable: 0
@@ -135,6 +134,7 @@ Material:
     - _ES_Shape: 3
     - _ES_Sharpness: 1
     - _ES_Speed: 2
+    - _FallBack: 0
     - _GI_EmissionMultiplier: 1
     - _GI_Enable: 0
     - _GI_IndirectChroma: 1
@@ -183,7 +183,6 @@ Material:
     - _NM_2ndType: 0
     - _NM_Enable: 0
     - _NM_FlipMirror: 0
-    - _NM_FlipTangent: 0
     - _NM_InvMaskVal: 0
     - _NM_Power: 0.25
     - _OL_BlendType: 0

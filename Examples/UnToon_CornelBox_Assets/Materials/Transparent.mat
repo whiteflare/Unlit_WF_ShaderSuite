@@ -23,6 +23,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _BK_BackTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -99,6 +103,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TS_3rdTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TS_BaseTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -117,6 +125,7 @@ Material:
     - _AO_Contrast: 1
     - _AO_Enable: 0
     - _AO_UseLightMap: 1
+    - _BK_Enable: 0
     - _BumpScale: 1
     - _CH_Enable: 0
     - _CL_DeltaH: 0
@@ -127,7 +136,6 @@ Material:
     - _CurrentVersion: 0
     - _DetailNormalMapScale: 0.4
     - _ES_AlphaScroll: 0
-    - _ES_BakeIntensity: 1
     - _ES_BlendType: 0
     - _ES_DirType: 0
     - _ES_Enable: 0
@@ -135,6 +143,11 @@ Material:
     - _ES_Shape: 3
     - _ES_Sharpness: 1
     - _ES_Speed: 2
+    - _FallBack: 0
+    - _GI_EmissionMultiplier: 1
+    - _GI_Enable: 0
+    - _GI_IndirectChroma: 1
+    - _GI_IndirectMultiplier: 1
     - _GL_BlendPower: 0.8
     - _GL_CastShadow: 1
     - _GL_CustomAltitude: 45
@@ -156,6 +169,7 @@ Material:
     - _LM_Enable: 0
     - _LM_Glitter: 0.5
     - _LM_InvMaskVal: 0
+    - _LM_MaxDist: 4
     - _LM_MinDist: 2
     - _LM_Scale: 0.5
     - _LM_Shape: 0
@@ -167,16 +181,18 @@ Material:
     - _MT_CubemapPower: 1
     - _MT_CubemapType: 0
     - _MT_Enable: 0
+    - _MT_GeomSpecAA: 1
     - _MT_InvMaskVal: 0
     - _MT_InvRoughnessMaskVal: 0
     - _MT_Metallic: 1
+    - _MT_MetallicMapType: 0
     - _MT_Monochrome: 0
     - _MT_ReflSmooth: 1
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_2ndType: 0
     - _NM_Enable: 0
-    - _NM_FlipTangent: 0
+    - _NM_FlipMirror: 0
     - _NM_InvMaskVal: 0
     - _NM_Power: 0.25
     - _OL_BlendType: 0
@@ -185,6 +201,8 @@ Material:
     - _OL_InvMaskVal: 0
     - _OL_Power: 1
     - _OL_UVType: 0
+    - _OL_VertColToDecal: 0
+    - _OL_VertColToMask: 0
     - _TR_BlendNormal: 0
     - _TR_BlendType: 0
     - _TR_Enable: 0
@@ -196,13 +214,17 @@ Material:
     - _TR_PowerTop: 0.1
     - _TS_1stBorder: 0.4
     - _TS_2ndBorder: 0.2
+    - _TS_3rdBorder: 0.1
     - _TS_BlendNormal: 0.1
     - _TS_Enable: 0
     - _TS_Feather: 0.05
     - _TS_InvMaskVal: 0
     - _TS_Power: 1
+    - _TS_Steps: 2
     - _UseVertexColor: 0
     m_Colors:
+    - _AO_TintColor: {r: 0, g: 0, b: 0, a: 1}
+    - _BK_BackColor: {r: 1, g: 1, b: 1, a: 1}
     - _CH_ColorB: {r: 1, g: 1, b: 1, a: 1}
     - _CH_ColorG: {r: 1, g: 1, b: 1, a: 1}
     - _CH_ColorR: {r: 1, g: 1, b: 1, a: 1}
@@ -210,10 +232,12 @@ Material:
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _LM_Color: {r: 1, g: 1, b: 1, a: 1}
     - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.7, g: 0.7, b: 0.9, a: 1}
     - _TS_2ndColor: {r: 0.5, g: 0.5, b: 0.8, a: 1}
+    - _TS_3rdColor: {r: 0.5, g: 0.5, b: 0.7, a: 1}
     - _TS_BaseColor: {r: 1, g: 1, b: 1, a: 1}
