@@ -72,9 +72,7 @@ namespace UnlitWF
 
         [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
         private static void Menu_AutoConvertMaterial() {
-            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
-                WFMaterialAutoConvertUtility.ExecAutoConvert(mat);
-            }
+            WFMaterialAutoConvertUtility.ExecAutoConvert(Selection.GetFiltered<Material>(SelectionMode.Assets));
         }
 
         [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
@@ -629,10 +627,7 @@ namespace UnlitWF
                 if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {
                     ctx.outline = true;
                 }
-                else if (HasCustomValueTexture(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler")) {
-                    ctx.outline = true;
-                }
-                else if (HasCustomValueFloat(ctx, "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
+                else if (HasCustomValue(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler", "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
                     ctx.outline = true;
                 }
             },
@@ -710,7 +705,7 @@ namespace UnlitWF
 
         private static readonly List<Action<ConvertContext>> selectFeature = new List<Action<ConvertContext>>() {
             ctx => {
-                if (HasCustomValueTexture(ctx, "_MainTex")) {
+                if (HasCustomValue(ctx, "_MainTex")) {
                     // メインテクスチャがあるならば _Color は白にする
                     ctx.target.SetColor("_Color", Color.white);
                 }
@@ -720,31 +715,36 @@ namespace UnlitWF
                 WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                     new PropertyNameReplacement("_AlphaMask", "_AL_MaskTex"),
                     new PropertyNameReplacement("_ClippingMask", "_AL_MaskTex"));
-                if (HasCustomValueTexture(ctx, "_AL_MaskTex")) {
+                if (HasCustomValue(ctx, "_AL_MaskTex")) {
                     ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
                 }
             },
             ctx => {
                 // ノーマルマップ
-                if (HasCustomValueTexture(ctx, "_BumpMap", "_DetailNormalMap")) {
+                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                    new PropertyNameReplacement("_NormalMap", "_BumpMap"));
+                if (HasCustomValue(ctx, "_BumpMap", "_DetailNormalMap")) {
                     ctx.target.SetInt("_NM_Enable", 1);
                 }
             },
             ctx => {
                 // メタリック
-                if (HasCustomValueTexture(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
+                if (HasCustomValue(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
                     ctx.target.SetInt("_MT_Enable", 1);
                 }
             },
             ctx => {
                 // AO
-                if (HasCustomValueTexture(ctx, "_OcclusionMap")) {
+                if (HasCustomValue(ctx, "_OcclusionMap")) {
                     ctx.target.SetInt("_AO_Enable", 1);
                 }
             },
             ctx => {
                 // Emission
-                if (HasCustomValueTexture(ctx, "_EmissionMap") || HasCustomValueFloat(ctx, "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
+                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                    new PropertyNameReplacement("_Emissive_Tex", "_EmissionMap"),
+                    new PropertyNameReplacement("_Emissive_Color", "_EmissionColor"));
+                if (HasCustomValue(ctx, "_EmissionMap", "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
                     ctx.target.SetInt("_ES_Enable", 1);
                 }
             },
@@ -764,13 +764,13 @@ namespace UnlitWF
                     new PropertyNameReplacement("_Shadow2ndColor", "_TS_2ndColor")
                     );
                 // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
-                if (HasCustomValueTexture(ctx, "_1st_ShadeMap", "_ShadowColorTex", "_2nd_ShadeMap", "_Shadow2ndColorTex")) {
+                if (HasCustomValue(ctx, "_TS_1stTex", "_TS_2ndTex")) {
                     ctx.target.SetTexture("_TS_BaseTex", ctx.target.GetTexture("_MainTex"));
                 }
             },
             ctx => {
                 // リムライト
-                if (HasCustomValueFloat(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
+                if (HasCustomValue(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
                     ctx.target.SetInt("_TR_Enable", 1);
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         new PropertyNameReplacement("_RimColor", "_TR_Color"),
@@ -803,16 +803,23 @@ namespace UnlitWF
             },
             ctx => {
                 // アルファをリセットし、キーワードを整理する
-                var resetParam = new ResetParameter();
+                var resetParam = ResetParameter.Create();
                 resetParam.materials = new Material[]{ ctx.target };
                 resetParam.resetColorAlpha = true;
-                resetParam.resetUnused = true;
+                // resetParam.resetUnused = true;
                 resetParam.resetKeywords = true;
                 WFMaterialEditUtility.ResetPropertiesWithoutUndo(resetParam);
             },
         };
 
-        public static void ExecAutoConvert(Material mat) {
+        public static void ExecAutoConvert(params Material[] mats) {
+            Undo.RecordObjects(mats, "WF Convert materials");
+            foreach(var mat in mats) {
+                ExecAutoConvertWithoutUndo(mat);
+            }
+        }
+
+        public static void ExecAutoConvertWithoutUndo(Material mat) {
             if (mat == null || mat.shader.name.Contains("UnlitWF")) {
                 return;
             }
@@ -846,26 +853,40 @@ namespace UnlitWF
             NoMatch, Opaque, Cutout, Transparent
         }
 
-        private static bool HasCustomValueFloat(ConvertContext ctx, params string[] names) {
-            foreach (var name in names) {
-                if (ctx.oldProps.TryGetValue(name, out var prop)) {
-                    if (prop.Type == ShaderUtil.ShaderPropertyType.Float || prop.Type == ShaderUtil.ShaderPropertyType.Range) {
+        private static bool hasCustomValue(Dictionary<string, ShaderSerializedProperty> props, string name) {
+            if (props.TryGetValue(name, out var prop)) {
+                switch(prop.Type) {
+                    case ShaderUtil.ShaderPropertyType.Float:
+                    case ShaderUtil.ShaderPropertyType.Range:
                         return 0.001f < Mathf.Abs(prop.FloatValue);
-                    }
+
+                    case ShaderUtil.ShaderPropertyType.Color:
+                    case ShaderUtil.ShaderPropertyType.Vector:
+                        var vec = prop.VectorValue;
+                        return 0.001f < Mathf.Abs(vec.x) || 0.001f < Mathf.Abs(vec.y) || 0.001f < Mathf.Abs(vec.z);
+
+                    case ShaderUtil.ShaderPropertyType.TexEnv:
+                        var tex = prop.TextureValue;
+                        return tex != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex));
+
+                    default:
+                        return false;
                 }
             }
             return false;
         }
 
-        private static bool HasCustomValueTexture(ConvertContext ctx, params string[] names) {
+        private static bool HasCustomValue(ConvertContext ctx, params string[] names) {
+            var newProp = ShaderSerializedProperty.AsDict(ctx.target);
+
             foreach (var name in names) {
-                if (ctx.oldProps.TryGetValue(name, out var prop)) {
-                    if (prop.Type == ShaderUtil.ShaderPropertyType.TexEnv) {
-                        var tex = prop.TextureValue;
-                        if (tex != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex))) {
-                            return true;
-                        }
-                    }
+                // 新しいマテリアルから設定されていないかを調べる
+                if (hasCustomValue(newProp, name)) {
+                    return true;
+                }
+                // 古いマテリアルの側から設定されていないかを調べる
+                if (hasCustomValue(ctx.oldProps, name)) {
+                    return true;
                 }
             }
             return false;
