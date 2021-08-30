@@ -17,6 +17,8 @@
 
 #if UNITY_EDITOR
 
+// #define _WF_LEGACY_FEATURE_SWITCH
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,7 +151,7 @@ namespace UnlitWF
                 }
             }
             // Enableキーワードを整理する
-#if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER && !_WF_LEGACY_FEATURE_SWITCH
             foreach (var mat in mats) {
                 if (!IsSupportedShader(mat)) {
                     continue;
@@ -253,6 +255,34 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool IsSupportedShader(Material mat) {
             return mat != null && IsSupportedShader(mat.shader);
+        }
+
+        /// <summary>
+        /// ShaderがVRC QuestでサポートされるUnlitWFかどうか判定する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static bool IsQuestSupportedShader(Shader shader) {
+            if (!IsSupportedShader(shader)) {
+                return false;
+            }
+            var name = shader.name;
+            if (name.Contains("FakeFur")) {
+                return false;
+            }
+            if (name.Contains("Mobile") || name.Contains("_Gem_") || name.Contains("Hidden") || name.Contains("DebugView")) {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// ShaderがVRC QuestでサポートされるUnlitWFかどうか判定する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static bool IsQuestSupportedShader(Material mat) {
+            return mat != null && IsQuestSupportedShader(mat.shader);
         }
 
         /// <summary>

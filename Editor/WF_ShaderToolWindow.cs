@@ -38,6 +38,7 @@ namespace UnlitWF
         public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "Switch DebugView shader";
         public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
         public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials in the Scene";
+        public const string ASSETS_QUEST = PATH_ASSETS + "Change shader For Quest";
 
         public const int PRI_ASSETS_AUTOCNV = 2201;
         public const int PRI_ASSETS_CREANUP = 2301;
@@ -47,6 +48,7 @@ namespace UnlitWF
         public const int PRI_ASSETS_DEBUGVIEW = 2401;
         public const int PRI_ASSETS_TEMPLATE = 2501;
         public const int PRI_ASSETS_KEEPMAT = 2601;
+        public const int PRI_ASSETS_QUEST = 2701;
 
         public const string PATH_TOOLS = "Tools/UnlitWF/";
 
@@ -113,6 +115,41 @@ namespace UnlitWF
 
         #endregion
 
+        #region Change Quest Shader
+
+        [MenuItem(WFMenu.ASSETS_QUEST, priority = WFMenu.PRI_ASSETS_QUEST)]
+        private static void Menu_ChangeQuestShader() {
+            var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
+
+            if (!EditorUtility.DisplayDialog("WF change Quest shader", WFI18N.Translate(WFMessageText.DgChangeQuest), "OK", "Cancel")) {
+                return;
+            }
+
+            Undo.RecordObjects(mats, "WF Change Quest Shader");
+
+            foreach (var mat in mats) {
+                // マテリアルが UnlitWF のもので、
+                // _FallBack プロパティを取得できて、
+                // かつ名前に Mobile が入っていないならば、
+                // シェーダを切り替える
+                var shader = mat.shader;
+                while (WFCommonUtility.IsSupportedShader(shader) && !WFCommonUtility.IsQuestSupportedShader(shader)) {
+                    var pi = shader.FindPropertyIndex("_FallBack");
+                    var fallback = "Hidden/InternalErrorShader";
+                    if (0 <= pi) {
+                        fallback = shader.GetPropertyDescription(pi);
+                    }
+                    var queue = mat.renderQueue;
+                    WFCommonUtility.ChangeShader(fallback, mat);
+                    mat.renderQueue = queue;
+                    shader = mat.shader;
+                    EditorUtility.SetDirty(mat);
+                }
+            }
+        }
+
+        #endregion
+
         [MenuItem(WFMenu.ASSETS_AUTOCNV, validate = true)]
         [MenuItem(WFMenu.ASSETS_CREANUP, validate = true)]
         [MenuItem(WFMenu.ASSETS_RESET, validate = true)]
@@ -120,6 +157,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_MIGRATION, validate = true)]
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, validate = true)]
         [MenuItem(WFMenu.ASSETS_KEEPMAT, validate = true)]
+        [MenuItem(WFMenu.ASSETS_QUEST, validate = true)]
         private static bool MenuValidation_HasMaterials() {
             return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
@@ -700,6 +738,8 @@ namespace UnlitWF
                             break;
                     }
                 }
+                // シェーダ切り替え後に RenderQueue をコピー
+                ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
             },
         };
 
@@ -814,7 +854,7 @@ namespace UnlitWF
 
         public static void ExecAutoConvert(params Material[] mats) {
             Undo.RecordObjects(mats, "WF Convert materials");
-            foreach(var mat in mats) {
+            foreach (var mat in mats) {
                 ExecAutoConvertWithoutUndo(mat);
             }
         }
@@ -855,7 +895,7 @@ namespace UnlitWF
 
         private static bool hasCustomValue(Dictionary<string, ShaderSerializedProperty> props, string name) {
             if (props.TryGetValue(name, out var prop)) {
-                switch(prop.Type) {
+                switch (prop.Type) {
                     case ShaderUtil.ShaderPropertyType.Float:
                     case ShaderUtil.ShaderPropertyType.Range:
                         return 0.001f < Mathf.Abs(prop.FloatValue);
