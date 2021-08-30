@@ -99,6 +99,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

@@ -190,7 +190,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
-            "DisableBatching" = "True"
         }
 
         Pass {

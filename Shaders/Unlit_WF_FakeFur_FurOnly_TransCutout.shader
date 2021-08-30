@@ -110,6 +110,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

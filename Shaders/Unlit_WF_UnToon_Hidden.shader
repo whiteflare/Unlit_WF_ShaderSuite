@@ -56,6 +56,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
+            "IgnoreProjector" = "True"
         }
 
         Pass {
