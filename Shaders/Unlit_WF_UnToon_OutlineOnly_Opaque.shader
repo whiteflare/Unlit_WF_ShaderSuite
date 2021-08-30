@@ -87,6 +87,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
             "DisableBatching" = "True"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

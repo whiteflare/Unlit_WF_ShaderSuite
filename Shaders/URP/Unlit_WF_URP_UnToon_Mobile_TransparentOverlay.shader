@@ -91,6 +91,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             "RenderType" = "Transparent"
             "Queue" = "Overlay"
             "RenderPipeline" = "LightweightPipeline"
+            "IgnoreProjector" = "True"
         }
 
         Pass {
