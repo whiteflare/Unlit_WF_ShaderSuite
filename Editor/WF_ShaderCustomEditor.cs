@@ -271,7 +271,7 @@ namespace UnlitWF
             DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Material Options");
             materialEditor.RenderQueueField();
             materialEditor.EnableInstancingField();
-            //materialEditor.DoubleSidedGIField();
+            materialEditor.DoubleSidedGIField();
 
             // 情報(ボトム)
             OnGuiSub_ShowCurrentShaderName(materialEditor, true);
@@ -1140,6 +1140,7 @@ namespace UnlitWF
                     param.materialSource = copiedMaterial;
                     param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
                     param.prefixs = new string[] { prefix };
+                    param.withoutTextures = true;
                     WFMaterialEditUtility.CopyProperties(param);
                 });
             }
