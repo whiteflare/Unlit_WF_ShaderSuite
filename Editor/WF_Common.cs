@@ -17,7 +17,7 @@
 
 #if UNITY_EDITOR
 
-// #define _WF_LEGACY_FEATURE_SWITCH
+#define _WF_LEGACY_FEATURE_SWITCH
 
 using System;
 using System.Collections.Generic;
