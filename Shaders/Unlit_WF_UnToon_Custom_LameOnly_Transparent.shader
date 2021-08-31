@@ -80,6 +80,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+450"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

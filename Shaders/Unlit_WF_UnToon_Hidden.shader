@@ -17,36 +17,6 @@
 Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
 
     Properties {
-        // 基本
-        [WFHeader(Base)]
-            _MainTex                ("Main Texture", 2D) = "white" {}
-        [HDR]
-            _Color                  ("Color", Color) = (1, 1, 1, 1)
-        [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 2
-        [Toggle(_)]
-            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
-
-        // Lit
-        [WFHeader(Lit)]
-        [Gamma]
-            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
-        [Gamma]
-            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
-            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
-            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
-
-        [WFHeader(Lit Advance)]
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
-            _GL_LightMode           ("Sun Source", Float) = 0
-            _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
-            _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
-        [Toggle(_)]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
-            _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
-
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/08/28", Float) = 0
@@ -56,6 +26,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
+            "IgnoreProjector" = "True"
         }
 
         Pass {
@@ -67,34 +38,36 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
 
             CGPROGRAM
 
-            #pragma vertex vert_depth
-            #pragma fragment frag_depth
+            #pragma vertex vert
+            #pragma fragment frag
 
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
+            #pragma target 2.0
+
             #pragma multi_compile_instancing
 
-            #include "WF_UnToon_DepthOnly.cginc"
+            #include "UnityCG.cginc"
 
-            ENDCG
-        }
+            struct appdata_t {
+                float4 vertex : POSITION;
+            };
 
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
+            struct v2f {
+                float4 vertex : SV_POSITION;
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
 
-            ColorMask 0
-            ZWrite OFF
+            v2f vert (appdata_t v) {
+                v2f o;
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-            CGPROGRAM
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                return o;
+            }
 
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow_hidden
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-
-            #include "WF_UnToon_ShadowCaster.cginc"
+            fixed4 frag (v2f i) : COLOR {
+                return fixed4(0, 0, 0, 1);
+            }
 
             ENDCG
         }
@@ -110,11 +83,25 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta_black
 
-            #define _VC_ENABLE
-
             #pragma shader_feature EDITOR_VISUALIZATION
 
-            #include "WF_UnToon_Meta.cginc"
+            #include "UnityStandardMeta.cginc"
+
+            float4 frag_meta_black(v2f_meta i) : SV_Target {
+                UnityMetaInput o;
+                UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
+
+                o.Albedo        = float3(0, 0, 0);
+                o.SpecularColor = float3(0, 0, 0);
+                o.Emission      = float3(0, 0, 0);
+
+                #ifdef EDITOR_VISUALIZATION
+                    o.VizUV         = i.vizUV;
+                    o.LightCoord    = i.lightCoord;
+                #endif
+
+                return UnityMetaFragment(o);
+            }
 
             ENDCG
         }

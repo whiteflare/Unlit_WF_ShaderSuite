@@ -135,12 +135,15 @@ namespace UnlitWF
                 if (propPair.after != null) {
                     propPair.before.CopyTo(propPair.after);
                     propPair.onAfterCopy(propPair.after);
+                } else {
+                    propPair.before.Rename(propPair.afterName);
+                    propPair.onAfterCopy(propPair.before);
                 }
             }
             // 保存
             ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.after));
             // 旧プロパティは全て削除
-            foreach (var prop in replaceList.Select(p => p.before)) {
+            foreach (var prop in replaceList.Where(p => p.after != null).Select(p => p.before)) {
                 prop.Remove();
             }
             // 保存
@@ -162,7 +165,7 @@ namespace UnlitWF
                 foreach (var pair in replacement) {
                     var before = props.GetValueOrNull(pair.beforeName);
                     if (before != null) {
-                        result.Add(new RelacePropertyName(before, props.GetValueOrNull(pair.afterName), pair.onAfterCopy));
+                        result.Add(new RelacePropertyName(before, props.GetValueOrNull(pair.afterName), pair.afterName, pair.onAfterCopy));
                     }
                 }
             }
@@ -174,11 +177,13 @@ namespace UnlitWF
         {
             public readonly ShaderSerializedProperty before;
             public readonly ShaderSerializedProperty after;
+            public readonly string afterName;
             public readonly Action<ShaderSerializedProperty> onAfterCopy;
 
-            public RelacePropertyName(ShaderSerializedProperty before, ShaderSerializedProperty after, Action<ShaderSerializedProperty> onAfterCopy = null) {
+            public RelacePropertyName(ShaderSerializedProperty before, ShaderSerializedProperty after, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null) {
                 this.before = before;
                 this.after = after;
+                this.afterName = afterName;
                 this.onAfterCopy = onAfterCopy ?? (p => { });
             }
         }
@@ -398,7 +403,11 @@ namespace UnlitWF
             if (prop == null || string.IsNullOrEmpty(prop.stringValue)) {
                 return;
             }
-            UnityEngine.Debug.Log("[WF][Tool] Deleted Shaderkeyword: " + prop.stringValue);
+            var keywords = prop.stringValue;
+            keywords = string.Join(" ", keywords.Split(' ').Where(kwd => !WFCommonUtility.IsEnableKeyword(kwd)).OrderBy(kwd => kwd));
+            if (!string.IsNullOrWhiteSpace(keywords)) {
+                UnityEngine.Debug.Log("[WF][Tool] Deleted Shaderkeyword: " + keywords);
+            }
             prop.stringValue = "";
             so.ApplyModifiedProperties();
         }

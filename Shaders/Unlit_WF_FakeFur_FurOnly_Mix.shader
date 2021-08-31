@@ -112,6 +112,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

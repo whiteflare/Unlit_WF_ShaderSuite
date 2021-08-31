@@ -81,7 +81,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
-            "DisableBatching" = "True"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

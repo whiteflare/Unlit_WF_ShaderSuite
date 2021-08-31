@@ -90,6 +90,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Overlay"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

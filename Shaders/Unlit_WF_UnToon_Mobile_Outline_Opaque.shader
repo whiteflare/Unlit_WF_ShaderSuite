@@ -188,7 +188,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
-            "DisableBatching" = "True"
         }
 
         Pass {
