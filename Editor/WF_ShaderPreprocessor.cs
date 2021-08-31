@@ -241,9 +241,8 @@ namespace UnlitWF
 
                 // 直接のシェーダではなく、そのフォールバックを利用できるならばそれも追加する
                 if (settings == null || !settings.stripFallback) {
-                    var pi = shader.FindPropertyIndex("_FallBack");
-                    if (0 <= pi) {
-                        var fallback = shader.GetPropertyDescription(pi);
+                    var fallback = WFCommonUtility.GetShaderFallBackTarget(shader);
+                    if (fallback != null) {
                         AppendUsedShaderVariant(result, mat, Shader.Find(fallback));
                     }
                 }

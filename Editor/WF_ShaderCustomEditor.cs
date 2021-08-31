@@ -327,7 +327,7 @@ namespace UnlitWF
             var snm = WFShaderNameDictionary.TryFindFromName(mat.shader.name);
 
             // CurrentVersion プロパティがあるなら表示
-            var currentVersion = GetShaderCurrentVersion(mat);
+            var currentVersion = WFCommonUtility.GetShaderCurrentVersion(mat);
             if (!string.IsNullOrWhiteSpace(currentVersion)) {
                 rect = EditorGUILayout.GetControlRect();
                 rect.y += 2;
@@ -390,19 +390,6 @@ namespace UnlitWF
                     }
                 }
             }
-        }
-
-        private static string GetShaderCurrentVersion(Shader shader) {
-            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--) {
-                if ("_CurrentVersion" == ShaderUtil.GetPropertyName(shader, idx)) {
-                    return ShaderUtil.GetPropertyDescription(shader, idx);
-                }
-            }
-            return null;
-        }
-
-        private static string GetShaderCurrentVersion(Material mat) {
-            return mat == null ? null : GetShaderCurrentVersion(mat.shader);
         }
 
         private void OnGUISub_MigrationHelpBox(MaterialEditor materialEditor) {
