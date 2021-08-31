@@ -204,7 +204,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #pragma target 3.0
 
             #define _TL_ENABLE // 常にオン
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -230,15 +230,15 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
 
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
+            #define _AO_ENABLE
+            #define _ES_ENABLE
             #define _ES_SIMPLE_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _HL_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -260,7 +260,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

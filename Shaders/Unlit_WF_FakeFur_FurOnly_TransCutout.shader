@@ -126,8 +126,8 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
+            #define _CL_ENABLE
+            #define _TS_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
