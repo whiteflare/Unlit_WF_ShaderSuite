@@ -659,7 +659,7 @@ namespace UnlitWF
                     continue;
                 }
                 if (!Validate(mat)) {
-                    return;
+                    continue;
                 }
 
                 var ctx = new ConvertContext();
@@ -755,7 +755,7 @@ namespace UnlitWF
 
         protected override bool Validate(Material mat) {
             // UnlitWFのマテリアルを対象に、URPではない場合に変換する
-            return WFCommonUtility.IsSupportedShader(mat) && !IsURP();
+            return WFCommonUtility.IsSupportedShader(mat) && !WFCommonUtility.IsMobileSupportedShader(mat) && !IsURP();
         }
 
         protected static List<Action<ConvertContext>> CreateConverterList() {
