@@ -321,7 +321,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
             _CurrentVersion         ("2021/08/28", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/WF_UnToon_Opaque", Float) = 0
+            _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", Float) = 0
     }
 
     SubShader {
@@ -406,7 +406,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
         UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
-    FallBack "UnlitWF/WF_UnToon_Opaque"
+    FallBack "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
