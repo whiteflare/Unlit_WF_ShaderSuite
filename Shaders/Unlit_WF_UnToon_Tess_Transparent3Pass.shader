@@ -339,7 +339,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _CurrentVersion         ("2021/08/28", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/WF_UnToon_Transparent3Pass", Float) = 0
+            _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass", Float) = 0
     }
 
     SubShader {
@@ -549,7 +549,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
         UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
-    FallBack "UnlitWF/WF_UnToon_Transparent3Pass"
+    FallBack "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

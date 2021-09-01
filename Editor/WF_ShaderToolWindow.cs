@@ -659,7 +659,7 @@ namespace UnlitWF
                     continue;
                 }
                 if (!Validate(mat)) {
-                    return;
+                    continue;
                 }
 
                 var ctx = new ConvertContext();
@@ -694,7 +694,11 @@ namespace UnlitWF
         }
 
         protected static bool IsMatchShaderName(ConvertContext ctx, string name) {
-            return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(ctx.oldMaterial.shader.name);
+            return IsMatchShaderName(ctx.oldMaterial.shader, name);
+        }
+
+        protected static bool IsMatchShaderName(Shader shader, string name) {
+            return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(shader.name);
         }
 
         private static bool hasCustomValue(Dictionary<string, ShaderSerializedProperty> props, string name) {
@@ -755,7 +759,7 @@ namespace UnlitWF
 
         protected override bool Validate(Material mat) {
             // UnlitWFのマテリアルを対象に、URPではない場合に変換する
-            return WFCommonUtility.IsSupportedShader(mat) && !IsURP();
+            return WFCommonUtility.IsSupportedShader(mat) && !WFCommonUtility.IsMobileSupportedShader(mat) && !IsURP();
         }
 
         protected static List<Action<ConvertContext>> CreateConverterList() {
@@ -777,6 +781,12 @@ namespace UnlitWF
                     if (cnv) {
                         WFCommonUtility.SetupShaderKeyword(ctx.target);
                         EditorUtility.SetDirty(ctx.target);
+                    }
+                },
+                ctx => {
+                    if (IsMatchShaderName(ctx.oldMaterial.shader, "Transparent3Pass") && !IsMatchShaderName(ctx.target.shader, "Transparent3Pass")) {
+                        // Transparent3Pass からそうではないシェーダの切り替えでは、_AL_ZWrite を ON に変更する
+                        ctx.target.SetInt("_AL_ZWrite", 1);
                     }
                 },
             };
