@@ -86,6 +86,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest-1"
             "RenderPipeline" = "LightweightPipeline"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

@@ -74,6 +74,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry-1"
             "RenderPipeline" = "LightweightPipeline"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

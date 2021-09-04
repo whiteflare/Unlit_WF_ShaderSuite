@@ -17,6 +17,8 @@
 
 #if UNITY_EDITOR
 
+// #define _WF_LEGACY_FEATURE_SWITCH
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,7 +151,7 @@ namespace UnlitWF
                 }
             }
             // Enableキーワードを整理する
-#if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER && !_WF_LEGACY_FEATURE_SWITCH
             foreach (var mat in mats) {
                 if (!IsSupportedShader(mat)) {
                     continue;
@@ -256,6 +258,34 @@ namespace UnlitWF
         }
 
         /// <summary>
+        /// ShaderがVRC QuestでサポートされるUnlitWFかどうか判定する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static bool IsMobileSupportedShader(Shader shader) {
+            if (!IsSupportedShader(shader)) {
+                return false;
+            }
+            var name = shader.name;
+            if (name.Contains("FakeFur")) {
+                return false;
+            }
+            if (name.Contains("Mobile") || name.Contains("_Gem_") || name.Contains("Hidden") || name.Contains("DebugView")) {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// ShaderがVRC QuestでサポートされるUnlitWFかどうか判定する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static bool IsMobileSupportedShader(Material mat) {
+            return mat != null && IsMobileSupportedShader(mat.shader);
+        }
+
+        /// <summary>
         /// 最新リリースのVersionInfo
         /// </summary>
         private static WFVersionInfo LatestVersion = null;
@@ -296,6 +326,65 @@ namespace UnlitWF
                 return;
             }
             Application.OpenURL(LatestVersion.downloadPage);
+        }
+
+        /// <summary>
+        /// Shaderから指定のnameのプロパティの description を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private static string getPropertyDescription(Shader shader, string name) {
+#if UNITY_2019_1_OR_NEWER
+            var idx = shader.FindPropertyIndex(name);
+            if (0 <= idx) {
+                return shader.GetPropertyDescription(idx);
+            }
+            return null;
+#else
+            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--) {
+                if (name == ShaderUtil.GetPropertyName(shader, idx)) {
+                    return ShaderUtil.GetPropertyDescription(shader, idx);
+                }
+            }
+            return null;
+#endif
+        }
+
+        /// <summary>
+        /// Shader から _CurrentVersion の値を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static string GetShaderCurrentVersion(Shader shader) {
+            return getPropertyDescription(shader, "_CurrentVersion");
+        }
+
+        /// <summary>
+        /// Material から _CurrentVersion の値を取得する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static string GetShaderCurrentVersion(Material mat) {
+            return mat == null ? null : GetShaderCurrentVersion(mat.shader);
+        }
+
+        /// <summary>
+        /// Shader から _FallBack の値を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static string GetShaderFallBackTarget(Shader shader) {
+            return getPropertyDescription(shader, "_FallBack");
+        }
+
+        /// <summary>
+        /// Material から _FallBack の値を取得する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static string GetShaderFallBackTarget(Material mat) {
+            return mat == null ? null : GetShaderFallBackTarget(mat.shader);
         }
     }
 

@@ -172,6 +172,7 @@
     }
 
     float3 pickLightmapLod(float2 uv_lmap) {
+#ifdef SHADER_API_D3D11
         float3 color = float3(0, 0, 0);
         #ifdef LIGHTMAP_ON
         {
@@ -190,6 +191,9 @@
         }
         #endif
         return color;
+#else
+        return float3(1, 1, 1);
+#endif
     }
 
     ////////////////////////////
