@@ -298,7 +298,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/08/28", Float) = 0
+            _CurrentVersion         ("2021/09/05", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0

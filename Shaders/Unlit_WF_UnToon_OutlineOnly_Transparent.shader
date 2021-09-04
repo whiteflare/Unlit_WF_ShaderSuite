@@ -87,7 +87,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/08/28", Float) = 0
+            _CurrentVersion         ("2021/09/05", Float) = 0
     }
 
     SubShader {
@@ -95,6 +95,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+100"
             "DisableBatching" = "True"
+            "IgnoreProjector" = "True"
         }
 
         GrabPass { "_UnToonOutlineOnlyCancel" }

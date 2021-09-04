@@ -104,7 +104,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/08/28", Float) = 0
+            _CurrentVersion         ("2021/09/05", Float) = 0
     }
 
     SubShader {
@@ -112,6 +112,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
+            "IgnoreProjector" = "True"
         }
 
         Pass {

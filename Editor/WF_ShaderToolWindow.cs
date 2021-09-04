@@ -38,6 +38,7 @@ namespace UnlitWF
         public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "Switch DebugView shader";
         public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
         public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials in the Scene";
+        public const string ASSETS_CNGMOBILE = PATH_ASSETS + "Change Mobile shader";
 
         public const int PRI_ASSETS_AUTOCNV = 2201;
         public const int PRI_ASSETS_CREANUP = 2301;
@@ -47,6 +48,7 @@ namespace UnlitWF
         public const int PRI_ASSETS_DEBUGVIEW = 2401;
         public const int PRI_ASSETS_TEMPLATE = 2501;
         public const int PRI_ASSETS_KEEPMAT = 2601;
+        public const int PRI_ASSETS_CNGMOBILE = 2701;
 
         public const string PATH_TOOLS = "Tools/UnlitWF/";
 
@@ -64,22 +66,22 @@ namespace UnlitWF
 
         public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "Convert UnlitWF material";
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView shader";
+        public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "Change Mobile shader";
 
         public const int PRI_MATERIAL_AUTOCNV = 1654;
         public const int PRI_MATERIAL_DEBUGVIEW = 1655;
+        public const int PRI_MATERIAL_CNGMOBILE = 1656;
 
         #region Convert UnlitWF material
 
         [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
         private static void Menu_AutoConvertMaterial() {
-            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
-                WFMaterialAutoConvertUtility.ExecAutoConvert(mat);
-            }
+            new WFMaterialFromOtherShaderConverter().ExecAutoConvert(Selection.GetFiltered<Material>(SelectionMode.Assets));
         }
 
         [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
         private static void ContextMenu_AutoConvertMaterial(MenuCommand cmd) {
-            WFMaterialAutoConvertUtility.ExecAutoConvert(cmd.context as Material);
+            new WFMaterialFromOtherShaderConverter().ExecAutoConvert(cmd.context as Material);
         }
 
         #endregion
@@ -115,6 +117,26 @@ namespace UnlitWF
 
         #endregion
 
+        #region Change Mobile Shader
+
+        [MenuItem(WFMenu.MATERIAL_CNGMOBILE, priority = WFMenu.PRI_MATERIAL_CNGMOBILE)]
+        private static void ContextMenu_ChangeMobileShader(MenuCommand cmd) {
+            ChangeMobileShader(cmd.context as Material);
+        }
+
+        [MenuItem(WFMenu.ASSETS_CNGMOBILE, priority = WFMenu.PRI_ASSETS_CNGMOBILE)]
+        private static void Menu_ChangeMobileShader() {
+            ChangeMobileShader(Selection.GetFiltered<Material>(SelectionMode.Assets));
+        }
+
+        private static void ChangeMobileShader(params Material[] mats) {
+            if (0 < mats.Length && EditorUtility.DisplayDialog("WF change Mobile shader", WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel")) {
+                new WFMaterialToMobileShaderConverter().ExecAutoConvert(mats);
+            }
+        }
+
+        #endregion
+
         [MenuItem(WFMenu.ASSETS_AUTOCNV, validate = true)]
         [MenuItem(WFMenu.ASSETS_CREANUP, validate = true)]
         [MenuItem(WFMenu.ASSETS_RESET, validate = true)]
@@ -122,6 +144,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_MIGRATION, validate = true)]
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, validate = true)]
         [MenuItem(WFMenu.ASSETS_KEEPMAT, validate = true)]
+        [MenuItem(WFMenu.ASSETS_CNGMOBILE, validate = true)]
         private static bool MenuValidation_HasMaterials() {
             return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
@@ -617,221 +640,45 @@ namespace UnlitWF
 
     #endregion
 
-    public class WFMaterialAutoConvertUtility
+    public abstract class AbstractMaterialConverter
     {
-        private static bool IsMatchShaderName(ConvertContext ctx, string name) {
-            return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(ctx.oldMaterial.shader.name);
+        private readonly List<Action<ConvertContext>> converters;
+
+        protected AbstractMaterialConverter(List<Action<ConvertContext>> converters) {
+            this.converters = converters;
         }
 
-        private static readonly List<Action<ConvertContext>> selectShader = new List<Action<ConvertContext>>() {
-            ctx => {
-                // アウトライン有無を判定する
-                if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {
-                    ctx.outline = true;
-                }
-                else if (HasCustomValueTexture(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler")) {
-                    ctx.outline = true;
-                }
-                else if (HasCustomValueFloat(ctx, "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
-                    ctx.outline = true;
-                }
-            },
-            ctx => {
-                // シェーダ名からシェーダタイプを判定する
-                if (ctx.renderType == ShaderType.NoMatch) {
-                    if (IsMatchShaderName(ctx, "opaque") || IsMatchShaderName(ctx, "texture")) {
-                        ctx.renderType = ShaderType.Opaque;
-                    }
-                    else if (IsMatchShaderName(ctx, "cutout")) {
-                        ctx.renderType = ShaderType.Cutout;
-                    }
-                    else if (IsMatchShaderName(ctx, "trans")) {
-                        ctx.renderType = ShaderType.Transparent;
-                    }
-                }
-            },
-            ctx => {
-                // RenderQueue からシェーダタイプを判定する
-                if (ctx.renderType == ShaderType.NoMatch) {
-                    var queue = ctx.oldMaterial.renderQueue;
-                    if (queue < 0) {
-                        queue = ctx.oldMaterial.shader.renderQueue;
-                    }
-                    if (queue < 2450) {
-                        ctx.renderType = ShaderType.Opaque;
-                    } else if (queue < 2500) {
-                        ctx.renderType = ShaderType.Cutout;
-                    } else {
-                        ctx.renderType = ShaderType.Transparent;
-                    }
-                }
-            },
-            ctx => {
-                if (IsURP()) {
-                    switch(ctx.renderType) {
-                        case ShaderType.Transparent:
-                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Transparent", ctx.target);
-                            break;
-                        case ShaderType.Cutout:
-                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_TransCutout", ctx.target);
-                            break;
-                        default:
-                            WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Opaque", ctx.target);
-                            break;
-                    }
-                }
-                else if (ctx.outline) {
-                    switch(ctx.renderType) {
-                        case ShaderType.Transparent:
-                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", ctx.target);
-                            break;
-                        case ShaderType.Cutout:
-                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout", ctx.target);
-                            break;
-                        default:
-                            WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", ctx.target);
-                            break;
-                    }
-                } else {
-                    switch(ctx.renderType) {
-                        case ShaderType.Transparent:
-                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Transparent", ctx.target);
-                            break;
-                        case ShaderType.Cutout:
-                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_TransCutout", ctx.target);
-                            break;
-                        default:
-                            WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Opaque", ctx.target);
-                            break;
-                    }
-                }
-            },
-        };
-
-        private static readonly List<Action<ConvertContext>> selectFeature = new List<Action<ConvertContext>>() {
-            ctx => {
-                if (HasCustomValueTexture(ctx, "_MainTex")) {
-                    // メインテクスチャがあるならば _Color は白にする
-                    ctx.target.SetColor("_Color", Color.white);
-                }
-            },
-            ctx => {
-                // アルファマスク
-                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                    new PropertyNameReplacement("_AlphaMask", "_AL_MaskTex"),
-                    new PropertyNameReplacement("_ClippingMask", "_AL_MaskTex"));
-                if (HasCustomValueTexture(ctx, "_AL_MaskTex")) {
-                    ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
-                }
-            },
-            ctx => {
-                // ノーマルマップ
-                if (HasCustomValueTexture(ctx, "_BumpMap", "_DetailNormalMap")) {
-                    ctx.target.SetInt("_NM_Enable", 1);
-                }
-            },
-            ctx => {
-                // メタリック
-                if (HasCustomValueTexture(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
-                    ctx.target.SetInt("_MT_Enable", 1);
-                }
-            },
-            ctx => {
-                // AO
-                if (HasCustomValueTexture(ctx, "_OcclusionMap")) {
-                    ctx.target.SetInt("_AO_Enable", 1);
-                }
-            },
-            ctx => {
-                // Emission
-                if (HasCustomValueTexture(ctx, "_EmissionMap") || HasCustomValueFloat(ctx, "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
-                    ctx.target.SetInt("_ES_Enable", 1);
-                }
-            },
-            ctx => {
-                // Toon影
-                ctx.target.SetInt("_TS_Enable", 1);
-                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                    // 1影
-                    new PropertyNameReplacement("_1st_ShadeMap", "_TS_1stTex"),
-                    new PropertyNameReplacement("_ShadowColorTex", "_TS_1stTex"),
-                    new PropertyNameReplacement("_1st_ShadeColor", "_TS_1stColor"),
-                    new PropertyNameReplacement("_ShadowColor", "_TS_1stColor"),
-                    // 2影
-                    new PropertyNameReplacement("_2nd_ShadeMap", "_TS_2ndTex"),
-                    new PropertyNameReplacement("_Shadow2ndColorTex", "_TS_2ndTex"),
-                    new PropertyNameReplacement("_2nd_ShadeColor", "_TS_2ndColor"),
-                    new PropertyNameReplacement("_Shadow2ndColor", "_TS_2ndColor")
-                    );
-                // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
-                if (HasCustomValueTexture(ctx, "_1st_ShadeMap", "_ShadowColorTex", "_2nd_ShadeMap", "_Shadow2ndColorTex")) {
-                    ctx.target.SetTexture("_TS_BaseTex", ctx.target.GetTexture("_MainTex"));
-                }
-            },
-            ctx => {
-                // リムライト
-                if (HasCustomValueFloat(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
-                    ctx.target.SetInt("_TR_Enable", 1);
-                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        new PropertyNameReplacement("_RimColor", "_TR_Color"),
-                        new PropertyNameReplacement("_RimLitColor", "_TR_Color"),
-                        new PropertyNameReplacement("_RimLightColor", "_TR_Color"),
-                        new PropertyNameReplacement("_RimLitMask", "_TR_MaskTex"),
-                        new PropertyNameReplacement("_RimBlendMask", "_TR_MaskTex"),
-                        new PropertyNameReplacement("_Set_RimLightMask", "_TR_Color"),
-                        new PropertyNameReplacement("_RimMask", "_TR_Color")
-                        );
-                }
-            },
-            ctx => {
-                // アウトライン
-                WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                    new PropertyNameReplacement("_OutlineColor", "_TL_LineColor"),
-                    new PropertyNameReplacement("_Outline_Color", "_TL_LineColor"),
-                    new PropertyNameReplacement("_OutLineColor", "_TL_LineColor"),
-                    new PropertyNameReplacement("_LineColor", "_TL_LineColor"),
-                    // ColorTex
-                    new PropertyNameReplacement("_OutlineTex", "_TL_CustomColorTex"),
-                    new PropertyNameReplacement("_OutLineTexture", "_TL_CustomColorTex"),
-                    new PropertyNameReplacement("_OutlineTexture", "_TL_CustomColorTex"),
-                    // MaskTex
-                    new PropertyNameReplacement("_OutlineWidthMask", "_TL_MaskTex"),
-                    new PropertyNameReplacement("_Outline_Sampler", "_TL_MaskTex"),
-                    new PropertyNameReplacement("_OutlineMask", "_TL_MaskTex"),
-                    new PropertyNameReplacement("_OutLineMask", "_TL_MaskTex")
-                    );
-            },
-            ctx => {
-                // アルファをリセットし、キーワードを整理する
-                var resetParam = new ResetParameter();
-                resetParam.materials = new Material[]{ ctx.target };
-                resetParam.resetColorAlpha = true;
-                resetParam.resetUnused = true;
-                resetParam.resetKeywords = true;
-                WFMaterialEditUtility.ResetPropertiesWithoutUndo(resetParam);
-            },
-        };
-
-        public static void ExecAutoConvert(Material mat) {
-            if (mat == null || mat.shader.name.Contains("UnlitWF")) {
-                return;
-            }
-
-            var ctx = new ConvertContext();
-            ctx.target = mat;
-            ctx.oldMaterial = new Material(mat);
-            ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
-
-            foreach (var cnv in selectShader) {
-                cnv(ctx);
-            }
-            foreach (var act in selectFeature) {
-                act(ctx);
-            }
-            Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+        public void ExecAutoConvert(params Material[] mats) {
+            Undo.RecordObjects(mats, "WF Convert materials");
+            ExecAutoConvertWithoutUndo(mats);
         }
 
-        private class ConvertContext
+        public void ExecAutoConvertWithoutUndo(params Material[] mats) {
+            foreach (var mat in mats) {
+                if (mat == null) {
+                    continue;
+                }
+                if (!Validate(mat)) {
+                    continue;
+                }
+
+                var ctx = new ConvertContext();
+                ctx.target = mat;
+                ctx.oldMaterial = new Material(mat);
+                ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
+
+                foreach (var cnv in converters) {
+                    cnv(ctx);
+                }
+                Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+            }
+        }
+
+        protected virtual bool Validate(Material mat) {
+            return true;
+        }
+
+        protected class ConvertContext
         {
             public Material target;
             public Material oldMaterial;
@@ -841,42 +688,314 @@ namespace UnlitWF
             public bool outline = false;
         }
 
-        private enum ShaderType
+        protected enum ShaderType
         {
             NoMatch, Opaque, Cutout, Transparent
         }
 
-        private static bool HasCustomValueFloat(ConvertContext ctx, params string[] names) {
-            foreach (var name in names) {
-                if (ctx.oldProps.TryGetValue(name, out var prop)) {
-                    if (prop.Type == ShaderUtil.ShaderPropertyType.Float || prop.Type == ShaderUtil.ShaderPropertyType.Range) {
+        protected static bool IsMatchShaderName(ConvertContext ctx, string name) {
+            return IsMatchShaderName(ctx.oldMaterial.shader, name);
+        }
+
+        protected static bool IsMatchShaderName(Shader shader, string name) {
+            return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(shader.name);
+        }
+
+        private static bool hasCustomValue(Dictionary<string, ShaderSerializedProperty> props, string name) {
+            if (props.TryGetValue(name, out var prop)) {
+                switch (prop.Type) {
+                    case ShaderUtil.ShaderPropertyType.Float:
+                    case ShaderUtil.ShaderPropertyType.Range:
                         return 0.001f < Mathf.Abs(prop.FloatValue);
-                    }
-                }
-            }
-            return false;
-        }
 
-        private static bool HasCustomValueTexture(ConvertContext ctx, params string[] names) {
-            foreach (var name in names) {
-                if (ctx.oldProps.TryGetValue(name, out var prop)) {
-                    if (prop.Type == ShaderUtil.ShaderPropertyType.TexEnv) {
+                    case ShaderUtil.ShaderPropertyType.Color:
+                    case ShaderUtil.ShaderPropertyType.Vector:
+                        var vec = prop.VectorValue;
+                        return 0.001f < Mathf.Abs(vec.x) || 0.001f < Mathf.Abs(vec.y) || 0.001f < Mathf.Abs(vec.z);
+
+                    case ShaderUtil.ShaderPropertyType.TexEnv:
                         var tex = prop.TextureValue;
-                        if (tex != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex))) {
-                            return true;
-                        }
-                    }
+                        return tex != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex));
+
+                    default:
+                        return false;
                 }
             }
             return false;
         }
 
-        private static bool IsURP() {
+        protected static bool HasCustomValue(ConvertContext ctx, params string[] names) {
+            var newProp = ShaderSerializedProperty.AsDict(ctx.target);
+
+            foreach (var name in names) {
+                // 新しいマテリアルから設定されていないかを調べる
+                if (hasCustomValue(newProp, name)) {
+                    return true;
+                }
+                // 古いマテリアルの側から設定されていないかを調べる
+                if (hasCustomValue(ctx.oldProps, name)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected static bool IsURP() {
 #if UNITY_2019_1_OR_NEWER
             return UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
 #else
             return false;
 #endif
+        }
+    }
+
+    /// <summary>
+    /// WFマテリアルをMobile系に変換するコンバータ
+    /// </summary>
+    public class WFMaterialToMobileShaderConverter : AbstractMaterialConverter
+    {
+        public WFMaterialToMobileShaderConverter() : base(CreateConverterList()) {
+        }
+
+        protected override bool Validate(Material mat) {
+            // UnlitWFのマテリアルを対象に、URPではない場合に変換する
+            return WFCommonUtility.IsSupportedShader(mat) && !WFCommonUtility.IsMobileSupportedShader(mat) && !IsURP();
+        }
+
+        protected static List<Action<ConvertContext>> CreateConverterList() {
+            return new List<Action<ConvertContext>>() {
+                ctx => {
+                    bool cnv = false;
+                    var shader = ctx.target.shader;
+                    while (WFCommonUtility.IsSupportedShader(shader) && !WFCommonUtility.IsMobileSupportedShader(shader)) {
+                        // シェーダ切り替え
+                        var fallback = WFCommonUtility.GetShaderFallBackTarget(shader) ?? "Hidden/UnlitWF/WF_UnToon_Hidden";
+                        WFCommonUtility.ChangeShader(fallback, ctx.target);
+
+                        // シェーダ切り替え後に RenderQueue をコピー
+                        ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
+
+                        shader = ctx.target.shader;
+                        cnv = true;
+                    }
+                    if (cnv) {
+                        WFCommonUtility.SetupShaderKeyword(ctx.target);
+                        EditorUtility.SetDirty(ctx.target);
+                    }
+                },
+                ctx => {
+                    if (IsMatchShaderName(ctx.oldMaterial.shader, "Transparent3Pass") && !IsMatchShaderName(ctx.target.shader, "Transparent3Pass")) {
+                        // Transparent3Pass からそうではないシェーダの切り替えでは、_AL_ZWrite を ON に変更する
+                        ctx.target.SetInt("_AL_ZWrite", 1);
+                    }
+                },
+            };
+        }
+    }
+
+    /// <summary>
+    /// WF系ではないマテリアルをWF系に変換するコンバータ
+    /// </summary>
+    public class WFMaterialFromOtherShaderConverter : AbstractMaterialConverter
+    {
+        public WFMaterialFromOtherShaderConverter() : base(CreateConverterList()) {
+        }
+
+        protected override bool Validate(Material mat) {
+            // UnlitWF系ではないマテリアルを対象に処理する
+            return !WFCommonUtility.IsSupportedShader(mat);
+        }
+
+        protected static List<Action<ConvertContext>> CreateConverterList() {
+            return new List<Action<ConvertContext>>() {
+                ctx => {
+                    // アウトライン有無を判定する
+                    if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {
+                        ctx.outline = true;
+                    }
+                    else if (HasCustomValue(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler", "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
+                        ctx.outline = true;
+                    }
+                },
+                ctx => {
+                    // シェーダ名からシェーダタイプを判定する
+                    if (ctx.renderType == ShaderType.NoMatch) {
+                        if (IsMatchShaderName(ctx, "opaque") || IsMatchShaderName(ctx, "texture")) {
+                            ctx.renderType = ShaderType.Opaque;
+                        }
+                        else if (IsMatchShaderName(ctx, "cutout")) {
+                            ctx.renderType = ShaderType.Cutout;
+                        }
+                        else if (IsMatchShaderName(ctx, "trans")) {
+                            ctx.renderType = ShaderType.Transparent;
+                        }
+                    }
+                },
+                ctx => {
+                    // RenderQueue からシェーダタイプを判定する
+                    if (ctx.renderType == ShaderType.NoMatch) {
+                        var queue = ctx.oldMaterial.renderQueue;
+                        if (queue < 0) {
+                            queue = ctx.oldMaterial.shader.renderQueue;
+                        }
+                        if (queue < 2450) {
+                            ctx.renderType = ShaderType.Opaque;
+                        } else if (queue < 2500) {
+                            ctx.renderType = ShaderType.Cutout;
+                        } else {
+                            ctx.renderType = ShaderType.Transparent;
+                        }
+                    }
+                },
+                ctx => {
+                    if (IsURP()) {
+                        switch(ctx.renderType) {
+                            case ShaderType.Transparent:
+                                WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Transparent", ctx.target);
+                                break;
+                            case ShaderType.Cutout:
+                                WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_TransCutout", ctx.target);
+                                break;
+                            default:
+                                WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Opaque", ctx.target);
+                                break;
+                        }
+                    }
+                    else if (ctx.outline) {
+                        switch(ctx.renderType) {
+                            case ShaderType.Transparent:
+                                WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", ctx.target);
+                                break;
+                            case ShaderType.Cutout:
+                                WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout", ctx.target);
+                                break;
+                            default:
+                                WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", ctx.target);
+                                break;
+                        }
+                    } else {
+                        switch(ctx.renderType) {
+                            case ShaderType.Transparent:
+                                WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Transparent", ctx.target);
+                                break;
+                            case ShaderType.Cutout:
+                                WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_TransCutout", ctx.target);
+                                break;
+                            default:
+                                WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Opaque", ctx.target);
+                                break;
+                        }
+                    }
+                    // シェーダ切り替え後に RenderQueue をコピー
+                    ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
+                },
+                ctx => {
+                    if (HasCustomValue(ctx, "_MainTex")) {
+                        // メインテクスチャがあるならば _Color は白にする
+                        ctx.target.SetColor("_Color", Color.white);
+                    }
+                },
+                ctx => {
+                    // アルファマスク
+                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                        new PropertyNameReplacement("_AlphaMask", "_AL_MaskTex"),
+                        new PropertyNameReplacement("_ClippingMask", "_AL_MaskTex"));
+                    if (HasCustomValue(ctx, "_AL_MaskTex")) {
+                        ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
+                    }
+                },
+                ctx => {
+                    // ノーマルマップ
+                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                        new PropertyNameReplacement("_NormalMap", "_BumpMap"));
+                    if (HasCustomValue(ctx, "_BumpMap", "_DetailNormalMap")) {
+                        ctx.target.SetInt("_NM_Enable", 1);
+                    }
+                },
+                ctx => {
+                    // メタリック
+                    if (HasCustomValue(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
+                        ctx.target.SetInt("_MT_Enable", 1);
+                    }
+                },
+                ctx => {
+                    // AO
+                    if (HasCustomValue(ctx, "_OcclusionMap")) {
+                        ctx.target.SetInt("_AO_Enable", 1);
+                    }
+                },
+                ctx => {
+                    // Emission
+                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                        new PropertyNameReplacement("_Emissive_Tex", "_EmissionMap"),
+                        new PropertyNameReplacement("_Emissive_Color", "_EmissionColor"));
+                    if (HasCustomValue(ctx, "_EmissionMap", "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
+                        ctx.target.SetInt("_ES_Enable", 1);
+                    }
+                },
+                ctx => {
+                    // Toon影
+                    ctx.target.SetInt("_TS_Enable", 1);
+                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                        // 1影
+                        new PropertyNameReplacement("_1st_ShadeMap", "_TS_1stTex"),
+                        new PropertyNameReplacement("_ShadowColorTex", "_TS_1stTex"),
+                        new PropertyNameReplacement("_1st_ShadeColor", "_TS_1stColor"),
+                        new PropertyNameReplacement("_ShadowColor", "_TS_1stColor"),
+                        // 2影
+                        new PropertyNameReplacement("_2nd_ShadeMap", "_TS_2ndTex"),
+                        new PropertyNameReplacement("_Shadow2ndColorTex", "_TS_2ndTex"),
+                        new PropertyNameReplacement("_2nd_ShadeColor", "_TS_2ndColor"),
+                        new PropertyNameReplacement("_Shadow2ndColor", "_TS_2ndColor")
+                        );
+                    // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
+                    if (HasCustomValue(ctx, "_TS_1stTex", "_TS_2ndTex")) {
+                        ctx.target.SetTexture("_TS_BaseTex", ctx.target.GetTexture("_MainTex"));
+                    }
+                },
+                ctx => {
+                    // リムライト
+                    if (HasCustomValue(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
+                        ctx.target.SetInt("_TR_Enable", 1);
+                        WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                            new PropertyNameReplacement("_RimColor", "_TR_Color"),
+                            new PropertyNameReplacement("_RimLitColor", "_TR_Color"),
+                            new PropertyNameReplacement("_RimLightColor", "_TR_Color"),
+                            new PropertyNameReplacement("_RimLitMask", "_TR_MaskTex"),
+                            new PropertyNameReplacement("_RimBlendMask", "_TR_MaskTex"),
+                            new PropertyNameReplacement("_Set_RimLightMask", "_TR_Color"),
+                            new PropertyNameReplacement("_RimMask", "_TR_Color")
+                            );
+                    }
+                },
+                ctx => {
+                    // アウトライン
+                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                        new PropertyNameReplacement("_OutlineColor", "_TL_LineColor"),
+                        new PropertyNameReplacement("_Outline_Color", "_TL_LineColor"),
+                        new PropertyNameReplacement("_OutLineColor", "_TL_LineColor"),
+                        new PropertyNameReplacement("_LineColor", "_TL_LineColor"),
+                        // ColorTex
+                        new PropertyNameReplacement("_OutlineTex", "_TL_CustomColorTex"),
+                        new PropertyNameReplacement("_OutLineTexture", "_TL_CustomColorTex"),
+                        new PropertyNameReplacement("_OutlineTexture", "_TL_CustomColorTex"),
+                        // MaskTex
+                        new PropertyNameReplacement("_OutlineWidthMask", "_TL_MaskTex"),
+                        new PropertyNameReplacement("_Outline_Sampler", "_TL_MaskTex"),
+                        new PropertyNameReplacement("_OutlineMask", "_TL_MaskTex"),
+                        new PropertyNameReplacement("_OutLineMask", "_TL_MaskTex")
+                        );
+                },
+                ctx => {
+                    // アルファをリセットし、キーワードを整理する
+                    var resetParam = ResetParameter.Create();
+                    resetParam.materials = new Material[]{ ctx.target };
+                    resetParam.resetColorAlpha = true;
+                    // resetParam.resetUnused = true;
+                    resetParam.resetKeywords = true;
+                    WFMaterialEditUtility.ResetPropertiesWithoutUndo(resetParam);
+                },
+            };
         }
     }
 }
