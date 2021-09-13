@@ -73,7 +73,7 @@ namespace UnlitWF
             }
 
             // プロパティ類をコピー
-            var prm = new CopyPropParameter();
+            var prm = CopyPropParameter.Create();
             prm.materialSource = material;
             prm.materialDestination = mats.ToArray();
             prm.labels = WFShaderFunction.GetEnableFunctionList(material).Select(f => f.Label).ToArray();
