@@ -1017,7 +1017,8 @@
 #endif
                 float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
-                occlusion *= WF_TEX2D_OCCLUSION(uv_main);
+                float2 uv_aomap = _AO_UVType == 1 ? i.uv_lmap : uv_main;
+                occlusion *= WF_TEX2D_OCCLUSION(uv_aomap);
                 occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
                 #ifdef _LMAP_ENABLE
