@@ -216,14 +216,16 @@
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
-        float4 maskTex = PICK_SUB_TEX2D(_FR_MaskTex, _MainTex, uv_main);
+        float4 maskTex = SAMPLE_MASK_VALUE(_FR_MaskTex, uv_main, _FR_InvMaskVal);
         if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
             discard;
         }
 
         // ファーノイズを追加
         float noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).r;
-        color = float4(color.rgb * saturate(1 - (1 - noise) * _FR_ShadowPower), saturate(noise - pow(gi.height, 4)));
+        color.rgb   *= lerp(_FR_TintColorBase, _FR_TintColorTip, gi.height);
+        color.rgb   *= saturate(1 - (1 - noise) * _FR_ShadowPower);
+        color.a     = saturate(noise - pow(gi.height, 4));
 
         return color;
     }
