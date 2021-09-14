@@ -255,6 +255,8 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
@@ -298,12 +300,12 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
-            "RenderPipeline" = "LightweightPipeline"
+            "RenderPipeline" = "UniversalPipeline"
         }
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "LightweightForward" }
+            Tags { "LightMode" = "UniversalForward" }
 
             Cull [_CullMode]
 

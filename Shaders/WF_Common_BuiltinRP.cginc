@@ -76,10 +76,15 @@
     }
 
     float3 getPoint1LightPos() {
+#ifdef VERTEXLIGHT_ON
         return float3(unity_4LightPosX0.x, unity_4LightPosY0.x, unity_4LightPosZ0.x);
+#else
+        return float3(0, 0, 0);
+#endif
     }
 
     float3 samplePoint1LightColor(float3 ws_vertex) {
+#ifdef VERTEXLIGHT_ON
         float3 ws_lightPos = getPoint1LightPos();
         if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
             return float3(0, 0, 0); // XYZすべて0はポイントライト未設定と判定する
@@ -88,6 +93,9 @@
         float lengthSq = dot(ls_lightPos, ls_lightPos);
         float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
         return unity_LightColor[0].rgb * atten;
+#else
+        return float3(0, 0, 0);
+#endif
     }
 
     float3 OmniDirectional_Shade4PointLights(
@@ -123,6 +131,7 @@
 
 
     float3 sampleAdditionalLightColor(float3 ws_vertex) {
+#ifdef VERTEXLIGHT_ON
         return OmniDirectional_Shade4PointLights(
                 unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                 unity_LightColor[0].rgb,
@@ -132,9 +141,13 @@
                 unity_4LightAtten0,
                 ws_vertex
             );
+#else
+        return float3(0, 0, 0);
+#endif
     }
 
     float3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
+#ifdef VERTEXLIGHT_ON
         return OmniDirectional_Shade4PointLights(
                 unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                 float3(0, 0, 0),
@@ -144,6 +157,9 @@
                 unity_4LightAtten0,
                 ws_vertex
             );
+#else
+        return float3(0, 0, 0);
+#endif
     }
 
     ////////////////////////////

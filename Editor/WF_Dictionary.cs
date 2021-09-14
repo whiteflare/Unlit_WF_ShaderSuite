@@ -368,6 +368,8 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Fur Vector", "方向"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
+            new WFI18NTranslation("FR", "Tint Color (Base)", "色調整 (根元)"),
+            new WFI18NTranslation("FR", "Tint Color (Tip)", "色調整 (先端)"),
 
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
