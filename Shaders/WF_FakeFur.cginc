@@ -61,9 +61,6 @@
     ////////////////////////////
 
     float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
-        // Tangent Transform 計算
-        float3x3 tangentTransform = float3x3(ws_tangent, ws_bitangent, ws_normal);
-
         // Static Fur Vector 計算
         float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
 
@@ -74,7 +71,8 @@
         vec_fur = BlendNormals(vec_fur, vec_map);
 #endif
 
-        return mul(vec_fur , tangentTransform);
+        // Tangent Transform 計算
+        return transformTangentToWorldNormal(vec_fur, ws_normal, ws_tangent, ws_bitangent);
     }
 
     v2g vert_fakefur(appdata_fur v) {
@@ -218,14 +216,16 @@
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
-        float4 maskTex = PICK_SUB_TEX2D(_FR_MaskTex, _MainTex, uv_main);
+        float4 maskTex = SAMPLE_MASK_VALUE(_FR_MaskTex, uv_main, _FR_InvMaskVal);
         if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
             discard;
         }
 
         // ファーノイズを追加
         float noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).r;
-        color = float4(color.rgb * saturate(1 - (1 - noise) * _FR_ShadowPower), saturate(noise - pow(gi.height, 4)));
+        color.rgb   *= lerp(_FR_TintColorBase, _FR_TintColorTip, gi.height);
+        color.rgb   *= saturate(1 - (1 - noise) * _FR_ShadowPower);
+        color.a     = saturate(noise - pow(gi.height, 4));
 
         return color;
     }

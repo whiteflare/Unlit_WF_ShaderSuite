@@ -266,6 +266,7 @@
 #ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _AO_Enable;
 #endif
+    uint            _AO_UVType;
     float           _AO_UseLightMap;
     float           _AO_Contrast;
     float           _AO_Brightness;
