@@ -102,12 +102,12 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "RenderPipeline" = "LightweightPipeline"
+            "RenderPipeline" = "UniversalPipeline"
         }
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "LightweightForward" }
+            Tags { "LightMode" = "UniversalForward" }
 
             Cull [_CullMode]
 

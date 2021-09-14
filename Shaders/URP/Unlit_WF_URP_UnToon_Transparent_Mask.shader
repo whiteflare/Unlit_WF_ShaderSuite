@@ -307,12 +307,12 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "RenderPipeline" = "LightweightPipeline"
+            "RenderPipeline" = "UniversalPipeline"
         }
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "LightweightForward" }
+            Tags { "LightMode" = "UniversalForward" }
 
             Cull [_CullMode]
             ZWrite [_AL_ZWrite]

@@ -177,12 +177,12 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
-            "RenderPipeline" = "LightweightPipeline"
+            "RenderPipeline" = "UniversalPipeline"
         }
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "LightweightForward" }
+            Tags { "LightMode" = "UniversalForward" }
 
             Cull [_CullMode]
             AlphaToMask [_AL_AlphaToMask]

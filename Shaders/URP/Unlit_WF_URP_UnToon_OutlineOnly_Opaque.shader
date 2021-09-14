@@ -73,13 +73,13 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry-1"
-            "RenderPipeline" = "LightweightPipeline"
+            "RenderPipeline" = "UniversalPipeline"
             "IgnoreProjector" = "True"
         }
 
         Pass {
             Name "OUTLINE"
-            Tags { "LightMode" = "LightweightForward" }
+            Tags { "LightMode" = "UniversalForward" }
 
             Cull Front
 

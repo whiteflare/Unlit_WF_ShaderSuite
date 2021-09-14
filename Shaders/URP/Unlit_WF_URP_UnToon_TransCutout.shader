@@ -298,12 +298,12 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
-            "RenderPipeline" = "LightweightPipeline"
+            "RenderPipeline" = "UniversalPipeline"
         }
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "LightweightForward" }
+            Tags { "LightMode" = "UniversalForward" }
 
             Cull [_CullMode]
 
