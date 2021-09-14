@@ -61,9 +61,6 @@
     ////////////////////////////
 
     float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
-        // Tangent Transform 計算
-        float3x3 tangentTransform = float3x3(ws_tangent, ws_bitangent, ws_normal);
-
         // Static Fur Vector 計算
         float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
 
@@ -74,7 +71,8 @@
         vec_fur = BlendNormals(vec_fur, vec_map);
 #endif
 
-        return mul(vec_fur , tangentTransform);
+        // Tangent Transform 計算
+        return transformTangentToWorldNormal(vec_fur, ws_normal, ws_tangent, ws_bitangent);
     }
 
     v2g vert_fakefur(appdata_fur v) {

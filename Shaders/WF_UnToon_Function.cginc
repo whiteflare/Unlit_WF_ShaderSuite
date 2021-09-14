@@ -457,22 +457,17 @@
 
 #ifndef _WF_MOBILE
                 // 2nd NormalMap
-                float2 uv_dtl = TRANSFORM_TEX(i.uv, _DetailNormalMap);
+                float dtlPower = _NM_2ndType == 0 ? 0 : WF_TEX2D_NORMAL_DTL_MASK(uv_main);
+                float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(i.uv, _DetailNormalMap) );
                 if (_NM_2ndType == 1) { // BLEND
-                    float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-                    float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL(uv_dtl);
-                    normalTangent = lerp(normalTangent, BlendNormals(normalTangent, dtlNormalTangent), dtlPower);
+                    dtlNormalTangent = BlendNormals(normalTangent, dtlNormalTangent);
                 }
-                else if (_NM_2ndType == 2) { // SWITCH
-                    float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-                    float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL(uv_dtl);
-                    normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
-                }
+                normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
 #endif
 
                 // 法線計算
-                float3x3 tangentTransform = float3x3(i.tangent, i.bitangent, i.normal); // vertex周辺のworld法線空間
-                return mul( normalTangent, tangentTransform);
+                return transformTangentToWorldNormal(normalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
+
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             }
             else {
@@ -484,7 +479,7 @@
         void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
             // bump_normal 計算
             ws_bump_normal = calcBumpNormal(i, uv_main);
-            
+
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_NM_Enable)) {
 #endif
@@ -748,7 +743,7 @@
         }
 
         void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
-            shadow_color = lerp( 
+            shadow_color = lerp(
                 max(ZERO_VEC3, lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power)),
                 shadow_color,
                 smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
