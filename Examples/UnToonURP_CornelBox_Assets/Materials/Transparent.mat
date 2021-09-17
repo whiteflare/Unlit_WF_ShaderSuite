@@ -124,6 +124,7 @@ Material:
     - _AO_Brightness: 0
     - _AO_Contrast: 1
     - _AO_Enable: 0
+    - _AO_UVType: 0
     - _AO_UseLightMap: 1
     - _BK_Enable: 0
     - _BumpScale: 1
