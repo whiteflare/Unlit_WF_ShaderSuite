@@ -83,7 +83,7 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.uv = v.uv;
-        o.ws_vertex = UnityObjectToWorldPos(v.vertex);
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
         float3 ws_tangent;
@@ -184,7 +184,7 @@
         }
     }
 
-    fixed4 frag_fakefur(g2f gi) : SV_Target {
+    float4 frag_fakefur(g2f gi) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         v2f i = (v2f) 0;
@@ -207,7 +207,7 @@
         affectColorChange(color);
 
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir);
+        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
         // 階調影
         affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
 
@@ -223,14 +223,14 @@
 
         // ファーノイズを追加
         float noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).r;
-        color.rgb   *= lerp(_FR_TintColorBase, _FR_TintColorTip, gi.height);
+        color.rgb   *= lerp(_FR_TintColorBase.rgb, _FR_TintColorTip.rgb, gi.height);
         color.rgb   *= saturate(1 - (1 - noise) * _FR_ShadowPower);
         color.a     = saturate(noise - pow(gi.height, 4));
 
         return color;
     }
 
-    fixed4 frag_fakefur_cutoff(g2f i) : SV_Target {
+    float4 frag_fakefur_cutoff(g2f i) : SV_Target {
         float4 color = frag_fakefur(i);
 
         color.a = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, color.a);

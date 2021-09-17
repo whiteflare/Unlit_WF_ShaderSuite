@@ -115,6 +115,12 @@ namespace UnlitWF
 
             new WFShaderName("Gem(URP)", "Basic", "Opaque",                     "UnlitWF_URP/WF_Gem_Opaque"),
             new WFShaderName("Gem(URP)", "Basic", "Transparent",                "UnlitWF_URP/WF_Gem_Transparent"),
+
+            new WFShaderName("FakeFur(URP)", "Basic", "TransCutout",            "UnlitWF_URP/WF_FakeFur_TransCutout"),
+            new WFShaderName("FakeFur(URP)", "Basic", "Transparent",            "UnlitWF_URP/WF_FakeFur_Transparent"),
+
+            new WFShaderName("FakeFur(URP)", "FurOnly", "TransCutout",          "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout"),
+            new WFShaderName("FakeFur(URP)", "FurOnly", "Transparent",          "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent"),
         };
 
         /// <summary>
