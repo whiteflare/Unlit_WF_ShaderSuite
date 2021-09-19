@@ -145,13 +145,13 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
-            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
+            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.81, 0.81, 0.9, 1)
         [NoScaleOffset]
             _TS_1stTex              ("[SH] 1st Shade Texture", 2D) = "white" {}
-            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
+            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
         [NoScaleOffset]
             _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
-            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.5, 0.5, 0.7, 1)
+            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
         [NoScaleOffset]
             _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
@@ -231,6 +231,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
@@ -319,9 +321,10 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_BLEND
 
-            #define _FG_ENABLE
-            #define _TL_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _TL_EDGE_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -387,16 +390,16 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
             #define _WF_ALPHA_BLEND
             #define _WF_FACE_BACK
 
-            #define _AO_ENABLE
-            #define _BK_ENABLE
-            #define _ES_ENABLE
-            #define _FG_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -430,18 +433,18 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_BLEND
 
-            #define _AO_ENABLE
-            #define _BK_ENABLE
-            #define _ES_ENABLE
-            #define _FG_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _OL_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -476,16 +479,16 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
             #define _WF_ALPHA_BLEND
             #define _WF_FACE_BACK
 
-            #define _AO_ENABLE
-            #define _BK_ENABLE
-            #define _ES_ENABLE
-            #define _FG_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -522,18 +525,18 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_BLEND
 
-            #define _AO_ENABLE
-            #define _BK_ENABLE
-            #define _ES_ENABLE
-            #define _FG_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _BK_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _OL_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

@@ -28,8 +28,11 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
 
         // ファー設定
         [WFHeader(Fake Fur)]
-            _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
             _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
+        [IntRange]
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
+        [Header(Fur Shape)]
+            _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
             _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
         [NoScaleOffset]
@@ -37,11 +40,15 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
             _FR_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FR_FlipMirror          ("[FR] Flip Mirror", Float) = 0
-        [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
+        [Header(Fur Color)]
             _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
+            _FR_TintColorBase       ("[FR] Tint Color (Base)", Color) = (1, 1, 1, 1)
+            _FR_TintColorTip        ("[FR] Tint Color (Tip)", Color) = (1, 1, 1, 1)
+        [Header(Fur Mask Texture)]
         [NoScaleOffset]
             _FR_MaskTex             ("[FR] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _FR_InvMaskVal          ("[FR] Invert Mask Value", Range(0, 1)) = 0
 
         // 色変換
         [WFHeaderToggle(Color Change)]
@@ -60,13 +67,13 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
-            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
+            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.81, 0.81, 0.9, 1)
         [NoScaleOffset]
             _TS_1stTex              ("[SH] 1st Shade Texture", 2D) = "white" {}
-            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
+            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
         [NoScaleOffset]
             _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
-            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.5, 0.5, 0.7, 1)
+            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
         [NoScaleOffset]
             _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1

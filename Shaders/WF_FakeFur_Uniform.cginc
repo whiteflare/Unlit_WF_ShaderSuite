@@ -39,5 +39,8 @@
 
     uint            _FR_Repeat;
     float           _FR_ShadowPower;
+    float4          _FR_TintColorBase;
+    float4          _FR_TintColorTip;
+    float           _FR_InvMaskVal;
 
 #endif

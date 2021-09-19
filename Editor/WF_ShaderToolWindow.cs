@@ -950,7 +950,15 @@ namespace UnlitWF
                         );
                     // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
                     if (HasCustomValue(ctx, "_TS_1stTex", "_TS_2ndTex")) {
-                        ctx.target.SetTexture("_TS_BaseTex", ctx.target.GetTexture("_MainTex"));
+                        if (!HasCustomValue(ctx, "_TS_BaseTex")) {
+                            ctx.target.SetTexture("_TS_BaseTex", ctx.target.GetTexture("_MainTex"));
+                        }
+                        if (!HasCustomValue(ctx, "_TS_1stTex")) {
+                            ctx.target.SetTexture("_TS_1stTex", ctx.target.GetTexture("_TS_BaseTex"));
+                        }
+                        if (!HasCustomValue(ctx, "_TS_2ndTex")) {
+                            ctx.target.SetTexture("_TS_2ndTex", ctx.target.GetTexture("_TS_1stTex"));
+                        }
                     }
                 },
                 ctx => {
