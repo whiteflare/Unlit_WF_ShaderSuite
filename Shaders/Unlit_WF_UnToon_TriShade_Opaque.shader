@@ -293,6 +293,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
 
             #pragma shader_feature_local _FG_ENABLE
             #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase

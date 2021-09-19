@@ -340,6 +340,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
             #pragma shader_feature_local _FG_ENABLE
             #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
