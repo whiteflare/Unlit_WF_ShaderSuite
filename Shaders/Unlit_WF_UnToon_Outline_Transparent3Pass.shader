@@ -363,7 +363,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
 
             #pragma shader_feature_local _FG_ENABLE
-            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
