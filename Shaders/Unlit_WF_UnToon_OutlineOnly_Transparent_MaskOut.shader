@@ -130,10 +130,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _TL_EDGE_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _FG_ENABLE
+            #define _TL_ENABLE
+            #define _TL_EDGE_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

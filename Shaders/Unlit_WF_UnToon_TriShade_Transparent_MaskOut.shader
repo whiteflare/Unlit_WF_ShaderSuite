@@ -320,10 +320,10 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _TL_EDGE_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _FG_ENABLE
+            #define _TL_ENABLE
+            #define _TL_EDGE_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -389,16 +389,16 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             #define _WF_ALPHA_BLEND
             #define _WF_FACE_BACK
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
+            #define _AO_ENABLE
+            #define _BK_ENABLE
+            #define _ES_ENABLE
+            #define _FG_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -432,18 +432,18 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
+            #define _AO_ENABLE
+            #define _BK_ENABLE
+            #define _ES_ENABLE
+            #define _FG_ENABLE
+            #define _HL_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
             #define _TS_TRISHADE_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
