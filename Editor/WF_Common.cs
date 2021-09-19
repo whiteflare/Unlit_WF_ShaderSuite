@@ -32,7 +32,7 @@ namespace UnlitWF
     {
         private static readonly Regex PAT_DISP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$");
         private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+?)(?<suffix>(?:_\d+)?)$");
-        private static readonly Regex PAT_ENABLE_KEYWORD = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_ENABLE(?<suffix>(?:_\d+)?)$", RegexOptions.Compiled);
+        private static readonly Regex PAT_ENABLE_KEYWORD = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9_]*)_ENABLE(?<suffix>(?:_\d+)?)$", RegexOptions.Compiled);
 
         /// <summary>
         /// プロパティのディスプレイ名から、Prefixと名前を分割する。

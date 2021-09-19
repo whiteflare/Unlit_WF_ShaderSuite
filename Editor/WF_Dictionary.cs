@@ -179,6 +179,7 @@ namespace UnlitWF
         /// </summary>
         public static readonly Dictionary<string, string> SpecialPropNameToKeywordMap = new Dictionary<string, string>() {
             { "_UseVertexColor", "_VC_ENABLE" },
+            { "_TL_LineType", "_TL_EDGE_ENABLE" },
         };
 
         /// <summary>

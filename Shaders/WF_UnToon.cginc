@@ -211,14 +211,16 @@
 
     // geometry シェーダでアウトラインメッシュを張るタイプ。NORMALとEDGEをどちらもサポートする。
 #if SHADER_TARGET >= 40
-    [maxvertexcount(15)]
+    [maxvertexcount(16)]
     void geom_outline(triangle v2f v[3], inout TriangleStream<v2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
-        #ifdef _TL_ENABLE
+#ifdef _TL_ENABLE
+
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_ON(_TL_Enable)) {
 #endif
+
             float width0 = getOutlineShiftWidth(TRANSFORM_TEX(v[0].uv, _MainTex));
             float width1 = getOutlineShiftWidth(TRANSFORM_TEX(v[1].uv, _MainTex));
             float width2 = getOutlineShiftWidth(TRANSFORM_TEX(v[2].uv, _MainTex));
@@ -226,46 +228,64 @@
             float shift1 = -_TL_Z_Shift - (TGL_ON(_TL_LineType) ? width1 * 10 : 0);
             float shift2 = -_TL_Z_Shift - (TGL_ON(_TL_LineType) ? width2 * 10 : 0);
 
-            // NORMAL
             v2f p0 = v[0];
             v2f p1 = v[1];
             v2f p2 = v[2];
             p0.vs_vertex = shiftOutlineVertex(p0, width0, shift0);
             p1.vs_vertex = shiftOutlineVertex(p1, width1, shift1);
             p2.vs_vertex = shiftOutlineVertex(p2, width2, shift2);
+
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            if (TGL_OFF(_TL_LineType)) {
+#endif
+
+#if defined(_WF_LEGACY_FEATURE_SWITCH) | !defined(_TL_EDGE_ENABLE)
+            // NORMAL
             triStream.Append(p0);
             triStream.Append(p1);
             triStream.Append(p2);
+#endif
 
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            } else {
+#endif
+
+#ifdef _TL_EDGE_ENABLE
             // EDGE
-            if (TGL_ON(_TL_LineType)) {
-                v2f n0 = v[0];
-                v2f n1 = v[1];
-                v2f n2 = v[2];
-                n0.vs_vertex = shiftOutlineVertex(n0, -width0, shift0);
-                n1.vs_vertex = shiftOutlineVertex(n1, -width1, shift1);
-                n2.vs_vertex = shiftOutlineVertex(n2, -width2, shift2);
-                triStream.Append(n2);
-                triStream.Append(p0);
-                triStream.Append(n0);
-                triStream.Append(p1);
-                triStream.Append(n1);
-                triStream.Append(p2);
-                triStream.Append(n2);
-                // 折り返すことで裏面まで描画する
-                triStream.Append(p1);
-                triStream.Append(n1);
-                triStream.Append(p0);
-                triStream.Append(n0);
-                triStream.Append(p2);
+            v2f n0 = v[0];
+            v2f n1 = v[1];
+            v2f n2 = v[2];
+            n0.vs_vertex = shiftOutlineVertex(n0, -width0, shift0);
+            n1.vs_vertex = shiftOutlineVertex(n1, -width1, shift1);
+            n2.vs_vertex = shiftOutlineVertex(n2, -width2, shift2);
+            triStream.Append(p2);
+            triStream.Append(n2);
+            triStream.Append(p0);
+            triStream.Append(n0);
+            triStream.Append(p1);
+            triStream.Append(n1);
+            triStream.Append(p2);
+            triStream.Append(n2);
+            triStream.Append(p1);   // 折り返すことで裏面まで描画する
+            triStream.Append(n1);
+            triStream.Append(p0);
+            triStream.Append(n0);
+            triStream.Append(p2);
+            triStream.Append(n2);
+#endif
+
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
 
             triStream.RestartStrip();
+
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         }
 #endif
-        #endif
+
+#endif  // _TL_ENABLE
     }
-#endif
+#endif  // SHADER_TARGET >= 40
 
 #endif
