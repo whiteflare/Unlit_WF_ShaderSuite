@@ -315,7 +315,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 

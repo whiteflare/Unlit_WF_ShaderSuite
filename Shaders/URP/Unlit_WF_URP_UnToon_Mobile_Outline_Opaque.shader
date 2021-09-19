@@ -211,7 +211,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
-            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             // -------------------------------------
