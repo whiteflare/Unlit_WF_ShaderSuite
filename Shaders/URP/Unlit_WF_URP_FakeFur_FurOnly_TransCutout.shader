@@ -94,8 +94,6 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
-            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
@@ -109,7 +107,7 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/09/05", Float) = 0
+            _CurrentVersion         ("2021/09/23", Float) = 0
     }
 
     SubShader {
