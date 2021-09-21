@@ -141,13 +141,13 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
-            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
+            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.81, 0.81, 0.9, 1)
         [NoScaleOffset]
             _TS_1stTex              ("[SH] 1st Shade Texture", 2D) = "white" {}
-            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
+            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
         [NoScaleOffset]
             _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
-            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.5, 0.5, 0.7, 1)
+            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
         [NoScaleOffset]
             _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
@@ -183,7 +183,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
         // Decal Texture
         [WFHeaderToggle(Decal Texture)]
             _OL_Enable              ("[OL] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1,SKYBOX,2,ANGEL_RING,3)]
+        [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
             _OL_UVType              ("[OL] UV Type", Float) = 0
         [HDR]
             _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
@@ -225,6 +225,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
@@ -273,7 +275,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/09/05", Float) = 0
+            _CurrentVersion         ("2021/09/23", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
@@ -306,6 +308,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
 
             #pragma shader_feature_local _FG_ENABLE
             #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase

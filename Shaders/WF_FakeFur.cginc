@@ -61,9 +61,6 @@
     ////////////////////////////
 
     float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
-        // Tangent Transform 計算
-        float3x3 tangentTransform = float3x3(ws_tangent, ws_bitangent, ws_normal);
-
         // Static Fur Vector 計算
         float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
 
@@ -74,7 +71,8 @@
         vec_fur = BlendNormals(vec_fur, vec_map);
 #endif
 
-        return mul(vec_fur , tangentTransform);
+        // Tangent Transform 計算
+        return transformTangentToWorldNormal(vec_fur, ws_normal, ws_tangent, ws_bitangent);
     }
 
     v2g vert_fakefur(appdata_fur v) {
@@ -85,7 +83,7 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.uv = v.uv;
-        o.ws_vertex = UnityObjectToWorldPos(v.vertex);
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
         float3 ws_tangent;
@@ -186,7 +184,7 @@
         }
     }
 
-    fixed4 frag_fakefur(g2f gi) : SV_Target {
+    float4 frag_fakefur(g2f gi) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         v2f i = (v2f) 0;
@@ -209,7 +207,7 @@
         affectColorChange(color);
 
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir);
+        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
         // 階調影
         affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
 
@@ -218,19 +216,21 @@
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
-        float4 maskTex = PICK_SUB_TEX2D(_FR_MaskTex, _MainTex, uv_main);
+        float4 maskTex = SAMPLE_MASK_VALUE(_FR_MaskTex, uv_main, _FR_InvMaskVal);
         if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
             discard;
         }
 
         // ファーノイズを追加
         float noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).r;
-        color = float4(color.rgb * saturate(1 - (1 - noise) * _FR_ShadowPower), saturate(noise - pow(gi.height, 4)));
+        color.rgb   *= lerp(_FR_TintColorBase.rgb, _FR_TintColorTip.rgb, gi.height);
+        color.rgb   *= saturate(1 - (1 - noise) * _FR_ShadowPower);
+        color.a     = saturate(noise - pow(gi.height, 4));
 
         return color;
     }
 
-    fixed4 frag_fakefur_cutoff(g2f i) : SV_Target {
+    float4 frag_fakefur_cutoff(g2f i) : SV_Target {
         float4 color = frag_fakefur(i);
 
         color.a = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, color.a);

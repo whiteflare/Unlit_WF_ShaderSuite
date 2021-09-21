@@ -101,14 +101,26 @@ namespace UnlitWF
             new WFShaderName("UnToon(URP)", "Mobile", "Transparent",            "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
             new WFShaderName("UnToon(URP)", "Mobile", "TransparentOverlay",     "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
 
+            new WFShaderName("UnToon(URP)", "Outline", "Opaque",                "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_Opaque"),
+            new WFShaderName("UnToon(URP)", "Outline", "TransCutout",           "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
+
             new WFShaderName("UnToon(URP)", "Outline_LineOnly", "Opaque",       "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque"),
             new WFShaderName("UnToon(URP)", "Outline_LineOnly", "TransCutout",  "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
+
+            new WFShaderName("UnToon(URP)", "Mobile_Outline", "Opaque",         "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"),
+            new WFShaderName("UnToon(URP)", "Mobile_Outline", "TransCutout",    "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout"),
 
             new WFShaderName("UnToon(URP)", "Mobile_LineOnly", "Opaque",        "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
             new WFShaderName("UnToon(URP)", "Mobile_LineOnly", "TransCutout",   "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
 
             new WFShaderName("Gem(URP)", "Basic", "Opaque",                     "UnlitWF_URP/WF_Gem_Opaque"),
             new WFShaderName("Gem(URP)", "Basic", "Transparent",                "UnlitWF_URP/WF_Gem_Transparent"),
+
+            new WFShaderName("FakeFur(URP)", "Basic", "TransCutout",            "UnlitWF_URP/WF_FakeFur_TransCutout"),
+            new WFShaderName("FakeFur(URP)", "Basic", "Transparent",            "UnlitWF_URP/WF_FakeFur_Transparent"),
+
+            new WFShaderName("FakeFur(URP)", "FurOnly", "TransCutout",          "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout"),
+            new WFShaderName("FakeFur(URP)", "FurOnly", "Transparent",          "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent"),
         };
 
         /// <summary>
@@ -167,6 +179,7 @@ namespace UnlitWF
         /// </summary>
         public static readonly Dictionary<string, string> SpecialPropNameToKeywordMap = new Dictionary<string, string>() {
             { "_UseVertexColor", "_VC_ENABLE" },
+            { "_TL_LineType", "_TL_EDGE_ENABLE" },
         };
 
         /// <summary>
@@ -368,6 +381,8 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Fur Vector", "方向"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
+            new WFI18NTranslation("FR", "Tint Color (Base)", "色調整 (根元)"),
+            new WFI18NTranslation("FR", "Tint Color (Tip)", "色調整 (先端)"),
 
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),

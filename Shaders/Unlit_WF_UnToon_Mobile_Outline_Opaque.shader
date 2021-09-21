@@ -104,9 +104,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
         [IntRange]
             _TS_Steps               ("[SH] Steps", Range(1, 3)) = 2
             _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
-            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.7, 0.7, 0.9, 1)
-            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.5, 0.5, 0.8, 1)
-            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.5, 0.5, 0.7, 1)
+            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.81, 0.81, 0.9, 1)
+            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
+            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
@@ -181,7 +181,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/09/05", Float) = 0
+            _CurrentVersion         ("2021/09/23", Float) = 0
     }
 
     SubShader {
@@ -203,7 +203,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
 
             #pragma target 3.0
 
-            #define _TL_ENABLE // 常にオン
+            #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase

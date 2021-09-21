@@ -125,6 +125,11 @@
         localNormalToWorldTangentSpace(normal, tangent, out_normal, out_tangent, out_bitangent, flipTangent, flipTangent);
     }
 
+    float3 transformTangentToWorldNormal(float3 v, float3 ws_normal, float3 ws_tangent, float3 ws_bitangent) {
+        float3x3 tangentTransform = float3x3(ws_tangent, ws_bitangent, ws_normal);
+        return mul(v, tangentTransform);
+    }
+
     ////////////////////////////
     // Lighting
     ////////////////////////////
