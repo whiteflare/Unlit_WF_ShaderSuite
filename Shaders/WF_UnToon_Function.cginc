@@ -891,6 +891,7 @@
                     _OL_UVType == 1 ? i.uv_lmap                                                 // UV2
                     : _OL_UVType == 2 ? computeOverlayTex(i.ws_vertex)                          // SKYBOX
                     : _OL_UVType == 3 ? computeAngelRingUV(vs_normal, i.uv_lmap)                // ANGELRING
+                    : _OL_UVType == 4 ? vs_normal.xy / 2 + 0.5                                  // MATCAP
                     : i.uv                                                                      // UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
