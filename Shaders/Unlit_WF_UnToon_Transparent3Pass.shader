@@ -215,7 +215,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         // Decal Texture
         [WFHeaderToggle(Decal Texture)]
             _OL_Enable              ("[OL] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1,SKYBOX,2,ANGEL_RING,3)]
+        [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
             _OL_UVType              ("[OL] UV Type", Float) = 0
         [HDR]
             _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
