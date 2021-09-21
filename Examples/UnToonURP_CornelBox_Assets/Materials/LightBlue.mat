@@ -227,7 +227,7 @@ Material:
     - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-    - _TS_1stColor: {r: 0.7, g: 0.7, b: 0.9, a: 1}
-    - _TS_2ndColor: {r: 0.5, g: 0.5, b: 0.8, a: 1}
-    - _TS_3rdColor: {r: 0.5, g: 0.5, b: 0.7, a: 1}
+    - _TS_1stColor: {r: 0.81, g: 0.81, b: 0.9, a: 1}
+    - _TS_2ndColor: {r: 0.68, g: 0.68, b: 0.8, a: 1}
+    - _TS_3rdColor: {r: 0.595, g: 0.595, b: 0.7, a: 1}
     - _TS_BaseColor: {r: 1, g: 1, b: 1, a: 1}
