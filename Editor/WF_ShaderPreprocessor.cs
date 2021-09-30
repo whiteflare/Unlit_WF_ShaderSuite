@@ -16,17 +16,20 @@
  */
 
 // #define WF_STRIP_DISABLE
-#define WF_STRIP_LOG_RESULT
+// #define WF_STRIP_LOG_RESULT
 // #define WF_STRIP_LOG_TRACE
 // #define WF_STRIP_LOG_VERBOSE
 
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.Build;
 using UnityEditor.Rendering;
 using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 namespace UnlitWF
 {
@@ -190,7 +193,7 @@ namespace UnlitWF
 
             // シーンから UsedShaderVariant を回収
             var used = new List<UsedShaderVariant>();
-            foreach (var mat in GetAllSceneAllMaterial()) {
+            foreach (var mat in MaterialSeeker.GetAllSceneAllMaterial().Distinct()) {
                 AppendUsedShaderVariant(used, mat, mat.shader);
             }
 
@@ -212,19 +215,6 @@ namespace UnlitWF
                 Debug.LogFormat("[WF][Preprocess] used variant: {0}", uv);
             }
 #endif
-        }
-
-        private Material[] GetAllSceneAllMaterial() {
-            var result = new List<Material>();
-            for (int i = 0; i < EditorSceneManager.sceneCount; i++) {
-                var scene = EditorSceneManager.GetSceneAt(i);
-                // Renderer
-                result.AddRange(scene.GetRootGameObjects()
-                    .SelectMany(go => go.GetComponentsInChildren<Renderer>(true))
-                    .SelectMany(mf => mf.sharedMaterials)
-                    .Where(mat => mat != null));
-            }
-            return result.Distinct().ToArray();
         }
 
         private void AppendUsedShaderVariant(List<UsedShaderVariant> result, Material mat, Shader shader) {
@@ -291,7 +281,158 @@ namespace UnlitWF
                 return shaderName + "(" + string.Join(", ", keywords) + ")";
             }
         }
+    }
+
+    internal static class MaterialSeeker
+    {
+        #region マテリアル列挙系
+
+        public static IEnumerable<Material> GetAllSceneAllMaterial(List<Material> result = null) {
+            if (result == null) {
+                result = new List<Material>();
+            }
+            for (int i = 0; i < EditorSceneManager.sceneCount; i++) {
+                GetAllMaterials(EditorSceneManager.GetSceneAt(i), result);
+            }
+
+#if WF_STRIP_LOG_TRACE
+            foreach (var mat in result) {
+                Debug.Log(string.Format("[WF][Preprocess] find materials in scene: {0}", mat), mat);
+            }
+#endif
+
+            return result;
+        }
+
+        public static IEnumerable<Material> GetAllMaterials(Scene scene, List<Material> result = null) {
+            if (result == null) {
+                result = new List<Material>();
+            }
+            if (scene == null) {
+                return result;
+            }
+            foreach (var go in scene.GetRootGameObjects()) {
+                GetAllMaterials(go, result);
+            }
+            return result;
+        }
+
+        public static IEnumerable<Material> GetAllMaterials(GameObject go, List<Material> result = null) {
+            if (result == null) {
+                result = new List<Material>();
+            }
+            if (go == null) {
+                return result;
+            }
+
+            // Renderer -> Material
+            foreach (var renderer in go.GetComponentsInChildren<Renderer>(true)) {
+                GetAllMaterials(renderer, result);
+            }
+
+            // Animator -> Controller -> AnimationClip -> Material
+            foreach (var animator in go.GetComponentsInChildren<Animator>(true)) {
+                GetAllMaterials(animator.runtimeAnimatorController, result);
+            }
+
+#if VRC_SDK_VRCSDK3
+            // VRCAvatarDescriptor -> Controller -> AnimationClip -> Material
+            foreach (var desc in go.GetComponentsInChildren<VRC.SDK3.Avatars.Components.VRCAvatarDescriptor>(true)) {
+                if (desc.customizeAnimationLayers) {
+                    foreach (var layer in desc.baseAnimationLayers) {
+                        GetAllMaterials(layer.animatorController, result);
+                    }
+                }
+                foreach (var layer in desc.specialAnimationLayers) {
+                    GetAllMaterials(layer.animatorController, result);
+                }
+            }
+#endif
+
+            return result;
+        }
+
+
+        public static IEnumerable<Material> GetAllMaterials(Renderer renderer, List<Material> result = null) {
+            if (result == null) {
+                result = new List<Material>();
+            }
+            if (renderer == null) {
+                return result;
+            }
+            foreach (var mat in renderer.sharedMaterials) {
+                if (mat != null) {
+                    result.Add(mat);
+                }
+            }
+            return result;
+        }
+
+        public static IEnumerable<Material> GetAllMaterials(RuntimeAnimatorController controller, List<Material> result = null) {
+            if (result == null) {
+                result = new List<Material>();
+            }
+            if (controller == null) {
+                return result;
+            }
+            if (controller is AnimatorController c2) {
+                GetAllMaterials(c2, result);
+            }
+            return result;
+        }
+
+        public static IEnumerable<Material> GetAllMaterials(AnimatorController controller, List<Material> result = null) {
+            if (result == null) {
+                result = new List<Material>();
+            }
+            if (controller == null) {
+                return result;
+            }
+            foreach (var layer in controller.layers) {
+                GetAllMaterials(layer.stateMachine, result);
+            }
+            return result;
+        }
+
+        public static IEnumerable<Material> GetAllMaterials(AnimatorStateMachine machine, List<Material> result = null) {
+            if (result == null) {
+                result = new List<Material>();
+            }
+            if (machine == null) {
+                return result;
+            }
+            foreach (var subState in machine.states) {
+                if (subState.state.motion is AnimationClip clip) {
+                    GetAllMaterials(clip, result);
+                }
+            }
+            foreach (var subMachine in machine.stateMachines) {
+                GetAllMaterials(subMachine.stateMachine, result);
+            }
+            return result;
+        }
+
+        public static IEnumerable<Material> GetAllMaterials(AnimationClip clip, List<Material> result = null) {
+            if (result == null) {
+                result = new List<Material>();
+            }
+            if (clip == null) {
+                return result;
+            }
+            foreach (var binding in AnimationUtility.GetObjectReferenceCurveBindings(clip)) {
+                foreach (var keyFrame in AnimationUtility.GetObjectReferenceCurve(clip, binding)) {
+                    if (keyFrame.value is Material mat) {
+                        result.Add(mat);
+                    }
+                }
+            }
+            return result;
+        }
+
+        #endregion
 
     }
+
+
 #endif
 }
