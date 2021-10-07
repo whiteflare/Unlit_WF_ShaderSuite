@@ -68,7 +68,7 @@
 
         #define MUL_BARY(array, member)   (bary.x * array[0].member + bary.y * array[1].member + bary.z * array[2].member)
 
-#ifdef _VC_ENABLE
+#if defined(_VC_ENABLE) || defined(_OL_ENABLE)
         o.vertex_color  = MUL_BARY(i, vertex_color);
 #endif
         o.light_color   = MUL_BARY(i, light_color);
