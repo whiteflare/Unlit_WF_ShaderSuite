@@ -30,7 +30,7 @@
 
     struct appdata {
         float4 vertex           : POSITION;
-#ifdef _VC_ENABLE
+#if defined(_VC_ENABLE) || defined(_OL_ENABLE)
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
@@ -44,7 +44,7 @@
 
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
-#ifdef _VC_ENABLE
+#if defined(_VC_ENABLE) || defined(_OL_ENABLE)
         float4 vertex_color     : COLOR0;
 #endif
         float3 light_color      : COLOR1;
@@ -88,7 +88,7 @@
 #else
         o.vs_vertex = shiftDepthVertex(o.ws_vertex, _WF_MAIN_Z_SHIFT);      // Zシフトした値を使う
 #endif
-#ifdef _VC_ENABLE
+#if defined(_VC_ENABLE) || defined(_OL_ENABLE)
         o.vertex_color = v.vertex_color;
 #endif
         o.uv = v.uv;
