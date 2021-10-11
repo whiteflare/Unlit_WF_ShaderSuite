@@ -15,10 +15,10 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// #define WF_STRIP_DISABLE
-// #define WF_STRIP_LOG_RESULT
-// #define WF_STRIP_LOG_TRACE
-// #define WF_STRIP_LOG_VERBOSE
+// #define WF_STRIP_DISABLE // Strippingそのものを無効化する
+// #define WF_STRIP_LOG_SCAN_RESULT // シーンスキャン結果をログ出力する
+// #define WF_STRIP_LOG_RESULT // Strippingの結果をログ出力する
+// #define WF_STRIP_LOG_VERBOSE // Strip中の挙動をログ出力する
 
 using System.Collections.Generic;
 using System.Linq;
@@ -187,41 +187,48 @@ namespace UnlitWF
                 // 初期化済みならば何もしない
                 return;
             }
-
             // Assets 内に WF_EditorSetting があるならば読み込み
             settings = WFEditorSetting.GetOneOfSettings();
 
-            // シーンから UsedShaderVariant を回収
+            var materials = new List<Material>();
             var used = new List<UsedShaderVariant>();
-            foreach (var mat in MaterialSeeker.GetAllSceneAllMaterial().Distinct()) {
-                AppendUsedShaderVariant(used, mat, mat.shader);
-            }
+
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            // シーンから UsedShaderVariant を回収
+            materials.AddRange(MaterialSeeker.GetAllSceneAllMaterial());
 
             // EditorSettings から UsedShaderVariant を回収
             if (settings.alwaysIncludeMaterials != null) {
-                foreach (var mat in settings.alwaysIncludeMaterials) {
-                    if (mat != null) {
-                        AppendUsedShaderVariant(used, mat, mat.shader);
-                    }
-                }
+                materials.AddRange(settings.alwaysIncludeMaterials);
             }
+            materials = materials.Distinct()
+                .Where(mat => mat != null && IsStripTargetShader(mat.shader))
+                .ToList();
+
+            foreach (var mat in materials) {
+                AppendUsedShaderVariant(used, mat, mat.shader);
+            }
+
+            sw.Stop();
 
             usedShaderVariantList = used.Distinct().ToList();
             initialized = true;
 
-#if WF_STRIP_LOG_TRACE
-            Debug.LogFormat("[WF][Preprocess] used variants: {0}", usedShaderVariantList.Count);
+#if WF_STRIP_LOG_SCAN_RESULT
+            foreach (var mat in materials) {
+                Debug.Log(string.Format("[WF][Preprocess] find materials in scene: {0}", mat), mat);
+            }
             foreach (var uv in usedShaderVariantList) {
                 Debug.LogFormat("[WF][Preprocess] used variant: {0}", uv);
             }
 #endif
+
+            Debug.LogFormat("[WF][Preprocess] fnish scene material scanning: {0} ms, {1} materials, {2} usedShaderVariantList", sw.ElapsedMilliseconds, materials.Count, usedShaderVariantList.Count);
         }
 
         private void AppendUsedShaderVariant(List<UsedShaderVariant> result, Material mat, Shader shader) {
-            if (mat == null || !IsStripTargetShader(shader)) {
-                return;
-            }
-
             // マテリアルから _XX_ENABLE となっているキーワードを回収
             IEnumerable<string> keywords = mat.shaderKeywords.Where(kwd => WFCommonUtility.IsEnableKeyword(kwd));
 
@@ -231,9 +238,10 @@ namespace UnlitWF
 
                 // 直接のシェーダではなく、そのフォールバックを利用できるならばそれも追加する
                 if (settings == null || !settings.stripFallback) {
-                    var fallback = WFCommonUtility.GetShaderFallBackTarget(shader);
-                    if (fallback != null) {
-                        AppendUsedShaderVariant(result, mat, Shader.Find(fallback));
+                    var name = WFCommonUtility.GetShaderFallBackTarget(shader);
+                    var fallback = name == null ? null :  Shader.Find(name);
+                    if (IsStripTargetShader(fallback)) {
+                        AppendUsedShaderVariant(result, mat, fallback);
                     }
                 }
             }
@@ -288,26 +296,16 @@ namespace UnlitWF
         #region マテリアル列挙系
 
         public static IEnumerable<Material> GetAllSceneAllMaterial(List<Material> result = null) {
-            if (result == null) {
-                result = new List<Material>();
-            }
+            InitList(ref result);
             for (int i = 0; i < EditorSceneManager.sceneCount; i++) {
                 GetAllMaterials(EditorSceneManager.GetSceneAt(i), result);
             }
-
-#if WF_STRIP_LOG_TRACE
-            foreach (var mat in result) {
-                Debug.Log(string.Format("[WF][Preprocess] find materials in scene: {0}", mat), mat);
-            }
-#endif
 
             return result;
         }
 
         public static IEnumerable<Material> GetAllMaterials(Scene scene, List<Material> result = null) {
-            if (result == null) {
-                result = new List<Material>();
-            }
+            InitList(ref result);
             if (scene == null) {
                 return result;
             }
@@ -318,9 +316,7 @@ namespace UnlitWF
         }
 
         public static IEnumerable<Material> GetAllMaterials(GameObject go, List<Material> result = null) {
-            if (result == null) {
-                result = new List<Material>();
-            }
+            InitList(ref result);
             if (go == null) {
                 return result;
             }
@@ -335,7 +331,9 @@ namespace UnlitWF
                 GetAllMaterials(animator.runtimeAnimatorController, result);
             }
 
-#if VRC_SDK_VRCSDK3
+#if VRC_SDK_VRCSDK3 && !UDON
+            // SDK2では無効、SDK3Worlds でも無効、SDK3Avatars でだけ有効になるよう細工
+
             // VRCAvatarDescriptor -> Controller -> AnimationClip -> Material
             foreach (var desc in go.GetComponentsInChildren<VRC.SDK3.Avatars.Components.VRCAvatarDescriptor>(true)) {
                 if (desc.customizeAnimationLayers) {
@@ -354,9 +352,7 @@ namespace UnlitWF
 
 
         public static IEnumerable<Material> GetAllMaterials(Renderer renderer, List<Material> result = null) {
-            if (result == null) {
-                result = new List<Material>();
-            }
+            InitList(ref result);
             if (renderer == null) {
                 return result;
             }
@@ -369,9 +365,7 @@ namespace UnlitWF
         }
 
         public static IEnumerable<Material> GetAllMaterials(RuntimeAnimatorController controller, List<Material> result = null) {
-            if (result == null) {
-                result = new List<Material>();
-            }
+            InitList(ref result);
             if (controller == null) {
                 return result;
             }
@@ -382,48 +376,83 @@ namespace UnlitWF
         }
 
         public static IEnumerable<Material> GetAllMaterials(AnimatorController controller, List<Material> result = null) {
-            if (result == null) {
-                result = new List<Material>();
-            }
+            InitList(ref result);
             if (controller == null) {
                 return result;
             }
-            foreach (var layer in controller.layers) {
-                GetAllMaterials(layer.stateMachine, result);
-            }
-            return result;
-        }
-
-        public static IEnumerable<Material> GetAllMaterials(AnimatorStateMachine machine, List<Material> result = null) {
-            if (result == null) {
-                result = new List<Material>();
-            }
-            if (machine == null) {
-                return result;
-            }
-            foreach (var subState in machine.states) {
-                if (subState.state.motion is AnimationClip clip) {
-                    GetAllMaterials(clip, result);
+            foreach (var clip in GetAllAnimationClip(controller)) {
+                foreach (var binding in AnimationUtility.GetObjectReferenceCurveBindings(clip)) {
+                    foreach (var keyFrame in AnimationUtility.GetObjectReferenceCurve(clip, binding)) {
+                        if (keyFrame.value is Material mat) {
+                            result.Add(mat);
+                        }
+                    }
                 }
             }
-            foreach (var subMachine in machine.stateMachines) {
-                GetAllMaterials(subMachine.stateMachine, result);
+            return result;
+        }
+
+        private static void InitList<T>(ref List<T> list) {
+            if (list == null) {
+                list = new List<T>();
+            }
+        }
+
+        /// <summary>
+        /// AnimatorControllerLayer 内の全ての AnimatorState を列挙する。
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <returns></returns>
+        public static IEnumerable<AnimatorState> GetAllState(AnimatorControllerLayer layer) {
+            return GetAllState(layer?.stateMachine);
+        }
+
+        /// <summary>
+        /// AnimatorStateMachine 内の全ての AnimatorState を列挙する。
+        /// </summary>
+        /// <param name="stateMachine"></param>
+        /// <returns></returns>
+        public static IEnumerable<AnimatorState> GetAllState(AnimatorStateMachine stateMachine) {
+            var result = new List<AnimatorState>();
+            if (stateMachine != null) {
+                result.AddRange(stateMachine.states.Select(state => state.state));
+                foreach (var child in stateMachine.stateMachines) {
+                    result.AddRange(GetAllState(child.stateMachine));
+                }
             }
             return result;
         }
 
-        public static IEnumerable<Material> GetAllMaterials(AnimationClip clip, List<Material> result = null) {
+        /// <summary>
+        /// AnimatorController 内の全ての AnimationClip を列挙する。
+        /// </summary>
+        /// <param name="animator"></param>
+        /// <returns></returns>
+        public static IEnumerable<AnimationClip> GetAllAnimationClip(AnimatorController animator) {
+            return animator.layers.SelectMany(ly => GetAllAnimationClip(ly)).Distinct();
+        }
+
+        /// <summary>
+        /// AnimatorControllerLayer 内の全ての AnimationClip を列挙する。
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <returns></returns>
+        public static IEnumerable<AnimationClip> GetAllAnimationClip(AnimatorControllerLayer layer) {
+            return GetAllState(layer).SelectMany(state => GetAllAnimationClip(state.motion)).Distinct();
+        }
+
+        private static IEnumerable<AnimationClip> GetAllAnimationClip(Motion motion, List<AnimationClip> result = null) {
             if (result == null) {
-                result = new List<Material>();
+                result = new List<AnimationClip>();
             }
-            if (clip == null) {
-                return result;
+            if (motion is AnimationClip clip) {
+                if (!result.Contains(clip)) {
+                    result.Add(clip);
+                }
             }
-            foreach (var binding in AnimationUtility.GetObjectReferenceCurveBindings(clip)) {
-                foreach (var keyFrame in AnimationUtility.GetObjectReferenceCurve(clip, binding)) {
-                    if (keyFrame.value is Material mat) {
-                        result.Add(mat);
-                    }
+            else if (motion is BlendTree tree) {
+                foreach (var ch in tree.children) {
+                    GetAllAnimationClip(ch.motion, result);
                 }
             }
             return result;
@@ -432,7 +461,6 @@ namespace UnlitWF
         #endregion
 
     }
-
 
 #endif
 }
