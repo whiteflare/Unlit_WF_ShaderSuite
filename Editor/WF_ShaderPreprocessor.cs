@@ -247,7 +247,7 @@ namespace UnlitWF
             }
         }
 
-        public class UsedShaderVariant
+        public class UsedShaderVariant : System.IEquatable<UsedShaderVariant>
         {
             public readonly string shaderName;
             public readonly List<string> keywords;
@@ -258,18 +258,12 @@ namespace UnlitWF
                 this.keywords.Sort();
             }
 
-            public override bool Equals(object obj) {
-                var variant = obj as UsedShaderVariant;
-                return variant != null &&
-                       shaderName == variant.shaderName &&
-                       EqualityComparer<List<string>>.Default.Equals(keywords, variant.keywords);
+            public bool Equals(UsedShaderVariant obj) {
+                return shaderName == obj.shaderName && keywords.SequenceEqual(obj.keywords);
             }
 
             public override int GetHashCode() {
-                var hashCode = -94728968;
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(shaderName);
-                hashCode = hashCode * -1521134295 + EqualityComparer<List<string>>.Default.GetHashCode(keywords);
-                return hashCode;
+                return shaderName.GetHashCode();
             }
 
             public bool IsMatchVariant(Shader shader, IEnumerable<string> existing, ShaderCompilerData data) {
