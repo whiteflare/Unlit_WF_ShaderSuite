@@ -833,6 +833,9 @@ namespace UnlitWF
                 },
                 ctx => {
                     // RenderQueue からシェーダタイプを判定する
+                    if (IsMatchShaderName(ctx, "InternalErrorShader")) {
+                        return;
+                    }
                     if (ctx.renderType == ShaderType.NoMatch) {
                         var queue = ctx.oldMaterial.renderQueue;
                         if (queue < 0) {
@@ -844,6 +847,14 @@ namespace UnlitWF
                             ctx.renderType = ShaderType.Cutout;
                         } else {
                             ctx.renderType = ShaderType.Transparent;
+                        }
+                    }
+                },
+                ctx => {
+                    // _ClippingMask の有無からシェーダタイプを判定する
+                    if (ctx.renderType == ShaderType.NoMatch) {
+                        if (HasCustomValue(ctx, "_ClippingMask")) {
+                            ctx.renderType = ShaderType.Cutout;
                         }
                     }
                 },
@@ -958,6 +969,18 @@ namespace UnlitWF
                         }
                         if (!HasCustomValue(ctx, "_TS_2ndTex")) {
                             ctx.target.SetTexture("_TS_2ndTex", ctx.target.GetTexture("_TS_1stTex"));
+                        }
+                        if (!HasCustomValue(ctx, "_TS_3rdTex")) {
+                            ctx.target.SetTexture("_TS_3rdTex", ctx.target.GetTexture("_TS_2ndTex"));
+                        }
+                        // ただし _TS_BaseTex, _TS_1stTex, _TS_2ndTex, _TS_3rdTex が全て同じ Texture を指しているならば全てクリアする
+                        if (ctx.target.GetTexture("_TS_BaseTex") == ctx.target.GetTexture("_TS_1stTex")
+                            && ctx.target.GetTexture("_TS_1stTex") == ctx.target.GetTexture("_TS_2ndTex")
+                            && ctx.target.GetTexture("_TS_2ndTex") == ctx.target.GetTexture("_TS_3rdTex")) {
+                            ctx.target.SetTexture("_TS_BaseTex", null);
+                            ctx.target.SetTexture("_TS_1stTex", null);
+                            ctx.target.SetTexture("_TS_2ndTex", null);
+                            ctx.target.SetTexture("_TS_3rdTex", null);
                         }
                     }
                 },
