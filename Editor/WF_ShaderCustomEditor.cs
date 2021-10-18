@@ -1107,7 +1107,7 @@ namespace UnlitWF
             }
 
             var menu = new GenericMenu();
-            menu.AddItem(new GUIContent("Copy material"), false, () => {
+            menu.AddItem(WFI18N.GetGUIContent("Copy material"), false, () => {
                 if (editor.target is Material) {
                     copiedMaterial = new Material((Material) editor.target);
                 } else {
@@ -1115,14 +1115,14 @@ namespace UnlitWF
                 }
             });
             if (copiedMaterial != null) {
-                menu.AddItem(new GUIContent("Paste value"), false, () => {
+                menu.AddItem(WFI18N.GetGUIContent("Paste value"), false, () => {
                     var param = CopyPropParameter.Create();
                     param.materialSource = copiedMaterial;
                     param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
                     param.prefixs = new string[] { prefix };
                     WFMaterialEditUtility.CopyProperties(param);
                 });
-                menu.AddItem(new GUIContent("Paste (without Textures)"), false, () => {
+                menu.AddItem(WFI18N.GetGUIContent("Paste (without Textures)"), false, () => {
                     var param = CopyPropParameter.Create();
                     param.materialSource = copiedMaterial;
                     param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
@@ -1132,11 +1132,11 @@ namespace UnlitWF
                 });
             }
             else {
-                menu.AddDisabledItem(new GUIContent("Paste value"));
-                menu.AddDisabledItem(new GUIContent("Paste (without Textures)"));
+                menu.AddDisabledItem(WFI18N.GetGUIContent("Paste value"));
+                menu.AddDisabledItem(WFI18N.GetGUIContent("Paste (without Textures)"));
             }
             menu.AddSeparator("");
-            menu.AddItem(new GUIContent("Reset"), false, () => {
+            menu.AddItem(WFI18N.GetGUIContent("Reset"), false, () => {
                 var param = ResetParameter.Create();
                 param.materials = WFCommonUtility.AsMaterials(editor.targets);
                 param.resetPrefixs = new string[] { prefix };

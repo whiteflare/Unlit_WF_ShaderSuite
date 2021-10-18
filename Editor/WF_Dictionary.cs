@@ -384,6 +384,12 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Tint Color (Base)", "色調整 (根元)"),
             new WFI18NTranslation("FR", "Tint Color (Tip)", "色調整 (先端)"),
 
+            // メニュー
+            new WFI18NTranslation("Copy material", "コピー"),
+            new WFI18NTranslation("Paste value", "貼り付け"),
+            new WFI18NTranslation("Paste (without Textures)", "貼り付け (Texture除く)"),
+            new WFI18NTranslation("Reset", "リセット"),
+
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
             new WFI18NTranslation(WFMessageText.PlzMigration, "このマテリアルは古いバージョンで作成されたようです。\n最新版に変換しますか？"),
