@@ -177,9 +177,20 @@ namespace UnlitWF
         /// <summary>
         /// ENABLEキーワードに対応していない特殊なプロパティ名 → キーワードの変換マップ。
         /// </summary>
-        public static readonly Dictionary<string, string> SpecialPropNameToKeywordMap = new Dictionary<string, string>() {
-            { "_UseVertexColor", "_VC_ENABLE" },
-            { "_TL_LineType", "_TL_EDGE_ENABLE" },
+        public static readonly Dictionary<string, WFCustomKeywordSetting> SpecialPropNameToKeywordMap = new Dictionary<string, WFCustomKeywordSetting>() {
+            { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE") },
+            { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
+                enablePropName = "_TL_Enable",
+            } },
+            { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_MT_ADD2ND_ENABLE", "_MT_ONLY2ND_ENABLE") {
+                enablePropName = "_MT_Enable",
+            } },
+            { "_NM_2ndType", new WFCustomKeywordSettingEnum("_NM_2ndType", "_", "_NM_BL2ND_ENABLE", "_NM_SW2ND_ENABLE") {
+                enablePropName = "_NM_Enable",
+            } },
+            { "_TS_Steps", new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
+                enablePropName = "_TS_Enable",
+            } },
         };
 
         /// <summary>

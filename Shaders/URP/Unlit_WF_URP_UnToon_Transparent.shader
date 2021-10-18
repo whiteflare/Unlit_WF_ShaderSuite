@@ -336,10 +336,13 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             #pragma shader_feature_local _HL_ENABLE
             #pragma shader_feature_local _LM_ENABLE
             #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local _OL_ENABLE
             #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             // -------------------------------------

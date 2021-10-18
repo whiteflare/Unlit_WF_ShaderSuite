@@ -176,6 +176,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             #pragma shader_feature_local _HL_ENABLE
             #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
 
             // -------------------------------------
             // Lightweight Pipeline keywords
@@ -222,6 +223,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
 
             #pragma shader_feature_local _CL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
 
             // -------------------------------------
             // Lightweight Pipeline keywords

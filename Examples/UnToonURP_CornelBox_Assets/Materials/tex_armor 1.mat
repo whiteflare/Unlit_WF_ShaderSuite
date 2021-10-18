@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_armor 1
   m_Shader: {fileID: 4800000, guid: f009b607188be344fac9370b2d7176c1, type: 3}
-  m_ShaderKeywords: _MT_ENABLE _TS_ENABLE
+  m_ShaderKeywords: _MT_ENABLE _MT_ONLY2ND_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
