@@ -27,6 +27,8 @@ namespace UnlitWF
     public class WFEditorSetting : ScriptableObject
     {
         public int settingPriority = 0;
+        [HideInInspector]
+        public int autoMigrationVersion = 0;
 
         [Header("Shader Stripping Settings")]
         public bool enableStripping = true;

@@ -171,10 +171,11 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
             #pragma target 4.5
 
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -197,8 +198,9 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
-            #pragma shader_feature_local _CL_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase

@@ -177,9 +177,20 @@ namespace UnlitWF
         /// <summary>
         /// ENABLEキーワードに対応していない特殊なプロパティ名 → キーワードの変換マップ。
         /// </summary>
-        public static readonly Dictionary<string, string> SpecialPropNameToKeywordMap = new Dictionary<string, string>() {
-            { "_UseVertexColor", "_VC_ENABLE" },
-            { "_TL_LineType", "_TL_EDGE_ENABLE" },
+        public static readonly Dictionary<string, WFCustomKeywordSetting> SpecialPropNameToKeywordMap = new Dictionary<string, WFCustomKeywordSetting>() {
+            { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE") },
+            { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
+                enablePropName = "_TL_Enable",
+            } },
+            { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_MT_ADD2ND_ENABLE", "_MT_ONLY2ND_ENABLE") {
+                enablePropName = "_MT_Enable",
+            } },
+            { "_NM_2ndType", new WFCustomKeywordSettingEnum("_NM_2ndType", "_", "_NM_BL2ND_ENABLE", "_NM_SW2ND_ENABLE") {
+                enablePropName = "_NM_Enable",
+            } },
+            { "_TS_Steps", new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
+                enablePropName = "_TS_Enable",
+            } },
         };
 
         /// <summary>
@@ -384,6 +395,12 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Tint Color (Base)", "色調整 (根元)"),
             new WFI18NTranslation("FR", "Tint Color (Tip)", "色調整 (先端)"),
 
+            // メニュー
+            new WFI18NTranslation("Copy material", "コピー"),
+            new WFI18NTranslation("Paste value", "貼り付け"),
+            new WFI18NTranslation("Paste (without Textures)", "貼り付け (Texture除く)"),
+            new WFI18NTranslation("Reset", "リセット"),
+
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
             new WFI18NTranslation(WFMessageText.PlzMigration, "このマテリアルは古いバージョンで作成されたようです。\n最新版に変換しますか？"),
@@ -396,6 +413,9 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PsCapTypeShade, "SHADE_CAPは白色を基準とした乗算合成を行うmatcapです"),
 
             new WFI18NTranslation(WFMessageText.DgChangeMobile, "シェーダをMobile向けに切り替えますか？\n\nこの操作はUndoできますが、バックアップを取ることをお勧めします。"),
+            new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダのバージョンが更新されました。\nプロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
+            new WFI18NTranslation(WFMessageText.DgMigrationManual, "プロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
+
 
             new WFI18NTranslation(WFMessageButton.Cleanup, "マテリアルから不要データを削除"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "テンプレートから適用"),
@@ -443,6 +463,8 @@ namespace UnlitWF
         public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";
         public static readonly string PsCapTypeShade = "SHADE_CAP is a matcap that performs white-based multiply blending.";
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
+        public static readonly string DgMigrationAuto = "The version of the UnlitWF shader has been updated.\nDo you want to scan the materials in your project and update them to the latest material values?";
+        public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
     }
 
     internal static class WFMessageButton
