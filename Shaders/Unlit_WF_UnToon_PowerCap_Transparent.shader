@@ -323,24 +323,24 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
-            #pragma shader_feature_local _HL_ENABLE_1
-            #pragma shader_feature_local _HL_ENABLE_2
-            #pragma shader_feature_local _HL_ENABLE_3
-            #pragma shader_feature_local _HL_ENABLE_4
-            #pragma shader_feature_local _HL_ENABLE_5
-            #pragma shader_feature_local _HL_ENABLE_6
-            #pragma shader_feature_local _HL_ENABLE_7
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _HL_ENABLE_2
+            #pragma shader_feature_local_fragment _HL_ENABLE_3
+            #pragma shader_feature_local_fragment _HL_ENABLE_4
+            #pragma shader_feature_local_fragment _HL_ENABLE_5
+            #pragma shader_feature_local_fragment _HL_ENABLE_6
+            #pragma shader_feature_local_fragment _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -369,24 +369,24 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_UNTOON_POWERCAP
 
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
-            #pragma shader_feature_local _HL_ENABLE_1
-            #pragma shader_feature_local _HL_ENABLE_2
-            #pragma shader_feature_local _HL_ENABLE_3
-            #pragma shader_feature_local _HL_ENABLE_4
-            #pragma shader_feature_local _HL_ENABLE_5
-            #pragma shader_feature_local _HL_ENABLE_6
-            #pragma shader_feature_local _HL_ENABLE_7
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _HL_ENABLE_2
+            #pragma shader_feature_local_fragment _HL_ENABLE_3
+            #pragma shader_feature_local_fragment _HL_ENABLE_4
+            #pragma shader_feature_local_fragment _HL_ENABLE_5
+            #pragma shader_feature_local_fragment _HL_ENABLE_6
+            #pragma shader_feature_local_fragment _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

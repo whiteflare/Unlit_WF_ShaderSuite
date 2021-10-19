@@ -168,9 +168,9 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
             #pragma target 4.5
 
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
 
@@ -196,7 +196,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
-            #pragma shader_feature_local _CL_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
 
