@@ -17,25 +17,17 @@
 
 #if UNITY_EDITOR
 
-using UnityEngine;
 using UnityEditor;
 
 namespace UnlitWF
 {
-#if UNITY_2019_1_OR_NEWER
-
     public class WF_AutoMigrationPostprocessor : AssetPostprocessor
     {
-        static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath) {
-            foreach (string path in importedAssets) {
-                if (path.EndsWith(".mat")) {
-                    var material = AssetDatabase.LoadAssetAtPath<Material>(path);
-                    WFCommonUtility.SetupShaderKeyword(material);
-                }
-            }
+        static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
+        {
+            ScanAndMigrationExecutor.Migration(importedAssets);
         }
     }
-#endif
 }
 
 #endif

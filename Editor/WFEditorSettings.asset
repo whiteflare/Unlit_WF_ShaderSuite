@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: WFEditorSettings
   m_EditorClassIdentifier: 
   settingPriority: 100
+  autoMigrationVersion: 0
   enableStripping: 1
   stripFallback: 1
   stripMetaPass: 1

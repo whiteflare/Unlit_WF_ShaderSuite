@@ -400,7 +400,7 @@ namespace UnlitWF
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now"))) {
                     // 名称を全て変更
-                    WFMaterialEditUtility.RenameOldNameProperties(mats);
+                    WFMaterialEditUtility.MigrationMaterial(mats);
                     // リセット
                     ResetOldMaterialTable(mats);
                 }
