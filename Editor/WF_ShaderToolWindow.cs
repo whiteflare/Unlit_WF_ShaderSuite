@@ -1142,6 +1142,11 @@ namespace UnlitWF
         [InitializeOnLoadMethod]
         public static void ExecuteAuto()
         {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                // 実行中は何もしない
+                return;
+            }
             var sets = WFEditorSetting.GetAllSettings();
             if (sets.Length == 0)
             {
