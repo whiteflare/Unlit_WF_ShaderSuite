@@ -252,6 +252,19 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
@@ -274,19 +287,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-
-        // Ambient Occlusion
-        [WFHeaderToggle(Ambient Occlusion)]
-            _AO_Enable              ("[AO] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1)]
-            _AO_UVType              ("[AO] UV Type", Float) = 0
-        [NoScaleOffset]
-            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
-            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
-            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
-            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
-            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         // Fog
         [WFHeaderToggle(Fog)]
@@ -362,10 +362,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
             #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
 
-            #define _FG_ENABLE
-            #define _TL_ENABLE
             #define _TL_EDGE_ENABLE
+            #define _TL_ENABLE
             #define _VC_ENABLE
+            #define _FG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -419,6 +419,14 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
 
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
+
+
             #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
@@ -428,11 +436,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -462,6 +466,14 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
             #define _WF_FACE_BACK
 
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
+
+
             #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
@@ -471,11 +483,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -504,6 +512,14 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
 
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
+
+
             #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
@@ -513,11 +529,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #define _HL_ENABLE
             #define _LM_ENABLE
             #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

@@ -315,8 +315,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _TL_ENABLE
             #define _TL_EDGE_ENABLE
+            #define _TL_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -343,13 +343,15 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
 
             #define _WF_UNTOON_POWERCAP
 
+            #define _NM_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _HL_ENABLE
-            #define _NM_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
 
             #define _HL_ENABLE_1
             #define _HL_ENABLE_2

@@ -133,8 +133,9 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
-            #define _CL_ENABLE
             #define _TS_ENABLE
+
+            #define _CL_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
@@ -159,8 +160,9 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
-            #define _CL_ENABLE
             #define _TS_ENABLE
+
+            #define _CL_ENABLE
 
             float _FR_Height2;
             #define _FR_HEIGHT_PARAM _FR_Height2

@@ -168,10 +168,11 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
             #pragma target 4.5
 
+            #define _TS_ENABLE
+
             #define _CL_ENABLE
             #define _HL_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -195,8 +196,9 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
-            #define _CL_ENABLE
             #define _TS_ENABLE
+
+            #define _CL_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase

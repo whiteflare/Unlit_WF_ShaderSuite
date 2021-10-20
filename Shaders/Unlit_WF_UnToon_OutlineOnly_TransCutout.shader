@@ -118,10 +118,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
             #define _WF_ALPHA_CUTOUT
 
-            #define _FG_ENABLE
-            #define _TL_ENABLE
             #define _TL_EDGE_ENABLE
+            #define _TL_ENABLE
             #define _VC_ENABLE
+            #define _FG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

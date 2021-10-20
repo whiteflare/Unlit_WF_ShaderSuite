@@ -137,6 +137,14 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
@@ -147,13 +155,16 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
         [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
-        // Ambient Occlusion
-        [WFHeaderToggle(Ambient Occlusion)]
-            _AO_Enable              ("[AO] Enable", Float) = 0
-        [Toggle(_)]
-            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
-            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
-            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+        [Header(Emissive Scroll)]
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
+            _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
+        [WF_Vector3]
+            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         // Lit
         [WFHeader(Lit)]
@@ -230,15 +241,16 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
 
             #define _WF_MOBILE
 
-            #define _AO_ENABLE
-            #define _ES_ENABLE
-            #define _ES_SIMPLE_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
             #define _NM_ENABLE
-            #define _TR_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
+
+
+            #define _AO_ENABLE
+            #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _MT_ENABLE
+            #define _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

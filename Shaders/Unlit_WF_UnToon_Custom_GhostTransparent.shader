@@ -202,6 +202,19 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
@@ -224,19 +237,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-
-        // Ambient Occlusion
-        [WFHeaderToggle(Ambient Occlusion)]
-            _AO_Enable              ("[AO] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1)]
-            _AO_UVType              ("[AO] UV Type", Float) = 0
-        [NoScaleOffset]
-            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
-            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
-            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
-            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
-            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         // Lit
         [WFHeader(Lit)]
@@ -303,6 +303,14 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
+
+
             #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
@@ -310,11 +318,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _ES_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -342,6 +346,14 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #define _WF_ALPHA_FRESNEL
 
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
+
+
             #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
@@ -349,11 +361,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #define _ES_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
             #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

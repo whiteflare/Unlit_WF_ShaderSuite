@@ -104,24 +104,27 @@ namespace UnlitWF
             return 0 < CreateRelacePropertyList(mats.Where(m => !m.shader.name.Contains("MatcapShadows")).ToArray()).Count;
         }
 
-        public static bool RenameOldNameProperties(MigrationParameter param) {
-            return RenameOldNameProperties(param.materials);
+        public static void MigrationMaterial(MigrationParameter param) {
+            MigrationMaterial(param.materials);
         }
 
-        public static bool RenameOldNameProperties(Material[] mats) {
+        public static void MigrationMaterial(params Material[] mats) {
             Undo.RecordObjects(mats, "WF Migration materials");
+            MigrationMaterialWithoutUndo(mats);
+        }
 
+        public static void MigrationMaterialWithoutUndo(params Material[] mats)
+        {
             mats = mats.Where(m => !m.shader.name.Contains("MatcapShadows")).ToArray();
+            // プロパティ名を変更
             var oldPropList = CreateRelacePropertyList(mats);
-            return RenamePropNameWithoutUndo(mats, oldPropList);
+            RenamePropNameWithoutUndo(mats, oldPropList);
+            // シェーダキーワードを整理
+            WFCommonUtility.SetupShaderKeyword(mats);
         }
 
         public static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement) {
             var mats = new Material[] { mat };
-            return RenamePropNameWithoutUndo(mats, CreateReplacePropertyList(mats, replacement));
-        }
-
-        public static bool ReplacePropertyNamesWithoutUndo(Material[] mats, params PropertyNameReplacement[] replacement) {
             return RenamePropNameWithoutUndo(mats, CreateReplacePropertyList(mats, replacement));
         }
 
@@ -148,8 +151,6 @@ namespace UnlitWF
             }
             // 保存
             ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.before));
-            // シェーダキーワードを整理
-            WFCommonUtility.SetupShaderKeyword(mats);
 
             return true;
         }
