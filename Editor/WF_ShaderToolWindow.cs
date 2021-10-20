@@ -1167,7 +1167,7 @@ namespace UnlitWF
             var cancel = lang == EditorLanguage.日本語 ? "結構です" : "No Thanks";
             var alt = lang == EditorLanguage.日本語 ? "後で聞いて" : "Ask Me Later";
 
-            switch(EditorUtility.DisplayDialogComplex("WF migration materials", msg, ok, cancel, alt))
+            switch (EditorUtility.DisplayDialogComplex("WF migration materials", msg, ok, cancel, alt))
             {
                 case 0:
                     // 実行してバージョン上書き
