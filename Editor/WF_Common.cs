@@ -18,6 +18,7 @@
 #if UNITY_EDITOR
 
 // #define _WF_LEGACY_FEATURE_SWITCH
+// #define WF_COMMON_LOG_KEYWORD // キーワード変更時のログを出力する
 
 using System;
 using System.Collections.Generic;
@@ -174,6 +175,7 @@ namespace UnlitWF
                 {
                     continue;
                 }
+                bool changed = false;
                 for (int idx = 0; idx < mat.shader.GetPropertyCount(); idx++)
                 {
                     var prop_name = mat.shader.GetPropertyName(idx);
@@ -182,16 +184,22 @@ namespace UnlitWF
                     var kwd = WFShaderDictionary.SpecialPropNameToKeywordMap.GetValueOrNull(prop_name);
                     if (kwd != null)
                     {
-                        kwd.SetKeywordTo(mat);
+                        changed |= kwd.SetKeywordTo(mat);
                         continue;
                     }
 
                     // Enableプロパティならば、それに対応するキーワードを設定する
                     if (IsEnableToggleFromPropName(prop_name))
                     {
-                        new WFCustomKeywordSettingBool(prop_name, prop_name.ToUpper()).SetKeywordTo(mat);
+                        changed |= new WFCustomKeywordSettingBool(prop_name, prop_name.ToUpper()).SetKeywordTo(mat);
                         continue;
                     }
+                }
+                if (changed)
+                {
+#if WF_COMMON_LOG_KEYWORD
+                    Debug.LogFormat("[WF] {0} keywords {1}", mat, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
+#endif
                 }
             }
 #endif
@@ -451,7 +459,7 @@ namespace UnlitWF
             this.propertyName = propertyName;
         }
 
-        public abstract void SetKeywordTo(Material mat);
+        public abstract bool SetKeywordTo(Material mat);
 
         protected bool IsEnable(Material mat)
         {
@@ -463,38 +471,38 @@ namespace UnlitWF
             return IsPropTrue(mat, enablePropName);
         }
 
-        protected void ApplyKeyword(Material mat, string[] kwds, int value)
+        protected bool ApplyKeyword(Material mat, string[] kwds, int value)
         {
             bool enable = IsEnable(mat);
+            bool changed = false;
             for (int i = 0; i < kwds.Length; i++)
             {
-                SetKeyword(mat, kwds[i], enable && i == value);
+                changed |= SetKeyword(mat, kwds[i], enable && i == value);
             }
+            return changed;
         }
 
-        public void ApplyKeywordByBool(Material mat, string kwd, bool value)
+        public bool ApplyKeywordByBool(Material mat, string kwd, bool value)
         {
             bool enable = IsEnable(mat);
-            SetKeyword(mat, kwd, enable && value);
+            return SetKeyword(mat, kwd, enable && value);
         }
 
-        public static void SetKeyword(Material mat, string kwd, bool value)
+        public static bool SetKeyword(Material mat, string kwd, bool value)
         {
-            if (string.IsNullOrEmpty(kwd) || kwd == "_")
+            if (string.IsNullOrEmpty(kwd) || kwd == "_" || mat.IsKeywordEnabled(kwd) == value)
             {
-                return;
+                return false;
             }
-            if (mat.IsKeywordEnabled(kwd) != value)
+            if (value)
             {
-                if (value)
-                {
-                    mat.EnableKeyword(kwd);
-                }
-                else
-                {
-                    mat.DisableKeyword(kwd);
-                }
+                mat.EnableKeyword(kwd);
             }
+            else
+            {
+                mat.DisableKeyword(kwd);
+            }
+            return true;
         }
 
         protected static bool IsPropTrue(Material mat, string prop_name)
@@ -512,9 +520,9 @@ namespace UnlitWF
             this.keyword = keyword;
         }
 
-        public override void SetKeywordTo(Material mat)
+        public override bool SetKeywordTo(Material mat)
         {
-            ApplyKeywordByBool(mat, keyword, IsPropTrue(mat, propertyName));
+            return ApplyKeywordByBool(mat, keyword, IsPropTrue(mat, propertyName));
         }
     }
 
@@ -527,9 +535,9 @@ namespace UnlitWF
             this.keywords = keywords;
         }
 
-        public override void SetKeywordTo(Material mat)
+        public override bool SetKeywordTo(Material mat)
         {
-            ApplyKeyword(mat, keywords, mat.GetInt(propertyName));
+            return ApplyKeyword(mat, keywords, mat.GetInt(propertyName));
         }
     }
 
