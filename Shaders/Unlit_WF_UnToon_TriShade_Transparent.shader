@@ -310,7 +310,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
@@ -371,7 +371,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _ES_SIMPLE_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local _NM_ENABLE
@@ -412,7 +412,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _ES_SIMPLE_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
