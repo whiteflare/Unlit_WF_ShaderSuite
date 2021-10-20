@@ -29,7 +29,8 @@ namespace UnlitWF
     {
         public Material[] materials = { null };
 
-        public static MigrationParameter Create() {
+        public static MigrationParameter Create()
+        {
             var result = ScriptableObject.CreateInstance<MigrationParameter>();
             result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
             return result;
@@ -45,7 +46,8 @@ namespace UnlitWF
         public bool withoutTextures = false;
         public bool onlyOverrideBuiltinTextures = false;
 
-        public static CopyPropParameter Create() {
+        public static CopyPropParameter Create()
+        {
             var result = ScriptableObject.CreateInstance<CopyPropParameter>();
             result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
             return result;
@@ -58,7 +60,8 @@ namespace UnlitWF
         public bool resetUnused = false;
         public bool resetKeywords = false;
 
-        public static CleanUpParameter Create() {
+        public static CleanUpParameter Create()
+        {
             var result = ScriptableObject.CreateInstance<CleanUpParameter>();
             result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
             return result;
@@ -77,7 +80,8 @@ namespace UnlitWF
         public bool resetKeywords = false;
         public string[] resetPrefixs = { };
 
-        public static ResetParameter Create() {
+        public static ResetParameter Create()
+        {
             var result = ScriptableObject.CreateInstance<ResetParameter>();
             result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
             return result;
@@ -90,25 +94,30 @@ namespace UnlitWF
         public readonly string afterName;
         public readonly Action<ShaderSerializedProperty> onAfterCopy;
 
-        public PropertyNameReplacement(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null) {
+        public PropertyNameReplacement(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
             this.beforeName = beforeName;
             this.afterName = afterName;
             this.onAfterCopy = onAfterCopy ?? (p => { });
         }
     }
 
-    public static class WFMaterialEditUtility {
+    public static class WFMaterialEditUtility
+    {
         #region マイグレーション
 
-        public static bool ExistsOldNameProperty(params Material[] mats) {
+        public static bool ExistsOldNameProperty(params Material[] mats)
+        {
             return 0 < CreateRelacePropertyList(mats.Where(m => !m.shader.name.Contains("MatcapShadows")).ToArray()).Count;
         }
 
-        public static void MigrationMaterial(MigrationParameter param) {
+        public static void MigrationMaterial(MigrationParameter param)
+        {
             MigrationMaterial(param.materials);
         }
 
-        public static void MigrationMaterial(params Material[] mats) {
+        public static void MigrationMaterial(params Material[] mats)
+        {
             Undo.RecordObjects(mats, "WF Migration materials");
             MigrationMaterialWithoutUndo(mats);
         }
@@ -123,22 +132,29 @@ namespace UnlitWF
             WFCommonUtility.SetupShaderKeyword(mats);
         }
 
-        public static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement) {
+        public static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement)
+        {
             var mats = new Material[] { mat };
             return RenamePropNameWithoutUndo(mats, CreateReplacePropertyList(mats, replacement));
         }
 
-        private static bool RenamePropNameWithoutUndo(Material[] mats, List<RelacePropertyName> replaceList) {
-            if (replaceList.Count == 0) {
+        private static bool RenamePropNameWithoutUndo(Material[] mats, List<RelacePropertyName> replaceList)
+        {
+            if (replaceList.Count == 0)
+            {
                 return false;
             }
 
             // 名称を全て変更
-            foreach (var propPair in replaceList) {
-                if (propPair.after != null) {
+            foreach (var propPair in replaceList)
+            {
+                if (propPair.after != null)
+                {
                     propPair.before.CopyTo(propPair.after);
                     propPair.onAfterCopy(propPair.after);
-                } else {
+                }
+                else
+                {
                     propPair.before.Rename(propPair.afterName);
                     propPair.onAfterCopy(propPair.before);
                 }
@@ -146,7 +162,8 @@ namespace UnlitWF
             // 保存
             ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.after));
             // 旧プロパティは全て削除
-            foreach (var prop in replaceList.Where(p => p.after != null).Select(p => p.before)) {
+            foreach (var prop in replaceList.Where(p => p.after != null).Select(p => p.before))
+            {
                 prop.Remove();
             }
             // 保存
@@ -155,17 +172,22 @@ namespace UnlitWF
             return true;
         }
 
-        private static List<RelacePropertyName> CreateRelacePropertyList(Material[] mats) {
+        private static List<RelacePropertyName> CreateRelacePropertyList(Material[] mats)
+        {
             return CreateReplacePropertyList(mats, WFShaderDictionary.OldPropNameToNewPropNameList);
         }
 
-        private static List<RelacePropertyName> CreateReplacePropertyList(Material[] mats, IEnumerable<PropertyNameReplacement> replacement) {
+        private static List<RelacePropertyName> CreateReplacePropertyList(Material[] mats, IEnumerable<PropertyNameReplacement> replacement)
+        {
             var result = new List<RelacePropertyName>();
-            foreach (var mat in mats) {
+            foreach (var mat in mats)
+            {
                 var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var pair in replacement) {
+                foreach (var pair in replacement)
+                {
                     var before = props.GetValueOrNull(pair.beforeName);
-                    if (before != null) {
+                    if (before != null)
+                    {
                         result.Add(new RelacePropertyName(before, props.GetValueOrNull(pair.afterName), pair.afterName, pair.onAfterCopy));
                     }
                 }
@@ -181,7 +203,8 @@ namespace UnlitWF
             public readonly string afterName;
             public readonly Action<ShaderSerializedProperty> onAfterCopy;
 
-            public RelacePropertyName(ShaderSerializedProperty before, ShaderSerializedProperty after, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null) {
+            public RelacePropertyName(ShaderSerializedProperty before, ShaderSerializedProperty after, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null)
+            {
                 this.before = before;
                 this.after = after;
                 this.afterName = afterName;
@@ -193,14 +216,18 @@ namespace UnlitWF
 
         #region コピー
 
-        public static void CopyProperties(CopyPropParameter param) {
+        public static void CopyProperties(CopyPropParameter param)
+        {
             copyProperties(param, true);
         }
-        public static void CopyPropertiesWithoutUndo(CopyPropParameter param) {
+        public static void CopyPropertiesWithoutUndo(CopyPropParameter param)
+        {
             copyProperties(param, false);
         }
-        public static void copyProperties(CopyPropParameter param, bool undo) {
-            if (param.materialSource == null) {
+        public static void copyProperties(CopyPropParameter param, bool undo)
+        {
+            if (param.materialSource == null)
+            {
                 return;
             }
             var src_props = new List<ShaderMaterialProperty>();
@@ -209,35 +236,44 @@ namespace UnlitWF
             var copy_target = new List<string>(WFShaderFunction.LabelToPrefix(param.labels.ToList()));
             copy_target.AddRange(param.prefixs);
 
-            foreach (var src_prop in ShaderMaterialProperty.AsList(param.materialSource)) {
+            foreach (var src_prop in ShaderMaterialProperty.AsList(param.materialSource))
+            {
                 string prefix = WFCommonUtility.GetPrefixFromPropName(src_prop.Name);
-                if (prefix == null) {
+                if (prefix == null)
+                {
                     continue;
                 }
                 // Prefixの一致判定
-                if (copy_target.Any(prefix.Contains)) {
-                    if (!param.withoutTextures || src_prop.Type != ShaderUtil.ShaderPropertyType.TexEnv) {
+                if (copy_target.Any(prefix.Contains))
+                {
+                    if (!param.withoutTextures || src_prop.Type != ShaderUtil.ShaderPropertyType.TexEnv)
+                    {
                         src_props.Add(src_prop);
                     }
                 }
             }
-            if (src_props.Count == 0) {
+            if (src_props.Count == 0)
+            {
                 return;
             }
 
-            if (undo) {
+            if (undo)
+            {
                 Undo.RecordObjects(param.materialDestination, "WF copy materials");
             }
 
-            for (int i = 0; i < param.materialDestination.Length; i++) {
+            for (int i = 0; i < param.materialDestination.Length; i++)
+            {
                 var dst = param.materialDestination[i];
-                if (dst == null || dst == param.materialSource) { // コピー先とコピー元が同じ時もコピーしない
+                if (dst == null || dst == param.materialSource)
+                { // コピー先とコピー元が同じ時もコピーしない
                     continue;
                 }
                 var dst_props = ShaderMaterialProperty.AsDict(dst);
 
                 // コピー
-                if (CopyProperties(src_props, dst_props, param.onlyOverrideBuiltinTextures)) {
+                if (CopyProperties(src_props, dst_props, param.onlyOverrideBuiltinTextures))
+                {
                     // キーワードを整理する
                     WFCommonUtility.SetupShaderKeyword(dst);
                     // ダーティフラグを付ける
@@ -247,17 +283,23 @@ namespace UnlitWF
             AssetDatabase.SaveAssets();
         }
 
-        private static bool CopyProperties(List<ShaderMaterialProperty> src, Dictionary<string, ShaderMaterialProperty> dst, bool onlyOverrideBuiltinTextures) {
+        private static bool CopyProperties(List<ShaderMaterialProperty> src, Dictionary<string, ShaderMaterialProperty> dst, bool onlyOverrideBuiltinTextures)
+        {
             var changed = false;
-            foreach (var src_prop in src) {
+            foreach (var src_prop in src)
+            {
                 ShaderMaterialProperty dst_prop;
-                if (dst.TryGetValue(src_prop.Name, out dst_prop)) {
+                if (dst.TryGetValue(src_prop.Name, out dst_prop))
+                {
 
                     // もしテクスチャがAssetsフォルダ内にある場合は上書きしない
-                    if (onlyOverrideBuiltinTextures) {
-                        if (dst_prop.Type == ShaderUtil.ShaderPropertyType.TexEnv) {
+                    if (onlyOverrideBuiltinTextures)
+                    {
+                        if (dst_prop.Type == ShaderUtil.ShaderPropertyType.TexEnv)
+                        {
                             var tex = dst_prop.Material.GetTexture(dst_prop.Name);
-                            if (!string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex))) {
+                            if (!string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex)))
+                            {
                                 continue;
                             }
                         }
@@ -274,21 +316,26 @@ namespace UnlitWF
 
         #region リセット・クリーンナップ
 
-        public static void CleanUpProperties(CleanUpParameter param) {
+        public static void CleanUpProperties(CleanUpParameter param)
+        {
             Undo.RecordObjects(param.materials, "WF cleanup materials");
 
-            foreach (Material material in param.materials) {
-                if (material == null) {
+            foreach (Material material in param.materials)
+            {
+                if (material == null)
+                {
                     continue;
                 }
                 var props = ShaderSerializedProperty.AsList(material);
 
                 // 無効になってる機能のプレフィックスを集める
                 var delPrefix = new List<string>();
-                foreach (var p in props) {
+                foreach (var p in props)
+                {
                     string label, name;
                     WFCommonUtility.FormatPropName(p.name, out label, out name);
-                    if (label != null && name.ToLower() == "enable" && p.FloatValue == 0) {
+                    if (label != null && name.ToLower() == "enable" && p.FloatValue == 0)
+                    {
                         delPrefix.Add(label);
                     }
                 }
@@ -296,7 +343,8 @@ namespace UnlitWF
                 var del_props = new HashSet<ShaderSerializedProperty>();
 
                 // プレフィックスに合致する設定値を消去
-                Predicate<ShaderSerializedProperty> predPrefix = p => {
+                Predicate<ShaderSerializedProperty> predPrefix = p =>
+                {
                     string label = WFCommonUtility.GetPrefixFromPropName(p.name);
                     return label != null && delPrefix.Contains(label);
                 };
@@ -310,8 +358,10 @@ namespace UnlitWF
                 DeleteProperties(del_props);
 
                 // キーワードクリア
-                if (param.resetKeywords) {
-                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props)) {
+                if (param.resetKeywords)
+                {
+                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
+                    {
                         DeleteShaderKeyword(so);
                     }
                 }
@@ -323,14 +373,18 @@ namespace UnlitWF
             }
         }
 
-        public static void ResetProperties(ResetParameter param) {
+        public static void ResetProperties(ResetParameter param)
+        {
             Undo.RecordObjects(param.materials, "WF reset materials");
             ResetPropertiesWithoutUndo(param);
         }
 
-        public static void ResetPropertiesWithoutUndo(ResetParameter param) {
-            foreach (Material material in param.materials) {
-                if (material == null) {
+        public static void ResetPropertiesWithoutUndo(ResetParameter param)
+        {
+            foreach (Material material in param.materials)
+            {
+                if (material == null)
+                {
                     continue;
                 }
 
@@ -338,8 +392,10 @@ namespace UnlitWF
                 var del_props = new HashSet<ShaderSerializedProperty>();
 
                 // ColorのAlphaチャンネルのみ変更
-                foreach (var p in props) {
-                    if (p.HasPropertyInShader && p.Type == ShaderUtil.ShaderPropertyType.Color) {
+                foreach (var p in props)
+                {
+                    if (p.HasPropertyInShader && p.Type == ShaderUtil.ShaderPropertyType.Color)
+                    {
                         var c = p.ColorValue;
                         c.a = 1;
                         p.ColorValue = c;
@@ -348,23 +404,30 @@ namespace UnlitWF
                 ShaderSerializedProperty.AllApplyPropertyChange(props);
 
                 // 条件に合致するプロパティを削除
-                foreach (var p in props) {
-                    if (param.resetColor && p.Type == ShaderUtil.ShaderPropertyType.Color) {
+                foreach (var p in props)
+                {
+                    if (param.resetColor && p.Type == ShaderUtil.ShaderPropertyType.Color)
+                    {
                         del_props.Add(p);
                     }
-                    else if (param.resetFloat && p.Type == ShaderUtil.ShaderPropertyType.Float) {
+                    else if (param.resetFloat && p.Type == ShaderUtil.ShaderPropertyType.Float)
+                    {
                         del_props.Add(p);
                     }
-                    else if (param.resetTexture && p.Type == ShaderUtil.ShaderPropertyType.TexEnv) {
+                    else if (param.resetTexture && p.Type == ShaderUtil.ShaderPropertyType.TexEnv)
+                    {
                         del_props.Add(p);
                     }
-                    else if (param.resetUnused && !p.HasPropertyInShader) {
+                    else if (param.resetUnused && !p.HasPropertyInShader)
+                    {
                         del_props.Add(p);
                     }
-                    else if (param.resetLit && p.name.StartsWith("_GL_")) {
+                    else if (param.resetLit && p.name.StartsWith("_GL_"))
+                    {
                         del_props.Add(p);
                     }
-                    else if (param.resetPrefixs.Contains(WFCommonUtility.GetPrefixFromPropName(p.name))) {
+                    else if (param.resetPrefixs.Contains(WFCommonUtility.GetPrefixFromPropName(p.name)))
+                    {
                         del_props.Add(p);
                     }
                 }
@@ -372,8 +435,10 @@ namespace UnlitWF
                 DeleteProperties(del_props);
 
                 // キーワードクリア
-                if (param.resetKeywords) {
-                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props)) {
+                if (param.resetKeywords)
+                {
+                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
+                    {
                         DeleteShaderKeyword(so);
                     }
                 }
@@ -385,13 +450,16 @@ namespace UnlitWF
             }
         }
 
-        private static void DeleteProperties(IEnumerable<ShaderSerializedProperty> props) {
+        private static void DeleteProperties(IEnumerable<ShaderSerializedProperty> props)
+        {
             var del_names = new HashSet<string>();
-            foreach (var p in props) {
+            foreach (var p in props)
+            {
                 del_names.Add(p.name);
                 p.Remove();
             }
-            if (0 < del_names.Count) {
+            if (0 < del_names.Count)
+            {
                 var names = new List<string>(del_names);
                 names.Sort();
                 UnityEngine.Debug.Log("[WF][Tool] Deleted Property: " + string.Join(", ", names.ToArray()));
@@ -399,14 +467,17 @@ namespace UnlitWF
             ShaderSerializedProperty.AllApplyPropertyChange(props);
         }
 
-        public static void DeleteShaderKeyword(SerializedObject so) {
+        public static void DeleteShaderKeyword(SerializedObject so)
+        {
             var prop = so.FindProperty("m_ShaderKeywords");
-            if (prop == null || string.IsNullOrEmpty(prop.stringValue)) {
+            if (prop == null || string.IsNullOrEmpty(prop.stringValue))
+            {
                 return;
             }
             var keywords = prop.stringValue;
             keywords = string.Join(" ", keywords.Split(' ').Where(kwd => !WFCommonUtility.IsEnableKeyword(kwd)).OrderBy(kwd => kwd));
-            if (!string.IsNullOrWhiteSpace(keywords)) {
+            if (!string.IsNullOrWhiteSpace(keywords))
+            {
                 UnityEngine.Debug.Log("[WF][Tool] Deleted Shaderkeyword: " + keywords);
             }
             prop.stringValue = "";
@@ -425,7 +496,8 @@ namespace UnlitWF
         private readonly Shader shader;
         private readonly int index;
 
-        ShaderMaterialProperty(Material material, Shader shader, int index) {
+        ShaderMaterialProperty(Material material, Shader shader, int index)
+        {
             this.Material = material;
             this.shader = shader;
             this.index = index;
@@ -444,11 +516,14 @@ namespace UnlitWF
         /// </summary>
         public ShaderUtil.ShaderPropertyType Type { get { return ShaderUtil.GetPropertyType(shader, index); } }
 
-        public bool CopyTo(ShaderMaterialProperty dst) {
+        public bool CopyTo(ShaderMaterialProperty dst)
+        {
             var srcType = Type;
             var dstType = dst.Type;
-            if (srcType == dstType) {
-                switch (srcType) {
+            if (srcType == dstType)
+            {
+                switch (srcType)
+                {
                     case ShaderUtil.ShaderPropertyType.Color:
                         dst.Material.SetColor(dst.Name, this.Material.GetColor(Name));
                         return true;
@@ -471,19 +546,23 @@ namespace UnlitWF
             return false;
         }
 
-        public static List<ShaderMaterialProperty> AsList(Material material) {
+        public static List<ShaderMaterialProperty> AsList(Material material)
+        {
             var shader = material.shader;
             int cnt = ShaderUtil.GetPropertyCount(shader);
             var result = new List<ShaderMaterialProperty>();
-            for (int i = 0; i < cnt; i++) {
+            for (int i = 0; i < cnt; i++)
+            {
                 result.Add(new ShaderMaterialProperty(material, shader, i));
             }
             return result;
         }
 
-        public static Dictionary<string, ShaderMaterialProperty> AsDict(Material material) {
+        public static Dictionary<string, ShaderMaterialProperty> AsDict(Material material)
+        {
             var result = new Dictionary<string, ShaderMaterialProperty>();
-            foreach (var p in AsList(material)) {
+            foreach (var p in AsList(material))
+            {
                 result[p.Name] = p;
             }
             return result;
@@ -502,7 +581,8 @@ namespace UnlitWF
         private readonly SerializedProperty property;
         private readonly SerializedProperty value;
 
-        ShaderSerializedProperty(string name, ShaderMaterialProperty matProp, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property) {
+        ShaderSerializedProperty(string name, ShaderMaterialProperty matProp, SerializedObject serialObject, SerializedProperty parent, SerializedProperty property)
+        {
             this.name = name;
             this.materialProperty = matProp;
             this.serialObject = serialObject;
@@ -512,12 +592,14 @@ namespace UnlitWF
             this.value = property.FindPropertyRelative("second");
         }
 
-        private static string GetSerializedName(SerializedProperty p) {
+        private static string GetSerializedName(SerializedProperty p)
+        {
             SerializedProperty first = p.FindPropertyRelative("first");
             return first != null ? first.stringValue : null;
         }
 
-        private static SerializedProperty GetSerializedValue(SerializedProperty p) {
+        private static SerializedProperty GetSerializedValue(SerializedProperty p)
+        {
             return p.FindPropertyRelative("second");
         }
 
@@ -528,22 +610,29 @@ namespace UnlitWF
 
         public ShaderUtil.ShaderPropertyType Type
         {
-            get {
-                if (materialProperty != null) {
+            get
+            {
+                if (materialProperty != null)
+                {
                     return materialProperty.Type;
                 }
-                if (parent != null) {
-                    if (ParentName == "m_Colors") {
+                if (parent != null)
+                {
+                    if (ParentName == "m_Colors")
+                    {
                         return ShaderUtil.ShaderPropertyType.Color;
                     }
-                    else if (ParentName == "m_Floats") {
+                    else if (ParentName == "m_Floats")
+                    {
                         return ShaderUtil.ShaderPropertyType.Float;
                     }
-                    else if (ParentName == "m_TexEnvs") {
+                    else if (ParentName == "m_TexEnvs")
+                    {
                         return ShaderUtil.ShaderPropertyType.TexEnv;
                     }
                 }
-                switch (value.propertyType) {
+                switch (value.propertyType)
+                {
                     case SerializedPropertyType.Generic: // Texture
                         return ShaderUtil.ShaderPropertyType.TexEnv;
                     case SerializedPropertyType.Float:
@@ -571,22 +660,27 @@ namespace UnlitWF
         public Vector4 VectorValue { get { return value.vector4Value; } set { this.value.vector4Value = value; } }
         public Texture TextureValue
         {
-            get {
+            get
+            {
                 var child = value.FindPropertyRelative("m_Texture");
                 return child == null ? null : child.objectReferenceValue as Texture;
             }
         }
 
-        public void Rename(string newName) {
+        public void Rename(string newName)
+        {
             property.FindPropertyRelative("first").stringValue = newName;
         }
 
-        private static void TryCopyValue(SerializedProperty src, SerializedProperty dst) {
-            if (src == null || dst == null) {
+        private static void TryCopyValue(SerializedProperty src, SerializedProperty dst)
+        {
+            if (src == null || dst == null)
+            {
                 return;
             }
 
-            switch (src.propertyType) {
+            switch (src.propertyType)
+            {
                 case SerializedPropertyType.Generic:
                     // テクスチャ系の子をコピーする
                     TryCopyValue(src.FindPropertyRelative("m_Texture"), dst.FindPropertyRelative("m_Texture"));
@@ -629,58 +723,73 @@ namespace UnlitWF
             }
         }
 
-        public void CopyTo(ShaderSerializedProperty other) {
+        public void CopyTo(ShaderSerializedProperty other)
+        {
             TryCopyValue(this.value, other.value);
         }
 
-        public void Remove() {
-            for (int i = parent.arraySize - 1; 0 <= i; i--) {
+        public void Remove()
+        {
+            for (int i = parent.arraySize - 1; 0 <= i; i--)
+            {
                 var prop = parent.GetArrayElementAtIndex(i);
-                if (GetSerializedName(prop) == this.name) {
+                if (GetSerializedName(prop) == this.name)
+                {
                     parent.DeleteArrayElementAtIndex(i);
                 }
             }
         }
 
-        public static void AllApplyPropertyChange(IEnumerable<ShaderSerializedProperty> props) {
-            foreach (var so in GetUniqueSerialObject(props)) {
+        public static void AllApplyPropertyChange(IEnumerable<ShaderSerializedProperty> props)
+        {
+            foreach (var so in GetUniqueSerialObject(props))
+            {
                 so.ApplyModifiedProperties();
             }
         }
 
-        public static HashSet<SerializedObject> GetUniqueSerialObject(IEnumerable<ShaderSerializedProperty> props) {
+        public static HashSet<SerializedObject> GetUniqueSerialObject(IEnumerable<ShaderSerializedProperty> props)
+        {
             var ret = new HashSet<SerializedObject>();
-            foreach (var prop in props) {
-                if (prop != null && prop.serialObject != null) {
+            foreach (var prop in props)
+            {
+                if (prop != null && prop.serialObject != null)
+                {
                     ret.Add(prop.serialObject);
                 }
             }
             return ret;
         }
 
-        public static Dictionary<string, ShaderSerializedProperty> AsDict(Material material) {
+        public static Dictionary<string, ShaderSerializedProperty> AsDict(Material material)
+        {
             var result = new Dictionary<string, ShaderSerializedProperty>();
-            foreach (var prop in AsList(material)) {
+            foreach (var prop in AsList(material))
+            {
                 result[prop.name] = prop;
             }
             return result;
         }
 
-        public static List<ShaderSerializedProperty> AsList(IEnumerable<Material> matlist) {
+        public static List<ShaderSerializedProperty> AsList(IEnumerable<Material> matlist)
+        {
             var result = new List<ShaderSerializedProperty>();
-            foreach (Material mat in matlist) {
+            foreach (Material mat in matlist)
+            {
                 result.AddRange(AsList(mat));
             }
             return result;
         }
 
-        public static List<ShaderSerializedProperty> AsList(Material material) {
+        public static List<ShaderSerializedProperty> AsList(Material material)
+        {
             var matProps = ShaderMaterialProperty.AsDict(material);
             SerializedObject so = new SerializedObject(material);
             so.Update();
             var result = new List<ShaderSerializedProperty>();
             var m_SavedProperties = so.FindProperty("m_SavedProperties");
-            if (m_SavedProperties != null) {
+            if (m_SavedProperties != null)
+            {
                 result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_Floats"), matProps));
                 result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_Colors"), matProps));
                 result.AddRange(AsList(material, so, m_SavedProperties.FindPropertyRelative("m_TexEnvs"), matProps));
@@ -688,13 +797,17 @@ namespace UnlitWF
             return result;
         }
 
-        private static List<ShaderSerializedProperty> AsList(Material material, SerializedObject so, SerializedProperty parent, Dictionary<string, ShaderMaterialProperty> matProps) {
+        private static List<ShaderSerializedProperty> AsList(Material material, SerializedObject so, SerializedProperty parent, Dictionary<string, ShaderMaterialProperty> matProps)
+        {
             var result = new List<ShaderSerializedProperty>();
-            if (parent != null) {
-                for (int i = 0; i < parent.arraySize; i++) {
+            if (parent != null)
+            {
+                for (int i = 0; i < parent.arraySize; i++)
+                {
                     var prop = parent.GetArrayElementAtIndex(i);
                     var name = GetSerializedName(prop);
-                    if (name != null) {
+                    if (name != null)
+                    {
                         result.Add(new ShaderSerializedProperty(name, matProps.GetValueOrNull(name), so, parent, prop));
                     }
                 }
