@@ -456,13 +456,23 @@
                 float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
 
 #ifndef _WF_MOBILE
+
+#if defined(_NM_BL2ND_ENABLE) || defined(_NM_SW2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 // 2nd NormalMap
                 float dtlPower = _NM_2ndType == 0 ? 0 : WF_TEX2D_NORMAL_DTL_MASK(uv_main);
                 float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(i.uv, _DetailNormalMap) );
+#if defined(_WF_LEGACY_FEATURE_SWITCH)
                 if (_NM_2ndType == 1) { // BLEND
+#endif
+#if defined(_NM_BL2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                     dtlNormalTangent = BlendNormals(normalTangent, dtlNormalTangent);
+#endif
+#if defined(_WF_LEGACY_FEATURE_SWITCH)
                 }
+#endif
                 normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
+#endif
+
 #endif
 
                 // 法線計算
@@ -511,15 +521,26 @@
         float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
             float3 color = ZERO_VEC3;
+
             // ONLYでなければ PROBE を加算
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (_MT_CubemapType != 2) {
+#endif
+#ifndef _MT_ONLY2ND_ENABLE
                 color += pickReflectionProbe(ws_vertex, ws_normal, metal_lod).rgb;
+#endif
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
+#endif
+#if defined(_MT_ADD2ND_ENABLE) || defined(_MT_ONLY2ND_ENABLE)
                 float3 cubemap = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
                 color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
+#endif
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
             return color;
         }
 
@@ -771,21 +792,30 @@
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
                 float3 shadow_color = ONE_VEC3;
 
-                if (_TS_Steps == 1) {
-                    // 1影まで
-                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
-                }
-                else if (_TS_Steps == 3) {
-                    // 3影まで
-                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+#ifndef _WF_LEGACY_FEATURE_SWITCH
+
+                // 1影
+                calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+
+#if !defined(_TS_STEP1_ENABLE) || defined(_TS_STEP3_ENABLE)
+                // 2影
+                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+#endif
+#if defined(_TS_STEP3_ENABLE)
+                // 3影
+                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
+#endif
+
+#else
+                // 1影まで
+                calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+                if (_TS_Steps == 2 || _TS_Steps == 3) {
                     calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                }
+                if (_TS_Steps == 3) {
                     calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
                 }
-                else {
-                    // 2影まで
-                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
-                    calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
-                }
+#endif
 
                 // 乗算
                 color.rgb *= shadow_color;

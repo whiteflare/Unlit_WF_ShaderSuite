@@ -39,6 +39,7 @@ namespace UnlitWF
         public const string ASSETS_TEMPLATE = PATH_ASSETS + "Create MaterialTemplate";
         public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials in the Scene";
         public const string ASSETS_CNGMOBILE = PATH_ASSETS + "Change Mobile shader";
+        public const string ASSETS_MIGALL = PATH_ASSETS + "Migration All materials";
 
         public const int PRI_ASSETS_AUTOCNV = 2201;
         public const int PRI_ASSETS_CREANUP = 2301;
@@ -49,6 +50,7 @@ namespace UnlitWF
         public const int PRI_ASSETS_TEMPLATE = 2501;
         public const int PRI_ASSETS_KEEPMAT = 2601;
         public const int PRI_ASSETS_CNGMOBILE = 2701;
+        public const int PRI_ASSETS_MIGALL = 2702;
 
         public const string PATH_TOOLS = "Tools/UnlitWF/";
 
@@ -56,11 +58,13 @@ namespace UnlitWF
         public const string TOOLS_COPY = PATH_TOOLS + "Copy material property";
         public const string TOOLS_RESET = PATH_TOOLS + "Reset material property";
         public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration material";
+        public const string TOOLS_MIGALL = PATH_TOOLS + "Migration All materials";
 
         public const int PRI_TOOLS_CREANUP = 101;
         public const int PRI_TOOLS_COPY = 102;
         public const int PRI_TOOLS_RESET = 103;
         public const int PRI_TOOLS_MIGRATION = 104;
+        public const int PRI_TOOLS_MIGALL = 301;
 
         public const string PATH_MATERIAL = "CONTEXT/Material/";
 
@@ -75,13 +79,26 @@ namespace UnlitWF
         #region Convert UnlitWF material
 
         [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
-        private static void Menu_AutoConvertMaterial() {
+        private static void Menu_AutoConvertMaterial()
+        {
             new WFMaterialFromOtherShaderConverter().ExecAutoConvert(Selection.GetFiltered<Material>(SelectionMode.Assets));
         }
 
         [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
-        private static void ContextMenu_AutoConvertMaterial(MenuCommand cmd) {
+        private static void ContextMenu_AutoConvertMaterial(MenuCommand cmd)
+        {
             new WFMaterialFromOtherShaderConverter().ExecAutoConvert(cmd.context as Material);
+        }
+
+        #endregion
+
+        #region Migration
+
+        [MenuItem(WFMenu.ASSETS_MIGALL, priority = WFMenu.PRI_ASSETS_MIGALL)]
+        [MenuItem(WFMenu.TOOLS_MIGALL, priority = WFMenu.PRI_TOOLS_MIGALL)]
+        private static void Menu_ScanAndAllMigration()
+        {
+            ScanAndMigrationExecutor.ExecuteByManual();
         }
 
         #endregion
@@ -89,7 +106,8 @@ namespace UnlitWF
         #region Keep materials
 
         [MenuItem(WFMenu.ASSETS_KEEPMAT, priority = WFMenu.PRI_ASSETS_KEEPMAT)]
-        private static void Menu_KeepMaterialInScene() {
+        private static void Menu_KeepMaterialInScene()
+        {
             var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
 
             var go = new GameObject("MaterialKeeper");
@@ -104,13 +122,16 @@ namespace UnlitWF
         #region DebugView
 
         [MenuItem(WFMenu.MATERIAL_DEBUGVIEW, priority = WFMenu.PRI_MATERIAL_DEBUGVIEW)]
-        private static void ContextMenu_DebugView(MenuCommand cmd) {
+        private static void ContextMenu_DebugView(MenuCommand cmd)
+        {
             WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, cmd.context as Material);
         }
 
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, priority = WFMenu.PRI_ASSETS_DEBUGVIEW)]
-        private static void Menu_DebugView() {
-            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets)) {
+        private static void Menu_DebugView()
+        {
+            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets))
+            {
                 WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, mat);
             }
         }
@@ -120,22 +141,27 @@ namespace UnlitWF
         #region Change Mobile Shader
 
         [MenuItem(WFMenu.MATERIAL_CNGMOBILE, priority = WFMenu.PRI_MATERIAL_CNGMOBILE)]
-        private static void ContextMenu_ChangeMobileShader(MenuCommand cmd) {
+        private static void ContextMenu_ChangeMobileShader(MenuCommand cmd)
+        {
             ChangeMobileShader(cmd.context as Material);
         }
 
         [MenuItem(WFMenu.ASSETS_CNGMOBILE, priority = WFMenu.PRI_ASSETS_CNGMOBILE)]
-        private static void Menu_ChangeMobileShader() {
+        private static void Menu_ChangeMobileShader()
+        {
             ChangeMobileShader(Selection.GetFiltered<Material>(SelectionMode.Assets));
         }
 
-        private static void ChangeMobileShader(params Material[] mats) {
-            if (0 < mats.Length && EditorUtility.DisplayDialog("WF change Mobile shader", WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel")) {
+        private static void ChangeMobileShader(params Material[] mats)
+        {
+            if (0 < mats.Length && EditorUtility.DisplayDialog("WF change Mobile shader", WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel"))
+            {
                 new WFMaterialToMobileShaderConverter().ExecAutoConvert(mats);
             }
         }
 
         #endregion
+
 
         [MenuItem(WFMenu.ASSETS_AUTOCNV, validate = true)]
         [MenuItem(WFMenu.ASSETS_CREANUP, validate = true)]
@@ -145,7 +171,8 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, validate = true)]
         [MenuItem(WFMenu.ASSETS_KEEPMAT, validate = true)]
         [MenuItem(WFMenu.ASSETS_CNGMOBILE, validate = true)]
-        private static bool MenuValidation_HasMaterials() {
+        private static bool MenuValidation_HasMaterials()
+        {
             return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
 
@@ -153,15 +180,19 @@ namespace UnlitWF
 
     internal static class ToolCommon
     {
-        public static bool IsUnlitWFMaterial(Material mm) {
-            if (mm != null && mm.shader != null) {
+        public static bool IsUnlitWFMaterial(Material mm)
+        {
+            if (mm != null && mm.shader != null)
+            {
                 return mm.shader.name.Contains("UnlitWF") && !mm.shader.name.Contains("Debug");
             }
             return false;
         }
 
-        public static bool IsNotUnlitWFMaterial(Material mm) {
-            if (mm != null && mm.shader != null) {
+        public static bool IsNotUnlitWFMaterial(Material mm)
+        {
+            if (mm != null && mm.shader != null)
+            {
                 return !IsUnlitWFMaterial(mm);
             }
             return false;
@@ -175,13 +206,15 @@ namespace UnlitWF
 
         [MenuItem(WFMenu.TOOLS_CREANUP, priority = WFMenu.PRI_TOOLS_CREANUP)]
         [MenuItem(WFMenu.ASSETS_CREANUP, priority = WFMenu.PRI_ASSETS_CREANUP)]
-        private static void OpenWindowFromMenu() {
+        private static void OpenWindowFromMenu()
+        {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
         }
 
-        internal static void OpenWindowFromShaderGUI(Material[] mats) {
+        internal static void OpenWindowFromShaderGUI(Material[] mats)
+        {
             arguments.Clear();
             arguments.AddRange(mats);
             GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
@@ -194,26 +227,31 @@ namespace UnlitWF
         Vector2 scroll = Vector2.zero;
         private CleanUpParameter param;
 
-        private void OnEnable() {
+        private void OnEnable()
+        {
             minSize = new Vector2(480, 640);
             param = CleanUpParameter.Create();
-            if (0 < arguments.Count) {
+            if (0 < arguments.Count)
+            {
                 param.materials = arguments.ToArray();
             }
 
-            styleTitle = new GUIStyle(EditorStyles.boldLabel) {
+            styleTitle = new GUIStyle(EditorStyles.boldLabel)
+            {
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
                 fixedHeight = 32,
             };
-            styleBigText = new GUIStyle(EditorStyles.boldLabel) {
+            styleBigText = new GUIStyle(EditorStyles.boldLabel)
+            {
                 fontSize = 16,
                 fontStyle = FontStyle.Bold,
                 fixedHeight = 32,
             };
         }
 
-        private void OnGUI() {
+        private void OnGUI()
+        {
             var so = new SerializedObject(param);
             so.Update();
 
@@ -240,10 +278,13 @@ namespace UnlitWF
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
             bool removeOther = false;
-            foreach (Material mm in param.materials) {
-                if (ToolCommon.IsNotUnlitWFMaterial(mm)) {
+            foreach (Material mm in param.materials)
+            {
+                if (ToolCommon.IsNotUnlitWFMaterial(mm))
+                {
                     EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                    if (GUILayout.Button("Remove other materials")) {
+                    if (GUILayout.Button("Remove other materials"))
+                    {
                         removeOther = true;
                     }
                     break;
@@ -264,14 +305,16 @@ namespace UnlitWF
             so.SetIsDifferentCacheDirty();
 
             // UnlitWF 以外のマテリアルを除去
-            if (removeOther) {
+            if (removeOther)
+            {
                 var newlist = new List<Material>();
                 newlist.AddRange(param.materials);
                 newlist.RemoveAll(mm => !ToolCommon.IsUnlitWFMaterial(mm));
                 param.materials = newlist.ToArray();
             }
 
-            if (GUILayout.Button("CleanUp")) {
+            if (GUILayout.Button("CleanUp"))
+            {
                 WFMaterialEditUtility.CleanUpProperties(param);
             }
             EditorGUILayout.Space();
@@ -290,7 +333,8 @@ namespace UnlitWF
 
         [MenuItem(WFMenu.TOOLS_RESET, priority = WFMenu.PRI_TOOLS_RESET)]
         [MenuItem(WFMenu.ASSETS_RESET, priority = WFMenu.PRI_ASSETS_RESET)]
-        private static void OpenWindowFromMenu() {
+        private static void OpenWindowFromMenu()
+        {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolResetWindow>("UnlitWF/Reset material property");
@@ -303,26 +347,31 @@ namespace UnlitWF
         Vector2 scroll = Vector2.zero;
         private ResetParameter param;
 
-        private void OnEnable() {
+        private void OnEnable()
+        {
             minSize = new Vector2(480, 640);
             param = ResetParameter.Create();
-            if (0 < arguments.Count) {
+            if (0 < arguments.Count)
+            {
                 param.materials = arguments.ToArray();
             }
 
-            styleTitle = new GUIStyle(EditorStyles.boldLabel) {
+            styleTitle = new GUIStyle(EditorStyles.boldLabel)
+            {
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
                 fixedHeight = 32,
             };
-            styleBigText = new GUIStyle(EditorStyles.boldLabel) {
+            styleBigText = new GUIStyle(EditorStyles.boldLabel)
+            {
                 fontSize = 16,
                 fontStyle = FontStyle.Bold,
                 fixedHeight = 32,
             };
         }
 
-        private void OnGUI() {
+        private void OnGUI()
+        {
             var so = new SerializedObject(param);
             so.Update();
 
@@ -349,10 +398,13 @@ namespace UnlitWF
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
             bool removeOther = false;
-            foreach (Material mm in param.materials) {
-                if (ToolCommon.IsNotUnlitWFMaterial(mm)) {
+            foreach (Material mm in param.materials)
+            {
+                if (ToolCommon.IsNotUnlitWFMaterial(mm))
+                {
                     EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                    if (GUILayout.Button("Remove other materials")) {
+                    if (GUILayout.Button("Remove other materials"))
+                    {
                         removeOther = true;
                     }
                     break;
@@ -394,14 +446,16 @@ namespace UnlitWF
             so.SetIsDifferentCacheDirty();
 
             // UnlitWF 以外のマテリアルを除去
-            if (removeOther) {
+            if (removeOther)
+            {
                 var newlist = new List<Material>();
                 newlist.AddRange(param.materials);
                 newlist.RemoveAll(mm => !ToolCommon.IsUnlitWFMaterial(mm));
                 param.materials = newlist.ToArray();
             }
 
-            if (GUILayout.Button("Reset Values")) {
+            if (GUILayout.Button("Reset Values"))
+            {
                 WFMaterialEditUtility.ResetProperties(param);
             }
             EditorGUILayout.Space();
@@ -420,7 +474,8 @@ namespace UnlitWF
 
         [MenuItem(WFMenu.TOOLS_COPY, priority = WFMenu.PRI_TOOLS_COPY)]
         [MenuItem(WFMenu.ASSETS_COPY, priority = WFMenu.PRI_ASSETS_COPY)]
-        private static void OpenWindowFromMenu() {
+        private static void OpenWindowFromMenu()
+        {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolCopyWindow>("UnlitWF/Copy material property");
@@ -433,26 +488,31 @@ namespace UnlitWF
         Vector2 scroll = Vector2.zero;
         private CopyPropParameter param;
 
-        private void OnEnable() {
+        private void OnEnable()
+        {
             minSize = new Vector2(480, 640);
             param = CopyPropParameter.Create();
-            if (0 < arguments.Count) {
+            if (0 < arguments.Count)
+            {
                 param.materialDestination = arguments.ToArray();
             }
 
-            styleTitle = new GUIStyle(EditorStyles.boldLabel) {
+            styleTitle = new GUIStyle(EditorStyles.boldLabel)
+            {
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
                 fixedHeight = 32,
             };
-            styleBigText = new GUIStyle(EditorStyles.boldLabel) {
+            styleBigText = new GUIStyle(EditorStyles.boldLabel)
+            {
                 fontSize = 16,
                 fontStyle = FontStyle.Bold,
                 fixedHeight = 32,
             };
         }
 
-        private void OnGUI() {
+        private void OnGUI()
+        {
             var so = new SerializedObject(param);
             so.Update();
 
@@ -477,10 +537,13 @@ namespace UnlitWF
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
             bool removeOther = false;
-            foreach (Material mm in param.materialDestination) {
-                if (ToolCommon.IsNotUnlitWFMaterial(mm)) {
+            foreach (Material mm in param.materialDestination)
+            {
+                if (ToolCommon.IsNotUnlitWFMaterial(mm))
+                {
                     EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                    if (GUILayout.Button("Remove other materials")) {
+                    if (GUILayout.Button("Remove other materials"))
+                    {
                         removeOther = true;
                     }
                     break;
@@ -492,7 +555,8 @@ namespace UnlitWF
             EditorGUILayout.PropertyField(so.FindProperty("materialSource"), new GUIContent("material"), true);
             EditorGUILayout.Space();
 
-            if (ToolCommon.IsNotUnlitWFMaterial(param.materialSource)) {
+            if (ToolCommon.IsNotUnlitWFMaterial(param.materialSource))
+            {
                 EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
                 EditorGUILayout.Space();
             }
@@ -504,28 +568,34 @@ namespace UnlitWF
             EditorGUILayout.LabelField("copy target functions", EditorStyles.boldLabel);
 
             var updatedFunctions = new List<string>();
-            foreach (var func in WFShaderFunction.GetEnableFunctionList(param.materialSource)) {
+            foreach (var func in WFShaderFunction.GetEnableFunctionList(param.materialSource))
+            {
                 bool value = param.labels.Contains(func.Label);
-                if (GUILayout.Toggle(value, string.Format("[{0}] {1}", func.Label, func.Name))) {
+                if (GUILayout.Toggle(value, string.Format("[{0}] {1}", func.Label, func.Name)))
+                {
                     updatedFunctions.Add(func.Label);
                 }
             }
-            if (!updatedFunctions.SequenceEqual(param.labels)) {
+            if (!updatedFunctions.SequenceEqual(param.labels))
+            {
                 param.labels = updatedFunctions.ToArray();
             }
 
             EditorGUILayout.Space();
 
             // UnlitWF 以外のマテリアルを除去
-            if (removeOther) {
+            if (removeOther)
+            {
                 var newlist = new List<Material>();
                 newlist.AddRange(param.materialDestination);
                 newlist.RemoveAll(mm => !ToolCommon.IsUnlitWFMaterial(mm));
                 param.materialDestination = newlist.ToArray();
             }
 
-            using (new EditorGUI.DisabledGroupScope(param.labels.Length == 0)) {
-                if (GUILayout.Button("Copy Values")) {
+            using (new EditorGUI.DisabledGroupScope(param.labels.Length == 0))
+            {
+                if (GUILayout.Button("Copy Values"))
+                {
                     WFMaterialEditUtility.CopyProperties(param);
                 }
             }
@@ -543,7 +613,8 @@ namespace UnlitWF
     {
         [MenuItem(WFMenu.TOOLS_MIGRATION, priority = WFMenu.PRI_TOOLS_MIGRATION)]
         [MenuItem(WFMenu.ASSETS_MIGRATION, priority = WFMenu.PRI_ASSETS_MIGRATION)]
-        private static void OpenWindowFromMenu() {
+        private static void OpenWindowFromMenu()
+        {
             arguments.Clear();
             arguments.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
             GetWindow<ToolMigrationWindow>("UnlitWF/Migration material");
@@ -556,26 +627,31 @@ namespace UnlitWF
         Vector2 scroll = Vector2.zero;
         private MigrationParameter param;
 
-        private void OnEnable() {
+        private void OnEnable()
+        {
             minSize = new Vector2(480, 640);
             param = MigrationParameter.Create();
-            if (0 < arguments.Count) {
+            if (0 < arguments.Count)
+            {
                 param.materials = arguments.ToArray();
             }
 
-            styleTitle = new GUIStyle(EditorStyles.boldLabel) {
+            styleTitle = new GUIStyle(EditorStyles.boldLabel)
+            {
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
                 fixedHeight = 32,
             };
-            styleBigText = new GUIStyle(EditorStyles.boldLabel) {
+            styleBigText = new GUIStyle(EditorStyles.boldLabel)
+            {
                 fontSize = 16,
                 fontStyle = FontStyle.Bold,
                 fixedHeight = 32,
             };
         }
 
-        private void OnGUI() {
+        private void OnGUI()
+        {
             var so = new SerializedObject(param);
             so.Update();
 
@@ -600,10 +676,13 @@ namespace UnlitWF
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
             bool removeOther = false;
-            foreach (Material mm in param.materials) {
-                if (ToolCommon.IsNotUnlitWFMaterial(mm)) {
+            foreach (Material mm in param.materials)
+            {
+                if (ToolCommon.IsNotUnlitWFMaterial(mm))
+                {
                     EditorGUILayout.HelpBox("Found Not-UnlitWF materials. Continue?\n(UnlitWF以外のマテリアルが紛れていますが大丈夫ですか？)", MessageType.Warning);
-                    if (GUILayout.Button("Remove other materials")) {
+                    if (GUILayout.Button("Remove other materials"))
+                    {
                         removeOther = true;
                     }
                     break;
@@ -615,20 +694,22 @@ namespace UnlitWF
             so.SetIsDifferentCacheDirty();
 
             // UnlitWF 以外のマテリアルを除去
-            if (removeOther) {
+            if (removeOther)
+            {
                 var newlist = new List<Material>();
                 newlist.AddRange(param.materials);
                 newlist.RemoveAll(mm => !ToolCommon.IsUnlitWFMaterial(mm));
                 param.materials = newlist.ToArray();
             }
 
-            if (GUILayout.Button("Convert")) {
-                if (WFMaterialEditUtility.RenameOldNameProperties(param)) {
-                    // ShaderGUI側のマテリアルキャッシュをリセット
-                    ShaderCustomEditor.ResetOldMaterialTable();
-                    // 変更したマテリアルを保存
-                    AssetDatabase.SaveAssets();
-                }
+            if (GUILayout.Button("Convert"))
+            {
+                // 変換
+                WFMaterialEditUtility.MigrationMaterial(param);
+                // ShaderGUI側のマテリアルキャッシュをリセット
+                ShaderCustomEditor.ResetOldMaterialTable();
+                // 変更したマテリアルを保存
+                AssetDatabase.SaveAssets();
             }
 
             EditorGUILayout.Space();
@@ -644,21 +725,27 @@ namespace UnlitWF
     {
         private readonly List<Action<ConvertContext>> converters;
 
-        protected AbstractMaterialConverter(List<Action<ConvertContext>> converters) {
+        protected AbstractMaterialConverter(List<Action<ConvertContext>> converters)
+        {
             this.converters = converters;
         }
 
-        public void ExecAutoConvert(params Material[] mats) {
+        public void ExecAutoConvert(params Material[] mats)
+        {
             Undo.RecordObjects(mats, "WF Convert materials");
             ExecAutoConvertWithoutUndo(mats);
         }
 
-        public void ExecAutoConvertWithoutUndo(params Material[] mats) {
-            foreach (var mat in mats) {
-                if (mat == null) {
+        public void ExecAutoConvertWithoutUndo(params Material[] mats)
+        {
+            foreach (var mat in mats)
+            {
+                if (mat == null)
+                {
                     continue;
                 }
-                if (!Validate(mat)) {
+                if (!Validate(mat))
+                {
                     continue;
                 }
 
@@ -667,14 +754,16 @@ namespace UnlitWF
                 ctx.oldMaterial = new Material(mat);
                 ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
 
-                foreach (var cnv in converters) {
+                foreach (var cnv in converters)
+                {
                     cnv(ctx);
                 }
                 Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
             }
         }
 
-        protected virtual bool Validate(Material mat) {
+        protected virtual bool Validate(Material mat)
+        {
             return true;
         }
 
@@ -693,17 +782,22 @@ namespace UnlitWF
             NoMatch, Opaque, Cutout, Transparent
         }
 
-        protected static bool IsMatchShaderName(ConvertContext ctx, string name) {
+        protected static bool IsMatchShaderName(ConvertContext ctx, string name)
+        {
             return IsMatchShaderName(ctx.oldMaterial.shader, name);
         }
 
-        protected static bool IsMatchShaderName(Shader shader, string name) {
+        protected static bool IsMatchShaderName(Shader shader, string name)
+        {
             return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(shader.name);
         }
 
-        private static bool hasCustomValue(Dictionary<string, ShaderSerializedProperty> props, string name) {
-            if (props.TryGetValue(name, out var prop)) {
-                switch (prop.Type) {
+        private static bool hasCustomValue(Dictionary<string, ShaderSerializedProperty> props, string name)
+        {
+            if (props.TryGetValue(name, out var prop))
+            {
+                switch (prop.Type)
+                {
                     case ShaderUtil.ShaderPropertyType.Float:
                     case ShaderUtil.ShaderPropertyType.Range:
                         return 0.001f < Mathf.Abs(prop.FloatValue);
@@ -724,23 +818,28 @@ namespace UnlitWF
             return false;
         }
 
-        protected static bool HasCustomValue(ConvertContext ctx, params string[] names) {
+        protected static bool HasCustomValue(ConvertContext ctx, params string[] names)
+        {
             var newProp = ShaderSerializedProperty.AsDict(ctx.target);
 
-            foreach (var name in names) {
+            foreach (var name in names)
+            {
                 // 新しいマテリアルから設定されていないかを調べる
-                if (hasCustomValue(newProp, name)) {
+                if (hasCustomValue(newProp, name))
+                {
                     return true;
                 }
                 // 古いマテリアルの側から設定されていないかを調べる
-                if (hasCustomValue(ctx.oldProps, name)) {
+                if (hasCustomValue(ctx.oldProps, name))
+                {
                     return true;
                 }
             }
             return false;
         }
 
-        protected static bool IsURP() {
+        protected static bool IsURP()
+        {
 #if UNITY_2019_1_OR_NEWER
             return UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
 #else
@@ -754,15 +853,18 @@ namespace UnlitWF
     /// </summary>
     public class WFMaterialToMobileShaderConverter : AbstractMaterialConverter
     {
-        public WFMaterialToMobileShaderConverter() : base(CreateConverterList()) {
+        public WFMaterialToMobileShaderConverter() : base(CreateConverterList())
+        {
         }
 
-        protected override bool Validate(Material mat) {
+        protected override bool Validate(Material mat)
+        {
             // UnlitWFのマテリアルを対象に、URPではない場合に変換する
             return WFCommonUtility.IsSupportedShader(mat) && !WFCommonUtility.IsMobileSupportedShader(mat) && !IsURP();
         }
 
-        protected static List<Action<ConvertContext>> CreateConverterList() {
+        protected static List<Action<ConvertContext>> CreateConverterList()
+        {
             return new List<Action<ConvertContext>>() {
                 ctx => {
                     bool cnv = false;
@@ -798,15 +900,18 @@ namespace UnlitWF
     /// </summary>
     public class WFMaterialFromOtherShaderConverter : AbstractMaterialConverter
     {
-        public WFMaterialFromOtherShaderConverter() : base(CreateConverterList()) {
+        public WFMaterialFromOtherShaderConverter() : base(CreateConverterList())
+        {
         }
 
-        protected override bool Validate(Material mat) {
+        protected override bool Validate(Material mat)
+        {
             // UnlitWF系ではないマテリアルを対象に処理する
             return !WFCommonUtility.IsSupportedShader(mat);
         }
 
-        protected static List<Action<ConvertContext>> CreateConverterList() {
+        protected static List<Action<ConvertContext>> CreateConverterList()
+        {
             return new List<Action<ConvertContext>>() {
                 ctx => {
                     // アウトライン有無を判定する
@@ -1027,6 +1132,133 @@ namespace UnlitWF
                     WFMaterialEditUtility.ResetPropertiesWithoutUndo(resetParam);
                 },
             };
+        }
+    }
+
+    public static class ScanAndMigrationExecutor
+    {
+        public const int VERSION = 1;
+
+        [InitializeOnLoadMethod]
+        public static void ExecuteAuto()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                // 実行中は何もしない
+                return;
+            }
+            var sets = WFEditorSetting.GetAllSettings();
+            if (sets.Length == 0)
+            {
+                // Settings が1件も無いときは何もしない
+                return;
+            }
+
+            var savedVersion = sets.Max(set => set.autoMigrationVersion);
+            if (VERSION <= savedVersion)
+            {
+                // バージョンが新しいなら何もしない
+                return;
+            }
+
+            var msg = WFI18N.Translate(WFMessageText.DgMigrationAuto);
+            var lang = WFEditorPrefs.LangMode;
+            var ok = lang == EditorLanguage.日本語 ? "実行する" : "Go Ahead";
+            var cancel = lang == EditorLanguage.日本語 ? "結構です" : "No Thanks";
+            var alt = lang == EditorLanguage.日本語 ? "後で聞いて" : "Ask Me Later";
+
+            switch(EditorUtility.DisplayDialogComplex("WF migration materials", msg, ok, cancel, alt))
+            {
+                case 0:
+                    // 実行してバージョン上書き
+                    ScanAndMigration();
+                    break;
+                case 1:
+                    // 実行せずバージョン上書き
+                    break;
+                case 2:
+                    // あとで確認する
+                    return;
+            }
+
+            // Setting の中のバージョンを上書き
+            SaveCurrentMigrationVersion();
+        }
+
+        public static void ExecuteByManual()
+        {
+            var msg = WFI18N.Translate(WFMessageText.DgMigrationManual);
+            var lang = WFEditorPrefs.LangMode;
+            var ok = lang == EditorLanguage.日本語 ? "実行する" : "Go Ahead";
+            var cancel = lang == EditorLanguage.日本語 ? "結構です" : "No Thanks";
+            if (EditorUtility.DisplayDialog("WF migration materials", msg, ok, cancel))
+            {
+                ScanAndMigration();
+                SaveCurrentMigrationVersion();
+            }
+        }
+
+        public static void SaveCurrentMigrationVersion()
+        {
+            // Setting の中のバージョンを上書き
+            foreach (var set in WFEditorSetting.GetAllSettings())
+            {
+                set.autoMigrationVersion = VERSION;
+                EditorUtility.SetDirty(set);
+            }
+            AssetDatabase.SaveAssets();
+        }
+
+        public static void ScanAndMigration()
+        {
+            // Go Ahead
+            var paths = AssetDatabase.FindAssets("t:Material")
+                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                .Distinct().ToArray();
+            if (0 < paths.Length)
+            {
+                int current = 0;
+                int done = 0;
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    if (Migration(paths[i]))
+                    {
+                        done++;
+                    }
+                    if (++current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar("WF", "migration materials", current / (float)paths.Length))
+                    {
+                        break;
+                    }
+                }
+                EditorUtility.ClearProgressBar();
+
+                Debug.LogFormat("[WF] Scan And Migration {0} materials", done);
+            }
+        }
+
+        public static bool Migration(string[] paths)
+        {
+            bool result = false;
+            foreach (var path in paths)
+            {
+                result |= Migration(path);
+            }
+            return result;
+        }
+
+        public static bool Migration(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !path.EndsWith(".mat"))
+            {
+                return false;
+            }
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (!WFCommonUtility.IsSupportedShader(mat))
+            {
+                return false;
+            }
+            WFMaterialEditUtility.MigrationMaterialWithoutUndo(mat);
+            return true;
         }
     }
 }
