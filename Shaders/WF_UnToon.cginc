@@ -239,7 +239,7 @@
             if (TGL_OFF(_TL_LineType)) {
 #endif
 
-#if defined(_WF_LEGACY_FEATURE_SWITCH) | !defined(_TL_EDGE_ENABLE)
+#if defined(_WF_LEGACY_FEATURE_SWITCH) || !defined(_TL_EDGE_ENABLE)
             // NORMAL
             triStream.Append(p0);
             triStream.Append(p1);
@@ -250,7 +250,7 @@
             } else {
 #endif
 
-#ifdef _TL_EDGE_ENABLE
+#if defined(_WF_LEGACY_FEATURE_SWITCH) || defined(_TL_EDGE_ENABLE)
             // EDGE
             v2f n0 = v[0];
             v2f n1 = v[1];
