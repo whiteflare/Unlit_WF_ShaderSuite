@@ -168,7 +168,6 @@ namespace UnlitWF
                 }
             }
             // Enableキーワードを整理する
-#if UNITY_2019_1_OR_NEWER && !_WF_LEGACY_FEATURE_SWITCH
             foreach (var mat in mats)
             {
                 if (!IsSupportedShader(mat))
@@ -176,10 +175,8 @@ namespace UnlitWF
                     continue;
                 }
                 bool changed = false;
-                for (int idx = 0; idx < mat.shader.GetPropertyCount(); idx++)
+                foreach (var prop_name in getAllPropertyNames(mat.shader))
                 {
-                    var prop_name = mat.shader.GetPropertyName(idx);
-
                     // 対応するキーワードが指定されているならばそれを設定する
                     var kwd = WFShaderDictionary.SpecialPropNameToKeywordMap.GetValueOrNull(prop_name);
                     if (kwd != null)
@@ -202,7 +199,6 @@ namespace UnlitWF
 #endif
                 }
             }
-#endif
         }
 
         private static void SetEnableKeyword(Material mat, string kwd, bool value)
@@ -383,6 +379,21 @@ namespace UnlitWF
             Application.OpenURL(LatestVersion.downloadPage);
         }
 
+        private static IEnumerable<string> getAllPropertyNames(Shader shader)
+        {
+#if UNITY_2019_1_OR_NEWER
+            for (int idx = 0; idx < shader.GetPropertyCount(); idx++)
+            {
+                yield return shader.GetPropertyName(idx);
+            }
+#else
+            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--)
+            {
+                yield return ShaderUtil.GetPropertyName(shader, idx);
+            }
+#endif
+        }
+
         /// <summary>
         /// Shaderから指定のnameのプロパティの description を取得する。
         /// </summary>
@@ -399,8 +410,10 @@ namespace UnlitWF
             }
             return null;
 #else
-            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--) {
-                if (name == ShaderUtil.GetPropertyName(shader, idx)) {
+            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--)
+            {
+                if (name == ShaderUtil.GetPropertyName(shader, idx))
+                {
                     return ShaderUtil.GetPropertyDescription(shader, idx);
                 }
             }
@@ -490,6 +503,10 @@ namespace UnlitWF
 
         public static bool SetKeyword(Material mat, string kwd, bool value)
         {
+#if !UNITY_2019_1_OR_NEWER || _WF_LEGACY_FEATURE_SWITCH
+            // 旧版では常に false として扱う。これにより既にマテリアルに設定されていたキーワードは2018で消去される。
+            value = false;
+#endif
             if (string.IsNullOrEmpty(kwd) || kwd == "_" || mat.IsKeywordEnabled(kwd) == value)
             {
                 return false;

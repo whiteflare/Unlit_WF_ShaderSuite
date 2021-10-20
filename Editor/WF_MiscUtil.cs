@@ -25,9 +25,11 @@ namespace UnlitWF
 {
     internal static class CollectionUtility
     {
-        public static T GetValueOrNull<K, T>(this Dictionary<K, T> dict, K key) where T : class {
+        public static T GetValueOrNull<K, T>(this Dictionary<K, T> dict, K key) where T : class
+        {
             T value;
-            if (dict.TryGetValue(key, out value)) {
+            if (dict.TryGetValue(key, out value))
+            {
                 return value;
             }
             return null;
@@ -38,14 +40,18 @@ namespace UnlitWF
     {
         private readonly List<WeakReference> refs = new List<WeakReference>();
 
-        public bool Contains(T target) {
-            lock (refs) {
+        public bool Contains(T target)
+        {
+            lock (refs)
+            {
                 // 終了しているものは全て削除
                 refs.RemoveAll(r => !r.IsAlive);
 
                 // 参照が存在しているならばtrue
-                foreach (var r in refs) {
-                    if (r.Target == target) {
+                foreach (var r in refs)
+                {
+                    if (r.Target == target)
+                    {
                         return true;
                     }
                 }
@@ -53,26 +59,33 @@ namespace UnlitWF
             }
         }
 
-        public void Add(T target) {
-            lock (refs) {
-                if (Contains(target)) {
+        public void Add(T target)
+        {
+            lock (refs)
+            {
+                if (Contains(target))
+                {
                     return;
                 }
                 refs.Add(new WeakReference(target));
             }
         }
 
-        public void Remove(T target) {
+        public void Remove(T target)
+        {
             RemoveAll(target);
         }
 
-        public void RemoveAll(params object[] targets) {
-            lock (refs) {
+        public void RemoveAll(params object[] targets)
+        {
+            lock (refs)
+            {
                 // 終了しているものは全て削除
                 refs.RemoveAll(r => !r.IsAlive);
 
                 // 一致しているものを全て削除
-                refs.RemoveAll(r => {
+                refs.RemoveAll(r =>
+                {
                     var tgt = r.Target as T;
                     return tgt != null && targets.Contains(tgt);
                 });

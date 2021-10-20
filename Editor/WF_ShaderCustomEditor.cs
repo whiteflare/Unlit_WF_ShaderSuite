@@ -138,19 +138,25 @@ namespace UnlitWF
             }),
         };
 
-        private static bool IsAnyIntValue(PropertyGUIContext ctx, string name, Predicate<int> pred) {
+        private static bool IsAnyIntValue(PropertyGUIContext ctx, string name, Predicate<int> pred)
+        {
             var mats = WFCommonUtility.AsMaterials(ctx.editor.targets).Where(mat => mat.HasProperty(name)).ToArray();
-            if (mats.Length == 0) {
+            if (mats.Length == 0)
+            {
                 return true; // もしプロパティを持つマテリアルがないなら、trueを返却する
             }
             return mats.Any(mat => pred(mat.GetInt(name)));
         }
 
-        public static bool CompareAndSet(MaterialProperty[] prop, string name, int before, int after) {
+        public static bool CompareAndSet(MaterialProperty[] prop, string name, int before, int after)
+        {
             var target = FindProperty(name, prop, false);
-            if (target != null) {
-                if (target.type == MaterialProperty.PropType.Float || target.type == MaterialProperty.PropType.Range) {
-                    if (Mathf.RoundToInt(target.floatValue) == before) {
+            if (target != null)
+            {
+                if (target.type == MaterialProperty.PropType.Float || target.type == MaterialProperty.PropType.Range)
+                {
+                    if (Mathf.RoundToInt(target.floatValue) == before)
+                    {
                         target.floatValue = after;
                         return true;
                     }
@@ -166,15 +172,18 @@ namespace UnlitWF
             public static readonly Texture2D menuTex = LoadTextureByFileName("wf_icon_menu");
         }
 
-        private static Texture2D LoadTextureByFileName(string search_name) {
+        private static Texture2D LoadTextureByFileName(string search_name)
+        {
             string[] guids = AssetDatabase.FindAssets(search_name + " t:texture");
-            if (guids.Length == 0) {
+            if (guids.Length == 0)
+            {
                 return Texture2D.whiteTexture;
             }
             return AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath(guids[0]));
         }
 
-        public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader) {
+        public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)
+        {
             PreChangeShader(material, oldShader, newShader);
 
             // 割り当て
@@ -183,30 +192,38 @@ namespace UnlitWF
             PostChangeShader(material, oldShader, newShader);
         }
 
-        public static void PreChangeShader(Material material, Shader oldShader, Shader newShader) {
+        public static void PreChangeShader(Material material, Shader oldShader, Shader newShader)
+        {
             // nop
         }
 
-        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader) {
-            if (material != null) {
+        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader)
+        {
+            if (material != null)
+            {
                 // DebugViewの保存に使っているタグはクリア
                 WF_DebugViewEditor.ClearDebugOverrideTag(material);
                 // シェーダキーワードを整理する
                 WFCommonUtility.SetupShaderKeyword(material);
                 // 他シェーダからの切替時に動作
-                if (!WFCommonUtility.IsSupportedShader(oldShader)) {
+                if (!WFCommonUtility.IsSupportedShader(oldShader))
+                {
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
-                    if (material.HasProperty("_EmissionColor")) {
+                    if (material.HasProperty("_EmissionColor"))
+                    {
                         var val = material.GetColor("_EmissionColor");
-                        if (val.a < 1e-4) {
+                        if (val.a < 1e-4)
+                        {
                             val.a = 1.0f;
                             material.SetColor("_EmissionColor", val);
                         }
                     }
                     // もし FakeFur への切り替えかつ _Cutoff が 0.5 だったら 0.2 を設定しちゃう
-                    if (newShader.name.Contains("FakeFur") && material.HasProperty("_Cutoff")) {
+                    if (newShader.name.Contains("FakeFur") && material.HasProperty("_Cutoff"))
+                    {
                         var val = material.GetFloat("_Cutoff");
-                        if (Mathf.Abs(val - 0.5f) < Mathf.Epsilon) {
+                        if (Mathf.Abs(val - 0.5f) < Mathf.Epsilon)
+                        {
                             val = 0.2f;
                             material.SetFloat("_Cutoff", val);
                         }
@@ -215,11 +232,13 @@ namespace UnlitWF
             }
         }
 
-        public static bool IsSupportedShader(Shader shader) {
+        public static bool IsSupportedShader(Shader shader)
+        {
             return WFCommonUtility.IsSupportedShader(shader) && !shader.name.Contains("WF_DebugView");
         }
 
-        public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
+        public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties)
+        {
             materialEditor.SetDefaultGUIWidths();
 
             // 情報(トップ)
@@ -234,13 +253,15 @@ namespace UnlitWF
             // 現在無効なラベルを保持するリスト
             var disable = new HashSet<string>();
             // プロパティを順に描画
-            foreach (var prop in properties) {
+            foreach (var prop in properties)
+            {
                 // ラベル付き displayName を、ラベルと名称に分割
                 string label, name, disp;
                 WFCommonUtility.FormatDispName(prop.displayName, out label, out name, out disp);
 
                 // ラベルが指定されていてdisableに入っているならばスキップ(ただしenable以外)
-                if (label != null && disable.Contains(label) && !WFCommonUtility.IsEnableToggle(label, name)) {
+                if (label != null && disable.Contains(label) && !WFCommonUtility.IsEnableToggle(label, name))
+                {
                     continue;
                 }
 
@@ -258,11 +279,14 @@ namespace UnlitWF
 
                 // ラベルが指定されていてenableならば有効無効をリストに追加
                 // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
-                if (WFCommonUtility.IsEnableToggle(label, name)) {
-                    if ((int)prop.floatValue == 0) {
+                if (WFCommonUtility.IsEnableToggle(label, name))
+                {
+                    if ((int)prop.floatValue == 0)
+                    {
                         disable.Add(label);
                     }
-                    else {
+                    else
+                    {
                         disable.Remove(label);
                     }
                 }
@@ -282,17 +306,20 @@ namespace UnlitWF
             WFCommonUtility.SetupShaderKeyword(WFCommonUtility.AsMaterials(materialEditor.targets));
         }
 
-        private void OnGuiSub_ShaderProperty(PropertyGUIContext context) {
+        private void OnGuiSub_ShaderProperty(PropertyGUIContext context)
+        {
             // 更新チェック
             EditorGUI.BeginChangeCheck();
 
             // フック
-            foreach (var hook in HOOKS) {
+            foreach (var hook in HOOKS)
+            {
                 hook.OnBefore(context);
             }
 
             // プロパティ表示
-            if (!context.hidden && !context.custom) {
+            if (!context.hidden && !context.custom)
+            {
                 context.editor.ShaderProperty(context.current, context.guiContent);
             }
 
@@ -300,20 +327,25 @@ namespace UnlitWF
             bool changed = EditorGUI.EndChangeCheck();
 
             // フック
-            foreach (var hook in HOOKS) {
+            foreach (var hook in HOOKS)
+            {
                 hook.OnAfter(context, changed);
             }
         }
 
-        private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, bool isBottom) {
+        private void OnGuiSub_ShowCurrentShaderName(MaterialEditor materialEditor, bool isBottom)
+        {
             var mat = materialEditor.target as Material;
-            if (mat == null) {
+            if (mat == null)
+            {
                 return;
             }
-            if (isBottom != WFEditorPrefs.MenuToBottom) {
+            if (isBottom != WFEditorPrefs.MenuToBottom)
+            {
                 return;
             }
-            if (isBottom) {
+            if (isBottom)
+            {
                 DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Information");
             }
 
@@ -328,23 +360,27 @@ namespace UnlitWF
 
             // CurrentVersion プロパティがあるなら表示
             var currentVersion = WFCommonUtility.GetShaderCurrentVersion(mat);
-            if (!string.IsNullOrWhiteSpace(currentVersion)) {
+            if (!string.IsNullOrWhiteSpace(currentVersion))
+            {
                 rect = EditorGUILayout.GetControlRect();
                 rect.y += 2;
                 GUI.Label(rect, "Current Version", EditorStyles.boldLabel);
                 GUILayout.Label(currentVersion);
 
                 // もしシェーダ名辞書にあって新しいバージョンがリリースされているならばボタンを表示
-                if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion)) {
+                if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion))
+                {
                     var message = WFI18N.Translate(WFMessageText.NewerVersion) + WFCommonUtility.GetLatestVersion()?.latestVersion;
-                    if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Go"))) {
+                    if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Go")))
+                    {
                         WFCommonUtility.OpenDownloadPage();
                     }
                 }
             }
 
             // シェーダ切り替えボタン
-            if (snm != null) {
+            if (snm != null)
+            {
                 var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
 
                 rect = EditorGUILayout.GetControlRect();
@@ -355,7 +391,8 @@ namespace UnlitWF
                     // 同じ Variant のシェーダをリストに
                     var variants = WFShaderNameDictionary.GetVariantList(snm, out var other);
                     // その他の Variant もリストに追加する
-                    if (0 < other.Count) {
+                    if (0 < other.Count)
+                    {
                         variants.Add(null);
                         variants.AddRange(other.Distinct(new WFShaderNameVariantComparer()));
                     }
@@ -366,7 +403,8 @@ namespace UnlitWF
 
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("Variant", idx, labels);
-                    if (EditorGUI.EndChangeCheck() && idx != select) {
+                    if (EditorGUI.EndChangeCheck() && idx != select)
+                    {
                         WFCommonUtility.ChangeShader(variants[select].Name, targets);
                     }
                 }
@@ -375,7 +413,8 @@ namespace UnlitWF
                     // 同じ RenderType のシェーダをリストに
                     var variants = WFShaderNameDictionary.GetRenderTypeList(snm, out List<WFShaderName> other);
                     // その他の RenderType もリストに追加する
-                    if (0 < other.Count) {
+                    if (0 < other.Count)
+                    {
                         variants.Add(null);
                         variants.AddRange(other.Distinct(new WFShaderNameRenderTypeComparer()));
                     }
@@ -385,20 +424,24 @@ namespace UnlitWF
 
                     EditorGUI.BeginChangeCheck();
                     int select = EditorGUILayout.Popup("RenderType", idx, labels);
-                    if (EditorGUI.EndChangeCheck() && idx != select) {
+                    if (EditorGUI.EndChangeCheck() && idx != select)
+                    {
                         WFCommonUtility.ChangeShader(variants[select].Name, targets);
                     }
                 }
             }
         }
 
-        private void OnGUISub_MigrationHelpBox(MaterialEditor materialEditor) {
+        private void OnGUISub_MigrationHelpBox(MaterialEditor materialEditor)
+        {
             var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
-            if (IsOldMaterial(mats)) {
+            if (IsOldMaterial(mats))
+            {
                 var message = WFI18N.Translate(WFMessageText.PlzMigration);
 
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now"))) {
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now")))
+                {
                     // 名称を全て変更
                     WFMaterialEditUtility.MigrationMaterial(mats);
                     // リセット
@@ -413,20 +456,23 @@ namespace UnlitWF
             public string path;
             public string name;
 
-            public GuidAndPath(string guid) {
+            public GuidAndPath(string guid)
+            {
                 this.guid = guid;
                 this.path = AssetDatabase.GUIDToAssetPath(guid) ?? "";
                 this.name = string.IsNullOrWhiteSpace(path) ? "" : new Regex(@"^.*/|\.[^\.]+$").Replace(this.path, "");
             }
         }
 
-        private static void OnGUISub_Utilities(MaterialEditor materialEditor) {
+        private static void OnGUISub_Utilities(MaterialEditor materialEditor)
+        {
             EditorGUILayout.Space();
             DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Utility");
 
 
             var rect = EditorGUILayout.GetControlRect();
-            if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate))) {
+            if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate)))
+            {
                 // WFMaterialTemplate を検索
                 var guids = AssetDatabase.FindAssets("t:" + typeof(WFMaterialTemplate))
                     .Select(guid => new GuidAndPath(guid))
@@ -434,21 +480,27 @@ namespace UnlitWF
                     .OrderBy(guid => guid.name);
                 // メニュー作成
                 var menu = new GenericMenu();
-                foreach (var guid in guids) {
-                    menu.AddItem(new GUIContent(guid.name), false, () => {
+                foreach (var guid in guids)
+                {
+                    menu.AddItem(new GUIContent(guid.name), false, () =>
+                    {
                         var temp = AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(guid.path);
-                        if (temp != null) {
+                        if (temp != null)
+                        {
                             temp.ApplyToMaterial(WFCommonUtility.AsMaterials(materialEditor.targets));
                         }
                     });
                 }
                 menu.AddSeparator("");
-                if (materialEditor.targets.Length <= 1) {
-                    menu.AddItem(WFI18N.GetGUIContent(WFMessageButton.SaveTemplate), false, () => {
+                if (materialEditor.targets.Length <= 1)
+                {
+                    menu.AddItem(WFI18N.GetGUIContent(WFMessageButton.SaveTemplate), false, () =>
+                    {
                         WFMaterialTemplate.CreateAsset(materialEditor.target as Material);
                     });
                 }
-                else {
+                else
+                {
                     menu.AddDisabledItem(WFI18N.GetGUIContent(WFMessageButton.SaveTemplate));
                 }
 
@@ -456,15 +508,18 @@ namespace UnlitWF
             }
 
             // cleanup
-            if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageButton.Cleanup), new string[] { "Open Cleanup Utility" }, idx => {
-                switch (idx) {
+            if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageButton.Cleanup), new string[] { "Open Cleanup Utility" }, idx =>
+            {
+                switch (idx)
+                {
                     case 0:
                         ToolCreanUpWindow.OpenWindowFromShaderGUI(WFCommonUtility.AsMaterials(materialEditor.targets));
                         break;
                     default:
                         break;
                 }
-            })) {
+            }))
+            {
                 var param = new CleanUpParameter();
                 param.materials = WFCommonUtility.AsMaterials(materialEditor.targets);
                 param.resetKeywords = true;
@@ -481,24 +536,31 @@ namespace UnlitWF
         static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
         static WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
 
-        private static bool IsOldMaterial(params object[] mats) {
+        private static bool IsOldMaterial(params object[] mats)
+        {
             bool result = false;
-            foreach (Material mat in mats) {
-                if (mat == null) {
+            foreach (Material mat in mats)
+            {
+                if (mat == null)
+                {
                     continue;
                 }
-                if (newMaterialVersionCache.Contains(mat)) {
+                if (newMaterialVersionCache.Contains(mat))
+                {
                     continue;
                 }
-                if (oldMaterialVersionCache.Contains(mat)) {
+                if (oldMaterialVersionCache.Contains(mat))
+                {
                     result |= true;
                     return true;
                 }
                 bool old = WFMaterialEditUtility.ExistsOldNameProperty(mat);
-                if (old) {
+                if (old)
+                {
                     oldMaterialVersionCache.Add(mat);
                 }
-                else {
+                else
+                {
                     newMaterialVersionCache.Add(mat);
                 }
                 result |= old;
@@ -506,20 +568,24 @@ namespace UnlitWF
             return result;
         }
 
-        public static void ResetOldMaterialTable(params object[] values) {
+        public static void ResetOldMaterialTable(params object[] values)
+        {
             var mats = values.Select(mat => mat as Material).Where(mat => mat != null).ToArray();
             oldMaterialVersionCache.RemoveAll(mats);
             newMaterialVersionCache.RemoveAll(mats);
         }
 
-        private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor) {
+        private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor)
+        {
             // 現在のシェーダが DisableBatching == False のとき以外は何もしない (Batching されないので)
             var target = materialEditor.target as Material;
-            if (target == null || !target.GetTag("DisableBatching", false, "False").Equals("False", StringComparison.OrdinalIgnoreCase)) {
+            if (target == null || !target.GetTag("DisableBatching", false, "False").Equals("False", StringComparison.OrdinalIgnoreCase))
+            {
                 return;
             }
             // ターゲットが設定用プロパティをどちらも持っていないならば何もしない
-            if (!target.HasProperty("_GL_DisableBackLit") && !target.HasProperty("_GL_DisableBasePos")) {
+            if (!target.HasProperty("_GL_DisableBackLit") && !target.HasProperty("_GL_DisableBasePos"))
+            {
                 return;
             }
             // 現在のシェーダ
@@ -530,7 +596,8 @@ namespace UnlitWF
             // 現在編集中のマテリアルのうち、Batching Static のときにオンにしたほうがいい設定がオフになっているマテリアル
             var allNonStaticMaterials = targets.Where(mat => mat.GetInt("_GL_DisableBackLit") == 0 || mat.GetInt("_GL_DisableBasePos") == 0).ToArray();
 
-            if (allNonStaticMaterials.Length == 0) {
+            if (allNonStaticMaterials.Length == 0)
+            {
                 return;
             }
 
@@ -544,13 +611,16 @@ namespace UnlitWF
                 .ToArray();
 
             // Batching Static の付いているマテリアルが targets 内にあるならば警告
-            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat))) {
+            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat)))
+            {
 
                 var message = WFI18N.Translate(WFMessageText.PlzBatchingStatic);
 
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now"))) {
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
+                {
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
-                    foreach (var mat in allNonStaticMaterials) {
+                    foreach (var mat in allNonStaticMaterials)
+                    {
                         mat.SetInt("_GL_DisableBackLit", 1);
                         mat.SetInt("_GL_DisableBasePos", 1);
                     }
@@ -558,10 +628,12 @@ namespace UnlitWF
             }
         }
 
-        private static void OnGUISub_LightmapStaticHelpBox(MaterialEditor materialEditor) {
+        private static void OnGUISub_LightmapStaticHelpBox(MaterialEditor materialEditor)
+        {
             // ターゲットが設定用プロパティを持っていないならば何もしない
             var target = materialEditor.target as Material;
-            if (target == null || !target.HasProperty("_AO_Enable") || !target.HasProperty("_AO_UseLightMap")) {
+            if (target == null || !target.HasProperty("_AO_Enable") || !target.HasProperty("_AO_UseLightMap"))
+            {
                 return;
             }
             // 現在のシェーダ
@@ -572,7 +644,8 @@ namespace UnlitWF
             // 現在編集中のマテリアルのうち、Lightmap Static のときにオンにしたほうがいい設定がオフになっているマテリアル
             var allNonStaticMaterials = targets.Where(mat => mat.GetInt("_AO_Enable") == 0 || mat.GetInt("_AO_UseLightMap") == 0).ToArray();
 
-            if (allNonStaticMaterials.Length == 0) {
+            if (allNonStaticMaterials.Length == 0)
+            {
                 return;
             }
 
@@ -592,13 +665,16 @@ namespace UnlitWF
                 .ToArray();
 
             // Lightmap Static の付いているマテリアルが targets 内にあるならば警告
-            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat))) {
+            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat)))
+            {
 
                 var message = WFI18N.Translate(WFMessageText.PlzLightmapStatic);
 
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now"))) {
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
+                {
                     // _AO_Enable と _AO_UseLightMap をオンにする
-                    foreach (var mat in allNonStaticMaterials) {
+                    foreach (var mat in allNonStaticMaterials)
+                    {
                         mat.SetInt("_AO_Enable", 1);
                         mat.SetInt("_AO_UseLightMap", 1);
                     }
@@ -606,8 +682,10 @@ namespace UnlitWF
             }
         }
 
-        private static void SuggestShadowColor(Material[] mats) {
-            foreach (var m in mats) {
+        private static void SuggestShadowColor(Material[] mats)
+        {
+            foreach (var m in mats)
+            {
                 Undo.RecordObject(m, "shade color change");
                 // ベース色を取得
                 Color baseColor = m.GetColor("_TS_BaseColor");
@@ -616,28 +694,35 @@ namespace UnlitWF
 
                 // 段数を取得
                 var steps = GetShadowStepsFromMaterial(m);
-                switch (steps) {
+                switch (steps)
+                {
                     case 1:
-                        if (m.HasProperty("_TS_1stColor")) {
+                        if (m.HasProperty("_TS_1stColor"))
+                        {
                             m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
                         }
                         break;
                     case 3:
-                        if (m.HasProperty("_TS_1stColor")) {
+                        if (m.HasProperty("_TS_1stColor"))
+                        {
                             m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
                         }
-                        if (m.HasProperty("_TS_2ndColor")) {
+                        if (m.HasProperty("_TS_2ndColor"))
+                        {
                             m.SetColor("_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
                         }
-                        if (m.HasProperty("_TS_3rdColor")) {
+                        if (m.HasProperty("_TS_3rdColor"))
+                        {
                             m.SetColor("_TS_3rdColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.7f));
                         }
                         break;
                     default:
-                        if (m.HasProperty("_TS_1stColor")) {
+                        if (m.HasProperty("_TS_1stColor"))
+                        {
                             m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
                         }
-                        if (m.HasProperty("_TS_2ndColor")) {
+                        if (m.HasProperty("_TS_2ndColor"))
+                        {
                             m.SetColor("_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
                         }
                         break;
@@ -645,49 +730,61 @@ namespace UnlitWF
             }
         }
 
-        private static void SuggestShadowBorder(Material[] mats) {
-            foreach (var m in mats) {
+        private static void SuggestShadowBorder(Material[] mats)
+        {
+            foreach (var m in mats)
+            {
                 Undo.RecordObject(m, "shade border change");
                 // 段数を取得
                 var steps = GetShadowStepsFromMaterial(m);
                 // 1影
                 var pos1 = m.GetFloat("_TS_1stBorder");
                 // 2影
-                if (2 <= steps && m.HasProperty("_TS_2ndBorder")) {
+                if (2 <= steps && m.HasProperty("_TS_2ndBorder"))
+                {
                     m.SetFloat("_TS_2ndBorder", pos1 * (steps - 1.0f) / steps);
                 }
                 // 3影
-                if (2 <= steps && m.HasProperty("_TS_3rdBorder")) {
+                if (2 <= steps && m.HasProperty("_TS_3rdBorder"))
+                {
                     m.SetFloat("_TS_3rdBorder", pos1 * (steps - 2.0f) / steps);
                 }
             }
         }
 
-        private static int GetShadowStepsFromMaterial(Material[] mat) {
-            if (mat.Length < 1) {
+        private static int GetShadowStepsFromMaterial(Material[] mat)
+        {
+            if (mat.Length < 1)
+            {
                 return 2;
             }
             return mat.Select(GetShadowStepsFromMaterial).Max();
         }
 
-        private static int GetShadowStepsFromMaterial(Material mat) {
+        private static int GetShadowStepsFromMaterial(Material mat)
+        {
             var steps = mat.HasProperty("_TS_Steps") ? mat.GetInt("_TS_Steps") : 0;
-            if (steps <= 0) {
+            if (steps <= 0)
+            {
                 return 2; // _TS_Stepsが無いとき、あっても初期値のときは2段
             }
             return steps;
         }
 
-        private static float ShiftHur(float hur, float sat, float mul) {
-            if (sat < 0.05f) {
+        private static float ShiftHur(float hur, float sat, float mul)
+        {
+            if (sat < 0.05f)
+            {
                 return 4 / 6f;
             }
             // R = 0/6f, G = 2/6f, B = 4/6f
             float[] COLOR = { 0 / 6f, 2 / 6f, 4 / 6f, 6 / 6f };
             // Y = 1/6f, C = 3/6f, M = 5/6f
             float[] LIMIT = { 1 / 6f, 3 / 6f, 5 / 6f, 10000 };
-            for (int i = 0; i < COLOR.Length; i++) {
-                if (hur < LIMIT[i]) {
+            for (int i = 0; i < COLOR.Length; i++)
+            {
+                if (hur < LIMIT[i])
+                {
                     return (hur - COLOR[i]) * mul + COLOR[i];
                 }
             }
@@ -703,7 +800,8 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static void DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null) {
+        public static void DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null)
+        {
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             style.font = EditorStyles.boldLabel.font;
@@ -714,9 +812,11 @@ namespace UnlitWF
             position = EditorGUI.IndentedRect(position);
             GUI.Box(position, text, style);
 
-            if (menu != null) {
+            if (menu != null)
+            {
                 var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
-                if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel)) {
+                if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel))
+                {
                     Event.current.Use();
                     menu.DropDown(rect);
                 }
@@ -730,7 +830,8 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static void DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, GenericMenu menu = null) {
+        public static void DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, GenericMenu menu = null)
+        {
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             style.font = EditorStyles.boldLabel.font;
@@ -741,12 +842,15 @@ namespace UnlitWF
             position = EditorGUI.IndentedRect(position);
             GUI.Box(position, text, style);
 
-            if (alwaysOn) {
-                if (prop.hasMixedValue || prop.floatValue == 0.0f) {
+            if (alwaysOn)
+            {
+                if (prop.hasMixedValue || prop.floatValue == 0.0f)
+                {
                     prop.floatValue = 1.0f;
                 }
             }
-            else {
+            else
+            {
                 bool value = 0.001f < Math.Abs(prop.floatValue);
 
                 // Toggle
@@ -759,7 +863,8 @@ namespace UnlitWF
                     EditorGUI.showMixedValue = prop.hasMixedValue;
                     EditorGUI.BeginChangeCheck();
                     value = EditorGUI.Toggle(rect, " ", value);
-                    if (EditorGUI.EndChangeCheck()) {
+                    if (EditorGUI.EndChangeCheck())
+                    {
                         prop.floatValue = value ? 1.0f : 0.0f;
                     }
                     EditorGUI.showMixedValue = false;
@@ -768,15 +873,18 @@ namespace UnlitWF
                 // ▼
                 {
                     var rect = new Rect(position.x + 4f, position.y + 2f, 13f, 13f);
-                    if (Event.current.type == EventType.Repaint) {
+                    if (Event.current.type == EventType.Repaint)
+                    {
                         EditorStyles.foldout.Draw(rect, false, false, value, false);
                     }
                 }
             }
 
-            if (menu != null) {
+            if (menu != null)
+            {
                 var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
-                if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel)) {
+                if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel))
+                {
                     Event.current.Use();
                     menu.DropDown(rect);
                 }
@@ -790,13 +898,16 @@ namespace UnlitWF
         /// <param name="label"></param>
         /// <param name="propColor"></param>
         /// <param name="propTexture"></param>
-        public static void DrawSingleLineTextureProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propColor, MaterialProperty propTexture) {
+        public static void DrawSingleLineTextureProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propColor, MaterialProperty propTexture)
+        {
             // 1行テクスチャプロパティ
             materialEditor.TexturePropertySingleLine(label, propTexture, propColor);
 
             // もし NoScaleOffset がないなら ScaleOffset も追加で表示する
-            if (!propTexture.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset)) {
-                using (new EditorGUI.IndentLevelScope()) {
+            if (!propTexture.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset))
+            {
+                using (new EditorGUI.IndentLevelScope())
+                {
                     float oldLabelWidth = EditorGUIUtility.labelWidth;
                     EditorGUIUtility.labelWidth = 0f;
                     materialEditor.TextureScaleOffsetProperty(propTexture);
@@ -813,7 +924,8 @@ namespace UnlitWF
         /// <param name="label"></param>
         /// <param name="propMin"></param>
         /// <param name="propMax"></param>
-        public static void DrawMinMaxProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propMin, MaterialProperty propMax) {
+        public static void DrawMinMaxProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propMin, MaterialProperty propMax)
+        {
             Vector2 propMinLimit = propMin.type == MaterialProperty.PropType.Range ? propMin.rangeLimits : new Vector2(0, 1);
             Vector2 propMaxLimit = propMax.type == MaterialProperty.PropType.Range ? propMax.rangeLimits : propMinLimit;
 
@@ -848,23 +960,29 @@ namespace UnlitWF
             EditorGUI.showMixedValue = false;
             EditorGUIUtility.labelWidth = oldLabelWidth;
 
-            if (EditorGUI.EndChangeCheck()) {
-                if (propMin.type == MaterialProperty.PropType.Range) {
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (propMin.type == MaterialProperty.PropType.Range)
+                {
                     propMin.floatValue = Mathf.Clamp(minValue, propMinLimit.x, propMinLimit.y);
                 }
-                else {
+                else
+                {
                     propMin.floatValue = minValue;
                 }
-                if (propMax.type == MaterialProperty.PropType.Range) {
+                if (propMax.type == MaterialProperty.PropType.Range)
+                {
                     propMax.floatValue = Mathf.Clamp(maxValue, propMaxLimit.x, propMaxLimit.y);
                 }
-                else {
+                else
+                {
                     propMax.floatValue = maxValue;
                 }
             }
         }
 
-        private static bool DrawButtonFieldProperty(GUIContent label, string buttonText) {
+        private static bool DrawButtonFieldProperty(GUIContent label, string buttonText)
+        {
             Rect rect = EditorGUILayout.GetControlRect(true, 20);
             rect.y += 1;
             rect = EditorGUI.PrefixLabel(rect, label);
@@ -873,7 +991,8 @@ namespace UnlitWF
             return GUI.Button(rect, buttonText);
         }
 
-        internal static bool ButtonWithDropdownList(GUIContent content, Action<Rect> openMenuCallback) {
+        internal static bool ButtonWithDropdownList(GUIContent content, Action<Rect> openMenuCallback)
+        {
             var style = new GUIStyle("DropDownButton");
             var rect = EditorGUILayout.GetControlRect(false, 20, style);
 
@@ -881,7 +1000,8 @@ namespace UnlitWF
             const float kDropDownButtonWidth = 20f;
             dropDownRect.xMin = dropDownRect.xMax - kDropDownButtonWidth;
 
-            if (Event.current.type == EventType.MouseDown && dropDownRect.Contains(Event.current.mousePosition)) {
+            if (Event.current.type == EventType.MouseDown && dropDownRect.Contains(Event.current.mousePosition))
+            {
                 openMenuCallback(rect);
                 Event.current.Use();
                 return false;
@@ -890,10 +1010,13 @@ namespace UnlitWF
             return GUI.Button(rect, content, style);
         }
 
-        internal static bool ButtonWithDropdownList(GUIContent content, string[] buttonNames, GenericMenu.MenuFunction2 selectMenuCallback) {
-            return ButtonWithDropdownList(content, rect => {
+        internal static bool ButtonWithDropdownList(GUIContent content, string[] buttonNames, GenericMenu.MenuFunction2 selectMenuCallback)
+        {
+            return ButtonWithDropdownList(content, rect =>
+            {
                 var menu = new GenericMenu();
-                for (int i = 0; i != buttonNames.Length; i++) {
+                for (int i = 0; i != buttonNames.Length; i++)
+                {
                     menu.AddItem(new GUIContent(buttonNames[i]), false, selectMenuCallback, i);
                 }
                 menu.DropDown(rect);
@@ -913,7 +1036,8 @@ namespace UnlitWF
             public bool hidden = false;
             public bool custom = false;
 
-            public PropertyGUIContext(MaterialEditor editor, MaterialProperty[] all, MaterialProperty current) {
+            public PropertyGUIContext(MaterialEditor editor, MaterialProperty[] all, MaterialProperty current)
+            {
                 this.editor = editor;
                 this.all = all;
                 this.current = current;
@@ -934,27 +1058,34 @@ namespace UnlitWF
         {
             protected readonly Regex matcher;
 
-            protected AbstractPropertyHook(string pattern) {
+            protected AbstractPropertyHook(string pattern)
+            {
                 this.matcher = new Regex(@"^(" + pattern + @")$", RegexOptions.Compiled);
             }
 
-            public void OnBefore(PropertyGUIContext context) {
-                if (matcher.IsMatch(context.current.name)) {
+            public void OnBefore(PropertyGUIContext context)
+            {
+                if (matcher.IsMatch(context.current.name))
+                {
                     OnBeforeProp(context);
                 }
             }
 
-            public void OnAfter(PropertyGUIContext context, bool changed) {
-                if (matcher.IsMatch(context.current.name)) {
+            public void OnAfter(PropertyGUIContext context, bool changed)
+            {
+                if (matcher.IsMatch(context.current.name))
+                {
                     OnAfterProp(context, changed);
                 }
             }
 
-            protected virtual void OnBeforeProp(PropertyGUIContext context) {
+            protected virtual void OnBeforeProp(PropertyGUIContext context)
+            {
 
             }
 
-            protected virtual void OnAfterProp(PropertyGUIContext context, bool changed) {
+            protected virtual void OnAfterProp(PropertyGUIContext context, bool changed)
+            {
 
             }
         }
@@ -967,28 +1098,35 @@ namespace UnlitWF
             private readonly string colName;
             private readonly string texName;
 
-            public SingleLineTexPropertyHook(string colName, string texName) : base(colName + "|" + texName) {
+            public SingleLineTexPropertyHook(string colName, string texName) : base(colName + "|" + texName)
+            {
                 this.colName = colName;
                 this.texName = texName;
             }
 
-            protected override void OnBeforeProp(PropertyGUIContext context) {
-                if (context.hidden) {
+            protected override void OnBeforeProp(PropertyGUIContext context)
+            {
+                if (context.hidden)
+                {
                     return;
                 }
-                if (colName == context.current.name) {
+                if (colName == context.current.name)
+                {
                     // テクスチャとカラーを1行で表示する
                     MaterialProperty another = FindProperty(texName, context.all, false);
-                    if (another != null) {
+                    if (another != null)
+                    {
                         DrawSingleLineTextureProperty(context.editor, context.guiContent, context.current, another);
                         context.custom = true;
                     }
-                    else {
+                    else
+                    {
                         // 相方がいない場合は単独で表示する (Mobile系の_TS_1stColorなどで発生)
                         context.custom = false;
                     }
                 }
-                else {
+                else
+                {
                     // 相方の側は何もしない
                     context.custom = true;
                 }
@@ -1003,19 +1141,24 @@ namespace UnlitWF
             private readonly string minName;
             private readonly string maxName;
 
-            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName + "|" + maxName) {
+            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName + "|" + maxName)
+            {
                 this.minName = minName;
                 this.maxName = maxName;
             }
 
-            protected override void OnBeforeProp(PropertyGUIContext context) {
-                if (context.hidden) {
+            protected override void OnBeforeProp(PropertyGUIContext context)
+            {
+                if (context.hidden)
+                {
                     return;
                 }
-                if (minName == context.current.name) {
+                if (minName == context.current.name)
+                {
                     // MinMaxSlider
                     MaterialProperty another = FindProperty(maxName, context.all, false);
-                    if (another != null) {
+                    if (another != null)
+                    {
                         DrawMinMaxProperty(context.editor, context.guiContent, context.current, another);
                     }
                 }
@@ -1033,12 +1176,15 @@ namespace UnlitWF
 
             private readonly DefValueSetDelegate setter;
 
-            public DefValueSetPropertyHook(string name, DefValueSetDelegate setter) : base(name) {
+            public DefValueSetPropertyHook(string name, DefValueSetDelegate setter) : base(name)
+            {
                 this.setter = setter;
             }
 
-            protected override void OnAfterProp(PropertyGUIContext context, bool changed) {
-                if (changed) {
+            protected override void OnAfterProp(PropertyGUIContext context, bool changed)
+            {
+                if (changed)
+                {
                     setter(context);
                 }
             }
@@ -1051,12 +1197,15 @@ namespace UnlitWF
         {
             private readonly Predicate<PropertyGUIContext> pred;
 
-            public ConditionVisiblePropertyHook(string pattern, Predicate<PropertyGUIContext> pred) : base(pattern) {
+            public ConditionVisiblePropertyHook(string pattern, Predicate<PropertyGUIContext> pred) : base(pattern)
+            {
                 this.pred = pred;
             }
 
-            protected override void OnBeforeProp(PropertyGUIContext context) {
-                if (!pred(context)) {
+            protected override void OnBeforeProp(PropertyGUIContext context)
+            {
+                if (!pred(context))
+                {
                     context.hidden = true;
                 }
             }
@@ -1073,19 +1222,24 @@ namespace UnlitWF
             private readonly OnBeforeDelegate before;
             private readonly OnAfterDelegate after;
 
-            public CustomPropertyHook(string pattern, OnBeforeDelegate before, OnAfterDelegate after) : base(pattern) {
+            public CustomPropertyHook(string pattern, OnBeforeDelegate before, OnAfterDelegate after) : base(pattern)
+            {
                 this.before = before;
                 this.after = after;
             }
 
-            protected override void OnBeforeProp(PropertyGUIContext context) {
-                if (before != null) {
+            protected override void OnBeforeProp(PropertyGUIContext context)
+            {
+                if (before != null)
+                {
                     before(context);
                 }
             }
 
-            protected override void OnAfterProp(PropertyGUIContext context, bool changed) {
-                if (after != null) {
+            protected override void OnAfterProp(PropertyGUIContext context, bool changed)
+            {
+                if (after != null)
+                {
                     after(context, changed);
                 }
             }
@@ -1100,29 +1254,38 @@ namespace UnlitWF
     {
         private static Material copiedMaterial = null;
 
-        public static GenericMenu GenerateMenuOrNull(MaterialEditor editor, MaterialProperty prop) {
+        public static GenericMenu GenerateMenuOrNull(MaterialEditor editor, MaterialProperty prop)
+        {
             var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
-            if (string.IsNullOrWhiteSpace(prefix)) {
+            if (string.IsNullOrWhiteSpace(prefix))
+            {
                 return null;
             }
 
             var menu = new GenericMenu();
-            menu.AddItem(WFI18N.GetGUIContent("Copy material"), false, () => {
-                if (editor.target is Material) {
-                    copiedMaterial = new Material((Material) editor.target);
-                } else {
+            menu.AddItem(WFI18N.GetGUIContent("Copy material"), false, () =>
+            {
+                if (editor.target is Material)
+                {
+                    copiedMaterial = new Material((Material)editor.target);
+                }
+                else
+                {
                     copiedMaterial = null;
                 }
             });
-            if (copiedMaterial != null) {
-                menu.AddItem(WFI18N.GetGUIContent("Paste value"), false, () => {
+            if (copiedMaterial != null)
+            {
+                menu.AddItem(WFI18N.GetGUIContent("Paste value"), false, () =>
+                {
                     var param = CopyPropParameter.Create();
                     param.materialSource = copiedMaterial;
                     param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
                     param.prefixs = new string[] { prefix };
                     WFMaterialEditUtility.CopyProperties(param);
                 });
-                menu.AddItem(WFI18N.GetGUIContent("Paste (without Textures)"), false, () => {
+                menu.AddItem(WFI18N.GetGUIContent("Paste (without Textures)"), false, () =>
+                {
                     var param = CopyPropParameter.Create();
                     param.materialSource = copiedMaterial;
                     param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
@@ -1131,12 +1294,14 @@ namespace UnlitWF
                     WFMaterialEditUtility.CopyProperties(param);
                 });
             }
-            else {
+            else
+            {
                 menu.AddDisabledItem(WFI18N.GetGUIContent("Paste value"));
                 menu.AddDisabledItem(WFI18N.GetGUIContent("Paste (without Textures)"));
             }
             menu.AddSeparator("");
-            menu.AddItem(WFI18N.GetGUIContent("Reset"), false, () => {
+            menu.AddItem(WFI18N.GetGUIContent("Reset"), false, () =>
+            {
                 var param = ResetParameter.Create();
                 param.materials = WFCommonUtility.AsMaterials(editor.targets);
                 param.resetPrefixs = new string[] { prefix };
@@ -1154,15 +1319,18 @@ namespace UnlitWF
     {
         public readonly string text;
 
-        public MaterialWFHeaderDecorator(string text) {
+        public MaterialWFHeaderDecorator(string text)
+        {
             this.text = text;
         }
 
-        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
             return 32;
         }
 
-        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
+        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
+        {
             ShaderCustomEditor.DrawShurikenStyleHeader(position, text, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
         }
     }
@@ -1174,15 +1342,18 @@ namespace UnlitWF
     {
         public readonly string text;
 
-        public MaterialWFHeaderToggleDrawer(string text) {
+        public MaterialWFHeaderToggleDrawer(string text)
+        {
             this.text = text;
         }
 
-        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
             return 32;
         }
 
-        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
+        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
+        {
             ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, false, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
         }
     }
@@ -1194,15 +1365,18 @@ namespace UnlitWF
     {
         public readonly string text;
 
-        public MaterialWFHeaderAlwaysOnDrawer(string text) {
+        public MaterialWFHeaderAlwaysOnDrawer(string text)
+        {
             this.text = text;
         }
 
-        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
             return 32;
         }
 
-        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor) {
+        public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
+        {
             ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, true, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
         }
     }
@@ -1210,10 +1384,12 @@ namespace UnlitWF
     [Obsolete]
     internal class MaterialFixFloatDrawer : MaterialWF_FixFloatDrawer
     {
-        public MaterialFixFloatDrawer() : base() {
+        public MaterialFixFloatDrawer() : base()
+        {
         }
 
-        public MaterialFixFloatDrawer(float value) : base(value) {
+        public MaterialFixFloatDrawer(float value) : base(value)
+        {
         }
     }
 
@@ -1224,19 +1400,23 @@ namespace UnlitWF
     {
         public readonly float value;
 
-        public MaterialWF_FixFloatDrawer() {
+        public MaterialWF_FixFloatDrawer()
+        {
             this.value = 0;
         }
 
-        public MaterialWF_FixFloatDrawer(float value) {
+        public MaterialWF_FixFloatDrawer(float value)
+        {
             this.value = value;
         }
 
-        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
             return 0;
         }
 
-        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
             prop.floatValue = this.value;
         }
     }
@@ -1251,11 +1431,13 @@ namespace UnlitWF
     /// </summary>
     internal class MaterialWF_FixNoTextureDrawer : MaterialPropertyDrawer
     {
-        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
             return 0;
         }
 
-        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
             prop.textureValue = null;
         }
     }
@@ -1265,11 +1447,13 @@ namespace UnlitWF
     /// </summary>
     internal class MaterialWF_Vector2Drawer : MaterialPropertyDrawer
     {
-        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
             return base.GetPropertyHeight(prop, label, editor) * 2;
         }
 
-        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
             float oldLabelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 0f;
             EditorGUI.showMixedValue = prop.hasMixedValue;
@@ -1277,7 +1461,8 @@ namespace UnlitWF
             Vector2 value = prop.vectorValue;
             EditorGUI.BeginChangeCheck();
             value = EditorGUI.Vector2Field(position, label, value);
-            if (EditorGUI.EndChangeCheck()) {
+            if (EditorGUI.EndChangeCheck())
+            {
                 prop.vectorValue = new Vector4(value.x, value.y, 0, 0);
             }
 
@@ -1291,11 +1476,13 @@ namespace UnlitWF
     /// </summary>
     internal class MaterialWF_Vector3Drawer : MaterialPropertyDrawer
     {
-        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor) {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
             return base.GetPropertyHeight(prop, label, editor) * 2;
         }
 
-        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor) {
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
             float oldLabelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 0f;
             EditorGUI.showMixedValue = prop.hasMixedValue;
@@ -1303,7 +1490,8 @@ namespace UnlitWF
             Vector3 value = prop.vectorValue;
             EditorGUI.BeginChangeCheck();
             value = EditorGUI.Vector3Field(position, label, value);
-            if (EditorGUI.EndChangeCheck()) {
+            if (EditorGUI.EndChangeCheck())
+            {
                 prop.vectorValue = new Vector4(value.x, value.y, value.z, 0);
             }
 

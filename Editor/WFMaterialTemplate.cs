@@ -30,24 +30,30 @@ namespace UnlitWF
         public Material material;
 
         [MenuItem(WFMenu.ASSETS_TEMPLATE, priority = WFMenu.PRI_ASSETS_TEMPLATE)]
-        public static void CreateAsset() {
+        public static void CreateAsset()
+        {
             var mat = new Material(Shader.Find("UnlitWF/WF_UnToon_Opaque"));
             CreateAsset(mat);
         }
 
-        public static void CreateAsset(Material copy) {
+        public static void CreateAsset(Material copy)
+        {
             var path = EditorUtility.SaveFilePanel("Save WF Material Template", "Assets", "", "asset");
-            if (string.IsNullOrWhiteSpace(path)) {
+            if (string.IsNullOrWhiteSpace(path))
+            {
                 return;
             }
-            if (path.StartsWith(Application.dataPath, System.StringComparison.InvariantCultureIgnoreCase)) {
+            if (path.StartsWith(Application.dataPath, System.StringComparison.InvariantCultureIgnoreCase))
+            {
                 path = "Assets" + path.Substring(Application.dataPath.Length);
             }
             CreateAsset(copy, path);
         }
 
-        public static void CreateAsset(Material copy, string path) {
-            if (copy == null || string.IsNullOrWhiteSpace(path)) {
+        public static void CreateAsset(Material copy, string path)
+        {
+            if (copy == null || string.IsNullOrWhiteSpace(path))
+            {
                 return;
             }
 
@@ -61,12 +67,15 @@ namespace UnlitWF
             AssetDatabase.AddObjectToAsset(tmp.material, tmp);
         }
 
-        public void ApplyToMaterial(IEnumerable<Material> mats) {
+        public void ApplyToMaterial(IEnumerable<Material> mats)
+        {
             Undo.RecordObjects(mats.ToArray(), "WF apply Template");
 
             // シェーダを揃える
-            foreach (var mat in mats) {
-                if (mat.shader != material.shader) {
+            foreach (var mat in mats)
+            {
+                if (mat.shader != material.shader)
+                {
                     mat.shader = material.shader;
                     mat.renderQueue = material.renderQueue;
                 }
@@ -86,14 +95,17 @@ namespace UnlitWF
     [CustomEditor(typeof(WFMaterialTemplate))]
     public class WFMaterialTemplateEditor : Editor
     {
-        void OnEnable() {
+        void OnEnable()
+        {
         }
 
-        public override void OnInspectorGUI() {
+        public override void OnInspectorGUI()
+        {
             serializedObject.Update();
 
             var m_material = serializedObject.FindProperty("material");
-            using (new EditorGUI.DisabledGroupScope(true)) {
+            using (new EditorGUI.DisabledGroupScope(true))
+            {
                 EditorGUILayout.PropertyField(m_material);
             }
 
