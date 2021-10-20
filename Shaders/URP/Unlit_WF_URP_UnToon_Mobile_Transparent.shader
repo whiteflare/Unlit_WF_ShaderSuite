@@ -125,6 +125,14 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
@@ -147,14 +155,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-
-        // Ambient Occlusion
-        [WFHeaderToggle(Ambient Occlusion)]
-            _AO_Enable              ("[AO] Enable", Float) = 0
-        [Toggle(_)]
-            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
-            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
-            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         // Lit
         [WFHeader(Lit)]
