@@ -310,7 +310,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-            #define _TL_EDGE_ENABLE
+
             #define _TL_ENABLE
             #define _VC_ENABLE
             #define _FG_ENABLE

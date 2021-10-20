@@ -119,7 +119,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
             #define _FG_ENABLE
             #define _TL_ENABLE
-            #define _TL_EDGE_ENABLE
+
             #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase

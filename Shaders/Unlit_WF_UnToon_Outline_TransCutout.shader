@@ -353,7 +353,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
 
             #define _WF_ALPHA_CUTOUT
 
-            #define _TL_EDGE_ENABLE
+
             #define _TL_ENABLE
             #define _VC_ENABLE
             #define _FG_ENABLE

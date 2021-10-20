@@ -291,7 +291,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _TL_EDGE_ENABLE
+
             #define _TL_ENABLE
             #define _VC_ENABLE
             #define _FG_ENABLE
