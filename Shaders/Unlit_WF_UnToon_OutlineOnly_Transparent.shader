@@ -117,9 +117,9 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _TL_EDGE_ENABLE
+            #pragma shader_feature_local _ _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase

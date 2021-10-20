@@ -310,16 +310,16 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
             #define _WF_UNTOON_POWERCAP
 
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _HL_ENABLE_2

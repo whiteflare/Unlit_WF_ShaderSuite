@@ -113,8 +113,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _WF_MAIN_Z_SHIFT    (_AL_Z_Offset)
             #define _WF_MOBILE
 
-            #pragma shader_feature_local_fragment _AO_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

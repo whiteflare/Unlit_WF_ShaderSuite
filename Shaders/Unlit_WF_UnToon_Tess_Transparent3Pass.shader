@@ -262,6 +262,19 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
@@ -284,19 +297,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
-
-        // Ambient Occlusion
-        [WFHeaderToggle(Ambient Occlusion)]
-            _AO_Enable              ("[AO] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1)]
-            _AO_UVType              ("[AO] UV Type", Float) = 0
-        [NoScaleOffset]
-            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
-            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
-            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
-            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
-            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         // Fog
         [WFHeaderToggle(Fog)]
@@ -373,7 +373,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
             #define _WF_UNTOON_TESS
 
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
@@ -437,7 +437,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SIMPLE_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
@@ -486,7 +487,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SIMPLE_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
@@ -534,7 +536,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SIMPLE_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
