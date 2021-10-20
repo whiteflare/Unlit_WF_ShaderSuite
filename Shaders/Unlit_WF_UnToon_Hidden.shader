@@ -49,6 +49,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
 
             struct appdata_t {
                 float4 vertex : POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f {

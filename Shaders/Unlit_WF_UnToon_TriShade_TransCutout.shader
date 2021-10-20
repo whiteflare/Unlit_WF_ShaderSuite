@@ -339,6 +339,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             #pragma shader_feature_local_fragment _AO_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _ES_SIMPLE_ENABLE
             #pragma shader_feature_local _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE

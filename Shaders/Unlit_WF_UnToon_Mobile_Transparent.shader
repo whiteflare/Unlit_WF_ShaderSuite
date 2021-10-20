@@ -212,6 +212,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
             #pragma shader_feature_local_fragment _AO_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _ES_SIMPLE_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE

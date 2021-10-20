@@ -191,6 +191,9 @@ namespace UnlitWF
             { "_TS_Steps", new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
                 enablePropName = "_TS_Enable",
             } },
+            { "_ES_Shape", new WFCustomKeywordSettingEnum("_ES_Shape", "_", "_", "_", "_ES_SIMPLE_ENABLE") {
+                enablePropName = "_ES_Enable",
+            } },
         };
 
         /// <summary>

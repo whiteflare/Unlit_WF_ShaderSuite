@@ -308,6 +308,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _ES_SIMPLE_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
@@ -350,6 +351,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _ES_SIMPLE_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
