@@ -925,6 +925,7 @@
                     : i.uv                                                                      // UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
+                uv_overlay += frac(_OL_UVScroll * _Time.xx);
                 float4 ov_color = PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color;
                 float ov_power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
 

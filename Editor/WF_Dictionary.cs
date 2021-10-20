@@ -334,6 +334,7 @@ namespace UnlitWF
             new WFI18NTranslation("OL", "Decal Texture", "デカール テクスチャ"),
             new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "頂点カラーをデカールに乗算する"),
             new WFI18NTranslation("OL", "Multiply VertexColor To Mask Texture", "頂点カラーをマスクに乗算する"),
+            new WFI18NTranslation("OL", "UV Scroll", "UVスクロール"),
             // EmissiveScroll
             new WFI18NTranslation("ES", "Emission", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),

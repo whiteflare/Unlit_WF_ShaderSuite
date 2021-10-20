@@ -1138,6 +1138,7 @@ namespace UnlitWF
     public static class ScanAndMigrationExecutor
     {
         public const int VERSION = 1;
+        private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         [InitializeOnLoadMethod]
         public static void ExecuteAuto()
@@ -1147,15 +1148,7 @@ namespace UnlitWF
                 // 実行中は何もしない
                 return;
             }
-            var sets = WFEditorSetting.GetAllSettings();
-            if (sets.Length == 0)
-            {
-                // Settings が1件も無いときは何もしない
-                return;
-            }
-
-            var savedVersion = sets.Max(set => set.autoMigrationVersion);
-            if (VERSION <= savedVersion)
+            if (VERSION <= GetCurrentMigrationVersion())
             {
                 // バージョンが新しいなら何もしない
                 return;
@@ -1198,15 +1191,18 @@ namespace UnlitWF
             }
         }
 
+        public static int GetCurrentMigrationVersion()
+        {
+            if (int.TryParse(EditorUserSettings.GetConfigValue(KEY_MIG_VERSION) ?? "0", out var version))
+            {
+                return version;
+            }
+            return 0;
+        }
+
         public static void SaveCurrentMigrationVersion()
         {
-            // Setting の中のバージョンを上書き
-            foreach (var set in WFEditorSetting.GetAllSettings())
-            {
-                set.autoMigrationVersion = VERSION;
-                EditorUtility.SetDirty(set);
-            }
-            AssetDatabase.SaveAssets();
+            EditorUserSettings.SetConfigValue(KEY_MIG_VERSION, VERSION.ToString());
         }
 
         public static void ScanAndMigration()
