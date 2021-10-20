@@ -37,7 +37,7 @@
         float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
 #ifdef _NM_ENABLE
-            float4 tangent      : TANGENT;
+        float4 tangent          : TANGENT;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
@@ -57,8 +57,8 @@
         float4 ws_light_dir     : TEXCOORD3;
         float3 normal           : TEXCOORD4;    // world space
 #ifdef _NM_ENABLE
-            float3 tangent      : TEXCOORD5;    // world space
-            float3 bitangent    : TEXCOORD6;    // world space
+        float3 tangent          : TEXCOORD5;    // world space
+        float3 bitangent        : TEXCOORD6;    // world space
 #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
