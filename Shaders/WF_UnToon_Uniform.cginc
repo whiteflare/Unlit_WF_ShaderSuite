@@ -243,6 +243,7 @@
     uint            _OL_UVType;
     float4          _OL_Color;
     float4          _OL_OverlayTex_ST;
+    float2          _OL_UVScroll;
     uint            _OL_BlendType;
     float           _OL_Power;
     float           _OL_CustomParam1;

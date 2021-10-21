@@ -218,6 +218,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         [HDR]
             _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
             _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
+        [WF_Vector2]
+            _OL_UVScroll            ("[OL] UV Scroll", Vector) = (0, 0, 0, 0)
         [Toggle(_)]
             _OL_VertColToDecal      ("[OL] Multiply VertexColor To Decal Texture", Range(0, 1)) = 0
         [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
