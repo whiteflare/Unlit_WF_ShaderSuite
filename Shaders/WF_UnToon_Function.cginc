@@ -608,6 +608,48 @@
     // Light Matcap
     ////////////////////////////
 
+    float4x4 calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+        // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
+
+        float4x4 matcapVector = 0;
+
+        // ワールド法線をビュー法線に変換
+        float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_normal_center         = matcapViewCorrect(vs_normal, ws_view_dir);
+        float3 vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir);
+        // 真上を揃える
+        float2x2 rotate = matcapRotateCorrectMatrix();
+        vs_normal_center.xy         = mul( vs_normal_center.xy, rotate );
+        vs_normal_side.xy           = mul( vs_normal_side.xy, rotate );
+        // 格納
+        matcapVector[0].xyz = normalize(vs_normal_center);
+        matcapVector[2].xyz = normalize(vs_normal_side);
+
+    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        // ワールド法線をビュー法線に変換
+        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_view_dir);
+        float3 vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir);
+        // 真上を揃える
+        vs_bump_normal_center.xy    = mul( vs_bump_normal_center.xy, rotate );
+        vs_bump_normal_side.xy      = mul( vs_bump_normal_side.xy, rotate );
+        // 格納
+        matcapVector[1].xyz = normalize(vs_bump_normal_center);
+        matcapVector[3].xyz = normalize(vs_bump_normal_side);
+    #endif
+        return matcapVector;
+    }
+
+    float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
+    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        return lerp( lerp(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerp(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax );
+    #else
+        return lerp( matcapVector[0].xyz, matcapVector[2].xyz, parallax );
+    #endif
+    }
+
     #ifdef _HL_ENABLE
 
         void affectMatcapColor(float2 matcapVector, float2 uv_main, inout float4 color) {
