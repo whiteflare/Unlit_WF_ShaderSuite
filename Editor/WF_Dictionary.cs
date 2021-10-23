@@ -235,6 +235,8 @@ namespace UnlitWF
             new WFI18NTranslation("Enable", "有効"),
             new WFI18NTranslation("Texture", "テクスチャ"),
             new WFI18NTranslation("Mask Texture", "マスクテクスチャ"),
+            new WFI18NTranslation("Mask Texture (R)", "マスクテクスチャ (R)"),
+            new WFI18NTranslation("Mask Texture (RGB)", "マスクテクスチャ (RGB)"),
             new WFI18NTranslation("Invert Mask Value", "マスク反転"),
             new WFI18NTranslation("UV Type", "UVタイプ"),
             new WFI18NTranslation("Brightness", "明るさ"),
@@ -277,6 +279,7 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "2nd NormalMap Texture", "2ndノーマルマップ"),
             new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
             new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
             // Metallic
             new WFI18NTranslation("MT", "Metallic", "メタリック強度"),
             new WFI18NTranslation("MT", "Smoothness", "滑らかさ"),
@@ -320,6 +323,7 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "3rd Border", "3影の境界位置"),
             new WFI18NTranslation("SH", "Feather", "境界のぼかし強度"),
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture", "アンチシャドウマスク"),
+            new WFI18NTranslation("SH", "Anti-Shadow Mask Texture (R)", "アンチシャドウマスク (R)"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "影色を自動設定する"),
             new WFI18NTranslation("SH", "Align the boundaries equally", "境界を等間隔に整列"),
             // RimLight
@@ -354,6 +358,7 @@ namespace UnlitWF
             new WFI18NTranslation("LI", "Z-shift (tweak)", "カメラから遠ざける"),
             // Ambient Occlusion
             new WFI18NTranslation("AO", "Occlusion Map", "オクルージョンマップ"),
+            new WFI18NTranslation("AO", "Occlusion Map (RGB)", "オクルージョンマップ (RGB)"),
             new WFI18NTranslation("AO", "Use LightMap", "ライトマップも使用する"),
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
             // Toon Fog
@@ -365,6 +370,7 @@ namespace UnlitWF
             new WFI18NTranslation("TE", "Tess Factor", "分割数"),
             new WFI18NTranslation("TE", "Smoothing", "スムーズ"),
             new WFI18NTranslation("TE", "Smoothing Mask Texture", "スムーズマスク"),
+            new WFI18NTranslation("TE", "Smoothing Mask Texture (R)", "スムーズマスク (R)"),
             // Lit Advance
             new WFI18NTranslation("Sun Source", "太陽光のモード"),
             new WFI18NTranslation("Custom Sun Azimuth", "カスタム太陽の方角"),
