@@ -120,19 +120,18 @@
         float3 ws_bump_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
 
+        // ビューポイントへの方向
         float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
+        // カメラへの方向
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
-
-        // ビュー空間法線
-        float3 vs_normal = calcMatcapVector(ws_view_dir, ws_normal);
-        float3 vs_bump_normal = calcMatcapVector(ws_view_dir, ws_bump_normal);
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir);
+        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
 
+        // matcapベクトルの配列
         float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 
         // Highlight
-        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax), uv_main, color);
+        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax).xy, uv_main, color);
 
 #ifdef _HL_ENABLE_1
         WF_POWERCAP_AFFECT(1);
@@ -168,7 +167,7 @@
         affectToonFog(i, ws_view_dir, color);
 
         // フレネル
-        affectFresnelAlpha(i.uv, ws_normal, ws_view_dir, color);
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

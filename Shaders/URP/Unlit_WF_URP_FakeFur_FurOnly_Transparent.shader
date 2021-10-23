@@ -80,7 +80,7 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
