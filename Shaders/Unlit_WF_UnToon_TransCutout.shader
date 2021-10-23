@@ -83,7 +83,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
             _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
-            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
+            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -132,7 +132,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
-            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
+            _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
@@ -159,7 +159,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _LM_Spot                ("[LM] FadeOut Angle", Range(0, 16)) = 2.0
             _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
-            _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}
+            _LM_MaskTex             ("[LM] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _LM_InvMaskVal          ("[LM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -187,7 +187,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
@@ -202,7 +202,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
@@ -227,7 +227,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] Mask Texture", 2D) = "white" {}
+            _OL_MaskTex             ("[OL] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _OL_VertColToMask       ("[OL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
         [Toggle(_)]
@@ -239,7 +239,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         [Enum(UV1,0,UV2,1)]
             _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
-            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
+            _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
         [Toggle(_)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1

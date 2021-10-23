@@ -47,7 +47,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             _LM_MaxDist             ("[LM] FadeOut Distance (Far)", Range(0, 5)) = 4.0
             _LM_Spot                ("[LM] FadeOut Angle", Range(0, 16)) = 2.0
             _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
-            _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}
+            _LM_MaskTex             ("[LM] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _LM_InvMaskVal          ("[LM] Invert Mask Value", Range(0, 1)) = 0
 
