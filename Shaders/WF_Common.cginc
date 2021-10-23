@@ -284,6 +284,8 @@
     }
 
     float3 calcMatcapVector(in float3 ws_view_dir, in float3 ws_normal) {
+        // このメソッドは ws_bump_normal を考慮しないバージョン。考慮するバージョンは WF_UnToon_Function.cginc にある。
+
         // ワールド法線をビュー法線に変換
         float3 vs_normal = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
 
@@ -293,36 +295,6 @@
         vs_normal.xy = mul( vs_normal.xy, matcapRotateCorrectMatrix() );
 
         return normalize( vs_normal );
-    }
-
-    float4x4 calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
-        // ワールド法線をビュー法線に変換
-        float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
-        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
-
-        // カメラ位置にて補正する
-        float3 vs_normal_center         = matcapViewCorrect(vs_normal, ws_view_dir);
-        float3 vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir);
-        float3 vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_view_dir);
-        float3 vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir);
-
-        // 真上を揃える
-        float2x2 rotate = matcapRotateCorrectMatrix();
-        vs_normal_center.xy         = mul( vs_normal_center.xy, rotate );
-        vs_normal_side.xy           = mul( vs_normal_side.xy, rotate );
-        vs_bump_normal_center.xy    = mul( vs_bump_normal_center.xy, rotate );
-        vs_bump_normal_side.xy      = mul( vs_bump_normal_side.xy, rotate );
-
-        float4x4 matcapVector;
-        matcapVector[0] = float4( normalize(vs_normal_center), 0 );
-        matcapVector[1] = float4( normalize(vs_bump_normal_center), 0 );
-        matcapVector[2] = float4( normalize(vs_normal_side), 0 );
-        matcapVector[3] = float4( normalize(vs_bump_normal_side), 0 );
-        return matcapVector;
-    }
-
-    float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
-        return lerp( lerp(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerp(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax);
     }
 
     ////////////////////////////
