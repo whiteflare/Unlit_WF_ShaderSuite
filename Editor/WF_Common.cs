@@ -550,6 +550,13 @@ namespace UnlitWF
         public WFCustomKeywordSettingEnum(string propertyName, params string[] keywords) : base(propertyName)
         {
             this.keywords = keywords;
+
+            // 複数の値で同じキーワードを設定することに対応していないので、ここでチェックしてNGならエラーを出す
+            var kwdCheck = keywords.Where(kwd => !string.IsNullOrEmpty(kwd) && "_" != kwd);
+            if (kwdCheck.Distinct().Count() != kwdCheck.Count())
+            {
+                Debug.LogErrorFormat("[WF] duplicate keyword {0}", string.Join(", ", keywords));
+            }
         }
 
         public override bool SetKeywordTo(Material mat)
