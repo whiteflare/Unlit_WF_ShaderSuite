@@ -652,7 +652,7 @@ namespace UnlitWF
 
     internal enum EditorLanguage
     {
-        English, 日本語
+        English, 日本語, 한국어
     }
 
     internal class WFI18NTranslation
@@ -736,14 +736,18 @@ namespace UnlitWF
             {
                 if (langMode == null)
                 {
-                    string lang = EditorPrefs.GetString(KEY_EDITOR_LANG);
-                    if (lang == "ja")
+                    string lang = EditorPrefs.GetString(KEY_EDITOR_LANG) ?? "";
+                    switch(lang)
                     {
-                        langMode = EditorLanguage.日本語;
-                    }
-                    else
-                    {
-                        langMode = EditorLanguage.English;
+                        case "ja":
+                            langMode = EditorLanguage.日本語;
+                            break;
+                        case "ko":
+                            langMode = EditorLanguage.한국어;
+                            break;
+                        default:
+                            langMode = EditorLanguage.English;
+                            break;
                     }
                 }
                 return langMode.Value;
@@ -758,6 +762,9 @@ namespace UnlitWF
                         case EditorLanguage.日本語:
                             EditorPrefs.SetString(KEY_EDITOR_LANG, "ja");
                             break;
+                        case EditorLanguage.한국어:
+                            EditorPrefs.SetString(KEY_EDITOR_LANG, "ko");
+                            break;
                         default:
                             EditorPrefs.DeleteKey(KEY_EDITOR_LANG);
                             break;
@@ -771,6 +778,7 @@ namespace UnlitWF
     {
         private static readonly Dictionary<string, List<WFI18NTranslation>> EN = new Dictionary<string, List<WFI18NTranslation>>();
         private static readonly Dictionary<string, List<WFI18NTranslation>> JA = ToDict(WFShaderDictionary.LangEnToJa);
+        private static readonly Dictionary<string, List<WFI18NTranslation>> KO = ToDict(WFShaderDictionary.LangEnToKo);
 
         static Dictionary<string, List<WFI18NTranslation>> GetDict()
         {
@@ -778,6 +786,8 @@ namespace UnlitWF
             {
                 case EditorLanguage.日本語:
                     return JA;
+                case EditorLanguage.한국어:
+                    return KO;
                 default:
                     return EN;
             }
