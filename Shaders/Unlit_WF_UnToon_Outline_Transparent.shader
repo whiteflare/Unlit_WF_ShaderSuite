@@ -361,10 +361,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _ _TL_EDGE_ENABLE
-            #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _FG_ENABLE
+
+            #define _TL_ENABLE
+            #define _VC_ENABLE
+            #define _FG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -418,24 +418,24 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _AO_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
-            #pragma shader_feature_local_fragment _CH_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _FG_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _LM_ENABLE
-            #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
+
+
+            #define _AO_ENABLE
+            #define _BK_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _FG_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -463,24 +463,24 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _AO_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
-            #pragma shader_feature_local_fragment _CH_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _FG_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _LM_ENABLE
-            #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
+            #define _NM_ENABLE
+            #define _OL_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
+
+
+            #define _AO_ENABLE
+            #define _BK_ENABLE
+            #define _CH_ENABLE
+            #define _CL_ENABLE
+            #define _ES_ENABLE
+            #define _FG_ENABLE
+            #define _HL_ENABLE
+            #define _LM_ENABLE
+            #define _MT_ENABLE
+            #define _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

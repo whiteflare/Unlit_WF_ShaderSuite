@@ -140,7 +140,6 @@ Material:
     - _CullMode: 2
     - _CurrentVersion: 0
     - _DetailNormalMapScale: 0.4
-    - _ES_BakeIntensity: 1
     - _ES_BlendType: 0
     - _ES_DirType: 0
     - _ES_Enable: 0
@@ -201,7 +200,6 @@ Material:
     - _NM_2ndType: 0
     - _NM_Enable: 0
     - _NM_FlipMirror: 0
-    - _NM_FlipTangent: 0
     - _NM_InvMaskVal: 0
     - _NM_Power: 0.25
     - _OL_BlendType: 0
@@ -221,7 +219,6 @@ Material:
     - _TL_BlendCustom: 0
     - _TL_Enable: 0
     - _TL_InvMaskVal: 0
-    - _TL_LineType: 0
     - _TL_LineWidth: 0.05
     - _TL_Z_Shift: 0
     - _TR_BlendNormal: 0
@@ -261,7 +258,7 @@ Material:
     - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1, a: 1}
     - _OL_UVScroll: {r: 0, g: 0, b: 0, a: 0}
-    - _TL_LineColor: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
+    - _TL_LineColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.7529412, g: 0.5921569, b: 0.46666667, a: 1}
     - _TS_2ndColor: {r: 0.6431373, g: 0.47843137, b: 0.34901962, a: 1}
