@@ -1148,6 +1148,7 @@ namespace UnlitWF
                 }
                 EditorUtility.ClearProgressBar();
 
+                AssetDatabase.SaveAssets();
                 Debug.LogFormat("[WF] Scan And Migration {0} materials", done);
             }
         }
