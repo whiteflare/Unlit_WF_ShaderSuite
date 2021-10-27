@@ -195,7 +195,7 @@ namespace UnlitWF
                 if (changed)
                 {
 #if WF_COMMON_LOG_KEYWORD
-                    Debug.LogFormat("[WF] {0} keywords {1}", mat, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
+                    Debug.LogFormat("[WF] {0} has {1} keywords {2}", mat, mat.shaderKeywords.Length, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
 #endif
                 }
             }
@@ -546,22 +546,34 @@ namespace UnlitWF
     public class WFCustomKeywordSettingEnum : WFCustomKeywordSetting
     {
         public readonly string[] keywords;
+        public readonly int[] index;
 
         public WFCustomKeywordSettingEnum(string propertyName, params string[] keywords) : base(propertyName)
         {
-            this.keywords = keywords;
-
-            // 複数の値で同じキーワードを設定することに対応していないので、ここでチェックしてNGならエラーを出す
-            var kwdCheck = keywords.Where(kwd => !string.IsNullOrEmpty(kwd) && "_" != kwd);
-            if (kwdCheck.Distinct().Count() != kwdCheck.Count())
+            // キーワードの配列を重複なしに変換し、インデックスの変換表を作成する
+            var newKwdArray = new List<string>();
+            var newIdxArray = new List<int>();
+            for (int i = 0; i < keywords.Length; i++)
             {
-                Debug.LogErrorFormat("[WF] duplicate keyword {0}", string.Join(", ", keywords));
+                string kwd = keywords[i];
+                int idx = newKwdArray.IndexOf(kwd);
+                if (idx < 0)
+                {
+                    idx = newKwdArray.Count;
+                    newKwdArray.Add(kwd);
+                }
+                newIdxArray.Add(idx);
             }
+
+            this.keywords = newKwdArray.ToArray();
+            this.index = newIdxArray.ToArray();
         }
 
         public override bool SetKeywordTo(Material mat)
         {
-            return ApplyKeyword(mat, keywords, mat.GetInt(propertyName));
+            int value = mat.GetInt(propertyName);
+            value = 0 <= value && value < index.Length ? index[value] : -1;
+            return ApplyKeyword(mat, keywords, value);
         }
     }
 
@@ -737,7 +749,7 @@ namespace UnlitWF
                 if (langMode == null)
                 {
                     string lang = EditorPrefs.GetString(KEY_EDITOR_LANG) ?? "";
-                    switch(lang)
+                    switch (lang)
                     {
                         case "ja":
                             langMode = EditorLanguage.日本語;
