@@ -343,7 +343,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SIMPLE_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
@@ -393,7 +393,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SIMPLE_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE

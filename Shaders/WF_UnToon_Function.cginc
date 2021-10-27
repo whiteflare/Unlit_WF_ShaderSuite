@@ -378,9 +378,7 @@
 
     #ifdef _ES_ENABLE
 
-    #ifdef _ES_SIMPLE_ENABLE
-        #define calcEmissiveWaving(i, uv_main)   (1)
-    #else
+    #ifdef _ES_SCROLL_ENABLE
         float calcEmissiveWaving(v2f i, float2 uv_main) {
             if (_ES_Shape == 3) {
                 // 定数
@@ -404,6 +402,8 @@
                 sin( time ) * _ES_Sharpness;
             return saturate(waving + _ES_LevelOffset);
         }
+    #else
+        #define calcEmissiveWaving(i, uv_main)   (1)
     #endif
 
         void affectEmissiveScroll(v2f i, float2 uv_main, inout float4 color) {
@@ -424,7 +424,7 @@
                     lerp(color.rgb, es_color.rgb, waving);
 
                 // Alpha側の合成
-                #if defined(_WF_ALPHA_BLEND) && !defined(_ES_SIMPLE_ENABLE)
+                #if defined(_WF_ALPHA_BLEND) && defined(_ES_SCROLL_ENABLE)
                     #ifdef _ES_FORCE_ALPHASCROLL
                         color.a = max(color.a, waving);
                     #else
