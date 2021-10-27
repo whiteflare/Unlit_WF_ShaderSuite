@@ -210,15 +210,15 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
 
-            #define _TS_ENABLE
-            #define _VC_ENABLE
-
-
-            #define _AO_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -242,7 +242,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 
