@@ -195,7 +195,7 @@ namespace UnlitWF
                 if (changed)
                 {
 #if WF_COMMON_LOG_KEYWORD
-                    Debug.LogFormat("[WF] {0} keywords {1}", mat, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
+                    Debug.LogFormat("[WF] {0} has {1} keywords {2}", mat, mat.shaderKeywords.Length, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
 #endif
                 }
             }
@@ -546,15 +546,34 @@ namespace UnlitWF
     public class WFCustomKeywordSettingEnum : WFCustomKeywordSetting
     {
         public readonly string[] keywords;
+        public readonly int[] index;
 
         public WFCustomKeywordSettingEnum(string propertyName, params string[] keywords) : base(propertyName)
         {
-            this.keywords = keywords;
+            // キーワードの配列を重複なしに変換し、インデックスの変換表を作成する
+            var newKwdArray = new List<string>();
+            var newIdxArray = new List<int>();
+            for (int i = 0; i < keywords.Length; i++)
+            {
+                string kwd = keywords[i];
+                int idx = newKwdArray.IndexOf(kwd);
+                if (idx < 0)
+                {
+                    idx = newKwdArray.Count;
+                    newKwdArray.Add(kwd);
+                }
+                newIdxArray.Add(idx);
+            }
+
+            this.keywords = newKwdArray.ToArray();
+            this.index = newIdxArray.ToArray();
         }
 
         public override bool SetKeywordTo(Material mat)
         {
-            return ApplyKeyword(mat, keywords, mat.GetInt(propertyName));
+            int value = mat.GetInt(propertyName);
+            value = 0 <= value && value < index.Length ? index[value] : -1;
+            return ApplyKeyword(mat, keywords, value);
         }
     }
 
@@ -645,7 +664,7 @@ namespace UnlitWF
 
     internal enum EditorLanguage
     {
-        English, 日本語
+        English, 日本語, 한국어
     }
 
     internal class WFI18NTranslation
@@ -729,14 +748,18 @@ namespace UnlitWF
             {
                 if (langMode == null)
                 {
-                    string lang = EditorPrefs.GetString(KEY_EDITOR_LANG);
-                    if (lang == "ja")
+                    string lang = EditorPrefs.GetString(KEY_EDITOR_LANG) ?? "";
+                    switch (lang)
                     {
-                        langMode = EditorLanguage.日本語;
-                    }
-                    else
-                    {
-                        langMode = EditorLanguage.English;
+                        case "ja":
+                            langMode = EditorLanguage.日本語;
+                            break;
+                        case "ko":
+                            langMode = EditorLanguage.한국어;
+                            break;
+                        default:
+                            langMode = EditorLanguage.English;
+                            break;
                     }
                 }
                 return langMode.Value;
@@ -751,6 +774,9 @@ namespace UnlitWF
                         case EditorLanguage.日本語:
                             EditorPrefs.SetString(KEY_EDITOR_LANG, "ja");
                             break;
+                        case EditorLanguage.한국어:
+                            EditorPrefs.SetString(KEY_EDITOR_LANG, "ko");
+                            break;
                         default:
                             EditorPrefs.DeleteKey(KEY_EDITOR_LANG);
                             break;
@@ -764,6 +790,7 @@ namespace UnlitWF
     {
         private static readonly Dictionary<string, List<WFI18NTranslation>> EN = new Dictionary<string, List<WFI18NTranslation>>();
         private static readonly Dictionary<string, List<WFI18NTranslation>> JA = ToDict(WFShaderDictionary.LangEnToJa);
+        private static readonly Dictionary<string, List<WFI18NTranslation>> KO = ToDict(WFShaderDictionary.LangEnToKo);
 
         static Dictionary<string, List<WFI18NTranslation>> GetDict()
         {
@@ -771,6 +798,8 @@ namespace UnlitWF
             {
                 case EditorLanguage.日本語:
                     return JA;
+                case EditorLanguage.한국어:
+                    return KO;
                 default:
                     return EN;
             }

@@ -27,7 +27,7 @@ namespace UnlitWF
 {
     public class MigrationParameter : ScriptableObject
     {
-        public Material[] materials = { null };
+        public Material[] materials = { };
 
         public static MigrationParameter Create()
         {
@@ -40,7 +40,7 @@ namespace UnlitWF
     public class CopyPropParameter : ScriptableObject
     {
         public Material materialSource = null;
-        public Material[] materialDestination = { null };
+        public Material[] materialDestination = { };
         public string[] labels = { };
         public string[] prefixs = { };
         public bool withoutTextures = false;
@@ -56,9 +56,9 @@ namespace UnlitWF
 
     public class CleanUpParameter : ScriptableObject
     {
-        public Material[] materials = { null };
-        public bool resetUnused = false;
-        public bool resetKeywords = false;
+        public Material[] materials = { };
+        public bool resetUnused = true;
+        public bool resetKeywords = true;
 
         public static CleanUpParameter Create()
         {
@@ -70,7 +70,7 @@ namespace UnlitWF
 
     public class ResetParameter : ScriptableObject
     {
-        public Material[] materials = { null };
+        public Material[] materials = { };
         public bool resetColor = false;
         public bool resetFloat = false;
         public bool resetTexture = false;

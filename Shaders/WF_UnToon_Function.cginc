@@ -378,9 +378,7 @@
 
     #ifdef _ES_ENABLE
 
-    #ifdef _ES_SIMPLE_ENABLE
-        #define calcEmissiveWaving(i, uv_main)   (1)
-    #else
+    #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         float calcEmissiveWaving(v2f i, float2 uv_main) {
             if (_ES_Shape == 3) {
                 // 定数
@@ -404,6 +402,8 @@
                 sin( time ) * _ES_Sharpness;
             return saturate(waving + _ES_LevelOffset);
         }
+    #else
+        #define calcEmissiveWaving(i, uv_main)   (1)
     #endif
 
         void affectEmissiveScroll(v2f i, float2 uv_main, inout float4 color) {
@@ -424,7 +424,7 @@
                     lerp(color.rgb, es_color.rgb, waving);
 
                 // Alpha側の合成
-                #if defined(_WF_ALPHA_BLEND) && !defined(_ES_SIMPLE_ENABLE)
+                #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
                     #ifdef _ES_FORCE_ALPHASCROLL
                         color.a = max(color.a, waving);
                     #else
@@ -534,7 +534,7 @@
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
 #endif
-#if defined(_MT_ADD2ND_ENABLE) || defined(_MT_ONLY2ND_ENABLE)
+#if defined(_MT_ADD2ND_ENABLE) || defined(_MT_ONLY2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 float3 cubemap = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
                 color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
 #endif
