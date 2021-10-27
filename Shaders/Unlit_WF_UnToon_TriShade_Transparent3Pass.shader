@@ -376,7 +376,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #pragma shader_feature_local _OL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SIMPLE_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
@@ -419,7 +419,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SIMPLE_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
@@ -461,7 +461,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #pragma shader_feature_local _OL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SIMPLE_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
