@@ -275,6 +275,16 @@
 
 #ifndef _WF_MOBILE
 #ifdef _WF_LEGACY_FEATURE_SWITCH
+    float           _DF_Enable;
+#endif
+    float4          _DF_Color;
+    float           _DF_MinDist;
+    float           _DF_MaxDist;
+    float           _DF_Power;
+#endif
+
+#ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _FG_Enable;
 #endif
     float4          _FG_Color;

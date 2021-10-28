@@ -73,6 +73,7 @@ namespace UnlitWF
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
             new MinMaxSliderPropertyHook("_FG_MinDist", "_FG_MaxDist"),
             new MinMaxSliderPropertyHook("_LM_MinDist", "_LM_MaxDist"),
+            new MinMaxSliderPropertyHook("_DF_MinDist", "_DF_MaxDist"),
 
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
             new CustomPropertyHook("_OL_CustomParam1", ctx => {

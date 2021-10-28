@@ -36,8 +36,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _TE_SmoothPowerTex      ("[TE] Smoothing Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _TE_InvMaskVal          ("[TE] Invert Mask Value", Float) = 0
-            _TE_MinDist             ("[TE] FeedOut Distance (Near)", Range(0, 4)) = 0.5
-            _TE_MaxDist             ("[TE] FeedOut Distance (Far)", Range(0, 4)) = 2
+            _TE_MinDist             ("[TE] FadeOut Distance (Near)", Range(0, 4)) = 0.5
+            _TE_MaxDist             ("[TE] FadeOut Distance (Far)", Range(0, 4)) = 2
 
         // アウトライン
         [WFHeaderToggle(Outline)]

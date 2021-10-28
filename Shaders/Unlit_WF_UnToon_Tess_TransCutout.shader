@@ -48,8 +48,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             _TE_SmoothPowerTex      ("[TE] Smoothing Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _TE_InvMaskVal          ("[TE] Invert Mask Value", Float) = 0
-            _TE_MinDist             ("[TE] FeedOut Distance (Near)", Range(0, 4)) = 0.5
-            _TE_MaxDist             ("[TE] FeedOut Distance (Far)", Range(0, 4)) = 2
+            _TE_MinDist             ("[TE] FadeOut Distance (Near)", Range(0, 4)) = 0.5
+            _TE_MaxDist             ("[TE] FadeOut Distance (Far)", Range(0, 4)) = 2
 
         // アウトライン
         [WFHeaderToggle(Outline)]
@@ -260,6 +260,14 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DF_Enable              ("[DF] Enable", Float) = 0
+            _DF_Color               ("[DF] Color", Color) = (0.3, 0.3, 0.3, 1)
+            _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.01
+            _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.1
+            _DF_Power               ("[DF] Power", Range(0, 1)) = 1
+
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
@@ -298,8 +306,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
             _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_MinDist             ("[FG] FadeOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FadeOut Distance (Far)", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
         [WF_Vector3]
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
@@ -410,6 +418,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE

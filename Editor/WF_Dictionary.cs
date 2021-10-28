@@ -146,6 +146,7 @@ namespace UnlitWF
                 new WFShaderFunction("ES", "ES", "Emission"),
                 new WFShaderFunction("LI", "TL", "Outline"),
                 new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
+                new WFShaderFunction("DF", "DF", "Distance Fade"),
                 new WFShaderFunction("FG", "FG", "ToonFog"),
                 new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
                 new WFShaderFunction("GI", "GI", "Light Bake Effects"),
@@ -361,6 +362,11 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Occlusion Map (RGB)", "オクルージョンマップ (RGB)"),
             new WFI18NTranslation("AO", "Use LightMap", "ライトマップも使用する"),
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
+            // Distance Fade
+            new WFI18NTranslation("DF", "Color", "色"),
+            new WFI18NTranslation("DF", "Fade Distance (Near)", "フェード距離"),
+            new WFI18NTranslation("DF", "Fade Distance (Far)", "フェード距離"),
+            new WFI18NTranslation("DF", "Power", "強度"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "フォグの色"),
             new WFI18NTranslation("FG", "Exponential", "変化の鋭さ"),
@@ -602,6 +608,11 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Occlusion Map (RGB)", "오클루전 맵 (RGB)"),
             new WFI18NTranslation("AO", "Use LightMap", "라이트 맵 사용"),
             new WFI18NTranslation("AO", "Contrast", "콘트라스트"),
+            // Distance Fade
+            new WFI18NTranslation("DF", "Color", "색상"),
+            new WFI18NTranslation("DF", "Fade Distance (Near)", "페이드 거리(가까워짐)"),
+            new WFI18NTranslation("DF", "Fade Distance (Far)", "페이드 거리(멀어짐)"),
+            new WFI18NTranslation("DF", "Power", "강도"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "Fog색상"),
             new WFI18NTranslation("FG", "Exponential", "Fog변화값"),

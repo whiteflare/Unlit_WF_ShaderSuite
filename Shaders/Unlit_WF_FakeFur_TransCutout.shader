@@ -123,6 +123,14 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DF_Enable              ("[DF] Enable", Float) = 0
+            _DF_Color               ("[DF] Color", Color) = (0.3, 0.3, 0.3, 1)
+            _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.01
+            _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.1
+            _DF_Power               ("[DF] Power", Range(0, 1)) = 1
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -176,6 +184,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -201,6 +210,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
