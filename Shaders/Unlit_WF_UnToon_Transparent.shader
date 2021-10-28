@@ -234,6 +234,14 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DF_Enable              ("[DF] Enable", Float) = 0
+            _DF_Color               ("[DF] Color", Color) = (0.3, 0.3, 0.3, 1)
+            _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.01
+            _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.1
+            _DF_Power               ("[DF] Power", Range(0, 1)) = 1
+
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
@@ -339,6 +347,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE
@@ -382,6 +391,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE

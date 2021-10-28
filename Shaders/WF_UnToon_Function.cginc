@@ -1123,6 +1123,26 @@
     }
 
     ////////////////////////////
+    // Distance Fade
+    ////////////////////////////
+
+    #ifdef _DF_ENABLE
+
+        void affectDistanceFade(v2f i, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            if (TGL_ON(_DF_Enable)) {
+#endif
+                float dist = length( i.ws_vertex.xyz - worldSpaceViewPointPos().xyz );
+                color.rgb = lerp(color.rgb, _DF_Color.rgb, _DF_Power * (1 - smoothstep(_DF_MinDist, max(_DF_MinDist + NZF, _DF_MaxDist), dist)));
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            }
+#endif
+        }
+    #else
+        #define affectDistanceFade(i, color)
+    #endif
+
+    ////////////////////////////
     // Fog
     ////////////////////////////
 
