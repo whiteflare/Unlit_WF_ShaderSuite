@@ -160,7 +160,7 @@
         // Decal
         affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 0.5), color);
         // Distance Fade
-        affectDistanceFade(i, color);
+        affectDistanceFade(i, facing, color);
         // Outline
         affectOutline(uv_main, color);
 
