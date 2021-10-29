@@ -185,6 +185,7 @@
     float           _HL_Power;
     float           _HL_BlendNormal;
     float           _HL_Parallax;
+    float           _HL_ChangeAlpha;
     float           _HL_InvMaskVal;
 
 #ifndef _WF_MOBILE
