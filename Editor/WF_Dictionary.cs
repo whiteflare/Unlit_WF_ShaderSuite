@@ -299,6 +299,7 @@ namespace UnlitWF
             new WFI18NTranslation("HL", "Matcap Tint Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Parallax", "視差(Parallax)").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Power", "matcap強度").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Change Alpha Transparency", "透明度も反映する"),
             // Lame
             new WFI18NTranslation("LM", "Color", "ラメ色・テクスチャ"),
             new WFI18NTranslation("LM", "Texture", "ラメ色・テクスチャ"),
@@ -545,6 +546,7 @@ namespace UnlitWF
             new WFI18NTranslation("HL", "Matcap Tint Color", "matcap 색상 조절").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Parallax", "시차값(Parallax)").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Power", "matcap 강도").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Change Alpha Transparency", "알파값 반영"),
             // Lame
             new WFI18NTranslation("LM", "Color", "LM색상・텍스처"),
             new WFI18NTranslation("LM", "Texture", "LM색상・텍스처"),
