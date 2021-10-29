@@ -135,6 +135,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha         ("[HL] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
@@ -238,6 +240,14 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             _OL_VertColToMask       ("[OL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
+
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DF_Enable              ("[DF] Enable", Float) = 0
+            _DF_Color               ("[DF] Color", Color) = (0.3, 0.3, 0.3, 1)
+            _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.01
+            _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.1
+            _DF_Power               ("[DF] Power", Range(0, 1)) = 1
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -351,6 +361,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
+            #define _DF_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
@@ -401,6 +412,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
+            #define _DF_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
@@ -452,6 +464,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
+            #define _DF_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE
@@ -505,6 +518,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
+            #define _DF_ENABLE
             #define _ES_ENABLE
             #define _HL_ENABLE
             #define _LM_ENABLE

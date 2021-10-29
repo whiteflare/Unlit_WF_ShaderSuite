@@ -146,6 +146,7 @@ namespace UnlitWF
                 new WFShaderFunction("ES", "ES", "Emission"),
                 new WFShaderFunction("LI", "TL", "Outline"),
                 new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
+                new WFShaderFunction("DF", "DF", "Distance Fade"),
                 new WFShaderFunction("FG", "FG", "ToonFog"),
                 new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
                 new WFShaderFunction("GI", "GI", "Light Bake Effects"),
@@ -298,6 +299,7 @@ namespace UnlitWF
             new WFI18NTranslation("HL", "Matcap Tint Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Parallax", "視差(Parallax)").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Power", "matcap強度").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Change Alpha Transparency", "透明度も反映する"),
             // Lame
             new WFI18NTranslation("LM", "Color", "ラメ色・テクスチャ"),
             new WFI18NTranslation("LM", "Texture", "ラメ色・テクスチャ"),
@@ -361,6 +363,11 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Occlusion Map (RGB)", "オクルージョンマップ (RGB)"),
             new WFI18NTranslation("AO", "Use LightMap", "ライトマップも使用する"),
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
+            // Distance Fade
+            new WFI18NTranslation("DF", "Color", "色"),
+            new WFI18NTranslation("DF", "Fade Distance (Near)", "フェード距離"),
+            new WFI18NTranslation("DF", "Fade Distance (Far)", "フェード距離"),
+            new WFI18NTranslation("DF", "Power", "強度"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "フォグの色"),
             new WFI18NTranslation("FG", "Exponential", "変化の鋭さ"),
@@ -539,6 +546,7 @@ namespace UnlitWF
             new WFI18NTranslation("HL", "Matcap Tint Color", "matcap 색상 조절").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Parallax", "시차값(Parallax)").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Power", "matcap 강도").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Change Alpha Transparency", "알파값 반영"),
             // Lame
             new WFI18NTranslation("LM", "Color", "LM색상・텍스처"),
             new WFI18NTranslation("LM", "Texture", "LM색상・텍스처"),
@@ -602,6 +610,11 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Occlusion Map (RGB)", "오클루전 맵 (RGB)"),
             new WFI18NTranslation("AO", "Use LightMap", "라이트 맵 사용"),
             new WFI18NTranslation("AO", "Contrast", "콘트라스트"),
+            // Distance Fade
+            new WFI18NTranslation("DF", "Color", "색상"),
+            new WFI18NTranslation("DF", "Fade Distance (Near)", "페이드 거리(가까워짐)"),
+            new WFI18NTranslation("DF", "Fade Distance (Far)", "페이드 거리(멀어짐)"),
+            new WFI18NTranslation("DF", "Power", "강도"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "Fog색상"),
             new WFI18NTranslation("FG", "Exponential", "Fog변화값"),

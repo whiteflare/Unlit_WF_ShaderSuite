@@ -185,6 +185,7 @@
     float           _HL_Power;
     float           _HL_BlendNormal;
     float           _HL_Parallax;
+    float           _HL_ChangeAlpha;
     float           _HL_InvMaskVal;
 
 #ifndef _WF_MOBILE
@@ -272,6 +273,16 @@
     float           _AO_Contrast;
     float           _AO_Brightness;
     float4          _AO_TintColor;
+
+#ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+    float           _DF_Enable;
+#endif
+    float4          _DF_Color;
+    float           _DF_MinDist;
+    float           _DF_MaxDist;
+    float           _DF_Power;
+#endif
 
 #ifndef _WF_MOBILE
 #ifdef _WF_LEGACY_FEATURE_SWITCH

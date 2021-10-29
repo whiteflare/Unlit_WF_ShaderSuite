@@ -89,6 +89,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha         ("[HL] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
@@ -258,8 +260,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
             _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_MinDist             ("[FG] FadeOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FadeOut Distance (Far)", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
         [WF_Vector3]
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
