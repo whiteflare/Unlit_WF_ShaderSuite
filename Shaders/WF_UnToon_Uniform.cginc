@@ -282,6 +282,7 @@
     float           _DF_MinDist;
     float           _DF_MaxDist;
     float           _DF_Power;
+    float           _DF_BackShadow;
 #endif
 
 #ifndef _WF_MOBILE

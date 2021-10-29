@@ -211,7 +211,7 @@
         // 階調影
         affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
         // Distance Fade
-        affectDistanceFade(i, color);
+        affectDistanceFade(i, 1, color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;

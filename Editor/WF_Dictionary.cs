@@ -368,6 +368,7 @@ namespace UnlitWF
             new WFI18NTranslation("DF", "Fade Distance (Near)", "フェード距離"),
             new WFI18NTranslation("DF", "Fade Distance (Far)", "フェード距離"),
             new WFI18NTranslation("DF", "Power", "強度"),
+            new WFI18NTranslation("DF", "BackFace Shadow", "裏面は影にする"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "フォグの色"),
             new WFI18NTranslation("FG", "Exponential", "変化の鋭さ"),
@@ -615,6 +616,7 @@ namespace UnlitWF
             new WFI18NTranslation("DF", "Fade Distance (Near)", "페이드 거리(가까워짐)"),
             new WFI18NTranslation("DF", "Fade Distance (Far)", "페이드 거리(멀어짐)"),
             new WFI18NTranslation("DF", "Power", "강도"),
+            new WFI18NTranslation("DF", "BackFace Shadow", "이면은 그림자"),
             // Toon Fog
             new WFI18NTranslation("FG", "Color", "Fog색상"),
             new WFI18NTranslation("FG", "Exponential", "Fog변화값"),

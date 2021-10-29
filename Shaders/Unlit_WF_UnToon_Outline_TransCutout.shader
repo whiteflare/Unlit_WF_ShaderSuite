@@ -253,10 +253,12 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
         // Distance Fade
         [WFHeaderToggle(Distance Fade)]
             _DF_Enable              ("[DF] Enable", Float) = 0
-            _DF_Color               ("[DF] Color", Color) = (0.3, 0.3, 0.3, 1)
+            _DF_Color               ("[DF] Color", Color) = (0.1, 0.1, 0.1, 1)
             _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.01
             _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.1
             _DF_Power               ("[DF] Power", Range(0, 1)) = 1
+        [Toggle(_)]
+            _DF_BackShadow          ("[DF] BackFace Shadow", Float) = 1
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
