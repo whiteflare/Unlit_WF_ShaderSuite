@@ -658,7 +658,7 @@
 #endif
                 // matcap サンプリング
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
-                float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+                float4 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv));
 
                 // マスク参照
                 float3 matcap_mask = WF_TEX2D_MATCAP_MASK(uv_main);
@@ -670,20 +670,28 @@
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
-                    matcap_color *= LinearToGammaSpace(matcap_mask_color);
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);
+                    matcap_color.rgb *= LinearToGammaSpace(matcap_mask_color);
+                    color.rgb = blendColor_Add(color.rgb, matcap_color.rgb, power);
                 } else if(_HL_CapType == 2) {
                     // 乗算合成
-                    matcap_color *= LinearToGammaSpace(matcap_mask_color);
-                    color.rgb = blendColor_Mul(color.rgb, matcap_color, power);
+                    matcap_color.rgb *= LinearToGammaSpace(matcap_mask_color);
+                    color.rgb = blendColor_Mul(color.rgb, matcap_color.rgb, power);
                 } else {
                     // 中間色合成
-                    matcap_color -= _HL_MedianColor;
-                    float3 lighten_color = max(ZERO_VEC3, matcap_color);
-                    float3 darken_color  = min(ZERO_VEC3, matcap_color);
-                    matcap_color = lerp(darken_color, lighten_color, matcap_mask_color);
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);
+                    matcap_color.rgb -= _HL_MedianColor;
+                    float3 lighten_color = max(ZERO_VEC3, matcap_color.rgb);
+                    float3 darken_color  = min(ZERO_VEC3, matcap_color.rgb);
+                    matcap_color.rgb = lerp(darken_color, lighten_color, matcap_mask_color);
+                    color.rgb = blendColor_Add(color.rgb, matcap_color.rgb, power);
                 }
+
+                // アルファ側の合成
+            #if defined(_WF_ALPHA_FRESNEL)
+                if (TGL_ON(_HL_ChangeAlpha)) {
+                    color.a = min(color.a, lerp(1, matcap_color.a, power));
+                }
+            #endif
+
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             }
 #endif
@@ -1121,6 +1129,26 @@
             return sampleSHLightColor();
         #endif
     }
+
+    ////////////////////////////
+    // Distance Fade
+    ////////////////////////////
+
+    #ifdef _DF_ENABLE
+
+        void affectDistanceFade(v2f i, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            if (TGL_ON(_DF_Enable)) {
+#endif
+                float dist = length( i.ws_vertex.xyz - worldSpaceViewPointPos().xyz );
+                color.rgb = lerp(color.rgb, _DF_Color.rgb, _DF_Power * (1 - smoothstep(_DF_MinDist, max(_DF_MinDist + NZF, _DF_MaxDist), dist)));
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            }
+#endif
+        }
+    #else
+        #define affectDistanceFade(i, color)
+    #endif
 
     ////////////////////////////
     // Fog
