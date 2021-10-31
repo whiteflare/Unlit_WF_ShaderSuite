@@ -73,7 +73,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
             _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
-            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
+            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -88,8 +88,10 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha         ("[HL] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
-            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
+            _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
@@ -230,7 +232,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
@@ -245,7 +247,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
@@ -257,8 +259,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
             _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_MinDist             ("[FG] FadeOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FadeOut Distance (Far)", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
         [WF_Vector3]
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
@@ -293,7 +295,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/10/16", Float) = 0
+            _CurrentVersion         ("2021/11/06", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -323,22 +325,24 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
             #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
-            #pragma shader_feature_local _HL_ENABLE_1
-            #pragma shader_feature_local _HL_ENABLE_2
-            #pragma shader_feature_local _HL_ENABLE_3
-            #pragma shader_feature_local _HL_ENABLE_4
-            #pragma shader_feature_local _HL_ENABLE_5
-            #pragma shader_feature_local _HL_ENABLE_6
-            #pragma shader_feature_local _HL_ENABLE_7
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _HL_ENABLE_2
+            #pragma shader_feature_local_fragment _HL_ENABLE_3
+            #pragma shader_feature_local_fragment _HL_ENABLE_4
+            #pragma shader_feature_local_fragment _HL_ENABLE_5
+            #pragma shader_feature_local_fragment _HL_ENABLE_6
+            #pragma shader_feature_local_fragment _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -367,22 +371,24 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_UNTOON_POWERCAP
 
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
             #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
-            #pragma shader_feature_local _HL_ENABLE_1
-            #pragma shader_feature_local _HL_ENABLE_2
-            #pragma shader_feature_local _HL_ENABLE_3
-            #pragma shader_feature_local _HL_ENABLE_4
-            #pragma shader_feature_local _HL_ENABLE_5
-            #pragma shader_feature_local _HL_ENABLE_6
-            #pragma shader_feature_local _HL_ENABLE_7
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _HL_ENABLE_2
+            #pragma shader_feature_local_fragment _HL_ENABLE_3
+            #pragma shader_feature_local_fragment _HL_ENABLE_4
+            #pragma shader_feature_local_fragment _HL_ENABLE_5
+            #pragma shader_feature_local_fragment _HL_ENABLE_6
+            #pragma shader_feature_local_fragment _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

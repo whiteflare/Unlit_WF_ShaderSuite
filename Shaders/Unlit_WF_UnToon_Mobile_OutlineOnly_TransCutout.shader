@@ -47,7 +47,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Mask Texture", 2D) = "white" {}
+            _TL_MaskTex             ("[LI] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
@@ -72,7 +72,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/10/16", Float) = 0
+            _CurrentVersion         ("2021/11/06", Float) = 0
     }
 
     SubShader {

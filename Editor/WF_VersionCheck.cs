@@ -38,32 +38,39 @@ namespace UnlitWF
         private const string localTestData = null; // @"{ ""latestVersion"": ""2021/01/20"", ""downloadPage"": ""/releases/tag/Unlit_WF_ShaderSuite_20210120"" }";
 
         [InitializeOnLoadMethod]
-        private static void Initialize() {
+        private static void Initialize()
+        {
             CoroutineHandler.StartStaticCoroutine(Execute());
         }
 
-        private static IEnumerator Execute() {
+        private static IEnumerator Execute()
+        {
             string rawText = localTestData;
 
-            if (string.IsNullOrWhiteSpace(rawText)) {
-                using (UnityWebRequest req = UnityWebRequest.Get(URI_VERSION_JSON)) {
+            if (string.IsNullOrWhiteSpace(rawText))
+            {
+                using (UnityWebRequest req = UnityWebRequest.Get(URI_VERSION_JSON))
+                {
                     yield return req.SendWebRequest();
 
-                    if (req.isHttpError || req.isNetworkError) {
+                    if (req.isHttpError || req.isNetworkError)
+                    {
                         Debug.LogWarningFormat("[WF][Version] An NetworkError was occured in version checking: {0}", req.error);
                         yield break;
                     }
                     rawText = req.downloadHandler.text;
                 }
             }
-            if (string.IsNullOrWhiteSpace(rawText)) {
+            if (string.IsNullOrWhiteSpace(rawText))
+            {
                 yield break;
             }
 
             var version = new WFVersionInfo();
             EditorJsonUtility.FromJsonOverwrite(rawText, version);
 
-            if (version.HasValue()) {
+            if (version.HasValue())
+            {
                 version.downloadPage = URI_HEAD + version.downloadPage;
                 WFCommonUtility.SetLatestVersion(version);
                 Debug.LogFormat("[WF][Version] VersionCheck Succeed, LatestVersion is {0}", version.latestVersion);
@@ -76,8 +83,10 @@ namespace UnlitWF
         private static CoroutineHandler m_Instance;
         private static CoroutineHandler instance
         {
-            get {
-                if (m_Instance == null) {
+            get
+            {
+                if (m_Instance == null)
+                {
                     GameObject o = new GameObject("CoroutineHandler");
                     o.hideFlags = HideFlags.HideAndDontSave;
                     m_Instance = o.AddComponent<CoroutineHandler>();
@@ -86,13 +95,16 @@ namespace UnlitWF
             }
         }
 
-        public void OnDisable() {
-            if (m_Instance) {
+        public void OnDisable()
+        {
+            if (m_Instance)
+            {
                 Destroy(m_Instance.gameObject);
             }
         }
 
-        static public Coroutine StartStaticCoroutine(IEnumerator coroutine) {
+        static public Coroutine StartStaticCoroutine(IEnumerator coroutine)
+        {
             return instance.StartCoroutine(coroutine);
         }
     }

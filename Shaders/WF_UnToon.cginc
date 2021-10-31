@@ -37,7 +37,7 @@
         float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
 #ifdef _NM_ENABLE
-            float4 tangent      : TANGENT;
+        float4 tangent          : TANGENT;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
@@ -57,8 +57,8 @@
         float4 ws_light_dir     : TEXCOORD3;
         float3 normal           : TEXCOORD4;    // world space
 #ifdef _NM_ENABLE
-            float3 tangent      : TEXCOORD5;    // world space
-            float3 bitangent    : TEXCOORD6;    // world space
+        float3 tangent          : TEXCOORD5;    // world space
+        float3 bitangent        : TEXCOORD6;    // world space
 #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -159,6 +159,8 @@
         affectRimLight(i, uv_main, calcMatcapVector(matcapVector, _TR_BlendNormal, 0), angle_light_camera, color);
         // Decal
         affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 0.5), color);
+        // Distance Fade
+        affectDistanceFade(i, facing, color);
         // Outline
         affectOutline(uv_main, color);
 
@@ -239,7 +241,7 @@
             if (TGL_OFF(_TL_LineType)) {
 #endif
 
-#if defined(_WF_LEGACY_FEATURE_SWITCH) | !defined(_TL_EDGE_ENABLE)
+#if defined(_WF_LEGACY_FEATURE_SWITCH) || !defined(_TL_EDGE_ENABLE)
             // NORMAL
             triStream.Append(p0);
             triStream.Append(p1);
@@ -250,7 +252,7 @@
             } else {
 #endif
 
-#ifdef _TL_EDGE_ENABLE
+#if defined(_WF_LEGACY_FEATURE_SWITCH) || defined(_TL_EDGE_ENABLE)
             // EDGE
             v2f n0 = v[0];
             v2f n1 = v[1];

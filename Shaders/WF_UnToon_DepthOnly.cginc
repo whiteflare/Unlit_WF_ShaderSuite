@@ -37,7 +37,7 @@
         float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
 #ifdef _NM_ENABLE
-            float4 tangent      : TANGENT;
+        float4 tangent          : TANGENT;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };

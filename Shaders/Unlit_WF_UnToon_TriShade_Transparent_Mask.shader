@@ -65,7 +65,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
             _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
-            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
+            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -114,7 +114,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
-            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
+            _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
@@ -143,7 +143,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
@@ -158,7 +158,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
@@ -174,6 +174,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [HDR]
             _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
             _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
+        [WF_Vector2]
+            _OL_UVScroll            ("[OL] UV Scroll", Vector) = (0, 0, 0, 0)
         [Toggle(_)]
             _OL_VertColToDecal      ("[OL] Multiply VertexColor To Decal Texture", Range(0, 1)) = 0
         [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
@@ -181,11 +183,24 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] Mask Texture", 2D) = "white" {}
+            _OL_MaskTex             ("[OL] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _OL_VertColToMask       ("[OL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
+
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         // Emission
         [WFHeaderToggle(Emission)]
@@ -210,25 +225,12 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
-        // Ambient Occlusion
-        [WFHeaderToggle(Ambient Occlusion)]
-            _AO_Enable              ("[AO] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1)]
-            _AO_UVType              ("[AO] UV Type", Float) = 0
-        [NoScaleOffset]
-            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
-            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
-            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
-            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
-            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
-
         // Fog
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
             _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_MinDist             ("[FG] FadeOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FadeOut Distance (Far)", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
         [WF_Vector3]
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
@@ -263,7 +265,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/10/16", Float) = 0
+            _CurrentVersion         ("2021/11/06", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -300,16 +302,19 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             #define _WF_ALPHA_BLEND
             #define _WF_FACE_BACK
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
             #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
-            #define _TS_TRISHADE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -344,18 +349,21 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
-            #define _TS_TRISHADE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

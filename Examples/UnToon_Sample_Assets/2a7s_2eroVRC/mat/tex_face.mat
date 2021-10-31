@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_face
   m_Shader: {fileID: 4800000, guid: dd3a683002b3a6f43bdb6c97bd0985c1, type: 3}
-  m_ShaderKeywords: _TS_ENABLE
+  m_ShaderKeywords: _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -257,6 +257,7 @@ Material:
     - _LM_Color: {r: 1, g: 1, b: 1, a: 1}
     - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1, a: 1}
+    - _OL_UVScroll: {r: 0, g: 0, b: 0, a: 0}
     - _TL_LineColor: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.7529412, g: 0.5921569, b: 0.46666667, a: 1}

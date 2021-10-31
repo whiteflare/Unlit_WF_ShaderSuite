@@ -49,7 +49,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Mask Texture", 2D) = "white" {}
+            _TL_MaskTex             ("[LI] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
@@ -58,8 +58,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
             _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_MinDist             ("[FG] FadeOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FadeOut Distance (Far)", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
         [WF_Vector3]
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
@@ -86,7 +86,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/10/16", Float) = 0
+            _CurrentVersion         ("2021/11/06", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout", Float) = 0
@@ -118,10 +118,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
             #define _WF_ALPHA_CUTOUT
 
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _ _TL_EDGE_ENABLE
             #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

@@ -19,7 +19,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
     Properties {
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/10/16", Float) = 0
+            _CurrentVersion         ("2021/11/06", Float) = 0
     }
 
     SubShader {
@@ -49,6 +49,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
 
             struct appdata_t {
                 float4 vertex : POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f {

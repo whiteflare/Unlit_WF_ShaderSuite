@@ -23,7 +23,7 @@ using UnityEditor;
 
 namespace UnlitWF
 {
-//    [CreateAssetMenu(menuName = "UnlitWF/EditorSettingAsset")]
+    // [CreateAssetMenu(menuName = "UnlitWF/EditorSettingAsset")]
     public class WFEditorSetting : ScriptableObject
     {
         public int settingPriority = 0;
@@ -35,9 +35,11 @@ namespace UnlitWF
         public ShaderVariantCollection alwaysIncludeShaders = null;
         public Material[] alwaysIncludeMaterials = { };
 
-        public static WFEditorSetting GetOneOfSettings() {
+        public static WFEditorSetting GetOneOfSettings()
+        {
             var settings = LoadAllSettingsFromAssetDatabase();
-            if (settings.Length == 0) {
+            if (settings.Length == 0)
+            {
                 // 見つからないなら一時オブジェクトを作成して返却
                 return ScriptableObject.CreateInstance<WFEditorSetting>();
             }
@@ -45,11 +47,13 @@ namespace UnlitWF
             return settings[0];
         }
 
-        public static WFEditorSetting[] GetAllSettings() {
+        public static WFEditorSetting[] GetAllSettings()
+        {
             return LoadAllSettingsFromAssetDatabase();
         }
 
-        private static WFEditorSetting[] LoadAllSettingsFromAssetDatabase() {
+        private static WFEditorSetting[] LoadAllSettingsFromAssetDatabase()
+        {
             // 検索
             var guids = AssetDatabase.FindAssets("t:" + typeof(WFEditorSetting).Name);
 

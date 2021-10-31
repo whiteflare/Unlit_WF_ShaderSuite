@@ -55,7 +55,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
             _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Mask Texture", 2D) = "white" {}
+            _TL_MaskTex             ("[LI] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
@@ -104,7 +104,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
             _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
-            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture", 2D) = "white" {}
+            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -152,8 +152,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha         ("[HL] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
-            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
+            _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
@@ -182,7 +184,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _LM_Spot                ("[LM] FadeOut Angle", Range(0, 16)) = 2.0
             _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
-            _LM_MaskTex             ("[LM] Mask Texture", 2D) = "white" {}
+            _LM_MaskTex             ("[LM] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _LM_InvMaskVal          ("[LM] Invert Mask Value", Range(0, 1)) = 0
 
@@ -210,7 +212,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
@@ -225,7 +227,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
@@ -241,6 +243,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
         [HDR]
             _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
             _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
+        [WF_Vector2]
+            _OL_UVScroll            ("[OL] UV Scroll", Vector) = (0, 0, 0, 0)
         [Toggle(_)]
             _OL_VertColToDecal      ("[OL] Multiply VertexColor To Decal Texture", Range(0, 1)) = 0
         [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
@@ -248,11 +252,34 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
             _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] Mask Texture", 2D) = "white" {}
+            _OL_MaskTex             ("[OL] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
             _OL_VertColToMask       ("[OL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
+
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DF_Enable              ("[DF] Enable", Float) = 0
+            _DF_Color               ("[DF] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DF_Power               ("[DF] Power", Range(0, 1)) = 1
+        [Toggle(_)]
+            _DF_BackShadow          ("[DF] BackFace Shadow", Float) = 1
+
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         // Emission
         [WFHeaderToggle(Emission)]
@@ -277,25 +304,12 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
-        // Ambient Occlusion
-        [WFHeaderToggle(Ambient Occlusion)]
-            _AO_Enable              ("[AO] Enable", Float) = 0
-        [Enum(UV1,0,UV2,1)]
-            _AO_UVType              ("[AO] UV Type", Float) = 0
-        [NoScaleOffset]
-            _OcclusionMap           ("[AO] Occlusion Map", 2D) = "white" {}
-            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
-            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
-            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
-            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
-
         // Fog
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
             _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FeedOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FeedOut Distance (Far)", Float) = 0.8
+            _FG_MinDist             ("[FG] FadeOut Distance (Near)", Float) = 0.5
+            _FG_MaxDist             ("[FG] FadeOut Distance (Far)", Float) = 0.8
             _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
         [WF_Vector3]
             _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
@@ -330,7 +344,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/10/16", Float) = 0
+            _CurrentVersion         ("2021/11/06", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -370,10 +384,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _FG_ENABLE
+            #pragma shader_feature_local _ _TL_EDGE_ENABLE
             #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _TL_EDGE_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -433,20 +447,25 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _LM_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _LM_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -480,20 +499,24 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _LM_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _LM_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -527,20 +550,24 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _LM_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _LM_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -577,20 +604,24 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _BK_ENABLE
-            #pragma shader_feature_local _CH_ENABLE
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _FG_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _LM_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _LM_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

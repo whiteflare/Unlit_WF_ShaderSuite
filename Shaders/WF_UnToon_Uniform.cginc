@@ -185,6 +185,7 @@
     float           _HL_Power;
     float           _HL_BlendNormal;
     float           _HL_Parallax;
+    float           _HL_ChangeAlpha;
     float           _HL_InvMaskVal;
 
 #ifndef _WF_MOBILE
@@ -243,6 +244,7 @@
     uint            _OL_UVType;
     float4          _OL_Color;
     float4          _OL_OverlayTex_ST;
+    float2          _OL_UVScroll;
     uint            _OL_BlendType;
     float           _OL_Power;
     float           _OL_CustomParam1;
@@ -271,6 +273,17 @@
     float           _AO_Contrast;
     float           _AO_Brightness;
     float4          _AO_TintColor;
+
+#ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+    float           _DF_Enable;
+#endif
+    float4          _DF_Color;
+    float           _DF_MinDist;
+    float           _DF_MaxDist;
+    float           _DF_Power;
+    float           _DF_BackShadow;
+#endif
 
 #ifndef _WF_MOBILE
 #ifdef _WF_LEGACY_FEATURE_SWITCH

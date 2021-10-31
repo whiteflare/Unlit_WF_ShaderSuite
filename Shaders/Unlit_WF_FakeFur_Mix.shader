@@ -73,7 +73,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
-            _HL_MaskTex             ("[HL] Mask Texture", 2D) = "white" {}
+            _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
@@ -102,7 +102,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
 
@@ -117,13 +117,23 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
             _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] Mask Texture", 2D) = "white" {}
+            _TR_MaskTex             ("[RM] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
             _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DF_Enable              ("[DF] Enable", Float) = 0
+            _DF_Color               ("[DF] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DF_Power               ("[DF] Power", Range(0, 1)) = 1
+        [Toggle(_)]
+            _DF_BackShadow          ("[DF] BackFace Shadow", Float) = 1
 
         // Lit
         [WFHeader(Lit)]
@@ -147,7 +157,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/10/16", Float) = 0
+            _CurrentVersion         ("2021/11/06", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
@@ -173,10 +183,12 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
 
             #pragma target 4.5
 
-            #pragma shader_feature_local _CL_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -199,8 +211,10 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
-            #pragma shader_feature_local _CL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
@@ -225,8 +239,10 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
-            #pragma shader_feature_local _CL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
 
             float _FR_Height2;
             #define _FR_HEIGHT_PARAM _FR_Height2

@@ -378,9 +378,7 @@
 
     #ifdef _ES_ENABLE
 
-    #ifdef _ES_SIMPLE_ENABLE
-        #define calcEmissiveWaving(i, uv_main)   (1)
-    #else
+    #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         float calcEmissiveWaving(v2f i, float2 uv_main) {
             if (_ES_Shape == 3) {
                 // 定数
@@ -404,6 +402,8 @@
                 sin( time ) * _ES_Sharpness;
             return saturate(waving + _ES_LevelOffset);
         }
+    #else
+        #define calcEmissiveWaving(i, uv_main)   (1)
     #endif
 
         void affectEmissiveScroll(v2f i, float2 uv_main, inout float4 color) {
@@ -424,7 +424,7 @@
                     lerp(color.rgb, es_color.rgb, waving);
 
                 // Alpha側の合成
-                #if defined(_WF_ALPHA_BLEND) && !defined(_ES_SIMPLE_ENABLE)
+                #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
                     #ifdef _ES_FORCE_ALPHASCROLL
                         color.a = max(color.a, waving);
                     #else
@@ -456,13 +456,23 @@
                 float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
 
 #ifndef _WF_MOBILE
+
+#if defined(_NM_BL2ND_ENABLE) || defined(_NM_SW2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 // 2nd NormalMap
                 float dtlPower = _NM_2ndType == 0 ? 0 : WF_TEX2D_NORMAL_DTL_MASK(uv_main);
                 float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(i.uv, _DetailNormalMap) );
+#if defined(_WF_LEGACY_FEATURE_SWITCH)
                 if (_NM_2ndType == 1) { // BLEND
+#endif
+#if defined(_NM_BL2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                     dtlNormalTangent = BlendNormals(normalTangent, dtlNormalTangent);
+#endif
+#if defined(_WF_LEGACY_FEATURE_SWITCH)
                 }
+#endif
                 normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
+#endif
+
 #endif
 
                 // 法線計算
@@ -511,15 +521,26 @@
         float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
             float3 color = ZERO_VEC3;
+
             // ONLYでなければ PROBE を加算
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             if (_MT_CubemapType != 2) {
+#endif
+#ifndef _MT_ONLY2ND_ENABLE
                 color += pickReflectionProbe(ws_vertex, ws_normal, metal_lod).rgb;
+#endif
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
+#endif
+#if defined(_MT_ADD2ND_ENABLE) || defined(_MT_ONLY2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 float3 cubemap = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
                 color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
+#endif
+#ifdef _WF_LEGACY_FEATURE_SWITCH
             }
+#endif
             return color;
         }
 
@@ -587,6 +608,48 @@
     // Light Matcap
     ////////////////////////////
 
+    float4x4 calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+        // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
+
+        float4x4 matcapVector = 0;
+
+        // ワールド法線をビュー法線に変換
+        float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_normal_center         = matcapViewCorrect(vs_normal, ws_view_dir);
+        float3 vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir);
+        // 真上を揃える
+        float2x2 rotate = matcapRotateCorrectMatrix();
+        vs_normal_center.xy         = mul( vs_normal_center.xy, rotate );
+        vs_normal_side.xy           = mul( vs_normal_side.xy, rotate );
+        // 格納
+        matcapVector[0].xyz = normalize(vs_normal_center);
+        matcapVector[2].xyz = normalize(vs_normal_side);
+
+    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        // ワールド法線をビュー法線に変換
+        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_view_dir);
+        float3 vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir);
+        // 真上を揃える
+        vs_bump_normal_center.xy    = mul( vs_bump_normal_center.xy, rotate );
+        vs_bump_normal_side.xy      = mul( vs_bump_normal_side.xy, rotate );
+        // 格納
+        matcapVector[1].xyz = normalize(vs_bump_normal_center);
+        matcapVector[3].xyz = normalize(vs_bump_normal_side);
+    #endif
+        return matcapVector;
+    }
+
+    float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
+    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        return lerp( lerp(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerp(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax );
+    #else
+        return lerp( matcapVector[0].xyz, matcapVector[2].xyz, parallax );
+    #endif
+    }
+
     #ifdef _HL_ENABLE
 
         void affectMatcapColor(float2 matcapVector, float2 uv_main, inout float4 color) {
@@ -595,7 +658,7 @@
 #endif
                 // matcap サンプリング
                 float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
-                float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv)).rgb;
+                float4 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv));
 
                 // マスク参照
                 float3 matcap_mask = WF_TEX2D_MATCAP_MASK(uv_main);
@@ -607,20 +670,28 @@
                 // 色合成
                 if (_HL_CapType == 1) {
                     // 加算合成
-                    matcap_color *= LinearToGammaSpace(matcap_mask_color);
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);
+                    matcap_color.rgb *= LinearToGammaSpace(matcap_mask_color);
+                    color.rgb = blendColor_Add(color.rgb, matcap_color.rgb, power);
                 } else if(_HL_CapType == 2) {
                     // 乗算合成
-                    matcap_color *= LinearToGammaSpace(matcap_mask_color);
-                    color.rgb = blendColor_Mul(color.rgb, matcap_color, power);
+                    matcap_color.rgb *= LinearToGammaSpace(matcap_mask_color);
+                    color.rgb = blendColor_Mul(color.rgb, matcap_color.rgb, power);
                 } else {
                     // 中間色合成
-                    matcap_color -= _HL_MedianColor;
-                    float3 lighten_color = max(ZERO_VEC3, matcap_color);
-                    float3 darken_color  = min(ZERO_VEC3, matcap_color);
-                    matcap_color = lerp(darken_color, lighten_color, matcap_mask_color);
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);
+                    matcap_color.rgb -= _HL_MedianColor;
+                    float3 lighten_color = max(ZERO_VEC3, matcap_color.rgb);
+                    float3 darken_color  = min(ZERO_VEC3, matcap_color.rgb);
+                    matcap_color.rgb = lerp(darken_color, lighten_color, matcap_mask_color);
+                    color.rgb = blendColor_Add(color.rgb, matcap_color.rgb, power);
                 }
+
+                // アルファ側の合成
+            #if defined(_WF_ALPHA_FRESNEL)
+                if (TGL_ON(_HL_ChangeAlpha)) {
+                    color.a = min(color.a, lerp(1, matcap_color.a, power));
+                }
+            #endif
+
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             }
 #endif
@@ -771,21 +842,30 @@
                 float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
                 float3 shadow_color = ONE_VEC3;
 
-                if (_TS_Steps == 1) {
-                    // 1影まで
-                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
-                }
-                else if (_TS_Steps == 3) {
-                    // 3影まで
-                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+#ifndef _WF_LEGACY_FEATURE_SWITCH
+
+                // 1影
+                calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+
+#if !defined(_TS_STEP1_ENABLE) || defined(_TS_STEP3_ENABLE)
+                // 2影
+                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+#endif
+#if defined(_TS_STEP3_ENABLE)
+                // 3影
+                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
+#endif
+
+#else
+                // 1影まで
+                calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+                if (_TS_Steps == 2 || _TS_Steps == 3) {
                     calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                }
+                if (_TS_Steps == 3) {
                     calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
                 }
-                else {
-                    // 2影まで
-                    calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
-                    calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
-                }
+#endif
 
                 // 乗算
                 color.rgb *= shadow_color;
@@ -895,6 +975,7 @@
                     : i.uv                                                                      // UV1
                     ;
                 uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
+                uv_overlay += frac(_OL_UVScroll * _Time.xx);
                 float4 ov_color = PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color;
                 float ov_power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
 
@@ -1048,6 +1129,44 @@
             return sampleSHLightColor();
         #endif
     }
+
+    ////////////////////////////
+    // Distance Fade
+    ////////////////////////////
+
+    #ifdef _DF_ENABLE
+
+        float calcDistanceFadeDistanceSq(float3 ws_vertex) {
+            float3 cam_vec1 = ws_vertex - worldSpaceViewPointPos();
+            float lenSq_vec1 = dot(cam_vec1, cam_vec1);
+
+            #ifndef USING_STEREO_MATRICES
+                return lenSq_vec1;
+            #else
+                float3 cam_vec2 = ws_vertex - unity_StereoWorldSpaceCameraPos[0];
+                float3 cam_vec3 = ws_vertex - unity_StereoWorldSpaceCameraPos[1];
+                float lenSq_vec2 = dot(cam_vec2, cam_vec2);
+                float lenSq_vec3 = dot(cam_vec3, cam_vec3);
+                return min(lenSq_vec1, min(lenSq_vec2, lenSq_vec3));
+            #endif
+        }
+
+        void affectDistanceFade(v2f i, uint facing, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            if (TGL_ON(_DF_Enable)) {
+#endif
+                float dist = sqrt(calcDistanceFadeDistanceSq(i.ws_vertex.xyz));
+                if (!facing && TGL_ON(_DF_BackShadow)) {
+                    dist = 0;
+                }
+                color.rgb = lerp(color.rgb, _DF_Color.rgb, _DF_Power * (1 - smoothstep(_DF_MinDist, max(_DF_MinDist + NZF, _DF_MaxDist), dist)));
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            }
+#endif
+        }
+    #else
+        #define affectDistanceFade(i, facing, color)
+    #endif
 
     ////////////////////////////
     // Fog

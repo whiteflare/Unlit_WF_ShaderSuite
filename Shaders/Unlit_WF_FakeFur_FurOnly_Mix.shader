@@ -85,9 +85,19 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture", 2D) = "black" {}
+            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
+
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DF_Enable              ("[DF] Enable", Float) = 0
+            _DF_Color               ("[DF] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DF_Power               ("[DF] Power", Range(0, 1)) = 1
+        [Toggle(_)]
+            _DF_BackShadow          ("[DF] BackFace Shadow", Float) = 1
 
         // Lit
         [WFHeader(Lit)]
@@ -109,7 +119,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/10/16", Float) = 0
+            _CurrentVersion         ("2021/11/06", Float) = 0
     }
 
     SubShader {
@@ -133,8 +143,10 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
-            #pragma shader_feature_local _CL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
@@ -159,8 +171,10 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
-            #pragma shader_feature_local _CL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
 
             float _FR_Height2;
             #define _FR_HEIGHT_PARAM _FR_Height2
