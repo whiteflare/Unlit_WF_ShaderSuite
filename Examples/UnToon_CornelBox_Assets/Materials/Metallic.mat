@@ -139,6 +139,11 @@ Material:
     - _CL_Monochrome: 0
     - _CullMode: 2
     - _CurrentVersion: 0
+    - _DF_BackShadow: 1
+    - _DF_Enable: 0
+    - _DF_MaxDist: 0.08
+    - _DF_MinDist: 0.02
+    - _DF_Power: 1
     - _DetailNormalMapScale: 0.4
     - _ES_BakeIntensity: 1
     - _ES_BlendType: 0
@@ -250,6 +255,7 @@ Material:
     - _CH_ColorG: {r: 1, g: 1, b: 1, a: 1}
     - _CH_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DF_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _FG_BaseOffset: {r: 0, g: 0, b: 0, a: 0}

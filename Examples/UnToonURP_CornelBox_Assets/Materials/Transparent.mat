@@ -160,6 +160,7 @@ Material:
     - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
     - _HL_CapType: 0
+    - _HL_ChangeAlpha: 0
     - _HL_Enable: 0
     - _HL_InvMaskVal: 0
     - _HL_Parallax: 0.75
