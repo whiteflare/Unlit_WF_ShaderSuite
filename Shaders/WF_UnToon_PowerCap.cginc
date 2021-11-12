@@ -107,6 +107,12 @@
         float4 color;
         float2 uv_main;
 
+        i.normal = normalize(i.normal);
+        #ifdef _NM_ENABLE
+            i.tangent = normalize(i.tangent);
+            i.bitangent = normalize(i.bitangent);
+        #endif
+
         // メイン
         affectBaseColor(i.uv, facing, uv_main, color);
         // 頂点カラー

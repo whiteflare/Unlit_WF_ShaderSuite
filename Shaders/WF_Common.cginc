@@ -93,6 +93,10 @@
         return in_vec * rsqrt(lenSq);
     }
 
+    float3 lerpNormals(float3 n1, float3 n2, float v) {
+        return normalize(lerp(n1, n2, v));
+    }
+
     ////////////////////////////
     // Normal
     ////////////////////////////

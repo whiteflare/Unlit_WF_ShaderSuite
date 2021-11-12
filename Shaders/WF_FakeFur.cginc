@@ -190,7 +190,7 @@
         v2f i = (v2f) 0;
         i.uv            = gi.uv;
         i.ws_vertex     = gi.ws_vertex;
-        i.normal        = gi.ws_normal;
+        i.normal        = normalize(gi.ws_normal);
         i.light_color   = gi.light_color;
 #ifdef _TS_ENABLE
         i.shadow_power  = gi.shadow_power;
