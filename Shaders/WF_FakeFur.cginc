@@ -36,7 +36,7 @@
         float4 ws_light_dir     : TEXCOORD3;
         float3 ws_fur_vector    : TEXCOORD4;
         float3 light_color      : COLOR1;
-#ifdef _TS_ENABLE
+#ifdef _V2F_HAS_SHADOWPOWER
         float shadow_power      : COLOR2;
 #endif
         UNITY_VERTEX_OUTPUT_STEREO
@@ -49,7 +49,7 @@
         float3 ws_normal        : TEXCOORD2;
         float  height           : COLOR0;
         float3 light_color      : COLOR1;
-#ifdef _TS_ENABLE
+#ifdef _V2F_HAS_SHADOWPOWER
         float shadow_power      : COLOR2;
 #endif
         float4 ws_light_dir     : TEXCOORD3;
@@ -116,7 +116,7 @@
         o.ws_vertex     = p.ws_vertex;
         o.ws_normal     = p.ws_normal;
         o.light_color   = p.light_color;
-#ifdef _TS_ENABLE
+#ifdef _V2F_HAS_SHADOWPOWER
         o.shadow_power  = p.shadow_power;
 #endif
         o.ws_light_dir  = p.ws_light_dir;
@@ -136,7 +136,7 @@
         o.ws_vertex         = lerp(x.ws_vertex,     y.ws_vertex,        div);
         o.ws_normal         = lerp(x.ws_normal,     y.ws_normal,        div);
         o.light_color       = lerp(x.light_color,   y.light_color,      div);
-#ifdef _TS_ENABLE
+#ifdef _V2F_HAS_SHADOWPOWER
         o.shadow_power      = lerp(x.shadow_power,  y.shadow_power,     div);
 #endif
         o.ws_light_dir      = lerp(x.ws_light_dir,  y.ws_light_dir,     div);
@@ -192,7 +192,7 @@
         i.ws_vertex     = gi.ws_vertex;
         i.normal        = normalize(gi.ws_normal);
         i.light_color   = gi.light_color;
-#ifdef _TS_ENABLE
+#ifdef _V2F_HAS_SHADOWPOWER
         i.shadow_power  = gi.shadow_power;
 #endif
         i.ws_light_dir  = gi.ws_light_dir;

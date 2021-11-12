@@ -75,10 +75,10 @@
         float2 uv_main;
 
         i.normal = normalize(i.normal);
-        #ifdef _NM_ENABLE
-            i.tangent = normalize(i.tangent);
-            i.bitangent = normalize(i.bitangent);
-        #endif
+#ifdef _V2F_HAS_TANGENT
+        i.tangent = normalize(i.tangent);
+        i.bitangent = normalize(i.bitangent);
+#endif
 
         // メイン
         affectMainTex(i.uv, uv_main, color);
@@ -130,10 +130,10 @@
         float2 uv_main;
 
         i.normal = normalize(i.normal);
-        #ifdef _NM_ENABLE
-            i.tangent = normalize(i.tangent);
-            i.bitangent = normalize(i.bitangent);
-        #endif
+#ifdef _V2F_HAS_TANGENT
+        i.tangent = normalize(i.tangent);
+        i.bitangent = normalize(i.bitangent);
+#endif
 
         // メイン
         affectMainTex(i.uv, uv_main, color);

@@ -68,11 +68,11 @@
 
         #define MUL_BARY(array, member)   (bary.x * array[0].member + bary.y * array[1].member + bary.z * array[2].member)
 
-#if defined(_VC_ENABLE) || defined(_OL_ENABLE)
+#ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color  = MUL_BARY(i, vertex_color);
 #endif
         o.light_color   = MUL_BARY(i, light_color);
-#ifdef _TS_ENABLE
+#ifdef _V2F_HAS_SHADOWPOWER
         o.shadow_power  = MUL_BARY(i, shadow_power);
 #endif
         o.uv            = MUL_BARY(i, uv);
@@ -80,7 +80,7 @@
         o.ws_vertex     = MUL_BARY(i, ws_vertex);
         o.ws_light_dir  = MUL_BARY(i, ws_light_dir);
         o.normal        = normalize( MUL_BARY(i, normal) );
-#ifdef _NM_ENABLE
+#ifdef _V2F_HAS_TANGENT
         o.tangent   = normalize( MUL_BARY(i, tangent) );
         o.bitangent = normalize( MUL_BARY(i, bitangent) );
 #endif
