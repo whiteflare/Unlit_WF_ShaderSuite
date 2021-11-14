@@ -33,7 +33,7 @@
         float2 uv0              : TEXCOORD0;
         float2 uv1              : TEXCOORD1;
         float2 uv2              : TEXCOORD2;
-#ifdef _VC_ENABLE
+#ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR0;
 #endif
     };
@@ -41,7 +41,7 @@
     struct v2f_meta {
         float4 pos              : SV_POSITION;
         float2 uv               : TEXCOORD0;
-#ifdef _VC_ENABLE
+#ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR0;
 #endif
 #ifdef EDITOR_VISUALIZATION
@@ -66,7 +66,7 @@
 
         o.pos   = UnityMetaVertexPosition(v.vertex, v.uv1.xy, v.uv2.xy, unity_LightmapST, unity_DynamicLightmapST);
         o.uv    = TRANSFORM_TEX(v.uv0, _MainTex);
-#ifdef _VC_ENABLE
+#ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = v.vertex_color;
 #endif
 

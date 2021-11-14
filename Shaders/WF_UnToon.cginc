@@ -30,13 +30,13 @@
 
     struct appdata {
         float4 vertex           : POSITION;
-#if defined(_VC_ENABLE) || defined(_OL_ENABLE)
+#ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
         float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
-#ifdef _NM_ENABLE
+#ifdef _V2F_HAS_TANGENT
         float4 tangent          : TANGENT;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -44,11 +44,11 @@
 
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
-#if defined(_VC_ENABLE) || defined(_OL_ENABLE)
+#ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR0;
 #endif
         float3 light_color      : COLOR1;
-#ifdef _TS_ENABLE
+#ifdef _V2F_HAS_SHADOWPOWER
         float shadow_power      : COLOR2;
 #endif
         float2 uv               : TEXCOORD0;
@@ -56,7 +56,7 @@
         float3 ws_vertex        : TEXCOORD2;
         float4 ws_light_dir     : TEXCOORD3;
         float3 normal           : TEXCOORD4;    // world space
-#ifdef _NM_ENABLE
+#ifdef _V2F_HAS_TANGENT
         float3 tangent          : TEXCOORD5;    // world space
         float3 bitangent        : TEXCOORD6;    // world space
 #endif
@@ -88,18 +88,18 @@
 #else
         o.vs_vertex = shiftDepthVertex(o.ws_vertex, _WF_MAIN_Z_SHIFT);      // Zシフトした値を使う
 #endif
-#if defined(_VC_ENABLE) || defined(_OL_ENABLE)
+#ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = v.vertex_color;
 #endif
         o.uv = v.uv;
         o.uv_lmap = v.uv_lmap;
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
-        #ifdef _NM_ENABLE
-            localNormalToWorldTangentSpace(v.normal, v.tangent, o.normal, o.tangent, o.bitangent, _NM_FlipMirror & 1, _NM_FlipMirror & 2);
-        #else
-            localNormalToWorldTangentSpace(v.normal, o.normal);
-        #endif
+#ifdef _V2F_HAS_TANGENT
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.normal, o.tangent, o.bitangent, _NM_FlipMirror & 1, _NM_FlipMirror & 2);
+#else
+        localNormalToWorldTangentSpace(v.normal, o.normal);
+#endif
 
         // 環境光取得
         float3 ambientColor = calcAmbientColorVertex(v.uv_lmap);
@@ -119,6 +119,12 @@
 
         float4 color;
         float2 uv_main;
+
+        i.normal = normalize(i.normal);
+#ifdef _V2F_HAS_TANGENT
+        i.tangent = normalize(i.tangent);
+        i.bitangent = normalize(i.bitangent);
+#endif
 
         // メイン
         affectBaseColor(i.uv, facing, uv_main, color);

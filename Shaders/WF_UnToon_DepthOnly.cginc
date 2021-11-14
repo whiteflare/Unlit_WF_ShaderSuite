@@ -30,22 +30,18 @@
 
     struct appdata {
         float4 vertex           : POSITION;
-#ifdef _VC_ENABLE
+#ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
-#ifdef _NM_ENABLE
-        float4 tangent          : TANGENT;
-#endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_depth {
         float4 pos              : SV_POSITION;
         float2 uv               : TEXCOORD0;
-#ifdef _VC_ENABLE
+#ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR0;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -71,7 +67,7 @@
 
         o.pos   = UnityObjectToClipPos(i.vertex.xyz);
         o.uv    = TRANSFORM_TEX(i.uv, _MainTex);
-#ifdef _VC_ENABLE
+#ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = i.vertex_color;
 #endif
 

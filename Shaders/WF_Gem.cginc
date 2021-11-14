@@ -74,6 +74,12 @@
         float4 color = TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
         float2 uv_main;
 
+        i.normal = normalize(i.normal);
+#ifdef _V2F_HAS_TANGENT
+        i.tangent = normalize(i.tangent);
+        i.bitangent = normalize(i.bitangent);
+#endif
+
         // メイン
         affectMainTex(i.uv, uv_main, color);
         // 頂点カラー
@@ -98,9 +104,9 @@
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // リフレクション
-        affectGemReflection(i, lerp(ws_normal.zyx, ws_bump_normal.zyx, _GR_BlendNormal), color);
+        affectGemReflection(i, lerpNormals(ws_normal.zyx, ws_bump_normal.zyx, _GR_BlendNormal), color);
         // フレーク
-        affectGemFlake(i, ws_camera_dir, lerp(ws_normal, ws_bump_normal, _GF_BlendNormal), 1 / NON_ZERO_FLOAT(_GF_FlakeSizeBack), color);
+        affectGemFlake(i, ws_camera_dir, lerpNormals(ws_normal, ws_bump_normal, _GF_BlendNormal), 1 / NON_ZERO_FLOAT(_GF_FlakeSizeBack), color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
@@ -122,6 +128,12 @@
 
         float4 color = _Color;
         float2 uv_main;
+
+        i.normal = normalize(i.normal);
+#ifdef _V2F_HAS_TANGENT
+        i.tangent = normalize(i.tangent);
+        i.bitangent = normalize(i.bitangent);
+#endif
 
         // メイン
         affectMainTex(i.uv, uv_main, color);
@@ -148,9 +160,9 @@
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // リフレクション
-        affectGemReflection(i, lerp(ws_normal, ws_bump_normal, _GR_BlendNormal), color);
+        affectGemReflection(i, lerpNormals(ws_normal, ws_bump_normal, _GR_BlendNormal), color);
         // フレーク
-        affectGemFlake(i, ws_camera_dir, lerp(ws_normal, ws_bump_normal, _GF_BlendNormal), 1 / NON_ZERO_FLOAT(_GF_FlakeSizeFront), color);
+        affectGemFlake(i, ws_camera_dir, lerpNormals(ws_normal, ws_bump_normal, _GF_BlendNormal), 1 / NON_ZERO_FLOAT(_GF_FlakeSizeFront), color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
