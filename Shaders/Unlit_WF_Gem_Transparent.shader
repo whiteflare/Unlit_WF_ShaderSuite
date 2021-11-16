@@ -141,6 +141,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+
             #include "WF_Gem.cginc"
 
             ENDCG
@@ -170,6 +172,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             #include "WF_Gem.cginc"
 
