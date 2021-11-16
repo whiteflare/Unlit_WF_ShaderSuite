@@ -123,7 +123,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
                 // メイン
                 float4 color = float4(0, 0, 0, 0);
 
-                float3 ws_normal = i.normal;
+                float3 ws_normal = normalize(i.normal);
 
                 // ラメ
                 affectLame(i, uv_main, ws_normal, color);
