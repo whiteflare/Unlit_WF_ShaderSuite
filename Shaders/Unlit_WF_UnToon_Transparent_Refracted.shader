@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
+Shader "UnlitWF/WF_UnToon_Transparent_Refracted" {
 
     Properties {
         // 基本
@@ -24,6 +24,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _CullMode               ("Cull Mode", int) = 2
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -33,40 +35,16 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.9
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
-        // Tessellation
-        [WFHeader(Tessellation)]
-        [IntRange]
-            _TE_Factor              ("[TE] Tess Factor", Range(1, 16)) = 4
-            _TE_SmoothPower         ("[TE] Smoothing", Range(0, 2)) = 1.0
-        [NoScaleOffset]
-            _TE_SmoothPowerTex      ("[TE] Smoothing Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
-            _TE_InvMaskVal          ("[TE] Invert Mask Value", Float) = 0
-            _TE_MinDist             ("[TE] FadeOut Distance (Near)", Range(0, 4)) = 0.5
-            _TE_MaxDist             ("[TE] FadeOut Distance (Far)", Range(0, 4)) = 2
-
-        // アウトライン
-        [WFHeaderToggle(Outline)]
-            _TL_Enable              ("[LI] Enable", Float) = 0
-            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
-        [NoScaleOffset]
-            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
-        [Toggle(_)]
-            _TL_UseCutout           ("[LI] Use Cutout", Float) = 0
-            _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
-            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
-        [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
-            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+        // リフラクション
+        [WFHeaderAlwaysOn(Refraction)]
+            _RF_Enable              ("[RF] Enable", Float) = 1
+            _RF_RefractiveIndex     ("[RF] Refractive Index", Range(1.0, 3.0)) = 1.33
+            _RF_Distance            ("[RF] Distance", Range(0, 10)) = 10.0
+            _RF_Tint                ("[RF] Tint Color", Color) = (0.5, 0.5, 0.5)
+            _RF_BlendNormal         ("[RF] Blend Normal", Range(0, 1)) = 0.1
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
@@ -312,18 +290,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
-        // Fog
-        [WFHeaderToggle(Fog)]
-            _FG_Enable              ("[FG] Enable", Float) = 0
-            _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FadeOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FadeOut Distance (Far)", Float) = 0.8
-            _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
-        [WF_Vector3]
-            _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
-        [WF_Vector3]
-            _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
-
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -355,242 +321,108 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             _CurrentVersion         ("2021/11/06", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass", Float) = 0
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
     }
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
+            "RenderType" = "Opaque"
             "Queue" = "Transparent"
-            "DisableBatching" = "True"
         }
 
-        GrabPass { "_UnToonOutlineCancel" }
+        GrabPass { "_UnToonRefractionBack" }
 
         Pass {
-            Name "OUTLINE"
+            Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull FRONT
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Cull [_CullMode]
+            ZWrite ON
 
             CGPROGRAM
 
             #pragma vertex vert
             #pragma fragment frag
-            #pragma hull hull
-            #pragma domain domain_outline
-
-            #pragma target 5.0
-
-            #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
-            #define _WF_UNTOON_TESS
-
-            #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _FG_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
-
-            #include "WF_UnToon_Tessellation.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "OUTLINE_CANCELLER"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull OFF
-            ZWrite OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_outline_canceller
-            #pragma fragment frag_outline_canceller
 
             #pragma target 4.5
 
+            #define _WF_ALPHA_FRESNEL
+
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _OL_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _AO_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _LM_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _RF_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
+
+            #define _RF_GRAB_TEXTURE _UnToonRefractionBack
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
-
-            #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineCancel
-
-            #include "WF_UnToon_LineCanceller.cginc"
+            #include "WF_UnToon.cginc"
 
             ENDCG
         }
 
         Pass {
-            Name "MAIN_OPAQUE"
-            Tags { "LightMode" = "ForwardBase" }
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
 
             Cull OFF
-            ZWrite ON
-            Blend Off
 
             CGPROGRAM
 
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma hull hull
-            #pragma domain domain
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
 
-            #pragma target 5.0
+            #define _WF_ALPHA_BLEND
 
-            #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
-            #define _WF_UNTOON_TESS
-
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _AO_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
-            #pragma shader_feature_local_fragment _CH_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _DF_ENABLE
-            #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _FG_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _LM_ENABLE
-            #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
+            #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
-
-            #include "WF_UnToon_Tessellation.cginc"
+            #include "WF_UnToon_ShadowCaster.cginc"
 
             ENDCG
         }
 
         Pass {
-            Name "MAIN_BACK"
-            Tags { "LightMode" = "ForwardBase" }
+            Name "META"
+            Tags { "LightMode" = "Meta" }
 
-            Cull FRONT
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Cull OFF
 
             CGPROGRAM
 
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma hull hull
-            #pragma domain domain
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta
 
-            #pragma target 5.0
+            #define _WF_ALPHA_BLEND
 
-            #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
-            #define _WF_FACE_BACK
-            #define _WF_UNTOON_TESS
-
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _AO_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
-            #pragma shader_feature_local_fragment _CH_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _DF_ENABLE
-            #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _FG_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _LM_ENABLE
-            #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
 
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
+            #pragma shader_feature EDITOR_VISUALIZATION
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
-
-            #include "WF_UnToon_Tessellation.cginc"
+            #include "WF_UnToon_Meta.cginc"
 
             ENDCG
         }
-
-        Pass {
-            Name "MAIN_FRONT"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull BACK
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma hull hull
-            #pragma domain domain
-
-            #pragma target 5.0
-
-            #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
-            #define _WF_UNTOON_TESS
-
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _AO_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
-            #pragma shader_feature_local_fragment _CH_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _DF_ENABLE
-            #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _FG_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _LM_ENABLE
-            #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
-
-            #include "WF_UnToon_Tessellation.cginc"
-
-            ENDCG
-        }
-
-        UsePass "UnlitWF/WF_UnToon_Transparent3Pass/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
-    FallBack "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

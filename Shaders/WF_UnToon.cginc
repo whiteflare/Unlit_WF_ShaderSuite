@@ -184,6 +184,8 @@
         affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
+        // リフラクション
+        affectRefraction(i, facing, ws_normal, ws_bump_normal, color);
 
         // fog
         UNITY_APPLY_FOG(i.fogCoord, color);

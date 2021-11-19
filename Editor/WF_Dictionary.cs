@@ -37,6 +37,7 @@ namespace UnlitWF
             new WFShaderName("UnToon", "Basic", "Transparent_Mask",             "UnlitWF/WF_UnToon_Transparent_Mask"),
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut",          "UnlitWF/WF_UnToon_Transparent_MaskOut"),
             new WFShaderName("UnToon", "Basic", "Transparent_MaskOut_Blend",    "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
+            new WFShaderName("UnToon", "Basic", "Transparent_Refracted",        "UnlitWF/WF_UnToon_Transparent_Refracted"),
 
             new WFShaderName("UnToon", "Outline", "Opaque",                     "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
             new WFShaderName("UnToon", "Outline", "TransCutout",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
@@ -148,6 +149,7 @@ namespace UnlitWF
                 new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
                 new WFShaderFunction("DF", "DF", "Distance Fade"),
                 new WFShaderFunction("FG", "FG", "ToonFog"),
+                new WFShaderFunction("RF", "RF", "Refraction"),
                 new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
                 new WFShaderFunction("GI", "GI", "Light Bake Effects"),
             };
@@ -247,6 +249,7 @@ namespace UnlitWF
             new WFI18NTranslation("Shape", "形状"),
             new WFI18NTranslation("Scale", "スケール"),
             new WFI18NTranslation("Direction", "方向"),
+            new WFI18NTranslation("Distance", "距離"),
             new WFI18NTranslation("Roughen", "粗くする"),
             new WFI18NTranslation("Finer", "細かくする"),
             new WFI18NTranslation("Tint Color", "色調整"),
@@ -412,6 +415,8 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
             new WFI18NTranslation("FR", "Tint Color (Base)", "色調整 (根元)"),
             new WFI18NTranslation("FR", "Tint Color (Tip)", "色調整 (先端)"),
+            // Refraction
+            new WFI18NTranslation("RF", "Refractive Index", "屈折率"),
 
             // メニュー
             new WFI18NTranslation("Copy material", "コピー"),
@@ -495,6 +500,7 @@ namespace UnlitWF
             new WFI18NTranslation("Shape", "모양"),
             new WFI18NTranslation("Scale", "스케일"),
             new WFI18NTranslation("Direction", "방향"),
+            new WFI18NTranslation("Distance", "거리"),
             new WFI18NTranslation("Roughen", "거칠기"),
             new WFI18NTranslation("Finer", "잘게 나누기"),
             new WFI18NTranslation("Tint Color", "색상 조정"),
@@ -660,6 +666,8 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Fur ShadowPower", "Fur 강도"),
             new WFI18NTranslation("FR", "Tint Color (Base)", "색조절 (뿌리 부분)"),
             new WFI18NTranslation("FR", "Tint Color (Tip)", "색조절 (끝 부분)"),
+            // Refraction
+            new WFI18NTranslation("RF", "Refractive Index", "한국어"),
 
             // 메뉴
             new WFI18NTranslation("Copy material", "복사"),

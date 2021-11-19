@@ -374,6 +374,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -424,6 +426,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             #include "WF_UnToon.cginc"
 
@@ -476,6 +480,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower
@@ -530,6 +536,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             uniform float _AL_StencilPower;
             #define _AL_CustomValue _AL_StencilPower

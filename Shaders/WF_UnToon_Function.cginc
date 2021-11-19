@@ -1196,4 +1196,36 @@
         #define affectToonFog(i, ws_view_dir, color)
     #endif
 
+    ////////////////////////////
+    // Refraction
+    ////////////////////////////
+
+    #ifdef _RF_ENABLE
+
+        void affectRefraction(v2f i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            if (TGL_ON(_RF_Enable)) {
+#endif
+                float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
+
+                float3 refract_normal = lerpNormals(ws_normal, ws_bump_normal, _RF_BlendNormal);
+                float3 refract_dir = refract(view_dir, facing ? refract_normal : -refract_normal, 1.0 / _RF_RefractiveIndex);
+                float3 refract_pos = i.ws_vertex + refract_dir * _RF_Distance;
+
+                float4 refract_scr_pos = mul(UNITY_MATRIX_VP, float4(refract_pos, 1));
+                float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
+
+                float3 refract_color = tex2Dproj(_RF_GRAB_TEXTURE, UNITY_PROJ_COORD(grab_uv)).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
+
+                color.rgb = lerp(refract_color.rgb, color.rgb, color.a);
+                color.a = 1;
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            }
+#endif
+        }
+
+    #else
+        #define affectRefraction(i, facing, ws_normal, ws_bump_normal, color)
+    #endif
+
 #endif
