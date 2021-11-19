@@ -235,18 +235,18 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
-        // Decal Texture
-        [WFHeaderToggle(Decal Texture)]
+        // Overlay Texture
+        [WFHeaderToggle(Overlay Texture)]
             _OL_Enable              ("[OL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
             _OL_UVType              ("[OL] UV Type", Float) = 0
         [HDR]
-            _OL_Color               ("[OL] Decal Color", Color) = (1, 1, 1, 1)
-            _OL_OverlayTex          ("[OL] Decal Texture", 2D) = "white" {}
+            _OL_Color               ("[OL] Overlay Color", Color) = (1, 1, 1, 1)
+            _OL_OverlayTex          ("[OL] Overlay Texture", 2D) = "white" {}
         [WF_Vector2]
             _OL_UVScroll            ("[OL] UV Scroll", Vector) = (0, 0, 0, 0)
         [Toggle(_)]
-            _OL_VertColToDecal      ("[OL] Multiply VertexColor To Decal Texture", Range(0, 1)) = 0
+            _OL_VertColToDecal      ("[OL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
         [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
             _OL_BlendType           ("[OL] Blend Type", Float) = 0
             _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1

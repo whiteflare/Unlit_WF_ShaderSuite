@@ -930,7 +930,7 @@
     #endif
 
     ////////////////////////////
-    // Decal Texture
+    // Overlay Texture
     ////////////////////////////
 
     #ifdef _OL_ENABLE

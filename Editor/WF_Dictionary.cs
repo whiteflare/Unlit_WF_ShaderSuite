@@ -338,10 +338,10 @@ namespace UnlitWF
             new WFI18NTranslation("RM", "Power Top", "強度(上)"),
             new WFI18NTranslation("RM", "Power Side", "強度(横)"),
             new WFI18NTranslation("RM", "Power Bottom", "強度(下)"),
-            // Decal
-            new WFI18NTranslation("OL", "Decal Color", "デカール テクスチャ"),
-            new WFI18NTranslation("OL", "Decal Texture", "デカール テクスチャ"),
-            new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "頂点カラーをデカールに乗算する"),
+            // Overlay Texture
+            new WFI18NTranslation("OL", "Overlay Color", "オーバーレイ テクスチャ"),
+            new WFI18NTranslation("OL", "Overlay Texture", "オーバーレイ テクスチャ"),
+            new WFI18NTranslation("OL", "Multiply VertexColor To Overlay Texture", "頂点カラーをオーバーレイテクスチャに乗算する"),
             new WFI18NTranslation("OL", "Multiply VertexColor To Mask Texture", "頂点カラーをマスクに乗算する"),
             new WFI18NTranslation("OL", "UV Scroll", "UVスクロール"),
             // EmissiveScroll
@@ -472,6 +472,9 @@ namespace UnlitWF
             new WFI18NTranslation("Lighten (max value)", "明るさの最大値"),
             new WFI18NTranslation("Blend Light Color", "ライト色の混合強度"),
             new WFI18NTranslation("FR", "Fur Height 2", "高さ (Transparent側)"),
+            new WFI18NTranslation("OL", "Decal Color", "デカール テクスチャ"),
+            new WFI18NTranslation("OL", "Decal Texture", "デカール テクスチャ"),
+            new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "頂点カラーをデカールに乗算する"),
         };
 
 
@@ -589,10 +592,10 @@ namespace UnlitWF
             new WFI18NTranslation("RM", "Power Top", "강도(위)"),
             new WFI18NTranslation("RM", "Power Side", "강도(좌우)"),
             new WFI18NTranslation("RM", "Power Bottom", "강도(아래)"),
-            // Decal
-            new WFI18NTranslation("OL", "Decal Color", "데칼 텍스처"),
-            new WFI18NTranslation("OL", "Decal Texture", "데칼 텍스처"),
-            new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "버텍스 컬러에 데칼 텍스처 곱하기"),
+            // Overlay Texture
+            new WFI18NTranslation("OL", "Overlay Color", "한국어 텍스처"),
+            new WFI18NTranslation("OL", "Overlay Texture", "한국어 텍스처"),
+            new WFI18NTranslation("OL", "Multiply VertexColor To Overlay Texture", "버텍스 컬러에 한국어 텍스처 곱하기"),
             new WFI18NTranslation("OL", "Multiply VertexColor To Mask Texture", "버텍스 컬러에 마스크 텍스처 곱하기"),
             new WFI18NTranslation("OL", "UV Scroll", "UV스크롤"),
             // EmissiveScroll
@@ -669,13 +672,13 @@ namespace UnlitWF
             // Refraction
             new WFI18NTranslation("RF", "Refractive Index", "한국어"),
 
-            // 메뉴
+            // メニュー
             new WFI18NTranslation("Copy material", "복사"),
             new WFI18NTranslation("Paste value", "붙여넣기"),
             new WFI18NTranslation("Paste (without Textures)", "붙여넣기 (Texture제외)"),
             new WFI18NTranslation("Reset", "리셋"),
 
-            // 그외 텍스트
+            // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "신버전이 출시되었습니다. \n최신판: "),
             new WFI18NTranslation(WFMessageText.PlzMigration, "이 머티리얼은 구버전에서 작성된 것 같습니다. \n최신버전으로 변환하시겠습니까?"),
             new WFI18NTranslation(WFMessageText.PlzBatchingStatic, "이 머티리얼은 Batching Static을 설정한 MeshRenderer 에서 사용되는 것 같습니다. \nBatching Static용 설정으로 변경하시겠습니까?"),
@@ -694,6 +697,11 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageButton.Cleanup, "머티리얼 내에서 불필요한 데이터 삭제"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "템플릿부터 적용"),
             new WFI18NTranslation(WFMessageButton.SaveTemplate, "템플릿으로 저장"),
+
+            // 今は使っていないはずの項目
+            new WFI18NTranslation("OL", "Decal Color", "데칼 텍스처"),
+            new WFI18NTranslation("OL", "Decal Texture", "데칼 텍스처"),
+            new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "버텍스 컬러에 데칼 텍스처 곱하기"),
         };
     }
 
