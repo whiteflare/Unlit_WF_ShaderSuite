@@ -57,7 +57,7 @@
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( PICK_VERT_TEX2D_LOD(tex, uv, 0), inv )
 
-    #define NZF                                     0.0001
+    #define NZF                                     0.000001
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)
     #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
     #define ZERO_VEC3                               float3(0, 0, 0)
