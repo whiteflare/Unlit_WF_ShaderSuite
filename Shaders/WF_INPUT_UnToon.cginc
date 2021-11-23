@@ -31,4 +31,20 @@
 
     #endif
 
+    #ifndef _V2F_HAS_VERTEXCOLOR
+        #if defined(_VC_ENABLE) || defined(_OL_ENABLE)
+            #define _V2F_HAS_VERTEXCOLOR
+        #endif
+    #endif
+    #ifndef _V2F_HAS_TANGENT
+        #if defined(_NM_ENABLE)
+            #define _V2F_HAS_TANGENT
+        #endif
+    #endif
+    #ifndef _V2F_HAS_SHADOWPOWER
+        #if defined(_TS_ENABLE)
+            #define _V2F_HAS_SHADOWPOWER
+        #endif
+    #endif
+
 #endif

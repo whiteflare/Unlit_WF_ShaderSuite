@@ -101,19 +101,6 @@ namespace UnlitWF
             {
                 var d = data[i];
 
-                if (ContainsShaderVariant(settings.alwaysIncludeShaders, shader, snippet, d))
-                {
-#if WF_STRIP_LOG_VERBOSE
-                        Debug.LogFormat("[WF][Preprocess] always include: {0}/{1}/{2}/{3} ({4})", 
-                            shader.name, 
-                            snippet.passName, 
-                            snippet.shaderType,
-                            d.shaderCompilerPlatform,
-                            string.Join(", ", ToKeywordArray(shader, d.shaderKeywordSet)));
-#endif
-                    continue;
-                }
-
                 if (usedShaderVariantList.Any(v => v.IsMatchVariant(shader, existingKwds, d)))
                 {
 #if WF_STRIP_LOG_VERBOSE
@@ -221,11 +208,6 @@ namespace UnlitWF
             // シーンから UsedShaderVariant を回収
             materials.AddRange(MaterialSeeker.GetAllSceneAllMaterial());
 
-            // EditorSettings から UsedShaderVariant を回収
-            if (settings.alwaysIncludeMaterials != null)
-            {
-                materials.AddRange(settings.alwaysIncludeMaterials);
-            }
             materials = materials.Distinct()
                 .Where(mat => mat != null && IsStripTargetShader(mat.shader))
                 .ToList();

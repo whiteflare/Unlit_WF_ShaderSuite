@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
+Shader "UnlitWF/Custom/WF_UnToon_Custom_MirrorControl_Opaque" {
 
     Properties {
         // 基本
@@ -23,21 +23,14 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 0
+            _CullMode               ("Cull Mode", int) = 2
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-        [NoScaleOffset]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
-        [Toggle(_)]
-            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
+        [WFHeaderAlwaysOn(Mirror Control)]
+            _MR_Enable              ("[MR] Enable", Float) = 0
+        [Enum(BOTH,0,IN_MIRROR,1,OUT_MIRROR,2)]
+            _MR_Visibility          ("[MR] Visibility", int) = 0
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
@@ -233,6 +226,16 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
         [Toggle(_)]
             _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
 
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DF_Enable              ("[DF] Enable", Float) = 0
+            _DF_Color               ("[DF] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DF_MinDist             ("[DF] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DF_MaxDist             ("[DF] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DF_Power               ("[DF] Power", Range(0, 1)) = 1
+        [Toggle(_)]
+            _DF_BackShadow          ("[DF] BackFace Shadow", Float) = 1
+
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
@@ -298,32 +301,29 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2021/11/06", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
     }
 
     SubShader {
         Tags {
-            "RenderType" = "TransparentCutout"
-            "Queue" = "AlphaTest"
-            "RenderPipeline" = "UniversalPipeline"
+            "RenderType" = "Opaque"
+            "Queue" = "Geometry"
         }
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
 
-            HLSLPROGRAM
-
-            #pragma exclude_renderers d3d11_9x gles
+            CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag
+            #pragma fragment frag_mirrorcontrol
 
-            #pragma target 3.0
-
-            #define _WF_ALPHA_CUTOUT
-            #define _WF_PLATFORM_LWRP
+            #pragma target 4.5
 
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE
@@ -337,62 +337,40 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
-            // -------------------------------------
-            // Lightweight Pipeline keywords
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
-
-            // -------------------------------------
-            // Unity defined keywords
-            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
-            #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
-
-            //--------------------------------------
             #pragma multi_compile_instancing
 
-            #include "../WF_INPUT_UnToon.cginc"
-            #include "../WF_UnToon.cginc"
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            ENDHLSL
-        }
+            #include "WF_UnToon.cginc"
 
-        Pass {
-            Name "DepthOnly"
-            Tags{"LightMode" = "DepthOnly"}
+            float   _MR_Enable;
+            uint    _MR_Visibility;
 
-            ZWrite On
-            ColorMask 0
-            Cull[_CullMode]
+            float4 frag_mirrorcontrol(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+                float4 color = frag(i, facing);
 
-            HLSLPROGRAM
+                if (TGL_ON(_MR_Enable)) {
+                    if (_MR_Visibility == 1 && !isInMirror()) {
+                        discard;
+                    }
+                    else if (_MR_Visibility == 2 && isInMirror()) {
+                        discard;
+                    }
+                }
 
-            #pragma exclude_renderers d3d11_9x gles
+                return color;
+            }
 
-            #pragma vertex vert_depth
-            #pragma fragment frag_depth
-
-            #define _WF_ALPHA_CUTOUT
-            #define _WF_PLATFORM_LWRP
-
-            #pragma shader_feature_local _VC_ENABLE
-
-            #pragma multi_compile_instancing
-
-            #include "../WF_INPUT_UnToon.cginc"
-            #include "../WF_UnToon_DepthOnly.cginc"
-
-            ENDHLSL
+            ENDCG
         }
 
         Pass {
@@ -401,52 +379,41 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
 
             Cull [_CullMode]
 
-            HLSLPROGRAM
-
-            #pragma exclude_renderers d3d11_9x gles
+            CGPROGRAM
 
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _WF_ALPHA_CUTOUT
-            #define _WF_PLATFORM_LWRP
-
-            #pragma shader_feature_local _VC_ENABLE
-
+            #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 
-            #include "../WF_INPUT_UnToon.cginc"
-            #include "WF_UnToonURP_ShadowCaster.cginc"
+            #include "WF_UnToon_ShadowCaster.cginc"
 
-            ENDHLSL
+            ENDCG
         }
 
         Pass {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
-            Cull Off
+            Cull OFF
 
-            HLSLPROGRAM
-
-            #pragma exclude_renderers d3d11_9x gles
+            CGPROGRAM
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #define _WF_ALPHA_CUTOUT
-            #define _WF_PLATFORM_LWRP
-
             #pragma shader_feature_local _VC_ENABLE
 
-            #include "../WF_INPUT_UnToon.cginc"
-            #include "WF_UnToonURP_Meta.cginc"
+            #pragma shader_feature EDITOR_VISUALIZATION
 
-            ENDHLSL
+            #include "WF_UnToon_Meta.cginc"
+
+            ENDCG
         }
     }
 
-    FallBack "Hidden/InternalErrorShader"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
