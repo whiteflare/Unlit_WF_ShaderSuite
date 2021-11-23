@@ -930,7 +930,7 @@
     #endif
 
     ////////////////////////////
-    // Decal Texture
+    // Overlay Texture
     ////////////////////////////
 
     #ifdef _OL_ENABLE
@@ -1093,7 +1093,8 @@
                 float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
                 float2 uv_aomap = _AO_UVType == 1 ? i.uv_lmap : uv_main;
-                occlusion *= WF_TEX2D_OCCLUSION(uv_aomap);
+                float3 aomap_var = WF_TEX2D_OCCLUSION(uv_aomap);
+                occlusion *= TGL_OFF(_AO_UseGreenMap) ? aomap_var.rgb : aomap_var.ggg;
                 occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
                 #ifdef _LMAP_ENABLE

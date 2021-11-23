@@ -163,7 +163,7 @@
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
         // リムライト
         affectRimLight(i, uv_main, calcMatcapVector(matcapVector, _TR_BlendNormal, 0), angle_light_camera, color);
-        // Decal
+        // Overlay Texture
         affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 0.5), color);
         // Distance Fade
         affectDistanceFade(i, facing, color);
