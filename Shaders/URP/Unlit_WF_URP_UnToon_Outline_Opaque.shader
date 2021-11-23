@@ -245,6 +245,8 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
         [Toggle(_)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1

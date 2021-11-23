@@ -273,6 +273,7 @@
 #endif
     uint            _AO_UVType;
     float           _AO_UseLightMap;
+    float           _AO_UseGreenMap;
     float           _AO_Contrast;
     float           _AO_Brightness;
     float4          _AO_TintColor;
