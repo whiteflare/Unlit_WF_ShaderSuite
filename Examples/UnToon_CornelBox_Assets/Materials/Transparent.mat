@@ -135,6 +135,11 @@ Material:
     - _CL_Enable: 0
     - _CL_Monochrome: 0
     - _CurrentVersion: 0
+    - _DF_BackShadow: 1
+    - _DF_Enable: 0
+    - _DF_MaxDist: 0.08
+    - _DF_MinDist: 0.02
+    - _DF_Power: 1
     - _DetailNormalMapScale: 0.4
     - _ES_AlphaScroll: 0
     - _ES_BlendType: 0
@@ -160,6 +165,7 @@ Material:
     - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
     - _HL_CapType: 0
+    - _HL_ChangeAlpha: 0
     - _HL_Enable: 0
     - _HL_InvMaskVal: 0
     - _HL_Parallax: 0.75
@@ -230,6 +236,7 @@ Material:
     - _CH_ColorG: {r: 1, g: 1, b: 1, a: 1}
     - _CH_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 0, g: 0, b: 0, a: 1}
+    - _DF_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

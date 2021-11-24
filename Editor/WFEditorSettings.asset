@@ -16,5 +16,4 @@ MonoBehaviour:
   enableStripping: 1
   stripFallback: 1
   stripMetaPass: 1
-  alwaysIncludeShaders: {fileID: 0}
-  alwaysIncludeMaterials: []
+  enableScanProjects: 1

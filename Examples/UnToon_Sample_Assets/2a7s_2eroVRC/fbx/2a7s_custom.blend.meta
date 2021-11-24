@@ -358,6 +358,34 @@ ModelImporter:
     2100008: tex_armor
     2100010: tex_photon
     2100012: tex_cloak
+    2300000: Body
+    2300002: Body.001
+    2300004: Body_armor_back
+    2300006: Body_armor_boots
+    2300008: Body_armor_head
+    2300010: Body_armor_horn
+    2300012: Body_armor_leg
+    2300014: Body_armor_loarm
+    2300016: Body_armor_neck
+    2300018: Body_armor_tie
+    2300020: Body_armor_uparm
+    2300022: cloak_back
+    2300024: cloak_front
+    2300026: cloak_tail
+    3300000: Body
+    3300002: Body.001
+    3300004: Body_armor_back
+    3300006: Body_armor_boots
+    3300008: Body_armor_head
+    3300010: Body_armor_horn
+    3300012: Body_armor_leg
+    3300014: Body_armor_loarm
+    3300016: Body_armor_neck
+    3300018: Body_armor_tie
+    3300020: Body_armor_uparm
+    3300022: cloak_back
+    3300024: cloak_front
+    3300026: cloak_tail
     4300000: Body
     4300002: Body_armor_back
     4300004: Body_armor_boots
@@ -372,21 +400,6 @@ ModelImporter:
     4300022: Body_armor_head
     4300024: Body_armor_neck
     4300026: Body.001
-    9500000: //RootNode
-    13700000: Body
-    13700002: Body.001
-    13700004: Body_armor_back
-    13700006: Body_armor_boots
-    13700008: Body_armor_head
-    13700010: Body_armor_horn
-    13700012: Body_armor_leg
-    13700014: Body_armor_loarm
-    13700016: Body_armor_neck
-    13700018: Body_armor_tie
-    13700020: Body_armor_uparm
-    13700022: cloak_back
-    13700024: cloak_front
-    13700026: cloak_tail
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -423,9 +436,9 @@ ModelImporter:
     addColliders: 0
     useSRGBMaterialColor: 1
     importVisibility: 1
-    importBlendShapes: 1
-    importCameras: 1
-    importLights: 1
+    importBlendShapes: 0
+    importCameras: 0
+    importLights: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -440,16 +453,16 @@ ModelImporter:
     secondaryUVPackMargin: 4
     useFileScale: 1
     previousCalculatedGlobalScale: 1
-    hasPreviousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
-    tangentImportMode: 3
+    tangentImportMode: 2
     normalCalculationMode: 4
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
-    blendShapeNormalImportMode: 1
+    blendShapeNormalImportMode: 2
     normalSmoothingSource: 0
-  importAnimation: 1
+  importAnimation: 0
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2
@@ -467,7 +480,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

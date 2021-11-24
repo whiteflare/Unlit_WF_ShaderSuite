@@ -28,12 +28,13 @@ namespace UnlitWF
     {
         public int settingPriority = 0;
 
-        [Header("Shader Stripping Settings")]
+        [Header("Shader Build Settings")]
         public bool enableStripping = true;
         public bool stripFallback = true;
         public bool stripMetaPass = true;
-        public ShaderVariantCollection alwaysIncludeShaders = null;
-        public Material[] alwaysIncludeMaterials = { };
+
+        [Header("Editor Behaviour Settings")]
+        public bool enableScanProjects = true;
 
         public static WFEditorSetting GetOneOfSettings()
         {
@@ -63,6 +64,61 @@ namespace UnlitWF
                 .Select(path => AssetDatabase.LoadAssetAtPath<WFEditorSetting>(path))
                 .Where(s => s != null)
                 .OrderBy(s => s.settingPriority).ToArray();
+        }
+    }
+
+    [CustomEditor(typeof(WFEditorSetting))]
+    public class WFEditorSettingEditor : Editor
+    {
+        SerializedProperty p_settingPriority;
+        SerializedProperty p_enableStripping;
+        SerializedProperty p_stripFallback;
+        SerializedProperty p_stripMetaPass;
+        SerializedProperty p_enableScanProjects;
+
+        private void OnEnable()
+        {
+            this.p_settingPriority = serializedObject.FindProperty("settingPriority");
+            this.p_enableStripping = serializedObject.FindProperty("enableStripping");
+            this.p_stripFallback = serializedObject.FindProperty("stripFallback");
+            this.p_stripMetaPass = serializedObject.FindProperty("stripMetaPass");
+            this.p_enableScanProjects = serializedObject.FindProperty("enableScanProjects");
+        }
+
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            EditorGUI.BeginChangeCheck();
+
+            // 優先度
+
+            EditorGUILayout.PropertyField(p_settingPriority);
+
+            // Shader Build Settings
+
+            EditorGUILayout.PropertyField(p_enableStripping);
+            using (new EditorGUI.DisabledGroupScope(!p_enableStripping.boolValue))
+            using (new EditorGUI.IndentLevelScope())
+            {
+                EditorGUILayout.PropertyField(p_stripFallback);
+                EditorGUILayout.PropertyField(p_stripMetaPass);
+            }
+
+            // Editor Behaviour Settings
+
+            EditorGUILayout.PropertyField(p_enableScanProjects);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
+
+            // Common Material Settings
+
+            EditorGUILayout.Space();
+            GUI.Label(EditorGUILayout.GetControlRect(), "Common Material Settings", EditorStyles.boldLabel);
+
+            WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
         }
     }
 }
