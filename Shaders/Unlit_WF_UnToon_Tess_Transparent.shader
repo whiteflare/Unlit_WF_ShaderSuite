@@ -347,6 +347,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
+            "VRCFallback" = "ToonTransparent"
         }
 
         Pass {

@@ -365,6 +365,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
+            "VRCFallback" = "ToonTransparent"
         }
 
         GrabPass { "_UnToonOutlineCancel" }

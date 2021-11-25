@@ -86,6 +86,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
             "Queue" = "Geometry"
             "DisableBatching" = "True"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         Pass {

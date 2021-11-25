@@ -128,6 +128,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             "Queue" = "Transparent"
             "DisableBatching" = "True"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         Pass {

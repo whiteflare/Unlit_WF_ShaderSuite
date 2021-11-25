@@ -298,6 +298,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
             "DisableBatching" = "True"
+            "VRCFallback" = "Toon"
         }
 
         Pass {

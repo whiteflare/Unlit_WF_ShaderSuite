@@ -323,6 +323,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
+            "VRCFallback" = "ToonTransparent"
         }
 
         Pass {

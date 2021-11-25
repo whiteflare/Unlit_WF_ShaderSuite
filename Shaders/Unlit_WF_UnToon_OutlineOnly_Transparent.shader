@@ -94,6 +94,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             "Queue" = "Transparent+100"
             "DisableBatching" = "True"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         GrabPass { "_UnToonOutlineOnlyCancel" }

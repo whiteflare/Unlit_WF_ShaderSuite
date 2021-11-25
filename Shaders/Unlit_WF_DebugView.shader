@@ -60,7 +60,10 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags {
+            "RenderType"="Opaque"
+            "VRCFallback" = "Hidden"
+        }
         LOD 100
 
         Pass

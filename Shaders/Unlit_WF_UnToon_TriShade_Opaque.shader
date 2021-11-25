@@ -278,6 +278,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
             "DisableBatching" = "True"
+            "VRCFallback" = "Toon"
         }
 
         Pass {

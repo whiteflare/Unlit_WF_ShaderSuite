@@ -191,6 +191,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
+            "VRCFallback" = "ToonTransparent"
         }
 
         Pass {

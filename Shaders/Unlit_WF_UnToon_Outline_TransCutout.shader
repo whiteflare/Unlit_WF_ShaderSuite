@@ -347,6 +347,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
+            "VRCFallback" = "ToonCutout"
         }
 
         Pass {

@@ -27,6 +27,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         Pass {

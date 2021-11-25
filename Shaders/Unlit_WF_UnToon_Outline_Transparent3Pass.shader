@@ -355,6 +355,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
+            "VRCFallback" = "ToonTransparent"
         }
 
         GrabPass { "_UnToonOutlineCancel" }

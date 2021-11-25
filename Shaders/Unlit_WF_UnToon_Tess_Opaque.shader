@@ -345,6 +345,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
             "DisableBatching" = "True"
+            "VRCFallback" = "Toon"
         }
 
         Pass {

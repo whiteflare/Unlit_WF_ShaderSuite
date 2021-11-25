@@ -317,6 +317,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
+            "VRCFallback" = "ToonCutout"
         }
 
         Pass {

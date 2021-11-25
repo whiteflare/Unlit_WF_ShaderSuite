@@ -126,6 +126,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         Pass {

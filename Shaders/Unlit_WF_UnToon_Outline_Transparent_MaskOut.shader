@@ -356,6 +356,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+1"
             "DisableBatching" = "True"
+            "VRCFallback" = "ToonTransparent"
         }
 
         GrabPass { "_UnToonOutlineCancelLater" }

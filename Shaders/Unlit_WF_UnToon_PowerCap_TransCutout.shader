@@ -305,6 +305,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
+            "VRCFallback" = "ToonCutout"
         }
 
         Pass {

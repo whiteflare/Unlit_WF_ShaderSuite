@@ -91,6 +91,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             "RenderType" = "Transparent"
             "Queue" = "Overlay"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "ToonTransparent"
         }
 
         Pass {

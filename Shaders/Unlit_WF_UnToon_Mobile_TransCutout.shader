@@ -186,6 +186,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         Tags {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
+            "VRCFallback" = "ToonCutout"
         }
 
         Pass {
