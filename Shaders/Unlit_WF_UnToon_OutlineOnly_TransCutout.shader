@@ -86,7 +86,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/11/06", Float) = 0
+            _CurrentVersion         ("2021/12/04", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout", Float) = 0
@@ -98,6 +98,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         Pass {

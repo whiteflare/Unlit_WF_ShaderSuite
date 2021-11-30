@@ -336,7 +336,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/11/06", Float) = 0
+            _CurrentVersion         ("2021/12/04", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout", Float) = 0
@@ -347,6 +347,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
+            "VRCFallback" = "UnlitCutout"
         }
 
         Pass {

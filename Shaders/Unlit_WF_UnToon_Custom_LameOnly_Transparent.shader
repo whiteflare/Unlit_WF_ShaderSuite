@@ -73,7 +73,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/11/06", Float) = 0
+            _CurrentVersion         ("2021/12/04", Float) = 0
     }
 
     SubShader {
@@ -81,6 +81,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+450"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         Pass {
