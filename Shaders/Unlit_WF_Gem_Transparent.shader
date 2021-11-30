@@ -103,7 +103,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/11/06", Float) = 0
+            _CurrentVersion         ("2021/12/04", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -113,6 +113,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
+            "VRCFallback" = "UnlitTransparent"
         }
 
         Pass {

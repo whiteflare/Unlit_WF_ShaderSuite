@@ -19,7 +19,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
     Properties {
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/11/06", Float) = 0
+            _CurrentVersion         ("2021/12/04", Float) = 0
     }
 
     SubShader {
@@ -27,6 +27,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         Pass {
