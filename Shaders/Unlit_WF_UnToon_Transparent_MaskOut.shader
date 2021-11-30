@@ -326,7 +326,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+1"
-            "VRCFallback" = "ToonTransparent"
+            "VRCFallback" = "UnlitCutout"
         }
 
         Pass {

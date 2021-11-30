@@ -168,7 +168,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
-            "VRCFallback" = "ToonCutout"
+            "VRCFallback" = "UnlitCutout"
         }
 
         Pass {

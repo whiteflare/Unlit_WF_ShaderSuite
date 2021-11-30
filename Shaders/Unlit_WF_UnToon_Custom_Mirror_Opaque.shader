@@ -310,7 +310,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_MirrorControl_Opaque" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
-            "VRCFallback" = "Toon"
+            "VRCFallback" = "Unlit"
         }
 
         Pass {

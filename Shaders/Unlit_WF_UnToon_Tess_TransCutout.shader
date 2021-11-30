@@ -357,7 +357,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             "RenderType" = "TransparentCutout"
             "Queue" = "AlphaTest"
             "DisableBatching" = "True"
-            "VRCFallback" = "ToonCutout"
+            "VRCFallback" = "UnlitCutout"
         }
 
         Pass {

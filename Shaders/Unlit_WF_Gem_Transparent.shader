@@ -113,7 +113,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "VRCFallback" = "ToonTransparent"
+            "VRCFallback" = "UnlitTransparent"
         }
 
         Pass {

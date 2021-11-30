@@ -277,7 +277,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
-            "VRCFallback" = "ToonTransparent"
+            "VRCFallback" = "UnlitCutout"
         }
 
         Pass {

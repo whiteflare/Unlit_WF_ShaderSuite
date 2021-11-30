@@ -184,7 +184,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
-            "VRCFallback" = "Toon"
+            "VRCFallback" = "Unlit"
         }
 
         Pass {

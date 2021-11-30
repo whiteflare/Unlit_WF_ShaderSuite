@@ -317,7 +317,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
             "DisableBatching" = "True"
-            "VRCFallback" = "Toon"
+            "VRCFallback" = "Unlit"
         }
 
         Pass {

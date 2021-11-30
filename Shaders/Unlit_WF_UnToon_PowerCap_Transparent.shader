@@ -306,7 +306,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
-            "VRCFallback" = "ToonTransparent"
+            "VRCFallback" = "UnlitTransparent"
         }
 
         Pass {

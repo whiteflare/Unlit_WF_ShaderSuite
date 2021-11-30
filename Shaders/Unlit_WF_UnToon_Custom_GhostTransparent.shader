@@ -282,7 +282,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
         Tags {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+450"
-            "VRCFallback" = "ToonTransparent"
+            "VRCFallback" = "UnlitTransparent"
         }
 
         Pass {

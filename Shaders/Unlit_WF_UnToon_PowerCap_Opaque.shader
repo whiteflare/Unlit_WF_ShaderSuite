@@ -293,7 +293,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
             "DisableBatching" = "True"
-            "VRCFallback" = "Toon"
+            "VRCFallback" = "Unlit"
         }
 
         Pass {

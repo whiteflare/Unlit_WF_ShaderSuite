@@ -305,7 +305,7 @@ Shader "UnlitWF/WF_UnToon_Opaque" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Geometry"
-            "VRCFallback" = "Toon"
+            "VRCFallback" = "Unlit"
         }
 
         Pass {

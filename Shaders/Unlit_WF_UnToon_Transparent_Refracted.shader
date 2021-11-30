@@ -330,7 +330,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Refracted" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Transparent"
-            "VRCFallback" = "ToonTransparent"
+            "VRCFallback" = "UnlitTransparent"
         }
 
         GrabPass { "_UnToonRefractionBack" }

@@ -293,7 +293,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "DisableBatching" = "True"
-            "VRCFallback" = "ToonTransparent"
+            "VRCFallback" = "UnlitTransparent"
         }
 
         GrabPass { "_UnToonOutlineCancel" }
