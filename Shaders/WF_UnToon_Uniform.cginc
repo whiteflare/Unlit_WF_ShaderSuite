@@ -64,6 +64,9 @@
     DECL_MAIN_TEXCUBE   (_MT_Cubemap);
     DECL_MAIN_TEX2D     (_HL_MatcapTex);
     DECL_MAIN_TEX2D     (_OL_OverlayTex);
+#ifdef _RF_GRAB_TEXTURE
+    sampler2D           _RF_GRAB_TEXTURE;
+#endif
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
 
@@ -270,6 +273,7 @@
 #endif
     uint            _AO_UVType;
     float           _AO_UseLightMap;
+    float           _AO_UseGreenMap;
     float           _AO_Contrast;
     float           _AO_Brightness;
     float4          _AO_TintColor;
@@ -295,6 +299,16 @@
     float           _FG_Exponential;
     float3          _FG_BaseOffset;
     float3          _FG_Scale;
+#endif
+
+#ifndef _WF_MOBILE
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+    float           _RF_Enable;
+#endif
+    float           _RF_RefractiveIndex;
+    float           _RF_Distance;
+    float3          _RF_Tint;
+    float           _RF_BlendNormal;
 #endif
 
 #ifdef _WF_UNTOON_TESS

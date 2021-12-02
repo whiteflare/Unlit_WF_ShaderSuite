@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_UnToon_Transparent" {
+Shader "UnlitWF/WF_UnToon_Transparent_Refracted" {
 
     Properties {
         // 基本
@@ -24,6 +24,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
+        [Enum(OFF,0,FRONT,1,BACK,2)]
+            _CullMode               ("Cull Mode", int) = 2
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -35,8 +37,14 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
+
+        // リフラクション
+        [WFHeaderAlwaysOn(Refraction)]
+            _RF_Enable              ("[RF] Enable", Float) = 1
+            _RF_RefractiveIndex     ("[RF] Refractive Index", Range(1.0, 3.0)) = 1.33
+            _RF_Distance            ("[RF] Distance", Range(0, 10)) = 10.0
+            _RF_Tint                ("[RF] Tint Color", Color) = (0.5, 0.5, 0.5)
+            _RF_BlendNormal         ("[RF] Blend Normal", Range(0, 1)) = 0.1
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
@@ -320,65 +328,19 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
+            "RenderType" = "Opaque"
             "Queue" = "Transparent"
             "VRCFallback" = "UnlitTransparent"
         }
 
-        Pass {
-            Name "MAIN_BACK"
-            Tags { "LightMode" = "ForwardBase" }
-
-            Cull FRONT
-            ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            CGPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #pragma target 4.5
-
-            #define _WF_ALPHA_FRESNEL
-            #define _WF_FACE_BACK
-
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
-            #pragma shader_feature_local_fragment _CH_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _DF_ENABLE
-            #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _LM_ENABLE
-            #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
-
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
-
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
-
-            #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
+        GrabPass { "_UnToonRefractionBack" }
 
         Pass {
-            Name "MAIN_FRONT"
+            Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull BACK
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Cull [_CullMode]
+            ZWrite ON
 
             CGPROGRAM
 
@@ -405,13 +367,14 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _RF_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+
+            #define _RF_GRAB_TEXTURE _UnToonRefractionBack
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
-
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             #include "WF_UnToon.cginc"
 

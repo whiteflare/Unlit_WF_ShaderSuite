@@ -73,7 +73,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/11/06", Float) = 0
+            _CurrentVersion         ("2021/12/04", Float) = 0
     }
 
     SubShader {
@@ -81,6 +81,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent+450"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         Pass {
@@ -108,6 +109,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+
             #include "WF_UnToon.cginc"
 
             float4 _LM_MaskTex_ST;
@@ -121,7 +124,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
                 // メイン
                 float4 color = float4(0, 0, 0, 0);
 
-                float3 ws_normal = i.normal;
+                float3 ws_normal = normalize(i.normal);
 
                 // ラメ
                 affectLame(i, uv_main, ws_normal, color);

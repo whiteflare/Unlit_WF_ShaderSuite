@@ -470,7 +470,7 @@
 #if defined(_WF_LEGACY_FEATURE_SWITCH)
                 }
 #endif
-                normalTangent = lerp(normalTangent, dtlNormalTangent, dtlPower);
+                normalTangent = lerpNormals(normalTangent, dtlNormalTangent, dtlPower);
 #endif
 
 #endif
@@ -494,8 +494,8 @@
             if (TGL_ON(_NM_Enable)) {
 #endif
                 // NormalMap は陰影として描画する
-                // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を加算することで明暗を付ける
-                color.rgb += (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(i.normal, i.ws_light_dir.xyz)) * _NM_Power;
+                // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を乗算することで明暗を付ける
+                color.rgb *= max(0.0, 1.0 + (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(i.normal, i.ws_light_dir.xyz)) * _NM_Power * 2);
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             }
 #endif
@@ -568,7 +568,7 @@
 
                 // Metallic描画
                 if (0.01 < metallic) {
-                    float3 ws_metal_normal = normalize(lerp(ws_normal, ws_bump_normal, _MT_BlendNormal));
+                    float3 ws_metal_normal = lerpNormals(ws_normal, ws_bump_normal, _MT_BlendNormal);
                     float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
                     float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
 
@@ -644,7 +644,7 @@
 
     float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
     #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
-        return lerp( lerp(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerp(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax );
+        return lerp( lerpNormals(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerpNormals(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax );
     #else
         return lerp( matcapVector[0].xyz, matcapVector[2].xyz, parallax );
     #endif
@@ -829,7 +829,7 @@
                 }
 
                 // 陰用法線とライト方向から Harf-Lambert
-                float3 ws_shade_normal = normalize(lerp(ws_normal, ws_bump_normal, _TS_BlendNormal));
+                float3 ws_shade_normal = lerpNormals(ws_normal, ws_bump_normal, _TS_BlendNormal);
                 float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
 
                 // アンチシャドウマスク加算
@@ -930,7 +930,7 @@
     #endif
 
     ////////////////////////////
-    // Decal Texture
+    // Overlay Texture
     ////////////////////////////
 
     #ifdef _OL_ENABLE
@@ -1093,7 +1093,8 @@
                 float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
                 float2 uv_aomap = _AO_UVType == 1 ? i.uv_lmap : uv_main;
-                occlusion *= WF_TEX2D_OCCLUSION(uv_aomap);
+                float3 aomap_var = WF_TEX2D_OCCLUSION(uv_aomap);
+                occlusion *= TGL_OFF(_AO_UseGreenMap) ? aomap_var.rgb : aomap_var.ggg;
                 occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
                 #ifdef _LMAP_ENABLE
@@ -1194,6 +1195,38 @@
         }
     #else
         #define affectToonFog(i, ws_view_dir, color)
+    #endif
+
+    ////////////////////////////
+    // Refraction
+    ////////////////////////////
+
+    #ifdef _RF_ENABLE
+
+        void affectRefraction(v2f i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            if (TGL_ON(_RF_Enable)) {
+#endif
+                float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
+
+                float3 refract_normal = lerpNormals(ws_normal, ws_bump_normal, _RF_BlendNormal);
+                float3 refract_dir = refract(view_dir, facing ? refract_normal : -refract_normal, 1.0 / _RF_RefractiveIndex);
+                float3 refract_pos = i.ws_vertex + refract_dir * _RF_Distance;
+
+                float4 refract_scr_pos = mul(UNITY_MATRIX_VP, float4(refract_pos, 1));
+                float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
+
+                float3 refract_color = tex2Dproj(_RF_GRAB_TEXTURE, UNITY_PROJ_COORD(grab_uv)).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
+
+                color.rgb = lerp(refract_color.rgb, color.rgb, color.a);
+                color.a = 1;
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            }
+#endif
+        }
+
+    #else
+        #define affectRefraction(i, facing, ws_normal, ws_bump_normal, color)
     #endif
 
 #endif

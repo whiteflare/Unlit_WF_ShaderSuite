@@ -90,7 +90,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/11/06", Float) = 0
+            _CurrentVersion         ("2021/12/04", Float) = 0
     }
 
     SubShader {
@@ -99,6 +99,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
             "Queue" = "Transparent+100"
             "DisableBatching" = "True"
             "IgnoreProjector" = "True"
+            "VRCFallback" = "Hidden"
         }
 
         GrabPass { "_UnToonOutlineOnlyCancel" }
@@ -137,6 +138,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+
             #include "WF_UnToon.cginc"
 
             ENDCG
@@ -165,6 +168,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             #define _WF_MAIN_Z_SHIFT    (-_Z_Shift)
             #define _TL_CANCEL_GRAB_TEXTURE _UnToonOutlineOnlyCancel
