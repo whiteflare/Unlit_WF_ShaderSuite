@@ -320,7 +320,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
             #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
 
-
+            #define _ _TL_EDGE_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
             #define _FG_ENABLE
@@ -381,6 +381,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha *= _AL_Power; } // _Cutoff 以上を描画
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -389,7 +390,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _ES_ENABLE
             #define _FG_ENABLE
@@ -427,6 +427,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
             #define _WF_FACE_BACK
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
@@ -434,7 +435,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _ES_ENABLE
             #define _FG_ENABLE
@@ -470,6 +470,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -478,7 +479,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _ES_ENABLE
             #define _FG_ENABLE

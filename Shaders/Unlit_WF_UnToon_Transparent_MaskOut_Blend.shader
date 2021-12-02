@@ -354,6 +354,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -362,7 +363,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
@@ -407,6 +407,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_FRESNEL
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -415,7 +416,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
@@ -461,6 +461,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -469,7 +470,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
@@ -517,6 +517,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_FRESNEL
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -525,7 +526,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE

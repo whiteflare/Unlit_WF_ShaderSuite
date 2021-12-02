@@ -352,6 +352,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #define _WF_ALPHA_BLEND
             #define _WF_FACE_BACK
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -360,7 +361,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
@@ -406,6 +406,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
             #define _WF_ALPHA_BLEND
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -414,7 +415,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE

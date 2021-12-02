@@ -336,6 +336,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
             #define _WF_ALPHA_CUTOUT
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -344,7 +345,6 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE

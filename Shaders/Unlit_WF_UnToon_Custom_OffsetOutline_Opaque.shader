@@ -332,7 +332,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             #pragma target 4.5
             #pragma require geometry
 
-
+            #define _ _TL_EDGE_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
 
@@ -362,6 +362,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
 
             #define _WF_MAIN_Z_SHIFT    (-_Z_Shift)
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -370,7 +371,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE

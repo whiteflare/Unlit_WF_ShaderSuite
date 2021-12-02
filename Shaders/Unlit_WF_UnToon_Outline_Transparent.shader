@@ -437,6 +437,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -445,7 +446,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE
@@ -485,6 +485,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -493,7 +494,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _CH_ENABLE
             #define _CL_ENABLE

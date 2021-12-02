@@ -325,7 +325,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
 
             #define _WF_ALPHA_BLEND
 
-
+            #define _ _TL_EDGE_ENABLE
             #define _TL_ENABLE
             #define _VC_ENABLE
             #define _FG_ENABLE
@@ -398,6 +398,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
             #define _WF_ALPHA_BLEND
             #define _WF_FACE_BACK
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _TS_ENABLE
             #define _VC_ENABLE
@@ -405,7 +406,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _ES_ENABLE
             #define _FG_ENABLE
@@ -446,6 +446,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
 
             #define _WF_ALPHA_BLEND
 
+            #define _AO_ENABLE
             #define _NM_ENABLE
             #define _OL_ENABLE
             #define _TS_ENABLE
@@ -454,7 +455,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_MaskOut" {
 
 
 
-            #define _AO_ENABLE
             #define _BK_ENABLE
             #define _ES_ENABLE
             #define _FG_ENABLE
