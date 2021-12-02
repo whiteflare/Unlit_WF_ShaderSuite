@@ -343,6 +343,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_FACE_BACK
 
+            #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
@@ -350,7 +351,6 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _AO_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
@@ -389,6 +389,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
 
+            #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
@@ -396,7 +397,6 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _AO_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
