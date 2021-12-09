@@ -226,6 +226,7 @@
     float           _TS_Feather;
     float           _TS_BlendNormal;
     float           _TS_InvMaskVal;
+    float           _TS_FixContrast;
 
 #ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _TR_Enable;

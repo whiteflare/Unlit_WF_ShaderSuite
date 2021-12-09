@@ -95,6 +95,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
             _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
+        [Toggle(_)]
+            _TS_FixContrast         ("[SH] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
             _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
@@ -211,6 +213,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE

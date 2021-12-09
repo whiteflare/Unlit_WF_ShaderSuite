@@ -796,17 +796,26 @@
         void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_TS_Enable)) {
+                if (TGL_OFF(_TS_FixContrast)) {
 #endif
+#if !defined(_TS_FIXC_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
                 float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
-
                 float main = saturate(calcBrightness( lightColorMain ));
                 float sub4 = saturate(calcBrightness( lightColorSub4 ));
                 float ambient = saturate(calcBrightness( ambientColor ));
                 shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
                 shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
-                shadow_power = min( shadow_power, 1 - saturate(ambient) * 0.5 );
+                shadow_power = min( shadow_power, 1 - ambient * 0.5 );
+#endif
 #ifdef _WF_LEGACY_FEATURE_SWITCH
+                } else {
+#endif
+#if defined(_TS_FIXC_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+                shadow_power = 1;
+#endif
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+                }
             } else {
                 shadow_power = 0;
             }

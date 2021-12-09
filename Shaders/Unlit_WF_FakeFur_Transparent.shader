@@ -91,6 +91,8 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [NoScaleOffset]
             _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
+        [Toggle(_)]
+            _TS_FixContrast         ("[SH] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
             _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
@@ -179,6 +181,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
             #pragma target 4.5
 
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
@@ -208,6 +211,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
