@@ -44,6 +44,9 @@
     #define PICK_VERT_TEX2D_LOD(tex, uv, lod)           tex2Dlod(tex, float4(uv.x, uv.y, 0, lod))
 #endif
 
+    #define DECL_GRAB_TEX2D(name)                       UNITY_DECLARE_SCREENSPACE_TEXTURE(name)
+    #define PICK_GRAB_TEX2D(tex, uv)                    UNITY_SAMPLE_SCREENSPACE_TEXTURE(tex, uv)
+
     ////////////////////////////
     // Compatible
     ////////////////////////////

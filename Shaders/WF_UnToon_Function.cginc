@@ -1212,6 +1212,8 @@
 
     #ifdef _RF_ENABLE
 
+        DECL_GRAB_TEX2D(_RF_GRAB_TEXTURE); // URPではGrabがサポートされていないのでここで宣言する
+
         void affectRefraction(v2f i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_RF_Enable)) {
@@ -1226,7 +1228,8 @@
                 refract_scr_pos.xy = clamp(refract_scr_pos.xy, -refract_scr_pos.w, refract_scr_pos.w);
 
                 float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
-                float3 refract_color = tex2Dproj(_RF_GRAB_TEXTURE, UNITY_PROJ_COORD(grab_uv)).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
+                grab_uv.xy /= grab_uv.w;
+                float3 refract_color = PICK_GRAB_TEX2D(_RF_GRAB_TEXTURE, grab_uv).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
                 color.rgb = lerp(refract_color.rgb, color.rgb, color.a);
                 color.a = 1;
