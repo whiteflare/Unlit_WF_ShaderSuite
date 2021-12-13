@@ -1223,8 +1223,9 @@
                 float3 refract_pos = i.ws_vertex + refract_dir * _RF_Distance;
 
                 float4 refract_scr_pos = mul(UNITY_MATRIX_VP, float4(refract_pos, 1));
-                float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
+                refract_scr_pos.xy = clamp(refract_scr_pos.xy, -refract_scr_pos.w, refract_scr_pos.w);
 
+                float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
                 float3 refract_color = tex2Dproj(_RF_GRAB_TEXTURE, UNITY_PROJ_COORD(grab_uv)).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
                 color.rgb = lerp(refract_color.rgb, color.rgb, color.a);
