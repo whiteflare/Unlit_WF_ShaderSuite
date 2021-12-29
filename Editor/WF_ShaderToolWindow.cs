@@ -1060,7 +1060,6 @@ namespace UnlitWF
         public const int VERSION = 1;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
-        [InitializeOnLoadMethod]
         public static void ExecuteAuto()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)

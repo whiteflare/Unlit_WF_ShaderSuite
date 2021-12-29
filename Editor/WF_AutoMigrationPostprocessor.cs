@@ -27,6 +27,13 @@ namespace UnlitWF
         {
             ScanAndMigrationExecutor.Migration(importedAssets);
         }
+
+        [InitializeOnLoadMethod]
+        public static void ExecuteAuto()
+        {
+            ScanAndMigrationExecutor.ExecuteAuto();
+
+        }
     }
 }
 
