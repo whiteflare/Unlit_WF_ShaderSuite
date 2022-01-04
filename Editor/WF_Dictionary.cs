@@ -334,6 +334,7 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture (R)", "アンチシャドウマスク (R)"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "影色を自動設定する"),
             new WFI18NTranslation("SH", "Align the boundaries equally", "境界を等間隔に整列"),
+            new WFI18NTranslation("SH", "Dont Ajust Contrast", "影コントラストを調整しない"),
             // RimLight
             new WFI18NTranslation("RM", "Rim Color", "リムライト色"),
             new WFI18NTranslation("RM", "Power", "強度(マスター)"),
@@ -588,6 +589,7 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture (R)", "안티 그림자 마스크 (R)"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "그림자 자동 설정"),
             new WFI18NTranslation("SH", "Align the boundaries equally", "경계값 동일 정렬 "),
+            new WFI18NTranslation("SH", "Dont Ajust Contrast", "그림자 콘트라스트를 조정하지 않는다"),
             // RimLight
             new WFI18NTranslation("RM", "Rim Color", "림라이트 색상"),
             new WFI18NTranslation("RM", "Power", "강도(최대)"),
