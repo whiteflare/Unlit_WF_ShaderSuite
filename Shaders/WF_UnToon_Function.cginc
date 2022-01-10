@@ -1005,6 +1005,33 @@
     // Outline
     ////////////////////////////
 
+    float3 shiftNormalVertex(inout float3 ws_vertex, float3 ws_normal, float width) {
+        // 外側にシフトする
+        return ws_vertex.xyz + ws_normal * width; // ws_normal は normalizeされている前提
+    }
+
+    float4 shiftDepthVertex(float3 ws_vertex, float width) {
+        // ワールド座標でのカメラ方向と距離を計算
+        float3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
+        // カメラ方向の z シフト量を加算
+        float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
+
+        float4 vertex;
+        if (unity_OrthoParams.w < 0.5) {
+            // カメラが perspective のときは単にカメラ方向にシフトする
+            vertex = UnityWorldToClipPos( ws_vertex + zShiftVec );
+        } else {
+            // カメラが orthographic のときはシフト後の z のみ採用する
+            vertex = UnityWorldToClipPos( ws_vertex );
+            vertex.z = UnityWorldToClipPos( ws_vertex + zShiftVec ).z;
+        }
+        return vertex;
+    }
+
+    float4 shiftNormalAndDepthVertex(float3 ws_vertex, float3 ws_normal, float width, float shift) {
+        return shiftDepthVertex(shiftNormalVertex(ws_vertex, ws_normal, width), shift);
+    }
+
     #ifdef _TL_ENABLE
 
         float getOutlineShiftWidth(float2 uv_main) {
@@ -1052,33 +1079,13 @@
         #define affectOutline(uv_main, color)
     #endif
 
-    float4 shiftDepthVertex(float3 ws_vertex, float width) { // これは複数箇所から使うので _TL_ENABLE には入れない
-        // ワールド座標でのカメラ方向と距離を計算
-        float3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
-        // カメラ方向の z シフト量を加算
-        float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
-
-        float4 vertex;
-        if (unity_OrthoParams.w < 0.5) {
-            // カメラが perspective のときは単にカメラ方向にシフトする
-            vertex = UnityWorldToClipPos( ws_vertex + zShiftVec );
-        } else {
-            // カメラが orthographic のときはシフト後の z のみ採用する
-            vertex = UnityWorldToClipPos( ws_vertex );
-            vertex.z = UnityWorldToClipPos( ws_vertex + zShiftVec ).z;
-        }
-        return vertex;
-    }
-
-    float4 shiftOutlineVertex(inout float3 ws_vertex, float3 ws_normal, float width, float shift) {
+    float4 shiftOutlineVertex(inout float3 ws_vertex, float3 ws_normal, float width, float shift) { // 4
         #ifdef _TL_ENABLE
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_ON(_TL_Enable)) {
 #endif
-            // 外側にシフトする
-            ws_vertex.xyz += ws_normal * width;
-            // Zシフト
-            return shiftDepthVertex(ws_vertex, shift);
+            // Normal方向にシフトとCamera方向にZ-Shiftを行う
+            return shiftNormalAndDepthVertex(ws_vertex, ws_normal, width, shift);
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
