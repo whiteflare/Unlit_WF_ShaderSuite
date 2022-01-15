@@ -230,6 +230,22 @@ namespace UnlitWF
                         }
                     }
                 }
+                else
+                {
+                    // UnlitWFからの切替時に動作
+                    if (oldShader.name.Contains("FakeFur") && newShader.name.Contains("FakeFur"))
+                    {
+                        // FakeFurどうしの切り替えで、
+                        if (!oldShader.name.Contains("_Mix") && newShader.name.Contains("_Mix"))
+                        {
+                            // Mixへの切り替えならば、FR_Height2とFR_Repeat2を設定する
+                            var height = material.GetFloat("_FR_Height");
+                            material.SetFloat("_FR_Height2", height * 1.25f);
+                            var repeat = material.GetInt("_FR_Repeat");
+                            material.SetInt("_FR_Repeat2", Math.Max(1, repeat - 1));
+                        }
+                    }
+                }
             }
         }
 

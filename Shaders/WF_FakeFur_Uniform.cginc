@@ -32,12 +32,19 @@
     // Other uniform variable
     ////////////////////////////
 
+#ifndef _FR_HEIGHT_PARAM
+    #define _FR_HEIGHT_PARAM _FR_Height
+#endif
+#ifndef _FR_REPEAT_PARAM
+    #define _FR_REPEAT_PARAM _FR_Repeat
+#endif
+
     float4          _FR_NoiseTex_ST;
-    float           _FR_Height;
+    float           _FR_HEIGHT_PARAM;
     float4          _FR_Vector;
     uint            _FR_FlipMirror;
 
-    uint            _FR_Repeat;
+    uint            _FR_REPEAT_PARAM;
     float           _FR_ShadowPower;
     float4          _FR_TintColorBase;
     float4          _FR_TintColorTip;

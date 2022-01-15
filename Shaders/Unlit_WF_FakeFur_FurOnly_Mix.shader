@@ -29,10 +29,12 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
 
         // ファー設定
         [WFHeader(Fake Fur)]
-            _FR_Height              ("[FR] Fur Height (Cutout)", Range(0, 0.2)) = 0.05
+            _FR_Height              ("[FR] Fur Height (Cutout)", Range(0, 0.2)) = 0.04
             _FR_Height2             ("[FR] Fur Height (Transparent)", Range(0, 0.2)) = 0.05
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat (Cutout)", Range(1, 6)) = 3
+        [IntRange]
+            _FR_Repeat2             ("[FR] Fur Repeat (Transparent)", Range(1, 6)) = 2
         [Header(Fur Shape)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
@@ -181,8 +183,8 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _DF_ENABLE
 
-            float _FR_Height2;
             #define _FR_HEIGHT_PARAM _FR_Height2
+            #define _FR_REPEAT_PARAM _FR_Repeat2
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
