@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2018-2022 whiteflare.
  *  Copyright 2021 ma1on.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -29,10 +29,12 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
 
         // ファー設定
         [WFHeader(Fake Fur)]
-            _FR_Height              ("[FR] Fur Height (Cutout)", Range(0, 0.2)) = 0.05
+            _FR_Height              ("[FR] Fur Height (Cutout)", Range(0, 0.2)) = 0.04
             _FR_Height2             ("[FR] Fur Height (Transparent)", Range(0, 0.2)) = 0.05
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat (Cutout)", Range(1, 6)) = 3
+        [IntRange]
+            _FR_Repeat2             ("[FR] Fur Repeat (Transparent)", Range(1, 6)) = 2
         [Header(Fur Shape)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
@@ -79,6 +81,8 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
         [NoScaleOffset]
             _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
+        [Toggle(_)]
+            _TS_FixContrast         ("[SH] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
             _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
@@ -144,6 +148,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
@@ -172,13 +177,14 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _DF_ENABLE
 
-            float _FR_Height2;
             #define _FR_HEIGHT_PARAM _FR_Height2
+            #define _FR_REPEAT_PARAM _FR_Repeat2
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase

@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2018-2022 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -98,12 +98,7 @@
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
         // ファーを伸ばす方向を計算
-        o.ws_fur_vector = calcFurVector(ws_tangent, ws_bitangent, o.ws_normal, o.uv)
-            #ifdef _FR_HEIGHT_PARAM
-                * _FR_HEIGHT_PARAM ;
-            #else
-                * _FR_Height ;
-            #endif
+        o.ws_fur_vector = calcFurVector(ws_tangent, ws_bitangent, o.ws_normal, o.uv) * _FR_HEIGHT_PARAM;
 
         return o;
     }
@@ -173,8 +168,8 @@
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
         v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
-        for (uint i = 0; i < _FR_Repeat; i++) {
-            float rate = i / (float) _FR_Repeat;
+        for (uint i = 0; i < _FR_REPEAT_PARAM; i++) {
+            float rate = i / (float) _FR_REPEAT_PARAM;
             v2g v2[3] = {
                 lerp_v2g(v[0], c, rate),
                 lerp_v2g(v[1], c, rate),

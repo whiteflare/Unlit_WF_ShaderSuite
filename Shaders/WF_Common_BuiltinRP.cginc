@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2018-2022 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -43,6 +43,9 @@
     #define DECL_VERT_TEX2D(name)                       sampler2D name
     #define PICK_VERT_TEX2D_LOD(tex, uv, lod)           tex2Dlod(tex, float4(uv.x, uv.y, 0, lod))
 #endif
+
+    #define DECL_GRAB_TEX2D(name)                       UNITY_DECLARE_SCREENSPACE_TEXTURE(name)
+    #define PICK_GRAB_TEX2D(tex, uv)                    UNITY_SAMPLE_SCREENSPACE_TEXTURE(tex, uv)
 
     ////////////////////////////
     // Compatible
