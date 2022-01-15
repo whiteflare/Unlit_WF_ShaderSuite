@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2018-2022 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -64,9 +64,6 @@
     DECL_MAIN_TEXCUBE   (_MT_Cubemap);
     DECL_MAIN_TEX2D     (_HL_MatcapTex);
     DECL_MAIN_TEX2D     (_OL_OverlayTex);
-#ifdef _RF_GRAB_TEXTURE
-    sampler2D           _RF_GRAB_TEXTURE;
-#endif
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
 
@@ -226,6 +223,7 @@
     float           _TS_Feather;
     float           _TS_BlendNormal;
     float           _TS_InvMaskVal;
+    float           _TS_FixContrast;
 
 #ifdef _WF_LEGACY_FEATURE_SWITCH
     float           _TR_Enable;

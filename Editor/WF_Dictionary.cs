@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2018-2022 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -197,6 +197,9 @@ namespace UnlitWF
             { "_ES_Shape", new WFCustomKeywordSettingEnum("_ES_Shape", "_ES_SCROLL_ENABLE", "_ES_SCROLL_ENABLE", "_ES_SCROLL_ENABLE", "_") {
                 enablePropName = "_ES_Enable",
             } },
+            { "_TS_FixContrast", new WFCustomKeywordSettingEnum("_TS_FixContrast", "_", "_TS_FIXC_ENABLE") {
+                enablePropName = "_TS_Enable",
+            } },
         };
 
         /// <summary>
@@ -331,6 +334,7 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture (R)", "アンチシャドウマスク (R)"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "影色を自動設定する"),
             new WFI18NTranslation("SH", "Align the boundaries equally", "境界を等間隔に整列"),
+            new WFI18NTranslation("SH", "Dont Ajust Contrast", "影コントラストを調整しない"),
             // RimLight
             new WFI18NTranslation("RM", "Rim Color", "リムライト色"),
             new WFI18NTranslation("RM", "Power", "強度(マスター)"),
@@ -412,6 +416,8 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Fur Height (Transparent)", "高さ (Transparent側)"),
             new WFI18NTranslation("FR", "Fur Vector", "方向"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
+            new WFI18NTranslation("FR", "Fur Repeat (Cutout)", "ファーの枚数 (Cutout側)"),
+            new WFI18NTranslation("FR", "Fur Repeat (Transparent)", "ファーの枚数 (Transparent側)"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "影の強さ"),
             new WFI18NTranslation("FR", "Tint Color (Base)", "色調整 (根元)"),
             new WFI18NTranslation("FR", "Tint Color (Tip)", "色調整 (先端)"),
@@ -585,6 +591,7 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture (R)", "안티 그림자 마스크 (R)"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "그림자 자동 설정"),
             new WFI18NTranslation("SH", "Align the boundaries equally", "경계값 동일 정렬 "),
+            new WFI18NTranslation("SH", "Dont Ajust Contrast", "그림자 콘트라스트를 조정하지 않는다"),
             // RimLight
             new WFI18NTranslation("RM", "Rim Color", "림라이트 색상"),
             new WFI18NTranslation("RM", "Power", "강도(최대)"),
@@ -666,6 +673,8 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Fur Height (Transparent)", "Fur 높이 (Transparent)"),
             new WFI18NTranslation("FR", "Fur Vector", "Fur 방향"),
             new WFI18NTranslation("FR", "Fur Repeat", "Fur 개수"),
+            new WFI18NTranslation("FR", "Fur Repeat (Cutout)", "Fur 개수 (Cutout)"),
+            new WFI18NTranslation("FR", "Fur Repeat (Transparent)", "Fur 개수 (Transparent)"),
             new WFI18NTranslation("FR", "Fur ShadowPower", "Fur 강도"),
             new WFI18NTranslation("FR", "Tint Color (Base)", "색조절 (뿌리 부분)"),
             new WFI18NTranslation("FR", "Tint Color (Tip)", "색조절 (끝 부분)"),
