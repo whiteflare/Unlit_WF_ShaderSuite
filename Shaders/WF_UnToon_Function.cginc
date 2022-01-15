@@ -712,14 +712,14 @@
         }
 
         float2 random2(float2 st) { // float2 -> float2 [0-1)
-            float2 ret = 0;
+            float2 ret = float2(0, 0);
             ret.x = random1(st);
             ret.y = random1(st + ret);
             return ret;
         }
 
         float3 random3(float2 st) { // float2 -> float3 [0-1)
-            float3 ret = 0;
+            float3 ret = float3(0, 0, 0);
             ret.x = random1(st);
             ret.y = random1(st + ret.xy);
             ret.z = random1(st + ret.xy);
@@ -753,8 +753,6 @@
                     }
 
                     float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
-
-                    min_pos.xy = round(min_pos.xy * 10) / 10; // ◆◇◆ ちらつき低減のテスト中 ◆◇◆
 
                     // アニメーション項
                     power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
