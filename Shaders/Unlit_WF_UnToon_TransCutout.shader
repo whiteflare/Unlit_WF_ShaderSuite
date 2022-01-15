@@ -309,7 +309,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/12/04", Float) = 0
+            _CurrentVersion         ("2022/01/17", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
