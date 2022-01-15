@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2018-2022 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -227,6 +227,22 @@ namespace UnlitWF
                         {
                             val = 0.2f;
                             material.SetFloat("_Cutoff", val);
+                        }
+                    }
+                }
+                else
+                {
+                    // UnlitWFからの切替時に動作
+                    if (oldShader.name.Contains("FakeFur") && newShader.name.Contains("FakeFur"))
+                    {
+                        // FakeFurどうしの切り替えで、
+                        if (!oldShader.name.Contains("_Mix") && newShader.name.Contains("_Mix"))
+                        {
+                            // Mixへの切り替えならば、FR_Height2とFR_Repeat2を設定する
+                            var height = material.GetFloat("_FR_Height");
+                            material.SetFloat("_FR_Height2", height * 1.25f);
+                            var repeat = material.GetInt("_FR_Repeat");
+                            material.SetInt("_FR_Repeat2", Math.Max(1, repeat - 1));
                         }
                     }
                 }

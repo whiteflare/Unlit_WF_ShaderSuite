@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2018-2022 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -51,7 +51,7 @@
     // アウトラインキャンセラ用 vertex&fragment shader
     ////////////////////////////
 
-    sampler2D _TL_CANCEL_GRAB_TEXTURE;
+    DECL_GRAB_TEX2D(_TL_CANCEL_GRAB_TEXTURE);
 
     v2f_canceller vert_outline_canceller(appdata v) {
         v2f_canceller o;
@@ -76,7 +76,8 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        return tex2Dproj(_TL_CANCEL_GRAB_TEXTURE, UNITY_PROJ_COORD(i.uv_grab));
+        i.uv_grab.xy /= i.uv_grab.w;
+        return PICK_GRAB_TEX2D(_TL_CANCEL_GRAB_TEXTURE, i.uv_grab);
     }
 
 #endif

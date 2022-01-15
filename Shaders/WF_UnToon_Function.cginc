@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2021 whiteflare.
+ *  Copyright 2018-2022 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -712,14 +712,14 @@
         }
 
         float2 random2(float2 st) { // float2 -> float2 [0-1)
-            float2 ret = 0;
+            float2 ret = float2(0, 0);
             ret.x = random1(st);
             ret.y = random1(st + ret);
             return ret;
         }
 
         float3 random3(float2 st) { // float2 -> float3 [0-1)
-            float3 ret = 0;
+            float3 ret = float3(0, 0, 0);
             ret.x = random1(st);
             ret.y = random1(st + ret.xy);
             ret.z = random1(st + ret.xy);
@@ -753,8 +753,6 @@
                     }
 
                     float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
-
-                    min_pos.xy = round(min_pos.xy * 10) / 10; // ◆◇◆ ちらつき低減のテスト中 ◆◇◆
 
                     // アニメーション項
                     power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
@@ -796,17 +794,26 @@
         void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_TS_Enable)) {
+                if (TGL_OFF(_TS_FixContrast)) {
 #endif
+#if !defined(_TS_FIXC_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
                 float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
-
                 float main = saturate(calcBrightness( lightColorMain ));
                 float sub4 = saturate(calcBrightness( lightColorSub4 ));
                 float ambient = saturate(calcBrightness( ambientColor ));
                 shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
                 shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
-                shadow_power = min( shadow_power, 1 - saturate(ambient) * 0.5 );
+                shadow_power = min( shadow_power, 1 - ambient * 0.5 );
+#endif
 #ifdef _WF_LEGACY_FEATURE_SWITCH
+                } else {
+#endif
+#if defined(_TS_FIXC_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+                shadow_power = 1;
+#endif
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+                }
             } else {
                 shadow_power = 0;
             }
@@ -996,6 +1003,33 @@
     // Outline
     ////////////////////////////
 
+    float3 shiftNormalVertex(inout float3 ws_vertex, float3 ws_normal, float width) {
+        // 外側にシフトする
+        return ws_vertex.xyz + ws_normal * width; // ws_normal は normalizeされている前提
+    }
+
+    float4 shiftDepthVertex(float3 ws_vertex, float width) {
+        // ワールド座標でのカメラ方向と距離を計算
+        float3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
+        // カメラ方向の z シフト量を加算
+        float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
+
+        float4 vertex;
+        if (unity_OrthoParams.w < 0.5) {
+            // カメラが perspective のときは単にカメラ方向にシフトする
+            vertex = UnityWorldToClipPos( ws_vertex + zShiftVec );
+        } else {
+            // カメラが orthographic のときはシフト後の z のみ採用する
+            vertex = UnityWorldToClipPos( ws_vertex );
+            vertex.z = UnityWorldToClipPos( ws_vertex + zShiftVec ).z;
+        }
+        return vertex;
+    }
+
+    float4 shiftNormalAndDepthVertex(float3 ws_vertex, float3 ws_normal, float width, float shift) {
+        return shiftDepthVertex(shiftNormalVertex(ws_vertex, ws_normal, width), shift);
+    }
+
     #ifdef _TL_ENABLE
 
         float getOutlineShiftWidth(float2 uv_main) {
@@ -1043,33 +1077,13 @@
         #define affectOutline(uv_main, color)
     #endif
 
-    float4 shiftDepthVertex(float3 ws_vertex, float width) { // これは複数箇所から使うので _TL_ENABLE には入れない
-        // ワールド座標でのカメラ方向と距離を計算
-        float3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
-        // カメラ方向の z シフト量を加算
-        float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
-
-        float4 vertex;
-        if (unity_OrthoParams.w < 0.5) {
-            // カメラが perspective のときは単にカメラ方向にシフトする
-            vertex = UnityWorldToClipPos( ws_vertex + zShiftVec );
-        } else {
-            // カメラが orthographic のときはシフト後の z のみ採用する
-            vertex = UnityWorldToClipPos( ws_vertex );
-            vertex.z = UnityWorldToClipPos( ws_vertex + zShiftVec ).z;
-        }
-        return vertex;
-    }
-
-    float4 shiftOutlineVertex(inout float3 ws_vertex, float3 ws_normal, float width, float shift) {
+    float4 shiftOutlineVertex(inout float3 ws_vertex, float3 ws_normal, float width, float shift) { // 4
         #ifdef _TL_ENABLE
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_ON(_TL_Enable)) {
 #endif
-            // 外側にシフトする
-            ws_vertex.xyz += ws_normal * width;
-            // Zシフト
-            return shiftDepthVertex(ws_vertex, shift);
+            // Normal方向にシフトとCamera方向にZ-Shiftを行う
+            return shiftNormalAndDepthVertex(ws_vertex, ws_normal, width, shift);
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         } else {
             return UnityObjectToClipPos( ZERO_VEC3 );
@@ -1203,6 +1217,8 @@
 
     #ifdef _RF_ENABLE
 
+        DECL_GRAB_TEX2D(_RF_GRAB_TEXTURE); // URPではGrabがサポートされていないのでここで宣言する
+
         void affectRefraction(v2f i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_RF_Enable)) {
@@ -1214,9 +1230,11 @@
                 float3 refract_pos = i.ws_vertex + refract_dir * _RF_Distance;
 
                 float4 refract_scr_pos = mul(UNITY_MATRIX_VP, float4(refract_pos, 1));
-                float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
+                refract_scr_pos.xy = clamp(refract_scr_pos.xy, -refract_scr_pos.w, refract_scr_pos.w);
 
-                float3 refract_color = tex2Dproj(_RF_GRAB_TEXTURE, UNITY_PROJ_COORD(grab_uv)).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
+                float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
+                grab_uv.xy /= grab_uv.w;
+                float3 refract_color = PICK_GRAB_TEX2D(_RF_GRAB_TEXTURE, grab_uv).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
                 color.rgb = lerp(refract_color.rgb, color.rgb, color.a);
                 color.a = 1;
