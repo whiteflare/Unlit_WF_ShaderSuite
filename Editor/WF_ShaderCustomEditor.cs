@@ -917,8 +917,17 @@ namespace UnlitWF
         /// <param name="propTexture"></param>
         public static void DrawSingleLineTextureProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty propColor, MaterialProperty propTexture)
         {
+            EditorGUI.BeginChangeCheck();
+            var oldTexture = propTexture.textureValue;
+
             // 1行テクスチャプロパティ
             materialEditor.TexturePropertySingleLine(label, propTexture, propColor);
+
+            // もしテクスチャが新たに設定されたならば、カラーを白にリセットする
+            if (EditorGUI.EndChangeCheck() && oldTexture == null && propTexture.textureValue != null)
+            {
+                propColor.colorValue = Color.white;
+            }
 
             // もし NoScaleOffset がないなら ScaleOffset も追加で表示する
             if (!propTexture.flags.HasFlag(MaterialProperty.PropFlags.NoScaleOffset))
