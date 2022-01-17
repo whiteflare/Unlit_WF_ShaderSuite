@@ -701,13 +701,21 @@ namespace UnlitWF
 
         private static void SuggestShadowColor(Material[] mats)
         {
+            Undo.RecordObjects(mats, "shade color change");
+
             foreach (var m in mats)
             {
-                Undo.RecordObject(m, "shade color change");
                 // ベース色を取得
                 Color baseColor = m.GetColor("_TS_BaseColor");
                 float hur, sat, val;
                 Color.RGBToHSV(baseColor, out hur, out sat, out val);
+
+                // もし val が 0.7 未満ならばベース色を明るめに再設定する
+                if (val < 0.7f)
+                {
+                    val = 0.7f;
+                    m.SetColor("_TS_BaseColor", Color.HSVToRGB(hur, sat, val));
+                }
 
                 // 段数を取得
                 var steps = GetShadowStepsFromMaterial(m);
@@ -717,6 +725,16 @@ namespace UnlitWF
                         if (m.HasProperty("_TS_1stColor"))
                         {
                             m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
+                        }
+                        break;
+                    default:
+                        if (m.HasProperty("_TS_1stColor"))
+                        {
+                            m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
+                        }
+                        if (m.HasProperty("_TS_2ndColor"))
+                        {
+                            m.SetColor("_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
                         }
                         break;
                     case 3:
@@ -733,25 +751,16 @@ namespace UnlitWF
                             m.SetColor("_TS_3rdColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.7f));
                         }
                         break;
-                    default:
-                        if (m.HasProperty("_TS_1stColor"))
-                        {
-                            m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
-                        }
-                        if (m.HasProperty("_TS_2ndColor"))
-                        {
-                            m.SetColor("_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
-                        }
-                        break;
                 }
             }
         }
 
         private static void SuggestShadowBorder(Material[] mats)
         {
+            Undo.RecordObjects(mats, "shade border change");
+
             foreach (var m in mats)
             {
-                Undo.RecordObject(m, "shade border change");
                 // 段数を取得
                 var steps = GetShadowStepsFromMaterial(m);
                 // 1影
