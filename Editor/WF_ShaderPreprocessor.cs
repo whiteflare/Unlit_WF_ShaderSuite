@@ -111,7 +111,7 @@ namespace UnlitWF
                 // ここで stripping するのは ForwardBase だけ
                 return 0;
             }
-            if (settings.stripUnusedVariant)
+            if (!settings.stripUnusedVariant)
             {
                 // 設定で無効化されているならば stripping しない
                 return 0;
