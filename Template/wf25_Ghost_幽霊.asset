@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent
   m_Shader: {fileID: 4800000, guid: 4ba701b07ccc81e4aae7f053bf332eab, type: 3}
-  m_ShaderKeywords: _TR_ENABLE _TS_ENABLE
+  m_ShaderKeywords: _TR_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -115,6 +115,8 @@ Material:
     - _AO_Brightness: 0
     - _AO_Contrast: 1
     - _AO_Enable: 0
+    - _AO_UVType: 0
+    - _AO_UseGreenMap: 0
     - _AO_UseLightMap: 1
     - _BK_Enable: 0
     - _BumpScale: 1
@@ -150,6 +152,7 @@ Material:
     - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
     - _HL_CapType: 0
+    - _HL_ChangeAlpha: 0
     - _HL_Enable: 0
     - _HL_InvMaskVal: 0
     - _HL_Parallax: 0.75
@@ -197,6 +200,7 @@ Material:
     - _TS_BlendNormal: 0.1
     - _TS_Enable: 1
     - _TS_Feather: 0.05
+    - _TS_FixContrast: 0
     - _TS_InvMaskVal: 0
     - _TS_Power: 1
     - _TS_Steps: 2
@@ -213,6 +217,7 @@ Material:
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1, a: 1}
+    - _OL_UVScroll: {r: 0, g: 0, b: 0, a: 0}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.81, g: 0.81, b: 0.9, a: 1}
     - _TS_2ndColor: {r: 0.68, g: 0.68, b: 0.8, a: 1}
