@@ -208,16 +208,17 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
 
+
+
+
+
             #define _AO_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
-
-
-
             #define _ES_ENABLE
             #define _HL_ENABLE
             #define _MT_ENABLE
             #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
