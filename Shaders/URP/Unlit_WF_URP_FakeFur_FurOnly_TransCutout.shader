@@ -140,9 +140,9 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
             #define _WF_PLATFORM_LWRP
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local _CL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
 
             // -------------------------------------
             // Lightweight Pipeline keywords

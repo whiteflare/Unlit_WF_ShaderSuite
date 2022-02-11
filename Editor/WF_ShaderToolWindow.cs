@@ -85,7 +85,8 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
         private static void Menu_AutoConvertMaterial()
         {
-            new WFMaterialFromOtherShaderConverter().ExecAutoConvert(Selection.GetFiltered<Material>(SelectionMode.Assets));
+            var mats = MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
+            new WFMaterialFromOtherShaderConverter().ExecAutoConvert(mats.ToArray());
         }
 
         [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
@@ -112,7 +113,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_KEEPMAT, priority = WFMenu.PRI_ASSETS_KEEPMAT)]
         private static void Menu_KeepMaterialInScene()
         {
-            var mats = Selection.GetFiltered<Material>(SelectionMode.Assets);
+            var mats = MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAsset);
 
             var go = new GameObject("MaterialKeeper");
             go.tag = "EditorOnly";
@@ -134,7 +135,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, priority = WFMenu.PRI_ASSETS_DEBUGVIEW)]
         private static void Menu_DebugView()
         {
-            foreach (var mat in Selection.GetFiltered<Material>(SelectionMode.Assets))
+            foreach (var mat in MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAsset))
             {
                 WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, mat);
             }
@@ -153,7 +154,8 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_CNGMOBILE, priority = WFMenu.PRI_ASSETS_CNGMOBILE)]
         private static void Menu_ChangeMobileShader()
         {
-            ChangeMobileShader(Selection.GetFiltered<Material>(SelectionMode.Assets));
+            var mats = MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
+            ChangeMobileShader(mats.ToArray());
         }
 
         private static void ChangeMobileShader(params Material[] mats)
@@ -166,14 +168,8 @@ namespace UnlitWF
 
         #endregion
 
-        [MenuItem(WFMenu.ASSETS_AUTOCNV, validate = true)]
-        [MenuItem(WFMenu.ASSETS_CREANUP, validate = true)]
-        [MenuItem(WFMenu.ASSETS_RESET, validate = true)]
-        [MenuItem(WFMenu.ASSETS_COPY, validate = true)]
-        [MenuItem(WFMenu.ASSETS_MIGRATION, validate = true)]
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, validate = true)]
         [MenuItem(WFMenu.ASSETS_KEEPMAT, validate = true)]
-        [MenuItem(WFMenu.ASSETS_CNGMOBILE, validate = true)]
         private static bool MenuValidation_HasMaterials()
         {
             return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
@@ -261,29 +257,16 @@ namespace UnlitWF
 
         private static readonly List<Material> arguments = new List<Material>();
 
-        public static void SetSelectedMaterials(params Material[] mats)
+        public static void SetSelectedMaterials(MatSelectMode mode)
         {
             arguments.Clear();
-            arguments.AddRange(SearchSelectedMaterials());
+            arguments.AddRange(MaterialSeeker.GetSelectionAllMaterial(mode));
         }
 
         public static void SetMaterials(Material[] mats)
         {
             arguments.Clear();
             arguments.AddRange(mats);
-        }
-
-        private static IEnumerable<Material> SearchSelectedMaterials()
-        {
-            var result = new List<Material>();
-            // 選択されてるマテリアル自体
-            result.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
-            // GameObject
-            foreach (var go in Selection.GetFiltered<GameObject>(SelectionMode.Unfiltered))
-            {
-                MaterialSeeker.GetAllMaterials(go, result);
-            }
-            return result.Distinct();
         }
 
         public static void GetSelectedMaterials(ref Material[] array)
@@ -301,12 +284,24 @@ namespace UnlitWF
 
     public class ToolCreanUpWindow : EditorWindow
     {
-        [MenuItem(WFMenu.TOOLS_CREANUP, priority = WFMenu.PRI_TOOLS_CREANUP)]
         [MenuItem(WFMenu.ASSETS_CREANUP, priority = WFMenu.PRI_ASSETS_CREANUP)]
-        [MenuItem(WFMenu.GAMEOBJECT_CREANUP, priority = 10)] // GameObject/配下は priority の扱いがちょっと特殊
-        private static void OpenWindowFromMenu()
+        private static void OpenWindowFromMenu_Asset()
         {
-            ToolCommon.SetSelectedMaterials();
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromAssetDeep);
+            GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
+        }
+
+        [MenuItem(WFMenu.GAMEOBJECT_CREANUP, priority = 10)] // GameObject/配下は priority の扱いがちょっと特殊
+        private static void OpenWindowFromMenu_GameObject()
+        {
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromScene);
+            GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
+        }
+
+        [MenuItem(WFMenu.TOOLS_CREANUP, priority = WFMenu.PRI_TOOLS_CREANUP)]
+        private static void OpenWindowFromMenu_Tool()
+        {
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromSceneOrAsset);
             GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
         }
 
@@ -388,12 +383,17 @@ namespace UnlitWF
 
     public class ToolResetWindow : EditorWindow
     {
+        [MenuItem(WFMenu.ASSETS_RESET, priority = WFMenu.PRI_ASSETS_RESET)]
+        private static void OpenWindowFromMenu_Asset()
+        {
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromAssetDeep);
+            GetWindow<ToolResetWindow>("UnlitWF/Reset material property");
+        }
 
         [MenuItem(WFMenu.TOOLS_RESET, priority = WFMenu.PRI_TOOLS_RESET)]
-        [MenuItem(WFMenu.ASSETS_RESET, priority = WFMenu.PRI_ASSETS_RESET)]
-        private static void OpenWindowFromMenu()
+        private static void OpenWindowFromMenu_Tool()
         {
-            ToolCommon.SetSelectedMaterials();
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromSceneOrAsset);
             GetWindow<ToolResetWindow>("UnlitWF/Reset material property");
         }
 
@@ -485,11 +485,17 @@ namespace UnlitWF
     public class ToolCopyWindow : EditorWindow
     {
 
-        [MenuItem(WFMenu.TOOLS_COPY, priority = WFMenu.PRI_TOOLS_COPY)]
         [MenuItem(WFMenu.ASSETS_COPY, priority = WFMenu.PRI_ASSETS_COPY)]
-        private static void OpenWindowFromMenu()
+        private static void OpenWindowFromMenu_Asset()
         {
-            ToolCommon.SetSelectedMaterials();
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromAssetDeep);
+            GetWindow<ToolCopyWindow>("UnlitWF/Copy material property");
+        }
+
+        [MenuItem(WFMenu.TOOLS_COPY, priority = WFMenu.PRI_TOOLS_COPY)]
+        private static void OpenWindowFromMenu_Tool()
+        {
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromSceneOrAsset);
             GetWindow<ToolCopyWindow>("UnlitWF/Copy material property");
         }
 
@@ -576,11 +582,17 @@ namespace UnlitWF
 
     public class ToolMigrationWindow : EditorWindow
     {
-        [MenuItem(WFMenu.TOOLS_MIGRATION, priority = WFMenu.PRI_TOOLS_MIGRATION)]
         [MenuItem(WFMenu.ASSETS_MIGRATION, priority = WFMenu.PRI_ASSETS_MIGRATION)]
-        private static void OpenWindowFromMenu()
+        private static void OpenWindowFromMenu_Asset()
         {
-            ToolCommon.SetSelectedMaterials();
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromAssetDeep);
+            GetWindow<ToolMigrationWindow>("UnlitWF/Migration material");
+        }
+
+        [MenuItem(WFMenu.TOOLS_MIGRATION, priority = WFMenu.PRI_TOOLS_MIGRATION)]
+        private static void OpenWindowFromMenu_Tool()
+        {
+            ToolCommon.SetSelectedMaterials(MatSelectMode.FromSceneOrAsset);
             GetWindow<ToolMigrationWindow>("UnlitWF/Migration material");
         }
 
@@ -1132,26 +1144,9 @@ namespace UnlitWF
         public static void ScanAndMigration()
         {
             // Go Ahead
-            var paths = AssetDatabase.FindAssets("t:Material")
-                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                .Distinct().ToArray();
-            if (0 < paths.Length)
+            var done = MaterialSeeker.SeekProjectAllMaterial("migration materials", Migration);
+            if (0 < done)
             {
-                int current = 0;
-                int done = 0;
-                for (int i = 0; i < paths.Length; i++)
-                {
-                    if (Migration(paths[i]))
-                    {
-                        done++;
-                    }
-                    if (++current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar("WF", "migration materials", current / (float)paths.Length))
-                    {
-                        break;
-                    }
-                }
-                EditorUtility.ClearProgressBar();
-
                 AssetDatabase.SaveAssets();
                 Debug.LogFormat("[WF] Scan And Migration {0} materials", done);
             }
@@ -1174,6 +1169,11 @@ namespace UnlitWF
                 return false;
             }
             var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            return Migration(mat);
+        }
+
+        private static bool Migration(Material mat)
+        {
             if (!WFCommonUtility.IsSupportedShader(mat))
             {
                 return false;
