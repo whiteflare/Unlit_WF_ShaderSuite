@@ -126,14 +126,15 @@ namespace UnlitWF
                 EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info);
             }),
             // _HL_MatcapColor の後に説明文を追加する
-            new CustomPropertyHook("_HL_MatcapColor", null, (ctx, changed) => {
-                if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 0)) {
+            new CustomPropertyHook("_HL_MatcapColor(_[0-9]+)?", null, (ctx, changed) => {
+                var name = ctx.current.name.Replace("_MatcapColor", "_CapType");
+                if (IsAnyIntValue(ctx, name, p => p == 0)) {
                     EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeMedian), MessageType.Info);
                 }
-                if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 1)) {
+                if (IsAnyIntValue(ctx, name, p => p == 1)) {
                     EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeLight), MessageType.Info);
                 }
-                if (IsAnyIntValue(ctx, "_HL_CapType", p => p == 2)) {
+                if (IsAnyIntValue(ctx, name, p => p == 2)) {
                     EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeShade), MessageType.Info);
                 }
             }),

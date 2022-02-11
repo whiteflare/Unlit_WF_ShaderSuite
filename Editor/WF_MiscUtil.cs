@@ -27,9 +27,93 @@ using UnityEngine.SceneManagement;
 
 namespace UnlitWF
 {
+    internal enum MatSelectMode
+    {
+        FromScene = 1,
+        FromAsset = 2,
+        FromSceneOrAsset = 3,
+        FromAssetDeep = 6,
+    }
+
     internal static class MaterialSeeker
     {
-        #region マテリアル列挙系
+        #region マテリアル列挙系(プロジェクトから)
+
+        public static string[] GetProjectAllMaterialPaths()
+        {
+            return AssetDatabase.FindAssets("t:Material")
+                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
+                .Distinct().ToArray();
+        }
+
+        public static int SeekProjectAllMaterial(string title, System.Func<Material, bool> action)
+        {
+            int done = 0;
+            var paths = GetProjectAllMaterialPaths();
+            if (0 < paths.Length)
+            {
+                int current = 0;
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    if (!string.IsNullOrWhiteSpace(paths[i]))
+                    {
+                        var mat = AssetDatabase.LoadAssetAtPath<Material>(paths[i]);
+                        if (action(mat))
+                        {
+                            done++;
+                        }
+                    }
+                    if (++current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar("WF", title, current / (float)paths.Length))
+                    {
+                        break;
+                    }
+                }
+                EditorUtility.ClearProgressBar();
+            }
+            return done;
+        }
+
+        #endregion
+
+        #region マテリアル列挙系(Selectionから)
+
+        public static IEnumerable<Material> GetSelectionAllMaterial(MatSelectMode mode, List<Material> result = null)
+        {
+            InitList(ref result);
+
+            if ((mode & MatSelectMode.FromScene) != 0)
+            {
+                // GameObject
+                GetAllMaterials(Selection.GetFiltered<GameObject>(SelectionMode.Editable), result);
+            }
+            if ((mode & MatSelectMode.FromAsset) != 0)
+            {
+                // Materialアセット自体
+                result.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
+            }
+            // サブフォルダ含めて
+            if ((mode & MatSelectMode.FromAssetDeep) == MatSelectMode.FromAssetDeep)
+            {
+                var folders = Selection.GetFiltered<DefaultAsset>(SelectionMode.Assets)
+                    .Select(asset => AssetDatabase.GetAssetPath(asset))
+                    .Where(path => !string.IsNullOrWhiteSpace(path))
+                    .Distinct().ToArray();
+                result.AddRange(
+                    AssetDatabase.FindAssets("t:Material", folders)
+                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                        .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
+                        .Distinct()
+                        .Select(path => AssetDatabase.LoadAssetAtPath<Material>(path))
+                        .Where(mat => mat != null));
+
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region マテリアル列挙系(シーンから)
 
         public static IEnumerable<Material> GetAllSceneAllMaterial(List<Material> result = null)
         {
@@ -49,7 +133,13 @@ namespace UnlitWF
             {
                 return result;
             }
-            foreach (var go in scene.GetRootGameObjects())
+            return GetAllMaterials(scene.GetRootGameObjects(), result);
+        }
+
+        public static IEnumerable<Material> GetAllMaterials(GameObject[] gos, List<Material> result = null)
+        {
+            InitList(ref result);
+            foreach (var go in gos)
             {
                 GetAllMaterials(go, result);
             }
