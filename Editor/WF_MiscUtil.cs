@@ -98,15 +98,19 @@ namespace UnlitWF
                 var folders = Selection.GetFiltered<DefaultAsset>(SelectionMode.Assets)
                     .Select(asset => AssetDatabase.GetAssetPath(asset))
                     .Where(path => !string.IsNullOrWhiteSpace(path))
-                    .Distinct().ToArray();
-                result.AddRange(
-                    AssetDatabase.FindAssets("t:Material", folders)
-                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                        .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
-                        .Distinct()
-                        .Select(path => AssetDatabase.LoadAssetAtPath<Material>(path))
-                        .Where(mat => mat != null));
-
+                    .Distinct()
+                    .Where(path => System.IO.File.GetAttributes(path).HasFlag(System.IO.FileAttributes.Directory))
+                    .ToArray();
+                if (0 < folders.Length)
+                {
+                    result.AddRange(
+                        AssetDatabase.FindAssets("t:Material", folders)
+                            .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                            .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
+                            .Distinct()
+                            .Select(path => AssetDatabase.LoadAssetAtPath<Material>(path))
+                            .Where(mat => mat != null));
+                }
             }
             return result;
         }
