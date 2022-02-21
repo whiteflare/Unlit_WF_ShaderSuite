@@ -652,45 +652,69 @@
 
     #ifdef _HL_ENABLE
 
+        void calcMatcapColorAdd(float3 matcap_color, float3 matcap_mask_color, float power, inout float4 color) {
+            // 加算合成
+            matcap_color.rgb *= LinearToGammaSpace(matcap_mask_color);
+            color.rgb = blendColor_Add(color.rgb, matcap_color.rgb, power);
+        }
+
+        void calcMatcapColorMul(float3 matcap_color, float3 matcap_mask_color, float power, inout float4 color) {
+            // 乗算合成
+            matcap_color.rgb *= LinearToGammaSpace(matcap_mask_color);
+            color.rgb = blendColor_Mul(color.rgb, matcap_color.rgb, power);
+        }
+
+        void calcMatcapColorMed(float3 matcap_color, float3 matcap_mask_color, float power, inout float4 color) {
+            // 中間色合成
+            float3 lighten_color = max(ZERO_VEC3, matcap_color.rgb);
+            float3 darken_color  = min(ZERO_VEC3, matcap_color.rgb);
+            matcap_color.rgb = lerp(darken_color, lighten_color, matcap_mask_color);
+            color.rgb = blendColor_Add(color.rgb, matcap_color.rgb, power);
+        }
+
+        void calcMatcapAlpha(float4 matcap_color, float power, inout float4 color) {
+            // アルファ側の合成
+            #if defined(_WF_ALPHA_FRESNEL)
+                color.a = min(color.a, lerp(1, matcap_color.a, power));
+            #endif
+        }
+
+        void calcMatcapColor(
+                float4  matcap_color,
+                float3  matcap_mask,
+                float   power,
+                float3  arrange_color,
+                float3  median_color,
+                float   change_alpha,
+                uint    cap_type,
+                inout float4 color) {
+
+            // 色調整前のマスクを元に強度を計算
+            power *= MAX_RGB(matcap_mask);
+            // マスク色調整
+            float3 matcap_mask_color = matcap_mask * arrange_color * 2;
+
+            // 色合成
+            if (cap_type == 1) {
+                calcMatcapColorAdd(matcap_color.rgb, matcap_mask_color, power, color);
+            } else if(cap_type == 2) {
+                calcMatcapColorMul(matcap_color.rgb, matcap_mask_color, power, color);
+            } else {
+                calcMatcapColorMed(matcap_color.rgb - median_color, matcap_mask_color, power, color);
+            }
+
+            // アルファ側の合成
+            calcMatcapAlpha(matcap_color, power * change_alpha, color);
+        }
+
         void affectMatcapColor(float2 matcapVector, float2 uv_main, inout float4 color) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_HL_Enable)) {
 #endif
-                // matcap サンプリング
-                float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;
-                float4 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcap_uv));
-
-                // マスク参照
-                float3 matcap_mask = WF_TEX2D_MATCAP_MASK(uv_main);
-                // 色調整前のマスクを元に強度を計算
-                float power = _HL_Power * MAX_RGB(matcap_mask);
-                // マスク色調整
-                float3 matcap_mask_color = matcap_mask * _HL_MatcapColor * 2;
-
-                // 色合成
-                if (_HL_CapType == 1) {
-                    // 加算合成
-                    matcap_color.rgb *= LinearToGammaSpace(matcap_mask_color);
-                    color.rgb = blendColor_Add(color.rgb, matcap_color.rgb, power);
-                } else if(_HL_CapType == 2) {
-                    // 乗算合成
-                    matcap_color.rgb *= LinearToGammaSpace(matcap_mask_color);
-                    color.rgb = blendColor_Mul(color.rgb, matcap_color.rgb, power);
-                } else {
-                    // 中間色合成
-                    matcap_color.rgb -= _HL_MedianColor;
-                    float3 lighten_color = max(ZERO_VEC3, matcap_color.rgb);
-                    float3 darken_color  = min(ZERO_VEC3, matcap_color.rgb);
-                    matcap_color.rgb = lerp(darken_color, lighten_color, matcap_mask_color);
-                    color.rgb = blendColor_Add(color.rgb, matcap_color.rgb, power);
-                }
-
-                // アルファ側の合成
-            #if defined(_WF_ALPHA_FRESNEL)
-                if (TGL_ON(_HL_ChangeAlpha)) {
-                    color.a = min(color.a, lerp(1, matcap_color.a, power));
-                }
-            #endif
+                calcMatcapColor(
+                    PICK_MAIN_TEX2D(_HL_MatcapTex, saturate(matcapVector.xy * 0.5 + 0.5)),
+                    SAMPLE_MASK_VALUE(_HL_MaskTex, uv_main, _HL_InvMaskVal).rgb,
+                    _HL_Power, _HL_MatcapColor, _HL_MedianColor, _HL_ChangeAlpha, _HL_CapType, color);
 
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             }
