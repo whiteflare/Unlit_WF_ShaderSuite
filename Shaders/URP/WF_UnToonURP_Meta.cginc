@@ -94,19 +94,16 @@
 
         o.Albedo        = color.rgb * lerp(1, _GI_IndirectMultiplier, _GI_Enable);
         o.SpecularColor = o.Albedo;
+        o.Emission      = ZERO_VEC3;    // 初期化
 
 #ifdef _ES_ENABLE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-        if (TGL_ON(_ES_Enable)) {
-#endif
-            float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv_main).rgba;
-            float4 es_color = _EmissionColor * es_mask;
-            o.Emission  = es_color.rgb * es_color.a * lerp(1, _GI_EmissionMultiplier, _GI_Enable);
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-        } else {
-            o.Emission  = ZERO_VEC3;
-        }
-#endif
+
+FEATURE_TGL_ON_BEGIN(_ES_Enable)
+        float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv_main).rgba;
+        float4 es_color = _EmissionColor * es_mask;
+        o.Emission  = es_color.rgb * es_color.a * lerp(1, _GI_EmissionMultiplier, _GI_Enable);
+FEATURE_TGL_END
+
 #endif
 
         return MetaFragment(o);
