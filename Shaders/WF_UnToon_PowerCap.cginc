@@ -24,78 +24,6 @@
     // Light Matcap Power
     ////////////////////////////
 
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    #define WF_POWERCAP_FUNC(id)                                                                                                    \
-        void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
-            if (TGL_ON(_HL_Enable_##id)) {                                                                                          \
-                float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;                                                                     \
-                float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                 \
-                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, uv_main, _HL_InvMaskVal_##id).rgb;                         \
-                float power = _HL_Power_##id * MAX_RGB(matcap_mask);                                                                \
-                float3 matcap_mask_color = matcap_mask * _HL_MatcapColor_##id * 2;                                                  \
-                if (_HL_CapType_##id == 1) {                                                                                        \
-                    matcap_color *= LinearToGammaSpace(matcap_mask_color);                                                          \
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);                                                     \
-                } else if(_HL_CapType_##id == 2) {                                                                                  \
-                    matcap_color *= LinearToGammaSpace(matcap_mask_color);                                                          \
-                    color.rgb = blendColor_Mul(color.rgb, matcap_color, power);                                                     \
-                } else {                                                                                                            \
-                    matcap_color -= _HL_MedianColor_##id;                                                                           \
-                    float3 lighten_color = max(ZERO_VEC3, matcap_color);                                                            \
-                    float3 darken_color  = min(ZERO_VEC3, matcap_color);                                                            \
-                    matcap_color = lerp(darken_color, lighten_color, matcap_mask_color);                                            \
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);                                                     \
-                }                                                                                                                   \
-            }                                                                                                                       \
-        }
-#else
-    #define WF_POWERCAP_FUNC(id)                                                                                                    \
-        void affectMatcapColor_##id(float2 matcapVector, float2 uv_main, inout float4 color) {                                      \
-                float2 matcap_uv = matcapVector.xy * 0.5 + 0.5;                                                                     \
-                float3 matcap_color = PICK_MAIN_TEX2D(_HL_MatcapTex_##id, saturate(matcap_uv)).rgb;                                 \
-                float3 matcap_mask = SAMPLE_MASK_VALUE(_HL_MaskTex_##id, uv_main, _HL_InvMaskVal_##id).rgb;                         \
-                float power = _HL_Power_##id * MAX_RGB(matcap_mask);                                                                \
-                float3 matcap_mask_color = matcap_mask * _HL_MatcapColor_##id * 2;                                                  \
-                if (_HL_CapType_##id == 1) {                                                                                        \
-                    matcap_color *= LinearToGammaSpace(matcap_mask_color);                                                          \
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);                                                     \
-                } else if(_HL_CapType_##id == 2) {                                                                                  \
-                    matcap_color *= LinearToGammaSpace(matcap_mask_color);                                                          \
-                    color.rgb = blendColor_Mul(color.rgb, matcap_color, power);                                                     \
-                } else {                                                                                                            \
-                    matcap_color -= _HL_MedianColor_##id;                                                                           \
-                    float3 lighten_color = max(ZERO_VEC3, matcap_color);                                                            \
-                    float3 darken_color  = min(ZERO_VEC3, matcap_color);                                                            \
-                    matcap_color = lerp(darken_color, lighten_color, matcap_mask_color);                                            \
-                    color.rgb = blendColor_Add(color.rgb, matcap_color, power);                                                     \
-                }                                                                                                                   \
-        }
-#endif
-
-    #define WF_POWERCAP_AFFECT(id)  affectMatcapColor_##id(calcMatcapVector(matcapVector, _HL_BlendNormal_##id, _HL_Parallax_##id), i.uv, color)
-
-#ifdef _HL_ENABLE_1
-    WF_POWERCAP_FUNC(1)
-#endif
-#ifdef _HL_ENABLE_2
-    WF_POWERCAP_FUNC(2)
-#endif
-#ifdef _HL_ENABLE_3
-    WF_POWERCAP_FUNC(3)
-#endif
-#ifdef _HL_ENABLE_4
-    WF_POWERCAP_FUNC(4)
-#endif
-#ifdef _HL_ENABLE_5
-    WF_POWERCAP_FUNC(5)
-#endif
-#ifdef _HL_ENABLE_6
-    WF_POWERCAP_FUNC(6)
-#endif
-#ifdef _HL_ENABLE_7
-    WF_POWERCAP_FUNC(7)
-#endif
-
     ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
@@ -137,29 +65,7 @@
         float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 
         // Highlight
-        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax).xy, uv_main, color);
-
-#ifdef _HL_ENABLE_1
-        WF_POWERCAP_AFFECT(1);
-#endif
-#ifdef _HL_ENABLE_2
-        WF_POWERCAP_AFFECT(2);
-#endif
-#ifdef _HL_ENABLE_3
-        WF_POWERCAP_AFFECT(3);
-#endif
-#ifdef _HL_ENABLE_4
-        WF_POWERCAP_AFFECT(4);
-#endif
-#ifdef _HL_ENABLE_5
-        WF_POWERCAP_AFFECT(5);
-#endif
-#ifdef _HL_ENABLE_6
-        WF_POWERCAP_AFFECT(6);
-#endif
-#ifdef _HL_ENABLE_7
-        WF_POWERCAP_AFFECT(7);
-#endif
+        affectMatcapColor(matcapVector, uv_main, color);
 
         // 階調影
         affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);

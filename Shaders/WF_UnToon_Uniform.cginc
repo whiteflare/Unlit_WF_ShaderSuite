@@ -34,7 +34,6 @@
     DECL_SUB_TEX2D      (_AL_MaskTex);
     DECL_SUB_TEX2D      (_EmissionMap);
     DECL_SUB_TEX2D      (_MetallicGlossMap);
-    DECL_SUB_TEX2D      (_HL_MaskTex);
     DECL_SUB_TEX2D      (_TS_MaskTex);
     DECL_SUB_TEX2D      (_TR_MaskTex);
     DECL_SUB_TEX2D      (_OL_MaskTex);
@@ -62,7 +61,6 @@
     DECL_MAIN_TEX2D     (_DetailNormalMap);
 #endif
     DECL_MAIN_TEXCUBE   (_MT_Cubemap);
-    DECL_MAIN_TEX2D     (_HL_MatcapTex);
     DECL_MAIN_TEX2D     (_OL_OverlayTex);
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
@@ -178,15 +176,30 @@
     float           _MT_CubemapPower;
     float           _MT_CubemapHighCut;
 
-    float           _HL_Enable;
-    uint            _HL_CapType;
-    float3          _HL_MedianColor;
-    float3          _HL_MatcapColor;
-    float           _HL_Power;
-    float           _HL_BlendNormal;
-    float           _HL_Parallax;
-    float           _HL_ChangeAlpha;
-    float           _HL_InvMaskVal;
+#define WF_DECL_MATCAP(id)                  \
+    DECL_MAIN_TEX2D(_HL_MatcapTex##id);     \
+    DECL_SUB_TEX2D(_HL_MaskTex##id);        \
+    float       _HL_Enable##id;             \
+    uint        _HL_CapType##id;            \
+    float3      _HL_MedianColor##id;        \
+    float3      _HL_MatcapColor##id;        \
+    float       _HL_Power##id;              \
+    float       _HL_BlendNormal##id;        \
+    float       _HL_Parallax##id;           \
+    float       _HL_InvMaskVal##id;         \
+    float       _HL_ChangeAlpha##id;
+
+    WF_DECL_MATCAP(##)
+
+#ifdef _WF_UNTOON_POWERCAP
+    WF_DECL_MATCAP(_1)
+    WF_DECL_MATCAP(_2)
+    WF_DECL_MATCAP(_3)
+    WF_DECL_MATCAP(_4)
+    WF_DECL_MATCAP(_5)
+    WF_DECL_MATCAP(_6)
+    WF_DECL_MATCAP(_7)
+#endif
 
 #ifndef _WF_MOBILE
 #ifdef _WF_LEGACY_FEATURE_SWITCH
@@ -315,28 +328,6 @@
     float           _TE_MaxDist;
     float           _TE_SmoothPower;
     float           _TE_InvMaskVal;
-#endif
-
-#ifdef _WF_UNTOON_POWERCAP
-    #define WF_POWERCAP_DECL(id)                \
-        float       _HL_Enable_##id;            \
-        uint        _HL_CapType_##id;           \
-        DECL_MAIN_TEX2D(_HL_MatcapTex_##id);    \
-        float3      _HL_MedianColor_##id;       \
-        float3      _HL_MatcapColor_##id;       \
-        float       _HL_Power_##id;             \
-        float       _HL_BlendNormal_##id;       \
-        float       _HL_Parallax_##id;          \
-        DECL_SUB_TEX2D(_HL_MaskTex_##id);       \
-        float       _HL_InvMaskVal_##id;
-
-    WF_POWERCAP_DECL(1)
-    WF_POWERCAP_DECL(2)
-    WF_POWERCAP_DECL(3)
-    WF_POWERCAP_DECL(4)
-    WF_POWERCAP_DECL(5)
-    WF_POWERCAP_DECL(6)
-    WF_POWERCAP_DECL(7)
 #endif
 
 #endif

@@ -156,7 +156,7 @@
         // メタリック
         affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
         // Highlight
-        affectMatcapColor(calcMatcapVector(matcapVector, _HL_BlendNormal, _HL_Parallax).xy, uv_main, color);
+        affectMatcapColor(matcapVector, uv_main, color);
         // ラメ
         affectLame(i, uv_main, ws_normal, color);
         // 階調影
