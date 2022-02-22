@@ -320,7 +320,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_powercap
+            #pragma fragment frag
 
             #pragma target 4.5
 
@@ -353,7 +353,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #include "WF_UnToon_PowerCap.cginc"
+            #include "WF_UnToon.cginc"
 
             ENDCG
         }

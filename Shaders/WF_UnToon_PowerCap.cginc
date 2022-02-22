@@ -21,72 +21,12 @@
     #include "WF_UnToon.cginc"
 
     ////////////////////////////
-    // Light Matcap Power
-    ////////////////////////////
-
-    ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
 
     float4 frag_powercap(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
-        UNITY_SETUP_INSTANCE_ID(i);
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-
-        float4 color;
-        float2 uv_main;
-
-        i.normal = normalize(i.normal);
-#ifdef _V2F_HAS_TANGENT
-        i.tangent = normalize(i.tangent);
-        i.bitangent = normalize(i.bitangent);
-#endif
-
-        // メイン
-        affectBaseColor(i.uv, facing, uv_main, color);
-        // 頂点カラー
-        affectVertexColor(i.vertex_color, color);
-
-        // アルファマスク適用
-        affectAlphaMask(uv_main, color);
-
-        // BumpMap
-        float3 ws_normal = i.normal;
-        float3 ws_bump_normal;
-        affectBumpNormal(i, uv_main, ws_bump_normal, color);
-
-        // ビューポイントへの方向
-        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
-        // カメラへの方向
-        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
-        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
-
-        // matcapベクトルの配列
-        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
-
-        // Highlight
-        affectMatcapColor(matcapVector, uv_main, color);
-
-        // 階調影
-        affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
-        // リムライト
-        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, _TR_BlendNormal, 0), angle_light_camera, color);
-
-        // Anti-Glare とライト色ブレンドを同時に計算
-        color.rgb *= i.light_color;
-
-        // ToonFog
-        affectToonFog(i, ws_view_dir, color);
-
-        // フレネル
-        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
-        // Alpha は 0-1 にクランプ
-        color.a = saturate(color.a);
-
-        // fog
-        UNITY_APPLY_FOG(i.fogCoord, color);
-
-        return color;
+        // deprecated
+        return frag(i, facing);
     }
 
 #endif
