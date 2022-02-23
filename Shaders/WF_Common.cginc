@@ -70,10 +70,12 @@
     #endif
 
     #ifdef _WF_LEGACY_FEATURE_SWITCH
+        #define FEATURE_TGL(name)               float name
         #define FEATURE_TGL_ON_BEGIN(name)      if (TGL_ON(name)) {
         #define FEATURE_TGL_OFF_BEGIN(name)     if (TGL_OFF(name)) {
         #define FEATURE_TGL_END                 }
     #else
+        #define FEATURE_TGL(name)
         #define FEATURE_TGL_ON_BEGIN(name)
         #define FEATURE_TGL_OFF_BEGIN(name)
         #define FEATURE_TGL_END
