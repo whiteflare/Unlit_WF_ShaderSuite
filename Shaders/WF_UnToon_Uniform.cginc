@@ -200,9 +200,11 @@
     float       _HL_ChangeAlpha##id;
 
     WF_DECL_MATCAP(##)
+#ifndef _WF_MOBILE
+    WF_DECL_MATCAP(_1)
+#endif
 
 #ifdef _WF_UNTOON_POWERCAP
-    WF_DECL_MATCAP(_1)
     WF_DECL_MATCAP(_2)
     WF_DECL_MATCAP(_3)
     WF_DECL_MATCAP(_4)

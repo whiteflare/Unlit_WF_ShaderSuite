@@ -60,10 +60,6 @@
         #endif
     #endif
 
-    #ifndef WF_TEX2D_MATCAP_MASK
-        #define WF_TEX2D_MATCAP_MASK(uv)        SAMPLE_MASK_VALUE(_HL_MaskTex, uv, _HL_InvMaskVal).rgb
-    #endif
-
     #ifndef WF_TEX2D_LAME_TEX
         #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LM_Texture, _MainTex, uv).rgba
     #endif
@@ -682,11 +678,14 @@ FEATURE_TGL_END
         WF_CALC_MATCAP_COLOR(##)
 #endif
 
-#ifdef _WF_UNTOON_POWERCAP
-
+#ifndef _WF_MOBILE
 #ifdef _HL_ENABLE_1
         WF_CALC_MATCAP_COLOR(_1)
 #endif
+#endif
+
+#ifdef _WF_UNTOON_POWERCAP
+
 #ifdef _HL_ENABLE_2
         WF_CALC_MATCAP_COLOR(_2)
 #endif
