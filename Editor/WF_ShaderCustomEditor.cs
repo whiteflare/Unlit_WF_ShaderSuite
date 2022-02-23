@@ -832,6 +832,8 @@ namespace UnlitWF
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             style.font = EditorStyles.boldLabel.font;
+            style.fontSize += 2;
+            style.fontStyle = FontStyle.Bold;
             style.fixedHeight = 20;
             style.contentOffset = new Vector2(20, -2);
             // Draw
@@ -862,6 +864,8 @@ namespace UnlitWF
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             style.font = EditorStyles.boldLabel.font;
+            style.fontSize += 2;
+            style.fontStyle = FontStyle.Bold;
             style.fixedHeight = 20;
             style.contentOffset = new Vector2(20, -2);
             // Draw
