@@ -79,7 +79,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
-        [WFHeaderToggle(Light Matcap 1)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
@@ -107,6 +107,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_1       ("[HA] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -123,6 +125,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_2             ("[HB] Power", Range(0, 2)) = 1
             _HL_BlendNormal_2       ("[HB] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_2          ("[HB] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_2       ("[HB] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_2           ("[HB] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -139,6 +143,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_3             ("[HC] Power", Range(0, 2)) = 1
             _HL_BlendNormal_3       ("[HC] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_3          ("[HC] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_3       ("[HC] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_3           ("[HC] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -155,6 +161,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_4             ("[HD] Power", Range(0, 2)) = 1
             _HL_BlendNormal_4       ("[HD] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_4          ("[HD] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_4       ("[HD] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_4           ("[HD] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -171,6 +179,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_5             ("[HE] Power", Range(0, 2)) = 1
             _HL_BlendNormal_5       ("[HE] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_5          ("[HE] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_5       ("[HE] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_5           ("[HE] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -187,6 +197,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_6             ("[HF] Power", Range(0, 2)) = 1
             _HL_BlendNormal_6       ("[HF] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_6          ("[HF] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_6       ("[HF] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_6           ("[HF] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -203,6 +215,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_7             ("[HG] Power", Range(0, 2)) = 1
             _HL_BlendNormal_7       ("[HG] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_7          ("[HG] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_7       ("[HG] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_7           ("[HG] Mask Texture", 2D) = "white" {}
         [Toggle(_)]

@@ -67,7 +67,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
-        [WFHeaderToggle(Light Matcap 1)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
