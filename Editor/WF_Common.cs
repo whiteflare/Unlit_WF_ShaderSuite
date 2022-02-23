@@ -598,18 +598,22 @@ namespace UnlitWF
         public readonly string Name;
         private readonly Func<WFShaderFunction, Material, bool> _contains;
 
-        internal WFShaderFunction(string label, string prefix, string name) : this(label, prefix, name,
-                (self, mat) =>
-                {
-                    var nm = "_" + self.Prefix + "_Enable";
-                    if (mat.HasProperty(nm))
-                    {
-                        return mat.GetInt(nm) != 0;
-                    }
-                    return false;
-                }
-            )
+        internal WFShaderFunction(string label, string prefix, string name) : this(label, prefix, name, IsEnable)
         {
+        }
+
+        public static bool IsEnable(WFShaderFunction func, Material mat)
+        {
+            return IsEnable("_" + func.Prefix + "_Enable", mat);
+        }
+
+        public static bool IsEnable(string name, Material mat)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetInt(name) != 0;
+            }
+            return false;
         }
 
         internal WFShaderFunction(string label, string prefix, string name, Func<WFShaderFunction, Material, bool> contains)
@@ -658,7 +662,7 @@ namespace UnlitWF
                     result.Add(func);
                 }
             }
-            return result.OrderBy(f => f.Label).ToArray();
+            return result.ToArray();
         }
     }
 
