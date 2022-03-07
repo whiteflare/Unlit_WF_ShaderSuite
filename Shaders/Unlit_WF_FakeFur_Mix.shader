@@ -204,14 +204,14 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
 
             #pragma target 4.5
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE_1
-            #pragma shader_feature_local_fragment _TR_ENABLE
-            #pragma shader_feature_local_fragment _DF_ENABLE
+
+            #define _TS_ENABLE
+
+            #define _CL_ENABLE
+            #define _HL_ENABLE
+            #define _HL_ENABLE_1
+            #define _TR_ENABLE
+            #define _DF_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -234,11 +234,11 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _DF_ENABLE
+
+            #define _TS_ENABLE
+
+            #define _CL_ENABLE
+            #define _DF_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
@@ -263,11 +263,11 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _CL_ENABLE
-            #pragma shader_feature_local_fragment _DF_ENABLE
+
+            #define _TS_ENABLE
+
+            #define _CL_ENABLE
+            #define _DF_ENABLE
 
             #define _FR_HEIGHT_PARAM _FR_Height2
             #define _FR_REPEAT_PARAM _FR_Repeat2
