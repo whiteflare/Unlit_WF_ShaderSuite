@@ -362,7 +362,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_powercap
+            #pragma fragment frag
             #pragma hull hull
             #pragma domain domain
 
@@ -396,7 +396,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             #include "WF_UnToon_Tessellation.cginc"
-            #include "WF_UnToon_PowerCap.cginc"
 
             ENDCG
         }

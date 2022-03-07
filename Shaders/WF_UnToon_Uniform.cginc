@@ -34,7 +34,6 @@
     DECL_SUB_TEX2D      (_AL_MaskTex);
     DECL_SUB_TEX2D      (_EmissionMap);
     DECL_SUB_TEX2D      (_MetallicGlossMap);
-    DECL_SUB_TEX2D      (_HL_MaskTex);
     DECL_SUB_TEX2D      (_TS_MaskTex);
     DECL_SUB_TEX2D      (_TR_MaskTex);
     DECL_SUB_TEX2D      (_OL_MaskTex);
@@ -62,7 +61,6 @@
     DECL_MAIN_TEX2D     (_DetailNormalMap);
 #endif
     DECL_MAIN_TEXCUBE   (_MT_Cubemap);
-    DECL_MAIN_TEX2D     (_HL_MatcapTex);
     DECL_MAIN_TEX2D     (_OL_OverlayTex);
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
@@ -84,13 +82,15 @@
     float           _UseVertexColor;
     float           _Z_Shift;
 
+    // -------------------------
+
 #ifndef _WF_MOBILE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _BK_Enable;
-#endif
+    FEATURE_TGL     (_BK_Enable);
     float4          _BK_BackTex_ST;
     float4          _BK_BackColor;
 #endif
+
+    // -------------------------
 
     uint            _AL_Source;
     float           _AL_Power;
@@ -98,6 +98,8 @@
     float           _AL_AlphaToMask;
     float           _AL_Z_Offset;
     float           _AL_InvMaskVal;
+
+    // -------------------------
 
     float           _GL_CastShadow;
     float           _GL_LevelMin;
@@ -109,33 +111,35 @@
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
 
+    // -------------------------
+
     float           _GI_Enable;
     float           _GI_IndirectChroma;
     float           _GI_IndirectMultiplier;
     float           _GI_EmissionMultiplier;
 
+    // -------------------------
+
 #ifndef _WF_MOBILE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _CH_Enable;
-#endif
+    FEATURE_TGL     (_CH_Enable);
     float4          _CH_ColorR;
     float4          _CH_ColorG;
     float4          _CH_ColorB;
 #endif
 
+    // -------------------------
+
 #ifndef _WF_MOBILE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _CL_Enable;
-#endif
+    FEATURE_TGL     (_CL_Enable);
     float           _CL_DeltaH;
     float           _CL_DeltaS;
     float           _CL_DeltaV;
     float           _CL_Monochrome;
 #endif
 
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _ES_Enable;
-#endif
+    // -------------------------
+
+    FEATURE_TGL     (_ES_Enable);
     float4          _EmissionColor;
     uint            _ES_BlendType;
     uint            _ES_Shape;
@@ -146,7 +150,9 @@
     float           _ES_Speed;
     float           _ES_AlphaScroll;
 
-    float           _NM_Enable;
+    // -------------------------
+
+    FEATURE_TGL     (_NM_Enable);
     float           _BumpScale;
     float           _NM_Power;
     uint            _NM_FlipMirror;
@@ -157,9 +163,9 @@
     float           _NM_InvMaskVal;
 #endif
 
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _MT_Enable;
-#endif
+    // -------------------------
+
+    FEATURE_TGL     (_MT_Enable);
     float           _MT_Metallic;
     float           _MT_ReflSmooth;
     float           _MT_BlendNormal;
@@ -178,20 +184,39 @@
     float           _MT_CubemapPower;
     float           _MT_CubemapHighCut;
 
-    float           _HL_Enable;
-    uint            _HL_CapType;
-    float3          _HL_MedianColor;
-    float3          _HL_MatcapColor;
-    float           _HL_Power;
-    float           _HL_BlendNormal;
-    float           _HL_Parallax;
-    float           _HL_ChangeAlpha;
-    float           _HL_InvMaskVal;
+    // -------------------------
+
+#define WF_DECL_MATCAP(id)                  \
+    DECL_MAIN_TEX2D(_HL_MatcapTex##id);     \
+    DECL_SUB_TEX2D(_HL_MaskTex##id);        \
+    FEATURE_TGL (_HL_Enable##id);           \
+    uint        _HL_CapType##id;            \
+    float3      _HL_MedianColor##id;        \
+    float3      _HL_MatcapColor##id;        \
+    float       _HL_Power##id;              \
+    float       _HL_BlendNormal##id;        \
+    float       _HL_Parallax##id;           \
+    float       _HL_InvMaskVal##id;         \
+    float       _HL_ChangeAlpha##id;
+
+    WF_DECL_MATCAP(##)
+#ifndef _WF_MOBILE
+    WF_DECL_MATCAP(_1)
+#endif
+
+#ifdef _WF_UNTOON_POWERCAP
+    WF_DECL_MATCAP(_2)
+    WF_DECL_MATCAP(_3)
+    WF_DECL_MATCAP(_4)
+    WF_DECL_MATCAP(_5)
+    WF_DECL_MATCAP(_6)
+    WF_DECL_MATCAP(_7)
+#endif
+
+    // -------------------------
 
 #ifndef _WF_MOBILE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _LM_Enable;
-#endif
+    FEATURE_TGL     (_LM_Enable);
     float4          _LM_Texture_ST;
     float4          _LM_Color;
     float3          _LM_RandColor;
@@ -208,9 +233,9 @@
     float           _LM_InvMaskVal;
 #endif
 
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _TS_Enable;
-#endif
+    // -------------------------
+
+    FEATURE_TGL     (_TS_Enable);
     uint            _TS_Steps;
     float3          _TS_BaseColor;
     float3          _TS_1stColor;
@@ -225,9 +250,9 @@
     float           _TS_InvMaskVal;
     float           _TS_FixContrast;
 
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _TR_Enable;
-#endif
+    // -------------------------
+
+    FEATURE_TGL     (_TR_Enable);
     float3          _TR_Color;
     uint            _TR_BlendType;
     float           _TR_Power;
@@ -238,10 +263,10 @@
     float           _TR_PowerSide;
     float           _TR_PowerBottom;
 
+    // -------------------------
+
 #ifndef _WF_MOBILE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _OL_Enable;
-#endif
+    FEATURE_TGL     (_OL_Enable);
     uint            _OL_UVType;
     float4          _OL_Color;
     float4          _OL_OverlayTex_ST;
@@ -254,9 +279,9 @@
     float           _OL_VertColToMask;
 #endif
 
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _TL_Enable;
-#endif
+    // -------------------------
+
+    FEATURE_TGL     (_TL_Enable);
     float           _TL_LineWidth;
     uint            _TL_LineType;
     float           _TL_Z_Shift;
@@ -266,9 +291,9 @@
     float           _TL_InvMaskVal;
     float           _TL_UseCutout;
 
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _AO_Enable;
-#endif
+    // -------------------------
+
+    FEATURE_TGL     (_AO_Enable);
     uint            _AO_UVType;
     float           _AO_UseLightMap;
     float           _AO_UseGreenMap;
@@ -276,10 +301,10 @@
     float           _AO_Brightness;
     float4          _AO_TintColor;
 
+    // -------------------------
+
 #ifndef _WF_MOBILE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _DF_Enable;
-#endif
+    FEATURE_TGL     (_DF_Enable);
     float4          _DF_Color;
     float           _DF_MinDist;
     float           _DF_MaxDist;
@@ -287,10 +312,10 @@
     float           _DF_BackShadow;
 #endif
 
+    // -------------------------
+
 #ifndef _WF_MOBILE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _FG_Enable;
-#endif
+    FEATURE_TGL     (_FG_Enable);
     float4          _FG_Color;
     float           _FG_MinDist;
     float           _FG_MaxDist;
@@ -299,15 +324,17 @@
     float3          _FG_Scale;
 #endif
 
+    // -------------------------
+
 #ifndef _WF_MOBILE
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-    float           _RF_Enable;
-#endif
+    FEATURE_TGL     (_RF_Enable);
     float           _RF_RefractiveIndex;
     float           _RF_Distance;
     float3          _RF_Tint;
     float           _RF_BlendNormal;
 #endif
+
+    // -------------------------
 
 #ifdef _WF_UNTOON_TESS
     float           _TE_Factor;
@@ -315,28 +342,6 @@
     float           _TE_MaxDist;
     float           _TE_SmoothPower;
     float           _TE_InvMaskVal;
-#endif
-
-#ifdef _WF_UNTOON_POWERCAP
-    #define WF_POWERCAP_DECL(id)                \
-        float       _HL_Enable_##id;            \
-        uint        _HL_CapType_##id;           \
-        DECL_MAIN_TEX2D(_HL_MatcapTex_##id);    \
-        float3      _HL_MedianColor_##id;       \
-        float3      _HL_MatcapColor_##id;       \
-        float       _HL_Power_##id;             \
-        float       _HL_BlendNormal_##id;       \
-        float       _HL_Parallax_##id;          \
-        DECL_SUB_TEX2D(_HL_MaskTex_##id);       \
-        float       _HL_InvMaskVal_##id;
-
-    WF_POWERCAP_DECL(1)
-    WF_POWERCAP_DECL(2)
-    WF_POWERCAP_DECL(3)
-    WF_POWERCAP_DECL(4)
-    WF_POWERCAP_DECL(5)
-    WF_POWERCAP_DECL(6)
-    WF_POWERCAP_DECL(7)
 #endif
 
 #endif

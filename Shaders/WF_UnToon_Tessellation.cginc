@@ -79,16 +79,17 @@
         o.uv_lmap       = MUL_BARY(i, uv_lmap);
         o.ws_vertex     = MUL_BARY(i, ws_vertex);
         o.ws_light_dir  = MUL_BARY(i, ws_light_dir);
-        o.normal        = normalize( MUL_BARY(i, normal) );
+        o.normal        = MUL_BARY(i, normal);  // frag で normalize するので、ここでは normalize しない
 #ifdef _V2F_HAS_TANGENT
-        o.tangent   = normalize( MUL_BARY(i, tangent) );
-        o.bitangent = normalize( MUL_BARY(i, bitangent) );
+        o.tangent       = MUL_BARY(i, tangent);
+        o.bitangent     = MUL_BARY(i, bitangent);
 #endif
 
         // Phong Tessellation
         float3 phg[3];
         for (int a = 0; a < 3; a++) {
-            phg[a] = i[a].normal * (dot( i[a].ws_vertex.xyz, i[a].normal ) - dot(o.ws_vertex.xyz, i[a].normal));
+            float3 nml = normalize(i[a].normal);
+            phg[a] = nml * (dot( i[a].ws_vertex.xyz, nml ) - dot(o.ws_vertex.xyz, nml));
         }
         float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);
         float smmoth = max(0, _TE_SmoothPower * WF_TEX2D_SMOOTH_MASK_TEX(uv_main)) / 2.0;
