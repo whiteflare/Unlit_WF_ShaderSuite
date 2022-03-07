@@ -753,38 +753,53 @@ namespace UnlitWF
                 if (langMode == null)
                 {
                     string lang = EditorPrefs.GetString(KEY_EDITOR_LANG) ?? "";
-                    switch (lang)
+                    if (!string.IsNullOrWhiteSpace(lang))
                     {
-                        case "ja":
-                            langMode = EditorLanguage.日本語;
-                            break;
-                        case "ko":
-                            langMode = EditorLanguage.한국어;
-                            break;
-                        default:
-                            langMode = EditorLanguage.English;
-                            break;
+                        return ToEditorLanguage(lang);
                     }
+                    langMode = ToEditorLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
                 }
                 return langMode.Value;
             }
             set
             {
-                if (langMode != value)
+                langMode = value;
+                SetLangModeInternal(langMode);
+            }
+        }
+
+        private static EditorLanguage ToEditorLanguage(string lang)
+        {
+            switch (lang)
+            {
+                case "ja":
+                    return EditorLanguage.日本語;
+                case "ko":
+                    return EditorLanguage.한국어;
+                default:
+                    return EditorLanguage.English;
+            }
+        }
+
+        private static void SetLangModeInternal(EditorLanguage? value)
+        {
+            if (value == null)
+            {
+                EditorPrefs.DeleteKey(KEY_EDITOR_LANG);
+            }
+            else
+            {
+                switch (value)
                 {
-                    langMode = value;
-                    switch (langMode)
-                    {
-                        case EditorLanguage.日本語:
-                            EditorPrefs.SetString(KEY_EDITOR_LANG, "ja");
-                            break;
-                        case EditorLanguage.한국어:
-                            EditorPrefs.SetString(KEY_EDITOR_LANG, "ko");
-                            break;
-                        default:
-                            EditorPrefs.DeleteKey(KEY_EDITOR_LANG);
-                            break;
-                    }
+                    case EditorLanguage.日本語:
+                        EditorPrefs.SetString(KEY_EDITOR_LANG, "ja");
+                        break;
+                    case EditorLanguage.한국어:
+                        EditorPrefs.SetString(KEY_EDITOR_LANG, "ko");
+                        break;
+                    default:
+                        EditorPrefs.SetString(KEY_EDITOR_LANG, "en");
+                        break;
                 }
             }
         }
