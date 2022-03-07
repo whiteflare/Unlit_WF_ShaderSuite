@@ -121,6 +121,21 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -171,6 +186,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
 
             #define _WF_FORCE_USE_SAMPLER
 
+            #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
@@ -234,6 +250,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
+        // Ambient Occlusion
+        affectOcclusion(i, uv_main, color);
 
         return color;
     }
