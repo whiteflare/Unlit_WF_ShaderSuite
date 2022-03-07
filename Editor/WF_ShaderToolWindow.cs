@@ -855,6 +855,26 @@ namespace UnlitWF
                     }
                 },
                 ctx => {
+                    // RenderType からシェーダタイプを判定する
+                    if (IsMatchShaderName(ctx, "InternalErrorShader")) {
+                        return;
+                    }
+                    if (ctx.renderType == ShaderType.NoMatch) {
+                        switch(ctx.oldMaterial.GetTag("RenderType", false, ""))
+                        {
+                            case "Opaque":
+                                ctx.renderType = ShaderType.Opaque;
+                                break;
+                            case "TransparentCutout":
+                                ctx.renderType = ShaderType.Cutout;
+                                break;
+                            case "Transparent":
+                                ctx.renderType = ShaderType.Transparent;
+                                break;
+                        }
+                    }
+                },
+                ctx => {
                     // シェーダ名からシェーダタイプを判定する
                     if (ctx.renderType == ShaderType.NoMatch) {
                         if (IsMatchShaderName(ctx, "opaque") || IsMatchShaderName(ctx, "texture")) {

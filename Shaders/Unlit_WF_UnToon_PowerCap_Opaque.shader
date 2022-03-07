@@ -67,7 +67,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
-        [WFHeaderToggle(Light Matcap 1)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
@@ -244,6 +244,42 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
+        // Emission
+        [WFHeaderToggle(Emission)]
+            _ES_Enable              ("[ES] Enable", Float) = 0
+        [HDR]
+            _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
+        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
+            _ES_BlendType           ("[ES] Blend Type", Float) = 0
+
+        [Header(Emissive Scroll)]
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
+            _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
+        [WF_Vector3]
+            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
         // Fog
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
@@ -307,20 +343,23 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_powercap
+            #pragma fragment frag
 
             #pragma target 4.5
 
             #define _WF_UNTOON_POWERCAP
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
@@ -339,7 +378,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #include "WF_UnToon_PowerCap.cginc"
+            #include "WF_UnToon.cginc"
 
             ENDCG
         }
