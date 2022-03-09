@@ -69,6 +69,11 @@ namespace UnlitWF
 
         public void ApplyToMaterial(IEnumerable<Material> mats)
         {
+            if (material == null)
+            {
+                Debug.LogWarningFormat("[WF] Material is not set in the template: {0}", name);
+                return;
+            }
             Undo.RecordObjects(mats.ToArray(), "WF apply Template");
 
             // シェーダを揃える
