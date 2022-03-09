@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
+Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
 
     Properties {
         // 基本
@@ -35,10 +35,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+        [Toggle(_)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // クリアコート
         [WFHeaderAlwaysOn(ClearCoat)]
@@ -156,8 +155,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
-        [Toggle(_)]
-            _HL_ChangeAlpha_1       ("[HA] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -174,8 +171,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             _LM_Texture             ("[LM] Texture", 2D) = "white" {}
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
-            _LM_ChangeAlpha         ("[LM] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LM_Shape               ("[LM] Shape", Float) = 0
         [PowerSlider(4.0)]
@@ -302,8 +297,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
-        [Toggle(_)]
-            _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
         [WF_Vector3]
@@ -343,14 +336,14 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             _CurrentVersion         ("2022/02/13", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
     }
 
     SubShader {
         Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
-            "VRCFallback" = "UnlitTransparent"
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest"
+            "VRCFallback" = "UnlitCutout"
         }
 
         Pass {
@@ -358,8 +351,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 
@@ -368,7 +360,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
             #pragma target 4.5
 
-            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUTOUT
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
@@ -438,14 +430,14 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             Name "SHADOWCASTER"
             Tags{ "LightMode" = "ShadowCaster" }
 
-            Cull OFF
+            Cull [_CullMode]
 
             CGPROGRAM
 
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _WF_ALPHA_BLEND
+            #define _WF_ALPHA_CUTOUT
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
@@ -466,7 +458,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #define _WF_ALPHA_BLEND
+            #define _WF_ALPHA_CUTOUT
 
             #pragma shader_feature_local _VC_ENABLE
 
@@ -478,7 +470,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
         }
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
