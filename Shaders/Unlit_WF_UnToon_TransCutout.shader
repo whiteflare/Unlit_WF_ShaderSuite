@@ -325,7 +325,7 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
@@ -402,8 +402,6 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
-
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             #include "WF_UnToon_ShadowCaster.cginc"
 

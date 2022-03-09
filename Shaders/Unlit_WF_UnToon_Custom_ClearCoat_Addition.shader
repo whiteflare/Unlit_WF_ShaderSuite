@@ -158,7 +158,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2021/12/04", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
     }
 
     SubShader {
@@ -200,61 +200,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #include "WF_UnToon.cginc"
-
-    float _CC_Width;
-    float _CC_Z_Shift;
-
-    // vertex シェーダでアウトラインメッシュを張るタイプ。NORMALのみサポートする。
-    v2f vert_clearcoat(appdata v) {
-        // 通常の vert を使う
-        v2f o = vert(v);
-        // SV_POSITION を上書き
-        o.vs_vertex = shiftNormalAndDepthVertex(o.ws_vertex, o.normal, _CC_Width * 0.001, -_CC_Z_Shift);
-
-        return o;
-    }
-
-    float4 frag_clearcoat(v2f i) : SV_Target {
-        UNITY_SETUP_INSTANCE_ID(i);
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-
-        i.normal = normalize(i.normal);
-#ifdef _V2F_HAS_TANGENT
-        i.tangent = normalize(i.tangent);
-        i.bitangent = normalize(i.bitangent);
-#endif
-
-        // メイン
-        float4 color = float4(0, 0, 0, 1);
-
-        // BumpMap
-        float3 ws_normal = i.normal;
-        float3 ws_bump_normal;
-        affectBumpNormal(i, uv_main, ws_bump_normal, color);
-
-        // ビューポイントへの方向
-        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
-        // カメラへの方向
-        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
-
-        // matcapベクトルの配列
-        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
-
-        // メタリック
-        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
-        // Highlight
-        affectMatcapColor(matcapVector, uv_main, color);
-
-        // Anti-Glare とライト色ブレンドを同時に計算
-        color.rgb *= i.light_color;
-        // Ambient Occlusion
-        affectOcclusion(i, uv_main, color);
-
-        return color;
-    }
+            #include "WF_UnToon_ClearCoat.cginc"
 
             ENDCG
         }
