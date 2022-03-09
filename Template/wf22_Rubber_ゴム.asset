@@ -43,8 +43,16 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _HL_MaskTex_1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _HL_MatcapTex:
         m_Texture: {fileID: 2800000, guid: aa8a3f966d6b7874fa743d4c67f78068, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HL_MatcapTex_1:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _LM_MaskTex:
@@ -156,11 +164,17 @@ Material:
     - _GL_LevelMin: 0.12499995
     - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
+    - _HL_BlendNormal_1: 0.1
     - _HL_CapType: 1
+    - _HL_CapType_1: 0
     - _HL_Enable: 1
+    - _HL_Enable_1: 0
     - _HL_InvMaskVal: 0
+    - _HL_InvMaskVal_1: 0
     - _HL_Parallax: 0.75
+    - _HL_Parallax_1: 0.75
     - _HL_Power: 1
+    - _HL_Power_1: 1
     - _LM_AnimSpeed: 0.2
     - _LM_Dencity: 0.5
     - _LM_Enable: 0
@@ -231,7 +245,9 @@ Material:
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MatcapColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MedianColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _LM_Color: {r: 1, g: 1, b: 1, a: 1}
     - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1.3, a: 1}
@@ -254,4 +270,4 @@ MonoBehaviour:
   m_Name: "wf22_Rubber_\u30B4\u30E0"
   m_EditorClassIdentifier: 
   memo: "\u30B4\u30E0\u306E\u8CEA\u611F\u3092\u30A4\u30E1\u30FC\u30B8\u3057\u305F\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
-  material: {fileID: 0}
+  material: {fileID: -3930553153085618222}
