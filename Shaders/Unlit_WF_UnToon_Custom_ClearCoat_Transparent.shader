@@ -80,6 +80,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
         [NoScaleOffset]
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
             _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
+        [WF_FixFloat(0.0)]
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _NM_FlipMirror          ("[NM] Flip Mirror", Float) = 0
@@ -99,6 +100,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
             _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
+        [WF_FixFloat(1.0)]
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
@@ -138,8 +140,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
-        [Toggle(_)]
-            _HL_ChangeAlpha         ("[HL] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
@@ -340,7 +340,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -370,21 +370,22 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
 
-
-            #define _AO_ENABLE
-            #define _NM_ENABLE
-            #define _OL_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
-
-
-            #define _BK_ENABLE
-            #define _CH_ENABLE
-            #define _CL_ENABLE
-            #define _DF_ENABLE
-            #define _ES_ENABLE
-            #define _LM_ENABLE
-            #define _TR_ENABLE
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _OL_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _CL_ENABLE
+            #pragma shader_feature_local_fragment _DF_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _LM_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -414,13 +415,13 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
             #define _WF_FORCE_USE_SAMPLER
 
-            #define _AO_ENABLE
-            #define _NM_ENABLE
-
-
-            #define _HL_ENABLE
-            #define _HL_ENABLE_1
-            #define _MT_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _MT_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -428,61 +429,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #include "WF_UnToon.cginc"
-
-    float _CC_Width;
-    float _CC_Z_Shift;
-
-    // vertex シェーダでアウトラインメッシュを張るタイプ。NORMALのみサポートする。
-    v2f vert_clearcoat(appdata v) {
-        // 通常の vert を使う
-        v2f o = vert(v);
-        // SV_POSITION を上書き
-        o.vs_vertex = shiftNormalAndDepthVertex(o.ws_vertex, o.normal, _CC_Width * 0.001, -_CC_Z_Shift);
-
-        return o;
-    }
-
-    float4 frag_clearcoat(v2f i) : SV_Target {
-        UNITY_SETUP_INSTANCE_ID(i);
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-
-        i.normal = normalize(i.normal);
-#ifdef _V2F_HAS_TANGENT
-        i.tangent = normalize(i.tangent);
-        i.bitangent = normalize(i.bitangent);
-#endif
-
-        // メイン
-        float4 color = float4(0, 0, 0, 1);
-
-        // BumpMap
-        float3 ws_normal = i.normal;
-        float3 ws_bump_normal;
-        affectBumpNormal(i, uv_main, ws_bump_normal, color);
-
-        // ビューポイントへの方向
-        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
-        // カメラへの方向
-        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
-
-        // matcapベクトルの配列
-        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
-
-        // メタリック
-        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
-        // Highlight
-        affectMatcapColor(matcapVector, uv_main, color);
-
-        // Anti-Glare とライト色ブレンドを同時に計算
-        color.rgb *= i.light_color;
-        // Ambient Occlusion
-        affectOcclusion(i, uv_main, color);
-
-        return color;
-    }
+            #include "WF_UnToon_ClearCoat.cginc"
 
             ENDCG
         }
@@ -521,7 +468,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-            #define _VC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

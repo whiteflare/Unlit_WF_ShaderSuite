@@ -285,7 +285,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
