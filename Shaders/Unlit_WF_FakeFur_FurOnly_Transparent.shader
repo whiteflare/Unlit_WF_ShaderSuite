@@ -134,7 +134,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
 
             Cull OFF
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
