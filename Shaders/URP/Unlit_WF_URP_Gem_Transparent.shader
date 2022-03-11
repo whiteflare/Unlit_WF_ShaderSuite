@@ -112,7 +112,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
             Cull [_CullMode]
 
             ZWrite [_AL_ZWrite]
-            Blend One OneMinusSrcAlpha
+            Blend One OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             HLSLPROGRAM
 

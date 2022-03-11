@@ -204,7 +204,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
             Cull [_CullMode]
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             HLSLPROGRAM
 

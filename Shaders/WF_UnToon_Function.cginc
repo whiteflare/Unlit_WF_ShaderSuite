@@ -202,8 +202,13 @@ FEATURE_TGL_END
                 _WF_ALPHA_CUSTOM
             #elif defined(_WF_ALPHA_CUTOUT)
                 alpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, alpha);
-                if (TGL_OFF(_AL_AlphaToMask) && alpha < 0.5) {
-                    discard;
+                if (TGL_OFF(_AL_AlphaToMask)) {
+                    if (alpha < 0.5) {
+                        discard;
+                        alpha = 0;
+                    } else {
+                        alpha = 1;
+                    }
                 }
             #else
                 alpha *= _AL_Power;

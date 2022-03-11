@@ -342,7 +342,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
 
             Cull [_CullMode]
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             Stencil {
                 Ref [_StencilMaskID]
