@@ -351,7 +351,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             Cull FRONT
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -401,7 +401,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             Cull BACK
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 

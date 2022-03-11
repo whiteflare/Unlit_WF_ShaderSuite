@@ -361,7 +361,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
             Cull [_CullMode]
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -406,7 +406,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
             Cull [_CC_CullMode]
             ZWrite OFF
-            Blend One One
+            Blend One One, One OneMinusSrcAlpha
 
             CGPROGRAM
 

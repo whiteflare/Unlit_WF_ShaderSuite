@@ -105,7 +105,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
             Cull FRONT
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 

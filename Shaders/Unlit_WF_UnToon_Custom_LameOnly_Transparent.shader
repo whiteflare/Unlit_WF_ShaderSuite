@@ -90,7 +90,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
             Cull [_CullMode]
             ZWrite OFF
-            Blend SrcAlpha One
+            Blend SrcAlpha One, One OneMinusSrcAlpha
 
             CGPROGRAM
 
