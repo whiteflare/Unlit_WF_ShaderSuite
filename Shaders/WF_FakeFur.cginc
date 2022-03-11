@@ -106,7 +106,7 @@
     g2f initGeomOutput(v2g p) {
         g2f o;
         UNITY_INITIALIZE_OUTPUT(g2f, o);
-        UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(g2f, o);
+        UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p, o);
         o.uv            = p.uv;
         o.ws_vertex     = p.ws_vertex;
         o.ws_normal     = p.ws_normal;
@@ -127,6 +127,7 @@
     v2g lerp_v2g(v2g x, v2g y, float div) {
         v2g o;
         UNITY_INITIALIZE_OUTPUT(v2g, o);
+        UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(x, o);
         o.uv                = lerp(x.uv,            y.uv,               div);
         o.ws_vertex         = lerp(x.ws_vertex,     y.ws_vertex,        div);
         o.ws_normal         = lerp(x.ws_normal,     y.ws_normal,        div);
@@ -163,7 +164,7 @@
         }
     }
 
-    [maxvertexcount(48)]
+    [maxvertexcount(40)]
     void geom_fakefur(triangle v2g v[3], inout TriangleStream<g2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
@@ -180,7 +181,7 @@
     }
 
     float4 frag_fakefur(g2f gi) : SV_Target {
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(gi);
 
         v2f i = (v2f) 0;
         i.uv            = gi.uv;
