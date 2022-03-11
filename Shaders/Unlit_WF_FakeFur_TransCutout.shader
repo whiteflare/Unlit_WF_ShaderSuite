@@ -30,7 +30,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [WFHeader(Fake Fur)]
             _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 5)) = 3
         [Header(Fur Shape)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
@@ -75,6 +75,22 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
+
+        [WFHeaderToggle(Light Matcap 2)]
+            _HL_Enable_1            ("[HA] Enable", Float) = 0
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+            _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
+        [NoScaleOffset]
+            _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
+            _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
+        [NoScaleOffset]
+            _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -157,7 +173,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
@@ -189,11 +205,13 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _TR_ENABLE
             #pragma shader_feature_local_fragment _DF_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "WF_UnToon.cginc"
 
@@ -221,7 +239,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "WF_FakeFur.cginc"
 

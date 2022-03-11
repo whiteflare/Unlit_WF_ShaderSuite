@@ -55,7 +55,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
     }
 
     SubShader
@@ -77,6 +77,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_fwdbase
+            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -91,6 +92,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 float2 uv4      : TEXCOORD3;
                 float3 normal   : NORMAL;
                 float4 tangent  : TANGENT;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f
@@ -106,11 +108,18 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 float3 normal       : TEXCOORD6;
                 float3 tangent      : TEXCOORD7;
                 float3 bitangent    : TEXCOORD8;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
             v2f vert (appdata v)
             {
                 v2f o;
+
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_OUTPUT(v2f, o);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
                 o.vertex    = UnityObjectToClipPos(v.vertex);
                 o.vcolor    = v.vcolor;
                 o.ls_vertex = v.vertex.xyz;
@@ -155,6 +164,9 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
             float4 frag (v2f i) : SV_Target
             {
+                UNITY_SETUP_INSTANCE_ID(i);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
                 float4 color = float4(0, 0, 0, 1);
 
                 // 基本色

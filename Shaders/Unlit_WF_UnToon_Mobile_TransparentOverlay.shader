@@ -83,7 +83,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
     }
 
     SubShader {
@@ -101,7 +101,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             Cull [_CullMode]
             ZTest [_AL_ZTest]
             ZWrite [_AL_ZWrite]
-            Blend [_AL_SrcAlpha] [_AL_DstAlpha]
+            Blend [_AL_SrcAlpha] [_AL_DstAlpha], One OneMinusSrcAlpha
 
             CGPROGRAM
 

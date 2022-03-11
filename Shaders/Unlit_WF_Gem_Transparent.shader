@@ -103,7 +103,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -122,7 +122,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             Cull [_GB_BackCulllMode]
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -155,7 +155,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             Cull BACK
             ZWrite [_AL_ZWrite]
-            Blend One OneMinusSrcAlpha
+            Blend One OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 

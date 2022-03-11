@@ -79,7 +79,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
-        [WFHeaderToggle(Light Matcap 1)]
+        [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
@@ -107,6 +107,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_1       ("[HA] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -123,6 +125,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_2             ("[HB] Power", Range(0, 2)) = 1
             _HL_BlendNormal_2       ("[HB] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_2          ("[HB] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_2       ("[HB] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_2           ("[HB] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -139,6 +143,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_3             ("[HC] Power", Range(0, 2)) = 1
             _HL_BlendNormal_3       ("[HC] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_3          ("[HC] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_3       ("[HC] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_3           ("[HC] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -155,6 +161,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_4             ("[HD] Power", Range(0, 2)) = 1
             _HL_BlendNormal_4       ("[HD] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_4          ("[HD] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_4       ("[HD] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_4           ("[HD] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -171,6 +179,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_5             ("[HE] Power", Range(0, 2)) = 1
             _HL_BlendNormal_5       ("[HE] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_5          ("[HE] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_5       ("[HE] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_5           ("[HE] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -187,6 +197,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_6             ("[HF] Power", Range(0, 2)) = 1
             _HL_BlendNormal_6       ("[HF] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_6          ("[HF] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_6       ("[HF] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_6           ("[HF] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -203,6 +215,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _HL_Power_7             ("[HG] Power", Range(0, 2)) = 1
             _HL_BlendNormal_7       ("[HG] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_7          ("[HG] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_7       ("[HG] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_7           ("[HG] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -258,6 +272,44 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
+        // Ambient Occlusion
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _AO_UVType              ("[AO] UV Type", Float) = 0
+        [NoScaleOffset]
+            _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
+        [Toggle(_)]
+            _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
+        // Emission
+        [WFHeaderToggle(Emission)]
+            _ES_Enable              ("[ES] Enable", Float) = 0
+        [HDR]
+            _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
+        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
+            _ES_BlendType           ("[ES] Blend Type", Float) = 0
+
+        [Header(Emissive Scroll)]
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
+            _ES_Shape               ("[ES] Wave Type", Float) = 3
+        [Toggle(_)]
+            _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
+            _ES_DirType             ("[ES] Direction Type", Float) = 0
+        [WF_Vector3]
+            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
+            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
         // Fog
         [WFHeaderToggle(Fog)]
             _FG_Enable              ("[FG] Enable", Float) = 0
@@ -298,7 +350,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -323,7 +375,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_powercap
+            #pragma fragment frag
 
             #pragma target 4.5
 
@@ -332,13 +384,16 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #define _WF_UNTOON_POWERCAP
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
@@ -357,7 +412,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #include "WF_UnToon_PowerCap.cginc"
+            #include "WF_UnToon.cginc"
 
             ENDCG
         }
@@ -368,7 +423,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             Cull FRONT
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -379,15 +434,20 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
+            #define _WF_UNTOON_POWERCAP
+            #define _WF_FACE_BACK
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
@@ -417,12 +477,12 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             Cull BACK
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_powercap
+            #pragma fragment frag
 
             #pragma target 4.5
 
@@ -434,10 +494,12 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
             #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _FG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
@@ -456,7 +518,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #include "WF_UnToon_PowerCap.cginc"
+            #include "WF_UnToon.cginc"
 
             ENDCG
         }

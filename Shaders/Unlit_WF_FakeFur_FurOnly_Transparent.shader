@@ -27,7 +27,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
         [WFHeader(Fake Fur)]
             _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 5)) = 3
         [Header(Fur Shape)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
@@ -116,7 +116,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
     }
 
     SubShader {
@@ -134,7 +134,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
 
             Cull OFF
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -150,7 +150,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "WF_FakeFur.cginc"
 

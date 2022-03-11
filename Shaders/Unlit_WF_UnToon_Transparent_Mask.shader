@@ -140,6 +140,24 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
+        [WFHeaderToggle(Light Matcap 2)]
+            _HL_Enable_1            ("[HA] Enable", Float) = 0
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+            _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
+        [NoScaleOffset]
+            _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
+            _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
+            _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
+        [Toggle(_)]
+            _HL_ChangeAlpha_1       ("[HA] Change Alpha Transparency", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
+            _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
+
         // ラメ
         [WFHeaderToggle(Lame)]
             _LM_Enable              ("[LM] Enable", Float) = 0
@@ -316,7 +334,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -335,7 +353,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
             Cull FRONT
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             Stencil {
                 Ref [_StencilMaskID]
@@ -370,6 +388,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #pragma shader_feature_local_fragment _DF_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
@@ -391,7 +410,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
             Cull BACK
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             Stencil {
                 Ref [_StencilMaskID]
@@ -425,6 +444,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             #pragma shader_feature_local_fragment _DF_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE

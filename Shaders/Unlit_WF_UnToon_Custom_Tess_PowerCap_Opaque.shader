@@ -308,7 +308,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/02/13", Float) = 0
+            _CurrentVersion         ("2022/03/12", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/WF_UnToon_Opaque", Float) = 0
@@ -362,7 +362,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             CGPROGRAM
 
             #pragma vertex vert
-            #pragma fragment frag_powercap
+            #pragma fragment frag
             #pragma hull hull
             #pragma domain domain
 
@@ -397,7 +397,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             #include "WF_UnToon_Tessellation.cginc"
-            #include "WF_UnToon_PowerCap.cginc"
 
             ENDCG
         }
