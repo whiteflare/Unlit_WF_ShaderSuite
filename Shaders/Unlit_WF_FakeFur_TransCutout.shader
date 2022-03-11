@@ -30,7 +30,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [WFHeader(Fake Fur)]
             _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 5)) = 3
         [Header(Fur Shape)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
@@ -211,6 +211,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "WF_UnToon.cginc"
 
@@ -238,7 +239,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "WF_FakeFur.cginc"
 
