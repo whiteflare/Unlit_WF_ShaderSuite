@@ -225,7 +225,7 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
 
             Cull OFF
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             HLSLPROGRAM
 

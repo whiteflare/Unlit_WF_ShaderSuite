@@ -122,7 +122,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             Cull [_GB_BackCulllMode]
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -155,7 +155,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
             Cull BACK
             ZWrite [_AL_ZWrite]
-            Blend One OneMinusSrcAlpha
+            Blend One OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 

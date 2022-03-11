@@ -101,7 +101,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             Cull [_CullMode]
             ZTest [_AL_ZTest]
             ZWrite [_AL_ZWrite]
-            Blend [_AL_SrcAlpha] [_AL_DstAlpha]
+            Blend [_AL_SrcAlpha] [_AL_DstAlpha], One OneMinusSrcAlpha
 
             CGPROGRAM
 

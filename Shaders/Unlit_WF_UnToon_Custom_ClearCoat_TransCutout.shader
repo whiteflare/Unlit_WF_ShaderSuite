@@ -398,7 +398,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
 
             Cull [_CC_CullMode]
             ZWrite OFF
-            Blend One One
+            Blend One One, One OneMinusSrcAlpha
 
             CGPROGRAM
 

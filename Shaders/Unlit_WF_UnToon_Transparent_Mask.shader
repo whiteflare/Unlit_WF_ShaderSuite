@@ -353,7 +353,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
             Cull FRONT
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             Stencil {
                 Ref [_StencilMaskID]
@@ -410,7 +410,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
 
             Cull BACK
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             Stencil {
                 Ref [_StencilMaskID]

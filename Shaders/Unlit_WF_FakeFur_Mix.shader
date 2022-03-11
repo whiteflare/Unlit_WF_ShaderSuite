@@ -255,7 +255,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
 
             Cull OFF
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
