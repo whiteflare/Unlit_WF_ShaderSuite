@@ -98,6 +98,22 @@ namespace UnlitWF
                     CompareAndSet(ctx.all, "_AL_Source", 0, 1); // MAIN_TEX_ALPHA -> MASK_TEX_RED
                 }
             }),
+            new DefValueSetPropertyHook("_HL_MatcapTex(_[0-9]+)?", ctx => {
+                if (ctx.current.textureValue != null) {
+                    var name = ctx.current.textureValue.name;
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        if (name.StartsWith("lcap_", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            CompareAndSet(ctx.all, ctx.current.name.Replace("_MatcapTex", "_CapType"), 0, 1); // MCAP -> LCAP
+                        }
+                        else if (name.StartsWith("mcap_", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            CompareAndSet(ctx.all, ctx.current.name.Replace("_MatcapTex", "_CapType"), 1, 0); // LCAP -> MCAP
+                        }
+                    }
+                }
+            }),
 
             // _DetailNormalMap と _FR_NoiseTex の直後に設定ボタンを追加する
             new CustomPropertyHook("_DetailNormalMap|_FR_NoiseTex", null, (ctx, changed) => {
