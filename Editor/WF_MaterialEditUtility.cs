@@ -45,6 +45,7 @@ namespace UnlitWF
         public string[] prefixs = { };
         public bool withoutTextures = false;
         public bool onlyOverrideBuiltinTextures = false;
+        public bool copyMaterialColor = false;
 
         public static CopyPropParameter Create()
         {
@@ -239,16 +240,26 @@ namespace UnlitWF
             foreach (var src_prop in ShaderMaterialProperty.AsList(param.materialSource))
             {
                 string prefix = WFCommonUtility.GetPrefixFromPropName(src_prop.Name);
-                if (prefix == null)
+                if (prefix != null)
                 {
-                    continue;
-                }
-                // Prefixの一致判定
-                if (copy_target.Any(prefix.Contains))
-                {
-                    if (!param.withoutTextures || src_prop.Type != ShaderUtil.ShaderPropertyType.TexEnv)
+                    // Prefixの一致判定
+                    if (copy_target.Any(prefix.Contains))
                     {
-                        src_props.Add(src_prop);
+                        if (!param.withoutTextures || src_prop.Type != ShaderUtil.ShaderPropertyType.TexEnv)
+                        {
+                            src_props.Add(src_prop);
+                        }
+                    }
+                }
+                else
+                {
+                    // Prefixが無いときは
+                    if (param.copyMaterialColor)
+                    {
+                        if (src_prop.Name == "_Color" || src_prop.Name == "_Cutoff")
+                        {
+                            src_props.Add(src_prop);
+                        }
                     }
                 }
             }
