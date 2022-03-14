@@ -112,19 +112,19 @@ namespace UnlitWF
 
             EditorGUI.BeginChangeCheck();
 
-            var m_material = serializedObject.FindProperty("material");
+            var m_material = serializedObject.FindProperty(nameof(WFMaterialTemplate.material));
             using (new EditorGUI.DisabledGroupScope(true))
             {
                 EditorGUILayout.PropertyField(m_material);
             }
 
-            var m_copy = serializedObject.FindProperty("copyMaterialColor");
+            var m_copy = serializedObject.FindProperty(nameof(WFMaterialTemplate.copyMaterialColor));
             EditorGUILayout.PropertyField(m_copy);
 
             var style = new GUIStyle(EditorStyles.textArea);
             style.wordWrap = true;
 
-            var m_memo = serializedObject.FindProperty("memo");
+            var m_memo = serializedObject.FindProperty(nameof(WFMaterialTemplate.memo));
             EditorGUILayout.PrefixLabel("memo");
             m_memo.stringValue = EditorGUILayout.TextArea(m_memo.stringValue, style, GUILayout.Height(80));
 
