@@ -197,7 +197,8 @@
     float       _HL_BlendNormal##id;        \
     float       _HL_Parallax##id;           \
     float       _HL_InvMaskVal##id;         \
-    float       _HL_ChangeAlpha##id;
+    float       _HL_ChangeAlpha##id;        \
+    float       _HL_MatcapMonochrome##id;
 
     WF_DECL_MATCAP(##)
 #ifndef _WF_MOBILE

@@ -633,6 +633,7 @@ FEATURE_TGL_END
             float4  matcap_color,
             float3  matcap_mask,
             float   power,
+            float   monochrome,
             float3  arrange_color,
             float3  median_color,
             float   change_alpha,
@@ -643,6 +644,8 @@ FEATURE_TGL_END
         power *= MAX_RGB(matcap_mask);
         // マスク色調整
         float3 matcap_mask_color = matcap_mask * arrange_color * 2;
+        // matcap彩度調整
+        matcap_color.rgb = lerp(matcap_color.rgb, AVE_RGB(matcap_color.rgb), monochrome);
 
         // 色合成
         if (cap_type == 1) {
@@ -675,7 +678,7 @@ FEATURE_TGL_END
                     calcMatcapColor(                                                                                                                        \
                         PICK_MAIN_TEX2D(_HL_MatcapTex##id, saturate(calcMatcapVector(matcapVector, _HL_BlendNormal##id, _HL_Parallax##id).xy * 0.5 + 0.5)), \
                         SAMPLE_MASK_VALUE(_HL_MaskTex##id, uv_main, _HL_InvMaskVal##id).rgb,                                                                \
-                        _HL_Power##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);                              \
+                        _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);    \
         FEATURE_TGL_END
 
     void affectMatcapColor(float4x4 matcapVector, float2 uv_main, inout float4 color) {

@@ -136,12 +136,32 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+        [Header(Matcap Advance)]
+            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+            _HL_MatcapMonochrome    ("[HL] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
+
+        [WFHeaderToggle(Light Matcap 2)]
+            _HL_Enable_1            ("[HA] Enable", Float) = 0
+        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+            _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
+        [NoScaleOffset]
+            _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
+            _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
+        [NoScaleOffset]
+            _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
+        [Toggle(_)]
+            _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
+        [Header(Matcap Advance)]
+            _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
+            _HL_MatcapMonochrome_1  ("[HA] Matcap Monochrome", Range(0, 1)) = 0
+            _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         // ラメ
         [WFHeaderToggle(Lame)]
@@ -379,6 +399,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             #pragma shader_feature_local_fragment _CL_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
