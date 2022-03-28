@@ -158,6 +158,7 @@
     uint            _NM_FlipMirror;
 #ifndef _WF_MOBILE
     uint            _NM_2ndType;
+    uint            _NM_2ndUVType;
     float4          _DetailNormalMap_ST;
     float           _DetailNormalMapScale;
     float           _NM_InvMaskVal;

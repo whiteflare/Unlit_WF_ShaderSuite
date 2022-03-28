@@ -447,7 +447,8 @@ FEATURE_TGL_END
 #if defined(_NM_BL2ND_ENABLE) || defined(_NM_SW2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 // 2nd NormalMap
                 float dtlPower = _NM_2ndType == 0 ? 0 : WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-                float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(i.uv, _DetailNormalMap) );
+                float2 uv_dtl = _NM_2ndUVType == 1 ? i.uv_lmap : i.uv;
+                float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
 #if defined(_WF_LEGACY_FEATURE_SWITCH)
                 if (_NM_2ndType == 1) { // BLEND
 #endif
