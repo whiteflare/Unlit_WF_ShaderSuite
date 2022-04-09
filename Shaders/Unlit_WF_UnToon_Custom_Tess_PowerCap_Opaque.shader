@@ -392,8 +392,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             #define _WF_UNTOON_TESS
             #define _WF_UNTOON_POWERCAP
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE

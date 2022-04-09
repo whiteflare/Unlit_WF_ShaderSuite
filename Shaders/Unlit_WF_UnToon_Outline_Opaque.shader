@@ -379,8 +379,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             #pragma target 4.5
             #pragma require geometry
 
-            #pragma shader_feature_local _ _TL_EDGE_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _ _TL_EDGE_ENABLE
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _FG_ENABLE
@@ -409,8 +409,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
             #pragma target 4.5
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _OL_ENABLE

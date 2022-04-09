@@ -399,8 +399,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             #define _WF_FACE_BACK
             #define _WF_UNTOON_TESS
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _TS_ENABLE

@@ -351,8 +351,8 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             #define _WF_ALPHA_CUTOUT
             #define _WF_PLATFORM_LWRP
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
