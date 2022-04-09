@@ -157,14 +157,6 @@
         return dot(color, BT601);
     }
 
-    float3 calcPointLight1WorldDir(float3 ws_vertex) {
-        ws_vertex = getPoint1LightPos() - ws_vertex;
-        if (dot(ws_vertex, ws_vertex) < NZF) {
-            ws_vertex = float3(0, 1, 0);
-        }
-        return SafeNormalizeVec3( ws_vertex );
-    }
-
     float3 calcHorizontalCoordSystem(float azimuth, float alt) {
         azimuth = radians(azimuth + 90);
         alt = radians(alt);

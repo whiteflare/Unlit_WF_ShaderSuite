@@ -189,6 +189,7 @@ namespace UnlitWF
         /// </summary>
         public static readonly Dictionary<string, WFCustomKeywordSetting> SpecialPropNameToKeywordMap = new Dictionary<string, WFCustomKeywordSetting>() {
             { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE") },
+            { "_GL_LightMode", new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE") },
             { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             } },
@@ -398,6 +399,7 @@ namespace UnlitWF
             new WFI18NTranslation("Sun Source", "太陽光のモード"),
             new WFI18NTranslation("Custom Sun Azimuth", "カスタム太陽の方角"),
             new WFI18NTranslation("Custom Sun Altitude", "カスタム太陽の高度"),
+            new WFI18NTranslation("Custom Light Pos", "カスタムライトの位置"),
             new WFI18NTranslation("Disable BackLit", "逆光補正しない"),
             new WFI18NTranslation("Disable ObjectBasePos", "メッシュ原点を取得しない"),
             // Light Bake Effects
@@ -656,6 +658,7 @@ namespace UnlitWF
             new WFI18NTranslation("Sun Source", "태양광 모드"),
             new WFI18NTranslation("Custom Sun Azimuth", "커스텀 태양광 방향"),
             new WFI18NTranslation("Custom Sun Altitude", "커스텀 태양광 고도"),
+            new WFI18NTranslation("Custom Light Pos", "커스텀 라이트의 위치"),
             new WFI18NTranslation("Disable BackLit", "역광 무보정"),
             new WFI18NTranslation("Disable ObjectBasePos", "매쉬의 원점을 취득하지 않음"),
             // Light Bake Effects

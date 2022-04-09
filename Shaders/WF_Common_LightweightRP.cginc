@@ -122,6 +122,22 @@
         return 1 <= GetAdditionalLightsCount() ? _AdditionalLightsPosition[0].xyz : float3(0, 0, 0);
     }
 
+    float3 calcPointLightWorldDir(float3 ws_light_pos, float3 ws_vertex) {
+        ws_vertex = ws_light_pos - ws_vertex;
+        if (dot(ws_vertex, ws_vertex) < 0.000001) {
+            ws_vertex = float3(0, 1, 0);    // 至近距離ならば+Y方向を返却する
+        }
+        return normalize( ws_vertex );
+    }
+
+    float3 calcPointLight1WorldDir(float3 ws_vertex) {
+        if (GetAdditionalLightsCount() < 1) {
+            return float3(0, 1, 0);
+        } else {
+            return calcPointLightWorldDir(getPoint1LightPos(), ws_vertex);
+        }
+    }
+
     float3 samplePoint1LightColor(float3 ws_vertex) {
         if (GetAdditionalLightsCount() < 1) {
             return float3(0, 0, 0);

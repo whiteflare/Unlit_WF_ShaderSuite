@@ -234,11 +234,23 @@ FEATURE_TGL_END
     // Anti Glare & Light Configuration
     ////////////////////////////
 
+    float3 calcWorldSpaceBasePos(float3 ws_vertex) {
+        if (TGL_OFF(_GL_DisableBasePos)) {
+            // Object原点をBasePosとして使用する
+            return UnityObjectToWorldPos(ZERO_VEC3);
+        }
+        else {
+            // 現在の座標をBasePosとして使用する
+            return ws_vertex;
+        }
+    }
+
     #define LIT_MODE_AUTO               0
     #define LIT_MODE_ONLY_DIR_LIT       1
     #define LIT_MODE_ONLY_POINT_LIT     2
     #define LIT_MODE_CUSTOM_WORLDSPACE  3
     #define LIT_MODE_CUSTOM_LOCALSPACE  4
+    #define LIT_MODE_CUSTOM_WORLDPOS    5
 
     uint calcAutoSelectMainLight(float3 ws_vertex) {
         float3 pointLight1Color = samplePoint1LightColor(ws_vertex);
@@ -257,19 +269,42 @@ FEATURE_TGL_END
         }
     }
 
-    float3 calcWorldSpaceBasePos(float3 ws_vertex) {
-        if (TGL_OFF(_GL_DisableBasePos)) {
-            // Object原点をBasePosとして使用する
-            return UnityObjectToWorldPos(ZERO_VEC3);
-        }
-        else {
-            // 現在の座標をBasePosとして使用する
-            return ws_vertex;
-        }
-    }
-
     float4 calcWorldSpaceLightDir(float3 ws_vertex) {
         ws_vertex = calcWorldSpaceBasePos(ws_vertex);
+
+#if defined(_GL_AUTO_ENABLE)
+
+        uint mode = calcAutoSelectMainLight(ws_vertex);
+        if (mode == LIT_MODE_ONLY_DIR_LIT) {
+            return float4( getMainLightDirection() , +1 );
+        }
+        if (mode == LIT_MODE_ONLY_POINT_LIT) {
+            return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+        }
+        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+
+#elif defined(_GL_ONLYDIR_ENABLE)
+
+        return float4( getMainLightDirection() , +1 );
+
+#elif defined(_GL_ONLYPOINT_ENABLE)
+
+        return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+
+#elif defined(_GL_WSDIR_ENABLE)
+
+        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+
+#elif defined(_GL_LSDIR_ENABLE)
+
+        return float4( UnityObjectToWorldDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)) , 0 );
+
+#elif defined(_GL_WSPOS_ENABLE)
+
+        return float4( calcPointLightWorldDir(_GL_CustomLitPos, ws_vertex) , 0 );
+
+#else
+
         uint mode = _GL_LightMode;
         if (mode == LIT_MODE_AUTO) {
             mode = calcAutoSelectMainLight(ws_vertex);
@@ -286,7 +321,12 @@ FEATURE_TGL_END
         if (mode == LIT_MODE_CUSTOM_LOCALSPACE) {
             return float4( UnityObjectToWorldDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)) , 0 );
         }
+        if (mode == LIT_MODE_CUSTOM_WORLDPOS) {
+            return float4( calcPointLightWorldDir(_GL_CustomLitPos, ws_vertex) , 0 );
+        }
         return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+
+#endif
     }
 
     float3 calcWorldSpaceLightColor(float3 ws_vertex, float lightType) {

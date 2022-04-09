@@ -108,6 +108,7 @@
     uint            _GL_LightMode;
     float           _GL_CustomAzimuth;
     float           _GL_CustomAltitude;
+    float3          _GL_CustomLitPos;
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
 
