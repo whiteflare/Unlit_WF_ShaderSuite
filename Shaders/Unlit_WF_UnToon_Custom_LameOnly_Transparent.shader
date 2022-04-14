@@ -105,8 +105,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             #define _WF_FORCE_USE_SAMPLER
             #define _WF_MAIN_Z_SHIFT    (-_Z_Shift)
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local_fragment _LM_ENABLE
+
+            #define _LM_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

@@ -359,9 +359,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
             #define _WF_UNTOON_TESS
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+
+            #define _TL_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -392,25 +392,25 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             #define _WF_UNTOON_TESS
             #define _WF_UNTOON_POWERCAP
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
-            #pragma shader_feature_local_fragment _CH_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
 
-            #pragma shader_feature_local_fragment _HL_ENABLE_1
-            #pragma shader_feature_local_fragment _HL_ENABLE_2
-            #pragma shader_feature_local_fragment _HL_ENABLE_3
-            #pragma shader_feature_local_fragment _HL_ENABLE_4
-            #pragma shader_feature_local_fragment _HL_ENABLE_5
-            #pragma shader_feature_local_fragment _HL_ENABLE_6
-            #pragma shader_feature_local_fragment _HL_ENABLE_7
+
+            #define _NM_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
+
+
+            #define _BK_ENABLE
+            #define _CH_ENABLE
+            #define _HL_ENABLE
+            #define _TR_ENABLE
+
+            #define _HL_ENABLE_1
+            #define _HL_ENABLE_2
+            #define _HL_ENABLE_3
+            #define _HL_ENABLE_4
+            #define _HL_ENABLE_5
+            #define _HL_ENABLE_6
+            #define _HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

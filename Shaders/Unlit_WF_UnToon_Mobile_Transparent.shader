@@ -219,18 +219,18 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _HL_ENABLE
-            #pragma shader_feature_local _MT_ENABLE
-            #pragma shader_feature_local _TR_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+
+
+
+
+
+            #define _AO_ENABLE
+            #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _MT_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -256,7 +256,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 
