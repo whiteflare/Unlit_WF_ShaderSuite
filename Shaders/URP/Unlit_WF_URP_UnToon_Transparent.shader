@@ -81,6 +81,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
         [Header(NormalMap Secondary)]
         [Enum(OFF,0,BLEND,1,SWITCH,2)]
             _NM_2ndType             ("[NM] 2nd Normal Blend", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _NM_2ndUVType           ("[NM] 2nd Normal UV Type", Float) = 0
             _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
             _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
@@ -131,13 +133,15 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [Toggle(_)]
             _HL_ChangeAlpha         ("[HL] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+        [Header(Matcap Advance)]
+            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+            _HL_MatcapMonochrome    ("[HL] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         [WFHeaderToggle(Light Matcap 2)]
@@ -149,13 +153,15 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
-            _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
         [Toggle(_)]
             _HL_ChangeAlpha_1       ("[HA] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
+        [Header(Matcap Advance)]
+            _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
+            _HL_MatcapMonochrome_1  ("[HA] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
         // ラメ
@@ -307,10 +313,12 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLDSPACE,3,CUSTOM_LOCALSPACE,4)]
+        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLD_DIR,3,CUSTOM_LOCAL_DIR,4,CUSTOM_WORLD_POS,5)]
             _GL_LightMode           ("Sun Source", Float) = 0
             _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
+        [WF_Vector3]
+            _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [Toggle(_)]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [Toggle(_)]
@@ -355,6 +363,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             #define _WF_PLATFORM_LWRP
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE

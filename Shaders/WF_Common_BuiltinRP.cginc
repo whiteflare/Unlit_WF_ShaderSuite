@@ -86,6 +86,22 @@
 #endif
     }
 
+    float3 calcPointLightWorldDir(float3 ws_light_pos, float3 ws_vertex) {
+        ws_vertex = ws_light_pos - ws_vertex;
+        if (dot(ws_vertex, ws_vertex) < 0.000001) {
+            ws_vertex = float3(0, 1, 0);    // 至近距離ならば+Y方向を返却する
+        }
+        return normalize( ws_vertex );
+    }
+
+    float3 calcPointLight1WorldDir(float3 ws_vertex) {
+#ifdef VERTEXLIGHT_ON
+        return calcPointLightWorldDir(getPoint1LightPos(), ws_vertex);
+#else
+        return float3(0, 1, 0);
+#endif
+    }
+
     float3 samplePoint1LightColor(float3 ws_vertex) {
 #ifdef VERTEXLIGHT_ON
         float3 ws_lightPos = getPoint1LightPos();

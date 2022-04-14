@@ -189,6 +189,7 @@ namespace UnlitWF
         /// </summary>
         public static readonly Dictionary<string, WFCustomKeywordSetting> SpecialPropNameToKeywordMap = new Dictionary<string, WFCustomKeywordSetting>() {
             { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE") },
+            { "_GL_LightMode", new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE") },
             { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             } },
@@ -312,7 +313,8 @@ namespace UnlitWF
             new WFI18NTranslation("HL", "Matcap Tint Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Parallax", "視差(Parallax)").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Power", "matcap強度").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
-            new WFI18NTranslation("HL", "Change Alpha Transparency", "透明度も反映する"),
+            new WFI18NTranslation("HL", "Change Alpha Transparency", "透明度も反映する").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Matcap Monochrome", "matcapモノクロ化").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             // Lame
             new WFI18NTranslation("LM", "Color", "ラメ色・テクスチャ"),
             new WFI18NTranslation("LM", "Texture", "ラメ色・テクスチャ"),
@@ -397,6 +399,7 @@ namespace UnlitWF
             new WFI18NTranslation("Sun Source", "太陽光のモード"),
             new WFI18NTranslation("Custom Sun Azimuth", "カスタム太陽の方角"),
             new WFI18NTranslation("Custom Sun Altitude", "カスタム太陽の高度"),
+            new WFI18NTranslation("Custom Light Pos", "カスタムライトの位置"),
             new WFI18NTranslation("Disable BackLit", "逆光補正しない"),
             new WFI18NTranslation("Disable ObjectBasePos", "メッシュ原点を取得しない"),
             // Light Bake Effects
@@ -569,7 +572,8 @@ namespace UnlitWF
             new WFI18NTranslation("HL", "Matcap Tint Color", "matcap 색상 조절").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Parallax", "시차값(Parallax)").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             new WFI18NTranslation("HL", "Power", "matcap 강도").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
-            new WFI18NTranslation("HL", "Change Alpha Transparency", "알파값 반영"),
+            new WFI18NTranslation("HL", "Change Alpha Transparency", "알파값 반영").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
+            new WFI18NTranslation("HL", "Matcap Monochrome", "matcap 단색화").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
             // Lame
             new WFI18NTranslation("LM", "Color", "LM색상・텍스처"),
             new WFI18NTranslation("LM", "Texture", "LM색상・텍스처"),
@@ -654,6 +658,7 @@ namespace UnlitWF
             new WFI18NTranslation("Sun Source", "태양광 모드"),
             new WFI18NTranslation("Custom Sun Azimuth", "커스텀 태양광 방향"),
             new WFI18NTranslation("Custom Sun Altitude", "커스텀 태양광 고도"),
+            new WFI18NTranslation("Custom Light Pos", "커스텀 라이트의 위치"),
             new WFI18NTranslation("Disable BackLit", "역광 무보정"),
             new WFI18NTranslation("Disable ObjectBasePos", "매쉬의 원점을 취득하지 않음"),
             // Light Bake Effects

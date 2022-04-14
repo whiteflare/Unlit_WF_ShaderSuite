@@ -57,6 +57,8 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
+            new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 0 || p == 3 || p == 4)),
+            new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
@@ -96,6 +98,22 @@ namespace UnlitWF
             new DefValueSetPropertyHook("_AL_MaskTex", ctx => {
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_AL_Source", 0, 1); // MAIN_TEX_ALPHA -> MASK_TEX_RED
+                }
+            }),
+            new DefValueSetPropertyHook("_HL_MatcapTex(_[0-9]+)?", ctx => {
+                if (ctx.current.textureValue != null) {
+                    var name = ctx.current.textureValue.name;
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        if (name.StartsWith("lcap_", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            CompareAndSet(ctx.all, ctx.current.name.Replace("_MatcapTex", "_CapType"), 0, 1); // MCAP -> LCAP
+                        }
+                        else if (name.StartsWith("mcap_", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            CompareAndSet(ctx.all, ctx.current.name.Replace("_MatcapTex", "_CapType"), 1, 0); // LCAP -> MCAP
+                        }
+                    }
                 }
             }),
 

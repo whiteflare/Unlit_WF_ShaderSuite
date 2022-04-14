@@ -28,6 +28,7 @@ namespace UnlitWF
     {
         public string memo;
         public Material material;
+        public bool copyMaterialColor;
 
         [MenuItem(WFMenu.ASSETS_TEMPLATE, priority = WFMenu.PRI_ASSETS_TEMPLATE)]
         public static void CreateAsset()
@@ -92,6 +93,7 @@ namespace UnlitWF
             prm.materialDestination = mats.ToArray();
             prm.labels = WFShaderFunction.GetEnableFunctionList(material).Select(f => f.Label).ToArray();
             prm.onlyOverrideBuiltinTextures = true; // テクスチャ類はビルトインテクスチャのみ上書き可能
+            prm.copyMaterialColor = copyMaterialColor; // チェックされている場合は Material Color 他もコピーする
 
             WFMaterialEditUtility.CopyPropertiesWithoutUndo(prm);
         }
@@ -108,20 +110,28 @@ namespace UnlitWF
         {
             serializedObject.Update();
 
-            var m_material = serializedObject.FindProperty("material");
+            EditorGUI.BeginChangeCheck();
+
+            var m_material = serializedObject.FindProperty(nameof(WFMaterialTemplate.material));
             using (new EditorGUI.DisabledGroupScope(true))
             {
                 EditorGUILayout.PropertyField(m_material);
             }
 
+            var m_copy = serializedObject.FindProperty(nameof(WFMaterialTemplate.copyMaterialColor));
+            EditorGUILayout.PropertyField(m_copy);
+
             var style = new GUIStyle(EditorStyles.textArea);
             style.wordWrap = true;
 
-            var m_memo = serializedObject.FindProperty("memo");
+            var m_memo = serializedObject.FindProperty(nameof(WFMaterialTemplate.memo));
             EditorGUILayout.PrefixLabel("memo");
             m_memo.stringValue = EditorGUILayout.TextArea(m_memo.stringValue, style, GUILayout.Height(80));
 
-            serializedObject.ApplyModifiedProperties();
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
         }
     }
 }
