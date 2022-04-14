@@ -234,11 +234,23 @@ FEATURE_TGL_END
     // Anti Glare & Light Configuration
     ////////////////////////////
 
+    float3 calcWorldSpaceBasePos(float3 ws_vertex) {
+        if (TGL_OFF(_GL_DisableBasePos)) {
+            // Object原点をBasePosとして使用する
+            return UnityObjectToWorldPos(ZERO_VEC3);
+        }
+        else {
+            // 現在の座標をBasePosとして使用する
+            return ws_vertex;
+        }
+    }
+
     #define LIT_MODE_AUTO               0
     #define LIT_MODE_ONLY_DIR_LIT       1
     #define LIT_MODE_ONLY_POINT_LIT     2
     #define LIT_MODE_CUSTOM_WORLDSPACE  3
     #define LIT_MODE_CUSTOM_LOCALSPACE  4
+    #define LIT_MODE_CUSTOM_WORLDPOS    5
 
     uint calcAutoSelectMainLight(float3 ws_vertex) {
         float3 pointLight1Color = samplePoint1LightColor(ws_vertex);
@@ -257,19 +269,42 @@ FEATURE_TGL_END
         }
     }
 
-    float3 calcWorldSpaceBasePos(float3 ws_vertex) {
-        if (TGL_OFF(_GL_DisableBasePos)) {
-            // Object原点をBasePosとして使用する
-            return UnityObjectToWorldPos(ZERO_VEC3);
-        }
-        else {
-            // 現在の座標をBasePosとして使用する
-            return ws_vertex;
-        }
-    }
-
     float4 calcWorldSpaceLightDir(float3 ws_vertex) {
         ws_vertex = calcWorldSpaceBasePos(ws_vertex);
+
+#if defined(_GL_AUTO_ENABLE)
+
+        uint mode = calcAutoSelectMainLight(ws_vertex);
+        if (mode == LIT_MODE_ONLY_DIR_LIT) {
+            return float4( getMainLightDirection() , +1 );
+        }
+        if (mode == LIT_MODE_ONLY_POINT_LIT) {
+            return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+        }
+        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+
+#elif defined(_GL_ONLYDIR_ENABLE)
+
+        return float4( getMainLightDirection() , +1 );
+
+#elif defined(_GL_ONLYPOINT_ENABLE)
+
+        return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+
+#elif defined(_GL_WSDIR_ENABLE)
+
+        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+
+#elif defined(_GL_LSDIR_ENABLE)
+
+        return float4( UnityObjectToWorldDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)) , 0 );
+
+#elif defined(_GL_WSPOS_ENABLE)
+
+        return float4( calcPointLightWorldDir(_GL_CustomLitPos, ws_vertex) , 0 );
+
+#else
+
         uint mode = _GL_LightMode;
         if (mode == LIT_MODE_AUTO) {
             mode = calcAutoSelectMainLight(ws_vertex);
@@ -286,7 +321,12 @@ FEATURE_TGL_END
         if (mode == LIT_MODE_CUSTOM_LOCALSPACE) {
             return float4( UnityObjectToWorldDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)) , 0 );
         }
+        if (mode == LIT_MODE_CUSTOM_WORLDPOS) {
+            return float4( calcPointLightWorldDir(_GL_CustomLitPos, ws_vertex) , 0 );
+        }
         return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+
+#endif
     }
 
     float3 calcWorldSpaceLightColor(float3 ws_vertex, float lightType) {
@@ -447,7 +487,8 @@ FEATURE_TGL_END
 #if defined(_NM_BL2ND_ENABLE) || defined(_NM_SW2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 // 2nd NormalMap
                 float dtlPower = _NM_2ndType == 0 ? 0 : WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-                float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(i.uv, _DetailNormalMap) );
+                float2 uv_dtl = _NM_2ndUVType == 1 ? i.uv_lmap : i.uv;
+                float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
 #if defined(_WF_LEGACY_FEATURE_SWITCH)
                 if (_NM_2ndType == 1) { // BLEND
 #endif
@@ -633,6 +674,7 @@ FEATURE_TGL_END
             float4  matcap_color,
             float3  matcap_mask,
             float   power,
+            float   monochrome,
             float3  arrange_color,
             float3  median_color,
             float   change_alpha,
@@ -643,6 +685,8 @@ FEATURE_TGL_END
         power *= MAX_RGB(matcap_mask);
         // マスク色調整
         float3 matcap_mask_color = matcap_mask * arrange_color * 2;
+        // matcap彩度調整
+        matcap_color.rgb = lerp(matcap_color.rgb, AVE_RGB(matcap_color.rgb), monochrome);
 
         // 色合成
         if (cap_type == 1) {
@@ -675,7 +719,7 @@ FEATURE_TGL_END
                     calcMatcapColor(                                                                                                                        \
                         PICK_MAIN_TEX2D(_HL_MatcapTex##id, saturate(calcMatcapVector(matcapVector, _HL_BlendNormal##id, _HL_Parallax##id).xy * 0.5 + 0.5)), \
                         SAMPLE_MASK_VALUE(_HL_MaskTex##id, uv_main, _HL_InvMaskVal##id).rgb,                                                                \
-                        _HL_Power##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);                              \
+                        _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);    \
         FEATURE_TGL_END
 
     void affectMatcapColor(float4x4 matcapVector, float2 uv_main, inout float4 color) {

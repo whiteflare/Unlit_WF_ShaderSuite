@@ -80,12 +80,12 @@ namespace UnlitWF
 
         private void OnEnable()
         {
-            this.p_settingPriority = serializedObject.FindProperty("settingPriority");
-            this.p_enableStripping = serializedObject.FindProperty("enableStripping");
-            this.p_stripUnusedVariant = serializedObject.FindProperty("stripUnusedVariant");
-            this.p_stripFallback = serializedObject.FindProperty("stripFallback");
-            this.p_stripMetaPass = serializedObject.FindProperty("stripMetaPass");
-            this.p_enableScanProjects = serializedObject.FindProperty("enableScanProjects");
+            this.p_settingPriority = serializedObject.FindProperty(nameof(WFEditorSetting.settingPriority));
+            this.p_enableStripping = serializedObject.FindProperty(nameof(WFEditorSetting.enableStripping));
+            this.p_stripUnusedVariant = serializedObject.FindProperty(nameof(WFEditorSetting.stripUnusedVariant));
+            this.p_stripFallback = serializedObject.FindProperty(nameof(WFEditorSetting.stripFallback));
+            this.p_stripMetaPass = serializedObject.FindProperty(nameof(WFEditorSetting.stripMetaPass));
+            this.p_enableScanProjects = serializedObject.FindProperty(nameof(WFEditorSetting.enableScanProjects));
         }
 
         public override void OnInspectorGUI()
