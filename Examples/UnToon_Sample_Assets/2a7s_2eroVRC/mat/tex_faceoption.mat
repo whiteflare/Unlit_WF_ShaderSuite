@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_faceoption
   m_Shader: {fileID: 4800000, guid: 0a7a6cdca16a38548a5d81aca8d4e3ba, type: 3}
-  m_ShaderKeywords: _TS_ENABLE _TS_STEP2_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -93,6 +93,7 @@ Material:
     - _HL_ChangeAlpha: 0
     - _HL_Enable: 0
     - _HL_InvMaskVal: 0
+    - _HL_MatcapMonochrome: 0
     - _HL_Parallax: 0.75
     - _HL_Power: 1
     - _MT_BlendNormal: 0.1
@@ -124,6 +125,7 @@ Material:
     - _TS_BlendNormal: 0.1
     - _TS_Enable: 1
     - _TS_Feather: 0.05
+    - _TS_FixContrast: 0
     - _TS_InvMaskVal: 1
     - _TS_Power: 1
     - _TS_Steps: 2
@@ -132,6 +134,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}

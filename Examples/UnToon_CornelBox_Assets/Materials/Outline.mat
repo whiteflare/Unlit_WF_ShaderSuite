@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Outline
   m_Shader: {fileID: 4800000, guid: 4eef00f52cc21b04e9e34e4caefa6bbf, type: 3}
-  m_ShaderKeywords: _TL_EDGE_ENABLE _TL_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _TL_EDGE_ENABLE _TL_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -59,4 +59,5 @@ Material:
     - _FG_BaseOffset: {r: 0, g: 0, b: 0, a: 0}
     - _FG_Color: {r: 0.5, g: 0.5, b: 0.6, a: 1}
     - _FG_Scale: {r: 1, g: 1, b: 1, a: 0}
+    - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _TL_LineColor: {r: 0.7558129, g: 0.755, b: 1, a: 1}
