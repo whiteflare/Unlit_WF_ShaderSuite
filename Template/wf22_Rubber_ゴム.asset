@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_UnToon_Opaque
   m_Shader: {fileID: 4800000, guid: a3678756e883b9349ac22fce33313139, type: 3}
-  m_ShaderKeywords: _HL_ENABLE _OL_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _HL_ENABLE _OL_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -171,6 +171,8 @@ Material:
     - _HL_Enable_1: 0
     - _HL_InvMaskVal: 0
     - _HL_InvMaskVal_1: 0
+    - _HL_MatcapMonochrome: 0
+    - _HL_MatcapMonochrome_1: 0
     - _HL_Parallax: 0.75
     - _HL_Parallax_1: 0.75
     - _HL_Power: 1
@@ -202,6 +204,7 @@ Material:
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_2ndType: 0
+    - _NM_2ndUVType: 0
     - _NM_Enable: 0
     - _NM_FlipMirror: 0
     - _NM_InvMaskVal: 0
@@ -244,6 +247,7 @@ Material:
     - _DF_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MatcapColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
