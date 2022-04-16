@@ -341,7 +341,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("materials", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(so.FindProperty("materials"), new GUIContent("list"), true);
+            EditorGUILayout.PropertyField(so.FindProperty(nameof(CleanUpParameter.materials)), new GUIContent("list"), true);
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -350,9 +350,9 @@ namespace UnlitWF
 
             // オプション
             EditorGUILayout.LabelField("options", EditorStyles.boldLabel);
-            prop = so.FindProperty("resetUnused");
+            prop = so.FindProperty(nameof(CleanUpParameter.resetUnused));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnUsed Properties (未使用の値) も一緒にクリアする");
-            prop = so.FindProperty("resetKeywords");
+            prop = so.FindProperty(nameof(CleanUpParameter.resetKeywords));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "ShaderKeywords (Shaderキーワード) も一緒にクリアする");
 
             EditorGUILayout.Space();
@@ -421,7 +421,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("materials", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(so.FindProperty("materials"), new GUIContent("list"), true);
+            EditorGUILayout.PropertyField(so.FindProperty(nameof(ResetParameter.materials)), new GUIContent("list"), true);
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -431,29 +431,29 @@ namespace UnlitWF
 
             // 対象(種類から)
             EditorGUILayout.LabelField("Reset by Type", EditorStyles.boldLabel);
-            prop = so.FindProperty("resetColor");
+            prop = so.FindProperty(nameof(ResetParameter.resetColor));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "Color (色) をデフォルトに戻す");
-            prop = so.FindProperty("resetTexture");
+            prop = so.FindProperty(nameof(ResetParameter.resetTexture));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "Texture (テクスチャ) をデフォルトに戻す");
-            prop = so.FindProperty("resetFloat");
+            prop = so.FindProperty(nameof(ResetParameter.resetFloat));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "Float (数値) をデフォルトに戻す");
 
             EditorGUILayout.Space();
 
             // 対象(機能から)
             EditorGUILayout.LabelField("Reset by Function", EditorStyles.boldLabel);
-            prop = so.FindProperty("resetColorAlpha");
+            prop = so.FindProperty(nameof(ResetParameter.resetColorAlpha));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "Color (色) の Alpha を 1.0 にする");
-            prop = so.FindProperty("resetLit");
+            prop = so.FindProperty(nameof(ResetParameter.resetLit));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "Lit & Lit Advance の設定をデフォルトに戻す");
 
             EditorGUILayout.Space();
 
             // オプション
             EditorGUILayout.LabelField("options", EditorStyles.boldLabel);
-            prop = so.FindProperty("resetUnused");
+            prop = so.FindProperty(nameof(ResetParameter.resetUnused));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "UnUsed Properties (未使用の値) も一緒にクリアする");
-            prop = so.FindProperty("resetKeywords");
+            prop = so.FindProperty(nameof(ResetParameter.resetKeywords));
             prop.boolValue = GUILayout.Toggle(prop.boolValue, "ShaderKeywords (Shaderキーワード) も一緒にクリアする");
 
             EditorGUILayout.Space();
@@ -521,7 +521,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("destination materials", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(so.FindProperty("materialDestination"), new GUIContent("list"), true);
+            EditorGUILayout.PropertyField(so.FindProperty(nameof(CopyPropParameter.materialDestination)), new GUIContent("list"), true);
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -529,7 +529,7 @@ namespace UnlitWF
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("source materials", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(so.FindProperty("materialSource"), new GUIContent("material"), true);
+            EditorGUILayout.PropertyField(so.FindProperty(nameof(CopyPropParameter.materialSource)), new GUIContent("material"), true);
             EditorGUILayout.Space();
 
             ToolCommon.NoticeIfIllegalMaterials(new Material[] { param.materialSource }, false);
@@ -618,7 +618,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("materials", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(so.FindProperty("materials"), new GUIContent("list"), true);
+            EditorGUILayout.PropertyField(so.FindProperty(nameof(MigrationParameter.materials)), new GUIContent("list"), true);
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -1089,7 +1089,7 @@ namespace UnlitWF
 
     public static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 1;
+        public const int VERSION = 2;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         public static void ExecuteAuto()

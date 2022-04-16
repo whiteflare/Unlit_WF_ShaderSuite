@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   memo: "\u773C\u93E1\u306A\u3069\u306B\u4F7F\u7528\u3059\u308B\u30AC\u30E9\u30B9\u30EC\u30F3\u30BA\u306E\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: 1071850308041696887}
+  copyMaterialColor: 0
 --- !u!21 &1071850308041696887
 Material:
   serializedVersion: 6
@@ -23,7 +24,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_UnToon_Transparent_Refracted
   m_Shader: {fileID: 4800000, guid: 45e1aee78764bec499e99106c330f95a, type: 3}
-  m_ShaderKeywords: _RF_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _RF_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -61,7 +62,15 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _HL_MaskTex_1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _HL_MatcapTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HL_MatcapTex_1:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -179,12 +188,21 @@ Material:
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
+    - _HL_BlendNormal_1: 0.1
     - _HL_CapType: 0
+    - _HL_CapType_1: 0
     - _HL_ChangeAlpha: 0
+    - _HL_ChangeAlpha_1: 0
     - _HL_Enable: 0
+    - _HL_Enable_1: 0
     - _HL_InvMaskVal: 0
+    - _HL_InvMaskVal_1: 0
+    - _HL_MatcapMonochrome: 0
+    - _HL_MatcapMonochrome_1: 0
     - _HL_Parallax: 0.75
+    - _HL_Parallax_1: 0.75
     - _HL_Power: 1
+    - _HL_Power_1: 1
     - _LM_AnimSpeed: 0.2
     - _LM_ChangeAlpha: 0
     - _LM_Dencity: 0.5
@@ -213,6 +231,7 @@ Material:
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_2ndType: 0
+    - _NM_2ndUVType: 0
     - _NM_Enable: 0
     - _NM_FlipMirror: 0
     - _NM_InvMaskVal: 0
@@ -259,8 +278,11 @@ Material:
     - _DF_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MatcapColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MedianColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _LM_Color: {r: 1, g: 1, b: 1, a: 1}
     - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1, a: 1}

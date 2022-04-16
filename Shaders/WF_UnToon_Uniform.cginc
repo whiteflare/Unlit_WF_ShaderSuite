@@ -108,6 +108,7 @@
     uint            _GL_LightMode;
     float           _GL_CustomAzimuth;
     float           _GL_CustomAltitude;
+    float3          _GL_CustomLitPos;
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
 
@@ -158,6 +159,7 @@
     uint            _NM_FlipMirror;
 #ifndef _WF_MOBILE
     uint            _NM_2ndType;
+    uint            _NM_2ndUVType;
     float4          _DetailNormalMap_ST;
     float           _DetailNormalMapScale;
     float           _NM_InvMaskVal;
@@ -197,7 +199,8 @@
     float       _HL_BlendNormal##id;        \
     float       _HL_Parallax##id;           \
     float       _HL_InvMaskVal##id;         \
-    float       _HL_ChangeAlpha##id;
+    float       _HL_ChangeAlpha##id;        \
+    float       _HL_MatcapMonochrome##id;
 
     WF_DECL_MATCAP(##)
 #ifndef _WF_MOBILE
