@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   memo: "\u8868\u60C5\u30D1\u30FC\u30C4\u306B\u4F7F\u7528\u3067\u304D\u308B\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002\u4ED6\u306E\u30E1\u30C3\u30B7\u30E5\u3088\u308A\u3082\u624B\u524D\u306B\u8868\u793A\u3055\u308C\u307E\u3059\u3002"
   material: {fileID: 7882261622881200054}
+  copyMaterialColor: 0
 --- !u!21 &7882261622881200054
 Material:
   serializedVersion: 6
@@ -23,7 +24,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay
   m_Shader: {fileID: 4800000, guid: 4e4be4aab63a2bd4fbcea2390ae92fdf, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _GL_AUTO_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -72,3 +73,4 @@ Material:
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}

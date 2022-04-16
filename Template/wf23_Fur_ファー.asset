@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_FakeFur_Mix
   m_Shader: {fileID: 4800000, guid: f19f31eb9bfd5154ba2c1a41c54a908b, type: 3}
-  m_ShaderKeywords: _TS_ENABLE _TS_STEP2_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -35,7 +35,15 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _HL_MaskTex_1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _HL_MatcapTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HL_MatcapTex_1:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -99,11 +107,17 @@ Material:
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
+    - _HL_BlendNormal_1: 0.1
     - _HL_CapType: 0
+    - _HL_CapType_1: 0
     - _HL_Enable: 0
+    - _HL_Enable_1: 0
     - _HL_InvMaskVal: 0
+    - _HL_InvMaskVal_1: 0
     - _HL_Parallax: 0.75
+    - _HL_Parallax_1: 0.75
     - _HL_Power: 1
+    - _HL_Power_1: 1
     - _TR_BlendNormal: 0
     - _TR_BlendType: 0
     - _TR_Enable: 0
@@ -129,8 +143,11 @@ Material:
     - _FR_TintColorBase: {r: 1, g: 1, b: 1, a: 1}
     - _FR_TintColorTip: {r: 1, g: 1, b: 1, a: 1}
     - _FR_Vector: {r: 0, g: 0, b: 1, a: 0}
+    - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MatcapColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _HL_MedianColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.9, g: 0.72933966, b: 0.72933966, a: 1}
     - _TS_2ndColor: {r: 0.8, g: 0.60830194, b: 0.60830194, a: 1}
@@ -150,3 +167,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   memo: "\u30D5\u30A1\u30FC\u3092\u7528\u3044\u305F\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: -8874921283336520688}
+  copyMaterialColor: 0

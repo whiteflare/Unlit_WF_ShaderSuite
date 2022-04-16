@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_Gem_Transparent
   m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
-  m_ShaderKeywords: _GB_ENABLE _GF_ENABLE _GR_ENABLE
+  m_ShaderKeywords: _GB_ENABLE _GF_ENABLE _GL_AUTO_ENABLE _GR_ENABLE
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -77,6 +77,7 @@ Material:
     m_Colors:
     - _Color: {r: 0.6952468, g: 0.64161134, b: 1, a: 1}
     - _GB_ColorBack: {r: 0.3948571, g: 0.29400003, b: 1, a: 1}
+    - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,3 +92,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   memo: "\u5C0F\u3055\u306A\u5B9D\u77F3\u306B\u4F7F\u7528\u53EF\u80FD\u306A\u30B8\u30A7\u30E0\u30B7\u30A7\u30FC\u30C0\u306E\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: -6123224880499273341}
+  copyMaterialColor: 0
