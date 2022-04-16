@@ -1089,7 +1089,7 @@ namespace UnlitWF
 
     public static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 1;
+        public const int VERSION = 2;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         public static void ExecuteAuto()
