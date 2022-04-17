@@ -269,6 +269,10 @@ FEATURE_TGL_END
         }
     }
 
+    float3 calcWorldSpaceCustomSunDir() {
+        return calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude);
+    }
+
     float4 calcWorldSpaceLightDir(float3 ws_vertex) {
         ws_vertex = calcWorldSpaceBasePos(ws_vertex);
 
@@ -281,23 +285,31 @@ FEATURE_TGL_END
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
             return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
         }
-        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_ONLYDIR_ENABLE)
 
-        return float4( getMainLightDirection() , +1 );
+        float3 dir = getMainLightDirection();
+        if (any(dir)) {
+            return float4( dir , +1 );
+        }
+        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_ONLYPOINT_ENABLE)
 
-        return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+        float3 dir = calcPointLight1WorldDir(ws_vertex);
+        if (any(dir)) {
+            return float4( dir , -1 );
+        }
+        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_WSDIR_ENABLE)
 
-        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_LSDIR_ENABLE)
 
-        return float4( UnityObjectToWorldDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)) , 0 );
+        return float4( UnityObjectToWorldDir(calcWorldSpaceCustomSunDir()) , 0 );
 
 #elif defined(_GL_WSPOS_ENABLE)
 
@@ -310,10 +322,18 @@ FEATURE_TGL_END
             mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
-            return float4( getMainLightDirection() , +1 );
+            float3 dir = getMainLightDirection();
+            if (any(dir)) {
+                return float4( dir , +1 );
+            }
+            mode = LIT_MODE_CUSTOM_WORLDSPACE;
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
-            return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+            float3 dir = calcPointLight1WorldDir(ws_vertex);
+            if (any(dir)) {
+                return float4( dir , -1 );
+            }
+            mode = LIT_MODE_CUSTOM_WORLDSPACE;
         }
         if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
             return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );

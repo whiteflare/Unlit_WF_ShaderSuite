@@ -132,7 +132,7 @@
 
     float3 calcPointLight1WorldDir(float3 ws_vertex) {
         if (GetAdditionalLightsCount() < 1) {
-            return float3(0, 1, 0);
+            return float3(0, 0, 0); // ポイントライトが無いときは 0, 0, 0 を返す
         } else {
             return calcPointLightWorldDir(getPoint1LightPos(), ws_vertex);
         }
