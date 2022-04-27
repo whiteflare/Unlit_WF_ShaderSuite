@@ -341,4 +341,27 @@
     }
 */
 
+    ////////////////////////////
+    // Random
+    ////////////////////////////
+
+    float random1(float2 st) {  // float2 -> float [0-1)
+        return frac(sin(dot(st, float2(12.9898, 78.233))) * 43758.5453);
+    }
+
+    float2 random2(float2 st) { // float2 -> float2 [0-1)
+        float2 ret = float2(0, 0);
+        ret.x = random1(st);
+        ret.y = random1(st + ret);
+        return ret;
+    }
+
+    float3 random3(float2 st) { // float2 -> float3 [0-1)
+        float3 ret = float3(0, 0, 0);
+        ret.x = random1(st);
+        ret.y = random1(st + ret.xy);
+        ret.z = random1(st + ret.xy);
+        return ret;
+    }
+
 #endif

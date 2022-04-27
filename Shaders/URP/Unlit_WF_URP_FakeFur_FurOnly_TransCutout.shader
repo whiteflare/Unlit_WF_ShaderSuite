@@ -35,6 +35,7 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
             _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
+            _FR_Random              ("[FR] Fur Vector Randomize", Range(0, 5)) = 0
         [NoScaleOffset]
         [Normal]
             _FR_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
