@@ -32,9 +32,9 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             _FR_Height              ("[FR] Fur Height (Cutout)", Range(0, 0.2)) = 0.04
             _FR_Height2             ("[FR] Fur Height (Transparent)", Range(0, 0.2)) = 0.05
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat (Cutout)", Range(1, 5)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat (Cutout)", Range(1, 6)) = 3
         [IntRange]
-            _FR_Repeat2             ("[FR] Fur Repeat (Transparent)", Range(1, 5)) = 2
+            _FR_Repeat2             ("[FR] Fur Repeat (Transparent)", Range(1, 6)) = 2
         [Header(Fur Shape)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]

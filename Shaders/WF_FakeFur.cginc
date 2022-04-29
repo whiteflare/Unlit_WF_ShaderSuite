@@ -36,7 +36,7 @@
         float3 ws_normal        : TEXCOORD2;
         float3 ws_tangent       : TEXCOORD3;
         float3 ws_bitangent     : TEXCOORD4;
-        float4 ws_light_dir     : TEXCOORD5;
+        float3 ws_light_dir     : TEXCOORD5;    // ws_light_dir.w は frag では使わないので削減
         float vid               : TEXCOORD6;
         float3 light_color      : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
@@ -50,13 +50,14 @@
         float2 uv               : TEXCOORD0;
         float3 ws_vertex        : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
+        float3 ws_light_dir     : TEXCOORD3;    // ws_light_dir.w は frag では使わないので削減
         float  height           : COLOR0;
         float3 light_color      : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
         float shadow_power      : COLOR2;
 #endif
-        float4 ws_light_dir     : TEXCOORD3;
         UNITY_VERTEX_OUTPUT_STEREO
+        // フルセット 21 value なので、geometry シェーダの制限 1024 value 内では 48 vertex = 6枚のファーまで使用できる
     };
 
     ////////////////////////////
@@ -72,15 +73,16 @@
 
         o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-        o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
         o.vid = (float) v.vid;
 
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipMirror & 1, _FR_FlipMirror & 2);
 
+        float4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+        o.ws_light_dir = ws_light_dir.xyz;
         // 環境光取得
         float3 ambientColor = sampleSHLightColor();
         // 影コントラスト
-        calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
+        calcToonShadeContrast(o.ws_vertex, ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
@@ -167,7 +169,7 @@
         }}
     }
 
-    [maxvertexcount(40)]
+    [maxvertexcount(48)]
     void geom_fakefur(triangle v2g v[3], inout TriangleStream<g2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
@@ -200,7 +202,7 @@
 #ifdef _V2F_HAS_SHADOWPOWER
         i.shadow_power  = gi.shadow_power;
 #endif
-        i.ws_light_dir  = gi.ws_light_dir;
+        i.ws_light_dir  = float4(gi.ws_light_dir, 0);
 
         // メイン
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
