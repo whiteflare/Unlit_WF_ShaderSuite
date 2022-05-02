@@ -97,6 +97,10 @@ namespace UnlitWF
             {
                 if (!p.name.StartsWith("_Mode"))
                 {
+                    if (p.flags.HasFlag(MaterialProperty.PropFlags.HideInInspector))
+                    {
+                        continue;
+                    }
                     materialEditor.ShaderProperty(p, p.displayName);
                 }
             }
@@ -105,6 +109,7 @@ namespace UnlitWF
             GUI.Label(EditorGUI.IndentedRect(EditorGUILayout.GetControlRect()), "Advanced Options", EditorStyles.boldLabel);
             materialEditor.RenderQueueField();
             materialEditor.EnableInstancingField();
+            materialEditor.DoubleSidedGIField();
             EditorGUILayout.Space();
 
             // 一番下にも、元シェーダに戻すボタンを置く
@@ -158,14 +163,13 @@ namespace UnlitWF
                 new DebugMode("White", "_ModeColor", 1),
                 new DebugMode("Black", "_ModeColor", 2),
                 new DebugMode("Magenta", "_ModeColor", 3),
-                new DebugMode("Discard", "_ModeColor", 4),
+                new DebugMode("Transparent", "_ModeColor", 4),
+            }),
+            new DebugModeSection("Model Visualization", new List<DebugMode>(){
                 new DebugMode("Vertex Color", "_ModeColor", 5),
+                new DebugMode("Facing", "_ModeColor", 6),
             }),
-            new DebugModeSection("Show Positions", new List<DebugMode>(){
-                new DebugMode("Local space", "_ModePos", 1),
-                new DebugMode("World space", "_ModePos", 2),
-            }),
-            new DebugModeSection("Show UVs", new List<DebugMode>(){
+            new DebugModeSection("UV Visualization", new List<DebugMode>(){
                 new DebugMode("UV1", "_ModeUV", 1),
                 new DebugMode("UV2", "_ModeUV", 2),
                 new DebugMode("UV3", "_ModeUV", 3),
@@ -173,29 +177,27 @@ namespace UnlitWF
                 new DebugMode("Lightmap UV", "_ModeUV", 5),
                 new DebugMode("Dynamic Lightmap UV", "_ModeUV", 6),
             }),
-            new DebugModeSection("Show Normals", new List<DebugMode>(){
-                new DebugMode("Normal (local space)", "_ModeNormal", 1),
-                new DebugMode("Tangent (local space)", "_ModeNormal", 2),
-                new DebugMode("BiTangent (local space)", "_ModeNormal", 3),
-                new DebugMode("Normal (world space)", "_ModeNormal", 4),
-                new DebugMode("Tangent (world space)", "_ModeNormal", 5),
-                new DebugMode("BiTangent (world space)", "_ModeNormal", 6),
+            new DebugModeSection("Normal Visualization (LocalSpace)", new List<DebugMode>(){
+                new DebugMode("Normal", "_ModeNormal", 1),
+                new DebugMode("Tangent", "_ModeNormal", 2),
+                new DebugMode("BiTangent", "_ModeNormal", 3),
             }),
-            new DebugModeSection("Show Parallel Normals", new List<DebugMode>(){
-                new DebugMode("view Parallel Normal and Tangent", "_ModeParaNormal", 1),
+            new DebugModeSection("Normal Visualization (WorldSpace)", new List<DebugMode>(){
+                new DebugMode("Normal", "_ModeNormal", 4),
+                new DebugMode("Tangent", "_ModeNormal", 5),
+                new DebugMode("BiTangent", "_ModeNormal", 6),
             }),
-            new DebugModeSection("Show Lightings", new List<DebugMode>(){
-                new DebugMode("Light 0", "_ModeLight", 1),
-                new DebugMode("Light 1-4", "_ModeLight", 2),
-                new DebugMode("ShadeSH9", "_ModeLight", 3),
+            new DebugModeSection("Texture Visualization", new List<DebugMode>(){
+                new DebugMode("_MainTex", "_ModeTexture", 1),
+                new DebugMode("_MetallicGlossMap", "_ModeTexture", 2),
+                new DebugMode("_SpecGlossMap", "_ModeTexture", 3),
+                new DebugMode("_BumpMap", "_ModeTexture", 4),
+                new DebugMode("_OcclusionMap", "_ModeTexture", 5),
+                new DebugMode("_EmissionMap", "_ModeTexture", 6),
             }),
-            new DebugModeSection("Show LightMaps", new List<DebugMode>(){
+            new DebugModeSection("LightMap Visualization", new List<DebugMode>(){
                 new DebugMode("Lightmap", "_ModeLightMap", 1),
                 new DebugMode("Dynamic Lightmap", "_ModeLightMap", 2),
-            }),
-            new DebugModeSection("Show SpecCubes", new List<DebugMode>(){
-                new DebugMode("SpecCube0", "_ModeSpecCube", 1),
-                new DebugMode("SpecCube1", "_ModeSpecCube", 2),
             }),
         };
 
