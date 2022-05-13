@@ -1016,6 +1016,23 @@ namespace UnlitWF
                         new PropertyNameReplacement("_2nd_ShadeColor", "_TS_2ndColor"),
                         new PropertyNameReplacement("_Shadow2ndColor", "_TS_2ndColor")
                         );
+                    // 1影2影とも色相だけ反映して彩度・明度はリセットしてしまう
+                    if (HasCustomValue(ctx, "_TS_1stColor")) {
+                        float hur, sat, val;
+                        Color.RGBToHSV(ctx.target.GetColor("_TS_1stColor"), out hur, out sat, out val);
+                        if (sat < 0.05f) {
+                            hur = 4 / 6f;
+                        }
+                        ctx.target.SetColor("_TS_1stColor", Color.HSVToRGB(hur, 0.1f, 0.9f));
+                    }
+                    if (HasCustomValue(ctx, "_TS_2ndColor")) {
+                        float hur, sat, val;
+                        Color.RGBToHSV(ctx.target.GetColor("_TS_2ndColor"), out hur, out sat, out val);
+                        if (sat < 0.05f) {
+                            hur = 4 / 6f;
+                        }
+                        ctx.target.SetColor("_TS_2ndColor", Color.HSVToRGB(hur, 0.15f, 0.8f));
+                    }
                     // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
                     if (HasCustomValue(ctx, "_TS_1stTex", "_TS_2ndTex")) {
                         if (!HasCustomValue(ctx, "_TS_BaseTex")) {
