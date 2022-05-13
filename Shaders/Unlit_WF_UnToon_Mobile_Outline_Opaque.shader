@@ -74,7 +74,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
 
         [Header(Metallic Secondary)]
-        [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
+        [Enum(OFF,0,ONLY_SECOND_MAP,2)]
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
@@ -253,7 +253,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local _AO_ENABLE

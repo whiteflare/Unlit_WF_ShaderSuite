@@ -193,7 +193,7 @@ namespace UnlitWF
             { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             } },
-            { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_MT_ADD2ND_ENABLE", "_MT_ONLY2ND_ENABLE") {
+            { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_", "_MT_ONLY2ND_ENABLE") {
                 enablePropName = "_MT_Enable",
             } },
             { "_NM_2ndType", new WFCustomKeywordSettingEnum("_NM_2ndType", "_", "_NM_BL2ND_ENABLE", "_NM_SW2ND_ENABLE") {

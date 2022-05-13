@@ -126,7 +126,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
 
         [Header(Metallic Secondary)]
-        [Enum(OFF,0,ADDITION,1,ONLY_SECOND_MAP,2)]
+        [Enum(OFF,0,ONLY_SECOND_MAP,2)]
             _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
@@ -406,7 +406,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
@@ -458,7 +458,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ADD2ND_ENABLE _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BK_ENABLE
