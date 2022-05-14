@@ -648,10 +648,12 @@ FEATURE_TGL_END
     // Light Matcap
     ////////////////////////////
 
-    float4x4 calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+#define WF_TYP_MATVEC	float4x4
+
+    WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
         // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
 
-        float4x4 matcapVector = 0;
+        WF_TYP_MATVEC matcapVector = 0;
 
         // ワールド法線をビュー法線に変換
         float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
@@ -682,7 +684,7 @@ FEATURE_TGL_END
         return matcapVector;
     }
 
-    float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
+    float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
     #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
         return lerp( lerpNormals(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerpNormals(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax );
     #else
@@ -742,7 +744,7 @@ FEATURE_TGL_END
                         _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);    \
         FEATURE_TGL_END
 
-    void affectMatcapColor(float4x4 matcapVector, float2 uv_main, inout float4 color) {
+    void affectMatcapColor(WF_TYP_MATVEC matcapVector, float2 uv_main, inout float4 color) {
 #ifdef _HL_ENABLE
         WF_CALC_MATCAP_COLOR(##)
 #endif
