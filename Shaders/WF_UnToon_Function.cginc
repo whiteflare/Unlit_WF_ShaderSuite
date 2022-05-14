@@ -648,48 +648,62 @@ FEATURE_TGL_END
     // Light Matcap
     ////////////////////////////
 
-#define WF_TYP_MATVEC	float4x4
+    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        #define _MV_HAS_NML
+    #endif
+
+    struct MatcapVector {
+        float3 vs_normal_center;
+        float3 vs_normal_side;
+#ifdef _MV_HAS_NML
+        float3 vs_bump_normal_center;
+        float3 vs_bump_normal_side;
+#endif
+    };
+    #define WF_TYP_MATVEC   MatcapVector
 
     WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
         // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
 
-        WF_TYP_MATVEC matcapVector = 0;
+        WF_TYP_MATVEC matcapVector;
+        UNITY_INITIALIZE_OUTPUT(WF_TYP_MATVEC, matcapVector);
 
         // ワールド法線をビュー法線に変換
         float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
+#ifdef _MV_HAS_NML
+        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
+#endif
+
         // カメラ位置にて補正する
-        float3 vs_normal_center         = matcapViewCorrect(vs_normal, ws_view_dir);
-        float3 vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir);
+        float3 base1 = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir   ) * float3(-1, -1, 1) + float3(0, 0, 1);
+        float3 base2 = mul( (float3x3)UNITY_MATRIX_V, ws_camera_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
+        float3 detail1 = vs_normal.xyz * float3(-1, -1, 1);
+        matcapVector.vs_normal_center       = base1 * dot(base1, detail1) / base1.z - detail1;
+        matcapVector.vs_normal_side         = base2 * dot(base2, detail1) / base2.z - detail1;
+#ifdef _MV_HAS_NML
+        float3 detail2 = vs_bump_normal.xyz * float3(-1, -1, 1);
+        matcapVector.vs_bump_normal_center  = base1 * dot(base1, detail2) / base1.z - detail2;
+        matcapVector.vs_bump_normal_side    = base2 * dot(base2, detail2) / base2.z - detail2;
+#endif
+
         // 真上を揃える
         float2x2 rotate = matcapRotateCorrectMatrix();
-        vs_normal_center.xy         = mul( vs_normal_center.xy, rotate );
-        vs_normal_side.xy           = mul( vs_normal_side.xy, rotate );
-        // 格納
-        matcapVector[0].xyz = normalize(vs_normal_center);
-        matcapVector[2].xyz = normalize(vs_normal_side);
+        matcapVector.vs_normal_center.xy         = mul( matcapVector.vs_normal_center.xy, rotate );
+        matcapVector.vs_normal_side.xy           = mul( matcapVector.vs_normal_side.xy, rotate );
+#ifdef _MV_HAS_NML
+        matcapVector.vs_bump_normal_center.xy    = mul( matcapVector.vs_bump_normal_center.xy, rotate );
+        matcapVector.vs_bump_normal_side.xy      = mul( matcapVector.vs_bump_normal_side.xy, rotate );
+#endif
 
-    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
-        // ワールド法線をビュー法線に変換
-        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
-        // カメラ位置にて補正する
-        float3 vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_view_dir);
-        float3 vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir);
-        // 真上を揃える
-        vs_bump_normal_center.xy    = mul( vs_bump_normal_center.xy, rotate );
-        vs_bump_normal_side.xy      = mul( vs_bump_normal_side.xy, rotate );
-        // 格納
-        matcapVector[1].xyz = normalize(vs_bump_normal_center);
-        matcapVector[3].xyz = normalize(vs_bump_normal_side);
-    #endif
         return matcapVector;
     }
 
     float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
-    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
-        return lerp( lerpNormals(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerpNormals(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax );
-    #else
-        return lerp( matcapVector[0].xyz, matcapVector[2].xyz, parallax );
-    #endif
+#ifdef _MV_HAS_NML
+        return normalize(lerp( lerp(matcapVector.vs_normal_center, matcapVector.vs_bump_normal_center, normal), lerp(matcapVector.vs_normal_side, matcapVector.vs_bump_normal_side, normal), parallax ));
+#else
+        return normalize(lerp( matcapVector.vs_normal_center, matcapVector.vs_normal_side, parallax ));
+#endif
     }
 
     void calcMatcapColor(
