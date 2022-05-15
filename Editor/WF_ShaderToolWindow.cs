@@ -1071,6 +1071,9 @@ namespace UnlitWF
                             new PropertyNameReplacement("_Set_RimLightMask", "_TR_Color"),
                             new PropertyNameReplacement("_RimMask", "_TR_Color")
                             );
+                        if (HasCustomValue(ctx, "_TR_Color")) {
+                            ctx.target.SetInt("_TR_BlendType", 2);  // ADD
+                        }
                     }
                 },
                 ctx => {
