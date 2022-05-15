@@ -648,16 +648,20 @@ FEATURE_TGL_END
     // Light Matcap
     ////////////////////////////
 
+    #if defined(USING_STEREO_MATRICES)
+        #define _MV_HAS_PARALLAX
+    #endif
     #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
         #define _MV_HAS_NML
     #endif
 
     struct MatcapVector {
         float3 vs_normal_center;
-        float3 vs_normal_side;
+#ifdef _MV_HAS_PARALLAX
+        float3 diff_parallax;
+#endif
 #ifdef _MV_HAS_NML
-        float3 vs_bump_normal_center;
-        float3 vs_bump_normal_side;
+        float3 diff_normal;
 #endif
     };
     #define WF_TYP_MATVEC   MatcapVector
@@ -668,42 +672,50 @@ FEATURE_TGL_END
         WF_TYP_MATVEC matcapVector;
         UNITY_INITIALIZE_OUTPUT(WF_TYP_MATVEC, matcapVector);
 
-        // ワールド法線をビュー法線に変換
-        float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
-#ifdef _MV_HAS_NML
-        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
-#endif
-
-        // カメラ位置にて補正する
-        float3 base1 = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir   ) * float3(-1, -1, 1) + float3(0, 0, 1);
-        float3 base2 = mul( (float3x3)UNITY_MATRIX_V, ws_camera_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
-        float3 detail1 = vs_normal.xyz * float3(-1, -1, 1);
-        matcapVector.vs_normal_center       = base1 * dot(base1, detail1) / base1.z - detail1;
-        matcapVector.vs_normal_side         = base2 * dot(base2, detail1) / base2.z - detail1;
-#ifdef _MV_HAS_NML
-        float3 detail2 = vs_bump_normal.xyz * float3(-1, -1, 1);
-        matcapVector.vs_bump_normal_center  = base1 * dot(base1, detail2) / base1.z - detail2;
-        matcapVector.vs_bump_normal_side    = base2 * dot(base2, detail2) / base2.z - detail2;
-#endif
-
-        // 真上を揃える
+        // 真上を揃える回転行列
         float2x2 rotate = matcapRotateCorrectMatrix();
-        matcapVector.vs_normal_center.xy         = mul( matcapVector.vs_normal_center.xy, rotate );
-        matcapVector.vs_normal_side.xy           = mul( matcapVector.vs_normal_side.xy, rotate );
+
+        // ワールド法線をビュー法線に変換
+        float3 vs_normal = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_normal_center = matcapViewCorrect(vs_normal, ws_view_dir);
+        // 真上を揃える
+        vs_normal_center.xy = mul( vs_normal_center.xy, rotate );
+        // 正規化して格納
+        matcapVector.vs_normal_center = normalize(vs_normal_center);
+
+#ifdef _MV_HAS_PARALLAX
+        // カメラ位置にて補正する
+        float3 vs_normal_side = matcapViewCorrect(vs_normal, ws_camera_dir);
+        // 真上を揃える
+        vs_normal_side.xy = mul( vs_normal_side.xy, rotate );
+        // 正規化して格納
+        matcapVector.diff_parallax = normalize(vs_normal_side) - matcapVector.vs_normal_center;
+#endif
+
 #ifdef _MV_HAS_NML
-        matcapVector.vs_bump_normal_center.xy    = mul( matcapVector.vs_bump_normal_center.xy, rotate );
-        matcapVector.vs_bump_normal_side.xy      = mul( matcapVector.vs_bump_normal_side.xy, rotate );
+        // ワールド法線をビュー法線に変換
+        float3 vs_bump_normal = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_bump_normal_center = matcapViewCorrect(vs_bump_normal, ws_view_dir);
+        // 真上を揃える
+        vs_bump_normal_center.xy = mul( vs_bump_normal_center.xy, rotate );
+        // 正規化して格納
+        matcapVector.diff_normal = normalize(vs_bump_normal_center) - matcapVector.vs_normal_center;
 #endif
 
         return matcapVector;
     }
 
     float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
-#ifdef _MV_HAS_NML
-        return normalize(lerp( lerp(matcapVector.vs_normal_center, matcapVector.vs_bump_normal_center, normal), lerp(matcapVector.vs_normal_side, matcapVector.vs_bump_normal_side, normal), parallax ));
-#else
-        return normalize(lerp( matcapVector.vs_normal_center, matcapVector.vs_normal_side, parallax ));
+        float3 vs_normal = matcapVector.vs_normal_center;
+#ifdef _MV_HAS_PARALLAX
+        vs_normal += matcapVector.diff_parallax * parallax;
 #endif
+#ifdef _MV_HAS_NML
+        vs_normal += matcapVector.diff_normal * normal;
+#endif
+        return SafeNormalizeVec3(vs_normal);
     }
 
     void calcMatcapColor(
