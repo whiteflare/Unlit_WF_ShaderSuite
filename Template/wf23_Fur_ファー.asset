@@ -93,6 +93,7 @@ Material:
     - _FR_Height: 0.02
     - _FR_Height2: 0.03
     - _FR_InvMaskVal: 0
+    - _FR_Random: 0
     - _FR_Repeat: 3
     - _FR_Repeat2: 2
     - _FR_ShadowPower: 0.05
@@ -126,7 +127,7 @@ Material:
     - _TR_Power: 1
     - _TR_PowerBottom: 0.1
     - _TR_PowerSide: 0.1
-    - _TR_PowerTop: 0.1
+    - _TR_PowerTop: 0.05
     - _TS_1stBorder: 0.4
     - _TS_2ndBorder: 0.2
     - _TS_3rdBorder: 0.1

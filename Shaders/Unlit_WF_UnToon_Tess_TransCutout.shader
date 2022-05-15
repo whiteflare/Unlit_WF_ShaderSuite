@@ -257,7 +257,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
-            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
+            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.05
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
