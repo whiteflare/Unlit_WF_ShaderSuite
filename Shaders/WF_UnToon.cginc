@@ -117,6 +117,8 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
+
         float4 color;
         float2 uv_main;
 

@@ -212,6 +212,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_UnToon.cginc"
 
@@ -241,6 +242,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma target 5.0
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_FakeFur.cginc"
 

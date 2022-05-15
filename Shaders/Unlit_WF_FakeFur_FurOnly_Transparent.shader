@@ -154,6 +154,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
             #pragma target 5.0
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_FakeFur.cginc"
 

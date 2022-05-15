@@ -399,6 +399,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
@@ -436,6 +437,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
@@ -459,6 +461,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_UnToon_ShadowCaster.cginc"
 

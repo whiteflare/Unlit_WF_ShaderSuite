@@ -228,6 +228,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 

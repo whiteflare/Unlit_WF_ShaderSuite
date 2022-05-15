@@ -46,7 +46,7 @@
     };
 
     struct g2f {
-        float4 vertex           : SV_POSITION;
+        float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float3 ws_vertex        : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
@@ -106,7 +106,7 @@
 
     void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
         o.ws_vertex = lerp(vb, vu, height);
-        o.vertex = UnityWorldToClipPos( o.ws_vertex );
+        o.vs_vertex = UnityWorldToClipPos( o.ws_vertex );
         o.height = height;
     }
 
@@ -194,7 +194,10 @@
     float4 frag_fakefur(g2f gi) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(gi);
 
+        UNITY_APPLY_DITHER_CROSSFADE(gi.vs_vertex);
+
         v2f i = (v2f) 0;
+        i.vs_vertex     = gi.vs_vertex;
         i.uv            = gi.uv;
         i.ws_vertex     = gi.ws_vertex;
         i.normal        = normalize(gi.ws_normal);

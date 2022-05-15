@@ -418,6 +418,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
@@ -473,6 +474,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
@@ -526,6 +528,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 

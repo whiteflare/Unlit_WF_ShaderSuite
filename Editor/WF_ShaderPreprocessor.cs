@@ -124,7 +124,6 @@ namespace UnlitWF
                 return 0;
             }
 
-
             // 存在するキーワードの配列
             var existingKwds = GetExistingShaderKeywords(shader, data);
             if (existingKwds.Length == 0)
@@ -134,6 +133,22 @@ namespace UnlitWF
             }
 
             var count = 0;
+
+            if (Core.CurrentPlatform == WFBuildPlatformType.VRCSDK3_Avatar)
+            {
+                // Avatar 用途で使用しないキーワードを削除
+                var kwd_LOD_FADE_CROSSFADE = new ShaderKeyword(shader, "LOD_FADE_CROSSFADE");
+                for (int i = data.Count - 1; 0 <= i; i--)
+                {
+                    var d = data[i];
+                    if (d.shaderKeywordSet.IsEnabled(kwd_LOD_FADE_CROSSFADE))
+                    {
+                        data.RemoveAt(i);
+                        count++;
+                        continue;
+                    }
+                }
+            }
 
             for (int i = data.Count - 1; 0 <= i; i--)
             {
@@ -231,6 +246,11 @@ namespace UnlitWF
 
             public int MaterialCount => materialCount;
 
+            public WFBuildPlatformType CurrentPlatform
+            {
+                get => currentPlatform;
+            }
+
             public List<UsedShaderVariant> GetList()
             {
                 lock (lockToken)
@@ -274,7 +294,7 @@ namespace UnlitWF
                     // プラットフォーム指定されたときは設定してリセット
                     if (currentPlatform != null)
                     {
-                        this.currentPlatform = (WFBuildPlatformType) currentPlatform;
+                        this.currentPlatform = (WFBuildPlatformType)currentPlatform;
                         ClearUsedShaderVariantList();
                     }
                     // 初期化済みならば何もしない

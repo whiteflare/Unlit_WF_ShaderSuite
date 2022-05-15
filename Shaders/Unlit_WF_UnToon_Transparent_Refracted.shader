@@ -406,6 +406,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Refracted" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_UnToon.cginc"
 
@@ -427,6 +428,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_Refracted" {
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_UnToon_ShadowCaster.cginc"
 
