@@ -193,7 +193,7 @@ namespace UnlitWF
             { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             } },
-            { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_MT_ADD2ND_ENABLE", "_MT_ONLY2ND_ENABLE") {
+            { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_", "_MT_ONLY2ND_ENABLE") {
                 enablePropName = "_MT_Enable",
             } },
             { "_NM_2ndType", new WFCustomKeywordSettingEnum("_NM_2ndType", "_", "_NM_BL2ND_ENABLE", "_NM_SW2ND_ENABLE") {
@@ -291,6 +291,7 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "Shadow Power", "影の濃さ"),
             new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("FR"),
             new WFI18NTranslation("NM", "2nd Normal Blend", "2ndマップの混合タイプ"),
+            new WFI18NTranslation("NM", "2nd Normal UV Type", "2ndマップのUVタイプ"),
             new WFI18NTranslation("NM", "2nd NormalMap Texture", "2ndノーマルマップ"),
             new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
             new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
@@ -425,6 +426,7 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Fur Height (Cutout)", "高さ (Cutout側)"),
             new WFI18NTranslation("FR", "Fur Height (Transparent)", "高さ (Transparent側)"),
             new WFI18NTranslation("FR", "Fur Vector", "方向"),
+            new WFI18NTranslation("FR", "Fur Vector Randomize", "方向のランダム化"),
             new WFI18NTranslation("FR", "Fur Repeat", "ファーの枚数"),
             new WFI18NTranslation("FR", "Fur Repeat (Cutout)", "ファーの枚数 (Cutout側)"),
             new WFI18NTranslation("FR", "Fur Repeat (Transparent)", "ファーの枚数 (Transparent側)"),
@@ -550,6 +552,7 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "Shadow Power", "그림자 강도"),
             new WFI18NTranslation("NM", "Flip Mirror", "거울 XY 반전").AddTag("FR"),
             new WFI18NTranslation("NM", "2nd Normal Blend", "2nd맵 혼합"),
+            new WFI18NTranslation("NM", "2nd Normal UV Type", "2nd맵 UV타입"),
             new WFI18NTranslation("NM", "2nd NormalMap Texture", "2nd노멀맵"),
             new WFI18NTranslation("NM", "2nd Bump Scale", "2nd범프 스케일"),
             new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2nd노멀 텍스처"),
@@ -684,6 +687,7 @@ namespace UnlitWF
             new WFI18NTranslation("FR", "Fur Height (Cutout)", "Fur 높이 (Cutout)"),
             new WFI18NTranslation("FR", "Fur Height (Transparent)", "Fur 높이 (Transparent)"),
             new WFI18NTranslation("FR", "Fur Vector", "Fur 방향"),
+            new WFI18NTranslation("FR", "Fur Vector Randomize", "Fur 방향 랜덤"),
             new WFI18NTranslation("FR", "Fur Repeat", "Fur 개수"),
             new WFI18NTranslation("FR", "Fur Repeat (Cutout)", "Fur 개수 (Cutout)"),
             new WFI18NTranslation("FR", "Fur Repeat (Transparent)", "Fur 개수 (Transparent)"),

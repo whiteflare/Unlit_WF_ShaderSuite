@@ -39,7 +39,7 @@
     };
 
     struct v2f_depth {
-        float4 pos              : SV_POSITION;
+        float4 vs_vertex              : SV_POSITION;
         float2 uv               : TEXCOORD0;
 #ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR0;
@@ -65,8 +65,8 @@
         UNITY_INITIALIZE_OUTPUT(v2f_depth, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        o.pos   = UnityObjectToClipPos(i.vertex.xyz);
-        o.uv    = TRANSFORM_TEX(i.uv, _MainTex);
+        o.vs_vertex = UnityObjectToClipPos(i.vertex.xyz);
+        o.uv        = TRANSFORM_TEX(i.uv, _MainTex);
 #ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = i.vertex_color;
 #endif
@@ -77,6 +77,8 @@
     float4 frag_depth(v2f_depth i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
         // アルファ計算
         #ifdef _AL_ENABLE
