@@ -807,7 +807,11 @@ namespace UnlitWF
                         WFCommonUtility.ChangeShader(fallback, ctx.target);
 
                         // シェーダ切り替え後に RenderQueue をコピー
-                        ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
+                        if (ctx.oldMaterial.renderQueue != ctx.oldMaterial.shader.renderQueue   // FromShader では無かった場合
+                            || ctx.target.shader.renderQueue != ctx.oldMaterial.shader.renderQueue) // shader で指定の queue が異なっていた場合
+                        {
+                            ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
+                        }
 
                         shader = ctx.target.shader;
                         cnv = true;
