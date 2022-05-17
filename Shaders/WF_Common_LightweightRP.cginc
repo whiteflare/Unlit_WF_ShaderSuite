@@ -82,6 +82,7 @@
     #define UnpackScaleNormal           UnpackNormalScale
     #define BlendNormals                BlendNormal
     #define GGXTerm                     D_GGX
+    #define UNITY_APPLY_DITHER_CROSSFADE(x)
 
     float3 DecodeLightmap(float4 lmap_tex) {
         return DecodeLightmap(lmap_tex, half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h));
