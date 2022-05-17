@@ -35,6 +35,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
             _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
+            _FR_Random              ("[FR] Fur Vector Randomize", Range(0, 5)) = 0
         [NoScaleOffset]
         [Normal]
             _FR_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
@@ -141,7 +142,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
         [Toggle(_)]
             _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
-            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.1
+            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.05
             _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
 
@@ -169,7 +170,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/04/17", Float) = 0
+            _CurrentVersion         ("2022/05/21", Float) = 0
     }
 
     SubShader {

@@ -76,6 +76,8 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
+
         i.uv_grab.xy /= i.uv_grab.w;
         return PICK_GRAB_TEX2D(_TL_CANCEL_GRAB_TEXTURE, i.uv_grab);
     }

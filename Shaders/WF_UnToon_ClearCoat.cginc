@@ -41,6 +41,8 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
+
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
 
         i.normal = normalize(i.normal);
@@ -63,7 +65,7 @@
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // matcapベクトルの配列
-        float4x4 matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
+        WF_TYP_MATVEC matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
 
         // メタリック
         affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
