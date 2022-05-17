@@ -96,25 +96,25 @@
 
     float3 calcPointLight1WorldDir(float3 ws_vertex) {
 #ifdef VERTEXLIGHT_ON
-        return calcPointLightWorldDir(getPoint1LightPos(), ws_vertex);
-#else
-        return float3(0, 1, 0);
+        float3 ws_lightPos = getPoint1LightPos();
+        if (any(ws_lightPos)) {
+            return calcPointLightWorldDir(ws_lightPos, ws_vertex);
+        }
 #endif
+        return float3(0, 0, 0); // ポイントライトが無いときは 0, 0, 0 を返す
     }
 
     float3 samplePoint1LightColor(float3 ws_vertex) {
 #ifdef VERTEXLIGHT_ON
         float3 ws_lightPos = getPoint1LightPos();
-        if (ws_lightPos.x == 0 && ws_lightPos.y == 0 && ws_lightPos.z == 0) {
-            return float3(0, 0, 0); // XYZすべて0はポイントライト未設定と判定する
+        if (any(ws_lightPos)) {
+            float3 ls_lightPos = ws_lightPos - ws_vertex;
+            float lengthSq = dot(ls_lightPos, ls_lightPos);
+            float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
+            return unity_LightColor[0].rgb * atten;
         }
-        float3 ls_lightPos = ws_lightPos - ws_vertex;
-        float lengthSq = dot(ls_lightPos, ls_lightPos);
-        float atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0.x);
-        return unity_LightColor[0].rgb * atten;
-#else
-        return float3(0, 0, 0);
 #endif
+        return float3(0, 0, 0); // ポイントライトが無いときは 0, 0, 0 を返す
     }
 
     float3 OmniDirectional_Shade4PointLights(

@@ -17,4 +17,5 @@ MonoBehaviour:
   stripUnusedVariant: 1
   stripFallback: 1
   stripMetaPass: 1
+  stripLodCrossFade: 1
   enableScanProjects: 1

@@ -30,11 +30,12 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
         [WFHeader(Fake Fur)]
             _FR_Height              ("[FR] Fur Height", Range(0, 0.2)) = 0.05
         [IntRange]
-            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 5)) = 3
+            _FR_Repeat              ("[FR] Fur Repeat", Range(1, 6)) = 3
         [Header(Fur Shape)]
             _FR_NoiseTex            ("[FR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
             _FR_Vector              ("[FR] Fur Vector", Vector) = (0, 0, 1, 0)
+            _FR_Random              ("[FR] Fur Vector Randomize", Range(0, 5)) = 0
         [NoScaleOffset]
         [Normal]
             _FR_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
@@ -121,7 +122,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/04/17", Float) = 0
+            _CurrentVersion         ("2022/05/21", Float) = 0
     }
 
     SubShader {
@@ -154,6 +155,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
             #pragma target 5.0
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_FakeFur.cginc"
 

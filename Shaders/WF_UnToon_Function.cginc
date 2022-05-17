@@ -269,6 +269,10 @@ FEATURE_TGL_END
         }
     }
 
+    float3 calcWorldSpaceCustomSunDir() {
+        return calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude);
+    }
+
     float4 calcWorldSpaceLightDir(float3 ws_vertex) {
         ws_vertex = calcWorldSpaceBasePos(ws_vertex);
 
@@ -281,23 +285,31 @@ FEATURE_TGL_END
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
             return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
         }
-        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_ONLYDIR_ENABLE)
 
-        return float4( getMainLightDirection() , +1 );
+        float3 dir = getMainLightDirection();
+        if (any(dir)) {
+            return float4( dir , +1 );
+        }
+        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_ONLYPOINT_ENABLE)
 
-        return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+        float3 dir = calcPointLight1WorldDir(ws_vertex);
+        if (any(dir)) {
+            return float4( dir , -1 );
+        }
+        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_WSDIR_ENABLE)
 
-        return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
+        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_LSDIR_ENABLE)
 
-        return float4( UnityObjectToWorldDir(calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude)) , 0 );
+        return float4( UnityObjectToWorldDir(calcWorldSpaceCustomSunDir()) , 0 );
 
 #elif defined(_GL_WSPOS_ENABLE)
 
@@ -310,10 +322,18 @@ FEATURE_TGL_END
             mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
-            return float4( getMainLightDirection() , +1 );
+            float3 dir = getMainLightDirection();
+            if (any(dir)) {
+                return float4( dir , +1 );
+            }
+            mode = LIT_MODE_CUSTOM_WORLDSPACE;
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
-            return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+            float3 dir = calcPointLight1WorldDir(ws_vertex);
+            if (any(dir)) {
+                return float4( dir , -1 );
+            }
+            mode = LIT_MODE_CUSTOM_WORLDSPACE;
         }
         if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
             return float4( calcHorizontalCoordSystem(_GL_CustomAzimuth, _GL_CustomAltitude) , 0 );
@@ -558,7 +578,7 @@ FEATURE_TGL_END
             // OFFでなければ SECOND_MAP を加算
             if (_MT_CubemapType != 0) {
 #endif
-#if defined(_MT_ADD2ND_ENABLE) || defined(_MT_ONLY2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+#if defined(_MT_ONLY2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 float3 cubemap = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
                 color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
 #endif
@@ -628,46 +648,74 @@ FEATURE_TGL_END
     // Light Matcap
     ////////////////////////////
 
-    float4x4 calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+    #if defined(USING_STEREO_MATRICES)
+        #define _MV_HAS_PARALLAX
+    #endif
+    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        #define _MV_HAS_NML
+    #endif
+
+    struct MatcapVector {
+        float3 vs_normal_center;
+#ifdef _MV_HAS_PARALLAX
+        float3 diff_parallax;
+#endif
+#ifdef _MV_HAS_NML
+        float3 diff_normal;
+#endif
+    };
+    #define WF_TYP_MATVEC   MatcapVector
+
+    WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
         // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
 
-        float4x4 matcapVector = 0;
+        WF_TYP_MATVEC matcapVector;
+        UNITY_INITIALIZE_OUTPUT(WF_TYP_MATVEC, matcapVector);
 
-        // ワールド法線をビュー法線に変換
-        float3 vs_normal        = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
-        // カメラ位置にて補正する
-        float3 vs_normal_center         = matcapViewCorrect(vs_normal, ws_view_dir);
-        float3 vs_normal_side           = matcapViewCorrect(vs_normal, ws_camera_dir);
-        // 真上を揃える
+        // 真上を揃える回転行列
         float2x2 rotate = matcapRotateCorrectMatrix();
-        vs_normal_center.xy         = mul( vs_normal_center.xy, rotate );
-        vs_normal_side.xy           = mul( vs_normal_side.xy, rotate );
-        // 格納
-        matcapVector[0].xyz = normalize(vs_normal_center);
-        matcapVector[2].xyz = normalize(vs_normal_side);
 
-    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
         // ワールド法線をビュー法線に変換
-        float3 vs_bump_normal   = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
+        float3 vs_normal = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
         // カメラ位置にて補正する
-        float3 vs_bump_normal_center    = matcapViewCorrect(vs_bump_normal, ws_view_dir);
-        float3 vs_bump_normal_side      = matcapViewCorrect(vs_bump_normal, ws_camera_dir);
+        float3 vs_normal_center = matcapViewCorrect(vs_normal, ws_view_dir);
         // 真上を揃える
-        vs_bump_normal_center.xy    = mul( vs_bump_normal_center.xy, rotate );
-        vs_bump_normal_side.xy      = mul( vs_bump_normal_side.xy, rotate );
-        // 格納
-        matcapVector[1].xyz = normalize(vs_bump_normal_center);
-        matcapVector[3].xyz = normalize(vs_bump_normal_side);
-    #endif
+        vs_normal_center.xy = mul( vs_normal_center.xy, rotate );
+        // 正規化して格納
+        matcapVector.vs_normal_center = normalize(vs_normal_center);
+
+#ifdef _MV_HAS_PARALLAX
+        // カメラ位置にて補正する
+        float3 vs_normal_side = matcapViewCorrect(vs_normal, ws_camera_dir);
+        // 真上を揃える
+        vs_normal_side.xy = mul( vs_normal_side.xy, rotate );
+        // 正規化して格納
+        matcapVector.diff_parallax = normalize(vs_normal_side) - matcapVector.vs_normal_center;
+#endif
+
+#ifdef _MV_HAS_NML
+        // ワールド法線をビュー法線に変換
+        float3 vs_bump_normal = mul(float4(ws_bump_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_bump_normal_center = matcapViewCorrect(vs_bump_normal, ws_view_dir);
+        // 真上を揃える
+        vs_bump_normal_center.xy = mul( vs_bump_normal_center.xy, rotate );
+        // 正規化して格納
+        matcapVector.diff_normal = normalize(vs_bump_normal_center) - matcapVector.vs_normal_center;
+#endif
+
         return matcapVector;
     }
 
-    float3 calcMatcapVector(float4x4 matcapVector, float normal, float parallax) {
-    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
-        return lerp( lerpNormals(matcapVector[0].xyz, matcapVector[1].xyz, normal), lerpNormals(matcapVector[2].xyz, matcapVector[3].xyz, normal), parallax );
-    #else
-        return lerp( matcapVector[0].xyz, matcapVector[2].xyz, parallax );
-    #endif
+    float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
+        float3 vs_normal = matcapVector.vs_normal_center;
+#ifdef _MV_HAS_PARALLAX
+        vs_normal += matcapVector.diff_parallax * parallax;
+#endif
+#ifdef _MV_HAS_NML
+        vs_normal += matcapVector.diff_normal * normal;
+#endif
+        return SafeNormalizeVec3(vs_normal);
     }
 
     void calcMatcapColor(
@@ -722,7 +770,7 @@ FEATURE_TGL_END
                         _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);    \
         FEATURE_TGL_END
 
-    void affectMatcapColor(float4x4 matcapVector, float2 uv_main, inout float4 color) {
+    void affectMatcapColor(WF_TYP_MATVEC matcapVector, float2 uv_main, inout float4 color) {
 #ifdef _HL_ENABLE
         WF_CALC_MATCAP_COLOR(##)
 #endif
@@ -762,25 +810,6 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _LM_ENABLE
-
-        float random1(float2 st) {  // float2 -> float [0-1)
-            return frac(sin(dot(st ,float2(12.9898, 78.233))) * 43758.5453);
-        }
-
-        float2 random2(float2 st) { // float2 -> float2 [0-1)
-            float2 ret = float2(0, 0);
-            ret.x = random1(st);
-            ret.y = random1(st + ret);
-            return ret;
-        }
-
-        float3 random3(float2 st) { // float2 -> float3 [0-1)
-            float3 ret = float3(0, 0, 0);
-            ret.x = random1(st);
-            ret.y = random1(st + ret.xy);
-            ret.z = random1(st + ret.xy);
-            return ret;
-        }
 
         void affectLame(v2f i, float2 uv_main, float3 ws_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_LM_Enable)

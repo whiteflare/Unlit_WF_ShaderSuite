@@ -26,6 +26,7 @@
         float2 uv               : TEXCOORD0;
         float3 normal           : NORMAL;
         float4 tangent          : TANGENT;
+        uint vid                : SV_VertexID;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
@@ -33,8 +34,10 @@
         float2 uv               : TEXCOORD0;
         float3 ws_vertex        : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
-        float4 ws_light_dir     : TEXCOORD3;
-        float3 ws_fur_vector    : TEXCOORD4;
+        float3 ws_tangent       : TEXCOORD3;
+        float3 ws_bitangent     : TEXCOORD4;
+        float3 ws_light_dir     : TEXCOORD5;    // ws_light_dir.w は frag では使わないので削減
+        float vid               : TEXCOORD6;
         float3 light_color      : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
         float shadow_power      : COLOR2;
@@ -43,37 +46,23 @@
     };
 
     struct g2f {
-        float4 vertex           : SV_POSITION;
+        float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float3 ws_vertex        : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
+        float3 ws_light_dir     : TEXCOORD3;    // ws_light_dir.w は frag では使わないので削減
         float  height           : COLOR0;
         float3 light_color      : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
         float shadow_power      : COLOR2;
 #endif
-        float4 ws_light_dir     : TEXCOORD3;
         UNITY_VERTEX_OUTPUT_STEREO
+        // フルセット 21 value なので、geometry シェーダの制限 1024 value 内では 48 vertex = 6枚のファーまで使用できる
     };
 
     ////////////////////////////
     // vertex & fragment shader
     ////////////////////////////
-
-    float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
-        // Static Fur Vector 計算
-        float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
-
-#ifndef _FR_DISABLE_NORMAL_MAP
-        // NormalMap Fur Vector 計算
-        float2 uv_main = TRANSFORM_TEX(uv, _MainTex);
-        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FR_BumpMap, uv_main, 0) );
-        vec_fur = BlendNormals(vec_fur, vec_map);
-#endif
-
-        // Tangent Transform 計算
-        return transformTangentToWorldNormal(vec_fur, ws_normal, ws_tangent, ws_bitangent);
-    }
 
     v2g vert_fakefur(appdata_fur v) {
         v2g o;
@@ -84,21 +73,18 @@
 
         o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-        o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+        o.vid = (float) v.vid;
 
-        float3 ws_tangent;
-        float3 ws_bitangent;
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, ws_tangent, ws_bitangent, _FR_FlipMirror & 1, _FR_FlipMirror & 2);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipMirror & 1, _FR_FlipMirror & 2);
 
+        float4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+        o.ws_light_dir = ws_light_dir.xyz;
         // 環境光取得
         float3 ambientColor = sampleSHLightColor();
         // 影コントラスト
-        calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
+        calcToonShadeContrast(o.ws_vertex, ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
-
-        // ファーを伸ばす方向を計算
-        o.ws_fur_vector = calcFurVector(ws_tangent, ws_bitangent, o.ws_normal, o.uv) * _FR_HEIGHT_PARAM;
 
         return o;
     }
@@ -120,7 +106,7 @@
 
     void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
         o.ws_vertex = lerp(vb, vu, height);
-        o.vertex = UnityWorldToClipPos( o.ws_vertex );
+        o.vs_vertex = UnityWorldToClipPos( o.ws_vertex );
         o.height = height;
     }
 
@@ -131,59 +117,87 @@
         o.uv                = lerp(x.uv,            y.uv,               div);
         o.ws_vertex         = lerp(x.ws_vertex,     y.ws_vertex,        div);
         o.ws_normal         = lerp(x.ws_normal,     y.ws_normal,        div);
+        o.ws_tangent        = lerp(x.ws_tangent,    y.ws_tangent,       div);
+        o.ws_bitangent      = lerp(x.ws_bitangent,  y.ws_bitangent,     div);
         o.light_color       = lerp(x.light_color,   y.light_color,      div);
 #ifdef _V2F_HAS_SHADOWPOWER
         o.shadow_power      = lerp(x.shadow_power,  y.shadow_power,     div);
 #endif
         o.ws_light_dir      = lerp(x.ws_light_dir,  y.ws_light_dir,     div);
-        o.ws_fur_vector     = lerp(x.ws_fur_vector, y.ws_fur_vector,    div);
+        o.vid               = lerp(x.vid,           y.vid,              div);
         return o;
     }
 
-    void fakefur(v2g v[3], inout TriangleStream<g2f> triStream) {
+    float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
+        // Static Fur Vector 計算
+        float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
+
+#ifndef _FR_DISABLE_NORMAL_MAP
+        // NormalMap Fur Vector 計算
+        float2 uv_main = TRANSFORM_TEX(uv, _MainTex);
+        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FR_BumpMap, uv_main, 0) );
+        vec_fur = BlendNormals(vec_fur, vec_map);
+#endif
+
+        // Tangent Transform 計算
+        return transformTangentToWorldNormal(vec_fur, ws_normal, ws_tangent, ws_bitangent);
+    }
+
+    void fakefur(v2g v[3], float3 ws_fur_vector[3], inout TriangleStream<g2f> triStream) {
         // 底辺座標
         float3 vb[3] = { v[0].ws_vertex, v[1].ws_vertex, v[2].ws_vertex };
         // 頂点座標
         float3 vu[3] = vb;
 
         // normal方向に従ってfurを伸ばす
-        {
-            for (uint i = 0; i < 3; i++) {
-                // 頂点移動
-                vu[i].xyz += v[i].ws_fur_vector;
+        {for (uint i = 0; i < 3; i++) {
+            // 頂点移動
+            vu[i].xyz += ws_fur_vector[i];
+            if (0 < _FR_Random) {
+                float2 niz = random2(ws_fur_vector[i].xy + v[i].vid) * 2 - 1;
+                niz *= 0.01 * _FR_Random;  // 1cm単位で±ランダム化
+                vu[i].xyz += v[i].ws_tangent * niz.x + v[i].ws_bitangent * niz.y;
             }
-        }
+        }}
+
         // ファーを増殖
-        {
-            for (uint i = 0; i < 4; i++) {
-                uint n = i % 3;
-                g2f o = initGeomOutput(v[n]);
-                transferGeomVertex(o, vb[n], vu[n], 0); triStream.Append(o);
-                transferGeomVertex(o, vb[n], vu[n], 1); triStream.Append(o);
-            }
-        }
+        {for (uint i = 0; i < 4; i++) {
+            uint n = i % 3;
+            g2f o = initGeomOutput(v[n]);
+            transferGeomVertex(o, vb[n], vu[n], 0); triStream.Append(o);
+            transferGeomVertex(o, vb[n], vu[n], 1); triStream.Append(o);
+        }}
     }
 
-    [maxvertexcount(40)]
+    [maxvertexcount(48)]
     void geom_fakefur(triangle v2g v[3], inout TriangleStream<g2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
+        // ファーを伸ばす方向を計算
+        float3 ws_fur_vector[3];
+        {for (uint i = 0; i < 3; i++) {
+            ws_fur_vector[i] = calcFurVector(v[i].ws_tangent, v[i].ws_bitangent, v[i].ws_normal, v[i].uv) * _FR_HEIGHT_PARAM;
+        }}
+
         v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
-        for (uint i = 0; i < _FR_REPEAT_PARAM; i++) {
+        {for (uint i = 0; i < _FR_REPEAT_PARAM; i++) {
             float rate = i / (float) _FR_REPEAT_PARAM;
             v2g v2[3] = {
                 lerp_v2g(v[0], c, rate),
                 lerp_v2g(v[1], c, rate),
                 lerp_v2g(v[2], c, rate)
             };
-            fakefur(v2, triStream);
-        }
+            fakefur(v2, ws_fur_vector, triStream);
+        }}
     }
 
     float4 frag_fakefur(g2f gi) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(gi);
 
+        UNITY_APPLY_DITHER_CROSSFADE(gi.vs_vertex);
+
         v2f i = (v2f) 0;
+        i.vs_vertex     = gi.vs_vertex;
         i.uv            = gi.uv;
         i.ws_vertex     = gi.ws_vertex;
         i.normal        = normalize(gi.ws_normal);
@@ -191,7 +205,7 @@
 #ifdef _V2F_HAS_SHADOWPOWER
         i.shadow_power  = gi.shadow_power;
 #endif
-        i.ws_light_dir  = gi.ws_light_dir;
+        i.ws_light_dir  = float4(gi.ws_light_dir, 0);
 
         // メイン
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
