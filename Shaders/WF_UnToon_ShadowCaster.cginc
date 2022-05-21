@@ -71,6 +71,8 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
+        UNITY_APPLY_DITHER_CROSSFADE(i.pos);
+
         if (TGL_OFF(_GL_CastShadow)) {
             discard;
             return float4(0, 0, 0, 0);

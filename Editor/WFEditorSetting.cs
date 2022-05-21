@@ -33,6 +33,7 @@ namespace UnlitWF
         public bool stripUnusedVariant = true;
         public bool stripFallback = true;
         public bool stripMetaPass = true;
+        public bool stripUnusedLodFade = true;
 
         [Header("Editor Behaviour Settings")]
         public bool enableScanProjects = true;
@@ -76,6 +77,7 @@ namespace UnlitWF
         SerializedProperty p_stripUnusedVariant;
         SerializedProperty p_stripFallback;
         SerializedProperty p_stripMetaPass;
+        SerializedProperty p_stripUnusedLodFade;
         SerializedProperty p_enableScanProjects;
 
         private void OnEnable()
@@ -83,6 +85,7 @@ namespace UnlitWF
             this.p_settingPriority = serializedObject.FindProperty(nameof(WFEditorSetting.settingPriority));
             this.p_enableStripping = serializedObject.FindProperty(nameof(WFEditorSetting.enableStripping));
             this.p_stripUnusedVariant = serializedObject.FindProperty(nameof(WFEditorSetting.stripUnusedVariant));
+            this.p_stripUnusedLodFade = serializedObject.FindProperty(nameof(WFEditorSetting.stripUnusedLodFade));
             this.p_stripFallback = serializedObject.FindProperty(nameof(WFEditorSetting.stripFallback));
             this.p_stripMetaPass = serializedObject.FindProperty(nameof(WFEditorSetting.stripMetaPass));
             this.p_enableScanProjects = serializedObject.FindProperty(nameof(WFEditorSetting.enableScanProjects));
@@ -104,6 +107,7 @@ namespace UnlitWF
             using (new EditorGUI.IndentLevelScope())
             {
                 EditorGUILayout.PropertyField(p_stripUnusedVariant);
+                EditorGUILayout.PropertyField(p_stripUnusedLodFade);
                 EditorGUILayout.PropertyField(p_stripFallback);
                 EditorGUILayout.PropertyField(p_stripMetaPass);
             }

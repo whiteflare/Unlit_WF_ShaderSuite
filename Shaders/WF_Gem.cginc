@@ -71,6 +71,8 @@
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
+
         float4 color = TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
         float2 uv_main;
 
@@ -125,6 +127,8 @@
     float4 frag_gem_front(v2f i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
         float4 color = _Color;
         float2 uv_main;

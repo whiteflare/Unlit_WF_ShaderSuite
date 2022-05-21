@@ -225,7 +225,7 @@ Material:
     - _TR_Power: 0.8
     - _TR_PowerBottom: 0.1
     - _TR_PowerSide: 0.1
-    - _TR_PowerTop: 0.1
+    - _TR_PowerTop: 0.05
     - _TS_1stBorder: 0.4
     - _TS_2ndBorder: 0.2
     - _TS_3rdBorder: 0.1
