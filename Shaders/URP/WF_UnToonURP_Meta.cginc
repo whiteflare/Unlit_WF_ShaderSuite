@@ -50,11 +50,7 @@
     // Unity Meta function
     ////////////////////////////
 
-#if UNITY_VERSION < 201904
-    #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/MetaInput.hlsl"
-#else
     #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl"
-#endif
 
     ////////////////////////////
     // vertex&fragment shader
@@ -64,11 +60,7 @@
         v2f_meta o;
         UNITY_INITIALIZE_OUTPUT(v2f_meta, o);
 
-#ifdef UNIVERSAL_META_PASS_INCLUDED
         o.pos   = MetaVertexPosition(i.vertex, i.uv1, i.uv2, unity_LightmapST, unity_DynamicLightmapST);
-#else
-        o.pos   = MetaVertexPosition(i.vertex, i.uv1, i.uv2, unity_LightmapST);
-#endif
 
         o.uv    = TRANSFORM_TEX(i.uv0, _MainTex);
 #ifdef _V2F_HAS_VERTEXCOLOR
@@ -93,7 +85,9 @@
         color.rgb = max(ZERO_VEC3, lerp(AVE_RGB(color.rgb).xxx, color.rgb, lerp(1, _GI_IndirectChroma, _GI_Enable)));
 
         o.Albedo        = color.rgb * lerp(1, _GI_IndirectMultiplier, _GI_Enable);
+#if UNITY_VERSION < 202103
         o.SpecularColor = o.Albedo;
+#endif
         o.Emission      = ZERO_VEC3;    // 初期化
 
 #ifdef _ES_ENABLE
@@ -114,7 +108,9 @@ FEATURE_TGL_END
         UNITY_INITIALIZE_OUTPUT(MetaInput, o);
 
         o.Albedo        = ZERO_VEC3;
+#if UNITY_VERSION < 202103
         o.SpecularColor = ZERO_VEC3;
+#endif
         o.Emission      = ZERO_VEC3;
 
         return MetaFragment(o);
