@@ -154,7 +154,7 @@
             // 頂点移動
             vu[i].xyz += ws_fur_vector[i];
             if (0 < _FR_Random) {
-                float2 niz = random2(ws_fur_vector[i].xy + v[i].vid) * 2 - 1;
+                float2 niz = random2to2(ws_fur_vector[i].xy + v[i].vid) * 2 - 1;
                 niz *= 0.01 * _FR_Random;  // 1cm単位で±ランダム化
                 vu[i].xyz += v[i].ws_tangent * niz.x + v[i].ws_bitangent * niz.y;
             }
