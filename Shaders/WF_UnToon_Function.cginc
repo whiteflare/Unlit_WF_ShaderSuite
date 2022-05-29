@@ -772,7 +772,11 @@ FEATURE_TGL_END
 
     void affectMatcapColor(WF_TYP_MATVEC matcapVector, float2 uv_main, inout float4 color) {
 #ifdef _HL_ENABLE
+    #ifdef UNITY_OLD_PREPROCESSOR
         WF_CALC_MATCAP_COLOR(##)
+    #else
+        WF_CALC_MATCAP_COLOR()
+    #endif
 #endif
 
 #ifndef _WF_MOBILE
