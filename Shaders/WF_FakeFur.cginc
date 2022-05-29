@@ -143,7 +143,7 @@
         return transformTangentToWorldNormal(vec_fur, ws_normal, ws_tangent, ws_bitangent);
     }
 
-    void fakefur(v2g v[3], float3 ws_fur_vector[3], inout TriangleStream<g2f> triStream) {
+    void fakefur(v2g v[3], float3 ws_fur_vector[3], float rate, inout TriangleStream<g2f> triStream) {
         // 底辺座標
         float3 vb[3] = { v[0].ws_vertex, v[1].ws_vertex, v[2].ws_vertex };
         // 頂点座標
@@ -154,7 +154,7 @@
             // 頂点移動
             vu[i].xyz += ws_fur_vector[i];
             if (0 < _FR_Random) {
-                float2 niz = random2(ws_fur_vector[i].xy + v[i].vid) * 2 - 1;
+                float2 niz = random2to2(float2(-1, +1) + v[i].vid + rate) * 2 - 1;
                 niz *= 0.01 * _FR_Random;  // 1cm単位で±ランダム化
                 vu[i].xyz += v[i].ws_tangent * niz.x + v[i].ws_bitangent * niz.y;
             }
@@ -187,7 +187,7 @@
                 lerp_v2g(v[1], c, rate),
                 lerp_v2g(v[2], c, rate)
             };
-            fakefur(v2, ws_fur_vector, triStream);
+            fakefur(v2, ws_fur_vector, rate, triStream);
         }}
     }
 
