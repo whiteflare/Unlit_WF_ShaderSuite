@@ -202,7 +202,11 @@
     float       _HL_ChangeAlpha##id;        \
     float       _HL_MatcapMonochrome##id;
 
+#ifdef UNITY_OLD_PREPROCESSOR
     WF_DECL_MATCAP(##)
+#else
+    WF_DECL_MATCAP()
+#endif
 #ifndef _WF_MOBILE
     WF_DECL_MATCAP(_1)
 #endif

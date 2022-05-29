@@ -772,7 +772,11 @@ FEATURE_TGL_END
 
     void affectMatcapColor(WF_TYP_MATVEC matcapVector, float2 uv_main, inout float4 color) {
 #ifdef _HL_ENABLE
+    #ifdef UNITY_OLD_PREPROCESSOR
         WF_CALC_MATCAP_COLOR(##)
+    #else
+        WF_CALC_MATCAP_COLOR()
+    #endif
 #endif
 
 #ifndef _WF_MOBILE
@@ -829,7 +833,7 @@ FEATURE_TGL_ON_BEGIN(_LM_Enable)
                     for (int x = -1; x <= 1; x++) {
                         float2 neighbor = float2(x, y);
                         float3 pos;
-                        pos.xy  = 0.5 + 0.5 * sin( random2((ist + neighbor) * scale) * 2 - 1 );
+                        pos.xy  = 0.5 + 0.5 * sin( random2to2((ist + neighbor) * scale) * 2 - 1 );
                         pos.z   = length(neighbor + pos.xy - fst);
                         min_pos = pos.z < min_pos.z ? pos : min_pos;
                     }
@@ -838,13 +842,13 @@ FEATURE_TGL_ON_BEGIN(_LM_Enable)
                 float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
 
                 // アニメーション項
-                power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
+                power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random2to1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
                 // Glitter項
                 power = lerp(power, max(power, pow(power + 0.1, 32)), _LM_Glitter);
                 // 密度項
                 power *= step(1 - _LM_Dencity / 4, abs(min_pos.x));
                 // フレークのばらつき項
-                power *= random1(min_pos.xy);
+                power *= random2to1(min_pos.xy);
                 // 距離フェード項
                 power *= 1 - smoothstep(_LM_MinDist, max(_LM_MinDist + NZF, _LM_MaxDist), length(ws_camera_vec));
                 // NdotV起因の強度項
@@ -853,7 +857,7 @@ FEATURE_TGL_ON_BEGIN(_LM_Enable)
                 power *= _LM_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
 
                 float4 lame_color = _LM_Color * WF_TEX2D_LAME_TEX(uv_lame);
-                lame_color.rgb += _LM_RandColor * (random3(min_pos.xy) * 2 - 1);
+                lame_color.rgb += _LM_RandColor * (random2to3(min_pos.xy) * 2 - 1);
 
                 color.rgb += max(ZERO_VEC3, lame_color.rgb) * power;
                 #ifdef _WF_ALPHA_BLEND

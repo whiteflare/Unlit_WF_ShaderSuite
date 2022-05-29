@@ -22,6 +22,11 @@
     // Platform Glue
     ////////////////////////////
 
+#if !defined(UNITY_OLD_PREPROCESSOR) && UNITY_VERSION < 202003
+    // 未定義だけどUnity2020.3未満のときは定義する
+    #define UNITY_OLD_PREPROCESSOR
+#endif
+
 #ifdef _WF_PLATFORM_LWRP
     // Lightweight RP 向け定義
     #include "WF_Common_LightweightRP.cginc"
@@ -345,23 +350,25 @@
     // Random
     ////////////////////////////
 
-    float random1(float2 st) {  // float2 -> float [0-1)
-        return frac(sin(dot(st, float2(12.9898, 78.233))) * 43758.5453);
+    float random2to1(float2 st) {  // float2 -> float [0-1)
+        float vec;
+        vec.x = dot(st, float2(12.9898, 78.233));
+        return frac(sin(vec) * 43758.5453);
     }
 
-    float2 random2(float2 st) { // float2 -> float2 [0-1)
-        float2 ret = float2(0, 0);
-        ret.x = random1(st);
-        ret.y = random1(st + ret);
-        return ret;
+    float2 random2to2(float2 st) { // float2 -> float2 [0-1)
+        float2 vec;
+        vec.x = dot(st, float2(12.9898, 78.233));
+        vec.y = dot(st, float2(31.5649, 51.877));
+        return frac(sin(vec) * 43758.5453);
     }
 
-    float3 random3(float2 st) { // float2 -> float3 [0-1)
-        float3 ret = float3(0, 0, 0);
-        ret.x = random1(st);
-        ret.y = random1(st + ret.xy);
-        ret.z = random1(st + ret.xy);
-        return ret;
+    float3 random2to3(float2 st) { // float2 -> float3 [0-1)
+        float3 vec;
+        vec.x = dot(st, float2(12.9898, 78.233));
+        vec.y = dot(st, float2(31.5649, 51.877));
+        vec.z = dot(st, float2(29.1773, 33.499));
+        return frac(sin(vec) * 43758.5453);
     }
 
 #endif
