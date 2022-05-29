@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: GrayGem
   m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
-  m_ShaderKeywords: _GB_ENABLE _GF_ENABLE _GL_AUTO_ENABLE _GR_ENABLE
+  m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -46,6 +46,7 @@ Material:
     - _BumpScale: 1
     - _CullMode: 2
     - _CurrentVersion: 0
+    - _FallBack: 0
     - _GB_BackCulllMode: 1
     - _GB_Enable: 1
     - _GF_BlendNormal: 0.1
