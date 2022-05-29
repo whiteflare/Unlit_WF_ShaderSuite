@@ -92,7 +92,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/05/21", Float) = 0
+            _CurrentVersion         ("2022/05/29", Float) = 0
     }
 
     SubShader {
