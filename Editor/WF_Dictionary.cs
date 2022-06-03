@@ -288,7 +288,7 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "NormalMap Texture", "ノーマルマップ").AddTag("FR"),
             new WFI18NTranslation("NM", "Bump Scale", "凹凸スケール"),
             new WFI18NTranslation("NM", "Shadow Power", "影の濃さ"),
-            new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("FR"),
+            new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("NS", "FR"),
             // Normal 2nd
             new WFI18NTranslation("NS", "2nd Normal Blend", "2ndマップの混合タイプ"),
             new WFI18NTranslation("NS", "2nd Normal UV Type", "2ndマップのUVタイプ"),
@@ -557,7 +557,7 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "NormalMap Texture", "노멀맵").AddTag("FR"),
             new WFI18NTranslation("NM", "Bump Scale", "범프 스케일"),
             new WFI18NTranslation("NM", "Shadow Power", "그림자 강도"),
-            new WFI18NTranslation("NM", "Flip Mirror", "거울 XY 반전").AddTag("FR"),
+            new WFI18NTranslation("NM", "Flip Mirror", "거울 XY 반전").AddTag("NS", "FR"),
             // Metallic
             new WFI18NTranslation("MT", "Metallic", "메탈릭 강도"),
             new WFI18NTranslation("MT", "Smoothness", "부드럽게"),

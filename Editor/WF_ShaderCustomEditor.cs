@@ -135,6 +135,14 @@ namespace UnlitWF
                 }
                 EditorGUILayout.Space();
             }),
+            // _NS_InvMaskVal の直後に FlipMirror を再表示
+            new CustomPropertyHook("_NS_InvMaskVal", null, (ctx, changed) => {
+                var prop = ctx.all.Where(p => p.name == "_NM_FlipMirror").FirstOrDefault();
+                if (prop != null)
+                {
+                    ctx.editor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName.Replace("[NM]", "[NS]")));
+                }
+            }),
             // _TS_InvMaskVal の後に説明文を追加する
             new CustomPropertyHook("_TS_InvMaskVal", null, (ctx, changed) => {
                 EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info);
