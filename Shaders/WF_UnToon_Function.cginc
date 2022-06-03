@@ -49,7 +49,7 @@
         #define WF_TEX2D_NORMAL_DTL(uv)         UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv), _DetailNormalMapScale ).xyz
     #endif
     #ifndef WF_TEX2D_NORMAL_DTL_MASK
-        #define WF_TEX2D_NORMAL_DTL_MASK(uv)    SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv, _NM_InvMaskVal).r
+        #define WF_TEX2D_NORMAL_DTL_MASK(uv)    SAMPLE_MASK_VALUE(_NS_2ndMaskTex, uv, _NS_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_METAL_GLOSS
@@ -495,34 +495,13 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _NM_ENABLE
+
         float3 calcBumpNormal(v2f i, float2 uv_main) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_NM_Enable)) {
 #endif
                 // 1st NormalMap
                 float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
-
-#ifndef _WF_MOBILE
-
-#if defined(_NM_BL2ND_ENABLE) || defined(_NM_SW2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                // 2nd NormalMap
-                float dtlPower = _NM_2ndType == 0 ? 0 : WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-                float2 uv_dtl = _NM_2ndUVType == 1 ? i.uv_lmap : i.uv;
-                float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
-#if defined(_WF_LEGACY_FEATURE_SWITCH)
-                if (_NM_2ndType == 1) { // BLEND
-#endif
-#if defined(_NM_BL2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                    dtlNormalTangent = BlendNormals(normalTangent, dtlNormalTangent);
-#endif
-#if defined(_WF_LEGACY_FEATURE_SWITCH)
-                }
-#endif
-                normalTangent = lerpNormals(normalTangent, dtlNormalTangent, dtlPower);
-#endif
-
-#endif
-
                 // 法線計算
                 return transformTangentToWorldNormal(normalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
 
@@ -544,9 +523,34 @@ FEATURE_TGL_ON_BEGIN(_NM_Enable)
             color.rgb *= max(0.0, 1.0 + (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(i.normal, i.ws_light_dir.xyz)) * _NM_Power * 2);
 FEATURE_TGL_END
         }
+
     #else
         #define calcBumpNormal(i, uv_main) i.normal
         #define affectBumpNormal(i, uv_main, ws_bump_normal, color)  ws_bump_normal = i.normal
+    #endif
+
+    ////////////////////////////
+    // Detail Normal Map
+    ////////////////////////////
+
+    #ifdef _NS_ENABLE
+
+        void affectDetailNormal(v2f i, float2 uv_main, out float3 ws_detail_normal, inout float4 color) {
+            ws_detail_normal = i.normal;
+
+FEATURE_TGL_ON_BEGIN(_NS_Enable)
+            // 2nd NormalMap
+            float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
+            float2 uv_dtl = _NS_2ndUVType == 1 ? i.uv_lmap : i.uv;
+            float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
+
+            // 法線計算
+            ws_detail_normal = transformTangentToWorldNormal(dtlNormalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
+FEATURE_TGL_END
+        }
+
+    #else
+        #define affectDetailNormal(i, uv_main, ws_detail_normal, color)  ws_detail_normal = i.normal
     #endif
 
     ////////////////////////////
@@ -592,7 +596,7 @@ FEATURE_TGL_END
             return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
         }
 
-        void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+        void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_MT_Enable)
             float metallic = _MT_Metallic;
             float monochrome = _MT_Monochrome;
@@ -610,7 +614,13 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
 
             // Metallic描画
             if (0.01 < metallic) {
-                float3 ws_metal_normal = lerpNormals(ws_normal, ws_bump_normal, _MT_BlendNormal);
+            float3 ws_metal_normal = ws_normal;
+#ifdef _NM_Enable
+            ws_metal_normal = lerpNormals(ws_metal_normal, ws_bump_normal, _MT_BlendNormal);
+#endif
+#ifdef _NS_Enable
+            ws_metal_normal = lerpNormals(ws_metal_normal, ws_detail_normal, _MT_BlendNormal2);
+#endif
                 float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
                 float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
 
@@ -641,7 +651,7 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
 FEATURE_TGL_END
         }
     #else
-        #define affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color)
+        #define affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, color)
     #endif
 
     ////////////////////////////
@@ -654,6 +664,9 @@ FEATURE_TGL_END
     #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
         #define _MV_HAS_NML
     #endif
+    #if defined(_NS_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        #define _MV_HAS_NML2
+    #endif
 
     struct MatcapVector {
         float3 vs_normal_center;
@@ -663,10 +676,13 @@ FEATURE_TGL_END
 #ifdef _MV_HAS_NML
         float3 diff_normal;
 #endif
+#ifdef _MV_HAS_NML2
+        float3 diff_normal2;
+#endif
     };
     #define WF_TYP_MATVEC   MatcapVector
 
-    WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+    WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal, in float3 ws_detail_normal) {
         // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
 
         WF_TYP_MATVEC matcapVector;
@@ -704,10 +720,21 @@ FEATURE_TGL_END
         matcapVector.diff_normal = normalize(vs_bump_normal_center) - matcapVector.vs_normal_center;
 #endif
 
+#ifdef _MV_HAS_NML2
+        // ワールド法線をビュー法線に変換
+        float3 vs_detail_normal = mul(float4(ws_detail_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_detail_normal_center = matcapViewCorrect(vs_detail_normal, ws_view_dir);
+        // 真上を揃える
+        vs_detail_normal_center.xy = mul( vs_detail_normal_center.xy, rotate );
+        // 正規化して格納
+        matcapVector.diff_normal2 = normalize(vs_detail_normal_center) - matcapVector.vs_normal_center;
+#endif
+
         return matcapVector;
     }
 
-    float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
+    float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float normal2, float parallax) {
         float3 vs_normal = matcapVector.vs_normal_center;
 #ifdef _MV_HAS_PARALLAX
         vs_normal += matcapVector.diff_parallax * parallax;
@@ -715,7 +742,14 @@ FEATURE_TGL_END
 #ifdef _MV_HAS_NML
         vs_normal += matcapVector.diff_normal * normal;
 #endif
+#ifdef _MV_HAS_NML2
+        vs_normal += matcapVector.diff_normal2 * normal2;
+#endif
         return SafeNormalizeVec3(vs_normal);
+    }
+
+    float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
+        return calcMatcapVector(matcapVector, normal, normal, parallax);
     }
 
     void calcMatcapColor(
@@ -765,7 +799,8 @@ FEATURE_TGL_END
     #define WF_CALC_MATCAP_COLOR(id)                                                                                                                        \
         FEATURE_TGL_ON_BEGIN(_HL_Enable##id)                                                                                                                \
                     calcMatcapColor(                                                                                                                        \
-                        PICK_MAIN_TEX2D(_HL_MatcapTex##id, saturate(calcMatcapVector(matcapVector, _HL_BlendNormal##id, _HL_Parallax##id).xy * 0.5 + 0.5)), \
+                        PICK_MAIN_TEX2D(_HL_MatcapTex##id,                                                                                                  \
+                        saturate(calcMatcapVector(matcapVector, _HL_BlendNormal##id, _HL_BlendNormal2##id, _HL_Parallax##id).xy * 0.5 + 0.5)),              \
                         SAMPLE_MASK_VALUE(_HL_MaskTex##id, uv_main, _HL_InvMaskVal##id).rgb,                                                                \
                         _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);    \
         FEATURE_TGL_END
@@ -912,14 +947,20 @@ FEATURE_TGL_END
                 smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
         }
 
-        void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
+        void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, float angle_light_camera, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_TS_Enable)
             if (isInMirror()) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
 
             // 陰用法線とライト方向から Harf-Lambert
-            float3 ws_shade_normal = lerpNormals(ws_normal, ws_bump_normal, _TS_BlendNormal);
+            float3 ws_shade_normal = ws_normal;
+#ifdef _NM_Enable
+            ws_shade_normal = lerpNormals(ws_shade_normal, ws_bump_normal, _TS_BlendNormal);
+#endif
+#ifdef _NS_Enable
+            ws_shade_normal = lerpNormals(ws_shade_normal, ws_detail_normal, _TS_BlendNormal2);
+#endif
             float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
 
             // アンチシャドウマスク加算
@@ -963,7 +1004,7 @@ FEATURE_TGL_END
         }
     #else
         #define calcToonShadeContrast(ws_vertex, ws_light_dir, ambientColor, shadow_power)
-        #define affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color)
+        #define affectToonShade(i, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, angle_light_camera, color)
     #endif
 
     ////////////////////////////

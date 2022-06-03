@@ -56,6 +56,7 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_OL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)), // ANGEL_RING
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NN_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
@@ -85,11 +86,6 @@ namespace UnlitWF
             }, null),
 
             // 値を設定したら他プロパティの値を自動で設定する
-            new DefValueSetPropertyHook("_DetailNormalMap", ctx => {
-                if (ctx.current.textureValue != null) {
-                    CompareAndSet(ctx.all, "_NM_2ndType", 0, 1); // OFF -> BLEND
-                }
-            }),
             new DefValueSetPropertyHook("_MT_Cubemap", ctx => {
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_MT_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP

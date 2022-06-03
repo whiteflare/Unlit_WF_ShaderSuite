@@ -138,6 +138,7 @@ namespace UnlitWF
                 new WFShaderFunction("CH", "CH", "3ch Color Mask"),
                 new WFShaderFunction("CL", "CL", "Color Change"),
                 new WFShaderFunction("NM", "NM", "NormalMap"),
+                new WFShaderFunction("NS", "NS", "NormalMap Secondary"),
                 new WFShaderFunction("MT", "MT", "Metallic"),
                 new WFShaderFunction("HL", "HL", "Light Matcap"),
                 new WFShaderFunction("HA", "HL_1", "Light Matcap 2", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_1", mat)),
@@ -168,8 +169,8 @@ namespace UnlitWF
             { "_Cutoff", "AL" },
             { "_BumpMap", "NM" },
             { "_BumpScale", "NM" },
-            { "_DetailNormalMap", "NM" },
-            { "_DetailNormalMapScale", "NM" },
+            { "_DetailNormalMap", "NS" },
+            { "_DetailNormalMapScale", "NS" },
             { "_MetallicGlossMap", "MT" },
             { "_SpecGlossMap", "MT" },
             { "_EmissionColor", "ES" },
@@ -195,9 +196,6 @@ namespace UnlitWF
             } },
             { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_", "_MT_ONLY2ND_ENABLE") {
                 enablePropName = "_MT_Enable",
-            } },
-            { "_NM_2ndType", new WFCustomKeywordSettingEnum("_NM_2ndType", "_", "_NM_BL2ND_ENABLE", "_NM_SW2ND_ENABLE") {
-                enablePropName = "_NM_Enable",
             } },
             { "_TS_Steps", new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
                 enablePropName = "_TS_Enable",
@@ -257,6 +255,7 @@ namespace UnlitWF
             new WFI18NTranslation("Blend Type", "混合タイプ"),
             new WFI18NTranslation("Blend Power", "混合の強度"),
             new WFI18NTranslation("Blend Normal", "ノーマルマップ強度"),
+            new WFI18NTranslation("Blend Normal 2nd", "ノーマルマップ(2nd)強度"),
             new WFI18NTranslation("Shape", "形状"),
             new WFI18NTranslation("Scale", "スケール"),
             new WFI18NTranslation("Direction", "方向"),
@@ -290,12 +289,13 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "Bump Scale", "凹凸スケール"),
             new WFI18NTranslation("NM", "Shadow Power", "影の濃さ"),
             new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("FR"),
-            new WFI18NTranslation("NM", "2nd Normal Blend", "2ndマップの混合タイプ"),
-            new WFI18NTranslation("NM", "2nd Normal UV Type", "2ndマップのUVタイプ"),
-            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2ndノーマルマップ"),
-            new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
+            // Normal 2nd
+            new WFI18NTranslation("NS", "2nd Normal Blend", "2ndマップの混合タイプ"),
+            new WFI18NTranslation("NS", "2nd Normal UV Type", "2ndマップのUVタイプ"),
+            new WFI18NTranslation("NS", "2nd NormalMap Texture", "2ndノーマルマップ"),
+            new WFI18NTranslation("NS", "2nd Bump Scale", "凹凸スケール"),
+            new WFI18NTranslation("NS", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
+            new WFI18NTranslation("NS", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
             // Metallic
             new WFI18NTranslation("MT", "Metallic", "メタリック強度"),
             new WFI18NTranslation("MT", "Smoothness", "滑らかさ"),
@@ -493,6 +493,12 @@ namespace UnlitWF
             new WFI18NTranslation("OL", "Decal Color", "デカール テクスチャ"),
             new WFI18NTranslation("OL", "Decal Texture", "デカール テクスチャ"),
             new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "頂点カラーをデカールに乗算する"),
+            new WFI18NTranslation("NM", "2nd Normal Blend", "2ndマップの混合タイプ"),
+            new WFI18NTranslation("NM", "2nd Normal UV Type", "2ndマップのUVタイプ"),
+            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2ndノーマルマップ"),
+            new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
         };
 
 
@@ -518,6 +524,7 @@ namespace UnlitWF
             new WFI18NTranslation("Blend Type", "혼합 타입"),
             new WFI18NTranslation("Blend Power", "혼합 강도"),
             new WFI18NTranslation("Blend Normal", "노멀맵 강도"),
+            new WFI18NTranslation("Blend Normal (2nd)", "노멀맵 (2nd) 강도"),
             new WFI18NTranslation("Shape", "모양"),
             new WFI18NTranslation("Scale", "스케일"),
             new WFI18NTranslation("Direction", "방향"),
@@ -551,12 +558,6 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "Bump Scale", "범프 스케일"),
             new WFI18NTranslation("NM", "Shadow Power", "그림자 강도"),
             new WFI18NTranslation("NM", "Flip Mirror", "거울 XY 반전").AddTag("FR"),
-            new WFI18NTranslation("NM", "2nd Normal Blend", "2nd맵 혼합"),
-            new WFI18NTranslation("NM", "2nd Normal UV Type", "2nd맵 UV타입"),
-            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2nd노멀맵"),
-            new WFI18NTranslation("NM", "2nd Bump Scale", "2nd범프 스케일"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2nd노멀 텍스처"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2nd노멀맵 마스크 (R)"),
             // Metallic
             new WFI18NTranslation("MT", "Metallic", "메탈릭 강도"),
             new WFI18NTranslation("MT", "Smoothness", "부드럽게"),
@@ -727,6 +728,12 @@ namespace UnlitWF
             new WFI18NTranslation("OL", "Decal Color", "데칼 텍스처"),
             new WFI18NTranslation("OL", "Decal Texture", "데칼 텍스처"),
             new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "버텍스 컬러에 데칼 텍스처 곱하기"),
+            new WFI18NTranslation("NM", "2nd Normal Blend", "2nd맵 혼합"),
+            new WFI18NTranslation("NM", "2nd Normal UV Type", "2nd맵 UV타입"),
+            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2nd노멀맵"),
+            new WFI18NTranslation("NM", "2nd Bump Scale", "2nd범프 스케일"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2nd노멀 텍스처"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2nd노멀맵 마스크 (R)"),
         };
     }
 

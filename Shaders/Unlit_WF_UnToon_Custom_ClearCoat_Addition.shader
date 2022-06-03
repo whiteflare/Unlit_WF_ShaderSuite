@@ -31,28 +31,27 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CC_CullMode            ("[CC] Cull Mode", int) = 2
 
-        // 法線マップ
+        // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
             _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
-        [WF_FixFloat(0.0)]
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _NM_FlipMirror          ("[NM] Flip Mirror", Float) = 0
 
-        [Header(NormalMap Secondary)]
-        [Enum(OFF,0,BLEND,1,SWITCH,2)]
-            _NM_2ndType             ("[NM] 2nd Normal Blend", Float) = 0
+        // Detailノーマルマップ
+        [WFHeaderToggle(NormalMap Secondary)]
+            _NS_Enable              ("[NS] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _NM_2ndUVType           ("[NM] 2nd Normal UV Type", Float) = 0
-            _DetailNormalMap        ("[NM] 2nd NormalMap Texture", 2D) = "bump" {}
-            _DetailNormalMapScale   ("[NM] 2nd Bump Scale", Range(0, 2)) = 0.4
+            _NS_2ndUVType           ("[NS] 2nd Normal UV Type", Float) = 0
+            _DetailNormalMap        ("[NS] 2nd NormalMap Texture", 2D) = "bump" {}
+            _DetailNormalMapScale   ("[NS] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
-            _NM_2ndMaskTex          ("[NM] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
+            _NS_2ndMaskTex          ("[NS] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
-            _NM_InvMaskVal          ("[NM] Invert Mask Value", Range(0, 1)) = 0
+            _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
         // メタリックマップ
         [WFHeaderToggle(Metallic)]
@@ -62,6 +61,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
         [WF_FixFloat(1.0)]
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
+            _MT_BlendNormal2        ("[MT] Blend Normal 2nd", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
         [Toggle(_)]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
@@ -98,6 +98,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2        ("[HL] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
@@ -116,6 +117,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2_1      ("[HA] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -195,8 +197,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _NM_BL2ND_ENABLE _NM_SW2ND_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _MT_ENABLE
