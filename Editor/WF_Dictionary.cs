@@ -209,31 +209,6 @@ namespace UnlitWF
         };
 
         /// <summary>
-        /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
-        /// </summary>
-        public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
-            new PropertyNameReplacement("_AL_CutOff", "_Cutoff"),
-            new PropertyNameReplacement("_CutOffLevel", "_Cutoff"),
-            new PropertyNameReplacement("_ES_Color", "_EmissionColor"),
-            new PropertyNameReplacement("_ES_MaskTex", "_EmissionMap"),
-            new PropertyNameReplacement("_FurHeight", "_FR_Height"),
-            new PropertyNameReplacement("_FurMaskTex", "_FR_MaskTex"),
-            new PropertyNameReplacement("_FurNoiseTex", "_FR_NoiseTex"),
-            new PropertyNameReplacement("_FurRepeat", "_FR_Repeat"),
-            new PropertyNameReplacement("_FurShadowPower", "_FR_ShadowPower"),
-            new PropertyNameReplacement("_FG_BumpMap", "_FR_BumpMap"),
-            new PropertyNameReplacement("_FG_FlipTangent", "_FR_FlipTangent"),
-            new PropertyNameReplacement("_GL_BrendPower", "_GL_BlendPower"),
-            new PropertyNameReplacement("_MT_BlendType", "_MT_Brightness"),
-            new PropertyNameReplacement("_MT_MaskTex", "_MetallicGlossMap"),
-            new PropertyNameReplacement("_MT_Smoothness", "_MT_ReflSmooth"),
-            new PropertyNameReplacement("_MT_Smoothness2", "_MT_SpecSmooth"),
-            new PropertyNameReplacement("_TessFactor", "_TE_Factor"),
-            new PropertyNameReplacement("_Smoothing", "_TE_SmoothPower"),
-            // new OldPropertyReplacement("_FurVector", "_FR_Vector"), // FurVectorの値は再設定が必要なので変換しない
-        };
-
-        /// <summary>
         /// ラベル名などの物理名 → 日本語訳の変換マップ。
         /// </summary>
         public static readonly List<WFI18NTranslation> LangEnToJa = new List<WFI18NTranslation>() {

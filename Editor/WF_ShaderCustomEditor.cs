@@ -137,7 +137,7 @@ namespace UnlitWF
             }),
             // _NS_InvMaskVal の直後に FlipMirror を再表示
             new CustomPropertyHook("_NS_InvMaskVal", null, (ctx, changed) => {
-                var prop = ctx.all.Where(p => p.name == "_NM_FlipMirror").FirstOrDefault();
+                var prop = ctx.all.Where(p => p.name == "_FlipMirror").FirstOrDefault();
                 if (prop != null)
                 {
                     ctx.editor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName.Replace("[NM]", "[NS]")));

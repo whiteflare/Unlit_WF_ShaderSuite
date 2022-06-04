@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
@@ -44,7 +45,7 @@ namespace UnlitWF.Converter
         public Dictionary<string, ShaderSerializedProperty> oldProps;
     }
 
-    public abstract class AbstractMaterialConverter<CTX> where CTX: ConvertContext, new()
+    public abstract class AbstractMaterialConverter<CTX> where CTX : ConvertContext, new()
     {
         private readonly List<Action<CTX>> converters;
 
@@ -53,14 +54,15 @@ namespace UnlitWF.Converter
             this.converters = converters;
         }
 
-        public void ExecAutoConvert(params Material[] mats)
+        public int ExecAutoConvert(params Material[] mats)
         {
             Undo.RecordObjects(mats, "WF Convert materials");
-            ExecAutoConvertWithoutUndo(mats);
+            return ExecAutoConvertWithoutUndo(mats);
         }
 
-        public void ExecAutoConvertWithoutUndo(params Material[] mats)
+        public int ExecAutoConvertWithoutUndo(params Material[] mats)
         {
+            int count = 0;
             foreach (var mat in mats)
             {
                 if (mat == null)
@@ -72,17 +74,21 @@ namespace UnlitWF.Converter
                     continue;
                 }
 
-                var ctx = new CTX();
-                ctx.target = mat;
-                ctx.oldMaterial = new Material(mat);
+                var ctx = new CTX
+                {
+                    target = mat,
+                    oldMaterial = new Material(mat)
+                };
                 ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
 
                 foreach (var cnv in converters)
                 {
                     cnv(ctx);
                 }
+                count++;
                 Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
             }
+            return count;
         }
 
         /// <summary>
@@ -90,10 +96,7 @@ namespace UnlitWF.Converter
         /// </summary>
         /// <param name="mat"></param>
         /// <returns></returns>
-        protected virtual bool Validate(Material mat)
-        {
-            return true;
-        }
+        protected abstract bool Validate(Material mat);
 
         protected static bool IsMatchShaderName(ConvertContext ctx, string name)
         {
@@ -614,8 +617,108 @@ namespace UnlitWF.Converter
             {
                 return false;
             }
-            WFMaterialEditUtility.MigrationMaterialWithoutUndo(mat);
-            return true;
+            return new WFMaterialMigrationConverter().ExecAutoConvert(mat) != 0;
+        }
+    }
+
+    /// <summary>
+    /// 古いWFマテリアルをマイグレーションするコンバータ
+    /// </summary>
+    public class WFMaterialMigrationConverter : AbstractMaterialConverter<ConvertContext>
+    {
+        public WFMaterialMigrationConverter() : base(CreateConverterList())
+        {
+        }
+
+        protected override bool Validate(Material mat)
+        {
+            // UnlitWFのマテリアルを対象に変換する
+            return WFCommonUtility.IsSupportedShader(mat) && ExistsNeedsMigration(mat);
+        }
+
+        /// <summary>
+        /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
+        /// </summary>
+        public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
+            new PropertyNameReplacement("_AL_CutOff", "_Cutoff"),
+            new PropertyNameReplacement("_CutOffLevel", "_Cutoff"),
+            new PropertyNameReplacement("_ES_Color", "_EmissionColor"),
+            new PropertyNameReplacement("_ES_MaskTex", "_EmissionMap"),
+            new PropertyNameReplacement("_FurHeight", "_FR_Height"),
+            new PropertyNameReplacement("_FurMaskTex", "_FR_MaskTex"),
+            new PropertyNameReplacement("_FurNoiseTex", "_FR_NoiseTex"),
+            new PropertyNameReplacement("_FurRepeat", "_FR_Repeat"),
+            new PropertyNameReplacement("_FurShadowPower", "_FR_ShadowPower"),
+            new PropertyNameReplacement("_FG_BumpMap", "_FR_BumpMap"),
+            new PropertyNameReplacement("_FG_FlipTangent", "_FlipMirror"),
+            new PropertyNameReplacement("_FR_FlipTangent", "_FlipMirror"),
+            new PropertyNameReplacement("_FR_FlipMirror", "_FlipMirror"),
+            new PropertyNameReplacement("_GL_BrendPower", "_GL_BlendPower"),
+            new PropertyNameReplacement("_MT_BlendType", "_MT_Brightness"),
+            new PropertyNameReplacement("_MT_MaskTex", "_MetallicGlossMap"),
+            new PropertyNameReplacement("_MT_Smoothness", "_MT_ReflSmooth"),
+            new PropertyNameReplacement("_MT_Smoothness2", "_MT_SpecSmooth"),
+            new PropertyNameReplacement("_TessFactor", "_TE_Factor"),
+            new PropertyNameReplacement("_Smoothing", "_TE_SmoothPower"),
+            new PropertyNameReplacement("_NM_FlipMirror", "_FlipMirror"),   // NS追加に合わせてFlipMirrorはラベルなしに変更する
+            new PropertyNameReplacement("_NM_2ndType", "_NS_Enable", p => {
+                if (p.IntValue != 0)
+                {
+                    p.IntValue = 1;
+                }
+            }),
+            new PropertyNameReplacement("_NM_2ndUVType", "_NS_2ndUVType"),
+            new PropertyNameReplacement("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
+            new PropertyNameReplacement("_NM_InvMaskVal", "_NS_InvMaskVal"),
+            // new OldPropertyReplacement("_FurVector", "_FR_Vector"), // FurVectorの値は再設定が必要なので変換しない
+        };
+
+        public static bool ExistsNeedsMigration(Material[] mats)
+        {
+            return mats.Any(ExistsNeedsMigration);
+        }
+
+        public static bool ExistsNeedsMigration(Material mat)
+        {
+            var props = ShaderSerializedProperty.AsDict(mat);
+            foreach (var map in OldPropNameToNewPropNameList)
+            {
+                if (props.ContainsKey(map.beforeName))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected static List<Action<ConvertContext>> CreateConverterList()
+        {
+            return new List<Action<ConvertContext>>()
+            {
+                ctx => {
+                    // まずはナイーブに名称変更
+                    if (WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target, OldPropNameToNewPropNameList))
+                    {
+                        WFCommonUtility.SetupShaderKeyword(ctx.target);
+                        EditorUtility.SetDirty(ctx.target);
+                    }
+                },
+                ctx => {
+                    // NSを変換したときはBlendNormalを複製する
+                    if (ctx.oldMaterial.GetInt("_NS_Enable") == 0 && ctx.target.GetInt("_NS_Enable") != 0)
+                    {
+                        foreach(var pn in ctx.oldProps.Keys)
+                        {
+                            if (WFCommonUtility.FormatPropName(pn, out var label, out var name)) {
+                                if (name == "BlendNormal")
+                                {
+                                    ctx.target.SetFloat(pn.Replace("_BlendNormal", "_BlendNormal2"), ctx.target.GetFloat(pn));
+                                }
+                            }
+                        }
+                    }
+                }
+            };
         }
     }
 }

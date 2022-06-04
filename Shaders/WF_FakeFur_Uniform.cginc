@@ -42,7 +42,6 @@
     float4          _FR_NoiseTex_ST;
     float           _FR_HEIGHT_PARAM;
     float4          _FR_Vector;
-    uint            _FR_FlipMirror;
 
     uint            _FR_REPEAT_PARAM;
     float           _FR_ShadowPower;

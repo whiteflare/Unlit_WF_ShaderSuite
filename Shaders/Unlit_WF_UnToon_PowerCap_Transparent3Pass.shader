@@ -66,7 +66,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Enum(NONE,0,X,1,Y,2,XY,3)]
-            _NM_FlipMirror          ("[NM] Flip Mirror", Float) = 0
+            _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
         // Detailノーマルマップ
         [WFHeaderToggle(NormalMap Secondary)]

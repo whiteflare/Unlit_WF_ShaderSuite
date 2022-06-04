@@ -40,7 +40,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
         [Normal]
             _FR_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
         [Enum(NONE,0,X,1,Y,2,XY,3)]
-            _FR_FlipMirror          ("[FR] Flip Mirror", Float) = 0
+            _FlipMirror             ("[FR] Flip Mirror", Float) = 0
         [Header(Fur Color)]
             _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
             _FR_TintColorBase       ("[FR] Tint Color (Base)", Color) = (1, 1, 1, 1)

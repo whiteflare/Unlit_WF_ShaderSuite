@@ -81,6 +81,7 @@
     float           _Cutoff;
     float           _UseVertexColor;
     float           _Z_Shift;
+    uint            _FlipMirror;
 
     // -------------------------
 
@@ -156,7 +157,6 @@
     FEATURE_TGL     (_NM_Enable);
     float           _BumpScale;
     float           _NM_Power;
-    uint            _NM_FlipMirror;
 
     // -------------------------
 
