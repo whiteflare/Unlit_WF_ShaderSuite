@@ -375,8 +375,14 @@ namespace UnlitWF.Converter
                     // ノーマルマップ
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         new PropertyNameReplacement("_NormalMap", "_BumpMap"));
-                    if (HasCustomValue(ctx, "_BumpMap", "_DetailNormalMap")) {
+                    if (HasCustomValue(ctx, "_BumpMap")) {
                         ctx.target.SetInt("_NM_Enable", 1);
+                    }
+                },
+                ctx => {
+                    // ノーマルマップ2nd
+                    if (HasCustomValue(ctx, "_DetailNormalMap")) {
+                        ctx.target.SetInt("_NS_Enable", 1);
                     }
                 },
                 ctx => {
@@ -704,9 +710,10 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
-                    // NSを変換したときはBlendNormalを複製する
+                    // NSを変換して有効になったとき
                     if (ctx.oldMaterial.GetInt("_NS_Enable") == 0 && ctx.target.GetInt("_NS_Enable") != 0)
                     {
+                        // BlendNormalを複製する
                         foreach(var pn in ctx.oldProps.Keys)
                         {
                             if (WFCommonUtility.FormatPropName(pn, out var label, out var name)) {
@@ -715,6 +722,11 @@ namespace UnlitWF.Converter
                                     ctx.target.SetFloat(pn.Replace("_BlendNormal", "_BlendNormal2"), ctx.target.GetFloat(pn));
                                 }
                             }
+                        }
+                        // BumpMap が未設定ならば _NM_Enable をオフにする
+                        if (!HasCustomValue(ctx, "_BumpMap"))
+                        {
+                            ctx.target.SetInt("_NM_Enable", 0);
                         }
                     }
                 }
