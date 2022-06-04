@@ -138,7 +138,7 @@ namespace UnlitWF
                 new WFShaderFunction("CH", "CH", "3ch Color Mask"),
                 new WFShaderFunction("CL", "CL", "Color Change"),
                 new WFShaderFunction("NM", "NM", "NormalMap"),
-                new WFShaderFunction("NS", "NS", "NormalMap Secondary"),
+                new WFShaderFunction("NS", "NS", "Detail NormalMap"),
                 new WFShaderFunction("MT", "MT", "Metallic"),
                 new WFShaderFunction("HL", "HL", "Light Matcap"),
                 new WFShaderFunction("HA", "HL_1", "Light Matcap 2", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_1", mat)),

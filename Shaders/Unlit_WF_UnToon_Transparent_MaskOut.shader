@@ -81,7 +81,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
         // Detailノーマルマップ
-        [WFHeaderToggle(NormalMap Secondary)]
+        [WFHeaderToggle(Detail NormalMap)]
             _NS_Enable              ("[NS] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
             _NS_2ndUVType           ("[NS] 2nd Normal UV Type", Float) = 0
