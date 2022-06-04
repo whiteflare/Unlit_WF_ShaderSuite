@@ -131,6 +131,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_MedianColor_2       ("[HB] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_2             ("[HB] Power", Range(0, 2)) = 1
             _HL_BlendNormal_2       ("[HB] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2_2      ("[HB] Blend Normal 2nd", Range(0, 1)) = 0.1
         [Toggle(_)]
             _HL_ChangeAlpha_2       ("[HB] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -151,6 +152,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_MedianColor_3       ("[HC] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_3             ("[HC] Power", Range(0, 2)) = 1
             _HL_BlendNormal_3       ("[HC] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2_3      ("[HC] Blend Normal 2nd", Range(0, 1)) = 0.1
         [Toggle(_)]
             _HL_ChangeAlpha_3       ("[HC] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -171,6 +173,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_MedianColor_4       ("[HD] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_4             ("[HD] Power", Range(0, 2)) = 1
             _HL_BlendNormal_4       ("[HD] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2_4      ("[HD] Blend Normal 2nd", Range(0, 1)) = 0.1
         [Toggle(_)]
             _HL_ChangeAlpha_4       ("[HD] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -191,6 +194,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_MedianColor_5       ("[HE] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_5             ("[HE] Power", Range(0, 2)) = 1
             _HL_BlendNormal_5       ("[HE] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2_5      ("[HE] Blend Normal 2nd", Range(0, 1)) = 0.1
         [Toggle(_)]
             _HL_ChangeAlpha_5       ("[HE] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -211,6 +215,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_MedianColor_6       ("[HF] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_6             ("[HF] Power", Range(0, 2)) = 1
             _HL_BlendNormal_6       ("[HF] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2_6      ("[HF] Blend Normal 2nd", Range(0, 1)) = 0.1
         [Toggle(_)]
             _HL_ChangeAlpha_6       ("[HF] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -231,6 +236,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _HL_MedianColor_7       ("[HG] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_7             ("[HG] Power", Range(0, 2)) = 1
             _HL_BlendNormal_7       ("[HG] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2_7      ("[HG] Blend Normal 2nd", Range(0, 1)) = 0.1
         [Toggle(_)]
             _HL_ChangeAlpha_7       ("[HG] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
