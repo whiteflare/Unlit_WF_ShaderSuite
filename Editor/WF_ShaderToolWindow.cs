@@ -85,13 +85,13 @@ namespace UnlitWF
         private static void Menu_AutoConvertMaterial()
         {
             var mats = MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
-            new WFMaterialFromOtherShaderConverter().ExecAutoConvert(mats.ToArray());
+            new Converter.WFMaterialFromOtherShaderConverter().ExecAutoConvert(mats.ToArray());
         }
 
         [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
         private static void ContextMenu_AutoConvertMaterial(MenuCommand cmd)
         {
-            new WFMaterialFromOtherShaderConverter().ExecAutoConvert(cmd.context as Material);
+            new Converter.WFMaterialFromOtherShaderConverter().ExecAutoConvert(cmd.context as Material);
         }
 
         #endregion
@@ -102,7 +102,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.TOOLS_MIGALL, priority = WFMenu.PRI_TOOLS_MIGALL)]
         private static void Menu_ScanAndAllMigration()
         {
-            ScanAndMigrationExecutor.ExecuteByManual();
+            Converter.ScanAndMigrationExecutor.ExecuteByManual();
         }
 
         #endregion
@@ -161,7 +161,7 @@ namespace UnlitWF
         {
             if (0 < mats.Length && EditorUtility.DisplayDialog("WF change Mobile shader", WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel"))
             {
-                new WFMaterialToMobileShaderConverter().ExecAutoConvert(mats);
+                new Converter.WFMaterialToMobileShaderConverter().ExecAutoConvert(mats);
             }
         }
 

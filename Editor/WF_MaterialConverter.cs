@@ -23,13 +23,32 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
-namespace UnlitWF
+namespace UnlitWF.Converter
 {
-     public abstract class AbstractMaterialConverter
+    /// <summary>
+    /// 変換コンテキスト
+    /// </summary>
+    public class ConvertContext
     {
-        private readonly List<Action<ConvertContext>> converters;
+        /// <summary>
+        /// 変換中のマテリアル
+        /// </summary>
+        public Material target;
+        /// <summary>
+        /// 変換前のマテリアル
+        /// </summary>
+        public Material oldMaterial;
+        /// <summary>
+        /// 変換前のマテリアルに入っていたShaderSerializedProperty
+        /// </summary>
+        public Dictionary<string, ShaderSerializedProperty> oldProps;
+    }
 
-        protected AbstractMaterialConverter(List<Action<ConvertContext>> converters)
+    public abstract class AbstractMaterialConverter<CTX> where CTX: ConvertContext, new()
+    {
+        private readonly List<Action<CTX>> converters;
+
+        protected AbstractMaterialConverter(List<Action<CTX>> converters)
         {
             this.converters = converters;
         }
@@ -53,7 +72,7 @@ namespace UnlitWF
                     continue;
                 }
 
-                var ctx = new ConvertContext();
+                var ctx = new CTX();
                 ctx.target = mat;
                 ctx.oldMaterial = new Material(mat);
                 ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
@@ -66,24 +85,14 @@ namespace UnlitWF
             }
         }
 
+        /// <summary>
+        /// 変換元マテリアルが変換対象かどうかを判定する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
         protected virtual bool Validate(Material mat)
         {
             return true;
-        }
-
-        protected class ConvertContext
-        {
-            public Material target;
-            public Material oldMaterial;
-            public Dictionary<string, ShaderSerializedProperty> oldProps;
-
-            public ShaderType renderType = ShaderType.NoMatch;
-            public bool outline = false;
-        }
-
-        protected enum ShaderType
-        {
-            NoMatch, Opaque, Cutout, Transparent
         }
 
         protected static bool IsMatchShaderName(ConvertContext ctx, string name)
@@ -155,7 +164,7 @@ namespace UnlitWF
     /// <summary>
     /// WFマテリアルをMobile系に変換するコンバータ
     /// </summary>
-    public class WFMaterialToMobileShaderConverter : AbstractMaterialConverter
+    public class WFMaterialToMobileShaderConverter : AbstractMaterialConverter<ConvertContext>
     {
         public WFMaterialToMobileShaderConverter() : base(CreateConverterList())
         {
@@ -206,7 +215,7 @@ namespace UnlitWF
     /// <summary>
     /// WF系ではないマテリアルをWF系に変換するコンバータ
     /// </summary>
-    public class WFMaterialFromOtherShaderConverter : AbstractMaterialConverter
+    public class WFMaterialFromOtherShaderConverter : AbstractMaterialConverter<WFMaterialFromOtherShaderConverter.SelectShaderContext>
     {
         public WFMaterialFromOtherShaderConverter() : base(CreateConverterList())
         {
@@ -218,9 +227,20 @@ namespace UnlitWF
             return !WFCommonUtility.IsSupportedShader(mat);
         }
 
-        protected static List<Action<ConvertContext>> CreateConverterList()
+        public class SelectShaderContext : ConvertContext
         {
-            return new List<Action<ConvertContext>>() {
+            public ShaderType renderType = ShaderType.NoMatch;
+            public bool outline = false;
+        }
+
+        public enum ShaderType
+        {
+            NoMatch, Opaque, Cutout, Transparent
+        }
+
+        protected static List<Action<SelectShaderContext>> CreateConverterList()
+        {
+            return new List<Action<SelectShaderContext>>() {
                 ctx => {
                     // アウトライン有無を判定する
                     if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {

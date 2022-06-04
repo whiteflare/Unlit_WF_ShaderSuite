@@ -1089,13 +1089,35 @@ namespace UnlitWF
 
         #region PropertyHook
 
+        /// <summary>
+        /// PropertyHookで使用する表示コンテキスト
+        /// </summary>
         class PropertyGUIContext
         {
+            /// <summary>
+            /// 動作中のMaterialEditor
+            /// </summary>
             public readonly MaterialEditor editor;
+            /// <summary>
+            /// 全てのMaterialProperty
+            /// </summary>
             public readonly MaterialProperty[] all;
+            /// <summary>
+            /// 現在表示しようとしているMaterialProperty
+            /// </summary>
             public readonly MaterialProperty current;
+
+            /// <summary>
+            /// 表示するMaterialPropertyのGUIContent。Hook内から変更することもできる。
+            /// </summary>
             public GUIContent guiContent = null;
+            /// <summary>
+            /// 非表示にするときにHook内からtrueにする。
+            /// </summary>
             public bool hidden = false;
+            /// <summary>
+            /// Hook内で独自にGUIを表示したとき(つまりデフォルトのShaderProperty呼び出しが不要なとき)にHook内からtrueにする。
+            /// </summary>
             public bool custom = false;
 
             public PropertyGUIContext(MaterialEditor editor, MaterialProperty[] all, MaterialProperty current)

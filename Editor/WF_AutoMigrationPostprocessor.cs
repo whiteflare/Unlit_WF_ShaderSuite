@@ -25,14 +25,13 @@ namespace UnlitWF
     {
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
         {
-            ScanAndMigrationExecutor.Migration(importedAssets);
+            Converter.ScanAndMigrationExecutor.Migration(importedAssets);
         }
 
         [InitializeOnLoadMethod]
         public static void ExecuteAuto()
         {
-            ScanAndMigrationExecutor.ExecuteAuto();
-
+            Converter.ScanAndMigrationExecutor.ExecuteAuto();
         }
     }
 }
