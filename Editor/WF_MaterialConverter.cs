@@ -34,18 +34,25 @@ namespace UnlitWF.Converter
         /// <summary>
         /// 変換中のマテリアル
         /// </summary>
-        public Material target;
+        public readonly Material target;
         /// <summary>
         /// 変換前のマテリアル
         /// </summary>
-        public Material oldMaterial;
+        public readonly Material oldMaterial;
         /// <summary>
         /// 変換前のマテリアルに入っていたShaderSerializedProperty
         /// </summary>
-        public Dictionary<string, ShaderSerializedProperty> oldProps;
+        public readonly Dictionary<string, ShaderSerializedProperty> oldProps;
+
+        public ConvertContext(Material mat)
+        {
+            this.target = mat;
+            this.oldMaterial = new Material(mat);
+            this.oldProps = ShaderSerializedProperty.AsDict(oldMaterial);
+        }
     }
 
-    public abstract class AbstractMaterialConverter<CTX> where CTX : ConvertContext, new()
+    public abstract class AbstractMaterialConverter<CTX> where CTX : ConvertContext
     {
         private readonly List<Action<CTX>> converters;
 
@@ -59,6 +66,8 @@ namespace UnlitWF.Converter
             Undo.RecordObjects(mats, "WF Convert materials");
             return ExecAutoConvertWithoutUndo(mats);
         }
+
+        public abstract CTX CreateContext(Material target);
 
         public int ExecAutoConvertWithoutUndo(params Material[] mats)
         {
@@ -74,13 +83,7 @@ namespace UnlitWF.Converter
                     continue;
                 }
 
-                var ctx = new CTX
-                {
-                    target = mat,
-                    oldMaterial = new Material(mat)
-                };
-                ctx.oldProps = ShaderSerializedProperty.AsDict(ctx.oldMaterial);
-
+                var ctx = CreateContext(mat);
                 foreach (var cnv in converters)
                 {
                     cnv(ctx);
@@ -173,6 +176,11 @@ namespace UnlitWF.Converter
         {
         }
 
+        public override ConvertContext CreateContext(Material target)
+        {
+            return new ConvertContext(target);
+        }
+
         protected override bool Validate(Material mat)
         {
             // UnlitWFのマテリアルを対象に、URPではない場合に変換する
@@ -224,6 +232,11 @@ namespace UnlitWF.Converter
         {
         }
 
+        public override SelectShaderContext CreateContext(Material target)
+        {
+            return new SelectShaderContext(target);
+        }
+
         protected override bool Validate(Material mat)
         {
             // UnlitWF系ではないマテリアルを対象に処理する
@@ -234,6 +247,11 @@ namespace UnlitWF.Converter
         {
             public ShaderType renderType = ShaderType.NoMatch;
             public bool outline = false;
+
+            public SelectShaderContext(Material mat): base(mat)
+            {
+
+            }
         }
 
         public enum ShaderType
@@ -636,6 +654,11 @@ namespace UnlitWF.Converter
         {
         }
 
+        public override ConvertContext CreateContext(Material target)
+        {
+            return new ConvertContext(target);
+        }
+
         protected override bool Validate(Material mat)
         {
             // UnlitWFのマテリアルを対象に変換する
@@ -667,12 +690,7 @@ namespace UnlitWF.Converter
             new PropertyNameReplacement("_TessFactor", "_TE_Factor"),
             new PropertyNameReplacement("_Smoothing", "_TE_SmoothPower"),
             new PropertyNameReplacement("_NM_FlipMirror", "_FlipMirror"),   // NS追加に合わせてFlipMirrorはラベルなしに変更する
-            new PropertyNameReplacement("_NM_2ndType", "_NS_Enable", p => {
-                if (p.IntValue != 0)
-                {
-                    p.IntValue = 1;
-                }
-            }),
+            new PropertyNameReplacement("_NM_2ndType", "_NS_Enable", p => p.IntValue = p.IntValue != 0 ? 1 : 0),
             new PropertyNameReplacement("_NM_2ndUVType", "_NS_2ndUVType"),
             new PropertyNameReplacement("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
             new PropertyNameReplacement("_NM_InvMaskVal", "_NS_InvMaskVal"),
@@ -697,21 +715,27 @@ namespace UnlitWF.Converter
             return false;
         }
 
+        protected static int GetIntOrDefault(Material mat, string name, int _default = default)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetInt(name);
+            }
+            return _default;
+        }
+
         protected static List<Action<ConvertContext>> CreateConverterList()
         {
             return new List<Action<ConvertContext>>()
             {
                 ctx => {
                     // まずはナイーブに名称変更
-                    if (WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target, OldPropNameToNewPropNameList))
-                    {
-                        WFCommonUtility.SetupShaderKeyword(ctx.target);
-                        EditorUtility.SetDirty(ctx.target);
-                    }
+                    WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target, OldPropNameToNewPropNameList);
+                    // Validate で確認しているのでここで変更されなかったというのは無いはず
                 },
                 ctx => {
                     // NSを変換して有効になったとき
-                    if (ctx.oldMaterial.GetInt("_NS_Enable") == 0 && ctx.target.GetInt("_NS_Enable") != 0)
+                    if (GetIntOrDefault(ctx.oldMaterial, "_NS_Enable") == 0 && GetIntOrDefault(ctx.target, "_NS_Enable") != 0)
                     {
                         // BlendNormalを複製する
                         foreach(var pn in ctx.oldProps.Keys)
@@ -729,7 +753,12 @@ namespace UnlitWF.Converter
                             ctx.target.SetInt("_NM_Enable", 0);
                         }
                     }
-                }
+                },
+                ctx => {
+                    // シェーダキーワードを整理
+                    WFCommonUtility.SetupShaderKeyword(ctx.target);
+                    EditorUtility.SetDirty(ctx.target);
+                },
             };
         }
     }
