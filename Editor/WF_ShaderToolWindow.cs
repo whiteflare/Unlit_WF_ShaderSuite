@@ -84,7 +84,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
         private static void Menu_AutoConvertMaterial()
         {
-            var mats = MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
+            var mats = new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
             new Converter.WFMaterialFromOtherShaderConverter().ExecAutoConvert(mats.ToArray());
         }
 
@@ -112,7 +112,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_KEEPMAT, priority = WFMenu.PRI_ASSETS_KEEPMAT)]
         private static void Menu_KeepMaterialInScene()
         {
-            var mats = MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAsset);
+            var mats = new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAsset);
 
             var go = new GameObject("MaterialKeeper");
             go.tag = "EditorOnly";
@@ -134,7 +134,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, priority = WFMenu.PRI_ASSETS_DEBUGVIEW)]
         private static void Menu_DebugView()
         {
-            foreach (var mat in MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAsset))
+            foreach (var mat in new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAsset))
             {
                 WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, mat);
             }
@@ -153,7 +153,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_CNGMOBILE, priority = WFMenu.PRI_ASSETS_CNGMOBILE)]
         private static void Menu_ChangeMobileShader()
         {
-            var mats = MaterialSeeker.GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
+            var mats = new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
             ChangeMobileShader(mats.ToArray());
         }
 
@@ -259,7 +259,7 @@ namespace UnlitWF
         public static void SetSelectedMaterials(MatSelectMode mode)
         {
             arguments.Clear();
-            arguments.AddRange(MaterialSeeker.GetSelectionAllMaterial(mode));
+            arguments.AddRange(new MaterialSeeker().GetSelectionAllMaterial(mode));
         }
 
         public static void SetMaterials(Material[] mats)

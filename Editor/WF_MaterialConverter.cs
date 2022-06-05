@@ -607,7 +607,7 @@ namespace UnlitWF.Converter
         public static void ScanAndMigration()
         {
             // Go Ahead
-            var done = MaterialSeeker.SeekProjectAllMaterial("migration materials", Migration);
+            var done = new MaterialSeeker().SeekProjectAllMaterial("migration materials", Migration);
             if (0 < done)
             {
                 AssetDatabase.SaveAssets();

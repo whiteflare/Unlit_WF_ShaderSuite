@@ -20,6 +20,15 @@
 // #define WF_STRIP_LOG_RESULT // Strippingの結果をログ出力する
 // #define WF_STRIP_LOG_VERBOSE // Strip中の挙動をログ出力する
 
+#if VRC_SDK_VRCSDK3
+#define ENV_VRCSDK3
+#if UDON
+#define ENV_VRCSDK3_WORLD
+#else
+#define ENV_VRCSDK3_AVATAR
+#endif
+#endif
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Build;
@@ -32,7 +41,7 @@ namespace UnlitWF
 #if UNITY_2019_1_OR_NEWER
 
     public class WF_ShaderPreprocessor : IPreprocessShaders
-#if VRC_SDK_VRCSDK3
+#if ENV_VRCSDK3
         , VRC.SDKBase.Editor.BuildPipeline.IVRCSDKBuildRequestedCallback
 #endif
     {
@@ -54,7 +63,7 @@ namespace UnlitWF
             OtherEnvs,
         }
 
-#if VRC_SDK_VRCSDK3
+#if ENV_VRCSDK3
         bool VRC.SDKBase.Editor.BuildPipeline.IVRCSDKBuildRequestedCallback.OnBuildRequested(VRC.SDKBase.Editor.BuildPipeline.VRCSDKRequestedBuildType requestedBuildType)
         {
             // VRCSDK3 からビルドリクエストされた場合はここでクリア＆初期化する
@@ -353,7 +362,16 @@ namespace UnlitWF
                 sw.Start();
 
                 // シーンから UsedShaderVariant を回収
-                materials.AddRange(MaterialSeeker.GetAllSceneAllMaterial());
+                var materialSeeker = new MaterialSeeker();
+#if ENV_VRCSDK3_AVATAR
+                if (Core.CurrentPlatform == WFBuildPlatformType.VRCSDK3_Avatar)
+                {
+                    // もしSDK3Avatarからのリクエストならば、非アクティブのAvatarDescriptorを親に持つGameObjectは無視するようにする
+                    materialSeeker.FilterHierarchy = cmp =>
+                        !(cmp.GetComponentsInParent<VRC.SDK3.Avatars.Components.VRCAvatarDescriptor>(true).Any(d => !d.isActiveAndEnabled));
+                }
+#endif
+                materials.AddRange(materialSeeker.GetAllSceneAllMaterial());
                 materials = materials.Distinct()
                     .Where(mat => mat != null && IsStripTargetShader(mat.shader))
                     .ToList();
