@@ -232,6 +232,21 @@ namespace UnlitWF
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
+                    // Color を sRGB -> Linear 変換して再設定する
+                    if (material.HasProperty("_Color"))
+                    {
+                        var idx = oldShader.FindPropertyIndex("_Color");
+                        if (0 <= idx)
+                        {
+                            var flags = oldShader.GetPropertyFlags(idx);
+                            if (!flags.HasFlag(UnityEngine.Rendering.ShaderPropertyFlags.HDR))
+                            {
+                                var val = material.GetColor("_Color");
+                                material.SetColor("_Color", val.linear);
+                            }
+                        }
+
+                    }
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
                     if (material.HasProperty("_EmissionColor"))
                     {
