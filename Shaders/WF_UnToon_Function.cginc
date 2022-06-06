@@ -540,12 +540,14 @@ FEATURE_TGL_END
 
 FEATURE_TGL_ON_BEGIN(_NS_Enable)
             // 2nd NormalMap
-            float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
             float2 uv_dtl = _NS_2ndUVType == 1 ? i.uv_lmap : i.uv;
             float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
 
             // 法線計算
             ws_detail_normal = transformTangentToWorldNormal(dtlNormalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
+
+            float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
+            ws_detail_normal = lerpNormals(i.normal, ws_detail_normal, dtlPower);
 FEATURE_TGL_END
         }
 
@@ -615,10 +617,10 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
             // Metallic描画
             if (0.01 < metallic) {
             float3 ws_metal_normal = ws_normal;
-#ifdef _NM_Enable
+#ifdef _NM_ENABLE
             ws_metal_normal = lerpNormals(ws_metal_normal, ws_bump_normal, _MT_BlendNormal);
 #endif
-#ifdef _NS_Enable
+#ifdef _NS_ENABLE
             ws_metal_normal = lerpNormals(ws_metal_normal, ws_detail_normal, _MT_BlendNormal2);
 #endif
                 float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
@@ -955,10 +957,10 @@ FEATURE_TGL_ON_BEGIN(_TS_Enable)
 
             // 陰用法線とライト方向から Harf-Lambert
             float3 ws_shade_normal = ws_normal;
-#ifdef _NM_Enable
+#ifdef _NM_ENABLE
             ws_shade_normal = lerpNormals(ws_shade_normal, ws_bump_normal, _TS_BlendNormal);
 #endif
-#ifdef _NS_Enable
+#ifdef _NS_ENABLE
             ws_shade_normal = lerpNormals(ws_shade_normal, ws_detail_normal, _TS_BlendNormal2);
 #endif
             float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
