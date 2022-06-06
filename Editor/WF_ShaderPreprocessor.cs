@@ -31,6 +31,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Rendering;
 using UnityEngine;
@@ -377,9 +378,12 @@ namespace UnlitWF
                     .ToList();
                 materialCount = materials.Count;
 
-                foreach (var mat in materials)
+                // 使っているバリアントを記録
+                AppendUsedShaderVariant(materials);
+                // ついでにシーンにあるマテリアルの検査もこのタイミングで行う。検査するだけで特に動作に影響しない。
+                if (settings.validateSceneMaterials)
                 {
-                    AppendUsedShaderVariant(mat, mat.shader);
+                    ValidateMaterials(materials);
                 }
 
                 sw.Stop();
@@ -399,6 +403,14 @@ namespace UnlitWF
 
                 Debug.LogFormat("[WF][Preprocess] fnish scene material scanning: {0} ms, {1} materials, {2} usedShaderVariantList", sw.ElapsedMilliseconds, materialCount, result.Count);
                 return result;
+            }
+
+            private void AppendUsedShaderVariant(IEnumerable<Material> mats)
+            {
+                foreach (var mat in mats)
+                {
+                    AppendUsedShaderVariant(mat, mat.shader);
+                }
             }
 
             private void AppendUsedShaderVariant(Material mat, Shader shader)
@@ -421,6 +433,26 @@ namespace UnlitWF
                             AppendUsedShaderVariant(mat, fallback);
                         }
                     }
+                }
+            }
+
+            private void ValidateMaterials(IEnumerable<Material> mats)
+            {
+                foreach (var mat in mats)
+                {
+                    ValidateMaterials(mat);
+                }
+            }
+
+            private void ValidateMaterials(Material mat)
+            {
+                if (WFCommonUtility.IsMigrationRequiredMaterial(mat))
+                {
+                    Debug.LogWarningFormat(mat, "[WF][Preprocess] {0}, mat = {1}", WFI18N.Translate(WFMessageText.LgWarnOlderVersion), mat);
+                }
+                if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android && WFCommonUtility.IsMobileSupportedShader(mat))
+                {
+                    Debug.LogWarningFormat(mat, "[WF][Preprocess] {0}, mat = {1}", WFI18N.Translate(WFMessageText.LgWarnNotSupportAndroid), mat);
                 }
             }
         }

@@ -432,6 +432,8 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダのバージョンが更新されました。\nプロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
             new WFI18NTranslation(WFMessageText.DgMigrationManual, "プロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
 
+            new WFI18NTranslation(WFMessageText.LgWarnOlderVersion, "古いバージョンで作成されたマテリアルがあります。"),
+            new WFI18NTranslation(WFMessageText.LgWarnNotSupportAndroid, "Android非対応のシェーダが使われているマテリアルがあります。"),
 
             new WFI18NTranslation(WFMessageButton.Cleanup, "マテリアルから不要データを削除"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "テンプレートから適用"),
@@ -725,6 +727,8 @@ namespace UnlitWF
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
         public static readonly string DgMigrationAuto = "The version of the UnlitWF shader has been updated.\nDo you want to scan the materials in your project and update them to the latest material values?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
+        public static readonly string LgWarnOlderVersion = "A material was created with an older shader version.";
+        public static readonly string LgWarnNotSupportAndroid = "A material uses a shader that is not supported by Android.";
     }
 
     internal static class WFMessageButton

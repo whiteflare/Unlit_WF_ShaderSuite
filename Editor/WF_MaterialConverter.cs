@@ -704,12 +704,15 @@ namespace UnlitWF.Converter
 
         public static bool ExistsNeedsMigration(Material mat)
         {
-            var props = ShaderSerializedProperty.AsDict(mat);
-            foreach (var map in OldPropNameToNewPropNameList)
+            if (mat != null)
             {
-                if (props.ContainsKey(map.beforeName))
+                var props = ShaderSerializedProperty.AsDict(mat);
+                foreach (var map in OldPropNameToNewPropNameList)
                 {
-                    return true;
+                    if (props.ContainsKey(map.beforeName))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
