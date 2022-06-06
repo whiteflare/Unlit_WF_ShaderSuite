@@ -17,6 +17,7 @@
 
 #if UNITY_EDITOR
 
+using System.Linq;
 using UnityEditor;
 
 namespace UnlitWF
@@ -25,13 +26,13 @@ namespace UnlitWF
     {
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
         {
+            // マテリアルのマイグレーション
             Converter.ScanAndMigrationExecutor.Migration(importedAssets);
-        }
-
-        [InitializeOnLoadMethod]
-        public static void ExecuteAuto()
-        {
-            Converter.ScanAndMigrationExecutor.ExecuteAuto();
+            // もしshaderファイルがimportされたなら、そのタイミングで全スキャンも動作させる
+            if (importedAssets.Any(path => path != null && path.EndsWith(".shader", System.StringComparison.InvariantCultureIgnoreCase)))
+            {
+                Converter.ScanAndMigrationExecutor.ExecuteAuto();
+            }
         }
     }
 }
