@@ -50,39 +50,69 @@ namespace UnlitWF
 
         #region マテリアル列挙系(プロジェクトから)
 
-        public string[] GetProjectAllMaterialPaths()
+        public IEnumerable<string> GetProjectAllMaterialPaths(params string[] folderPaths)
         {
-            return AssetDatabase.FindAssets("t:Material")
-                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
-                .Distinct().ToArray();
+            return (folderPaths.Length == 0 ?
+                    AssetDatabase.FindAssets("t:Material") :
+                    AssetDatabase.FindAssets("t:Material", folderPaths))
+                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                        .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
+                        .Distinct();
+        }
+
+        public IEnumerable<string> GetProjectAllMaterialTemplatePaths(params string[] folderPaths)
+        {
+            return (folderPaths.Length == 0 ?
+                    AssetDatabase.FindAssets("t:" + nameof(WFMaterialTemplate)) :
+                    AssetDatabase.FindAssets("t:" + nameof(WFMaterialTemplate), folderPaths))
+                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                        .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".asset"))
+                        .Distinct();
         }
 
         public int SeekProjectAllMaterial(string title, System.Func<Material, bool> action)
         {
+            return VisitMaterials<Material>(title, GetProjectAllMaterialPaths().ToArray(), mat => mat, action)
+                + VisitMaterials<WFMaterialTemplate>(title, GetProjectAllMaterialTemplatePaths().ToArray(), tmp => tmp.material, action);
+        }
+
+        private int VisitMaterials<T>(string title, string[] path, System.Func<T, Material> load, System.Func<Material, bool> action) where T : UnityEngine.Object
+        {
             int done = 0;
-            var paths = GetProjectAllMaterialPaths();
-            if (0 < paths.Length)
+            if (0 < path.Length)
             {
                 int current = 0;
-                for (int i = 0; i < paths.Length; i++)
+                for (int i = 0; i < path.Length; i++)
                 {
-                    if (!string.IsNullOrWhiteSpace(paths[i]))
+                    if (VisitMaterial<T>(path[i], load, action))
                     {
-                        var mat = AssetDatabase.LoadAssetAtPath<Material>(paths[i]);
-                        if (action(mat))
-                        {
-                            done++;
-                        }
+                        done++;
                     }
-                    if (++current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar("WF", title, current / (float)paths.Length))
+                    if (++current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar("WF", title, current / (float)path.Length))
                     {
                         break;
                     }
                 }
-                EditorUtility.ClearProgressBar();
             }
+            EditorUtility.ClearProgressBar();
             return done;
+        }
+
+        private bool VisitMaterial<T>(string path, System.Func<T, Material> load, System.Func<Material, bool> action) where T : UnityEngine.Object
+        {
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+                if (asset != null)
+                {
+                    var mat = load(asset);
+                    if (mat != null && action(mat))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         #endregion
@@ -101,7 +131,9 @@ namespace UnlitWF
             if ((mode & MatSelectMode.FromAsset) != 0)
             {
                 // Materialアセット自体
-                result.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
+                GetAllMaterials(Selection.GetFiltered<Material>(SelectionMode.Assets), result);
+                // MaterialTemplate
+                GetAllMaterials(Selection.GetFiltered<WFMaterialTemplate>(SelectionMode.Assets), result);
             }
             // サブフォルダ含めて
             if ((mode & MatSelectMode.FromAssetDeep) == MatSelectMode.FromAssetDeep)
@@ -114,13 +146,48 @@ namespace UnlitWF
                     .ToArray();
                 if (0 < folders.Length)
                 {
-                    result.AddRange(
-                        AssetDatabase.FindAssets("t:Material", folders)
-                            .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                            .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
-                            .Distinct()
-                            .Select(path => AssetDatabase.LoadAssetAtPath<Material>(path))
-                            .Where(mat => mat != null));
+                    GetAllMaterials(folders, result);
+                }
+            }
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(string[] folderPaths, List<Material> result = null)
+        {
+            InitList(ref result);
+            result.AddRange(
+                GetProjectAllMaterialPaths(folderPaths)
+                    .Select(path => AssetDatabase.LoadAssetAtPath<Material>(path))
+                    .Where(mat => mat != null));
+            result.AddRange(
+                GetProjectAllMaterialTemplatePaths(folderPaths)
+                    .Select(path => AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(path))
+                    .Where(temp => temp != null && temp.material != null)
+                    .Select(temp => temp.material));
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(Material[] mats, List<Material> result = null)
+        {
+            InitList(ref result);
+            foreach (var mat in mats)
+            {
+                if (mat != null)
+                {
+                    result.Add(mat);
+                }
+            }
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(WFMaterialTemplate[] temps, List<Material> result = null)
+        {
+            InitList(ref result);
+            foreach (var temp in temps)
+            {
+                if (temp != null && temp.material != null)
+                {
+                    result.Add(temp.material);
                 }
             }
             return result;
