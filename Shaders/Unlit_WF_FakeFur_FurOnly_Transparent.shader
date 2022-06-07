@@ -83,7 +83,6 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
             _TS_1stFeather          ("[SH] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[SH] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[SH] 3rd Feather", Range(0, 0.2)) = 0.05
-            _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]

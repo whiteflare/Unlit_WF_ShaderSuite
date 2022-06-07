@@ -66,7 +66,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
-            _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
@@ -82,7 +81,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
@@ -116,7 +114,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _TS_1stFeather          ("[SH] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[SH] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[SH] 3rd Feather", Range(0, 0.2)) = 0.05
-            _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
@@ -131,7 +128,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _TR_BlendType           ("[RM] Blend Type", Float) = 0
             _TR_Power               ("[RM] Power", Range(0, 2)) = 1
             _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
-            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[RM] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
