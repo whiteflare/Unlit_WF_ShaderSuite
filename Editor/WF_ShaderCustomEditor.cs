@@ -40,7 +40,7 @@ namespace UnlitWF
                 }
             } , null),
             // _TS_Feather の直前に設定ボタンを追加する
-            new CustomPropertyHook("_TS_Feather", ctx => {
+            new CustomPropertyHook("_TS_Feather|_TS_1stFeather", ctx => {
                 if (GetShadowStepsFromMaterial(WFCommonUtility.AsMaterials(ctx.editor.targets)) < 2) {
                     return;
                 }
