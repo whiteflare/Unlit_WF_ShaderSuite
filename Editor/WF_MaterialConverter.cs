@@ -741,12 +741,16 @@ namespace UnlitWF.Converter
                     if (GetIntOrDefault(ctx.oldMaterial, "_NS_Enable") == 0 && GetIntOrDefault(ctx.target, "_NS_Enable") != 0)
                     {
                         // BlendNormalを複製する
-                        foreach(var pn in ctx.oldProps.Keys)
+                        foreach(var propName in ctx.oldProps.Keys)
                         {
-                            if (WFCommonUtility.FormatPropName(pn, out var label, out var name)) {
-                                if (name == "BlendNormal")
+                            if (WFCommonUtility.FormatPropName(propName, out var label, out var name)) {
+                                if (name == "BlendNormal" && ctx.target.HasProperty(propName))
                                 {
-                                    ctx.target.SetFloat(pn.Replace("_BlendNormal", "_BlendNormal2"), ctx.target.GetFloat(pn));
+                                    var propName2 = propName.Replace("_BlendNormal", "_BlendNormal2");
+                                    if (ctx.target.HasProperty(propName2))
+                                    {
+                                        ctx.target.SetFloat(propName2, ctx.target.GetFloat(propName));
+                                    }
                                 }
                             }
                         }
