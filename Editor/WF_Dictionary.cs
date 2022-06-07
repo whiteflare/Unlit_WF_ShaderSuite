@@ -314,7 +314,9 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "1st Border", "1影の境界位置"),
             new WFI18NTranslation("SH", "2nd Border", "2影の境界位置"),
             new WFI18NTranslation("SH", "3rd Border", "3影の境界位置"),
-            new WFI18NTranslation("SH", "Feather", "境界のぼかし強度"),
+            new WFI18NTranslation("SH", "1st Feather", "1影の境界ぼかし強度"),
+            new WFI18NTranslation("SH", "2nd Feather", "2影の境界ぼかし強度"),
+            new WFI18NTranslation("SH", "3rd Feather", "3影の境界ぼかし強度"),
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture", "アンチシャドウマスク"),
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture (R)", "アンチシャドウマスク (R)"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "影色を自動設定する"),
@@ -476,6 +478,7 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
             new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
             new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
+            new WFI18NTranslation("SH", "Feather", "境界のぼかし強度"),
         };
 
 

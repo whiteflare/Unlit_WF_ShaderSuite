@@ -694,6 +694,7 @@ namespace UnlitWF.Converter
             new PropertyNameReplacement("_NM_2ndUVType", "_NS_UVType"),
             new PropertyNameReplacement("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
             new PropertyNameReplacement("_NM_InvMaskVal", "_NS_InvMaskVal"),
+            new PropertyNameReplacement("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
             // new OldPropertyReplacement("_FurVector", "_FR_Vector"), // FurVectorの値は再設定が必要なので変換しない
         };
 
@@ -727,6 +728,14 @@ namespace UnlitWF.Converter
             return _default;
         }
 
+        protected static void CopyFloatValue(Material mat, string from, string to)
+        {
+            if (mat.HasProperty(from) && mat.HasProperty(to))
+            {
+                mat.SetFloat(to, mat.GetFloat(from));
+            }
+        }
+
         protected static List<Action<ConvertContext>> CreateConverterList()
         {
             return new List<Action<ConvertContext>>()
@@ -744,13 +753,10 @@ namespace UnlitWF.Converter
                         foreach(var propName in ctx.oldProps.Keys)
                         {
                             if (WFCommonUtility.FormatPropName(propName, out var label, out var name)) {
-                                if (name == "BlendNormal" && ctx.target.HasProperty(propName))
+                                if (name == "BlendNormal")
                                 {
                                     var propName2 = propName.Replace("_BlendNormal", "_BlendNormal2");
-                                    if (ctx.target.HasProperty(propName2))
-                                    {
-                                        ctx.target.SetFloat(propName2, ctx.target.GetFloat(propName));
-                                    }
+                                    CopyFloatValue(ctx.target, propName, propName2);
                                 }
                             }
                         }
@@ -759,6 +765,14 @@ namespace UnlitWF.Converter
                         {
                             ctx.target.SetInt("_NM_Enable", 0);
                         }
+                    }
+                },
+                ctx => {
+                    // _TS_Featherありの状態から_TS_1stFeatherに変更されたならば、
+                    if (HasCustomValue(ctx, "_TS_Feather") && HasCustomValue(ctx, "_TS_1stFeather"))
+                    {
+                        CopyFloatValue(ctx.target, "_TS_1stFeather", "_TS_2ndFeather");
+                        CopyFloatValue(ctx.target, "_TS_1stFeather", "_TS_3rdFeather");
                     }
                 },
                 ctx => {

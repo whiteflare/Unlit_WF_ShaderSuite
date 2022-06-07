@@ -258,7 +258,9 @@
     float           _TS_1stBorder;
     float           _TS_2ndBorder;
     float           _TS_3rdBorder;
-    float           _TS_Feather;
+    float           _TS_1stFeather;
+    float           _TS_2ndFeather;
+    float           _TS_3rdFeather;
     float           _TS_BlendNormal;
     float           _TS_BlendNormal2;
     float           _TS_InvMaskVal;

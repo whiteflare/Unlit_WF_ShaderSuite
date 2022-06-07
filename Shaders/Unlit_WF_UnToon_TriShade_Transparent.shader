@@ -186,7 +186,9 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
             _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
             _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
-            _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
+            _TS_1stFeather          ("[SH] 1st Feather", Range(0, 0.2)) = 0.05
+            _TS_2ndFeather          ("[SH] 2nd Feather", Range(0, 0.2)) = 0.05
+            _TS_3rdFeather          ("[SH] 3rd Feather", Range(0, 0.2)) = 0.05
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
             _TS_BlendNormal2        ("[SH] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
