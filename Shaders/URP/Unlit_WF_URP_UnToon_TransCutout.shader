@@ -81,7 +81,7 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
         [WFHeaderToggle(Detail NormalMap)]
             _NS_Enable              ("[NS] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _NS_2ndUVType           ("[NS] 2nd Normal UV Type", Float) = 0
+            _NS_UVType              ("[NS] 2nd Normal UV Type", Float) = 0
             _DetailNormalMap        ("[NS] 2nd NormalMap Texture", 2D) = "bump" {}
             _DetailNormalMapScale   ("[NS] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]

@@ -540,7 +540,7 @@ FEATURE_TGL_END
 
 FEATURE_TGL_ON_BEGIN(_NS_Enable)
             // 2nd NormalMap
-            float2 uv_dtl = _NS_2ndUVType == 1 ? i.uv_lmap : i.uv;
+            float2 uv_dtl = _NS_UVType == 1 ? i.uv_lmap : i.uv;
             float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
 
             // 法線計算

@@ -162,8 +162,7 @@
 
 #ifndef _WF_MOBILE
     FEATURE_TGL     (_NS_Enable);
-    uint            _NS_2ndType;
-    uint            _NS_2ndUVType;
+    uint            _NS_UVType;
     float4          _DetailNormalMap_ST;
     float           _DetailNormalMapScale;
     float           _NS_InvMaskVal;

@@ -691,7 +691,7 @@ namespace UnlitWF.Converter
             new PropertyNameReplacement("_Smoothing", "_TE_SmoothPower"),
             new PropertyNameReplacement("_NM_FlipMirror", "_FlipMirror"),   // NS追加に合わせてFlipMirrorはラベルなしに変更する
             new PropertyNameReplacement("_NM_2ndType", "_NS_Enable", p => p.IntValue = p.IntValue != 0 ? 1 : 0),
-            new PropertyNameReplacement("_NM_2ndUVType", "_NS_2ndUVType"),
+            new PropertyNameReplacement("_NM_2ndUVType", "_NS_UVType"),
             new PropertyNameReplacement("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
             new PropertyNameReplacement("_NM_InvMaskVal", "_NS_InvMaskVal"),
             // new OldPropertyReplacement("_FurVector", "_FR_Vector"), // FurVectorの値は再設定が必要なので変換しない
