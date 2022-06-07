@@ -47,6 +47,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
             _BK_Enable              ("[BK] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _BK_UVType              ("[BK] UV Type", Float) = 0
             _BK_BackTex             ("[BK] Back Texture", 2D) = "white" {}
         [HDR]
             _BK_BackColor           ("[BK] Back Color", Color) = (1, 1, 1, 1)

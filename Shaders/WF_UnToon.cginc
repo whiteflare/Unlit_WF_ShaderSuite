@@ -129,7 +129,7 @@
 #endif
 
         // メイン
-        affectBaseColor(i.uv, facing, uv_main, color);
+        affectBaseColor(i.uv, i.uv_lmap, facing, uv_main, color);
         // 頂点カラー
         affectVertexColor(i.vertex_color, color);
 

@@ -89,6 +89,7 @@
     FEATURE_TGL     (_BK_Enable);
     float4          _BK_BackTex_ST;
     float4          _BK_BackColor;
+    uint            _BK_UVType;
 #endif
 
     // -------------------------

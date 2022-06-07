@@ -133,24 +133,25 @@
     }
 
     #ifdef _BK_ENABLE
-        void affectBackTex(float2 uv, uint facing, inout float4 color) {
+        void affectBackTex(float2 uv, float2 uv2, uint facing, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_BK_Enable)
             if (!facing) {
-                float2 uv_back = TRANSFORM_TEX(uv, _BK_BackTex);
+                float2 uv_back = _BK_UVType == 1 ? uv2 : uv;
+                uv_back = TRANSFORM_TEX(uv_back, _BK_BackTex);
                 color = PICK_MAIN_TEX2D(_BK_BackTex, uv_back) * _BK_BackColor;
             }
 FEATURE_TGL_END
         }
     #else
-        #define affectBackTex(uv, facing, color)
+        #define affectBackTex(uv, uv2, facing, color)
     #endif
 
-    void affectBaseColor(float2 uv, uint facing, out float2 uv_main, out float4 color) {
+    void affectBaseColor(float2 uv, float2 uv2, uint facing, out float2 uv_main, out float4 color) {    // ShadowCasterがv2f_shadowを使うので、ここではv2fを引数にしない
         color = _Color;
         // メイン
         affectMainTex(uv, uv_main, color);
         // バック
-        affectBackTex(uv, facing, color);
+        affectBackTex(uv, uv2, facing, color);
     }
 
     #ifdef _VC_ENABLE
