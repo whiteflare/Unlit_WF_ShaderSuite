@@ -864,7 +864,7 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static void DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null)
+        public static Rect DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null)
         {
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
@@ -878,6 +878,18 @@ namespace UnlitWF
             position = EditorGUI.IndentedRect(position);
             GUI.Box(position, text, style);
 
+            // ヘルプテキスト
+            var helpText = WFI18N.Translate(text);
+            if (!string.IsNullOrWhiteSpace(helpText) && helpText != text) {
+                var titleSize = style.CalcSize(new GUIContent(text));
+                var rect = new Rect(position.x + titleSize.x + 24, position.y, position.width - titleSize.x - 24, 16f);
+                var style2 = new GUIStyle(EditorStyles.label);
+                style2.fontSize = style.fontSize - 1;
+                style2.contentOffset = new Vector2(4, 1);
+                GUI.Label(rect, helpText, style2);
+            }
+
+            // コンテキストメニュー
             if (menu != null)
             {
                 var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
@@ -887,6 +899,8 @@ namespace UnlitWF
                     menu.DropDown(rect);
                 }
             }
+
+            return position;
         }
 
         /// <summary>
@@ -896,19 +910,9 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static void DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, GenericMenu menu = null)
+        public static Rect DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, GenericMenu menu = null)
         {
-            // SurikenStyleHeader
-            var style = new GUIStyle("ShurikenModuleTitle");
-            style.font = EditorStyles.boldLabel.font;
-            style.fontSize += 2;
-            style.fontStyle = FontStyle.Bold;
-            style.fixedHeight = 20;
-            style.contentOffset = new Vector2(20, -2);
-            // Draw
-            position.y += 8;
-            position = EditorGUI.IndentedRect(position);
-            GUI.Box(position, text, style);
+            position = DrawShurikenStyleHeader(position, text, menu);
 
             if (alwaysOn)
             {
@@ -948,15 +952,7 @@ namespace UnlitWF
                 }
             }
 
-            if (menu != null)
-            {
-                var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
-                if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel))
-                {
-                    Event.current.Use();
-                    menu.DropDown(rect);
-                }
-            }
+            return position;
         }
 
         /// <summary>
@@ -1423,6 +1419,11 @@ namespace UnlitWF
             this.text = text;
         }
 
+        public MaterialWFHeaderDecorator(string text, string helptext)
+        {
+            this.text = text;
+        }
+
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
             return 32;
@@ -1446,6 +1447,11 @@ namespace UnlitWF
             this.text = text;
         }
 
+        public MaterialWFHeaderToggleDrawer(string text, string helptext)
+        {
+            this.text = text;
+        }
+
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
             return 32;
@@ -1465,6 +1471,11 @@ namespace UnlitWF
         public readonly string text;
 
         public MaterialWFHeaderAlwaysOnDrawer(string text)
+        {
+            this.text = text;
+        }
+
+        public MaterialWFHeaderAlwaysOnDrawer(string text, string helptext)
         {
             this.text = text;
         }
