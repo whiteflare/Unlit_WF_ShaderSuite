@@ -265,6 +265,8 @@
     float           _TS_BlendNormal2;
     float           _TS_InvMaskVal;
     float           _TS_FixContrast;
+    float           _TS_MinDist;
+    float           _TS_MaxDist;
 
     // -------------------------
 

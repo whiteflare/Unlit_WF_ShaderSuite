@@ -914,28 +914,45 @@ FEATURE_TGL_END
 
     #ifdef _TS_ENABLE
 
+        float calcShadowPower(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor) {
+            float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
+            float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
+            float main = saturate(calcBrightness( lightColorMain ));
+            float sub4 = saturate(calcBrightness( lightColorSub4 ));
+            float ambient = saturate(calcBrightness( ambientColor ));
+
+            // メインライトとそれ以外のライトの明るさの差が影の強さになる
+            float shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
+
+            // メインライトが真上または真下から当たっている場合は影を弱める
+            shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
+
+            // 環境光が強い場合は影を弱める
+            shadow_power = min( shadow_power, 1 - ambient * 0.5 );
+
+            // 距離が離れているときは影を弱める
+            if (TGL_OFF(_GL_DisableBasePos)) {  // BatchingStatic のときには DisableBasePos が ON になるのでそのときは影を弱めない
+                float3 cam_vec = worldSpaceViewPointPos() - calcWorldSpaceBasePos(ws_vertex);
+                float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(cam_vec.xz) );
+                shadow_power = min( shadow_power, 1 - smoothstep(_TS_MinDist, max(_TS_MinDist + NZF, _TS_MaxDist), length(cam_vec)) * saturate(-angle_light_camera) );
+            }
+
+            return shadow_power;
+        }
+
         void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
-#ifdef _WF_LEGACY_FEATURE_SWITCH
+#ifndef _WF_LEGACY_FEATURE_SWITCH
+    #if !defined(_TS_FIXC_ENABLE)
+            shadow_power = calcShadowPower(ws_vertex, ws_light_dir, ambientColor);
+    #else
+            shadow_power = 1;
+    #endif
+#else
             if (TGL_ON(_TS_Enable)) {
                 if (TGL_OFF(_TS_FixContrast)) {
-#endif
-#if !defined(_TS_FIXC_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
-                float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
-                float main = saturate(calcBrightness( lightColorMain ));
-                float sub4 = saturate(calcBrightness( lightColorSub4 ));
-                float ambient = saturate(calcBrightness( ambientColor ));
-                shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
-                shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
-                shadow_power = min( shadow_power, 1 - ambient * 0.5 );
-#endif
-#ifdef _WF_LEGACY_FEATURE_SWITCH
+                    shadow_power = calcShadowPower(ws_vertex, ws_light_dir, ambientColor);
                 } else {
-#endif
-#if defined(_TS_FIXC_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                shadow_power = 1;
-#endif
-#ifdef _WF_LEGACY_FEATURE_SWITCH
+                    shadow_power = 1;
                 }
             } else {
                 shadow_power = 0;

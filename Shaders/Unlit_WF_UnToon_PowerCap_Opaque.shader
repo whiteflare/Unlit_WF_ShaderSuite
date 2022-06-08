@@ -241,6 +241,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
         [NoScaleOffset]
             _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
+            _TS_MinDist             ("[SH] FadeOut Distance (Near)", Range(0, 15)) = 1.0
+            _TS_MaxDist             ("[SH] FadeOut Distance (Far)", Range(0, 15)) = 4.0
         [Toggle(_)]
             _TS_FixContrast         ("[SH] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1

@@ -95,6 +95,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
             _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
+            _TS_MinDist             ("[SH] FadeOut Distance (Near)", Range(0, 15)) = 1.0
+            _TS_MaxDist             ("[SH] FadeOut Distance (Far)", Range(0, 15)) = 4.0
         [Toggle(_)]
             _TS_FixContrast         ("[SH] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
