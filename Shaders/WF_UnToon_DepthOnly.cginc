@@ -34,6 +34,7 @@
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
         float3 normal           : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
@@ -41,6 +42,7 @@
     struct v2f_depth {
         float4 vs_vertex              : SV_POSITION;
         float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
 #ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR0;
 #endif
@@ -66,7 +68,8 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.vs_vertex = UnityObjectToClipPos(i.vertex.xyz);
-        o.uv        = TRANSFORM_TEX(i.uv, _MainTex);
+        o.uv = v.uv;
+        o.uv_lmap = v.uv_lmap;
 #ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = i.vertex_color;
 #endif
@@ -86,7 +89,7 @@
             float2 uv_main;
 
             // メイン
-            affectBaseColor(i.uv, facing, uv_main, color);
+            affectBaseColor(i.uv, i.uv_lmap, facing, uv_main, color);
             // 頂点カラー
             affectVertexColor(i.vertex_color, color);
 

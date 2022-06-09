@@ -49,7 +49,7 @@
         #define WF_TEX2D_NORMAL_DTL(uv)         UnpackScaleNormal( PICK_MAIN_TEX2D(_DetailNormalMap, uv), _DetailNormalMapScale ).xyz
     #endif
     #ifndef WF_TEX2D_NORMAL_DTL_MASK
-        #define WF_TEX2D_NORMAL_DTL_MASK(uv)    SAMPLE_MASK_VALUE(_NM_2ndMaskTex, uv, _NM_InvMaskVal).r
+        #define WF_TEX2D_NORMAL_DTL_MASK(uv)    SAMPLE_MASK_VALUE(_NS_2ndMaskTex, uv, _NS_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_METAL_GLOSS
@@ -133,24 +133,25 @@
     }
 
     #ifdef _BK_ENABLE
-        void affectBackTex(float2 uv, uint facing, inout float4 color) {
+        void affectBackTex(float2 uv, float2 uv2, uint facing, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_BK_Enable)
             if (!facing) {
-                float2 uv_back = TRANSFORM_TEX(uv, _BK_BackTex);
+                float2 uv_back = _BK_UVType == 1 ? uv2 : uv;
+                uv_back = TRANSFORM_TEX(uv_back, _BK_BackTex);
                 color = PICK_MAIN_TEX2D(_BK_BackTex, uv_back) * _BK_BackColor;
             }
 FEATURE_TGL_END
         }
     #else
-        #define affectBackTex(uv, facing, color)
+        #define affectBackTex(uv, uv2, facing, color)
     #endif
 
-    void affectBaseColor(float2 uv, uint facing, out float2 uv_main, out float4 color) {
+    void affectBaseColor(float2 uv, float2 uv2, uint facing, out float2 uv_main, out float4 color) {    // ShadowCasterがv2f_shadowを使うので、ここではv2fを引数にしない
         color = _Color;
         // メイン
         affectMainTex(uv, uv_main, color);
         // バック
-        affectBackTex(uv, facing, color);
+        affectBackTex(uv, uv2, facing, color);
     }
 
     #ifdef _VC_ENABLE
@@ -495,34 +496,13 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _NM_ENABLE
+
         float3 calcBumpNormal(v2f i, float2 uv_main) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_NM_Enable)) {
 #endif
                 // 1st NormalMap
                 float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
-
-#ifndef _WF_MOBILE
-
-#if defined(_NM_BL2ND_ENABLE) || defined(_NM_SW2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                // 2nd NormalMap
-                float dtlPower = _NM_2ndType == 0 ? 0 : WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-                float2 uv_dtl = _NM_2ndUVType == 1 ? i.uv_lmap : i.uv;
-                float3 dtlNormalTangent = _NM_2ndType == 0 ? float3(0, 0, 1) : WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
-#if defined(_WF_LEGACY_FEATURE_SWITCH)
-                if (_NM_2ndType == 1) { // BLEND
-#endif
-#if defined(_NM_BL2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                    dtlNormalTangent = BlendNormals(normalTangent, dtlNormalTangent);
-#endif
-#if defined(_WF_LEGACY_FEATURE_SWITCH)
-                }
-#endif
-                normalTangent = lerpNormals(normalTangent, dtlNormalTangent, dtlPower);
-#endif
-
-#endif
-
                 // 法線計算
                 return transformTangentToWorldNormal(normalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
 
@@ -544,9 +524,36 @@ FEATURE_TGL_ON_BEGIN(_NM_Enable)
             color.rgb *= max(0.0, 1.0 + (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(i.normal, i.ws_light_dir.xyz)) * _NM_Power * 2);
 FEATURE_TGL_END
         }
+
     #else
         #define calcBumpNormal(i, uv_main) i.normal
         #define affectBumpNormal(i, uv_main, ws_bump_normal, color)  ws_bump_normal = i.normal
+    #endif
+
+    ////////////////////////////
+    // Detail Normal Map
+    ////////////////////////////
+
+    #ifdef _NS_ENABLE
+
+        void affectDetailNormal(v2f i, float2 uv_main, out float3 ws_detail_normal, inout float4 color) {
+            ws_detail_normal = i.normal;
+
+FEATURE_TGL_ON_BEGIN(_NS_Enable)
+            // 2nd NormalMap
+            float2 uv_dtl = _NS_UVType == 1 ? i.uv_lmap : i.uv;
+            float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
+
+            // 法線計算
+            ws_detail_normal = transformTangentToWorldNormal(dtlNormalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
+
+            float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
+            ws_detail_normal = lerpNormals(i.normal, ws_detail_normal, dtlPower);
+FEATURE_TGL_END
+        }
+
+    #else
+        #define affectDetailNormal(i, uv_main, ws_detail_normal, color)  ws_detail_normal = i.normal
     #endif
 
     ////////////////////////////
@@ -592,7 +599,7 @@ FEATURE_TGL_END
             return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
         }
 
-        void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+        void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_MT_Enable)
             float metallic = _MT_Metallic;
             float monochrome = _MT_Monochrome;
@@ -610,7 +617,13 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
 
             // Metallic描画
             if (0.01 < metallic) {
-                float3 ws_metal_normal = lerpNormals(ws_normal, ws_bump_normal, _MT_BlendNormal);
+            float3 ws_metal_normal = ws_normal;
+#ifdef _NM_ENABLE
+            ws_metal_normal = lerpNormals(ws_metal_normal, ws_bump_normal, _MT_BlendNormal);
+#endif
+#ifdef _NS_ENABLE
+            ws_metal_normal = lerpNormals(ws_metal_normal, ws_detail_normal, _MT_BlendNormal2);
+#endif
                 float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
                 float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
 
@@ -641,7 +654,7 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
 FEATURE_TGL_END
         }
     #else
-        #define affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color)
+        #define affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, color)
     #endif
 
     ////////////////////////////
@@ -654,6 +667,9 @@ FEATURE_TGL_END
     #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
         #define _MV_HAS_NML
     #endif
+    #if defined(_NS_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        #define _MV_HAS_NML2
+    #endif
 
     struct MatcapVector {
         float3 vs_normal_center;
@@ -663,10 +679,13 @@ FEATURE_TGL_END
 #ifdef _MV_HAS_NML
         float3 diff_normal;
 #endif
+#ifdef _MV_HAS_NML2
+        float3 diff_normal2;
+#endif
     };
     #define WF_TYP_MATVEC   MatcapVector
 
-    WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal) {
+    WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal, in float3 ws_detail_normal) {
         // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
 
         WF_TYP_MATVEC matcapVector;
@@ -704,10 +723,21 @@ FEATURE_TGL_END
         matcapVector.diff_normal = normalize(vs_bump_normal_center) - matcapVector.vs_normal_center;
 #endif
 
+#ifdef _MV_HAS_NML2
+        // ワールド法線をビュー法線に変換
+        float3 vs_detail_normal = mul(float4(ws_detail_normal, 1), UNITY_MATRIX_I_V).xyz;
+        // カメラ位置にて補正する
+        float3 vs_detail_normal_center = matcapViewCorrect(vs_detail_normal, ws_view_dir);
+        // 真上を揃える
+        vs_detail_normal_center.xy = mul( vs_detail_normal_center.xy, rotate );
+        // 正規化して格納
+        matcapVector.diff_normal2 = normalize(vs_detail_normal_center) - matcapVector.vs_normal_center;
+#endif
+
         return matcapVector;
     }
 
-    float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
+    float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float normal2, float parallax) {
         float3 vs_normal = matcapVector.vs_normal_center;
 #ifdef _MV_HAS_PARALLAX
         vs_normal += matcapVector.diff_parallax * parallax;
@@ -715,7 +745,14 @@ FEATURE_TGL_END
 #ifdef _MV_HAS_NML
         vs_normal += matcapVector.diff_normal * normal;
 #endif
+#ifdef _MV_HAS_NML2
+        vs_normal += matcapVector.diff_normal2 * normal2;
+#endif
         return SafeNormalizeVec3(vs_normal);
+    }
+
+    float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
+        return calcMatcapVector(matcapVector, normal, normal, parallax);
     }
 
     void calcMatcapColor(
@@ -765,7 +802,8 @@ FEATURE_TGL_END
     #define WF_CALC_MATCAP_COLOR(id)                                                                                                                        \
         FEATURE_TGL_ON_BEGIN(_HL_Enable##id)                                                                                                                \
                     calcMatcapColor(                                                                                                                        \
-                        PICK_MAIN_TEX2D(_HL_MatcapTex##id, saturate(calcMatcapVector(matcapVector, _HL_BlendNormal##id, _HL_Parallax##id).xy * 0.5 + 0.5)), \
+                        PICK_MAIN_TEX2D(_HL_MatcapTex##id,                                                                                                  \
+                        saturate(calcMatcapVector(matcapVector, _HL_BlendNormal##id, _HL_BlendNormal2##id, _HL_Parallax##id).xy * 0.5 + 0.5)),              \
                         SAMPLE_MASK_VALUE(_HL_MaskTex##id, uv_main, _HL_InvMaskVal##id).rgb,                                                                \
                         _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);    \
         FEATURE_TGL_END
@@ -876,28 +914,45 @@ FEATURE_TGL_END
 
     #ifdef _TS_ENABLE
 
+        float calcShadowPower(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor) {
+            float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
+            float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
+            float main = saturate(calcBrightness( lightColorMain ));
+            float sub4 = saturate(calcBrightness( lightColorSub4 ));
+            float ambient = saturate(calcBrightness( ambientColor ));
+
+            // メインライトとそれ以外のライトの明るさの差が影の強さになる
+            float shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
+
+            // メインライトが真上または真下から当たっている場合は影を弱める
+            shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
+
+            // 環境光が強い場合は影を弱める
+            shadow_power = min( shadow_power, 1 - ambient * 0.5 );
+
+            // 距離が離れているときは影を弱める
+            if (TGL_OFF(_GL_DisableBasePos)) {  // BatchingStatic のときには DisableBasePos が ON になるのでそのときは影を弱めない
+                float3 cam_vec = worldSpaceViewPointPos() - calcWorldSpaceBasePos(ws_vertex);
+                float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(cam_vec.xz) );
+                shadow_power = min( shadow_power, 1 - smoothstep(_TS_MinDist, max(_TS_MinDist + NZF, _TS_MaxDist), length(cam_vec)) * saturate(-angle_light_camera) );
+            }
+
+            return shadow_power;
+        }
+
         void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
-#ifdef _WF_LEGACY_FEATURE_SWITCH
+#ifndef _WF_LEGACY_FEATURE_SWITCH
+    #if !defined(_TS_FIXC_ENABLE)
+            shadow_power = calcShadowPower(ws_vertex, ws_light_dir, ambientColor);
+    #else
+            shadow_power = 1;
+    #endif
+#else
             if (TGL_ON(_TS_Enable)) {
                 if (TGL_OFF(_TS_FixContrast)) {
-#endif
-#if !defined(_TS_FIXC_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
-                float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
-                float main = saturate(calcBrightness( lightColorMain ));
-                float sub4 = saturate(calcBrightness( lightColorSub4 ));
-                float ambient = saturate(calcBrightness( ambientColor ));
-                shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
-                shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
-                shadow_power = min( shadow_power, 1 - ambient * 0.5 );
-#endif
-#ifdef _WF_LEGACY_FEATURE_SWITCH
+                    shadow_power = calcShadowPower(ws_vertex, ws_light_dir, ambientColor);
                 } else {
-#endif
-#if defined(_TS_FIXC_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                shadow_power = 1;
-#endif
-#ifdef _WF_LEGACY_FEATURE_SWITCH
+                    shadow_power = 1;
                 }
             } else {
                 shadow_power = 0;
@@ -905,21 +960,27 @@ FEATURE_TGL_END
 #endif
         }
 
-        void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float brightness, inout float3 shadow_color) {
+        void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float feather, float brightness, inout float3 shadow_color) {
             shadow_color = lerp(
                 max(ZERO_VEC3, lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power)),
                 shadow_color,
-                smoothstep(border, border + max(_TS_Feather, 0.001), brightness) );
+                smoothstep(border, border + max(feather, 0.001), brightness) );
         }
 
-        void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float angle_light_camera, inout float4 color) {
+        void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, float angle_light_camera, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_TS_Enable)
             if (isInMirror()) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
 
             // 陰用法線とライト方向から Harf-Lambert
-            float3 ws_shade_normal = lerpNormals(ws_normal, ws_bump_normal, _TS_BlendNormal);
+            float3 ws_shade_normal = ws_normal;
+#ifdef _NM_ENABLE
+            ws_shade_normal = lerpNormals(ws_shade_normal, ws_bump_normal, _TS_BlendNormal);
+#endif
+#ifdef _NS_ENABLE
+            ws_shade_normal = lerpNormals(ws_shade_normal, ws_detail_normal, _TS_BlendNormal2);
+#endif
             float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
 
             // アンチシャドウマスク加算
@@ -935,25 +996,25 @@ FEATURE_TGL_ON_BEGIN(_TS_Enable)
 #ifndef _WF_LEGACY_FEATURE_SWITCH
 
             // 1影
-            calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+            calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, _TS_1stFeather, brightness, shadow_color);
 
 #if !defined(_TS_STEP1_ENABLE) || defined(_TS_STEP3_ENABLE)
             // 2影
-            calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+            calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, _TS_2ndFeather, brightness, shadow_color);
 #endif
 #if defined(_TS_STEP3_ENABLE)
             // 3影
-            calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
+            calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, _TS_3rdFeather, brightness, shadow_color);
 #endif
 
 #else
             // 1影まで
-            calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, brightness, shadow_color);
+            calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, _TS_1stFeather, brightness, shadow_color);
             if (_TS_Steps == 2 || _TS_Steps == 3) {
-                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, brightness, shadow_color);
+                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, _TS_2ndFeather, brightness, shadow_color);
             }
             if (_TS_Steps == 3) {
-                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, brightness, shadow_color);
+                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, _TS_3rdFeather, brightness, shadow_color);
             }
 #endif
 
@@ -963,7 +1024,7 @@ FEATURE_TGL_END
         }
     #else
         #define calcToonShadeContrast(ws_vertex, ws_light_dir, ambientColor, shadow_power)
-        #define affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color)
+        #define affectToonShade(i, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, angle_light_camera, color)
     #endif
 
     ////////////////////////////
