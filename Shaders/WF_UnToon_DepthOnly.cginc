@@ -68,8 +68,8 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.vs_vertex = UnityObjectToClipPos(i.vertex.xyz);
-        o.uv = v.uv;
-        o.uv_lmap = v.uv_lmap;
+        o.uv = i.uv;
+        o.uv_lmap = i.uv_lmap;
 #ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = i.vertex_color;
 #endif
