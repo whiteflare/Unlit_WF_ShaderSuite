@@ -57,7 +57,9 @@
         // BumpMap
         float3 ws_normal = i.normal;
         float3 ws_bump_normal;
+        float3 ws_detail_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
+        affectDetailNormal(i, uv_main, ws_detail_normal, color);
 
         // ビューポイントへの方向
         float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
@@ -65,10 +67,10 @@
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // matcapベクトルの配列
-        WF_TYP_MATVEC matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
+        WF_TYP_MATVEC matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal, ws_detail_normal);
 
         // メタリック
-        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
+        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, color);
         // Highlight
         affectMatcapColor(matcapVector, uv_main, color);
 

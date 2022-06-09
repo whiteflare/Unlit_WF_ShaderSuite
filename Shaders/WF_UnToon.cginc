@@ -96,7 +96,7 @@
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
 #ifdef _V2F_HAS_TANGENT
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.normal, o.tangent, o.bitangent, _NM_FlipMirror & 1, _NM_FlipMirror & 2);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.normal, o.tangent, o.bitangent, _FlipMirror & 1, _FlipMirror & 2);
 #else
         localNormalToWorldTangentSpace(v.normal, o.normal);
 #endif
@@ -129,7 +129,7 @@
 #endif
 
         // メイン
-        affectBaseColor(i.uv, facing, uv_main, color);
+        affectBaseColor(i.uv, i.uv_lmap, facing, uv_main, color);
         // 頂点カラー
         affectVertexColor(i.vertex_color, color);
 
@@ -140,10 +140,13 @@
 
         // 色変換
         affectColorChange(color);
+
         // BumpMap
         float3 ws_normal = i.normal;
         float3 ws_bump_normal;
+        float3 ws_detail_normal;
         affectBumpNormal(i, uv_main, ws_bump_normal, color);
+        affectDetailNormal(i, uv_main, ws_detail_normal, color);
 
         // ビューポイントへの方向
         float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
@@ -153,20 +156,20 @@
         float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
 
         // matcapベクトルの配列
-        WF_TYP_MATVEC matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal);
+        WF_TYP_MATVEC matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal, ws_detail_normal);
 
         // メタリック
-        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, color);
+        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, color);
         // Highlight
         affectMatcapColor(matcapVector, uv_main, color);
         // ラメ
         affectLame(i, uv_main, ws_normal, color);
         // 階調影
-        affectToonShade(i, uv_main, ws_normal, ws_bump_normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, angle_light_camera, color);
         // リムライト
-        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, _TR_BlendNormal, 0), angle_light_camera, color);
+        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, _TR_BlendNormal, _TR_BlendNormal2, 0), angle_light_camera, color);
         // Overlay Texture
-        affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 0.5), color);
+        affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 1, 0.5), color);
         // Distance Fade
         affectDistanceFade(i, facing, color);
         // Outline

@@ -330,6 +330,11 @@ namespace UnlitWF
             return mat != null && IsMobileSupportedShader(mat.shader);
         }
 
+        public static bool IsMigrationRequiredMaterial(Material mat)
+        {
+            return mat != null && Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat);
+        }
+
         /// <summary>
         /// 最新リリースのVersionInfo
         /// </summary>

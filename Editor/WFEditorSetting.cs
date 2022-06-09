@@ -34,6 +34,7 @@ namespace UnlitWF
         public bool stripFallback = true;
         public bool stripMetaPass = true;
         public bool stripUnusedLodFade = true;
+        public bool validateSceneMaterials = true;
 
         [Header("Editor Behaviour Settings")]
         public bool enableScanProjects = true;
@@ -78,6 +79,7 @@ namespace UnlitWF
         SerializedProperty p_stripFallback;
         SerializedProperty p_stripMetaPass;
         SerializedProperty p_stripUnusedLodFade;
+        SerializedProperty p_validateSceneMaterials;
         SerializedProperty p_enableScanProjects;
 
         private void OnEnable()
@@ -88,6 +90,7 @@ namespace UnlitWF
             this.p_stripUnusedLodFade = serializedObject.FindProperty(nameof(WFEditorSetting.stripUnusedLodFade));
             this.p_stripFallback = serializedObject.FindProperty(nameof(WFEditorSetting.stripFallback));
             this.p_stripMetaPass = serializedObject.FindProperty(nameof(WFEditorSetting.stripMetaPass));
+            this.p_validateSceneMaterials = serializedObject.FindProperty(nameof(WFEditorSetting.validateSceneMaterials));
             this.p_enableScanProjects = serializedObject.FindProperty(nameof(WFEditorSetting.enableScanProjects));
         }
 
@@ -111,6 +114,7 @@ namespace UnlitWF
                 EditorGUILayout.PropertyField(p_stripFallback);
                 EditorGUILayout.PropertyField(p_stripMetaPass);
             }
+            EditorGUILayout.PropertyField(p_validateSceneMaterials);
 
             // Editor Behaviour Settings
 

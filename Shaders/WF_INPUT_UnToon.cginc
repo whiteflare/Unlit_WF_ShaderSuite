@@ -37,7 +37,7 @@
         #endif
     #endif
     #ifndef _V2F_HAS_TANGENT
-        #if defined(_NM_ENABLE)
+        #if defined(_NM_ENABLE) || defined(_NS_ENABLE)
             #define _V2F_HAS_TANGENT
         #endif
     #endif

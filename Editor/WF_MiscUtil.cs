@@ -17,6 +17,15 @@
 
 #if UNITY_EDITOR
 
+#if VRC_SDK_VRCSDK3
+#define ENV_VRCSDK3
+#if UDON
+#define ENV_VRCSDK3_WORLD
+#else
+#define ENV_VRCSDK3_AVATAR
+#endif
+#endif
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -35,50 +44,82 @@ namespace UnlitWF
         FromAssetDeep = 6,
     }
 
-    internal static class MaterialSeeker
+    internal class MaterialSeeker
     {
+        public System.Func<Component, bool> FilterHierarchy = cmp => true;
+
         #region マテリアル列挙系(プロジェクトから)
 
-        public static string[] GetProjectAllMaterialPaths()
+        public IEnumerable<string> GetProjectAllMaterialPaths(params string[] folderPaths)
         {
-            return AssetDatabase.FindAssets("t:Material")
-                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
-                .Distinct().ToArray();
+            return (folderPaths.Length == 0 ?
+                    AssetDatabase.FindAssets("t:Material") :
+                    AssetDatabase.FindAssets("t:Material", folderPaths))
+                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                        .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
+                        .Distinct();
         }
 
-        public static int SeekProjectAllMaterial(string title, System.Func<Material, bool> action)
+        public IEnumerable<string> GetProjectAllMaterialTemplatePaths(params string[] folderPaths)
+        {
+            return (folderPaths.Length == 0 ?
+                    AssetDatabase.FindAssets("t:" + nameof(WFMaterialTemplate)) :
+                    AssetDatabase.FindAssets("t:" + nameof(WFMaterialTemplate), folderPaths))
+                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                        .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".asset"))
+                        .Distinct();
+        }
+
+        public int SeekProjectAllMaterial(string title, System.Func<Material, bool> action)
+        {
+            return VisitMaterials<Material>(title, GetProjectAllMaterialPaths().ToArray(), mat => mat, action)
+                + VisitMaterials<WFMaterialTemplate>(title, GetProjectAllMaterialTemplatePaths().ToArray(), tmp => tmp.material, action);
+        }
+
+        private int VisitMaterials<T>(string title, string[] path, System.Func<T, Material> load, System.Func<Material, bool> action) where T : UnityEngine.Object
         {
             int done = 0;
-            var paths = GetProjectAllMaterialPaths();
-            if (0 < paths.Length)
+            if (0 < path.Length)
             {
                 int current = 0;
-                for (int i = 0; i < paths.Length; i++)
+                for (int i = 0; i < path.Length; i++)
                 {
-                    if (!string.IsNullOrWhiteSpace(paths[i]))
+                    if (VisitMaterial<T>(path[i], load, action))
                     {
-                        var mat = AssetDatabase.LoadAssetAtPath<Material>(paths[i]);
-                        if (action(mat))
-                        {
-                            done++;
-                        }
+                        done++;
                     }
-                    if (++current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar("WF", title, current / (float)paths.Length))
+                    if (++current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar("WF", title, current / (float)path.Length))
                     {
                         break;
                     }
                 }
-                EditorUtility.ClearProgressBar();
             }
+            EditorUtility.ClearProgressBar();
             return done;
+        }
+
+        private bool VisitMaterial<T>(string path, System.Func<T, Material> load, System.Func<Material, bool> action) where T : UnityEngine.Object
+        {
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+                if (asset != null)
+                {
+                    var mat = load(asset);
+                    if (mat != null && action(mat))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         #endregion
 
         #region マテリアル列挙系(Selectionから)
 
-        public static IEnumerable<Material> GetSelectionAllMaterial(MatSelectMode mode, List<Material> result = null)
+        public IEnumerable<Material> GetSelectionAllMaterial(MatSelectMode mode, List<Material> result = null)
         {
             InitList(ref result);
 
@@ -90,7 +131,9 @@ namespace UnlitWF
             if ((mode & MatSelectMode.FromAsset) != 0)
             {
                 // Materialアセット自体
-                result.AddRange(Selection.GetFiltered<Material>(SelectionMode.Assets));
+                GetAllMaterials(Selection.GetFiltered<Material>(SelectionMode.Assets), result);
+                // MaterialTemplate
+                GetAllMaterials(Selection.GetFiltered<WFMaterialTemplate>(SelectionMode.Assets), result);
             }
             // サブフォルダ含めて
             if ((mode & MatSelectMode.FromAssetDeep) == MatSelectMode.FromAssetDeep)
@@ -103,13 +146,48 @@ namespace UnlitWF
                     .ToArray();
                 if (0 < folders.Length)
                 {
-                    result.AddRange(
-                        AssetDatabase.FindAssets("t:Material", folders)
-                            .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                            .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
-                            .Distinct()
-                            .Select(path => AssetDatabase.LoadAssetAtPath<Material>(path))
-                            .Where(mat => mat != null));
+                    GetAllMaterials(folders, result);
+                }
+            }
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(string[] folderPaths, List<Material> result = null)
+        {
+            InitList(ref result);
+            result.AddRange(
+                GetProjectAllMaterialPaths(folderPaths)
+                    .Select(path => AssetDatabase.LoadAssetAtPath<Material>(path))
+                    .Where(mat => mat != null));
+            result.AddRange(
+                GetProjectAllMaterialTemplatePaths(folderPaths)
+                    .Select(path => AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(path))
+                    .Where(temp => temp != null && temp.material != null)
+                    .Select(temp => temp.material));
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(Material[] mats, List<Material> result = null)
+        {
+            InitList(ref result);
+            foreach (var mat in mats)
+            {
+                if (mat != null)
+                {
+                    result.Add(mat);
+                }
+            }
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(WFMaterialTemplate[] temps, List<Material> result = null)
+        {
+            InitList(ref result);
+            foreach (var temp in temps)
+            {
+                if (temp != null && temp.material != null)
+                {
+                    result.Add(temp.material);
                 }
             }
             return result;
@@ -119,7 +197,7 @@ namespace UnlitWF
 
         #region マテリアル列挙系(シーンから)
 
-        public static IEnumerable<Material> GetAllSceneAllMaterial(List<Material> result = null)
+        public IEnumerable<Material> GetAllSceneAllMaterial(List<Material> result = null)
         {
             InitList(ref result);
             for (int i = 0; i < EditorSceneManager.sceneCount; i++)
@@ -130,7 +208,7 @@ namespace UnlitWF
             return result;
         }
 
-        public static IEnumerable<Material> GetAllMaterials(Scene scene, List<Material> result = null)
+        public IEnumerable<Material> GetAllMaterials(Scene scene, List<Material> result = null)
         {
             InitList(ref result);
             if (scene == null)
@@ -140,7 +218,7 @@ namespace UnlitWF
             return GetAllMaterials(scene.GetRootGameObjects(), result);
         }
 
-        public static IEnumerable<Material> GetAllMaterials(GameObject[] gos, List<Material> result = null)
+        public IEnumerable<Material> GetAllMaterials(GameObject[] gos, List<Material> result = null)
         {
             InitList(ref result);
             foreach (var go in gos)
@@ -150,7 +228,7 @@ namespace UnlitWF
             return result;
         }
 
-        public static IEnumerable<Material> GetAllMaterials(GameObject go, List<Material> result = null)
+        public IEnumerable<Material> GetAllMaterials(GameObject go, List<Material> result = null)
         {
             InitList(ref result);
             if (go == null)
@@ -161,31 +239,38 @@ namespace UnlitWF
             // Renderer -> Material
             foreach (var renderer in go.GetComponentsInChildren<Renderer>(true))
             {
-                GetAllMaterials(renderer, result);
+                if (FilterHierarchy(renderer))
+                {
+                    GetAllMaterials(renderer, result);
+                }
             }
 
             // Animator -> Controller -> AnimationClip -> Material
             foreach (var animator in go.GetComponentsInChildren<Animator>(true))
             {
-                GetAllMaterials(animator.runtimeAnimatorController, result);
+                if (FilterHierarchy(animator))
+                {
+                    GetAllMaterials(animator.runtimeAnimatorController, result);
+                }
             }
 
-#if VRC_SDK_VRCSDK3 && !UDON
-            // SDK2では無効、SDK3Worlds でも無効、SDK3Avatars でだけ有効になるよう細工
-
+#if ENV_VRCSDK3_AVATAR
             // VRCAvatarDescriptor -> Controller -> AnimationClip -> Material
             foreach (var desc in go.GetComponentsInChildren<VRC.SDK3.Avatars.Components.VRCAvatarDescriptor>(true))
             {
-                if (desc.customizeAnimationLayers)
+                if (FilterHierarchy(desc))
                 {
-                    foreach (var layer in desc.baseAnimationLayers)
+                    if (desc.customizeAnimationLayers)
+                    {
+                        foreach (var layer in desc.baseAnimationLayers)
+                        {
+                            GetAllMaterials(layer.animatorController, result);
+                        }
+                    }
+                    foreach (var layer in desc.specialAnimationLayers)
                     {
                         GetAllMaterials(layer.animatorController, result);
                     }
-                }
-                foreach (var layer in desc.specialAnimationLayers)
-                {
-                    GetAllMaterials(layer.animatorController, result);
                 }
             }
 #endif
@@ -194,7 +279,7 @@ namespace UnlitWF
         }
 
 
-        public static IEnumerable<Material> GetAllMaterials(Renderer renderer, List<Material> result = null)
+        public IEnumerable<Material> GetAllMaterials(Renderer renderer, List<Material> result = null)
         {
             InitList(ref result);
             if (renderer == null)
@@ -211,7 +296,7 @@ namespace UnlitWF
             return result;
         }
 
-        public static IEnumerable<Material> GetAllMaterials(RuntimeAnimatorController controller, List<Material> result = null)
+        public IEnumerable<Material> GetAllMaterials(RuntimeAnimatorController controller, List<Material> result = null)
         {
             InitList(ref result);
             if (controller == null)
@@ -225,7 +310,7 @@ namespace UnlitWF
             return result;
         }
 
-        public static IEnumerable<Material> GetAllMaterials(AnimatorController controller, List<Material> result = null)
+        public IEnumerable<Material> GetAllMaterials(AnimatorController controller, List<Material> result = null)
         {
             InitList(ref result);
             if (controller == null)
@@ -248,7 +333,7 @@ namespace UnlitWF
             return result;
         }
 
-        private static void InitList<T>(ref List<T> list)
+        private void InitList<T>(ref List<T> list)
         {
             if (list == null)
             {
@@ -261,7 +346,7 @@ namespace UnlitWF
         /// </summary>
         /// <param name="layer"></param>
         /// <returns></returns>
-        public static IEnumerable<AnimatorState> GetAllState(AnimatorControllerLayer layer)
+        public IEnumerable<AnimatorState> GetAllState(AnimatorControllerLayer layer)
         {
             return GetAllState(layer?.stateMachine);
         }
@@ -271,7 +356,7 @@ namespace UnlitWF
         /// </summary>
         /// <param name="stateMachine"></param>
         /// <returns></returns>
-        public static IEnumerable<AnimatorState> GetAllState(AnimatorStateMachine stateMachine)
+        public IEnumerable<AnimatorState> GetAllState(AnimatorStateMachine stateMachine)
         {
             var result = new List<AnimatorState>();
             if (stateMachine != null)
@@ -290,7 +375,7 @@ namespace UnlitWF
         /// </summary>
         /// <param name="animator"></param>
         /// <returns></returns>
-        public static IEnumerable<AnimationClip> GetAllAnimationClip(AnimatorController animator)
+        public IEnumerable<AnimationClip> GetAllAnimationClip(AnimatorController animator)
         {
             return animator.layers.SelectMany(ly => GetAllAnimationClip(ly)).Distinct();
         }
@@ -300,12 +385,12 @@ namespace UnlitWF
         /// </summary>
         /// <param name="layer"></param>
         /// <returns></returns>
-        public static IEnumerable<AnimationClip> GetAllAnimationClip(AnimatorControllerLayer layer)
+        public IEnumerable<AnimationClip> GetAllAnimationClip(AnimatorControllerLayer layer)
         {
             return GetAllState(layer).SelectMany(state => GetAllAnimationClip(state.motion)).Distinct();
         }
 
-        private static IEnumerable<AnimationClip> GetAllAnimationClip(Motion motion, List<AnimationClip> result = null)
+        private IEnumerable<AnimationClip> GetAllAnimationClip(Motion motion, List<AnimationClip> result = null)
         {
             if (result == null)
             {
