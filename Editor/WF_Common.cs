@@ -465,6 +465,19 @@ namespace UnlitWF
         {
             return mat == null ? null : GetShaderFallBackTarget(mat.shader);
         }
+
+        public static int GetMaterialRenderQueueValue(Material mat)
+        {
+            // Material.renderQueue の値を単に参照すると -1 (FromShader) が取れないので SerializedObject から取得する
+            var so = new SerializedObject(mat);
+            so.Update();
+            var prop = so.FindProperty("m_CustomRenderQueue");
+            if (prop != null)
+            {
+                return prop.intValue;
+            }
+            return mat.renderQueue;
+        }
     }
 
     public abstract class WFCustomKeywordSetting

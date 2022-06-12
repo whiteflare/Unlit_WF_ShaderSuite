@@ -83,7 +83,7 @@ namespace UnlitWF
                 if (mat.shader != material.shader)
                 {
                     mat.shader = material.shader;
-                    mat.renderQueue = material.renderQueue;
+                    mat.renderQueue = WFCommonUtility.GetMaterialRenderQueueValue(material);
                 }
             }
 
