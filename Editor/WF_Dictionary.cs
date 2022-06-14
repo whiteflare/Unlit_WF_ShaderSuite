@@ -138,6 +138,7 @@ namespace UnlitWF
                 new WFShaderFunction("CH", "CH", "3ch Color Mask"),
                 new WFShaderFunction("CL", "CL", "Color Change"),
                 new WFShaderFunction("NM", "NM", "NormalMap"),
+                new WFShaderFunction("NS", "NS", "Detail NormalMap"),
                 new WFShaderFunction("MT", "MT", "Metallic"),
                 new WFShaderFunction("HL", "HL", "Light Matcap"),
                 new WFShaderFunction("HA", "HL_1", "Light Matcap 2", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_1", mat)),
@@ -168,8 +169,8 @@ namespace UnlitWF
             { "_Cutoff", "AL" },
             { "_BumpMap", "NM" },
             { "_BumpScale", "NM" },
-            { "_DetailNormalMap", "NM" },
-            { "_DetailNormalMapScale", "NM" },
+            { "_DetailNormalMap", "NS" },
+            { "_DetailNormalMapScale", "NS" },
             { "_MetallicGlossMap", "MT" },
             { "_SpecGlossMap", "MT" },
             { "_EmissionColor", "ES" },
@@ -196,9 +197,6 @@ namespace UnlitWF
             { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_", "_MT_ONLY2ND_ENABLE") {
                 enablePropName = "_MT_Enable",
             } },
-            { "_NM_2ndType", new WFCustomKeywordSettingEnum("_NM_2ndType", "_", "_NM_BL2ND_ENABLE", "_NM_SW2ND_ENABLE") {
-                enablePropName = "_NM_Enable",
-            } },
             { "_TS_Steps", new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
                 enablePropName = "_TS_Enable",
             } },
@@ -211,34 +209,50 @@ namespace UnlitWF
         };
 
         /// <summary>
-        /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
-        /// </summary>
-        public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
-            new PropertyNameReplacement("_AL_CutOff", "_Cutoff"),
-            new PropertyNameReplacement("_CutOffLevel", "_Cutoff"),
-            new PropertyNameReplacement("_ES_Color", "_EmissionColor"),
-            new PropertyNameReplacement("_ES_MaskTex", "_EmissionMap"),
-            new PropertyNameReplacement("_FurHeight", "_FR_Height"),
-            new PropertyNameReplacement("_FurMaskTex", "_FR_MaskTex"),
-            new PropertyNameReplacement("_FurNoiseTex", "_FR_NoiseTex"),
-            new PropertyNameReplacement("_FurRepeat", "_FR_Repeat"),
-            new PropertyNameReplacement("_FurShadowPower", "_FR_ShadowPower"),
-            new PropertyNameReplacement("_FG_BumpMap", "_FR_BumpMap"),
-            new PropertyNameReplacement("_FG_FlipTangent", "_FR_FlipTangent"),
-            new PropertyNameReplacement("_GL_BrendPower", "_GL_BlendPower"),
-            new PropertyNameReplacement("_MT_BlendType", "_MT_Brightness"),
-            new PropertyNameReplacement("_MT_MaskTex", "_MetallicGlossMap"),
-            new PropertyNameReplacement("_MT_Smoothness", "_MT_ReflSmooth"),
-            new PropertyNameReplacement("_MT_Smoothness2", "_MT_SpecSmooth"),
-            new PropertyNameReplacement("_TessFactor", "_TE_Factor"),
-            new PropertyNameReplacement("_Smoothing", "_TE_SmoothPower"),
-            // new OldPropertyReplacement("_FurVector", "_FR_Vector"), // FurVectorの値は再設定が必要なので変換しない
-        };
-
-        /// <summary>
         /// ラベル名などの物理名 → 日本語訳の変換マップ。
         /// </summary>
         public static readonly List<WFI18NTranslation> LangEnToJa = new List<WFI18NTranslation>() {
+            // HeaderTitle
+            new WFI18NTranslation("3ch Color Mask", "3chカラーマスク"),
+            new WFI18NTranslation("Ambient Occlusion", "AOマップとライトマップ"),
+            new WFI18NTranslation("BackFace Texture", "裏面テクスチャ"),
+            new WFI18NTranslation("Base", "基本設定"),
+            new WFI18NTranslation("ClearCoat", "クリアコート"),
+            new WFI18NTranslation("Color Change", "色変更"),
+            new WFI18NTranslation("Detail NormalMap", "ディテールノーマルマップ"),
+            new WFI18NTranslation("Distance Fade", "距離フェード"),
+            new WFI18NTranslation("Emission", "エミッション"),
+            new WFI18NTranslation("Fake Fur", "ファー"),
+            new WFI18NTranslation("Fog", "フォグ"),
+            new WFI18NTranslation("Gem Background", "ジェム(裏面)"),
+            new WFI18NTranslation("Gem Flake", "ジェム(フレーク)"),
+            new WFI18NTranslation("Gem Reflection", "ジェム(反射)"),
+            new WFI18NTranslation("Gem Surface", "ジェム(表面)"),
+            new WFI18NTranslation("Lame", "ラメ"),
+            new WFI18NTranslation("Light Bake Effects", "ライトベイク調整"),
+            new WFI18NTranslation("Light Matcap", "マットキャップ"),
+            new WFI18NTranslation("Light Matcap 2", "マットキャップ2"),
+            new WFI18NTranslation("Light Matcap 3", "マットキャップ3"),
+            new WFI18NTranslation("Light Matcap 4", "マットキャップ4"),
+            new WFI18NTranslation("Light Matcap 5", "マットキャップ5"),
+            new WFI18NTranslation("Light Matcap 6", "マットキャップ6"),
+            new WFI18NTranslation("Light Matcap 7", "マットキャップ7"),
+            new WFI18NTranslation("Light Matcap 8", "マットキャップ8"),
+            new WFI18NTranslation("Lit", "ライト設定"),
+            new WFI18NTranslation("Lit Advance", "ライト設定(拡張)"),
+            new WFI18NTranslation("Metallic", "メタリック"),
+            new WFI18NTranslation("Mirror Control", "ミラー制御"),
+            new WFI18NTranslation("NormalMap", "ノーマルマップ"),
+            new WFI18NTranslation("Outline", "アウトライン"),
+            new WFI18NTranslation("Overlay Texture", "オーバーレイテクスチャ"),
+            new WFI18NTranslation("Refraction", "屈折"),
+            new WFI18NTranslation("RimLight", "リムライト"),
+            new WFI18NTranslation("Stencil Mask", "ステンシル"),
+            new WFI18NTranslation("Tessellation", "細分化"),
+            new WFI18NTranslation("ToonShade", "トゥーン影"),
+            new WFI18NTranslation("Transparent Alpha", "透過"),
+            new WFI18NTranslation("Material Options", "マテリアル設定"),
+            new WFI18NTranslation("Utility", "ユーティリティ"),
             // Base
             new WFI18NTranslation("Main Texture", "メイン テクスチャ"),
             new WFI18NTranslation("Color", "マテリアルカラー"),
@@ -257,6 +271,7 @@ namespace UnlitWF
             new WFI18NTranslation("Blend Type", "混合タイプ"),
             new WFI18NTranslation("Blend Power", "混合の強度"),
             new WFI18NTranslation("Blend Normal", "ノーマルマップ強度"),
+            new WFI18NTranslation("Blend Normal 2nd", "ノーマルマップ(2nd)強度"),
             new WFI18NTranslation("Shape", "形状"),
             new WFI18NTranslation("Scale", "スケール"),
             new WFI18NTranslation("Direction", "方向"),
@@ -289,13 +304,14 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "NormalMap Texture", "ノーマルマップ").AddTag("FR"),
             new WFI18NTranslation("NM", "Bump Scale", "凹凸スケール"),
             new WFI18NTranslation("NM", "Shadow Power", "影の濃さ"),
-            new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("FR"),
-            new WFI18NTranslation("NM", "2nd Normal Blend", "2ndマップの混合タイプ"),
-            new WFI18NTranslation("NM", "2nd Normal UV Type", "2ndマップのUVタイプ"),
-            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2ndノーマルマップ"),
-            new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
+            new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("NS", "FR"),
+            // Normal 2nd
+            new WFI18NTranslation("NS", "2nd Normal Blend", "2ndマップの混合タイプ"),
+            new WFI18NTranslation("NS", "2nd Normal UV Type", "2ndマップのUVタイプ"),
+            new WFI18NTranslation("NS", "2nd NormalMap Texture", "2ndノーマルマップ"),
+            new WFI18NTranslation("NS", "2nd Bump Scale", "凹凸スケール"),
+            new WFI18NTranslation("NS", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
+            new WFI18NTranslation("NS", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
             // Metallic
             new WFI18NTranslation("MT", "Metallic", "メタリック強度"),
             new WFI18NTranslation("MT", "Smoothness", "滑らかさ"),
@@ -339,7 +355,9 @@ namespace UnlitWF
             new WFI18NTranslation("SH", "1st Border", "1影の境界位置"),
             new WFI18NTranslation("SH", "2nd Border", "2影の境界位置"),
             new WFI18NTranslation("SH", "3rd Border", "3影の境界位置"),
-            new WFI18NTranslation("SH", "Feather", "境界のぼかし強度"),
+            new WFI18NTranslation("SH", "1st Feather", "1影の境界ぼかし強度"),
+            new WFI18NTranslation("SH", "2nd Feather", "2影の境界ぼかし強度"),
+            new WFI18NTranslation("SH", "3rd Feather", "3影の境界ぼかし強度"),
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture", "アンチシャドウマスク"),
             new WFI18NTranslation("SH", "Anti-Shadow Mask Texture (R)", "アンチシャドウマスク (R)"),
             new WFI18NTranslation("SH", "Shade Color Suggest", "影色を自動設定する"),
@@ -457,6 +475,8 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダのバージョンが更新されました。\nプロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
             new WFI18NTranslation(WFMessageText.DgMigrationManual, "プロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
 
+            new WFI18NTranslation(WFMessageText.LgWarnOlderVersion, "古いバージョンで作成されたマテリアルがあります。"),
+            new WFI18NTranslation(WFMessageText.LgWarnNotSupportAndroid, "Android非対応のシェーダが使われているマテリアルがあります。"),
 
             new WFI18NTranslation(WFMessageButton.Cleanup, "マテリアルから不要データを削除"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "テンプレートから適用"),
@@ -493,6 +513,13 @@ namespace UnlitWF
             new WFI18NTranslation("OL", "Decal Color", "デカール テクスチャ"),
             new WFI18NTranslation("OL", "Decal Texture", "デカール テクスチャ"),
             new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "頂点カラーをデカールに乗算する"),
+            new WFI18NTranslation("NM", "2nd Normal Blend", "2ndマップの混合タイプ"),
+            new WFI18NTranslation("NM", "2nd Normal UV Type", "2ndマップのUVタイプ"),
+            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2ndノーマルマップ"),
+            new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
+            new WFI18NTranslation("SH", "Feather", "境界のぼかし強度"),
         };
 
 
@@ -518,6 +545,7 @@ namespace UnlitWF
             new WFI18NTranslation("Blend Type", "혼합 타입"),
             new WFI18NTranslation("Blend Power", "혼합 강도"),
             new WFI18NTranslation("Blend Normal", "노멀맵 강도"),
+            new WFI18NTranslation("Blend Normal (2nd)", "노멀맵 (2nd) 강도"),
             new WFI18NTranslation("Shape", "모양"),
             new WFI18NTranslation("Scale", "스케일"),
             new WFI18NTranslation("Direction", "방향"),
@@ -550,13 +578,7 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "NormalMap Texture", "노멀맵").AddTag("FR"),
             new WFI18NTranslation("NM", "Bump Scale", "범프 스케일"),
             new WFI18NTranslation("NM", "Shadow Power", "그림자 강도"),
-            new WFI18NTranslation("NM", "Flip Mirror", "거울 XY 반전").AddTag("FR"),
-            new WFI18NTranslation("NM", "2nd Normal Blend", "2nd맵 혼합"),
-            new WFI18NTranslation("NM", "2nd Normal UV Type", "2nd맵 UV타입"),
-            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2nd노멀맵"),
-            new WFI18NTranslation("NM", "2nd Bump Scale", "2nd범프 스케일"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2nd노멀 텍스처"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2nd노멀맵 마스크 (R)"),
+            new WFI18NTranslation("NM", "Flip Mirror", "거울 XY 반전").AddTag("NS", "FR"),
             // Metallic
             new WFI18NTranslation("MT", "Metallic", "메탈릭 강도"),
             new WFI18NTranslation("MT", "Smoothness", "부드럽게"),
@@ -727,6 +749,12 @@ namespace UnlitWF
             new WFI18NTranslation("OL", "Decal Color", "데칼 텍스처"),
             new WFI18NTranslation("OL", "Decal Texture", "데칼 텍스처"),
             new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "버텍스 컬러에 데칼 텍스처 곱하기"),
+            new WFI18NTranslation("NM", "2nd Normal Blend", "2nd맵 혼합"),
+            new WFI18NTranslation("NM", "2nd Normal UV Type", "2nd맵 UV타입"),
+            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2nd노멀맵"),
+            new WFI18NTranslation("NM", "2nd Bump Scale", "2nd범프 스케일"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2nd노멀 텍스처"),
+            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2nd노멀맵 마스크 (R)"),
         };
     }
 
@@ -743,6 +771,8 @@ namespace UnlitWF
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
         public static readonly string DgMigrationAuto = "The version of the UnlitWF shader has been updated.\nDo you want to scan the materials in your project and update them to the latest material values?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
+        public static readonly string LgWarnOlderVersion = "A material was created with an older shader version.";
+        public static readonly string LgWarnNotSupportAndroid = "A material uses a shader that is not supported by Android.";
     }
 
     internal static class WFMessageButton

@@ -49,7 +49,7 @@ namespace UnlitWF
             if (material != null && oldShader != null && !IsSupportedShader(oldShader))
             {
                 material.SetOverrideTag(TAG_PREV_SHADER, oldShader.name);
-                material.SetOverrideTag(TAG_PREV_QUEUE, material.renderQueue.ToString());
+                material.SetOverrideTag(TAG_PREV_QUEUE, WFCommonUtility.GetMaterialRenderQueueValue(material).ToString());
             }
         }
 

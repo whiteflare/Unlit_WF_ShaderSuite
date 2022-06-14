@@ -40,7 +40,7 @@ namespace UnlitWF
                 }
             } , null),
             // _TS_Feather の直前に設定ボタンを追加する
-            new CustomPropertyHook("_TS_Feather", ctx => {
+            new CustomPropertyHook("_TS_Feather|_TS_1stFeather", ctx => {
                 if (GetShadowStepsFromMaterial(WFCommonUtility.AsMaterials(ctx.editor.targets)) < 2) {
                     return;
                 }
@@ -51,11 +51,12 @@ namespace UnlitWF
             } , null),
 
             // 条件付きHide
-            new ConditionVisiblePropertyHook("_TS_2ndColor|_TS_2ndBorder", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
-            new ConditionVisiblePropertyHook("_TS_3rdColor|_TS_3rdBorder", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
+            new ConditionVisiblePropertyHook("_TS_2ndColor|_TS_2ndBorder|_TS_2ndFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
+            new ConditionVisiblePropertyHook("_TS_3rdColor|_TS_3rdBorder|_TS_3rdFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
             new ConditionVisiblePropertyHook("_OL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)), // ANGEL_RING
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
@@ -75,6 +76,7 @@ namespace UnlitWF
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
             new MinMaxSliderPropertyHook("_FG_MinDist", "_FG_MaxDist"),
             new MinMaxSliderPropertyHook("_LM_MinDist", "_LM_MaxDist"),
+            new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist"),
             new MinMaxSliderPropertyHook("_DF_MinDist", "_DF_MaxDist"),
 
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
@@ -85,11 +87,6 @@ namespace UnlitWF
             }, null),
 
             // 値を設定したら他プロパティの値を自動で設定する
-            new DefValueSetPropertyHook("_DetailNormalMap", ctx => {
-                if (ctx.current.textureValue != null) {
-                    CompareAndSet(ctx.all, "_NM_2ndType", 0, 1); // OFF -> BLEND
-                }
-            }),
             new DefValueSetPropertyHook("_MT_Cubemap", ctx => {
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_MT_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP
@@ -138,6 +135,14 @@ namespace UnlitWF
                     ctx.current.textureScaleAndOffset = so;
                 }
                 EditorGUILayout.Space();
+            }),
+            // _NS_InvMaskVal の直後に FlipMirror を再表示
+            new CustomPropertyHook("_NS_InvMaskVal", null, (ctx, changed) => {
+                var prop = ctx.all.Where(p => p.name == "_FlipMirror").FirstOrDefault();
+                if (prop != null)
+                {
+                    ctx.editor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName.Replace("[NM]", "[NS]")));
+                }
             }),
             // _TS_InvMaskVal の後に説明文を追加する
             new CustomPropertyHook("_TS_InvMaskVal", null, (ctx, changed) => {
@@ -228,6 +233,21 @@ namespace UnlitWF
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
+                    // Color を sRGB -> Linear 変換して再設定する
+                    if (material.HasProperty("_Color"))
+                    {
+                        var idx = oldShader.FindPropertyIndex("_Color");
+                        if (0 <= idx)
+                        {
+                            var flags = oldShader.GetPropertyFlags(idx);
+                            if (!flags.HasFlag(UnityEngine.Rendering.ShaderPropertyFlags.HDR))
+                            {
+                                var val = material.GetColor("_Color");
+                                material.SetColor("_Color", val.linear);
+                            }
+                        }
+
+                    }
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
                     if (material.HasProperty("_EmissionColor"))
                     {
@@ -556,7 +576,7 @@ namespace UnlitWF
                 }
             }))
             {
-                var param = new CleanUpParameter();
+                var param = CleanUpParameter.Create();
                 param.materials = WFCommonUtility.AsMaterials(materialEditor.targets);
                 param.resetKeywords = true;
                 param.resetUnused = true;
@@ -845,7 +865,7 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static void DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null)
+        public static Rect DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null)
         {
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
@@ -859,6 +879,18 @@ namespace UnlitWF
             position = EditorGUI.IndentedRect(position);
             GUI.Box(position, text, style);
 
+            // ヘルプテキスト
+            var helpText = WFI18N.Translate(text);
+            if (!string.IsNullOrWhiteSpace(helpText) && helpText != text) {
+                var titleSize = style.CalcSize(new GUIContent(text));
+                var rect = new Rect(position.x + titleSize.x + 24, position.y, position.width - titleSize.x - 24, 16f);
+                var style2 = new GUIStyle(EditorStyles.label);
+                style2.fontSize = style.fontSize - 1;
+                style2.contentOffset = new Vector2(4, 1);
+                GUI.Label(rect, helpText, style2);
+            }
+
+            // コンテキストメニュー
             if (menu != null)
             {
                 var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
@@ -868,6 +900,8 @@ namespace UnlitWF
                     menu.DropDown(rect);
                 }
             }
+
+            return position;
         }
 
         /// <summary>
@@ -877,19 +911,9 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static void DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, GenericMenu menu = null)
+        public static Rect DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, GenericMenu menu = null)
         {
-            // SurikenStyleHeader
-            var style = new GUIStyle("ShurikenModuleTitle");
-            style.font = EditorStyles.boldLabel.font;
-            style.fontSize += 2;
-            style.fontStyle = FontStyle.Bold;
-            style.fixedHeight = 20;
-            style.contentOffset = new Vector2(20, -2);
-            // Draw
-            position.y += 8;
-            position = EditorGUI.IndentedRect(position);
-            GUI.Box(position, text, style);
+            position = DrawShurikenStyleHeader(position, text, menu);
 
             if (alwaysOn)
             {
@@ -929,15 +953,7 @@ namespace UnlitWF
                 }
             }
 
-            if (menu != null)
-            {
-                var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
-                if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel))
-                {
-                    Event.current.Use();
-                    menu.DropDown(rect);
-                }
-            }
+            return position;
         }
 
         /// <summary>
@@ -1085,13 +1101,35 @@ namespace UnlitWF
 
         #region PropertyHook
 
+        /// <summary>
+        /// PropertyHookで使用する表示コンテキスト
+        /// </summary>
         class PropertyGUIContext
         {
+            /// <summary>
+            /// 動作中のMaterialEditor
+            /// </summary>
             public readonly MaterialEditor editor;
+            /// <summary>
+            /// 全てのMaterialProperty
+            /// </summary>
             public readonly MaterialProperty[] all;
+            /// <summary>
+            /// 現在表示しようとしているMaterialProperty
+            /// </summary>
             public readonly MaterialProperty current;
+
+            /// <summary>
+            /// 表示するMaterialPropertyのGUIContent。Hook内から変更することもできる。
+            /// </summary>
             public GUIContent guiContent = null;
+            /// <summary>
+            /// 非表示にするときにHook内からtrueにする。
+            /// </summary>
             public bool hidden = false;
+            /// <summary>
+            /// Hook内で独自にGUIを表示したとき(つまりデフォルトのShaderProperty呼び出しが不要なとき)にHook内からtrueにする。
+            /// </summary>
             public bool custom = false;
 
             public PropertyGUIContext(MaterialEditor editor, MaterialProperty[] all, MaterialProperty current)
@@ -1382,6 +1420,11 @@ namespace UnlitWF
             this.text = text;
         }
 
+        public MaterialWFHeaderDecorator(string text, string helptext)
+        {
+            this.text = text;
+        }
+
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
             return 32;
@@ -1405,6 +1448,11 @@ namespace UnlitWF
             this.text = text;
         }
 
+        public MaterialWFHeaderToggleDrawer(string text, string helptext)
+        {
+            this.text = text;
+        }
+
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
             return 32;
@@ -1424,6 +1472,11 @@ namespace UnlitWF
         public readonly string text;
 
         public MaterialWFHeaderAlwaysOnDrawer(string text)
+        {
+            this.text = text;
+        }
+
+        public MaterialWFHeaderAlwaysOnDrawer(string text, string helptext)
         {
             this.text = text;
         }

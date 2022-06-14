@@ -24,6 +24,11 @@
 
 #define _WF_LEGACY_FEATURE_SWITCH
 
+#if !defined(UNITY_OLD_PREPROCESSOR) && UNITY_VERSION < 202003
+    // 未定義だけどUnity2020.3未満のときは定義する
+    #define UNITY_OLD_PREPROCESSOR
+#endif
+
 #ifdef _WF_PLATFORM_LWRP
     // Lightweight RP 向け定義
     #include "WF_Common_LightweightRP.cginc"

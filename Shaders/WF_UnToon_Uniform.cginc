@@ -40,7 +40,7 @@
     DECL_SUB_TEX2D      (_TL_CustomColorTex);
     DECL_SUB_TEX2D      (_CH_3chMaskTex);
 #ifndef _WF_MOBILE
-    DECL_SUB_TEX2D      (_NM_2ndMaskTex);
+    DECL_SUB_TEX2D      (_NS_2ndMaskTex);
     DECL_SUB_TEX2D      (_SpecGlossMap);
     DECL_SUB_TEX2D      (_TS_BaseTex);
     DECL_SUB_TEX2D      (_TS_1stTex);
@@ -81,6 +81,7 @@
     float           _Cutoff;
     float           _UseVertexColor;
     float           _Z_Shift;
+    uint            _FlipMirror;
 
     // -------------------------
 
@@ -88,6 +89,7 @@
     FEATURE_TGL     (_BK_Enable);
     float4          _BK_BackTex_ST;
     float4          _BK_BackColor;
+    uint            _BK_UVType;
 #endif
 
     // -------------------------
@@ -156,13 +158,15 @@
     FEATURE_TGL     (_NM_Enable);
     float           _BumpScale;
     float           _NM_Power;
-    uint            _NM_FlipMirror;
+
+    // -------------------------
+
 #ifndef _WF_MOBILE
-    uint            _NM_2ndType;
-    uint            _NM_2ndUVType;
+    FEATURE_TGL     (_NS_Enable);
+    uint            _NS_UVType;
     float4          _DetailNormalMap_ST;
     float           _DetailNormalMapScale;
-    float           _NM_InvMaskVal;
+    float           _NS_InvMaskVal;
 #endif
 
     // -------------------------
@@ -171,6 +175,7 @@
     float           _MT_Metallic;
     float           _MT_ReflSmooth;
     float           _MT_BlendNormal;
+    float           _MT_BlendNormal2;
     float           _MT_Brightness;
     float           _MT_Monochrome;
     float           _MT_GeomSpecAA;
@@ -197,12 +202,17 @@
     float3      _HL_MatcapColor##id;        \
     float       _HL_Power##id;              \
     float       _HL_BlendNormal##id;        \
+    float       _HL_BlendNormal2##id;       \
     float       _HL_Parallax##id;           \
     float       _HL_InvMaskVal##id;         \
     float       _HL_ChangeAlpha##id;        \
     float       _HL_MatcapMonochrome##id;
 
+#ifdef UNITY_OLD_PREPROCESSOR
     WF_DECL_MATCAP(##)
+#else
+    WF_DECL_MATCAP()
+#endif
 #ifndef _WF_MOBILE
     WF_DECL_MATCAP(_1)
 #endif
@@ -248,10 +258,15 @@
     float           _TS_1stBorder;
     float           _TS_2ndBorder;
     float           _TS_3rdBorder;
-    float           _TS_Feather;
+    float           _TS_1stFeather;
+    float           _TS_2ndFeather;
+    float           _TS_3rdFeather;
     float           _TS_BlendNormal;
+    float           _TS_BlendNormal2;
     float           _TS_InvMaskVal;
     float           _TS_FixContrast;
+    float           _TS_MinDist;
+    float           _TS_MaxDist;
 
     // -------------------------
 
@@ -262,6 +277,7 @@
     float           _TR_Feather;
     float           _TR_InvMaskVal;
     float           _TR_BlendNormal;
+    float           _TR_BlendNormal2;
     float           _TR_PowerTop;
     float           _TR_PowerSide;
     float           _TR_PowerBottom;
@@ -335,6 +351,7 @@
     float           _RF_Distance;
     float3          _RF_Tint;
     float           _RF_BlendNormal;
+    float           _RF_BlendNormal2;
 #endif
 
     // -------------------------

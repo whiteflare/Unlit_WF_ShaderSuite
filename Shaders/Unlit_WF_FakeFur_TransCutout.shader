@@ -40,7 +40,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [Normal]
             _FR_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
         [Enum(NONE,0,X,1,Y,2,XY,3)]
-            _FR_FlipMirror          ("[FR] Flip Mirror", Float) = 0
+            _FlipMirror             ("[FR] Flip Mirror", Float) = 0
         [Header(Fur Color)]
             _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
             _FR_TintColorBase       ("[FR] Tint Color (Base)", Color) = (1, 1, 1, 1)
@@ -69,7 +69,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
-            _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
@@ -85,7 +84,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
             _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
-            _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
@@ -111,17 +109,21 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
         [NoScaleOffset]
             _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
+            _TS_MinDist             ("[SH] FadeOut Distance (Near)", Range(0, 15)) = 1.0
+            _TS_MaxDist             ("[SH] FadeOut Distance (Far)", Range(0, 15)) = 4.0
         [Toggle(_)]
             _TS_FixContrast         ("[SH] Dont Ajust Contrast", Range(0, 1)) = 0
-            _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
-            _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
-            _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
-            _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
-            _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
+        [Header(ToonShade Advance)]
+            _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
+            _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
+            _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
+            _TS_1stFeather          ("[SH] 1st Feather", Range(0, 0.2)) = 0.05
+            _TS_2ndFeather          ("[SH] 2nd Feather", Range(0, 0.2)) = 0.05
+            _TS_3rdFeather          ("[SH] 3rd Feather", Range(0, 0.2)) = 0.05
 
         // リムライト
         [WFHeaderToggle(RimLight)]
@@ -132,7 +134,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             _TR_BlendType           ("[RM] Blend Type", Float) = 0
             _TR_Power               ("[RM] Power", Range(0, 2)) = 1
             _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
-            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[RM] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
