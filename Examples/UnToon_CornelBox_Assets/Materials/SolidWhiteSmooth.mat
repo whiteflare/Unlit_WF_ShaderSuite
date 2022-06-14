@@ -143,7 +143,6 @@ Material:
     - _DF_MinDist: 0.02
     - _DF_Power: 1
     - _DetailNormalMapScale: 0.4
-    - _ES_BakeIntensity: 1
     - _ES_BlendType: 0
     - _ES_DirType: 0
     - _ES_Enable: 0
@@ -210,7 +209,6 @@ Material:
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_Enable: 0
-    - _NM_FlipTangent: 0
     - _NM_Power: 0.25
     - _NS_Enable: 0
     - _NS_InvMaskVal: 0
