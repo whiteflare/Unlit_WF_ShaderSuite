@@ -24,7 +24,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque
   m_Shader: {fileID: 4800000, guid: a5ae7f40ac53e274ea0bc1262e1f6895, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE _NM_BL2ND_ENABLE _NM_ENABLE _TL_ENABLE _TR_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _NM_BL2ND_ENABLE _NS_ENABLE _TL_ENABLE _TR_ENABLE
     _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -91,7 +91,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _NM_2ndMaskTex:
+    - _NS_2ndMaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -151,6 +151,7 @@ Material:
     - _AO_UseGreenMap: 0
     - _AO_UseLightMap: 1
     - _BK_Enable: 0
+    - _BK_UVType: 0
     - _BumpScale: 1
     - _CH_Enable: 0
     - _CL_DeltaH: 0
@@ -178,6 +179,7 @@ Material:
     - _FG_MaxDist: 0.8
     - _FG_MinDist: 0.5
     - _FallBack: 0
+    - _FlipMirror: 0
     - _GI_EmissionMultiplier: 1
     - _GI_Enable: 0
     - _GI_IndirectChroma: 1
@@ -192,6 +194,8 @@ Material:
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
     - _HL_BlendNormal: 0.1
+    - _HL_BlendNormal2: 0.1
+    - _HL_BlendNormal2_1: 0.1
     - _HL_BlendNormal_1: 0.1
     - _HL_CapType: 0
     - _HL_CapType_1: 0
@@ -217,6 +221,7 @@ Material:
     - _LM_Spot: 2
     - _LM_UVType: 0
     - _MT_BlendNormal: 0.1
+    - _MT_BlendNormal2: 0.1
     - _MT_Brightness: 0.2
     - _MT_CubemapHighCut: 0
     - _MT_CubemapPower: 1
@@ -231,12 +236,11 @@ Material:
     - _MT_ReflSmooth: 1
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
-    - _NM_2ndType: 1
-    - _NM_2ndUVType: 0
-    - _NM_Enable: 1
-    - _NM_FlipMirror: 0
-    - _NM_InvMaskVal: 0
+    - _NM_Enable: 0
     - _NM_Power: 0
+    - _NS_Enable: 1
+    - _NS_InvMaskVal: 0
+    - _NS_UVType: 0
     - _OL_BlendType: 0
     - _OL_CustomParam1: 0
     - _OL_Enable: 0
@@ -253,6 +257,7 @@ Material:
     - _TL_LineWidth: 0.05
     - _TL_Z_Shift: 0.005
     - _TR_BlendNormal: 0
+    - _TR_BlendNormal2: 0
     - _TR_BlendType: 0
     - _TR_Enable: 1
     - _TR_Feather: 0.05
@@ -262,13 +267,18 @@ Material:
     - _TR_PowerSide: 0.1
     - _TR_PowerTop: 0.05
     - _TS_1stBorder: 0.4
+    - _TS_1stFeather: 0.05
     - _TS_2ndBorder: 0.2
+    - _TS_2ndFeather: 0.05
     - _TS_3rdBorder: 0.1
+    - _TS_3rdFeather: 0.05
     - _TS_BlendNormal: 0.1
+    - _TS_BlendNormal2: 0.1
     - _TS_Enable: 1
-    - _TS_Feather: 0.05
     - _TS_FixContrast: 0
     - _TS_InvMaskVal: 0
+    - _TS_MaxDist: 4
+    - _TS_MinDist: 1
     - _TS_Power: 1
     - _TS_Steps: 2
     - _UseVertexColor: 0
