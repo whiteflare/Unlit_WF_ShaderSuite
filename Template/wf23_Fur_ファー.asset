@@ -89,7 +89,6 @@ Material:
     - _DF_MaxDist: 0.08
     - _DF_MinDist: 0.02
     - _DF_Power: 1
-    - _FR_FlipMirror: 0
     - _FR_Height: 0.02
     - _FR_Height2: 0.03
     - _FR_InvMaskVal: 0
@@ -98,6 +97,7 @@ Material:
     - _FR_Repeat2: 2
     - _FR_ShadowPower: 0.05
     - _FallBack: 0
+    - _FlipMirror: 0
     - _GL_BlendPower: 0.8
     - _GL_CastShadow: 1
     - _GL_CustomAltitude: 45
@@ -107,8 +107,6 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
-    - _HL_BlendNormal: 0.1
-    - _HL_BlendNormal_1: 0.1
     - _HL_CapType: 0
     - _HL_CapType_1: 0
     - _HL_Enable: 0
@@ -119,7 +117,6 @@ Material:
     - _HL_Parallax_1: 0.75
     - _HL_Power: 1
     - _HL_Power_1: 1
-    - _TR_BlendNormal: 0
     - _TR_BlendType: 0
     - _TR_Enable: 0
     - _TR_Feather: 0.05
@@ -129,13 +126,16 @@ Material:
     - _TR_PowerSide: 0.1
     - _TR_PowerTop: 0.05
     - _TS_1stBorder: 0.4
+    - _TS_1stFeather: 0.05
     - _TS_2ndBorder: 0.2
+    - _TS_2ndFeather: 0.05
     - _TS_3rdBorder: 0.1
-    - _TS_BlendNormal: 0.1
+    - _TS_3rdFeather: 0.05
     - _TS_Enable: 1
-    - _TS_Feather: 0.05
     - _TS_FixContrast: 0
     - _TS_InvMaskVal: 0
+    - _TS_MaxDist: 4
+    - _TS_MinDist: 1
     - _TS_Power: 1
     - _TS_Steps: 2
     m_Colors:

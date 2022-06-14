@@ -109,7 +109,7 @@ namespace UnlitWF
 
         public static bool ExistsOldNameProperty(params Material[] mats)
         {
-            return 0 < CreateRelacePropertyList(mats.Where(m => !m.shader.name.Contains("MatcapShadows")).ToArray()).Count;
+            return Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mats);
         }
 
         public static void MigrationMaterial(MigrationParameter param)
@@ -120,26 +120,23 @@ namespace UnlitWF
         public static void MigrationMaterial(params Material[] mats)
         {
             Undo.RecordObjects(mats, "WF Migration materials");
-            MigrationMaterialWithoutUndo(mats);
+            new Converter.WFMaterialMigrationConverter().ExecAutoConvertWithoutUndo(mats);
         }
 
-        public static void MigrationMaterialWithoutUndo(params Material[] mats)
+
+        public static bool ReplacePropertyNamesWithoutUndo(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
-            mats = mats.Where(m => !m.shader.name.Contains("MatcapShadows")).ToArray();
-            // プロパティ名を変更
-            var oldPropList = CreateRelacePropertyList(mats);
-            RenamePropNameWithoutUndo(mats, oldPropList);
-            // シェーダキーワードを整理
-            WFCommonUtility.SetupShaderKeyword(mats);
+            var mats = new Material[] { mat };
+            return RenamePropNameWithoutUndo(CreateReplacePropertyList(mats, replacement));
         }
 
         public static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement)
         {
             var mats = new Material[] { mat };
-            return RenamePropNameWithoutUndo(mats, CreateReplacePropertyList(mats, replacement));
+            return RenamePropNameWithoutUndo(CreateReplacePropertyList(mats, replacement));
         }
 
-        private static bool RenamePropNameWithoutUndo(Material[] mats, List<RelacePropertyName> replaceList)
+        private static bool RenamePropNameWithoutUndo(List<ReplacingPropertyMapping> replaceList)
         {
             if (replaceList.Count == 0)
             {
@@ -147,19 +144,7 @@ namespace UnlitWF
             }
 
             // 名称を全て変更
-            foreach (var propPair in replaceList)
-            {
-                if (propPair.after != null)
-                {
-                    propPair.before.CopyTo(propPair.after);
-                    propPair.onAfterCopy(propPair.after);
-                }
-                else
-                {
-                    propPair.before.Rename(propPair.afterName);
-                    propPair.onAfterCopy(propPair.before);
-                }
-            }
+            replaceList.ForEach(r => r.Execute());
             // 保存
             ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.after));
             // 旧プロパティは全て削除
@@ -173,14 +158,9 @@ namespace UnlitWF
             return true;
         }
 
-        private static List<RelacePropertyName> CreateRelacePropertyList(Material[] mats)
+        private static List<ReplacingPropertyMapping> CreateReplacePropertyList(Material[] mats, IEnumerable<PropertyNameReplacement> replacement)
         {
-            return CreateReplacePropertyList(mats, WFShaderDictionary.OldPropNameToNewPropNameList);
-        }
-
-        private static List<RelacePropertyName> CreateReplacePropertyList(Material[] mats, IEnumerable<PropertyNameReplacement> replacement)
-        {
-            var result = new List<RelacePropertyName>();
+            var result = new List<ReplacingPropertyMapping>();
             foreach (var mat in mats)
             {
                 var props = ShaderSerializedProperty.AsDict(mat);
@@ -189,7 +169,7 @@ namespace UnlitWF
                     var before = props.GetValueOrNull(pair.beforeName);
                     if (before != null)
                     {
-                        result.Add(new RelacePropertyName(before, props.GetValueOrNull(pair.afterName), pair.afterName, pair.onAfterCopy));
+                        result.Add(new ReplacingPropertyMapping(before, props.GetValueOrNull(pair.afterName), pair.afterName, pair.onAfterCopy));
                     }
                 }
             }
@@ -197,19 +177,34 @@ namespace UnlitWF
             return result;
         }
 
-        struct RelacePropertyName
+        struct ReplacingPropertyMapping
         {
             public readonly ShaderSerializedProperty before;
             public readonly ShaderSerializedProperty after;
             public readonly string afterName;
             public readonly Action<ShaderSerializedProperty> onAfterCopy;
 
-            public RelacePropertyName(ShaderSerializedProperty before, ShaderSerializedProperty after, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null)
+            public ReplacingPropertyMapping(ShaderSerializedProperty before, ShaderSerializedProperty after, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null)
             {
                 this.before = before;
                 this.after = after;
                 this.afterName = afterName;
                 this.onAfterCopy = onAfterCopy ?? (p => { });
+            }
+
+            public void Execute()
+            {
+                if (after != null)
+                {
+                    before.CopyTo(after);
+                    onAfterCopy(after);
+                }
+                else
+                {
+                    before.Rename(afterName);
+                    onAfterCopy(before);
+                }
+
             }
         }
 
@@ -343,8 +338,7 @@ namespace UnlitWF
                 var delPrefix = new List<string>();
                 foreach (var p in props)
                 {
-                    string label, name;
-                    WFCommonUtility.FormatPropName(p.name, out label, out name);
+                    WFCommonUtility.FormatPropName(p.name, out var label, out var name);
                     if (label != null && name.ToLower() == "enable" && p.FloatValue == 0)
                     {
                         delPrefix.Add(label);
@@ -356,15 +350,28 @@ namespace UnlitWF
                 // プレフィックスに合致する設定値を消去
                 Predicate<ShaderSerializedProperty> predPrefix = p =>
                 {
-                    string label = WFCommonUtility.GetPrefixFromPropName(p.name);
-                    return label != null && delPrefix.Contains(label);
+                    if (WFCommonUtility.IsEnableToggleFromPropName(p.name))
+                    {
+                        return false; // EnableToggle自体は削除しない
+                    }
+                    // ラベルを取得
+                    WFCommonUtility.FormatPropName(p.name, out var label, out var name);
+                    if (string.IsNullOrEmpty(label))
+                    {
+                        return false; // ラベルなしは削除しない
+                    }
+                    if (!delPrefix.Contains(label))
+                    {
+                        return false; // 削除対象でないラベルは削除しない
+                    }
+                    return true; // 削除する
                 };
-                props.FindAll(predPrefix)
-                    // ただしEnableToggle自体は初期化しない
-                    .Where(p => !WFCommonUtility.IsEnableToggleFromPropName(p.name)).ToList().ForEach(p => del_props.Add(p));
+                props.FindAll(predPrefix).ForEach(p => del_props.Add(p));
+
                 // 未使用の値を削除
                 Predicate<ShaderSerializedProperty> predUnused = p => param.resetUnused && !p.HasPropertyInShader;
                 props.FindAll(predUnused).ForEach(p => del_props.Add(p));
+
                 // 削除実行
                 DeleteProperties(del_props);
 
@@ -666,6 +673,7 @@ namespace UnlitWF
 
         public string ParentName { get { return parent.name; } }
 
+        public int IntValue {  get { return (int)value.floatValue;  } set { this.value.floatValue = value;  } }
         public float FloatValue { get { return value.floatValue; } set { this.value.floatValue = value; } }
         public Color ColorValue { get { return value.colorValue; } set { this.value.colorValue = value; } }
         public Vector4 VectorValue { get { return value.vector4Value; } set { this.value.vector4Value = value; } }

@@ -330,6 +330,11 @@ namespace UnlitWF
             return mat != null && IsMobileSupportedShader(mat.shader);
         }
 
+        public static bool IsMigrationRequiredMaterial(Material mat)
+        {
+            return mat != null && Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat);
+        }
+
         /// <summary>
         /// 最新リリースのVersionInfo
         /// </summary>
@@ -459,6 +464,19 @@ namespace UnlitWF
         public static string GetShaderFallBackTarget(Material mat)
         {
             return mat == null ? null : GetShaderFallBackTarget(mat.shader);
+        }
+
+        public static int GetMaterialRenderQueueValue(Material mat)
+        {
+            // Material.renderQueue の値を単に参照すると -1 (FromShader) が取れないので SerializedObject から取得する
+            var so = new SerializedObject(mat);
+            so.Update();
+            var prop = so.FindProperty("m_CustomRenderQueue");
+            if (prop != null)
+            {
+                return prop.intValue;
+            }
+            return mat.renderQueue;
         }
     }
 

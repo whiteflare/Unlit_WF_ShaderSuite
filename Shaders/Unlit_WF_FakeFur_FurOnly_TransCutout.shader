@@ -40,7 +40,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
         [Normal]
             _FR_BumpMap             ("[FR] NormalMap Texture", 2D) = "bump" {}
         [Enum(NONE,0,X,1,Y,2,XY,3)]
-            _FR_FlipMirror          ("[FR] Flip Mirror", Float) = 0
+            _FlipMirror             ("[FR] Flip Mirror", Float) = 0
         [Header(Fur Color)]
             _FR_ShadowPower         ("[FR] Fur ShadowPower", Range(0, 1)) = 0
             _FR_TintColorBase       ("[FR] Tint Color (Base)", Color) = (1, 1, 1, 1)
@@ -78,17 +78,21 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
         [NoScaleOffset]
             _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
+            _TS_MinDist             ("[SH] FadeOut Distance (Near)", Range(0, 15)) = 1.0
+            _TS_MaxDist             ("[SH] FadeOut Distance (Far)", Range(0, 15)) = 4.0
         [Toggle(_)]
             _TS_FixContrast         ("[SH] Dont Ajust Contrast", Range(0, 1)) = 0
-            _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
-            _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
-            _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
-            _TS_Feather             ("[SH] Feather", Range(0, 0.2)) = 0.05
-            _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
             _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
+        [Header(ToonShade Advance)]
+            _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
+            _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
+            _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
+            _TS_1stFeather          ("[SH] 1st Feather", Range(0, 0.2)) = 0.05
+            _TS_2ndFeather          ("[SH] 2nd Feather", Range(0, 0.2)) = 0.05
+            _TS_3rdFeather          ("[SH] 3rd Feather", Range(0, 0.2)) = 0.05
 
         // Distance Fade
         [WFHeaderToggle(Distance Fade)]
@@ -122,7 +126,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/05/29", Float) = 0
+            _CurrentVersion         ("2022/06/15", Float) = 0
     }
 
     SubShader {

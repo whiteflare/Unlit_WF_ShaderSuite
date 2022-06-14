@@ -75,7 +75,7 @@
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
         o.vid = (float) v.vid;
 
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FR_FlipMirror & 1, _FR_FlipMirror & 2);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FlipMirror & 1, _FlipMirror & 2);
 
         float4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
         o.ws_light_dir = ws_light_dir.xyz;
@@ -219,7 +219,7 @@
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
         // 階調影
-        affectToonShade(i, uv_main, i.normal, i.normal, angle_light_camera, color);
+        affectToonShade(i, uv_main, i.normal, i.normal, i.normal, angle_light_camera, color);
         // Distance Fade
         affectDistanceFade(i, 1, color);
 
