@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: WhiteGem
   m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _GB_ENABLE _GF_ENABLE _GL_AUTO_ENABLE _GR_ENABLE
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -44,9 +44,9 @@ Material:
     - _AlphaBack: 0.8
     - _AlphaFront: 0.5
     - _BumpScale: 1
-    - _CullMode: 2
     - _CurrentVersion: 0
     - _FallBack: 0
+    - _FlipMirror: 0
     - _GB_BackCulllMode: 1
     - _GB_Enable: 1
     - _GF_BlendNormal: 0.1
@@ -73,8 +73,6 @@ Material:
     - _GR_Monochrome: 1
     - _GR_Power: 1
     - _NM_Enable: 0
-    - _NM_FlipMirror: 0
-    - _NM_FlipTangent: 0
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
