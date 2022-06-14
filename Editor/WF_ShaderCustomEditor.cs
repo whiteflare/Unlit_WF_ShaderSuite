@@ -236,6 +236,7 @@ namespace UnlitWF
                     // Color を sRGB -> Linear 変換して再設定する
                     if (material.HasProperty("_Color"))
                     {
+#if UNITY_2019_1_OR_NEWER
                         var idx = oldShader.FindPropertyIndex("_Color");
                         if (0 <= idx)
                         {
@@ -246,7 +247,10 @@ namespace UnlitWF
                                 material.SetColor("_Color", val.linear);
                             }
                         }
-
+#else
+                        var val = material.GetColor("_Color");
+                        material.SetColor("_Color", val.linear);
+#endif
                     }
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
                     if (material.HasProperty("_EmissionColor"))
@@ -856,7 +860,7 @@ namespace UnlitWF
             return hur;
         }
 
-        #region GUI部品
+#region GUI部品
 
         /// <summary>
         /// Shurikenスタイルのヘッダを表示する
@@ -1097,9 +1101,9 @@ namespace UnlitWF
             });
         }
 
-        #endregion
+#endregion
 
-        #region PropertyHook
+#region PropertyHook
 
         /// <summary>
         /// PropertyHookで使用する表示コンテキスト
@@ -1341,10 +1345,10 @@ namespace UnlitWF
             }
         }
 
-        #endregion
+#endregion
     }
 
-    #region MaterialPropertyDrawer
+#region MaterialPropertyDrawer
 
     internal static class WFHeaderMenuController
     {
@@ -1611,7 +1615,7 @@ namespace UnlitWF
         }
     }
 
-    #endregion
+#endregion
 }
 
 #endif
