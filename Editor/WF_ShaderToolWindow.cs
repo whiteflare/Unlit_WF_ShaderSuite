@@ -28,7 +28,34 @@ namespace UnlitWF
     internal static class WFMenu
     {
         public const string PATH_ASSETS = "Assets/UnlitWF Material Tools/";
+        public const string PATH_TOOLS = "Tools/UnlitWF/";
+        public const string PATH_MATERIAL = "CONTEXT/Material/";
+        public const string PATH_GAMEOBJECT = "GameObject/";
 
+#if WF_ML_JP
+        public const string ASSETS_AUTOCNV = PATH_ASSETS + "UnlitWF のマテリアルに変換する";
+        public const string ASSETS_CREANUP = PATH_ASSETS + "マテリアルのクリンナップ";
+        public const string ASSETS_COPY = PATH_ASSETS + "マテリアル設定値のコピー";
+        public const string ASSETS_RESET = PATH_ASSETS + "マテリアル設定値のリセット";
+        public const string ASSETS_MIGRATION = PATH_ASSETS + "マテリアルを最新に変換する";
+        public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "DebugView シェーダに切り替える";
+        public const string ASSETS_TEMPLATE = PATH_ASSETS + "MaterialTemplate を新規作成する";
+        public const string ASSETS_KEEPMAT = PATH_ASSETS + "マテリアルをシーンに保持する";
+        public const string ASSETS_CNGMOBILE = PATH_ASSETS + "モバイル向けシェーダに変換する";
+        public const string ASSETS_MIGALL = PATH_ASSETS + "全てのマテリアルを最新に変換する";
+
+        public const string TOOLS_CREANUP = PATH_TOOLS + "マテリアルのクリンナップ";
+        public const string TOOLS_COPY = PATH_TOOLS + "マテリアル設定値のコピー";
+        public const string TOOLS_RESET = PATH_TOOLS + "マテリアル設定値のリセット";
+        public const string TOOLS_MIGRATION = PATH_TOOLS + "マテリアルを最新に変換する";
+        public const string TOOLS_MIGALL = PATH_TOOLS + "全てのマテリアルを最新に変換する";
+
+        public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "UnlitWF のマテリアルに変換する";
+        public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "DebugView シェーダに切り替える";
+        public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "モバイル向けシェーダに変換する";
+
+        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "マテリアルのクリンナップ";
+#else
         public const string ASSETS_AUTOCNV = PATH_ASSETS + "Convert UnlitWF Material";
         public const string ASSETS_CREANUP = PATH_ASSETS + "CleanUp Material Property";
         public const string ASSETS_COPY = PATH_ASSETS + "Copy Material Property";
@@ -39,6 +66,22 @@ namespace UnlitWF
         public const string ASSETS_KEEPMAT = PATH_ASSETS + "Keep Materials in the Scene";
         public const string ASSETS_CNGMOBILE = PATH_ASSETS + "Change Mobile Shader";
         public const string ASSETS_MIGALL = PATH_ASSETS + "Migration All Materials";
+
+        public const string TOOLS_CREANUP = PATH_TOOLS + "CleanUp Material Property";
+        public const string TOOLS_COPY = PATH_TOOLS + "Copy Material Property";
+        public const string TOOLS_RESET = PATH_TOOLS + "Reset Material Property";
+        public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration Material";
+        public const string TOOLS_MIGALL = PATH_TOOLS + "Migration All Materials";
+
+        public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "Convert UnlitWF Material";
+        public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView Shader";
+        public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "Change Mobile shader";
+
+        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "CleanUp Material Property";
+#endif
+
+        public const string TOOLS_LNG_EN = PATH_TOOLS + "Menu Language Change To English";
+        public const string TOOLS_LNG_JP = PATH_TOOLS + "メニューの言語を日本語にする";
 
         public const int PRI_ASSETS_AUTOCNV = 2201;
         public const int PRI_ASSETS_CREANUP = 2301;
@@ -51,33 +94,16 @@ namespace UnlitWF
         public const int PRI_ASSETS_CNGMOBILE = 2701;
         public const int PRI_ASSETS_MIGALL = 2702;
 
-        public const string PATH_TOOLS = "Tools/UnlitWF/";
-
-        public const string TOOLS_CREANUP = PATH_TOOLS + "CleanUp Material Property";
-        public const string TOOLS_COPY = PATH_TOOLS + "Copy Material Property";
-        public const string TOOLS_RESET = PATH_TOOLS + "Reset Material Property";
-        public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration Material";
-        public const string TOOLS_MIGALL = PATH_TOOLS + "Migration All Materials";
-
         public const int PRI_TOOLS_CREANUP = 101;
         public const int PRI_TOOLS_COPY = 102;
         public const int PRI_TOOLS_RESET = 103;
         public const int PRI_TOOLS_MIGRATION = 104;
         public const int PRI_TOOLS_MIGALL = 301;
-
-        public const string PATH_MATERIAL = "CONTEXT/Material/";
-
-        public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "Convert UnlitWF Material";
-        public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView Shader";
-        public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "Change Mobile shader";
+        public const int PRI_TOOLS_CNGLANG = 501;
 
         public const int PRI_MATERIAL_AUTOCNV = 1654;
         public const int PRI_MATERIAL_DEBUGVIEW = 1655;
         public const int PRI_MATERIAL_CNGMOBILE = 1656;
-
-        public const string PATH_GAMEOBJECT = "GameObject/";
-
-        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "CleanUp Material Property";
 
         #region Convert UnlitWF material
 
@@ -164,6 +190,39 @@ namespace UnlitWF
                 new Converter.WFMaterialToMobileShaderConverter().ExecAutoConvert(mats);
             }
         }
+
+        #endregion
+
+        #region Change Lang
+
+#if WF_ML_JP
+        [MenuItem(TOOLS_LNG_EN, priority = WFMenu.PRI_TOOLS_CNGLANG)]
+        private static void Menu_ChangeLang()
+        {
+            if (!EditorUtility.DisplayDialog("WF", "Do you want to switch the menu about UnlitWF to English?\nIt may take a few minutes to switch.", "OK", "Cancel"))
+            {
+                return;
+            }
+            BuildTargetGroup currentTarget = EditorUserBuildSettings.selectedBuildTargetGroup;
+            var symbols = new List<string>(PlayerSettings.GetScriptingDefineSymbolsForGroup(currentTarget).Split(';'));
+            symbols.Remove("WF_ML_JP");
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(currentTarget, string.Join(";", symbols));
+        }
+#else
+        [MenuItem(TOOLS_LNG_JP, priority = WFMenu.PRI_TOOLS_CNGLANG)]
+        private static void Menu_ChangeLang()
+        {
+            if (!EditorUtility.DisplayDialog("WF", "UnlitWF に関するメニューを日本語にしますか？\n切り替えには数分の時間がかかる場合があります。", "OK", "Cancel"))
+            {
+                return;
+            }
+            BuildTargetGroup currentTarget = EditorUserBuildSettings.selectedBuildTargetGroup;
+            var symbols = new List<string>(PlayerSettings.GetScriptingDefineSymbolsForGroup(currentTarget).Split(';'));
+            symbols.Remove("WF_ML_JP");
+            symbols.Add("WF_ML_JP");
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(currentTarget, string.Join(";", symbols));
+        }
+#endif
 
         #endregion
 
