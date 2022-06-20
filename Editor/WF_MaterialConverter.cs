@@ -63,9 +63,11 @@ namespace UnlitWF.Converter
 
         public int ExecAutoConvert(params Material[] mats)
         {
-            Undo.RecordObjects(mats, "WF Convert materials");
+            Undo.RecordObjects(mats, "WF " + GetShortName());
             return ExecAutoConvertWithoutUndo(mats);
         }
+
+        public abstract string GetShortName();
 
         public abstract CTX CreateContext(Material target);
 
@@ -89,9 +91,26 @@ namespace UnlitWF.Converter
                     cnv(ctx);
                 }
                 count++;
-                Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+                OnAfterConvert(ctx);
             }
+            OnAfterExecute(mats, count);
             return count;
+        }
+
+        protected virtual void OnAfterConvert(CTX ctx)
+        {
+            if (ctx.oldMaterial.shader.name != ctx.target.shader.name)
+            {
+                Debug.LogFormat("[WF] {0} {1}: {2} -> {3}", GetShortName(), ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+            }
+        }
+
+        protected virtual void OnAfterExecute(Material[] mats, int total)
+        {
+            if (0 < total)
+            {
+                Debug.LogFormat("[WF] {0}: total {1} material converted", GetShortName(), total);
+            }
         }
 
         /// <summary>
@@ -176,6 +195,11 @@ namespace UnlitWF.Converter
         {
         }
 
+        public override string GetShortName()
+        {
+            return "Convert To MobileShader";
+        }
+
         public override ConvertContext CreateContext(Material target)
         {
             return new ConvertContext(target);
@@ -235,6 +259,11 @@ namespace UnlitWF.Converter
         public override SelectShaderContext CreateContext(Material target)
         {
             return new SelectShaderContext(target);
+        }
+
+        public override string GetShortName()
+        {
+            return "Convert From OtherShader";
         }
 
         protected override bool Validate(Material mat)
@@ -652,6 +681,11 @@ namespace UnlitWF.Converter
     {
         public WFMaterialMigrationConverter() : base(CreateConverterList())
         {
+        }
+
+        public override string GetShortName()
+        {
+            return "Migration Materials";
         }
 
         public override ConvertContext CreateContext(Material target)
