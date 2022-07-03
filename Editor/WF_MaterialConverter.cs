@@ -277,7 +277,7 @@ namespace UnlitWF.Converter
             public ShaderType renderType = ShaderType.NoMatch;
             public bool outline = false;
 
-            public SelectShaderContext(Material mat): base(mat)
+            public SelectShaderContext(Material mat) : base(mat)
             {
 
             }
@@ -358,6 +358,10 @@ namespace UnlitWF.Converter
                     if (ctx.renderType == ShaderType.NoMatch) {
                         if (HasCustomValue(ctx, "_ClippingMask")) {
                             ctx.renderType = ShaderType.Cutout;
+                        }
+                        if (HasCustomValue(ctx, "_AlphaMask"))
+                        {
+                            ctx.renderType = ShaderType.Transparent;
                         }
                     }
                 },
