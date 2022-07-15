@@ -136,6 +136,19 @@ namespace UnlitWF
                 }
                 EditorGUILayout.Space();
             }),
+
+            // _TR_InvMaskVal の直後に設定ボタンを追加する
+            new CustomPropertyHook("_TR_InvMaskVal", null, (ctx, changed) => {
+                var guiContent = WFI18N.GetGUIContent("RM", "Assign MainTex to MaskTexture", "メインテクスチャをリムライトマスクに設定します");
+                if (DrawButtonFieldProperty(guiContent, "APPLY")) {
+                    foreach(var mat in WFCommonUtility.AsMaterials(ctx.editor.targets))
+                    {
+                        mat.SetTexture("_TR_MaskTex", mat.GetTexture("_MainTex"));
+                        mat.SetFloat("_TR_InvMaskVal", 0);
+                    }
+                }
+            }),
+
             // _NS_InvMaskVal の直後に FlipMirror を再表示
             new CustomPropertyHook("_NS_InvMaskVal", null, (ctx, changed) => {
                 var prop = ctx.all.Where(p => p.name == "_FlipMirror").FirstOrDefault();
@@ -144,6 +157,7 @@ namespace UnlitWF
                     ctx.editor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName.Replace("[NM]", "[NS]")));
                 }
             }),
+
             // _TS_InvMaskVal の後に説明文を追加する
             new CustomPropertyHook("_TS_InvMaskVal", null, (ctx, changed) => {
                 EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info);
