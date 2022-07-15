@@ -405,12 +405,18 @@ namespace UnlitWF.Converter
                         }
                     }
                     // シェーダ切り替え後に RenderQueue をコピー
-                    ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
+                    if (ctx.target.renderQueue != ctx.oldMaterial.renderQueue)
+                    {
+                        ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
+                    }
                 },
                 ctx => {
                     if (HasCustomValue(ctx, "_MainTex")) {
                         // メインテクスチャがあるならば _Color は白にする
-                        ctx.target.SetColor("_Color", Color.white);
+                        if (!IsMatchShaderName(ctx, "Standard") && !IsMatchShaderName(ctx, "Autodesk"))
+                        {
+                            ctx.target.SetColor("_Color", Color.white);
+                        }
                     }
                 },
                 ctx => {
