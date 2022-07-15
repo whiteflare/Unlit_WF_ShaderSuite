@@ -36,6 +36,7 @@ namespace UnlitWF
             new CustomPropertyHook("_TS_Power", ctx => {
                 var guiContent = WFI18N.GetGUIContent("SH", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
+                    ctx.editor.RegisterPropertyChangeUndo("Shade Color Suggest");
                     SuggestShadowColor(WFCommonUtility.AsMaterials(ctx.editor.targets));
                 }
             } , null),
@@ -46,6 +47,7 @@ namespace UnlitWF
                 }
                 var guiContent = WFI18N.GetGUIContent("SH", "Align the boundaries equally", "影の境界線を等間隔に整列します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
+                    ctx.editor.RegisterPropertyChangeUndo("Align the boundaries equally");
                     SuggestShadowBorder(WFCommonUtility.AsMaterials(ctx.editor.targets));
                 }
             } , null),
@@ -125,6 +127,7 @@ namespace UnlitWF
                     var so = ctx.current.textureScaleAndOffset;
                     so.x /= 2;
                     so.y /= 2;
+                    ctx.editor.RegisterPropertyChangeUndo("Texture scale change");
                     ctx.current.textureScaleAndOffset = so;
                 }
                 rect.x += rect.width + 4;
@@ -132,6 +135,7 @@ namespace UnlitWF
                     var so = ctx.current.textureScaleAndOffset;
                     so.x *= 2;
                     so.y *= 2;
+                    ctx.editor.RegisterPropertyChangeUndo("Texture scale change");
                     ctx.current.textureScaleAndOffset = so;
                 }
                 EditorGUILayout.Space();
@@ -141,6 +145,7 @@ namespace UnlitWF
             new CustomPropertyHook("_TR_InvMaskVal", null, (ctx, changed) => {
                 var guiContent = WFI18N.GetGUIContent("RM", "Assign MainTex to MaskTexture", "メインテクスチャをリムライトマスクに設定します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
+                    ctx.editor.RegisterPropertyChangeUndo("Assign MainTex to MaskTexture");
                     foreach(var mat in WFCommonUtility.AsMaterials(ctx.editor.targets))
                     {
                         mat.SetTexture("_TR_MaskTex", mat.GetTexture("_MainTex"));
