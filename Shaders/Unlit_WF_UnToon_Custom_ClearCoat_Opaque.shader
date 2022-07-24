@@ -466,6 +466,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION

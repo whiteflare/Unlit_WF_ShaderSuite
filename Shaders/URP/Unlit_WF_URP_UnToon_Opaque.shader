@@ -463,6 +463,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
 
             #define _WF_PLATFORM_LWRP
 
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #include "../WF_INPUT_UnToon.cginc"

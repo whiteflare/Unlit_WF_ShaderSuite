@@ -384,6 +384,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #include "../WF_INPUT_UnToon.cginc"

@@ -251,6 +251,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
             #define _WF_ALPHA_CUTOUT
 
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION

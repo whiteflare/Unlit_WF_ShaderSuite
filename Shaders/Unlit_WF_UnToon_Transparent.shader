@@ -503,6 +503,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
