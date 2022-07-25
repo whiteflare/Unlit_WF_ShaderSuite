@@ -177,6 +177,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
                 float4 color = float4(0, 0, 0, 1);
+                float2 grid_uv;
 
                 // 基本色
                 switch(_ModeColor) {
@@ -195,12 +196,21 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                     case 6:
                         color.rgb = facing ? float4(0, 1, 0, 1) : float4(1, 0, 0, 1);
                         break;
+                    case 7:
+#ifdef LIGHTMAP_ON
+                        color.rgb = facing ? float4(0, 1, 0, 1) : float4(1, 0, 0, 1);
+                        grid_uv = saturate(i.uv2 * unity_LightmapST.xy + unity_LightmapST.zw);
+                        color.b = 0;
+#else
+                        grid_uv.xy = 0;
+                        discard;
+#endif
+                        break;
                     default:
                         break;
                 }
 
                 // UV
-                float2 grid_uv;
                 switch(_ModeUV) {
                     case 1:
                         grid_uv = i.uv;
