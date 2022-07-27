@@ -352,7 +352,14 @@ namespace UnlitWF
         [MenuItem(WFMenu.GAMEOBJECT_CREANUP, priority = 10)] // GameObject/配下は priority の扱いがちょっと特殊
         private static void OpenWindowFromMenu_GameObject()
         {
-            ToolCommon.SetSelectedMaterials(MatSelectMode.FromScene);
+            if (Selection.GetFiltered<GameObject>(SelectionMode.Unfiltered).Length == 0)
+            {
+                ToolCommon.SetMaterials(new MaterialSeeker().GetAllSceneAllMaterial().ToArray());
+            }
+            else
+            {
+                ToolCommon.SetSelectedMaterials(MatSelectMode.FromScene);
+            }
             GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
         }
 
@@ -361,12 +368,6 @@ namespace UnlitWF
         {
             ToolCommon.SetSelectedMaterials(MatSelectMode.FromSceneOrAsset);
             GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
-        }
-
-        [MenuItem(WFMenu.GAMEOBJECT_CREANUP, validate = true)]
-        private static bool MenuValidation_HasGameObjects()
-        {
-            return Selection.GetFiltered<GameObject>(SelectionMode.Unfiltered).Length != 0;
         }
 
         internal static void OpenWindowFromShaderGUI(Material[] mats)
