@@ -141,6 +141,9 @@ namespace UnlitWF.Converter
                         return 0.001f < Mathf.Abs(prop.FloatValue);
 
                     case ShaderUtil.ShaderPropertyType.Color:
+                        var col = prop.ColorValue;
+                        return 0.001f < Mathf.Abs(col.r) || 0.001f < Mathf.Abs(col.g) || 0.001f < Mathf.Abs(col.b);
+
                     case ShaderUtil.ShaderPropertyType.Vector:
                         var vec = prop.VectorValue;
                         return 0.001f < Mathf.Abs(vec.x) || 0.001f < Mathf.Abs(vec.y) || 0.001f < Mathf.Abs(vec.z);
