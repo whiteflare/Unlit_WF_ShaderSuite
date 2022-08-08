@@ -416,7 +416,7 @@ namespace UnlitWF.Converter
                 ctx => {
                     if (HasCustomValue(ctx, "_MainTex")) {
                         // メインテクスチャがあるならば _Color は白にする
-                        if (!IsMatchShaderName(ctx, "Standard") && !IsMatchShaderName(ctx, "Autodesk"))
+                        if (!IsMatchShaderName(ctx, "Standard") && !IsMatchShaderName(ctx, "Autodesk") && !IsMatchShaderName(ctx, "Unlit/Color"))
                         {
                             ctx.target.SetColor("_Color", Color.white);
                         }
@@ -467,6 +467,10 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    if (IsMatchShaderName(ctx, "Unlit/"))
+                    {
+                        return;
+                    }
                     // Toon影
                     ctx.target.SetInt("_TS_Enable", 1);
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
