@@ -344,7 +344,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/06/15", Float) = 0
+            _CurrentVersion         ("2022/08/13", Float) = 0
     }
 
     SubShader {
@@ -489,6 +489,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
             #define _WF_ALPHA_BLEND
             #define _WF_PLATFORM_LWRP
 
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #include "../WF_INPUT_UnToon.cginc"

@@ -188,7 +188,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/06/15", Float) = 0
+            _CurrentVersion         ("2022/08/13", Float) = 0
     }
 
     SubShader {
@@ -330,6 +330,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
 
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #include "../WF_INPUT_UnToon.cginc"
