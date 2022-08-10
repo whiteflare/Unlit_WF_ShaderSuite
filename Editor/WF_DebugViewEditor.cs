@@ -168,6 +168,7 @@ namespace UnlitWF
             new DebugModeSection("Model Visualization", new List<DebugMode>(){
                 new DebugMode("Vertex Color", "_ModeColor", 5),
                 new DebugMode("Facing", "_ModeColor", 6),
+                new DebugMode("Facing (Lightmapped Only)", "_ModeColor", 7),
             }),
             new DebugModeSection("UV Visualization", new List<DebugMode>(){
                 new DebugMode("UV1", "_ModeUV", 1),

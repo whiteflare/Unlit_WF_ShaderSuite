@@ -30,12 +30,12 @@ namespace UnlitWF
         public Material material;
         public bool copyMaterialColor;
 
-        [MenuItem(WFMenu.ASSETS_TEMPLATE, priority = WFMenu.PRI_ASSETS_TEMPLATE)]
-        public static void CreateAsset()
-        {
-            var mat = new Material(Shader.Find("UnlitWF/WF_UnToon_Opaque"));
-            CreateAsset(mat);
-        }
+        //[MenuItem(WFMenu.ASSETS_TEMPLATE, priority = WFMenu.PRI_ASSETS_TEMPLATE)]
+        //public static void CreateAsset()
+        //{
+        //    var mat = new Material(Shader.Find("UnlitWF/WF_UnToon_Opaque"));
+        //    CreateAsset(mat);
+        //}
 
         public static void CreateAsset(Material copy)
         {
