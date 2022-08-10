@@ -352,7 +352,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/06/15", Float) = 0
+            _CurrentVersion         ("2022/08/13", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -503,6 +503,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
+            #define _ES_ENABLE
             #define _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION

@@ -198,6 +198,15 @@ namespace UnlitWF
                     Debug.LogFormat("[WF] {0} has {1} keywords {2}", mat, mat.shaderKeywords.Length, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
 #endif
                 }
+                // _ES_ENABLE に連動して MaterialGlobalIlluminationFlags を設定する
+                if (mat.HasProperty("_ES_Enable"))
+                {
+                    var flag = mat.GetInt("_ES_Enable") != 0 ? MaterialGlobalIlluminationFlags.BakedEmissive : MaterialGlobalIlluminationFlags.None;
+                    if (mat.globalIlluminationFlags != flag)
+                    {
+                        mat.globalIlluminationFlags = flag;
+                    }
+                }
             }
         }
 
