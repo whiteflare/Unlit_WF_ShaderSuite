@@ -355,7 +355,7 @@ namespace UnlitWF
                         return false; // EnableToggle自体は削除しない
                     }
                     // ラベルを取得
-                    WFCommonUtility.FormatPropName(p.name, out var label, out var name);
+                    var label = WFCommonUtility.GetPrefixFromPropName(p.name);
                     if (string.IsNullOrEmpty(label))
                     {
                         return false; // ラベルなしは削除しない

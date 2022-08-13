@@ -15,6 +15,11 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/*
+ * NOTE: もしインポート時にダイアログを表示させたくない場合、このcsファイルを削除してください。
+ * If you do not want the dialog to appear on import, delete this cs file.
+ */
+
 #if UNITY_EDITOR
 
 using System.Linq;

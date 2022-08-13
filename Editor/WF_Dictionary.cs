@@ -370,6 +370,7 @@ namespace UnlitWF
             new WFI18NTranslation("RM", "Power Top", "強度(上)"),
             new WFI18NTranslation("RM", "Power Side", "強度(横)"),
             new WFI18NTranslation("RM", "Power Bottom", "強度(下)"),
+            new WFI18NTranslation("RM", "Assign MainTex to MaskTexture", "MainTexをマスクに設定する"),
             // Overlay Texture
             new WFI18NTranslation("OL", "Overlay Color", "オーバーレイ テクスチャ"),
             new WFI18NTranslation("OL", "Overlay Texture", "オーバーレイ テクスチャ"),

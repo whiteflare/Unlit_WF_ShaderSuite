@@ -63,9 +63,11 @@ namespace UnlitWF.Converter
 
         public int ExecAutoConvert(params Material[] mats)
         {
-            Undo.RecordObjects(mats, "WF Convert materials");
+            Undo.RecordObjects(mats, "WF " + GetShortName());
             return ExecAutoConvertWithoutUndo(mats);
         }
+
+        public abstract string GetShortName();
 
         public abstract CTX CreateContext(Material target);
 
@@ -89,9 +91,26 @@ namespace UnlitWF.Converter
                     cnv(ctx);
                 }
                 count++;
-                Debug.LogFormat("[WF] Convert {0}: {1} -> {2}", ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+                OnAfterConvert(ctx);
             }
+            OnAfterExecute(mats, count);
             return count;
+        }
+
+        protected virtual void OnAfterConvert(CTX ctx)
+        {
+            if (ctx.oldMaterial.shader.name != ctx.target.shader.name)
+            {
+                Debug.LogFormat("[WF] {0} {1}: {2} -> {3}", GetShortName(), ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+            }
+        }
+
+        protected virtual void OnAfterExecute(Material[] mats, int total)
+        {
+            if (0 < total)
+            {
+                Debug.LogFormat("[WF] {0}: total {1} material converted", GetShortName(), total);
+            }
         }
 
         /// <summary>
@@ -122,6 +141,9 @@ namespace UnlitWF.Converter
                         return 0.001f < Mathf.Abs(prop.FloatValue);
 
                     case ShaderUtil.ShaderPropertyType.Color:
+                        var col = prop.ColorValue;
+                        return 0.001f < Mathf.Abs(col.r) || 0.001f < Mathf.Abs(col.g) || 0.001f < Mathf.Abs(col.b);
+
                     case ShaderUtil.ShaderPropertyType.Vector:
                         var vec = prop.VectorValue;
                         return 0.001f < Mathf.Abs(vec.x) || 0.001f < Mathf.Abs(vec.y) || 0.001f < Mathf.Abs(vec.z);
@@ -174,6 +196,11 @@ namespace UnlitWF.Converter
     {
         public WFMaterialToMobileShaderConverter() : base(CreateConverterList())
         {
+        }
+
+        public override string GetShortName()
+        {
+            return "Convert To MobileShader";
         }
 
         public override ConvertContext CreateContext(Material target)
@@ -237,6 +264,11 @@ namespace UnlitWF.Converter
             return new SelectShaderContext(target);
         }
 
+        public override string GetShortName()
+        {
+            return "Convert From OtherShader";
+        }
+
         protected override bool Validate(Material mat)
         {
             // UnlitWF系ではないマテリアルを対象に処理する
@@ -248,7 +280,7 @@ namespace UnlitWF.Converter
             public ShaderType renderType = ShaderType.NoMatch;
             public bool outline = false;
 
-            public SelectShaderContext(Material mat): base(mat)
+            public SelectShaderContext(Material mat) : base(mat)
             {
 
             }
@@ -330,6 +362,10 @@ namespace UnlitWF.Converter
                         if (HasCustomValue(ctx, "_ClippingMask")) {
                             ctx.renderType = ShaderType.Cutout;
                         }
+                        if (HasCustomValue(ctx, "_AlphaMask"))
+                        {
+                            ctx.renderType = ShaderType.Transparent;
+                        }
                     }
                 },
                 ctx => {
@@ -372,12 +408,18 @@ namespace UnlitWF.Converter
                         }
                     }
                     // シェーダ切り替え後に RenderQueue をコピー
-                    ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
+                    if (ctx.target.renderQueue != ctx.oldMaterial.renderQueue)
+                    {
+                        ctx.target.renderQueue = ctx.oldMaterial.renderQueue;
+                    }
                 },
                 ctx => {
                     if (HasCustomValue(ctx, "_MainTex")) {
                         // メインテクスチャがあるならば _Color は白にする
-                        ctx.target.SetColor("_Color", Color.white);
+                        if (!IsMatchShaderName(ctx, "Standard") && !IsMatchShaderName(ctx, "Autodesk") && !IsMatchShaderName(ctx, "Unlit/Color"))
+                        {
+                            ctx.target.SetColor("_Color", Color.white);
+                        }
                     }
                 },
                 ctx => {
@@ -425,6 +467,10 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    if (IsMatchShaderName(ctx, "Unlit/"))
+                    {
+                        return;
+                    }
                     // Toon影
                     ctx.target.SetInt("_TS_Enable", 1);
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
@@ -652,6 +698,11 @@ namespace UnlitWF.Converter
     {
         public WFMaterialMigrationConverter() : base(CreateConverterList())
         {
+        }
+
+        public override string GetShortName()
+        {
+            return "Migration Materials";
         }
 
         public override ConvertContext CreateContext(Material target)
