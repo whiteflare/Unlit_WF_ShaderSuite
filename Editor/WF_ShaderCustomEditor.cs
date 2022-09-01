@@ -231,9 +231,10 @@ namespace UnlitWF
             PreChangeShader(material, oldShader, newShader);
 
             // 割り当て
+            var oldMat = new Material(material);
             base.AssignNewShaderToMaterial(material, oldShader, newShader);
 
-            PostChangeShader(material, oldShader, newShader);
+            PostChangeShader(oldMat, material, oldShader, newShader);
         }
 
         public static void PreChangeShader(Material material, Shader oldShader, Shader newShader)
@@ -241,19 +242,19 @@ namespace UnlitWF
             // nop
         }
 
-        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader)
+        public static void PostChangeShader(Material oldMat, Material newMat, Shader oldShader, Shader newShader)
         {
-            if (material != null)
+            if (newMat != null)
             {
                 // DebugViewの保存に使っているタグはクリア
-                WF_DebugViewEditor.ClearDebugOverrideTag(material);
+                WF_DebugViewEditor.ClearDebugOverrideTag(newMat);
                 // シェーダキーワードを整理する
-                WFCommonUtility.SetupShaderKeyword(material);
+                WFCommonUtility.SetupShaderKeyword(newMat);
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
                     // Color を sRGB -> Linear 変換して再設定する
-                    if (material.HasProperty("_Color"))
+                    if (newMat.HasProperty("_Color"))
                     {
 #if UNITY_2019_1_OR_NEWER
                         var idx = oldShader.FindPropertyIndex("_Color");
@@ -262,8 +263,8 @@ namespace UnlitWF
                             var flags = oldShader.GetPropertyFlags(idx);
                             if (!flags.HasFlag(UnityEngine.Rendering.ShaderPropertyFlags.HDR))
                             {
-                                var val = material.GetColor("_Color");
-                                material.SetColor("_Color", val.linear);
+                                var val = newMat.GetColor("_Color");
+                                newMat.SetColor("_Color", val.linear);
                             }
                         }
 #else
@@ -272,23 +273,23 @@ namespace UnlitWF
 #endif
                     }
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
-                    if (material.HasProperty("_EmissionColor"))
+                    if (newMat.HasProperty("_EmissionColor"))
                     {
-                        var val = material.GetColor("_EmissionColor");
+                        var val = newMat.GetColor("_EmissionColor");
                         if (val.a < 1e-4)
                         {
                             val.a = 1.0f;
-                            material.SetColor("_EmissionColor", val);
+                            newMat.SetColor("_EmissionColor", val);
                         }
                     }
                     // もし FakeFur への切り替えかつ _Cutoff が 0.5 だったら 0.2 を設定しちゃう
-                    if (newShader.name.Contains("FakeFur") && material.HasProperty("_Cutoff"))
+                    if (newShader.name.Contains("FakeFur") && newMat.HasProperty("_Cutoff"))
                     {
-                        var val = material.GetFloat("_Cutoff");
+                        var val = newMat.GetFloat("_Cutoff");
                         if (Mathf.Abs(val - 0.5f) < Mathf.Epsilon)
                         {
                             val = 0.2f;
-                            material.SetFloat("_Cutoff", val);
+                            newMat.SetFloat("_Cutoff", val);
                         }
                     }
                 }
@@ -301,11 +302,16 @@ namespace UnlitWF
                         if (!oldShader.name.Contains("_Mix") && newShader.name.Contains("_Mix"))
                         {
                             // Mixへの切り替えならば、FR_Height2とFR_Repeat2を設定する
-                            var height = material.GetFloat("_FR_Height");
-                            material.SetFloat("_FR_Height2", height * 1.25f);
-                            var repeat = material.GetInt("_FR_Repeat");
-                            material.SetInt("_FR_Repeat2", Math.Max(1, repeat - 1));
+                            var height = newMat.GetFloat("_FR_Height");
+                            newMat.SetFloat("_FR_Height2", height * 1.25f);
+                            var repeat = newMat.GetInt("_FR_Repeat");
+                            newMat.SetInt("_FR_Repeat2", Math.Max(1, repeat - 1));
                         }
+                    }
+                    // 同種シェーダの切替時には RenderQueue をコピーする
+                    if (oldShader.renderQueue == newShader.renderQueue && oldMat.renderQueue != oldShader.renderQueue)
+                    {
+                        newMat.renderQueue = oldMat.renderQueue;
                     }
                 }
             }

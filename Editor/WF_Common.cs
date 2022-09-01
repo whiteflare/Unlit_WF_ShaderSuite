@@ -246,27 +246,27 @@ namespace UnlitWF
                     {
                         continue;
                     }
-                    var oldShader = m.shader;
+                    var oldM = new Material(m);
 
                     // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
                     if (WF_DebugViewEditor.IsSupportedShader(newShader))
                     {
-                        WF_DebugViewEditor.PreChangeShader(m, oldShader, newShader);
+                        WF_DebugViewEditor.PreChangeShader(m, oldM.shader, newShader);
                     }
                     else if (ShaderCustomEditor.IsSupportedShader(newShader))
                     {
-                        ShaderCustomEditor.PreChangeShader(m, oldShader, newShader);
+                        ShaderCustomEditor.PreChangeShader(m, oldM.shader, newShader);
                     }
                     // マテリアルにシェーダ割り当て
                     m.shader = newShader;
                     // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
                     if (WF_DebugViewEditor.IsSupportedShader(newShader))
                     {
-                        WF_DebugViewEditor.PostChangeShader(m, oldShader, newShader);
+                        WF_DebugViewEditor.PostChangeShader(oldM, m, oldM.shader, newShader);
                     }
                     else if (ShaderCustomEditor.IsSupportedShader(newShader))
                     {
-                        ShaderCustomEditor.PostChangeShader(m, oldShader, newShader);
+                        ShaderCustomEditor.PostChangeShader(oldM, m, oldM.shader, newShader);
                     }
                 }
             }
