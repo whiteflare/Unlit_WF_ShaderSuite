@@ -405,7 +405,13 @@ namespace UnlitWF
             // プロパティ表示
             if (!context.hidden && !context.custom)
             {
+                // プロパティ表示
                 context.editor.ShaderProperty(context.current, context.guiContent);
+                // Colorについては追加で出力
+                if (context.current.type == MaterialProperty.PropType.Color)
+                {
+                    DrawAdditionalColorCodeField(context.current);
+                }
             }
 
             // チェック終了
@@ -999,6 +1005,8 @@ namespace UnlitWF
 
             // 1行テクスチャプロパティ
             materialEditor.TexturePropertySingleLine(label, propTexture, propColor);
+            // 追加のカラーコードフィールド
+            DrawAdditionalColorCodeField(propColor);
 
             // もしテクスチャが新たに設定されたならば、カラーを白にリセットする
             if (EditorGUI.EndChangeCheck() && oldTexture == null && propTexture.textureValue != null)
@@ -1084,7 +1092,13 @@ namespace UnlitWF
             }
         }
 
-        private static bool DrawButtonFieldProperty(GUIContent label, string buttonText)
+        /// <summary>
+        /// ラベル付きボタンフィールドを表示する。
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="buttonText"></param>
+        /// <returns></returns>
+        public static bool DrawButtonFieldProperty(GUIContent label, string buttonText)
         {
             Rect rect = EditorGUILayout.GetControlRect(true, 20);
             rect.y += 1;
@@ -1092,6 +1106,40 @@ namespace UnlitWF
             rect.y -= 2;
             rect.height = 18;
             return GUI.Button(rect, buttonText);
+        }
+
+        /// <summary>
+        /// 追加のカラーコードテキストフィールドを表示する。
+        /// </summary>
+        /// <param name="propColor"></param>
+        public static void DrawAdditionalColorCodeField(MaterialProperty propColor)
+        {
+            var color = propColor.colorValue;
+            if (1f < color.maxColorComponent)
+            {
+                return; // HDRカラーになっている場合はフィールド自体を表示しない
+            }
+
+            var code = ColorUtility.ToHtmlStringRGB(color);
+
+            // 位置合わせ
+            var rect2 = GUILayoutUtility.GetLastRect();
+            rect2.x = rect2.xMax - EditorGUIUtility.fieldWidth * 2 - 4;
+            rect2.width = EditorGUIUtility.fieldWidth;
+
+            // 表示
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = propColor.hasMixedValue;
+            code = EditorGUI.DelayedTextField(rect2, code);
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck())
+            {
+                // 回収
+                if (ColorUtility.TryParseHtmlString(code, out color) || ColorUtility.TryParseHtmlString("#" + code, out color))
+                {
+                    propColor.colorValue = color;
+                }
+            }
         }
 
         internal static bool ButtonWithDropdownList(GUIContent content, Action<Rect> openMenuCallback)
