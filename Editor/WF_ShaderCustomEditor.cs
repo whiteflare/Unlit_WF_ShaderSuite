@@ -613,8 +613,6 @@ namespace UnlitWF
             {
                 var param = CleanUpParameter.Create();
                 param.materials = WFCommonUtility.AsMaterials(materialEditor.targets);
-                param.resetKeywords = true;
-                param.resetUnused = true;
                 WFMaterialEditUtility.CleanUpProperties(param);
             }
 
