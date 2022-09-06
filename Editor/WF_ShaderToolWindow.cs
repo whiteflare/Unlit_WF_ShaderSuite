@@ -17,6 +17,7 @@
 
 #if UNITY_EDITOR
 
+// VRCSDK有無の判定ここから //////
 #if VRC_SDK_VRCSDK3
 #define ENV_VRCSDK3
 #if UDON
@@ -25,6 +26,7 @@
 #define ENV_VRCSDK3_AVATAR
 #endif
 #endif
+// VRCSDK有無の判定ここまで //////
 
 using System;
 using System.Collections.Generic;
