@@ -477,6 +477,24 @@ namespace UnlitWF
                 rect = EditorGUILayout.GetControlRect();
                 rect.y += 2;
                 GUI.Label(rect, "Current Shader Variants", EditorStyles.boldLabel);
+
+                // 一時的にフィールド幅を変更
+                EditorGUIUtility.labelWidth = 0;
+
+                // ファミリー
+                {
+                    var families = WFShaderNameDictionary.GetFamilyList();
+                    // ラベル文字列を作成
+                    var labels = families.Select(nm => nm == null ? "" : nm.Familly).ToArray();
+                    int idx = Array.IndexOf(labels, snm.Familly);
+
+                    EditorGUI.BeginChangeCheck();
+                    int select = EditorGUILayout.Popup("Family", idx, labels);
+                    if (EditorGUI.EndChangeCheck() && idx != select)
+                    {
+                        WFCommonUtility.ChangeShader(families[select].Name, targets);
+                    }
+                }
                 // バリアント
                 {
                     // 同じ Variant のシェーダをリストに
@@ -520,6 +538,9 @@ namespace UnlitWF
                         WFCommonUtility.ChangeShader(variants[select].Name, targets);
                     }
                 }
+
+                // フィールド幅を戻す
+                materialEditor.SetDefaultGUIWidths();
             }
         }
 

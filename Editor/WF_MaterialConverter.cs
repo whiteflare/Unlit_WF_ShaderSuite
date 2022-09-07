@@ -178,15 +178,6 @@ namespace UnlitWF.Converter
             }
             return false;
         }
-
-        protected static bool IsURP()
-        {
-#if UNITY_2019_1_OR_NEWER
-            return UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
-#else
-            return false;
-#endif
-        }
     }
 
     /// <summary>
@@ -211,7 +202,7 @@ namespace UnlitWF.Converter
         protected override bool Validate(Material mat)
         {
             // UnlitWFのマテリアルを対象に、URPではない場合に変換する
-            return WFCommonUtility.IsSupportedShader(mat) && !WFCommonUtility.IsMobileSupportedShader(mat) && !IsURP();
+            return WFCommonUtility.IsSupportedShader(mat) && !WFCommonUtility.IsMobileSupportedShader(mat) && !WFCommonUtility.IsURP();
         }
 
         protected static List<Action<ConvertContext>> CreateConverterList()
@@ -369,7 +360,7 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
-                    if (IsURP()) {
+                    if (WFCommonUtility.IsURP()) {
                         switch(ctx.renderType) {
                             case ShaderType.Transparent:
                                 WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Transparent", ctx.target);

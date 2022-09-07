@@ -487,6 +487,20 @@ namespace UnlitWF
             }
             return mat.renderQueue;
         }
+
+        public static string GetCurrentRenderPipeline()
+        {
+            return WFCommonUtility.IsURP() ? "URP" : "BRP";
+        }
+
+        public static bool IsURP()
+        {
+#if UNITY_2019_1_OR_NEWER
+            return UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
+#else
+            return false;
+#endif
+        }
     }
 
     public abstract class WFCustomKeywordSetting
@@ -942,17 +956,21 @@ namespace UnlitWF
 
     internal class WFShaderName
     {
-        public string Familly { get; private set; }
-        public string Variant { get; private set; }
-        public string RenderType { get; private set; }
-        public string Name { get; private set; }
+        public readonly string RenderPipeline;
+        public readonly string Familly;
+        public readonly string Variant;
+        public readonly string RenderType;
+        public readonly string Name;
+        public readonly bool Represent;
 
-        public WFShaderName(string familly, string variant, string renderType, string name)
+        public WFShaderName(string rp, string familly, string variant, string renderType, string name, bool represent = false)
         {
-            this.Familly = familly;
-            this.Variant = variant;
-            this.RenderType = renderType;
-            this.Name = name;
+            RenderPipeline = rp;
+            Familly = familly;
+            Variant = variant;
+            RenderType = renderType;
+            Name = name;
+            Represent = represent;
         }
     }
 
@@ -968,7 +986,7 @@ namespace UnlitWF
             {
                 return false;
             }
-            return x.Familly == y.Familly && x.Variant == y.Variant;
+            return x.RenderPipeline == y.RenderPipeline && x.Familly == y.Familly && x.Variant == y.Variant;
         }
 
         public int GetHashCode(WFShaderName x)
@@ -977,7 +995,7 @@ namespace UnlitWF
             {
                 return 0;
             }
-            return x.Familly.GetHashCode() ^ x.Variant.GetHashCode();
+            return x.RenderPipeline.GetHashCode() ^ x.Familly.GetHashCode() ^ x.Variant.GetHashCode();
         }
     }
 
@@ -993,7 +1011,7 @@ namespace UnlitWF
             {
                 return false;
             }
-            return x.Familly == y.Familly && x.RenderType == y.RenderType;
+            return x.RenderPipeline == y.RenderPipeline && x.Familly == y.Familly && x.RenderType == y.RenderType;
         }
 
         public int GetHashCode(WFShaderName x)
@@ -1002,15 +1020,36 @@ namespace UnlitWF
             {
                 return 0;
             }
-            return x.Familly.GetHashCode() ^ x.RenderType.GetHashCode();
+            return x.RenderPipeline.GetHashCode() ^ x.Familly.GetHashCode() ^ x.Variant.GetHashCode();
         }
     }
 
     internal static class WFShaderNameDictionary
     {
+        private static IEnumerable<WFShaderName> GetCurrentRpNames()
+        {
+            var rp = WFCommonUtility.GetCurrentRenderPipeline();
+            return WFShaderDictionary.ShaderNameList.Where(nm => nm.RenderPipeline == rp);
+        }
+
         public static WFShaderName TryFindFromName(string name)
         {
-            return WFShaderDictionary.ShaderNameList.Where(nm => nm.Name == name).FirstOrDefault();
+            return GetCurrentRpNames().Where(nm => nm.Name == name).FirstOrDefault();
+        }
+
+        public static List<WFShaderName> GetFamilyList()
+        {
+            var result = new List<WFShaderName>();
+            foreach(var group in GetCurrentRpNames().GroupBy(p => p.Familly))
+            {
+                // Family ごとにグループ化して、Represent が true のものがあればそれを取得、そうでなければ最初の1件を取得してリストに詰める
+                var represent = group.Where(p => p.Represent).Union(group).FirstOrDefault();
+                if (represent != null)
+                {
+                    result.Add(represent);
+                }
+            }
+            return result;
         }
 
         public static List<WFShaderName> GetVariantList(WFShaderName name)
@@ -1019,7 +1058,7 @@ namespace UnlitWF
             {
                 return new List<WFShaderName>();
             }
-            return WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.RenderType == name.RenderType).ToList();
+            return GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.RenderType == name.RenderType).ToList();
         }
 
         public static List<WFShaderName> GetVariantList(WFShaderName name, out List<WFShaderName> other)
@@ -1029,7 +1068,7 @@ namespace UnlitWF
 
             // 異なるVariantのShaderNameをotherに詰める
             other = new List<WFShaderName>();
-            other.AddRange(WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly));
+            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly));
             other.RemoveAll(a => items.Contains(a.Variant));
 
             return result;
@@ -1041,7 +1080,7 @@ namespace UnlitWF
             {
                 return new List<WFShaderName>();
             }
-            return WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly && nm.Variant == name.Variant).ToList();
+            return GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.Variant == name.Variant).ToList();
         }
 
         public static List<WFShaderName> GetRenderTypeList(WFShaderName name, out List<WFShaderName> other)
@@ -1051,7 +1090,7 @@ namespace UnlitWF
 
             // 異なるRenderTypeのShaderNameをotherに詰める
             other = new List<WFShaderName>();
-            other.AddRange(WFShaderDictionary.ShaderNameList.Where(nm => nm.Familly == name.Familly));
+            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly));
             other.RemoveAll(a => items.Contains(a.RenderType));
 
             return result;
