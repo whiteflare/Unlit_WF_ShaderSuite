@@ -1398,12 +1398,14 @@ FEATURE_TGL_END
 
 #ifdef _GS_BLURFAST_ENABLE
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
-                color += PICK_GRAB_TEX2D(_GS_GRAB_TEXTURE, uv + BLUR_KERNEL[j] * scale).rgb * BLUR_WEIGHT;
+                float2 offset = BLUR_KERNEL[j] * scale;
+                color += PICK_GRAB_TEX2D(_GS_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHT;
             }
 #else
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
                 for (int k = 0; k < BLUR_SAMPLE_COUNT; k++) {
-                    color += PICK_GRAB_TEX2D(_GS_GRAB_TEXTURE, uv + float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
+                    float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale;
+                    color += PICK_GRAB_TEX2D(_GS_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
                 }
             }
 #endif
