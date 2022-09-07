@@ -1361,4 +1361,68 @@ FEATURE_TGL_END
         #define affectRefraction(i, facing, ws_normal, ws_bump_normal, color)
     #endif
 
+    ////////////////////////////
+    // FrostedGlass
+    ////////////////////////////
+
+    #ifdef _GS_ENABLE
+
+        DECL_GRAB_TEX2D(_GS_GRAB_TEXTURE); // URPではGrabがサポートされていないのでここで宣言する
+
+        float   _GS_Blur;
+
+#ifdef _GS_BLURFAST_ENABLE
+        static const int BLUR_SAMPLE_COUNT = 8;
+        static const float2 BLUR_KERNEL[BLUR_SAMPLE_COUNT] = {
+            float2(-1.0, -1.0),
+            float2(-1.0, +1.0),
+            float2(+1.0, -1.0),
+            float2(+1.0, +1.0),
+            float2(-0.70711, 0),
+            float2(0, +0.70711),
+            float2(+0.70711, 0),
+            float2(0, -0.70711),
+        };
+        static const float BLUR_WEIGHT = 1.0 / BLUR_SAMPLE_COUNT;
+#else
+        static const int BLUR_SAMPLE_COUNT = 7;
+        static const float BLUR_KERNEL[BLUR_SAMPLE_COUNT] = { -1, -2.0/3, -1.0/3, 0, 1.0/3, 2.0/3, 1 };
+        static const half BLUR_WEIGHTS[BLUR_SAMPLE_COUNT] = { 0.036, 0.113, 0.216, 0.269, 0.216, 0.113, 0.036 };
+#endif
+
+        float3 sampleScreenTextureBlur(float2 uv) {
+            float2 scale = _GS_Blur / 100;
+            scale.y *= _ScreenParams.x / _ScreenParams.y;
+
+            float3 color = ZERO_VEC3;
+
+#ifdef _GS_BLURFAST_ENABLE
+            for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
+                color += PICK_GRAB_TEX2D(_GS_GRAB_TEXTURE, uv + BLUR_KERNEL[j] * scale).rgb * BLUR_WEIGHT;
+            }
+#else
+            for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
+                for (int k = 0; k < BLUR_SAMPLE_COUNT; k++) {
+                    color += PICK_GRAB_TEX2D(_GS_GRAB_TEXTURE, uv + float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
+                }
+            }
+#endif
+            return color;
+        }
+
+        void affectFrostedGlass(v2f i, inout float4 color) {
+FEATURE_TGL_ON_BEGIN(_GS_Enable)
+            float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
+            grab_uv.xy /= grab_uv.w;
+            float3 trans_color = sampleScreenTextureBlur(grab_uv).rgb;
+
+            color.rgb = lerp(trans_color.rgb, color.rgb, color.a);
+            color.a = 1;
+FEATURE_TGL_END
+        }
+
+    #else
+        #define affectFrostedGlass(i, color)
+    #endif
+
 #endif
