@@ -1090,12 +1090,14 @@ namespace UnlitWF
         public static void DrawAdditionalColorCodeField(MaterialProperty propColor)
         {
             var color = propColor.colorValue;
-            if (1f < color.maxColorComponent)
-            {
-                return; // HDRカラーになっている場合はフィールド自体を表示しない
-            }
+            var isHdr = (propColor.flags & MaterialProperty.PropFlags.HDR) != 0;
+            var intensity = isHdr ? Mathf.Max(1f, color.maxColorComponent) : 1f;
 
-            var code = ColorUtility.ToHtmlStringRGB(color);
+            var color2 = color;
+            color2.r /= intensity;
+            color2.g /= intensity;
+            color2.b /= intensity;
+            var code = ColorUtility.ToHtmlStringRGB(color2);
 
             // 位置合わせ
             var rect2 = GUILayoutUtility.GetLastRect();
@@ -1117,6 +1119,9 @@ namespace UnlitWF
                 // 回収
                 if (ColorUtility.TryParseHtmlString(code, out color) || ColorUtility.TryParseHtmlString("#" + code, out color))
                 {
+                    color.r *= intensity;
+                    color.g *= intensity;
+                    color.b *= intensity;
                     propColor.colorValue = color;
                 }
             }
