@@ -180,6 +180,9 @@ namespace UnlitWF
         {
             Undo.RecordObjects(mats, "WF Migration materials");
             new Converter.WFMaterialMigrationConverter().ExecAutoConvertWithoutUndo(mats);
+
+            // 新旧キャッシュから指定のマテリアルを削除
+            WFMaterialCache.instance.ResetOldMaterialTable(mats);
         }
 
 
@@ -402,6 +405,9 @@ namespace UnlitWF
                     }
                 }
             }
+
+            // 新旧キャッシュから指定のマテリアルを削除
+            WFMaterialCache.instance.ResetOldMaterialTable(param.materials);
         }
 
         private static bool IsUnlitWFMaterial(Material mm)
@@ -506,6 +512,9 @@ namespace UnlitWF
                     ResetPropertiesWithoutUndo(param, material);
                 }
             }
+
+            // 新旧キャッシュから指定のマテリアルを削除
+            WFMaterialCache.instance.ResetOldMaterialTable(param.materials);
         }
 
         private static void ResetPropertiesWithoutUndo(ResetParameter param, Material material)

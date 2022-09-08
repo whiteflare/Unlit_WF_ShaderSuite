@@ -487,6 +487,14 @@ namespace UnlitWF
                 });
             }
         }
+
+        public void Clear()
+        {
+            lock (refs)
+            {
+                refs.Clear();
+            }
+        }
     }
 
 }

@@ -705,8 +705,6 @@ namespace UnlitWF
             {
                 // 変換
                 WFMaterialEditUtility.MigrationMaterial(param);
-                // ShaderGUI側のマテリアルキャッシュをリセット
-                ShaderCustomEditor.ResetOldMaterialTable();
                 // 変更したマテリアルを保存
                 AssetDatabase.SaveAssets();
             }

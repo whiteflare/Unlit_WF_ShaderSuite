@@ -548,7 +548,7 @@ namespace UnlitWF
         {
             var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
-            if (IsOldMaterial(mats))
+            if (WFMaterialCache.instance.IsOldMaterial(mats))
             {
                 var message = WFI18N.Translate(WFMessageText.PlzMigration);
 
@@ -556,8 +556,6 @@ namespace UnlitWF
                 {
                     // 名称を全て変更
                     WFMaterialEditUtility.MigrationMaterial(mats);
-                    // リセット
-                    ResetOldMaterialTable(mats);
                 }
             }
         }
@@ -641,48 +639,6 @@ namespace UnlitWF
 
             WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
             WFEditorPrefs.MenuToBottom = EditorGUILayout.Toggle("Menu To Bottom", WFEditorPrefs.MenuToBottom);
-        }
-
-        static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
-        static WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
-
-        private static bool IsOldMaterial(params object[] mats)
-        {
-            bool result = false;
-            foreach (Material mat in mats)
-            {
-                if (mat == null)
-                {
-                    continue;
-                }
-                if (newMaterialVersionCache.Contains(mat))
-                {
-                    continue;
-                }
-                if (oldMaterialVersionCache.Contains(mat))
-                {
-                    result |= true;
-                    return true;
-                }
-                bool old = WFMaterialEditUtility.ExistsOldNameProperty(mat);
-                if (old)
-                {
-                    oldMaterialVersionCache.Add(mat);
-                }
-                else
-                {
-                    newMaterialVersionCache.Add(mat);
-                }
-                result |= old;
-            }
-            return result;
-        }
-
-        public static void ResetOldMaterialTable(params object[] values)
-        {
-            var mats = values.Select(mat => mat as Material).Where(mat => mat != null).ToArray();
-            oldMaterialVersionCache.RemoveAll(mats);
-            newMaterialVersionCache.RemoveAll(mats);
         }
 
         private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor)
@@ -1708,6 +1664,69 @@ namespace UnlitWF
     }
 
 #endregion
+
+    public class WFMaterialCache : ScriptableSingleton<WFMaterialCache>
+    {
+        private readonly WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
+        private readonly WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
+
+        public void OnEnable()
+        {
+            Undo.undoRedoPerformed += OnUndoOrRedo;
+        }
+
+        public void OnDestroy()
+        {
+            Undo.undoRedoPerformed -= OnUndoOrRedo;
+        }
+
+        private void OnUndoOrRedo()
+        {
+            // undo|redo のタイミングではキャッシュが当てにならないのでクリアする
+            oldMaterialVersionCache.Clear();
+            newMaterialVersionCache.Clear();
+        }
+
+        public bool IsOldMaterial(Material[] mats)
+        {
+            bool result = false;
+            foreach (Material mat in mats)
+            {
+                if (mat == null)
+                {
+                    continue;
+                }
+                if (newMaterialVersionCache.Contains(mat))
+                {
+                    continue;
+                }
+                if (oldMaterialVersionCache.Contains(mat))
+                {
+                    result |= true;
+                    return true;
+                }
+                bool old = WFMaterialEditUtility.ExistsOldNameProperty(mat);
+                if (old)
+                {
+                    oldMaterialVersionCache.Add(mat);
+                }
+                else
+                {
+                    newMaterialVersionCache.Add(mat);
+                }
+                result |= old;
+            }
+            return result;
+        }
+
+        public void ResetOldMaterialTable(params Material[] values)
+        {
+            var mats = values.Where(mat => mat != null).ToArray();
+            oldMaterialVersionCache.RemoveAll(mats);
+            newMaterialVersionCache.RemoveAll(mats);
+        }
+    }
+
 }
 
 #endif
