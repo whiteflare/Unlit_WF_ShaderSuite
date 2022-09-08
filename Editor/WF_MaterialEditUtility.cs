@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 namespace UnlitWF
 {
@@ -87,17 +88,77 @@ namespace UnlitWF
         }
     }
 
-    public class PropertyNameReplacement
+    public abstract class PropertyNameReplacement
     {
-        public readonly string beforeName;
-        public readonly string afterName;
         public readonly Action<ShaderSerializedProperty> onAfterCopy;
 
-        public PropertyNameReplacement(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null)
+        public PropertyNameReplacement(Action<ShaderSerializedProperty> onAfterCopy = null)
         {
-            this.beforeName = beforeName;
-            this.afterName = afterName;
             this.onAfterCopy = onAfterCopy ?? (p => { });
+        }
+
+        public abstract bool TryMatch(string beforeName, out string afterName);
+
+        public static PropertyNameReplacement Rename(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new SimpleRename(bn, an, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement Replace(string pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new RegexRename(new Regex(pattern, RegexOptions.Compiled), replacement, onAfterCopy);
+        }
+
+        private class SimpleRename : PropertyNameReplacement
+        {
+            private readonly string beforeName;
+            private readonly string afterName;
+
+            public SimpleRename(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            {
+                this.beforeName = beforeName;
+                this.afterName = afterName;
+            }
+
+            public override bool TryMatch(string beforeName, out string afterName)
+            {
+                if (this.beforeName == beforeName)
+                {
+                    afterName = this.afterName;
+                    return true;
+                }
+                else
+                {
+                    afterName = null;
+                    return false;
+                }
+            }
+        }
+
+        private class RegexRename : PropertyNameReplacement
+        {
+            private readonly Regex pattern;
+            private readonly string replacement;
+
+            public RegexRename(Regex pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            {
+                this.pattern = pattern;
+                this.replacement = replacement;
+            }
+
+            public override bool TryMatch(string beforeName, out string afterName)
+            {
+                if (pattern.IsMatch(beforeName))
+                {
+                    afterName = pattern.Replace(beforeName, replacement);
+                    return true;
+                }
+                else
+                {
+                    afterName = null;
+                    return false;
+                }
+            }
         }
     }
 
@@ -162,12 +223,16 @@ namespace UnlitWF
             foreach (var mat in mats)
             {
                 var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var pair in replacement)
+                foreach (var beforeName in props.Keys)
                 {
-                    var before = props.GetValueOrNull(pair.beforeName);
-                    if (before != null)
+                    foreach (var rep in replacement)
                     {
-                        result.Add(new ReplacingPropertyMapping(before, props.GetValueOrNull(pair.afterName), pair.afterName, pair.onAfterCopy));
+                        if (rep.TryMatch(beforeName, out var afterName))
+                        {
+                            var before = props[beforeName];
+                            var after = props.GetValueOrNull(afterName);
+                            result.Add(new ReplacingPropertyMapping(before, after, afterName, rep.onAfterCopy));
+                        }
                     }
                 }
             }
@@ -202,7 +267,6 @@ namespace UnlitWF
                     before.Rename(afterName);
                     onAfterCopy(before);
                 }
-
             }
         }
 

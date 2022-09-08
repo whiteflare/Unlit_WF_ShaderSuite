@@ -416,8 +416,8 @@ namespace UnlitWF.Converter
                 ctx => {
                     // アルファマスク
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        new PropertyNameReplacement("_AlphaMask", "_AL_MaskTex"),
-                        new PropertyNameReplacement("_ClippingMask", "_AL_MaskTex"));
+                        PropertyNameReplacement.Rename("_AlphaMask", "_AL_MaskTex"),
+                        PropertyNameReplacement.Rename("_ClippingMask", "_AL_MaskTex"));
                     if (HasCustomValue(ctx, "_AL_MaskTex")) {
                         ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
                     }
@@ -425,7 +425,7 @@ namespace UnlitWF.Converter
                 ctx => {
                     // ノーマルマップ
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        new PropertyNameReplacement("_NormalMap", "_BumpMap"));
+                        PropertyNameReplacement.Rename("_NormalMap", "_BumpMap"));
                     if (HasCustomValue(ctx, "_BumpMap")) {
                         ctx.target.SetInt("_NM_Enable", 1);
                     }
@@ -451,8 +451,8 @@ namespace UnlitWF.Converter
                 ctx => {
                     // Emission
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        new PropertyNameReplacement("_Emissive_Tex", "_EmissionMap"),
-                        new PropertyNameReplacement("_Emissive_Color", "_EmissionColor"));
+                        PropertyNameReplacement.Rename("_Emissive_Tex", "_EmissionMap"),
+                        PropertyNameReplacement.Rename("_Emissive_Color", "_EmissionColor"));
                     if (HasCustomValue(ctx, "_EmissionMap", "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
                         ctx.target.SetInt("_ES_Enable", 1);
                     }
@@ -466,15 +466,15 @@ namespace UnlitWF.Converter
                     ctx.target.SetInt("_TS_Enable", 1);
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         // 1影
-                        new PropertyNameReplacement("_1st_ShadeMap", "_TS_1stTex"),
-                        new PropertyNameReplacement("_ShadowColorTex", "_TS_1stTex"),
-                        new PropertyNameReplacement("_1st_ShadeColor", "_TS_1stColor"),
-                        new PropertyNameReplacement("_ShadowColor", "_TS_1stColor"),
+                        PropertyNameReplacement.Rename("_1st_ShadeMap", "_TS_1stTex"),
+                        PropertyNameReplacement.Rename("_ShadowColorTex", "_TS_1stTex"),
+                        PropertyNameReplacement.Rename("_1st_ShadeColor", "_TS_1stColor"),
+                        PropertyNameReplacement.Rename("_ShadowColor", "_TS_1stColor"),
                         // 2影
-                        new PropertyNameReplacement("_2nd_ShadeMap", "_TS_2ndTex"),
-                        new PropertyNameReplacement("_Shadow2ndColorTex", "_TS_2ndTex"),
-                        new PropertyNameReplacement("_2nd_ShadeColor", "_TS_2ndColor"),
-                        new PropertyNameReplacement("_Shadow2ndColor", "_TS_2ndColor")
+                        PropertyNameReplacement.Rename("_2nd_ShadeMap", "_TS_2ndTex"),
+                        PropertyNameReplacement.Rename("_Shadow2ndColorTex", "_TS_2ndTex"),
+                        PropertyNameReplacement.Rename("_2nd_ShadeColor", "_TS_2ndColor"),
+                        PropertyNameReplacement.Rename("_Shadow2ndColor", "_TS_2ndColor")
                         );
                     // 1影2影とも色相だけ反映して彩度・明度はリセットしてしまう
                     if (HasCustomValue(ctx, "_TS_1stColor")) {
@@ -523,13 +523,13 @@ namespace UnlitWF.Converter
                     if (HasCustomValue(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
                         ctx.target.SetInt("_TR_Enable", 1);
                         WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                            new PropertyNameReplacement("_RimColor", "_TR_Color"),
-                            new PropertyNameReplacement("_RimLitColor", "_TR_Color"),
-                            new PropertyNameReplacement("_RimLightColor", "_TR_Color"),
-                            new PropertyNameReplacement("_RimLitMask", "_TR_MaskTex"),
-                            new PropertyNameReplacement("_RimBlendMask", "_TR_MaskTex"),
-                            new PropertyNameReplacement("_Set_RimLightMask", "_TR_Color"),
-                            new PropertyNameReplacement("_RimMask", "_TR_Color")
+                            PropertyNameReplacement.Rename("_RimColor", "_TR_Color"),
+                            PropertyNameReplacement.Rename("_RimLitColor", "_TR_Color"),
+                            PropertyNameReplacement.Rename("_RimLightColor", "_TR_Color"),
+                            PropertyNameReplacement.Rename("_RimLitMask", "_TR_MaskTex"),
+                            PropertyNameReplacement.Rename("_RimBlendMask", "_TR_MaskTex"),
+                            PropertyNameReplacement.Rename("_Set_RimLightMask", "_TR_Color"),
+                            PropertyNameReplacement.Rename("_RimMask", "_TR_Color")
                             );
                         if (HasCustomValue(ctx, "_TR_Color")) {
                             ctx.target.SetInt("_TR_BlendType", 2);  // ADD
@@ -539,19 +539,19 @@ namespace UnlitWF.Converter
                 ctx => {
                     // アウトライン
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        new PropertyNameReplacement("_OutlineColor", "_TL_LineColor"),
-                        new PropertyNameReplacement("_Outline_Color", "_TL_LineColor"),
-                        new PropertyNameReplacement("_OutLineColor", "_TL_LineColor"),
-                        new PropertyNameReplacement("_LineColor", "_TL_LineColor"),
+                        PropertyNameReplacement.Rename("_OutlineColor", "_TL_LineColor"),
+                        PropertyNameReplacement.Rename("_Outline_Color", "_TL_LineColor"),
+                        PropertyNameReplacement.Rename("_OutLineColor", "_TL_LineColor"),
+                        PropertyNameReplacement.Rename("_LineColor", "_TL_LineColor"),
                         // ColorTex
-                        new PropertyNameReplacement("_OutlineTex", "_TL_CustomColorTex"),
-                        new PropertyNameReplacement("_OutLineTexture", "_TL_CustomColorTex"),
-                        new PropertyNameReplacement("_OutlineTexture", "_TL_CustomColorTex"),
+                        PropertyNameReplacement.Rename("_OutlineTex", "_TL_CustomColorTex"),
+                        PropertyNameReplacement.Rename("_OutLineTexture", "_TL_CustomColorTex"),
+                        PropertyNameReplacement.Rename("_OutlineTexture", "_TL_CustomColorTex"),
                         // MaskTex
-                        new PropertyNameReplacement("_OutlineWidthMask", "_TL_MaskTex"),
-                        new PropertyNameReplacement("_Outline_Sampler", "_TL_MaskTex"),
-                        new PropertyNameReplacement("_OutlineMask", "_TL_MaskTex"),
-                        new PropertyNameReplacement("_OutLineMask", "_TL_MaskTex")
+                        PropertyNameReplacement.Rename("_OutlineWidthMask", "_TL_MaskTex"),
+                        PropertyNameReplacement.Rename("_Outline_Sampler", "_TL_MaskTex"),
+                        PropertyNameReplacement.Rename("_OutlineMask", "_TL_MaskTex"),
+                        PropertyNameReplacement.Rename("_OutLineMask", "_TL_MaskTex")
                         );
                 },
                 ctx => {
@@ -711,33 +711,32 @@ namespace UnlitWF.Converter
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
         public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
-            new PropertyNameReplacement("_AL_CutOff", "_Cutoff"),
-            new PropertyNameReplacement("_CutOffLevel", "_Cutoff"),
-            new PropertyNameReplacement("_ES_Color", "_EmissionColor"),
-            new PropertyNameReplacement("_ES_MaskTex", "_EmissionMap"),
-            new PropertyNameReplacement("_FurHeight", "_FR_Height"),
-            new PropertyNameReplacement("_FurMaskTex", "_FR_MaskTex"),
-            new PropertyNameReplacement("_FurNoiseTex", "_FR_NoiseTex"),
-            new PropertyNameReplacement("_FurRepeat", "_FR_Repeat"),
-            new PropertyNameReplacement("_FurShadowPower", "_FR_ShadowPower"),
-            new PropertyNameReplacement("_FG_BumpMap", "_FR_BumpMap"),
-            new PropertyNameReplacement("_FG_FlipTangent", "_FlipMirror"),
-            new PropertyNameReplacement("_FR_FlipTangent", "_FlipMirror"),
-            new PropertyNameReplacement("_FR_FlipMirror", "_FlipMirror"),
-            new PropertyNameReplacement("_GL_BrendPower", "_GL_BlendPower"),
-            new PropertyNameReplacement("_MT_BlendType", "_MT_Brightness"),
-            new PropertyNameReplacement("_MT_MaskTex", "_MetallicGlossMap"),
-            new PropertyNameReplacement("_MT_Smoothness", "_MT_ReflSmooth"),
-            new PropertyNameReplacement("_MT_Smoothness2", "_MT_SpecSmooth"),
-            new PropertyNameReplacement("_TessFactor", "_TE_Factor"),
-            new PropertyNameReplacement("_Smoothing", "_TE_SmoothPower"),
-            new PropertyNameReplacement("_NM_FlipMirror", "_FlipMirror"),   // NS追加に合わせてFlipMirrorはラベルなしに変更する
-            new PropertyNameReplacement("_NM_2ndType", "_NS_Enable", p => p.IntValue = p.IntValue != 0 ? 1 : 0),
-            new PropertyNameReplacement("_NM_2ndUVType", "_NS_UVType"),
-            new PropertyNameReplacement("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
-            new PropertyNameReplacement("_NM_InvMaskVal", "_NS_InvMaskVal"),
-            new PropertyNameReplacement("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
-            // new OldPropertyReplacement("_FurVector", "_FR_Vector"), // FurVectorの値は再設定が必要なので変換しない
+            PropertyNameReplacement.Rename("_AL_CutOff", "_Cutoff"),
+            PropertyNameReplacement.Rename("_CutOffLevel", "_Cutoff"),
+            PropertyNameReplacement.Rename("_ES_Color", "_EmissionColor"),
+            PropertyNameReplacement.Rename("_ES_MaskTex", "_EmissionMap"),
+            PropertyNameReplacement.Rename("_FurHeight", "_FR_Height"),
+            PropertyNameReplacement.Rename("_FurMaskTex", "_FR_MaskTex"),
+            PropertyNameReplacement.Rename("_FurNoiseTex", "_FR_NoiseTex"),
+            PropertyNameReplacement.Rename("_FurRepeat", "_FR_Repeat"),
+            PropertyNameReplacement.Rename("_FurShadowPower", "_FR_ShadowPower"),
+            PropertyNameReplacement.Rename("_FG_BumpMap", "_FR_BumpMap"),
+            PropertyNameReplacement.Rename("_FG_FlipTangent", "_FlipMirror"),
+            PropertyNameReplacement.Rename("_FR_FlipTangent", "_FlipMirror"),
+            PropertyNameReplacement.Rename("_FR_FlipMirror", "_FlipMirror"),
+            PropertyNameReplacement.Rename("_GL_BrendPower", "_GL_BlendPower"),
+            PropertyNameReplacement.Rename("_MT_BlendType", "_MT_Brightness"),
+            PropertyNameReplacement.Rename("_MT_MaskTex", "_MetallicGlossMap"),
+            PropertyNameReplacement.Rename("_MT_Smoothness", "_MT_ReflSmooth"),
+            PropertyNameReplacement.Rename("_MT_Smoothness2", "_MT_SpecSmooth"),
+            PropertyNameReplacement.Rename("_TessFactor", "_TE_Factor"),
+            PropertyNameReplacement.Rename("_Smoothing", "_TE_SmoothPower"),
+            PropertyNameReplacement.Rename("_NM_FlipMirror", "_FlipMirror"),   // NS追加に合わせてFlipMirrorはラベルなしに変更する
+            PropertyNameReplacement.Rename("_NM_2ndType", "_NS_Enable", p => p.IntValue = p.IntValue != 0 ? 1 : 0),
+            PropertyNameReplacement.Rename("_NM_2ndUVType", "_NS_UVType"),
+            PropertyNameReplacement.Rename("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
+            PropertyNameReplacement.Rename("_NM_InvMaskVal", "_NS_InvMaskVal"),
+            PropertyNameReplacement.Rename("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
         };
 
         public static bool ExistsNeedsMigration(Material[] mats)
@@ -750,11 +749,14 @@ namespace UnlitWF.Converter
             if (mat != null)
             {
                 var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var map in OldPropNameToNewPropNameList)
+                foreach (var beforeName in props.Keys)
                 {
-                    if (props.ContainsKey(map.beforeName))
+                    foreach (var rep in OldPropNameToNewPropNameList)
                     {
-                        return true;
+                        if (rep.TryMatch(beforeName, out var afterName))
+                        {
+                            return true;
+                        }
                     }
                 }
             }

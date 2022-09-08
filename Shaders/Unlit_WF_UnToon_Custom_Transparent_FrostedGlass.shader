@@ -274,7 +274,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _ _GS_BLURFAST_ENABLE
 
-            #define _GS_GRAB_TEXTURE _UnToonFrostedGlass
+            #define _WF_PB_GRAB_TEXTURE _UnToonFrostedGlass
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

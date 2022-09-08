@@ -72,6 +72,13 @@
     DECL_VERT_TEX2D     (_TE_SmoothPowerTex);
 #endif
 
+    // GrabTexture =============================================
+
+#ifdef _WF_PB_GRAB_TEXTURE
+    DECL_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE);   // URPではGrabがサポートされていないのでここで宣言する
+#endif
+
+
     ////////////////////////////
     // Other uniform variable
     ////////////////////////////
@@ -86,7 +93,7 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_BK_Enable);
+    FEATURE_TGL    (_BK_Enable);
     float4          _BK_BackTex_ST;
     float4          _BK_BackColor;
     uint            _BK_UVType;
@@ -124,7 +131,7 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_CH_Enable);
+    FEATURE_TGL    (_CH_Enable);
     float4          _CH_ColorR;
     float4          _CH_ColorG;
     float4          _CH_ColorB;
@@ -133,7 +140,7 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_CL_Enable);
+    FEATURE_TGL    (_CL_Enable);
     float           _CL_DeltaH;
     float           _CL_DeltaS;
     float           _CL_DeltaV;
@@ -142,7 +149,7 @@
 
     // -------------------------
 
-    FEATURE_TGL     (_ES_Enable);
+    FEATURE_TGL    (_ES_Enable);
     float4          _EmissionColor;
     uint            _ES_BlendType;
     uint            _ES_Shape;
@@ -155,14 +162,14 @@
 
     // -------------------------
 
-    FEATURE_TGL     (_NM_Enable);
+    FEATURE_TGL    (_NM_Enable);
     float           _BumpScale;
     float           _NM_Power;
 
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_NS_Enable);
+    FEATURE_TGL    (_NS_Enable);
     uint            _NS_UVType;
     float4          _DetailNormalMap_ST;
     float           _DetailNormalMapScale;
@@ -171,7 +178,7 @@
 
     // -------------------------
 
-    FEATURE_TGL     (_MT_Enable);
+    FEATURE_TGL    (_MT_Enable);
     float           _MT_Metallic;
     float           _MT_ReflSmooth;
     float           _MT_BlendNormal;
@@ -196,7 +203,7 @@
 #define WF_DECL_MATCAP(id)                  \
     DECL_MAIN_TEX2D(_HL_MatcapTex##id);     \
     DECL_SUB_TEX2D(_HL_MaskTex##id);        \
-    FEATURE_TGL (_HL_Enable##id);           \
+    FEATURE_TGL(_HL_Enable##id);            \
     uint        _HL_CapType##id;            \
     float3      _HL_MedianColor##id;        \
     float3      _HL_MatcapColor##id;        \
@@ -229,7 +236,7 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_LM_Enable);
+    FEATURE_TGL    (_LM_Enable);
     float4          _LM_Texture_ST;
     float4          _LM_Color;
     float3          _LM_RandColor;
@@ -248,7 +255,7 @@
 
     // -------------------------
 
-    FEATURE_TGL     (_TS_Enable);
+    FEATURE_TGL    (_TS_Enable);
     uint            _TS_Steps;
     float3          _TS_BaseColor;
     float3          _TS_1stColor;
@@ -270,7 +277,7 @@
 
     // -------------------------
 
-    FEATURE_TGL     (_TR_Enable);
+    FEATURE_TGL    (_TR_Enable);
     float3          _TR_Color;
     uint            _TR_BlendType;
     float           _TR_Power;
@@ -285,7 +292,7 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_OL_Enable);
+    FEATURE_TGL    (_OL_Enable);
     uint            _OL_UVType;
     float4          _OL_Color;
     float4          _OL_OverlayTex_ST;
@@ -300,7 +307,7 @@
 
     // -------------------------
 
-    FEATURE_TGL     (_TL_Enable);
+    FEATURE_TGL    (_TL_Enable);
     float           _TL_LineWidth;
     uint            _TL_LineType;
     float           _TL_Z_Shift;
@@ -312,7 +319,7 @@
 
     // -------------------------
 
-    FEATURE_TGL     (_AO_Enable);
+    FEATURE_TGL    (_AO_Enable);
     uint            _AO_UVType;
     float           _AO_UseLightMap;
     float           _AO_UseGreenMap;
@@ -323,7 +330,7 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_DF_Enable);
+    FEATURE_TGL    (_DF_Enable);
     float4          _DF_Color;
     float           _DF_MinDist;
     float           _DF_MaxDist;
@@ -334,7 +341,7 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_FG_Enable);
+    FEATURE_TGL    (_FG_Enable);
     float4          _FG_Color;
     float           _FG_MinDist;
     float           _FG_MaxDist;
@@ -346,12 +353,25 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL     (_RF_Enable);
+    FEATURE_TGL    (_RF_Enable);
     float           _RF_RefractiveIndex;
     float           _RF_Distance;
     float3          _RF_Tint;
     float           _RF_BlendNormal;
     float           _RF_BlendNormal2;
+#endif
+
+    // -------------------------
+
+    FEATURE_TGL    (_GO_Enable);
+    float           _GO_Power;
+
+    // -------------------------
+
+#ifndef _WF_MOBILE
+    FEATURE_TGL    (_GS_Enable);
+    float           _GS_Blur;
+    uint            _GS_BlurMode;
 #endif
 
     // -------------------------

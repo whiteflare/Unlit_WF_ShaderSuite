@@ -1330,12 +1330,33 @@ FEATURE_TGL_END
     #endif
 
     ////////////////////////////
+    // GhostTransparent
+    ////////////////////////////
+
+    #ifdef _GO_ENABLE
+
+        void affectGhostTransparent(v2f i, inout float4 color) {
+FEATURE_TGL_ON_BEGIN(_GO_Enable)
+            // GrabScreenPos 計算
+            float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
+            grab_uv.xy /= grab_uv.w;
+
+            float3 back_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv).rgb;
+
+            color.rgb = lerp(back_color.rgb, color.rgb, saturate(color.a * _GO_Power));
+            color.a = 1;
+FEATURE_TGL_END
+        }
+
+    #else
+        #define affectGhostTransparent(i, color)
+    #endif
+
+    ////////////////////////////
     // Refraction
     ////////////////////////////
 
     #ifdef _RF_ENABLE
-
-        DECL_GRAB_TEX2D(_RF_GRAB_TEXTURE); // URPではGrabがサポートされていないのでここで宣言する
 
         void affectRefraction(v2f i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_RF_Enable)
@@ -1350,9 +1371,9 @@ FEATURE_TGL_ON_BEGIN(_RF_Enable)
 
             float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
             grab_uv.xy /= grab_uv.w;
-            float3 refract_color = PICK_GRAB_TEX2D(_RF_GRAB_TEXTURE, grab_uv).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
+            float3 back_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
-            color.rgb = lerp(refract_color.rgb, color.rgb, color.a);
+            color.rgb = lerp(back_color.rgb, color.rgb, color.a);
             color.a = 1;
 FEATURE_TGL_END
         }
@@ -1367,58 +1388,65 @@ FEATURE_TGL_END
 
     #ifdef _GS_ENABLE
 
-        DECL_GRAB_TEX2D(_GS_GRAB_TEXTURE); // URPではGrabがサポートされていないのでここで宣言する
-
-        float   _GS_Blur;
-
-#ifdef _GS_BLURFAST_ENABLE
-        static const int BLUR_SAMPLE_COUNT = 8;
-        static const float2 BLUR_KERNEL[BLUR_SAMPLE_COUNT] = {
-            float2(-1.0, -1.0),
-            float2(-1.0, +1.0),
-            float2(+1.0, -1.0),
-            float2(+1.0, +1.0),
-            float2(-0.70711, 0),
-            float2(0, +0.70711),
-            float2(+0.70711, 0),
-            float2(0, -0.70711),
-        };
-        static const float BLUR_WEIGHT = 1.0 / BLUR_SAMPLE_COUNT;
-#else
-        static const int BLUR_SAMPLE_COUNT = 7;
-        static const float BLUR_KERNEL[BLUR_SAMPLE_COUNT] = { -1, -2.0/3, -1.0/3, 0, 1.0/3, 2.0/3, 1 };
-        static const half BLUR_WEIGHTS[BLUR_SAMPLE_COUNT] = { 0.036, 0.113, 0.216, 0.269, 0.216, 0.113, 0.036 };
-#endif
-
-        float3 sampleScreenTextureBlur(float2 uv) {
-            float2 scale = _GS_Blur / 100;
-            scale.y *= _ScreenParams.x / _ScreenParams.y;
+        float3 sampleScreenTextureBlur1(float2 uv, float2 scale) {    // NORMAL
+            static const int    BLUR_SAMPLE_COUNT = 7;
+            static const float  BLUR_KERNEL[BLUR_SAMPLE_COUNT] = { -1, -2.0/3, -1.0/3, 0, 1.0/3, 2.0/3, 1 };
+            static const half   BLUR_WEIGHTS[BLUR_SAMPLE_COUNT] = { 0.036, 0.113, 0.216, 0.269, 0.216, 0.113, 0.036 };
 
             float3 color = ZERO_VEC3;
-
-#ifdef _GS_BLURFAST_ENABLE
-            for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
-                float2 offset = BLUR_KERNEL[j] * scale;
-                color += PICK_GRAB_TEX2D(_GS_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHT;
-            }
-#else
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
                 for (int k = 0; k < BLUR_SAMPLE_COUNT; k++) {
                     float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale;
-                    color += PICK_GRAB_TEX2D(_GS_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
+                    color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
                 }
             }
-#endif
+            return color;
+        }
+
+        float3 sampleScreenTextureBlur2(float2 uv, float2 scale) {    // FAST
+            static const int    BLUR_SAMPLE_COUNT = 8;
+            static const float2 BLUR_KERNEL[BLUR_SAMPLE_COUNT] = {
+                float2(-1.0, -1.0),
+                float2(-1.0, +1.0),
+                float2(+1.0, -1.0),
+                float2(+1.0, +1.0),
+                float2(-0.70711, 0),
+                float2(0, +0.70711),
+                float2(+0.70711, 0),
+                float2(0, -0.70711),
+            };
+            static const float  BLUR_WEIGHT = 1.0 / BLUR_SAMPLE_COUNT;
+
+            float3 color = ZERO_VEC3;
+            for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
+                float2 offset = BLUR_KERNEL[j] * scale;
+                color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHT;
+            }
             return color;
         }
 
         void affectFrostedGlass(v2f i, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_GS_Enable)
+            // GrabScreenPos 計算
             float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
             grab_uv.xy /= grab_uv.w;
-            float3 trans_color = sampleScreenTextureBlur(grab_uv).rgb;
 
-            color.rgb = lerp(trans_color.rgb, color.rgb, color.a);
+            // Scale 計算
+            float2 scale = _GS_Blur / 100;
+            scale.y *= _ScreenParams.x / _ScreenParams.y;
+
+            float3 back_color =
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+                _GS_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale).rgb : sampleScreenTextureBlur2(grab_uv, scale).rgb;
+#else
+    #ifdef _GS_BLURFAST_ENABLE
+                sampleScreenTextureBlur2(grab_uv, scale).rgb;
+    #else
+                sampleScreenTextureBlur1(grab_uv, scale).rgb;
+    #endif
+#endif
+
+            color.rgb = lerp(back_color.rgb, color.rgb, color.a);
             color.a = 1;
 FEATURE_TGL_END
         }

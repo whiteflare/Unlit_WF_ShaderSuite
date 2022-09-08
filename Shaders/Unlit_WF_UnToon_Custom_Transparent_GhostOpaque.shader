@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
+Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_GhostOpaque" {
 
     Properties {
         // 基本
@@ -22,29 +22,15 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
-        [Toggle(_)]
-            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
-
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-        [NoScaleOffset]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [Toggle(_)]
-            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
+            _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // リフラクション
-        [WFHeaderAlwaysOn(Refraction)]
-            _RF_Enable              ("[RF] Enable", Float) = 1
-            _RF_RefractiveIndex     ("[RF] Refractive Index", Range(1.0, 3.0)) = 1.33
-            _RF_Distance            ("[RF] Distance", Range(0, 10)) = 10.0
-            _RF_Tint                ("[RF] Tint Color", Color) = (0.5, 0.5, 0.5)
-            _RF_BlendNormal         ("[RF] Blend Normal", Range(0, 1)) = 0.1
+        // GhostTransparent
+        [WFHeaderAlwaysOn(Ghost Transparent)]
+            _GO_Enable              ("[GO] Enable", Float) = 1
+            _GO_Power               ("[GO] Power", Range(0, 1)) = 1.0
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
@@ -143,8 +129,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
             _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
             _HL_BlendNormal2        ("[HL] Blend Normal 2nd", Range(0, 1)) = 0.1
-        [Toggle(_)]
-            _HL_ChangeAlpha         ("[HL] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
@@ -164,8 +148,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
             _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
             _HL_BlendNormal2_1      ("[HA] Blend Normal 2nd", Range(0, 1)) = 0.1
-        [Toggle(_)]
-            _HL_ChangeAlpha_1       ("[HA] Change Alpha Transparency", Range(0, 1)) = 0
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
@@ -185,8 +167,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _LM_Texture             ("[LM] Texture", 2D) = "white" {}
         [HDR]
             _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
-            _LM_ChangeAlpha         ("[LM] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LM_Shape               ("[LM] Shape", Float) = 0
         [PowerSlider(4.0)]
@@ -320,8 +300,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
         [Header(Emissive Scroll)]
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
             _ES_Shape               ("[ES] Wave Type", Float) = 3
-        [Toggle(_)]
-            _ES_AlphaScroll         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
             _ES_DirType             ("[ES] Direction Type", Float) = 0
         [WF_Vector3]
@@ -369,11 +347,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
     SubShader {
         Tags {
             "RenderType" = "Opaque"
-            "Queue" = "Transparent"
+            "Queue" = "Transparent+450"
             "VRCFallback" = "UnlitTransparent"
         }
 
-        GrabPass { "_UnToonRefractionBack" }
+        GrabPass { "_UnToonGhostBack" }
 
         Pass {
             Name "MAIN"
@@ -389,8 +367,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
             #pragma target 4.5
 
-            #define _WF_ALPHA_FRESNEL
-
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
@@ -410,39 +387,19 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LM_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _RF_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _GO_ENABLE
 
-            #define _WF_PB_GRAB_TEXTURE _UnToonRefractionBack
+            #define _WF_PB_GRAB_TEXTURE _UnToonGhostBack
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
 
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+
             #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #define _WF_ALPHA_BLEND
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ LOD_FADE_CROSSFADE
-
-            #include "WF_UnToon_ShadowCaster.cginc"
 
             ENDCG
         }
@@ -457,8 +414,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
             #pragma vertex vert_meta
             #pragma fragment frag_meta
-
-            #define _WF_ALPHA_BLEND
 
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE

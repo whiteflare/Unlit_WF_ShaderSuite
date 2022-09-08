@@ -31,8 +31,17 @@ namespace UnlitWF
 {
     internal static class WFCommonUtility
     {
+        /// <summary>
+        /// GUIに表示されるDisplayNameのパターン
+        /// </summary>
         private static readonly Regex PAT_DISP_NAME = new Regex(@"^\[(?<label>[A-Z][A-Z0-9]*)\]\s+(?<name>.+)$", RegexOptions.Compiled);
+        /// <summary>
+        /// マテリアルに保存されるプロパティ名のパターン
+        /// </summary>
         private static readonly Regex PAT_PROP_NAME = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_(?<name>.+?)(?<suffix>(?:_\d+)?)$", RegexOptions.Compiled);
+        /// <summary>
+        /// ENABLEキーワードのパターン
+        /// </summary>
         private static readonly Regex PAT_ENABLE_KEYWORD = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_((?<func>[A-Z0-9]+)_)?ENABLE(?<suffix>(?:_\d+)?)$", RegexOptions.Compiled);
 
         /// <summary>
@@ -1068,7 +1077,7 @@ namespace UnlitWF
 
             // 異なるVariantのShaderNameをotherに詰める
             other = new List<WFShaderName>();
-            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly));
+            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.Variant != "Custom"));
             other.RemoveAll(a => items.Contains(a.Variant));
 
             return result;
@@ -1090,7 +1099,7 @@ namespace UnlitWF
 
             // 異なるRenderTypeのShaderNameをotherに詰める
             other = new List<WFShaderName>();
-            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly));
+            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.Variant != "Custom"));
             other.RemoveAll(a => items.Contains(a.RenderType));
 
             return result;

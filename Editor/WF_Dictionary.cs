@@ -40,6 +40,7 @@ namespace UnlitWF
             
             new WFShaderName("BRP", "UnToon", "Custom", "Transparent_Refracted",       "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted"),
             new WFShaderName("BRP", "UnToon", "Custom", "Transparent_FrostedGlass",    "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass"),
+            new WFShaderName("BRP", "UnToon", "Custom", "Ghost_Opaque",                "UnlitWF/Custom/WF_UnToon_Custom_Transparent_GhostOpaque"),
 
             new WFShaderName("BRP", "UnToon", "Outline", "Opaque",                     "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
             new WFShaderName("BRP", "UnToon", "Outline", "TransCutout",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
@@ -122,18 +123,25 @@ namespace UnlitWF
         /// シェーダ機能のリスト。
         /// </summary>
         public static readonly List<WFShaderFunction> ShaderFuncList = new List<WFShaderFunction>() {
+                // 基本機能
                 new WFShaderFunction("AL", "AL", "Transparent Alpha", (self, mat) => mat.shader.name.Contains("Trans") && mat.HasProperty("_AL_Source")),
+                new WFShaderFunction("NM", "NM", "NormalMap"),
+                new WFShaderFunction("NS", "NS", "Detail NormalMap"),
+                new WFShaderFunction("MT", "MT", "Metallic"),
+                new WFShaderFunction("ES", "ES", "Emission"),
+                new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
                 new WFShaderFunction("TE", "TE", "Tessellation", (self, mat) => mat.shader.name.Contains("Tess")),
+                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
+                new WFShaderFunction("GI", "GI", "Light Bake Effects"),
+
                 new WFShaderFunction("GB", "GB", "Gem Background"),
                 new WFShaderFunction("GF", "GF", "Gem Flake"),
                 new WFShaderFunction("GR", "GR", "Gem Reflection"),
                 new WFShaderFunction("FR", "FR", "Fake Fur", (self, mat) => mat.shader.name.Contains("Fur")),
+
                 new WFShaderFunction("BK", "BK", "BackFace Texture"),
                 new WFShaderFunction("CH", "CH", "3ch Color Mask"),
                 new WFShaderFunction("CL", "CL", "Color Change"),
-                new WFShaderFunction("NM", "NM", "NormalMap"),
-                new WFShaderFunction("NS", "NS", "Detail NormalMap"),
-                new WFShaderFunction("MT", "MT", "Metallic"),
                 new WFShaderFunction("HL", "HL", "Light Matcap"),
                 new WFShaderFunction("HA", "HL_1", "Light Matcap 2", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_1", mat)),
                 new WFShaderFunction("HB", "HL_2", "Light Matcap 3", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_2", mat)),
@@ -146,14 +154,12 @@ namespace UnlitWF
                 new WFShaderFunction("SH", "TS", "ToonShade"),
                 new WFShaderFunction("RM", "TR", "RimLight"),
                 new WFShaderFunction("OL", "OL", "Decal Texture"),
-                new WFShaderFunction("ES", "ES", "Emission"),
                 new WFShaderFunction("LI", "TL", "Outline"),
-                new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
                 new WFShaderFunction("DF", "DF", "Distance Fade"),
                 new WFShaderFunction("FG", "FG", "ToonFog"),
                 new WFShaderFunction("RF", "RF", "Refraction"),
-                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
-                new WFShaderFunction("GI", "GI", "Light Bake Effects"),
+                new WFShaderFunction("GS", "GS", "Frosted Glass"),
+                new WFShaderFunction("GO", "GO", "Ghost Transparent"),
             };
 
         /// <summary>
@@ -170,13 +176,6 @@ namespace UnlitWF
             { "_EmissionColor", "ES" },
             { "_EmissionMap", "ES" },
             { "_OcclusionMap", "AO" },
-            // 今は使っていないはずの項目
-            { "_TessType", "TE" },
-            { "_TessFactor", "TE" },
-            { "_Smoothing", "TE" },
-            { "_DispMap", "TE" },
-            { "_DispMapScale", "TE" },
-            { "_DispMapLevel", "TE" },
         };
 
         /// <summary>
@@ -483,45 +482,6 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageButton.Cleanup, "マテリアルから不要データを削除"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "テンプレートから適用"),
             new WFI18NTranslation(WFMessageButton.SaveTemplate, "テンプレートとして保存"),
-
-            // 今は使っていないはずの項目
-            new WFI18NTranslation("Anti-Glare", "まぶしさ防止"),
-            new WFI18NTranslation("Debug View", "デバッグ表示"),
-            new WFI18NTranslation("HL", "Matcap Color", "matcap色調整").AddTag("HA", "HB", "HC", "HD", "HE", "HF", "HG"),
-            new WFI18NTranslation("RM", "RimLight Mask Texture", "マスクテクスチャ"),
-            new WFI18NTranslation("LI", "Outline Mask Texture", "マスクテクスチャ"),
-            new WFI18NTranslation("AO", "Occlusion Mask Texture", "マスクテクスチャ"),
-            new WFI18NTranslation("OL", "Decal Mask Texture", "マスクテクスチャ"),
-            new WFI18NTranslation("FR", "Fur Mask Texture", "マスクテクスチャ"),
-            new WFI18NTranslation("MT", "MetallicMap Texture", "MetallicSmoothnessマップ"),
-            new WFI18NTranslation("Displacement HeightMap", "ハイトマップ"),
-            new WFI18NTranslation("HeightMap Scale", "ハイトマップのスケール"),
-            new WFI18NTranslation("HeightMap Level", "ハイトマップのゼロ点調整"),
-            new WFI18NTranslation("ES", "Cull Mode", "カリングモード"),
-            new WFI18NTranslation("ES", "Z-shift", "カメラに近づける"),
-            new WFI18NTranslation("FG", "Fog Min Distance", "フォグが効き始める距離"),
-            new WFI18NTranslation("FG", "Fog Max Distance", "フォグが最大になる距離"),
-            new WFI18NTranslation("TE", "Tess Type", "Tessタイプ"),
-            new WFI18NTranslation("LM", "Dist Fade Start", "フェードアウト距離"),
-            new WFI18NTranslation("LM", "Spot Fade Strength", "フェードアウト角度"),
-            new WFI18NTranslation("FeedOut Distance (Near)", "フェードアウト距離"),
-            new WFI18NTranslation("FeedOut Distance (Far)", "フェードアウト距離"),
-            new WFI18NTranslation("NM", "Flip Tangent", "タンジェント反転"),
-            new WFI18NTranslation("FR", "Flip Tangent", "タンジェント反転"),
-            new WFI18NTranslation("Darken (min value)", "暗さの最小値"),
-            new WFI18NTranslation("Lighten (max value)", "明るさの最大値"),
-            new WFI18NTranslation("Blend Light Color", "ライト色の混合強度"),
-            new WFI18NTranslation("FR", "Fur Height 2", "高さ (Transparent側)"),
-            new WFI18NTranslation("OL", "Decal Color", "デカール テクスチャ"),
-            new WFI18NTranslation("OL", "Decal Texture", "デカール テクスチャ"),
-            new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "頂点カラーをデカールに乗算する"),
-            new WFI18NTranslation("NM", "2nd Normal Blend", "2ndマップの混合タイプ"),
-            new WFI18NTranslation("NM", "2nd Normal UV Type", "2ndマップのUVタイプ"),
-            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2ndノーマルマップ"),
-            new WFI18NTranslation("NM", "2nd Bump Scale", "凹凸スケール"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2ndノーマルのマスク"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2ndノーマルのマスク (R)"),
-            new WFI18NTranslation("SH", "Feather", "境界のぼかし強度"),
         };
 
 
@@ -746,17 +706,6 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageButton.Cleanup, "머티리얼 내에서 불필요한 데이터 삭제"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "템플릿부터 적용"),
             new WFI18NTranslation(WFMessageButton.SaveTemplate, "템플릿으로 저장"),
-
-            // 今は使っていないはずの項目
-            new WFI18NTranslation("OL", "Decal Color", "데칼 텍스처"),
-            new WFI18NTranslation("OL", "Decal Texture", "데칼 텍스처"),
-            new WFI18NTranslation("OL", "Multiply VertexColor To Decal Texture", "버텍스 컬러에 데칼 텍스처 곱하기"),
-            new WFI18NTranslation("NM", "2nd Normal Blend", "2nd맵 혼합"),
-            new WFI18NTranslation("NM", "2nd Normal UV Type", "2nd맵 UV타입"),
-            new WFI18NTranslation("NM", "2nd NormalMap Texture", "2nd노멀맵"),
-            new WFI18NTranslation("NM", "2nd Bump Scale", "2nd범프 스케일"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture", "2nd노멀 텍스처"),
-            new WFI18NTranslation("NM", "2nd NormalMap Mask Texture (R)", "2nd노멀맵 마스크 (R)"),
         };
     }
 
