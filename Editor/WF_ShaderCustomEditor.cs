@@ -1100,12 +1100,17 @@ namespace UnlitWF
             // 位置合わせ
             var rect2 = GUILayoutUtility.GetLastRect();
             rect2.x = rect2.xMax - EditorGUIUtility.fieldWidth * 2 - 4;
+            rect2.y += Mathf.Max(0, rect2.height - 18);
             rect2.width = EditorGUIUtility.fieldWidth;
+            rect2.height = 16;
+
+            var style = new GUIStyle(EditorStyles.miniTextField);
+            style.fontSize--;
 
             // 表示
             EditorGUI.BeginChangeCheck();
             EditorGUI.showMixedValue = propColor.hasMixedValue;
-            code = EditorGUI.DelayedTextField(rect2, code);
+            code = EditorGUI.DelayedTextField(rect2, code, style);
             EditorGUI.showMixedValue = false;
             if (EditorGUI.EndChangeCheck())
             {
