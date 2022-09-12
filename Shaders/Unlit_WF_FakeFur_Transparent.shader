@@ -25,7 +25,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
         // ファー設定
         [WFHeader(Fake Fur)]
-            _FUR_Height              ("[FUR] Fur Height", Range(0, 0.2)) = 0.05
+            _FUR_Height              ("[FUR] Fur Height", Range(0, 0.2)) = 0.02
         [IntRange]
             _FUR_Repeat              ("[FUR] Fur Repeat", Range(1, 6)) = 3
         [Header(Fur Shape)]
