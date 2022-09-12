@@ -10,7 +10,7 @@ Material:
   m_Name: tex_body
   m_Shader: {fileID: 4800000, guid: dd3a683002b3a6f43bdb6c97bd0985c1, type: 3}
   m_ShaderKeywords: _CL_ENABLE _GL_AUTO_ENABLE _HL_ENABLE _TR_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
-  m_LightmapFlags: 4
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -162,10 +162,6 @@ Material:
     - _ES_Shape: 3
     - _ES_Sharpness: 1
     - _ES_Speed: 2
-    - _FG_Enable: 0
-    - _FG_Exponential: 1
-    - _FG_MaxDist: 0.8
-    - _FG_MinDist: 0.5
     - _FallBack: 0
     - _FlipMirror: 0
     - _GI_EmissionMultiplier: 1
@@ -242,6 +238,10 @@ Material:
     - _TE_MaxDist: 2
     - _TE_MinDist: 0.5
     - _TE_SmoothPower: 1
+    - _TFG_Enable: 0
+    - _TFG_Exponential: 1
+    - _TFG_MaxDist: 0.8
+    - _TFG_MinDist: 0.5
     - _TL_BlendBase: 0
     - _TL_BlendCustom: 0
     - _TL_Enable: 0
@@ -284,9 +284,6 @@ Material:
     - _DF_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _FG_BaseOffset: {r: 0, g: 0, b: 0, a: 0}
-    - _FG_Color: {r: 0.5, g: 0.5, b: 0.6, a: 1}
-    - _FG_Scale: {r: 1, g: 1, b: 1, a: 0}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MatcapColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
@@ -296,6 +293,9 @@ Material:
     - _LM_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OL_Color: {r: 1, g: 1, b: 1, a: 1}
     - _OL_UVScroll: {r: 0, g: 0, b: 0, a: 0}
+    - _TFG_BaseOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _TFG_Color: {r: 0.5, g: 0.5, b: 0.6, a: 1}
+    - _TFG_Scale: {r: 1, g: 1, b: 1, a: 0}
     - _TL_LineColor: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 1, a: 1}
     - _TS_1stColor: {r: 1, g: 1, b: 1, a: 1}

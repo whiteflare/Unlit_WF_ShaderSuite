@@ -24,30 +24,30 @@
     // Texture & Sampler
     ////////////////////////////
 
-    DECL_MAIN_TEX2D (_FR_NoiseTex);
-    DECL_VERT_TEX2D (_FR_BumpMap);
-    DECL_SUB_TEX2D  (_FR_MaskTex);
+    DECL_MAIN_TEX2D (_FUR_NoiseTex);
+    DECL_VERT_TEX2D (_FUR_BumpMap);
+    DECL_SUB_TEX2D  (_FUR_MaskTex);
 
     ////////////////////////////
     // Other uniform variable
     ////////////////////////////
 
-#ifndef _FR_HEIGHT_PARAM
-    #define _FR_HEIGHT_PARAM _FR_Height
+#ifndef _FUR_HEIGHT_PARAM
+    #define _FUR_HEIGHT_PARAM _FUR_Height
 #endif
-#ifndef _FR_REPEAT_PARAM
-    #define _FR_REPEAT_PARAM _FR_Repeat
+#ifndef _FUR_REPEAT_PARAM
+    #define _FUR_REPEAT_PARAM _FUR_Repeat
 #endif
 
-    float4          _FR_NoiseTex_ST;
-    float           _FR_HEIGHT_PARAM;
-    float4          _FR_Vector;
+    float4          _FUR_NoiseTex_ST;
+    float           _FUR_HEIGHT_PARAM;
+    float4          _FUR_Vector;
 
-    uint            _FR_REPEAT_PARAM;
-    float           _FR_ShadowPower;
-    float4          _FR_TintColorBase;
-    float4          _FR_TintColorTip;
-    float           _FR_InvMaskVal;
-    float           _FR_Random;
+    uint            _FUR_REPEAT_PARAM;
+    float           _FUR_ShadowPower;
+    float4          _FUR_TintColorBase;
+    float4          _FUR_TintColorTip;
+    float           _FUR_InvMaskVal;
+    float           _FUR_Random;
 
 #endif

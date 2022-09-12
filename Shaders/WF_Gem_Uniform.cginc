@@ -24,34 +24,34 @@
     // Texture & Sampler
     ////////////////////////////
 
-    DECL_MAIN_TEXCUBE(_GR_Cubemap);
+    DECL_MAIN_TEXCUBE(_GMR_Cubemap);
 
     ////////////////////////////
     // Other uniform variable
     ////////////////////////////
 
-    float           _GF_Enable;
-    float           _GF_FlakeSizeFront;
-    float           _GF_FlakeSizeBack;
-    float           _GF_FlakeShear;
-    float           _GF_FlakeBrighten;
-    float           _GF_FlakeDarken;
-    float           _GF_Twinkle;
-    float           _GF_BlendNormal;
+    float           _GMF_Enable;
+    float           _GMF_FlakeSizeFront;
+    float           _GMF_FlakeSizeBack;
+    float           _GMF_FlakeShear;
+    float           _GMF_FlakeBrighten;
+    float           _GMF_FlakeDarken;
+    float           _GMF_Twinkle;
+    float           _GMF_BlendNormal;
 
-    float           _GR_Enable;
-    float           _GR_Power;
-    float           _GR_Brightness;
-    float           _GR_Monochrome;
-    float4          _GR_Cubemap_HDR;
-    float           _GR_CubemapPower;
-    float           _GR_CubemapHighCut;
-    float           _GR_BlendNormal;
+    float           _GMR_Enable;
+    float           _GMR_Power;
+    float           _GMR_Brightness;
+    float           _GMR_Monochrome;
+    float4          _GMR_Cubemap_HDR;
+    float           _GMR_CubemapPower;
+    float           _GMR_CubemapHighCut;
+    float           _GMR_BlendNormal;
 
     float           _AlphaFront;
     float           _AlphaBack;
 
-    float           _GB_Enable;
-    float4          _GB_ColorBack;
+    float           _GMB_Enable;
+    float4          _GMB_ColorBack;
 
 #endif

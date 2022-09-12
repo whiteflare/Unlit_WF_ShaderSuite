@@ -34,7 +34,7 @@ namespace UnlitWF
         private static readonly List<IPropertyHook> HOOKS = new List<IPropertyHook>() {
             // _TS_Power の直前に設定ボタンを追加する
             new CustomPropertyHook("_TS_Power", ctx => {
-                var guiContent = WFI18N.GetGUIContent("SH", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します");
+                var guiContent = WFI18N.GetGUIContent("TS", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
                     ctx.editor.RegisterPropertyChangeUndo("Shade Color Suggest");
                     SuggestShadowColor(WFCommonUtility.AsMaterials(ctx.editor.targets));
@@ -45,7 +45,7 @@ namespace UnlitWF
                 if (GetShadowStepsFromMaterial(WFCommonUtility.AsMaterials(ctx.editor.targets)) < 2) {
                     return;
                 }
-                var guiContent = WFI18N.GetGUIContent("SH", "Align the boundaries equally", "影の境界線を等間隔に整列します");
+                var guiContent = WFI18N.GetGUIContent("TS", "Align the boundaries equally", "影の境界線を等間隔に整列します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
                     ctx.editor.RegisterPropertyChangeUndo("Align the boundaries equally");
                     SuggestShadowBorder(WFCommonUtility.AsMaterials(ctx.editor.targets));
@@ -55,7 +55,7 @@ namespace UnlitWF
             // 条件付きHide
             new ConditionVisiblePropertyHook("_TS_2ndColor|_TS_2ndBorder|_TS_2ndFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
             new ConditionVisiblePropertyHook("_TS_3rdColor|_TS_3rdBorder|_TS_3rdFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
-            new ConditionVisiblePropertyHook("_OL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)), // ANGEL_RING
+            new ConditionVisiblePropertyHook("_OVL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)), // ANGEL_RING
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
@@ -70,20 +70,20 @@ namespace UnlitWF
             new SingleLineTexPropertyHook( "_TS_3rdColor", "_TS_3rdTex" ),
             new SingleLineTexPropertyHook( "_ES_Color", "_ES_MaskTex" ),
             new SingleLineTexPropertyHook( "_EmissionColor", "_EmissionMap" ),
-            new SingleLineTexPropertyHook( "_LM_Color", "_LM_Texture" ),
+            new SingleLineTexPropertyHook( "_LME_Color", "_LME_Texture" ),
             new SingleLineTexPropertyHook( "_TL_LineColor", "_TL_CustomColorTex" ),
-            new SingleLineTexPropertyHook( "_OL_Color", "_OL_OverlayTex" ),
+            new SingleLineTexPropertyHook( "_OVL_Color", "_OVL_OverlayTex" ),
 
             // MinMaxSlider
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
-            new MinMaxSliderPropertyHook("_FG_MinDist", "_FG_MaxDist"),
-            new MinMaxSliderPropertyHook("_LM_MinDist", "_LM_MaxDist"),
+            new MinMaxSliderPropertyHook("_TFG_MinDist", "_TFG_MaxDist"),
+            new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist"),
             new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist"),
-            new MinMaxSliderPropertyHook("_DF_MinDist", "_DF_MaxDist"),
+            new MinMaxSliderPropertyHook("_DFD_MinDist", "_DFD_MaxDist"),
 
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
-            new CustomPropertyHook("_OL_CustomParam1", ctx => {
-                if (IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)) {
+            new CustomPropertyHook("_OVL_CustomParam1", ctx => {
+                if (IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)) {
                     ctx.guiContent = WFI18N.GetGUIContent("OL", "UV2.y <-> Normal.y");
                 }
             }, null),
@@ -116,8 +116,8 @@ namespace UnlitWF
                 }
             }),
 
-            // _DetailNormalMap と _FR_NoiseTex の直後に設定ボタンを追加する
-            new CustomPropertyHook("_DetailNormalMap|_FR_NoiseTex", null, (ctx, changed) => {
+            // _DetailNormalMap と _FUR_NoiseTex の直後に設定ボタンを追加する
+            new CustomPropertyHook("_DetailNormalMap|_FUR_NoiseTex", null, (ctx, changed) => {
                 if (ctx.current.textureValue == null) {
                     return;
                 }
@@ -143,7 +143,7 @@ namespace UnlitWF
 
             // _TR_InvMaskVal の直後に設定ボタンを追加する
             new CustomPropertyHook("_TR_InvMaskVal", null, (ctx, changed) => {
-                var guiContent = WFI18N.GetGUIContent("RM", "Assign MainTex to MaskTexture", "メインテクスチャをリムライトマスクに設定します");
+                var guiContent = WFI18N.GetGUIContent("TR", "Assign MainTex to MaskTexture", "メインテクスチャをリムライトマスクに設定します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
                     ctx.editor.RegisterPropertyChangeUndo("Assign MainTex to MaskTexture");
                     foreach(var mat in WFCommonUtility.AsMaterials(ctx.editor.targets))

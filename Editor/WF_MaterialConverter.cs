@@ -715,12 +715,12 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Rename("_CutOffLevel", "_Cutoff"),
             PropertyNameReplacement.Rename("_ES_Color", "_EmissionColor"),
             PropertyNameReplacement.Rename("_ES_MaskTex", "_EmissionMap"),
-            PropertyNameReplacement.Rename("_FurHeight", "_FR_Height"),
-            PropertyNameReplacement.Rename("_FurMaskTex", "_FR_MaskTex"),
-            PropertyNameReplacement.Rename("_FurNoiseTex", "_FR_NoiseTex"),
-            PropertyNameReplacement.Rename("_FurRepeat", "_FR_Repeat"),
-            PropertyNameReplacement.Rename("_FurShadowPower", "_FR_ShadowPower"),
-            PropertyNameReplacement.Rename("_FG_BumpMap", "_FR_BumpMap"),
+            PropertyNameReplacement.Rename("_FurHeight", "_FUR_Height"),
+            PropertyNameReplacement.Rename("_FurMaskTex", "_FUR_MaskTex"),
+            PropertyNameReplacement.Rename("_FurNoiseTex", "_FUR_NoiseTex"),
+            PropertyNameReplacement.Rename("_FurRepeat", "_FUR_Repeat"),
+            PropertyNameReplacement.Rename("_FurShadowPower", "_FUR_ShadowPower"),
+            PropertyNameReplacement.Rename("_FG_BumpMap", "_FUR_BumpMap"),
             PropertyNameReplacement.Rename("_FG_FlipTangent", "_FlipMirror"),
             PropertyNameReplacement.Rename("_FR_FlipTangent", "_FlipMirror"),
             PropertyNameReplacement.Rename("_FR_FlipMirror", "_FlipMirror"),
@@ -737,6 +737,18 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Rename("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
             PropertyNameReplacement.Rename("_NM_InvMaskVal", "_NS_InvMaskVal"),
             PropertyNameReplacement.Rename("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
+            PropertyNameReplacement.Replace("^_GB_", "_GMB_"),
+            PropertyNameReplacement.Replace("^_GF_", "_GMF_"),
+            PropertyNameReplacement.Replace("^_GR_", "_GMR_"),
+            PropertyNameReplacement.Replace("^_FG_", "_TFG_"),
+            PropertyNameReplacement.Replace("^_BK_", "_BKT_"),
+            PropertyNameReplacement.Replace("^_CH_", "_CHM_"),
+            PropertyNameReplacement.Replace("^_CL_", "_CLC_"),
+            PropertyNameReplacement.Replace("^_LM_", "_LME_"),
+            PropertyNameReplacement.Replace("^_OV_", "_OVL_"),
+            PropertyNameReplacement.Replace("^_DF_", "_DFD_"),
+            PropertyNameReplacement.Replace("^_GI_", "_LBE_"),
+            PropertyNameReplacement.Replace("^_RF_", "_CRF_"),
         };
 
         public static bool ExistsNeedsMigration(Material[] mats)
@@ -755,6 +767,7 @@ namespace UnlitWF.Converter
                     {
                         if (rep.TryMatch(beforeName, out var afterName))
                         {
+                            Debug.Log("change need: " + beforeName);
                             return true;
                         }
                     }

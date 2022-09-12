@@ -28,36 +28,36 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         [WFHeaderToggle(Gem Background)]
-            _GB_Enable              ("[GB] Enable", Float) = 0
+            _GMB_Enable              ("[GMB] Enable", Float) = 0
         [HDR]
-            _GB_ColorBack           ("[GB] Background Color", Color) = (0.2, 0.2, 0.2, 1)
+            _GMB_ColorBack           ("[GMB] Background Color", Color) = (0.2, 0.2, 0.2, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _GB_BackCulllMode       ("[GB] Background CullMode", Float) = 1
+            _GMB_BackCulllMode       ("[GMB] Background CullMode", Float) = 1
 
         // Flake
         [WFHeaderToggle(Gem Flake)]
-            _GF_Enable              ("[GF] Enable", Float) = 1
+            _GMF_Enable              ("[GMF] Enable", Float) = 1
         [PowerSlider(2.0)]
-            _GF_FlakeSizeFront      ("[GF] Flake Size (front)", Range(0, 1)) = 0.1
+            _GMF_FlakeSizeFront      ("[GMF] Flake Size (front)", Range(0, 1)) = 0.1
         [PowerSlider(2.0)]
-            _GF_FlakeSizeBack       ("[GF] Flake Size (back)", Range(0, 1)) = 0.25
-            _GF_FlakeShear          ("[GF] Shear", Range(0, 1)) = 0.5
-            _GF_FlakeBrighten       ("[GF] Brighten", Range(0, 8)) = 2
-            _GF_FlakeDarken         ("[GF] Darken", Range(0, 8)) = 0.5
-            _GF_Twinkle             ("[GF] Twinkle", Range(0, 4)) = 2
-            _GF_BlendNormal         ("[GF] Blend Normal", Range(0, 1)) = 0.1
+            _GMF_FlakeSizeBack       ("[GMF] Flake Size (back)", Range(0, 1)) = 0.25
+            _GMF_FlakeShear          ("[GMF] Shear", Range(0, 1)) = 0.5
+            _GMF_FlakeBrighten       ("[GMF] Brighten", Range(0, 8)) = 2
+            _GMF_FlakeDarken         ("[GMF] Darken", Range(0, 8)) = 0.5
+            _GMF_Twinkle             ("[GMF] Twinkle", Range(0, 4)) = 2
+            _GMF_BlendNormal         ("[GMF] Blend Normal", Range(0, 1)) = 0.1
 
         // Reflection
         [WFHeaderToggle(Gem Reflection)]
-            _GR_Enable              ("[GR] Enable", Float) = 1
-            _GR_Power               ("[GR] Blend Power", Range(0, 1)) = 1
+            _GMR_Enable              ("[GMR] Enable", Float) = 1
+            _GMR_Power               ("[GMR] Blend Power", Range(0, 1)) = 1
         [NoScaleOffset]
-            _GR_Cubemap             ("[GR] CubeMap", Cube) = "" {}
-            _GR_Brightness          ("[GR] Brightness", Range(0, 1)) = 0
-            _GR_Monochrome          ("[GR] Monochrome Reflection", Range(0, 1)) = 1
-            _GR_CubemapPower        ("[GR] 2nd CubeMap Power", Range(0, 2)) = 1
-            _GR_CubemapHighCut      ("[GR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
-            _GR_BlendNormal         ("[GR] Blend Normal", Range(0, 1)) = 0.1
+            _GMR_Cubemap             ("[GMR] CubeMap", Cube) = "" {}
+            _GMR_Brightness          ("[GMR] Brightness", Range(0, 1)) = 0
+            _GMR_Monochrome          ("[GMR] Monochrome Reflection", Range(0, 1)) = 1
+            _GMR_CubemapPower        ("[GMR] 2nd CubeMap Power", Range(0, 2)) = 1
+            _GMR_CubemapHighCut      ("[GMR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
+            _GMR_BlendNormal         ("[GMR] Blend Normal", Range(0, 1)) = 0.1
 
         // Alpha
         [WFHeader(Transparent Alpha)]
@@ -122,7 +122,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             Name "MAIN_BACK"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull [_GB_BackCulllMode]
+            Cull [_GMB_BackCulllMode]
             ZWrite [_AL_ZWrite]
             Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 

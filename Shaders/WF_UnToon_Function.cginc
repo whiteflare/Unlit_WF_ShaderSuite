@@ -35,7 +35,7 @@
     #endif
 
     #ifndef WF_TEX2D_3CH_MASK
-        #define WF_TEX2D_3CH_MASK(uv)           PICK_SUB_TEX2D(_CH_3chMaskTex, _MainTex, uv).rgb
+        #define WF_TEX2D_3CH_MASK(uv)           PICK_SUB_TEX2D(_CHM_3chMaskTex, _MainTex, uv).rgb
     #endif
 
     #ifndef WF_TEX2D_EMISSION
@@ -61,10 +61,10 @@
     #endif
 
     #ifndef WF_TEX2D_LAME_TEX
-        #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LM_Texture, _MainTex, uv).rgba
+        #define WF_TEX2D_LAME_TEX(uv)           PICK_SUB_TEX2D(_LME_Texture, _MainTex, uv).rgba
     #endif
     #ifndef WF_TEX2D_LAME_MASK
-        #define WF_TEX2D_LAME_MASK(uv)          SAMPLE_MASK_VALUE(_LM_MaskTex, uv, _LM_InvMaskVal).r
+        #define WF_TEX2D_LAME_MASK(uv)          SAMPLE_MASK_VALUE(_LME_MaskTex, uv, _LME_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_SHADE_BASE
@@ -104,7 +104,7 @@
     #endif
 
     #ifndef WF_TEX2D_SCREEN_MASK
-        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OL_MaskTex, uv, _OL_InvMaskVal).r
+        #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OVL_MaskTex, uv, _OVL_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_OUTLINE_COLOR
@@ -132,13 +132,13 @@
         color *= PICK_MAIN_TEX2D(_MainTex, uv_main);
     }
 
-    #ifdef _BK_ENABLE
+    #ifdef _BKT_ENABLE
         void affectBackTex(float2 uv, float2 uv2, uint facing, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_BK_Enable)
+FEATURE_TGL_ON_BEGIN(_BKT_Enable)
             if (!facing) {
-                float2 uv_back = _BK_UVType == 1 ? uv2 : uv;
-                uv_back = TRANSFORM_TEX(uv_back, _BK_BackTex);
-                color = PICK_MAIN_TEX2D(_BK_BackTex, uv_back) * _BK_BackColor;
+                float2 uv_back = _BKT_UVType == 1 ? uv2 : uv;
+                uv_back = TRANSFORM_TEX(uv_back, _BKT_BackTex);
+                color = PICK_MAIN_TEX2D(_BKT_BackTex, uv_back) * _BKT_BackColor;
             }
 FEATURE_TGL_END
         }
@@ -381,16 +381,16 @@ FEATURE_TGL_END
     // Color Change
     ////////////////////////////
 
-    #ifdef _CL_ENABLE
+    #ifdef _CLC_ENABLE
         void affectColorChange(inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_CL_Enable)
-            if (TGL_ON(_CL_Monochrome)) {
+FEATURE_TGL_ON_BEGIN(_CLC_Enable)
+            if (TGL_ON(_CLC_Monochrome)) {
                 color.r += color.g + color.b;
                 color.g = (color.r - 1) / 2;
                 color.b = (color.r - 1) / 2;
             }
             float3 hsv = rgb2hsv( saturate(color.rgb) );
-            hsv += float3( _CL_DeltaH, _CL_DeltaS, _CL_DeltaV);
+            hsv += float3( _CLC_DeltaH, _CLC_DeltaS, _CLC_DeltaV);
             hsv.r = frac(hsv.r);
             color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
 FEATURE_TGL_END
@@ -405,14 +405,14 @@ FEATURE_TGL_END
     // 3ch Color Mask
     ////////////////////////////
 
-    #ifdef _CH_ENABLE
+    #ifdef _CHM_ENABLE
 
         void affect3chColorMask(float2 mask_uv, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_CH_Enable)
+FEATURE_TGL_ON_BEGIN(_CHM_Enable)
             float3 mask  = WF_TEX2D_3CH_MASK(mask_uv);
-            float4 c1 = color * _CH_ColorR;
-            float4 c2 = color * _CH_ColorG;
-            float4 c3 = color * _CH_ColorB;
+            float4 c1 = color * _CHM_ColorR;
+            float4 c2 = color * _CHM_ColorG;
+            float4 c3 = color * _CHM_ColorB;
             color = lerp(color, c1, mask.r);
             color = lerp(color, c2, mask.g);
             color = lerp(color, c3, mask.b);
@@ -851,16 +851,16 @@ FEATURE_TGL_END
     // Lame
     ////////////////////////////
 
-    #ifdef _LM_ENABLE
+    #ifdef _LME_ENABLE
 
         void affectLame(v2f i, float2 uv_main, float3 ws_normal, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_LM_Enable)
+FEATURE_TGL_ON_BEGIN(_LME_Enable)
             float power = WF_TEX2D_LAME_MASK(uv_main);
             if (0 < power) {
-                float2 uv_lame = _LM_UVType == 1 ? i.uv_lmap : i.uv;
-                uv_lame = TRANSFORM_TEX(uv_lame, _LM_Texture);
+                float2 uv_lame = _LME_UVType == 1 ? i.uv_lmap : i.uv;
+                uv_lame = TRANSFORM_TEX(uv_lame, _LME_Texture);
 
-                float   scale = NON_ZERO_FLOAT(_LM_Scale) / 100;
+                float   scale = NON_ZERO_FLOAT(_LME_Scale) / 100;
                 float2  st = uv_lame / scale;
 
                 float2  ist = floor(st);
@@ -880,26 +880,26 @@ FEATURE_TGL_ON_BEGIN(_LM_Enable)
                 float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
 
                 // アニメーション項
-                power *= _LM_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LM_AnimSpeed + random2to1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
+                power *= _LME_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LME_AnimSpeed + random2to1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
                 // Glitter項
-                power = lerp(power, max(power, pow(power + 0.1, 32)), _LM_Glitter);
+                power = lerp(power, max(power, pow(power + 0.1, 32)), _LME_Glitter);
                 // 密度項
-                power *= step(1 - _LM_Dencity / 4, abs(min_pos.x));
+                power *= step(1 - _LME_Dencity / 4, abs(min_pos.x));
                 // フレークのばらつき項
                 power *= random2to1(min_pos.xy);
                 // 距離フェード項
-                power *= 1 - smoothstep(_LM_MinDist, max(_LM_MinDist + NZF, _LM_MaxDist), length(ws_camera_vec));
+                power *= 1 - smoothstep(_LME_MinDist, max(_LME_MinDist + NZF, _LME_MaxDist), length(ws_camera_vec));
                 // NdotV起因の強度項
-                power *= pow(abs(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LM_Spot));
+                power *= pow(abs(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LME_Spot));
                 // 形状
-                power *= _LM_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
+                power *= _LME_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
 
-                float4 lame_color = _LM_Color * WF_TEX2D_LAME_TEX(uv_lame);
-                lame_color.rgb += _LM_RandColor * (random2to3(min_pos.xy) * 2 - 1);
+                float4 lame_color = _LME_Color * WF_TEX2D_LAME_TEX(uv_lame);
+                lame_color.rgb += _LME_RandColor * (random2to3(min_pos.xy) * 2 - 1);
 
                 color.rgb += max(ZERO_VEC3, lame_color.rgb) * power;
                 #ifdef _WF_ALPHA_BLEND
-                    color.a = max(color.a, lerp(color.a, lame_color.a, saturate(power * _LM_ChangeAlpha)));
+                    color.a = max(color.a, lerp(color.a, lame_color.a, saturate(power * _LME_ChangeAlpha)));
                 #endif
             }
 FEATURE_TGL_END
@@ -1078,7 +1078,7 @@ FEATURE_TGL_END
     // Overlay Texture
     ////////////////////////////
 
-    #ifdef _OL_ENABLE
+    #ifdef _OVL_ENABLE
 
         float2 computeOverlayTex(float3 ws_vertex) {
             float3 ws_view_dir = normalize( ws_vertex - _WorldSpaceCameraPos.xyz );
@@ -1091,40 +1091,40 @@ FEATURE_TGL_END
         }
 
         float2 computeAngelRingUV(float3 vs_normal, float2 uv2) {
-            return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OL_CustomParam1));
+            return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OVL_CustomParam1));
         }
 
         float3 blendOverlayColor(float3 base, float4 decal, float power) {
             power *= decal.a;
             return
-                  _OL_BlendType == 0 ? blendColor_Alpha(base, decal.rgb, power)
-                : _OL_BlendType == 1 ? blendColor_Add(base, decal.rgb, power)
-                : _OL_BlendType == 2 ? blendColor_Mul(base, decal.rgb, power)
-                : _OL_BlendType == 3 ? blendColor_AddAndSub(base, decal.rgb, power)
-                : _OL_BlendType == 4 ? blendColor_Screen(base, decal.rgb, power)
-                : _OL_BlendType == 5 ? blendColor_Overlay(base, decal.rgb, power)
-                : _OL_BlendType == 6 ? blendColor_HardLight(base, decal.rgb, power)
+                  _OVL_BlendType == 0 ? blendColor_Alpha(base, decal.rgb, power)
+                : _OVL_BlendType == 1 ? blendColor_Add(base, decal.rgb, power)
+                : _OVL_BlendType == 2 ? blendColor_Mul(base, decal.rgb, power)
+                : _OVL_BlendType == 3 ? blendColor_AddAndSub(base, decal.rgb, power)
+                : _OVL_BlendType == 4 ? blendColor_Screen(base, decal.rgb, power)
+                : _OVL_BlendType == 5 ? blendColor_Overlay(base, decal.rgb, power)
+                : _OVL_BlendType == 6 ? blendColor_HardLight(base, decal.rgb, power)
                 : base  // 何もしない
                 ;
         }
 
         void affectOverlayTexture(v2f i, float2 uv_main, float3 vs_normal, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_OL_Enable)
+FEATURE_TGL_ON_BEGIN(_OVL_Enable)
             float2 uv_overlay =
-                _OL_UVType == 1 ? i.uv_lmap                                                 // UV2
-                : _OL_UVType == 2 ? computeOverlayTex(i.ws_vertex)                          // SKYBOX
-                : _OL_UVType == 3 ? computeAngelRingUV(vs_normal, i.uv_lmap)                // ANGELRING
-                : _OL_UVType == 4 ? vs_normal.xy / 2 + 0.5                                  // MATCAP
+                _OVL_UVType == 1 ? i.uv_lmap                                                 // UV2
+                : _OVL_UVType == 2 ? computeOverlayTex(i.ws_vertex)                          // SKYBOX
+                : _OVL_UVType == 3 ? computeAngelRingUV(vs_normal, i.uv_lmap)                // ANGELRING
+                : _OVL_UVType == 4 ? vs_normal.xy / 2 + 0.5                                  // MATCAP
                 : i.uv                                                                      // UV1
                 ;
-            uv_overlay = TRANSFORM_TEX(uv_overlay, _OL_OverlayTex);
-            uv_overlay += frac(_OL_UVScroll * _Time.xx);
-            float4 ov_color = PICK_MAIN_TEX2D(_OL_OverlayTex, uv_overlay) * _OL_Color;
-            float ov_power = _OL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
+            uv_overlay = TRANSFORM_TEX(uv_overlay, _OVL_OverlayTex);
+            uv_overlay += frac(_OVL_UVScroll * _Time.xx);
+            float4 ov_color = PICK_MAIN_TEX2D(_OVL_OverlayTex, uv_overlay) * _OVL_Color;
+            float ov_power = _OVL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
 
             // 頂点カラーを加味
-            ov_color *= lerp(ONE_VEC4, i.vertex_color, _OL_VertColToDecal);
-            ov_power *= lerp(1, saturate(TGL_OFF(_OL_InvMaskVal) ? i.vertex_color.r : 1 - i.vertex_color.r), _OL_VertColToMask);
+            ov_color *= lerp(ONE_VEC4, i.vertex_color, _OVL_VertColToDecal);
+            ov_power *= lerp(1, saturate(TGL_OFF(_OVL_InvMaskVal) ? i.vertex_color.r : 1 - i.vertex_color.r), _OVL_VertColToMask);
 
             color.rgb = blendOverlayColor(color.rgb, ov_color, ov_power);
 FEATURE_TGL_END
@@ -1275,7 +1275,7 @@ FEATURE_TGL_END
     // Distance Fade
     ////////////////////////////
 
-    #ifdef _DF_ENABLE
+    #ifdef _DFD_ENABLE
 
         float calcDistanceFadeDistanceSq(float3 ws_vertex) {
             float3 cam_vec1 = ws_vertex - worldSpaceViewPointPos();
@@ -1293,12 +1293,12 @@ FEATURE_TGL_END
         }
 
         void affectDistanceFade(v2f i, uint facing, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_DF_Enable)
+FEATURE_TGL_ON_BEGIN(_DFD_Enable)
             float dist = sqrt(calcDistanceFadeDistanceSq(i.ws_vertex.xyz));
-            if (!facing && TGL_ON(_DF_BackShadow)) {
+            if (!facing && TGL_ON(_DFD_BackShadow)) {
                 dist = 0;
             }
-            color.rgb = lerp(color.rgb, _DF_Color.rgb, _DF_Power * (1 - smoothstep(_DF_MinDist, max(_DF_MinDist + NZF, _DF_MaxDist), dist)));
+            color.rgb = lerp(color.rgb, _DFD_Color.rgb, _DFD_Power * (1 - smoothstep(_DFD_MinDist, max(_DFD_MinDist + NZF, _DFD_MaxDist), dist)));
 FEATURE_TGL_END
         }
     #else
@@ -1309,20 +1309,20 @@ FEATURE_TGL_END
     // Fog
     ////////////////////////////
 
-    #ifdef _FG_ENABLE
+    #ifdef _TFG_ENABLE
 
         void affectToonFog(v2f i, float3 ws_view_dir, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_FG_Enable)
-            float3 ws_base_position = UnityObjectToWorldPos(_FG_BaseOffset);
-            float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _FG_Scale);
+FEATURE_TGL_ON_BEGIN(_TFG_Enable)
+            float3 ws_base_position = UnityObjectToWorldPos(_TFG_BaseOffset);
+            float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _TFG_Scale);
             float power =
                 // 原点からの距離の判定
-                smoothstep(_FG_MinDist, max(_FG_MinDist + NZF, _FG_MaxDist), length( ws_offset_vertex ))
+                smoothstep(_TFG_MinDist, max(_TFG_MinDist + NZF, _TFG_MaxDist), length( ws_offset_vertex ))
                 // 前後の判定
                 * smoothstep(0, 0.2, -dot(ws_view_dir.xz, ws_offset_vertex.xz))
                 // カメラと原点の水平距離の判定
-                * smoothstep(_FG_MinDist, max(_FG_MinDist + NZF, _FG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
-            color.rgb = lerp(color.rgb, _FG_Color.rgb * i.light_color, _FG_Color.a * pow(power, _FG_Exponential));
+                * smoothstep(_TFG_MinDist, max(_TFG_MinDist + NZF, _TFG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
+            color.rgb = lerp(color.rgb, _TFG_Color.rgb * i.light_color, _TFG_Color.a * pow(power, _TFG_Exponential));
 FEATURE_TGL_END
         }
     #else
@@ -1333,17 +1333,17 @@ FEATURE_TGL_END
     // GhostTransparent
     ////////////////////////////
 
-    #ifdef _GO_ENABLE
+    #ifdef _CGO_ENABLE
 
         void affectGhostTransparent(v2f i, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_GO_Enable)
+FEATURE_TGL_ON_BEGIN(_CGO_Enable)
             // GrabScreenPos 計算
             float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
             grab_uv.xy /= grab_uv.w;
 
             float3 back_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv).rgb;
 
-            color.rgb = lerp(back_color.rgb, color.rgb, saturate(color.a * _GO_Power));
+            color.rgb = lerp(back_color.rgb, color.rgb, saturate(color.a * _CGO_Power));
             color.a = 1;
 FEATURE_TGL_END
         }
@@ -1356,22 +1356,22 @@ FEATURE_TGL_END
     // Refraction
     ////////////////////////////
 
-    #ifdef _RF_ENABLE
+    #ifdef _CRF_ENABLE
 
         void affectRefraction(v2f i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_RF_Enable)
+FEATURE_TGL_ON_BEGIN(_CRF_Enable)
             float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
 
-            float3 refract_normal = lerpNormals(ws_normal, ws_bump_normal, _RF_BlendNormal);
-            float3 refract_dir = refract(view_dir, facing ? refract_normal : -refract_normal, 1.0 / _RF_RefractiveIndex);
-            float3 refract_pos = i.ws_vertex + refract_dir * _RF_Distance;
+            float3 refract_normal = lerpNormals(ws_normal, ws_bump_normal, _CRF_BlendNormal);
+            float3 refract_dir = refract(view_dir, facing ? refract_normal : -refract_normal, 1.0 / _CRF_RefractiveIndex);
+            float3 refract_pos = i.ws_vertex + refract_dir * _CRF_Distance;
 
             float4 refract_scr_pos = mul(UNITY_MATRIX_VP, float4(refract_pos, 1));
             refract_scr_pos.xy = clamp(refract_scr_pos.xy, -refract_scr_pos.w, refract_scr_pos.w);
 
             float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
             grab_uv.xy /= grab_uv.w;
-            float3 back_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv).rgb * (_RF_Tint.rgb * unity_ColorSpaceDouble.rgb);
+            float3 back_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv).rgb * (_CRF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
             color.rgb = lerp(back_color.rgb, color.rgb, color.a);
             color.a = 1;
@@ -1386,7 +1386,7 @@ FEATURE_TGL_END
     // FrostedGlass
     ////////////////////////////
 
-    #ifdef _GS_ENABLE
+    #ifdef _CGL_ENABLE
 
         float3 sampleScreenTextureBlur1(float2 uv, float2 scale) {    // NORMAL
             static const int    BLUR_SAMPLE_COUNT = 7;
@@ -1426,20 +1426,20 @@ FEATURE_TGL_END
         }
 
         void affectFrostedGlass(v2f i, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_GS_Enable)
+FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             // GrabScreenPos 計算
             float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
             grab_uv.xy /= grab_uv.w;
 
             // Scale 計算
-            float2 scale = _GS_Blur / 100;
+            float2 scale = _CGL_Blur / 100;
             scale.y *= _ScreenParams.x / _ScreenParams.y;
 
             float3 back_color =
 #ifdef _WF_LEGACY_FEATURE_SWITCH
-                _GS_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale).rgb : sampleScreenTextureBlur2(grab_uv, scale).rgb;
+                _CGL_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale).rgb : sampleScreenTextureBlur2(grab_uv, scale).rgb;
 #else
-    #ifdef _GS_BLURFAST_ENABLE
+    #ifdef _CGL_BLURFAST_ENABLE
                 sampleScreenTextureBlur2(grab_uv, scale).rgb;
     #else
                 sampleScreenTextureBlur1(grab_uv, scale).rgb;

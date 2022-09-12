@@ -40,19 +40,19 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
         // すりガラス
         [WFHeaderAlwaysOn(FrostedGlass)]
-            _GS_Enable              ("[GS] Enable", Float) = 1
-            _GS_Blur                ("[GS] Blur", Range(0, 2)) = 0.4
+            _CGL_Enable              ("[CGL] Enable", Float) = 1
+            _CGL_Blur                ("[CGL] Blur", Range(0, 2)) = 0.4
         [Enum(NORMAL,0,FAST,1)]
-            _GS_BlurMode            ("[GS] Blur Mode", Float) = 0
+            _CGL_BlurMode            ("[CGL] Blur Mode", Float) = 0
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
-            _BK_Enable              ("[BK] Enable", Float) = 0
+            _BKT_Enable              ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _BK_UVType              ("[BK] UV Type", Float) = 0
-            _BK_BackTex             ("[BK] Back Texture", 2D) = "white" {}
+            _BKT_UVType              ("[BKT] UV Type", Float) = 0
+            _BKT_BackTex             ("[BKT] Back Texture", 2D) = "white" {}
         [HDR]
-            _BK_BackColor           ("[BK] Back Color", Color) = (1, 1, 1, 1)
+            _BKT_BackColor           ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
         // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
@@ -112,54 +112,54 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
         // ラメ
         [WFHeaderToggle(Lame)]
-            _LM_Enable              ("[LM] Enable", Float) = 0
+            _LME_Enable              ("[LME] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _LM_UVType              ("[LM] UV Type", Float) = 0
+            _LME_UVType              ("[LME] UV Type", Float) = 0
         [HDR]
-            _LM_Color               ("[LM] Color", Color) = (1, 1, 1, 1)
-            _LM_Texture             ("[LM] Texture", 2D) = "white" {}
+            _LME_Color               ("[LME] Color", Color) = (1, 1, 1, 1)
+            _LME_Texture             ("[LME] Texture", 2D) = "white" {}
         [HDR]
-            _LM_RandColor           ("[LM] Random Color", Color) = (0, 0, 0, 1)
+            _LME_RandColor           ("[LME] Random Color", Color) = (0, 0, 0, 1)
         [Toggle(_)]
-            _LM_ChangeAlpha         ("[LM] Change Alpha Transparency", Range(0, 1)) = 0
+            _LME_ChangeAlpha         ("[LME] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(POLYGON,0,POINT,1)]
-            _LM_Shape               ("[LM] Shape", Float) = 0
+            _LME_Shape               ("[LME] Shape", Float) = 0
         [PowerSlider(4.0)]
-            _LM_Scale               ("[LM] Scale", Range(0, 4)) = 0.5
+            _LME_Scale               ("[LME] Scale", Range(0, 4)) = 0.5
         [PowerSlider(4.0)]
-            _LM_Dencity             ("[LM] Dencity", Range(0.3, 4)) = 0.5
-            _LM_Glitter             ("[LM] Glitter", Range(0, 1)) = 0.5
-            _LM_MinDist             ("[LM] FadeOut Distance (Near)", Range(0, 5)) = 2.0
-            _LM_MaxDist             ("[LM] FadeOut Distance (Far)", Range(0, 5)) = 4.0
-            _LM_Spot                ("[LM] FadeOut Angle", Range(0, 16)) = 2.0
-            _LM_AnimSpeed           ("[LM] Anim Speed", Range(0, 1)) = 0.2
+            _LME_Dencity             ("[LME] Dencity", Range(0.3, 4)) = 0.5
+            _LME_Glitter             ("[LME] Glitter", Range(0, 1)) = 0.5
+            _LME_MinDist             ("[LME] FadeOut Distance (Near)", Range(0, 5)) = 2.0
+            _LME_MaxDist             ("[LME] FadeOut Distance (Far)", Range(0, 5)) = 4.0
+            _LME_Spot                ("[LME] FadeOut Angle", Range(0, 16)) = 2.0
+            _LME_AnimSpeed           ("[LME] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
-            _LM_MaskTex             ("[LM] Mask Texture (R)", 2D) = "white" {}
+            _LME_MaskTex             ("[LME] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
-            _LM_InvMaskVal          ("[LM] Invert Mask Value", Range(0, 1)) = 0
+            _LME_InvMaskVal          ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
         // Overlay Texture
         [WFHeaderToggle(Overlay Texture)]
-            _OL_Enable              ("[OL] Enable", Float) = 0
+            _OVL_Enable              ("[OVL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
-            _OL_UVType              ("[OL] UV Type", Float) = 0
+            _OVL_UVType              ("[OVL] UV Type", Float) = 0
         [HDR]
-            _OL_Color               ("[OL] Overlay Color", Color) = (1, 1, 1, 1)
-            _OL_OverlayTex          ("[OL] Overlay Texture", 2D) = "white" {}
+            _OVL_Color               ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
+            _OVL_OverlayTex          ("[OVL] Overlay Texture", 2D) = "white" {}
         [WF_Vector2]
-            _OL_UVScroll            ("[OL] UV Scroll", Vector) = (0, 0, 0, 0)
+            _OVL_UVScroll            ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [Toggle(_)]
-            _OL_VertColToDecal      ("[OL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
+            _OVL_VertColToDecal      ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
         [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
-            _OL_BlendType           ("[OL] Blend Type", Float) = 0
-            _OL_Power               ("[OL] Blend Power", Range(0, 1)) = 1
-            _OL_CustomParam1        ("[OL] Customize Parameter 1", Range(0, 1)) = 0
+            _OVL_BlendType           ("[OVL] Blend Type", Float) = 0
+            _OVL_Power               ("[OVL] Blend Power", Range(0, 1)) = 1
+            _OVL_CustomParam1        ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OL_MaskTex             ("[OL] Mask Texture (R)", 2D) = "white" {}
+            _OVL_MaskTex             ("[OVL] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
-            _OL_VertColToMask       ("[OL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
+            _OVL_VertColToMask       ("[OVL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
         [Toggle(_)]
-            _OL_InvMaskVal          ("[OL] Invert Mask Value", Range(0, 1)) = 0
+            _OVL_InvMaskVal          ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -222,10 +222,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
-            _GI_Enable              ("[GI] Enable", Float) = 0
-            _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
-            _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1
-            _GI_IndirectChroma      ("[GI] Indirect Chroma", Range(0, 2)) = 1
+            _LBE_Enable              ("[LBE] Enable", Float) = 0
+            _LBE_IndirectMultiplier  ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
+            _LBE_EmissionMultiplier  ("[LBE] Emission Multiplier", Range(0, 2)) = 1
+            _LBE_IndirectChroma      ("[LBE] Indirect Chroma", Range(0, 2)) = 1
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
@@ -263,16 +263,16 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _NS_ENABLE
-            #pragma shader_feature_local _OL_ENABLE
+            #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
+            #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _GS_ENABLE
-            #pragma shader_feature_local_fragment _LM_ENABLE
+            #pragma shader_feature_local_fragment _CGL_ENABLE
+            #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _ _GS_BLURFAST_ENABLE
+            #pragma shader_feature_local_fragment _ _CGL_BLURFAST_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonFrostedGlass
 
