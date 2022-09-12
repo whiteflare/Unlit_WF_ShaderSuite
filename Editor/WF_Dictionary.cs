@@ -170,7 +170,7 @@ namespace UnlitWF
                 new WFShaderFunction("CGO", "CGO", "Ghost Transparent"),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
-                // GB, GF, GR, FG, BK, CH, CL, LM, OV, DF, GI, RF
+                // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF
             };
 
         /// <summary>

@@ -745,7 +745,7 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Replace("^_CH_", "_CHM_"),
             PropertyNameReplacement.Replace("^_CL_", "_CLC_"),
             PropertyNameReplacement.Replace("^_LM_", "_LME_"),
-            PropertyNameReplacement.Replace("^_OV_", "_OVL_"),
+            PropertyNameReplacement.Replace("^_OL_", "_OVL_"),
             PropertyNameReplacement.Replace("^_DF_", "_DFD_"),
             PropertyNameReplacement.Replace("^_GI_", "_LBE_"),
             PropertyNameReplacement.Replace("^_RF_", "_CRF_"),
