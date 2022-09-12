@@ -4,7 +4,7 @@ ShaderImporter:
   externalObjects: {}
   defaultTextures:
   - _MainTex: {instanceID: 0}
-  - _GR_Cubemap: {fileID: 8900000, guid: 80b684ec03e5e1c40943d9eb0e0d32f4, type: 3}
+  - _GMR_Cubemap: {fileID: 8900000, guid: 80b684ec03e5e1c40943d9eb0e0d32f4, type: 3}
   - _AL_MaskTex: {instanceID: 0}
   - _BumpMap: {instanceID: 0}
   nonModifiableTextures: []
