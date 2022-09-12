@@ -563,7 +563,7 @@ namespace UnlitWF
                 }
             }
             // 削除実行
-            DeleteProperties(del_props, material);
+            var del_names = DeleteProperties(del_props, material);
 
             // キーワードクリア
             if (param.resetKeywords)
@@ -576,11 +576,50 @@ namespace UnlitWF
 
             // キーワードを整理する
             WFCommonUtility.SetupShaderKeyword(material);
+            // Default割り当てTextureを再設定する
+            ResetDefaultTextures(material, del_names);
             // 反映
             EditorUtility.SetDirty(material);
         }
 
-        private static void DeleteProperties(IEnumerable<ShaderSerializedProperty> props, Material logTarget)
+        private static void ResetDefaultTextures(Material material, HashSet<string> del_names)
+        {
+            var shader = material.shader;
+            var path = AssetDatabase.GetAssetPath(shader);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+            var importer = AssetImporter.GetAtPath(path) as ShaderImporter;
+            if (importer == null)
+            {
+                return;
+            }
+
+            foreach (var pn in del_names)
+            {
+                if (IsShaderPropertyTexture(shader, pn))
+                {
+                    var tex = importer.GetDefaultTexture(pn);
+                    if (tex != null)
+                    {
+                        material.SetTexture(pn, tex);
+                    }
+                }
+            }
+        }
+
+        private static bool IsShaderPropertyTexture(Shader shader, string name)
+        {
+            var idx = WFCommonUtility.FindPropertyIndex(shader, name);
+            if (idx < 0)
+            {
+                return false;
+            }
+            return shader.GetPropertyType(idx) == UnityEngine.Rendering.ShaderPropertyType.Texture;
+        }
+
+        private static HashSet<string> DeleteProperties(IEnumerable<ShaderSerializedProperty> props, Material material)
         {
             var del_names = new HashSet<string>();
             foreach (var p in props)
@@ -592,9 +631,11 @@ namespace UnlitWF
             {
                 var names = new List<string>(del_names);
                 names.Sort();
-                UnityEngine.Debug.LogFormat(logTarget, "[WF][Tool] Deleted {0} Property: {1}", logTarget, string.Join(", ", names.ToArray()));
+                UnityEngine.Debug.LogFormat(material, "[WF][Tool] Deleted {0} Property: {1}", material, string.Join(", ", names.ToArray()));
             }
             ShaderSerializedProperty.AllApplyPropertyChange(props);
+
+            return del_names;
         }
 
         public static void DeleteShaderKeyword(SerializedObject so, Material logTarget)
@@ -614,7 +655,7 @@ namespace UnlitWF
             so.ApplyModifiedProperties();
         }
 
-        #endregion
+#endregion
     }
 
     /// <summary>

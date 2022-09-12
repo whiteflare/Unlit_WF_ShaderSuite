@@ -219,21 +219,6 @@ namespace UnlitWF
             }
         }
 
-        private static void SetEnableKeyword(Material mat, string kwd, bool value)
-        {
-            if (mat.IsKeywordEnabled(kwd) != value)
-            {
-                if (value)
-                {
-                    mat.EnableKeyword(kwd);
-                }
-                else
-                {
-                    mat.DisableKeyword(kwd);
-                }
-            }
-        }
-
         /// <summary>
         /// マテリアルの shader を指定の名前のものに変更する。
         /// </summary>
@@ -402,6 +387,22 @@ namespace UnlitWF
             Application.OpenURL(LatestVersion.downloadPage);
         }
 
+        public static int FindPropertyIndex(Shader shader, string name)
+        {
+#if UNITY_2019_1_OR_NEWER
+            return shader.FindPropertyIndex(name);
+#else
+            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--)
+            {
+                if (name == ShaderUtil.GetPropertyName(shader, idx))
+                {
+                    return idx;
+                }
+            }
+            return -1;
+#endif
+        }
+
         private static IEnumerable<string> getAllPropertyNames(Shader shader)
         {
 #if UNITY_2019_1_OR_NEWER
@@ -425,23 +426,12 @@ namespace UnlitWF
         /// <returns></returns>
         private static string getPropertyDescription(Shader shader, string name)
         {
-#if UNITY_2019_1_OR_NEWER
-            var idx = shader.FindPropertyIndex(name);
+            var idx = FindPropertyIndex(shader, name);
             if (0 <= idx)
             {
                 return shader.GetPropertyDescription(idx);
             }
             return null;
-#else
-            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--)
-            {
-                if (name == ShaderUtil.GetPropertyName(shader, idx))
-                {
-                    return ShaderUtil.GetPropertyDescription(shader, idx);
-                }
-            }
-            return null;
-#endif
         }
 
         /// <summary>
