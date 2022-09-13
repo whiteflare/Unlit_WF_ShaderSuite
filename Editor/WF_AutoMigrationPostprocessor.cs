@@ -36,7 +36,7 @@ namespace UnlitWF
         public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
         {
             // マテリアルのマイグレーション
-            Converter.ScanAndMigrationExecutor.Migration(importedAssets);
+            Converter.ScanAndMigrationExecutor.ImportAndMigration(importedAssets);
 
             // もしshaderファイルがimportされたなら、そのタイミングで全スキャンも動作させる
             if (importedAssets.Any(IsSupportedShaderPath))

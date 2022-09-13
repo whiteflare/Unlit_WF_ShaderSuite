@@ -652,17 +652,23 @@ namespace UnlitWF.Converter
             }
         }
 
-        public static bool Migration(string[] paths)
+        public static void ImportAndMigration(string[] paths)
         {
-            bool result = false;
+            var done = 0;
             foreach (var path in paths)
             {
-                result |= Migration(path);
+                if (Migration(path))
+                {
+                    done++;
+                }
             }
-            return result;
+            if (0 < done)
+            {
+                Debug.LogFormat("[WF] Import And Migration {0} materials", done);
+            }
         }
 
-        public static bool Migration(string path)
+        private static bool Migration(string path)
         {
             if (string.IsNullOrWhiteSpace(path) || !path.EndsWith(".mat"))
             {
@@ -799,6 +805,16 @@ namespace UnlitWF.Converter
             {
                 mat.SetFloat(to, mat.GetFloat(from));
             }
+        }
+
+        protected override void OnAfterConvert(ConvertContext ctx)
+        {
+            // 大量に変換すると大量にログが出るので出さない
+        }
+
+        protected override void OnAfterExecute(Material[] mats, int total)
+        {
+            // 大量に変換すると大量にログが出るので出さない
         }
 
         protected static List<Action<ConvertContext>> CreateConverterList()
