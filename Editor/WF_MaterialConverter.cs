@@ -711,43 +711,52 @@ namespace UnlitWF.Converter
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
         public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
+            // 2020/01/28
             PropertyNameReplacement.Match("_AL_CutOff", "_Cutoff"),
-            PropertyNameReplacement.Match("_CutOffLevel", "_Cutoff"),
             PropertyNameReplacement.Match("_ES_Color", "_EmissionColor"),
             PropertyNameReplacement.Match("_ES_MaskTex", "_EmissionMap"),
-            PropertyNameReplacement.Match("_FurHeight", "_FUR_Height"),
-            PropertyNameReplacement.Match("_FurMaskTex", "_FUR_MaskTex"),
-            PropertyNameReplacement.Match("_FurNoiseTex", "_FUR_NoiseTex"),
-            PropertyNameReplacement.Match("_FurRepeat", "_FUR_Repeat"),
-            PropertyNameReplacement.Match("_FurShadowPower", "_FUR_ShadowPower"),
-            PropertyNameReplacement.Match("_FG_BumpMap", "_FUR_BumpMap"),
-            PropertyNameReplacement.Match("_FG_FlipTangent", "_FlipMirror"),
-            PropertyNameReplacement.Match("_FR_FlipTangent", "_FlipMirror"),
-            PropertyNameReplacement.Match("_FR_FlipMirror", "_FlipMirror"),
             PropertyNameReplacement.Match("_GL_BrendPower", "_GL_BlendPower"),
             PropertyNameReplacement.Match("_MT_BlendType", "_MT_Brightness"),
             PropertyNameReplacement.Match("_MT_MaskTex", "_MetallicGlossMap"),
             PropertyNameReplacement.Match("_MT_Smoothness", "_MT_ReflSmooth"),
             PropertyNameReplacement.Match("_MT_Smoothness2", "_MT_SpecSmooth"),
-            PropertyNameReplacement.Match("_TessFactor", "_TE_Factor"),
+            // 2020/09/04
+            PropertyNameReplacement.Match("_CutOffLevel", "_Cutoff"),
+            PropertyNameReplacement.Match("_FurHeight", "_FR_Height"),
+            PropertyNameReplacement.Match("_FurMaskTex", "_FR_MaskTex"),
+            PropertyNameReplacement.Match("_FurNoiseTex", "_FR_NoiseTex"),
+            PropertyNameReplacement.Match("_FurRepeat", "_FR_Repeat"),
+            PropertyNameReplacement.Match("_FurShadowPower", "_FR_ShadowPower"),
+            // 2020/12/18
+            PropertyNameReplacement.Match("_FG_BumpMap", "_FR_BumpMap"),
+            PropertyNameReplacement.Match("_FG_FlipTangent", "_FR_FlipMirror"),
+            // 2021/01/11
             PropertyNameReplacement.Match("_Smoothing", "_TE_SmoothPower"),
-            PropertyNameReplacement.Match("_NM_FlipMirror", "_FlipMirror"),   // NS追加に合わせてFlipMirrorはラベルなしに変更する
-            PropertyNameReplacement.Match("_NM_2ndType", "_NS_Enable", p => p.IntValue = p.IntValue != 0 ? 1 : 0),
-            PropertyNameReplacement.Match("_NM_2ndUVType", "_NS_UVType"),
+            PropertyNameReplacement.Match("_TessFactor", "_TE_Factor"),
+            // 2022/06/04
+            PropertyNameReplacement.Match("_FR_FlipMirror", "_FlipMirror"),
+            PropertyNameReplacement.Match("_FR_FlipTangent", "_FlipMirror"),
             PropertyNameReplacement.Match("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
+            PropertyNameReplacement.Match("_NM_2ndType", "_NS_Enable", p => p.IntValue = p.IntValue != 0 ? 1 : 0),
+            PropertyNameReplacement.Match("_NM_2ndUVType", "_NS_2ndUVType"),
+            PropertyNameReplacement.Match("_NM_FlipMirror", "_FlipMirror"),
             PropertyNameReplacement.Match("_NM_InvMaskVal", "_NS_InvMaskVal"),
+            // 2022/06/08
+            PropertyNameReplacement.Match("_NS_2ndUVType", "_NS_UVType"),
             PropertyNameReplacement.Match("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
-            PropertyNameReplacement.Prefix("_GB_", "_GMB_"),
-            PropertyNameReplacement.Prefix("_GF_", "_GMF_"),
-            PropertyNameReplacement.Prefix("_GR_", "_GMR_"),
-            PropertyNameReplacement.Prefix("_FG_", "_TFG_"),
+            // 2022/09/12
             PropertyNameReplacement.Prefix("_BK_", "_BKT_"),
             PropertyNameReplacement.Prefix("_CH_", "_CHM_"),
             PropertyNameReplacement.Prefix("_CL_", "_CLC_"),
+            PropertyNameReplacement.Prefix("_DF_", "_DFD_"),
+            PropertyNameReplacement.Prefix("_FG_", "_TFG_"),
+            PropertyNameReplacement.Prefix("_FR_", "_FUR_"),
+            PropertyNameReplacement.Prefix("_GB_", "_GMB_"),
+            PropertyNameReplacement.Prefix("_GF_", "_GMF_"),
+            PropertyNameReplacement.Prefix("_GI_", "_LBE_"),
+            PropertyNameReplacement.Prefix("_GR_", "_GMR_"),
             PropertyNameReplacement.Prefix("_LM_", "_LME_"),
             PropertyNameReplacement.Prefix("_OL_", "_OVL_"),
-            PropertyNameReplacement.Prefix("_DF_", "_DFD_"),
-            PropertyNameReplacement.Prefix("_GI_", "_LBE_"),
             PropertyNameReplacement.Prefix("_RF_", "_CRF_"),
         };
 

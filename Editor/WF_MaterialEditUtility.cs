@@ -211,33 +211,41 @@ namespace UnlitWF
 
         private static bool RenamePropNamesWithoutUndoInternal(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
+            var props = ShaderSerializedProperty.AsList(mat);
             // 名称を全て変更
-            var props = ShaderSerializedProperty.AsDict(mat);
-            foreach (var beforeName in props.Keys)
+            foreach (var rep in replacement)
             {
-                foreach (var rep in replacement)
+                var modified = false;
+                foreach (var before in props)
                 {
-                    if (rep.TryReplace(beforeName, out var afterName))
+                    if (!rep.TryReplace(before.name, out var afterName))
                     {
-                        var before = props[beforeName];
-                        var after = props.GetValueOrNull(afterName);
-                        if (after != null)
-                        {
-                            before.CopyTo(after);
-                            before.Remove();
-                            rep.onAfterCopy(after);
-                        }
-                        else
-                        {
-                            before.Rename(afterName);
-                            rep.onAfterCopy(before);
-                        }
+                        continue;
                     }
+                    var after = props.Where(pn => pn.name == afterName).FirstOrDefault();
+                    if (after != null)
+                    {
+                        before.CopyTo(after);
+                        before.Remove();
+                        rep.onAfterCopy(after);
+                    }
+                    else
+                    {
+                        before.Rename(afterName);
+                        rep.onAfterCopy(before);
+                    }
+                    modified = true;
+                }
+                if (modified)
+                {
+                    // 保存
+                    ShaderSerializedProperty.AllApplyPropertyChange(props);
+                    // 再取得
+                    props = ShaderSerializedProperty.AsList(mat);
+                    // フラグクリア
+                    modified = false;
                 }
             }
-
-            // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(props.Values);
 
             return true;
         }
