@@ -23,21 +23,39 @@
 #if UNITY_EDITOR
 
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 
 namespace UnlitWF
 {
+    /// <summary>
+    /// シェーダが新規インポートされたタイミングでプロジェクト内をスキャンしてマテリアルをマイグレーションするAssetPostprocessor
+    /// </summary>
     public class WF_AutoMigrationPostprocessor : AssetPostprocessor
     {
-        static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
+        public override int GetPostprocessOrder()
         {
-            // マテリアルのマイグレーション
-            Converter.ScanAndMigrationExecutor.Migration(importedAssets);
+            return 109;
+        }
+
+        public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
+        {
             // もしshaderファイルがimportされたなら、そのタイミングで全スキャンも動作させる
-            if (importedAssets.Any(path => path != null && path.EndsWith(".shader", System.StringComparison.InvariantCultureIgnoreCase)))
+            if (importedAssets.Any(IsSupportedShaderPath))
             {
                 Converter.ScanAndMigrationExecutor.ExecuteAuto();
             }
+        }
+
+        private static readonly Regex regexPath = new Regex(@".*WF_.*\.shader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private static bool IsSupportedShaderPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+            return regexPath.IsMatch(path);
         }
     }
 }

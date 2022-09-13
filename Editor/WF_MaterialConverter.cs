@@ -567,9 +567,27 @@ namespace UnlitWF.Converter
         }
     }
 
+    /// <summary>
+    /// マテリアルが新規インポートされたタイミングでダイアログなくマイグレーションするAssetPostprocessor
+    /// </summary>
+    public class WF_MaterialMigrationPostProcessor : AssetPostprocessor
+    {
+        public override int GetPostprocessOrder()
+        {
+            return 108;
+        }
+
+        public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
+        {
+            // マテリアルのマイグレーション
+            Converter.ScanAndMigrationExecutor.Migration(importedAssets);
+        }
+    }
+
+
     public static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 3;
+        public const int VERSION = 4;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         public static void ExecuteAuto()
