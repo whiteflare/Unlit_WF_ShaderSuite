@@ -567,23 +567,6 @@ namespace UnlitWF.Converter
         }
     }
 
-    /// <summary>
-    /// マテリアルが新規インポートされたタイミングでダイアログなくマイグレーションするAssetPostprocessor
-    /// </summary>
-    public class WF_MaterialMigrationPostProcessor : AssetPostprocessor
-    {
-        public override int GetPostprocessOrder()
-        {
-            return 108;
-        }
-
-        public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
-        {
-            // マテリアルのマイグレーション
-            Converter.ScanAndMigrationExecutor.Migration(importedAssets);
-        }
-    }
-
     public static class ScanAndMigrationExecutor
     {
         public const int VERSION = 4;

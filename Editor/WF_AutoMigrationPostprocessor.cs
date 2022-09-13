@@ -29,17 +29,15 @@ using UnityEditor;
 namespace UnlitWF
 {
     /// <summary>
-    /// シェーダが新規インポートされたタイミングでプロジェクト内をスキャンしてマテリアルをマイグレーションするAssetPostprocessor
+    /// マテリアルとシェーダが新規インポートされたタイミングでプロジェクト内をスキャンしてマテリアルをマイグレーションするAssetPostprocessor
     /// </summary>
     public class WF_AutoMigrationPostprocessor : AssetPostprocessor
     {
-        public override int GetPostprocessOrder()
-        {
-            return 109;
-        }
-
         public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
         {
+            // マテリアルのマイグレーション
+            Converter.ScanAndMigrationExecutor.Migration(importedAssets);
+
             // もしshaderファイルがimportされたなら、そのタイミングで全スキャンも動作させる
             if (importedAssets.Any(IsSupportedShaderPath))
             {
