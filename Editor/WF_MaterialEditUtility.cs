@@ -97,42 +97,67 @@ namespace UnlitWF
             this.onAfterCopy = onAfterCopy ?? (p => { });
         }
 
-        public abstract bool TryMatch(string beforeName, out string afterName);
+        public abstract bool IsMatch(string beforeName);
 
-        public static PropertyNameReplacement Rename(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
+        protected abstract string Replace(string beforeName);
+
+        public virtual bool TryReplace(string beforeName, out string afterName)
         {
-            return new SimpleRename(bn, an, onAfterCopy);
+            if (IsMatch(beforeName))
+            {
+                afterName = Replace(beforeName);
+                return true;
+            }
+            else
+            {
+                afterName = null;
+                return false;
+            }
         }
 
-        public static PropertyNameReplacement Replace(string pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy = null)
+        public static PropertyNameReplacement Match(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new MatchRename(bn, an, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement Prefix(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new PrefixRename(beforePrefix, afterPrefix, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement Regex(string pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy = null)
         {
             return new RegexRename(new Regex(pattern, RegexOptions.Compiled), replacement, onAfterCopy);
         }
 
-        private class SimpleRename : PropertyNameReplacement
+        private class MatchRename : PropertyNameReplacement
         {
             private readonly string beforeName;
             private readonly string afterName;
 
-            public SimpleRename(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            public MatchRename(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
             {
                 this.beforeName = beforeName;
                 this.afterName = afterName;
             }
 
-            public override bool TryMatch(string beforeName, out string afterName)
+            public override bool IsMatch(string beforeName) => this.beforeName == beforeName;
+            protected override string Replace(string beforeName) => afterName;
+        }
+
+        private class PrefixRename : PropertyNameReplacement
+        {
+            private readonly string beforePrefix;
+            private readonly string afterPrefix;
+
+            public PrefixRename(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
             {
-                if (this.beforeName == beforeName)
-                {
-                    afterName = this.afterName;
-                    return true;
-                }
-                else
-                {
-                    afterName = null;
-                    return false;
-                }
+                this.beforePrefix = beforePrefix;
+                this.afterPrefix = afterPrefix;
             }
+
+            public override bool IsMatch(string beforeName) => beforeName.StartsWith(beforePrefix);
+            protected override string Replace(string beforeName) => afterPrefix + beforeName.Substring(beforePrefix.Length);
         }
 
         private class RegexRename : PropertyNameReplacement
@@ -146,19 +171,8 @@ namespace UnlitWF
                 this.replacement = replacement;
             }
 
-            public override bool TryMatch(string beforeName, out string afterName)
-            {
-                if (pattern.IsMatch(beforeName))
-                {
-                    afterName = pattern.Replace(beforeName, replacement);
-                    return true;
-                }
-                else
-                {
-                    afterName = null;
-                    return false;
-                }
-            }
+            public override bool IsMatch(string beforeName) => pattern.IsMatch(beforeName);
+            protected override string Replace(string beforeName) => pattern.Replace(beforeName, replacement);
         }
     }
 
@@ -185,92 +199,47 @@ namespace UnlitWF
             WFMaterialCache.instance.ResetOldMaterialTable(mats);
         }
 
-
         public static bool ReplacePropertyNamesWithoutUndo(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
-            var mats = new Material[] { mat };
-            return RenamePropNameWithoutUndo(CreateReplacePropertyList(mats, replacement));
+            return RenamePropNamesWithoutUndoInternal(mat, replacement);
         }
 
         public static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement)
         {
-            var mats = new Material[] { mat };
-            return RenamePropNameWithoutUndo(CreateReplacePropertyList(mats, replacement));
+            return RenamePropNamesWithoutUndoInternal(mat, replacement);
         }
 
-        private static bool RenamePropNameWithoutUndo(List<ReplacingPropertyMapping> replaceList)
+        private static bool RenamePropNamesWithoutUndoInternal(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
-            if (replaceList.Count == 0)
-            {
-                return false;
-            }
-
             // 名称を全て変更
-            replaceList.ForEach(r => r.Execute());
-            // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.after));
-            // 旧プロパティは全て削除
-            foreach (var prop in replaceList.Where(p => p.after != null).Select(p => p.before))
+            var props = ShaderSerializedProperty.AsDict(mat);
+            foreach (var beforeName in props.Keys)
             {
-                prop.Remove();
-            }
-            // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.before));
-
-            return true;
-        }
-
-        private static List<ReplacingPropertyMapping> CreateReplacePropertyList(Material[] mats, IEnumerable<PropertyNameReplacement> replacement)
-        {
-            var result = new List<ReplacingPropertyMapping>();
-            foreach (var mat in mats)
-            {
-                var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var beforeName in props.Keys)
+                foreach (var rep in replacement)
                 {
-                    foreach (var rep in replacement)
+                    if (rep.TryReplace(beforeName, out var afterName))
                     {
-                        if (rep.TryMatch(beforeName, out var afterName))
+                        var before = props[beforeName];
+                        var after = props.GetValueOrNull(afterName);
+                        if (after != null)
                         {
-                            var before = props[beforeName];
-                            var after = props.GetValueOrNull(afterName);
-                            result.Add(new ReplacingPropertyMapping(before, after, afterName, rep.onAfterCopy));
+                            before.CopyTo(after);
+                            before.Remove();
+                            rep.onAfterCopy(after);
+                        }
+                        else
+                        {
+                            before.Rename(afterName);
+                            rep.onAfterCopy(before);
                         }
                     }
                 }
             }
 
-            return result;
-        }
+            // 保存
+            ShaderSerializedProperty.AllApplyPropertyChange(props.Values);
 
-        struct ReplacingPropertyMapping
-        {
-            public readonly ShaderSerializedProperty before;
-            public readonly ShaderSerializedProperty after;
-            public readonly string afterName;
-            public readonly Action<ShaderSerializedProperty> onAfterCopy;
-
-            public ReplacingPropertyMapping(ShaderSerializedProperty before, ShaderSerializedProperty after, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null)
-            {
-                this.before = before;
-                this.after = after;
-                this.afterName = afterName;
-                this.onAfterCopy = onAfterCopy ?? (p => { });
-            }
-
-            public void Execute()
-            {
-                if (after != null)
-                {
-                    before.CopyTo(after);
-                    onAfterCopy(after);
-                }
-                else
-                {
-                    before.Rename(afterName);
-                    onAfterCopy(before);
-                }
-            }
+            return true;
         }
 
         #endregion

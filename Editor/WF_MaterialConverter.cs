@@ -416,8 +416,8 @@ namespace UnlitWF.Converter
                 ctx => {
                     // アルファマスク
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        PropertyNameReplacement.Rename("_AlphaMask", "_AL_MaskTex"),
-                        PropertyNameReplacement.Rename("_ClippingMask", "_AL_MaskTex"));
+                        PropertyNameReplacement.Match("_AlphaMask", "_AL_MaskTex"),
+                        PropertyNameReplacement.Match("_ClippingMask", "_AL_MaskTex"));
                     if (HasCustomValue(ctx, "_AL_MaskTex")) {
                         ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
                     }
@@ -425,7 +425,7 @@ namespace UnlitWF.Converter
                 ctx => {
                     // ノーマルマップ
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        PropertyNameReplacement.Rename("_NormalMap", "_BumpMap"));
+                        PropertyNameReplacement.Match("_NormalMap", "_BumpMap"));
                     if (HasCustomValue(ctx, "_BumpMap")) {
                         ctx.target.SetInt("_NM_Enable", 1);
                     }
@@ -451,8 +451,8 @@ namespace UnlitWF.Converter
                 ctx => {
                     // Emission
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        PropertyNameReplacement.Rename("_Emissive_Tex", "_EmissionMap"),
-                        PropertyNameReplacement.Rename("_Emissive_Color", "_EmissionColor"));
+                        PropertyNameReplacement.Match("_Emissive_Tex", "_EmissionMap"),
+                        PropertyNameReplacement.Match("_Emissive_Color", "_EmissionColor"));
                     if (HasCustomValue(ctx, "_EmissionMap", "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
                         ctx.target.SetInt("_ES_Enable", 1);
                     }
@@ -466,15 +466,15 @@ namespace UnlitWF.Converter
                     ctx.target.SetInt("_TS_Enable", 1);
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         // 1影
-                        PropertyNameReplacement.Rename("_1st_ShadeMap", "_TS_1stTex"),
-                        PropertyNameReplacement.Rename("_ShadowColorTex", "_TS_1stTex"),
-                        PropertyNameReplacement.Rename("_1st_ShadeColor", "_TS_1stColor"),
-                        PropertyNameReplacement.Rename("_ShadowColor", "_TS_1stColor"),
+                        PropertyNameReplacement.Match("_1st_ShadeMap", "_TS_1stTex"),
+                        PropertyNameReplacement.Match("_ShadowColorTex", "_TS_1stTex"),
+                        PropertyNameReplacement.Match("_1st_ShadeColor", "_TS_1stColor"),
+                        PropertyNameReplacement.Match("_ShadowColor", "_TS_1stColor"),
                         // 2影
-                        PropertyNameReplacement.Rename("_2nd_ShadeMap", "_TS_2ndTex"),
-                        PropertyNameReplacement.Rename("_Shadow2ndColorTex", "_TS_2ndTex"),
-                        PropertyNameReplacement.Rename("_2nd_ShadeColor", "_TS_2ndColor"),
-                        PropertyNameReplacement.Rename("_Shadow2ndColor", "_TS_2ndColor")
+                        PropertyNameReplacement.Match("_2nd_ShadeMap", "_TS_2ndTex"),
+                        PropertyNameReplacement.Match("_Shadow2ndColorTex", "_TS_2ndTex"),
+                        PropertyNameReplacement.Match("_2nd_ShadeColor", "_TS_2ndColor"),
+                        PropertyNameReplacement.Match("_Shadow2ndColor", "_TS_2ndColor")
                         );
                     // 1影2影とも色相だけ反映して彩度・明度はリセットしてしまう
                     if (HasCustomValue(ctx, "_TS_1stColor")) {
@@ -523,13 +523,13 @@ namespace UnlitWF.Converter
                     if (HasCustomValue(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
                         ctx.target.SetInt("_TR_Enable", 1);
                         WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                            PropertyNameReplacement.Rename("_RimColor", "_TR_Color"),
-                            PropertyNameReplacement.Rename("_RimLitColor", "_TR_Color"),
-                            PropertyNameReplacement.Rename("_RimLightColor", "_TR_Color"),
-                            PropertyNameReplacement.Rename("_RimLitMask", "_TR_MaskTex"),
-                            PropertyNameReplacement.Rename("_RimBlendMask", "_TR_MaskTex"),
-                            PropertyNameReplacement.Rename("_Set_RimLightMask", "_TR_Color"),
-                            PropertyNameReplacement.Rename("_RimMask", "_TR_Color")
+                            PropertyNameReplacement.Match("_RimColor", "_TR_Color"),
+                            PropertyNameReplacement.Match("_RimLitColor", "_TR_Color"),
+                            PropertyNameReplacement.Match("_RimLightColor", "_TR_Color"),
+                            PropertyNameReplacement.Match("_RimLitMask", "_TR_MaskTex"),
+                            PropertyNameReplacement.Match("_RimBlendMask", "_TR_MaskTex"),
+                            PropertyNameReplacement.Match("_Set_RimLightMask", "_TR_Color"),
+                            PropertyNameReplacement.Match("_RimMask", "_TR_Color")
                             );
                         if (HasCustomValue(ctx, "_TR_Color")) {
                             ctx.target.SetInt("_TR_BlendType", 2);  // ADD
@@ -539,19 +539,19 @@ namespace UnlitWF.Converter
                 ctx => {
                     // アウトライン
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        PropertyNameReplacement.Rename("_OutlineColor", "_TL_LineColor"),
-                        PropertyNameReplacement.Rename("_Outline_Color", "_TL_LineColor"),
-                        PropertyNameReplacement.Rename("_OutLineColor", "_TL_LineColor"),
-                        PropertyNameReplacement.Rename("_LineColor", "_TL_LineColor"),
+                        PropertyNameReplacement.Match("_OutlineColor", "_TL_LineColor"),
+                        PropertyNameReplacement.Match("_Outline_Color", "_TL_LineColor"),
+                        PropertyNameReplacement.Match("_OutLineColor", "_TL_LineColor"),
+                        PropertyNameReplacement.Match("_LineColor", "_TL_LineColor"),
                         // ColorTex
-                        PropertyNameReplacement.Rename("_OutlineTex", "_TL_CustomColorTex"),
-                        PropertyNameReplacement.Rename("_OutLineTexture", "_TL_CustomColorTex"),
-                        PropertyNameReplacement.Rename("_OutlineTexture", "_TL_CustomColorTex"),
+                        PropertyNameReplacement.Match("_OutlineTex", "_TL_CustomColorTex"),
+                        PropertyNameReplacement.Match("_OutLineTexture", "_TL_CustomColorTex"),
+                        PropertyNameReplacement.Match("_OutlineTexture", "_TL_CustomColorTex"),
                         // MaskTex
-                        PropertyNameReplacement.Rename("_OutlineWidthMask", "_TL_MaskTex"),
-                        PropertyNameReplacement.Rename("_Outline_Sampler", "_TL_MaskTex"),
-                        PropertyNameReplacement.Rename("_OutlineMask", "_TL_MaskTex"),
-                        PropertyNameReplacement.Rename("_OutLineMask", "_TL_MaskTex")
+                        PropertyNameReplacement.Match("_OutlineWidthMask", "_TL_MaskTex"),
+                        PropertyNameReplacement.Match("_Outline_Sampler", "_TL_MaskTex"),
+                        PropertyNameReplacement.Match("_OutlineMask", "_TL_MaskTex"),
+                        PropertyNameReplacement.Match("_OutLineMask", "_TL_MaskTex")
                         );
                 },
                 ctx => {
@@ -583,7 +583,6 @@ namespace UnlitWF.Converter
             Converter.ScanAndMigrationExecutor.Migration(importedAssets);
         }
     }
-
 
     public static class ScanAndMigrationExecutor
     {
@@ -729,44 +728,44 @@ namespace UnlitWF.Converter
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
         public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
-            PropertyNameReplacement.Rename("_AL_CutOff", "_Cutoff"),
-            PropertyNameReplacement.Rename("_CutOffLevel", "_Cutoff"),
-            PropertyNameReplacement.Rename("_ES_Color", "_EmissionColor"),
-            PropertyNameReplacement.Rename("_ES_MaskTex", "_EmissionMap"),
-            PropertyNameReplacement.Rename("_FurHeight", "_FUR_Height"),
-            PropertyNameReplacement.Rename("_FurMaskTex", "_FUR_MaskTex"),
-            PropertyNameReplacement.Rename("_FurNoiseTex", "_FUR_NoiseTex"),
-            PropertyNameReplacement.Rename("_FurRepeat", "_FUR_Repeat"),
-            PropertyNameReplacement.Rename("_FurShadowPower", "_FUR_ShadowPower"),
-            PropertyNameReplacement.Rename("_FG_BumpMap", "_FUR_BumpMap"),
-            PropertyNameReplacement.Rename("_FG_FlipTangent", "_FlipMirror"),
-            PropertyNameReplacement.Rename("_FR_FlipTangent", "_FlipMirror"),
-            PropertyNameReplacement.Rename("_FR_FlipMirror", "_FlipMirror"),
-            PropertyNameReplacement.Rename("_GL_BrendPower", "_GL_BlendPower"),
-            PropertyNameReplacement.Rename("_MT_BlendType", "_MT_Brightness"),
-            PropertyNameReplacement.Rename("_MT_MaskTex", "_MetallicGlossMap"),
-            PropertyNameReplacement.Rename("_MT_Smoothness", "_MT_ReflSmooth"),
-            PropertyNameReplacement.Rename("_MT_Smoothness2", "_MT_SpecSmooth"),
-            PropertyNameReplacement.Rename("_TessFactor", "_TE_Factor"),
-            PropertyNameReplacement.Rename("_Smoothing", "_TE_SmoothPower"),
-            PropertyNameReplacement.Rename("_NM_FlipMirror", "_FlipMirror"),   // NS追加に合わせてFlipMirrorはラベルなしに変更する
-            PropertyNameReplacement.Rename("_NM_2ndType", "_NS_Enable", p => p.IntValue = p.IntValue != 0 ? 1 : 0),
-            PropertyNameReplacement.Rename("_NM_2ndUVType", "_NS_UVType"),
-            PropertyNameReplacement.Rename("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
-            PropertyNameReplacement.Rename("_NM_InvMaskVal", "_NS_InvMaskVal"),
-            PropertyNameReplacement.Rename("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
-            PropertyNameReplacement.Replace("^_GB_", "_GMB_"),
-            PropertyNameReplacement.Replace("^_GF_", "_GMF_"),
-            PropertyNameReplacement.Replace("^_GR_", "_GMR_"),
-            PropertyNameReplacement.Replace("^_FG_", "_TFG_"),
-            PropertyNameReplacement.Replace("^_BK_", "_BKT_"),
-            PropertyNameReplacement.Replace("^_CH_", "_CHM_"),
-            PropertyNameReplacement.Replace("^_CL_", "_CLC_"),
-            PropertyNameReplacement.Replace("^_LM_", "_LME_"),
-            PropertyNameReplacement.Replace("^_OL_", "_OVL_"),
-            PropertyNameReplacement.Replace("^_DF_", "_DFD_"),
-            PropertyNameReplacement.Replace("^_GI_", "_LBE_"),
-            PropertyNameReplacement.Replace("^_RF_", "_CRF_"),
+            PropertyNameReplacement.Match("_AL_CutOff", "_Cutoff"),
+            PropertyNameReplacement.Match("_CutOffLevel", "_Cutoff"),
+            PropertyNameReplacement.Match("_ES_Color", "_EmissionColor"),
+            PropertyNameReplacement.Match("_ES_MaskTex", "_EmissionMap"),
+            PropertyNameReplacement.Match("_FurHeight", "_FUR_Height"),
+            PropertyNameReplacement.Match("_FurMaskTex", "_FUR_MaskTex"),
+            PropertyNameReplacement.Match("_FurNoiseTex", "_FUR_NoiseTex"),
+            PropertyNameReplacement.Match("_FurRepeat", "_FUR_Repeat"),
+            PropertyNameReplacement.Match("_FurShadowPower", "_FUR_ShadowPower"),
+            PropertyNameReplacement.Match("_FG_BumpMap", "_FUR_BumpMap"),
+            PropertyNameReplacement.Match("_FG_FlipTangent", "_FlipMirror"),
+            PropertyNameReplacement.Match("_FR_FlipTangent", "_FlipMirror"),
+            PropertyNameReplacement.Match("_FR_FlipMirror", "_FlipMirror"),
+            PropertyNameReplacement.Match("_GL_BrendPower", "_GL_BlendPower"),
+            PropertyNameReplacement.Match("_MT_BlendType", "_MT_Brightness"),
+            PropertyNameReplacement.Match("_MT_MaskTex", "_MetallicGlossMap"),
+            PropertyNameReplacement.Match("_MT_Smoothness", "_MT_ReflSmooth"),
+            PropertyNameReplacement.Match("_MT_Smoothness2", "_MT_SpecSmooth"),
+            PropertyNameReplacement.Match("_TessFactor", "_TE_Factor"),
+            PropertyNameReplacement.Match("_Smoothing", "_TE_SmoothPower"),
+            PropertyNameReplacement.Match("_NM_FlipMirror", "_FlipMirror"),   // NS追加に合わせてFlipMirrorはラベルなしに変更する
+            PropertyNameReplacement.Match("_NM_2ndType", "_NS_Enable", p => p.IntValue = p.IntValue != 0 ? 1 : 0),
+            PropertyNameReplacement.Match("_NM_2ndUVType", "_NS_UVType"),
+            PropertyNameReplacement.Match("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
+            PropertyNameReplacement.Match("_NM_InvMaskVal", "_NS_InvMaskVal"),
+            PropertyNameReplacement.Match("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
+            PropertyNameReplacement.Prefix("_GB_", "_GMB_"),
+            PropertyNameReplacement.Prefix("_GF_", "_GMF_"),
+            PropertyNameReplacement.Prefix("_GR_", "_GMR_"),
+            PropertyNameReplacement.Prefix("_FG_", "_TFG_"),
+            PropertyNameReplacement.Prefix("_BK_", "_BKT_"),
+            PropertyNameReplacement.Prefix("_CH_", "_CHM_"),
+            PropertyNameReplacement.Prefix("_CL_", "_CLC_"),
+            PropertyNameReplacement.Prefix("_LM_", "_LME_"),
+            PropertyNameReplacement.Prefix("_OL_", "_OVL_"),
+            PropertyNameReplacement.Prefix("_DF_", "_DFD_"),
+            PropertyNameReplacement.Prefix("_GI_", "_LBE_"),
+            PropertyNameReplacement.Prefix("_RF_", "_CRF_"),
         };
 
         public static bool ExistsNeedsMigration(Material[] mats)
@@ -783,9 +782,8 @@ namespace UnlitWF.Converter
                 {
                     foreach (var rep in OldPropNameToNewPropNameList)
                     {
-                        if (rep.TryMatch(beforeName, out var afterName))
+                        if (rep.IsMatch(beforeName))
                         {
-                            Debug.Log("change need: " + beforeName);
                             return true;
                         }
                     }
