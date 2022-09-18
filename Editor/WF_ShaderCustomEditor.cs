@@ -868,6 +868,22 @@ namespace UnlitWF
 
 #region GUI部品
 
+        private static void SetStyleFont(GUIStyle style, System.Func<int, int> fontSize, FontStyle fontStyle)
+        {
+            if (style.font != null && style.font.dynamic)
+            {
+                if (style.fontSize != 0)
+                {
+                    style.fontSize = fontSize(style.fontSize);
+                }
+                else
+                {
+                    style.fontSize = fontSize(style.font.fontSize);
+                }
+                style.fontStyle = fontStyle;
+            }
+        }
+
         /// <summary>
         /// Shurikenスタイルのヘッダを表示する
         /// </summary>
@@ -880,8 +896,7 @@ namespace UnlitWF
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             style.font = EditorStyles.boldLabel.font;
-            style.fontSize += 2;
-            style.fontStyle = FontStyle.Bold;
+            SetStyleFont(style, s => s + 2, FontStyle.Bold);
             style.fixedHeight = 20;
             style.contentOffset = new Vector2(20, -2);
             // Draw
@@ -895,7 +910,7 @@ namespace UnlitWF
                 var titleSize = style.CalcSize(new GUIContent(text));
                 var rect = new Rect(position.x + titleSize.x + 24, position.y, position.width - titleSize.x - 24, 16f);
                 var style2 = new GUIStyle(EditorStyles.label);
-                style2.fontSize = style.fontSize - 1;
+                SetStyleFont(style2, s => style.fontSize - 1, FontStyle.Normal);
                 style2.contentOffset = new Vector2(4, 1);
                 GUI.Label(rect, helpText, style2);
             }
@@ -1107,7 +1122,7 @@ namespace UnlitWF
             rect2.height = 16;
 
             var style = new GUIStyle(EditorStyles.miniTextField);
-            style.fontSize--;
+            SetStyleFont(style, s => s - 1, FontStyle.Normal);
 
             // 表示
             EditorGUI.BeginChangeCheck();
