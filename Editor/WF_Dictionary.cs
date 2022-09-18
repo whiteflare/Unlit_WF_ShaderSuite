@@ -30,6 +30,11 @@ namespace UnlitWF
         /// シェーダ名のリスト。
         /// </summary>
         public static readonly List<WFShaderName> ShaderNameList = new List<WFShaderName>() {
+
+            // ================
+            // UnToon 系列
+            // ================
+
             new WFShaderName("BRP", "UnToon", "Basic", "Opaque",                       "UnlitWF/WF_UnToon_Opaque", represent: true),
             new WFShaderName("BRP", "UnToon", "Basic", "TransCutout",                  "UnlitWF/WF_UnToon_TransCutout"),
             new WFShaderName("BRP", "UnToon", "Basic", "Transparent",                  "UnlitWF/WF_UnToon_Transparent"),
@@ -38,10 +43,6 @@ namespace UnlitWF
             new WFShaderName("BRP", "UnToon", "Basic", "Transparent_MaskOut",          "UnlitWF/WF_UnToon_Transparent_MaskOut"),
             new WFShaderName("BRP", "UnToon", "Basic", "Transparent_MaskOut_Blend",    "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
             
-            new WFShaderName("BRP", "UnToon", "Custom", "Transparent_Refracted",       "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted"),
-            new WFShaderName("BRP", "UnToon", "Custom", "Transparent_FrostedGlass",    "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass"),
-            new WFShaderName("BRP", "UnToon", "Custom", "Ghost_Opaque",                "UnlitWF/Custom/WF_UnToon_Custom_Transparent_GhostOpaque"),
-
             new WFShaderName("BRP", "UnToon", "Outline", "Opaque",                     "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
             new WFShaderName("BRP", "UnToon", "Outline", "TransCutout",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
             new WFShaderName("BRP", "UnToon", "Outline", "Transparent",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent"),
@@ -75,6 +76,15 @@ namespace UnlitWF
             new WFShaderName("BRP", "UnToon", "Tessellation", "Transparent",           "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
             new WFShaderName("BRP", "UnToon", "Tessellation", "Transparent3Pass",      "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
 
+            new WFShaderName("BRP", "UnToon", "Custom", "Transparent_Refracted",       "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted"),
+            new WFShaderName("BRP", "UnToon", "Custom", "Transparent_FrostedGlass",    "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass"),
+            new WFShaderName("BRP", "UnToon", "Custom", "Ghost_Opaque",                "UnlitWF/Custom/WF_UnToon_Custom_GhostOpaque"),
+            new WFShaderName("BRP", "UnToon", "Custom", "Ghost_Transparent",           "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent"),
+
+            // ================
+            // FakeFur 系列
+            // ================
+
             new WFShaderName("BRP", "FakeFur", "Basic", "TransCutout",                 "UnlitWF/WF_FakeFur_TransCutout"),
             new WFShaderName("BRP", "FakeFur", "Basic", "Transparent",                 "UnlitWF/WF_FakeFur_Transparent"),
             new WFShaderName("BRP", "FakeFur", "Basic", "Mix",                         "UnlitWF/WF_FakeFur_Mix", represent: true),
@@ -83,8 +93,16 @@ namespace UnlitWF
             new WFShaderName("BRP", "FakeFur", "FurOnly", "Transparent",               "UnlitWF/WF_FakeFur_FurOnly_Transparent"),
             new WFShaderName("BRP", "FakeFur", "FurOnly", "Mix",                       "UnlitWF/WF_FakeFur_FurOnly_Mix"),
 
+            // ================
+            // Gem 系列
+            // ================
+
             new WFShaderName("BRP", "Gem", "Basic", "Opaque",                          "UnlitWF/WF_Gem_Opaque"),
             new WFShaderName("BRP", "Gem", "Basic", "Transparent",                     "UnlitWF/WF_Gem_Transparent", represent: true),
+
+            // ================
+            // UnToon 系列(URP)
+            // ================
 
             new WFShaderName("URP", "UnToon", "Basic", "Opaque",                       "UnlitWF_URP/WF_UnToon_Opaque", represent: true),
             new WFShaderName("URP", "UnToon", "Basic", "TransCutout",                  "UnlitWF_URP/WF_UnToon_TransCutout"),
@@ -109,11 +127,19 @@ namespace UnlitWF
             new WFShaderName("URP", "UnToon", "Mobile_LineOnly", "Opaque",             "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
             new WFShaderName("URP", "UnToon", "Mobile_LineOnly", "TransCutout",        "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
 
+            // ================
+            // FakeFur 系列(URP)
+            // ================
+
             new WFShaderName("URP", "FakeFur", "Basic", "TransCutout",                 "UnlitWF_URP/WF_FakeFur_TransCutout", represent: true),
             new WFShaderName("URP", "FakeFur", "Basic", "Transparent",                 "UnlitWF_URP/WF_FakeFur_Transparent"),
 
             new WFShaderName("URP", "FakeFur", "FurOnly", "TransCutout",               "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout"),
             new WFShaderName("URP", "FakeFur", "FurOnly", "Transparent",               "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent"),
+
+            // ================
+            // Gem 系列(URP)
+            // ================
 
             new WFShaderName("URP", "Gem", "Basic", "Opaque",                          "UnlitWF_URP/WF_Gem_Opaque"),
             new WFShaderName("URP", "Gem", "Basic", "Transparent",                     "UnlitWF_URP/WF_Gem_Transparent", represent: true),
@@ -259,6 +285,7 @@ namespace UnlitWF
             new WFI18NTranslation("Tessellation", "細分化"),
             new WFI18NTranslation("ToonShade", "トゥーン影"),
             new WFI18NTranslation("Transparent Alpha", "透過"),
+            new WFI18NTranslation("Ghost Transparent", "ゴースト透過"),
             new WFI18NTranslation("Material Options", "マテリアル設定"),
             new WFI18NTranslation("Utility", "ユーティリティ"),
             // Base

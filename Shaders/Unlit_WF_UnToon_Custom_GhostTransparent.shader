@@ -25,6 +25,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
+        // GhostTransparent
+        [WFHeaderAlwaysOn(Ghost Transparent)]
+            _CGO_Enable              ("[CGO] Enable", Float) = 1
+            _CGO_Power               ("[CGO] Power", Range(0, 1)) = 1.0
+
         // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
@@ -34,7 +39,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
         [Toggle(_)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
@@ -164,6 +168,32 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
             _HL_MatcapMonochrome_1  ("[HA] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
+
+        // ラメ
+        [WFHeaderToggle(Lame)]
+            _LME_Enable              ("[LME] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _LME_UVType              ("[LME] UV Type", Float) = 0
+        [HDR]
+            _LME_Color               ("[LME] Color", Color) = (1, 1, 1, 1)
+            _LME_Texture             ("[LME] Texture", 2D) = "white" {}
+        [HDR]
+            _LME_RandColor           ("[LME] Random Color", Color) = (0, 0, 0, 1)
+        [Enum(POLYGON,0,POINT,1)]
+            _LME_Shape               ("[LME] Shape", Float) = 0
+        [PowerSlider(4.0)]
+            _LME_Scale               ("[LME] Scale", Range(0, 4)) = 0.5
+        [PowerSlider(4.0)]
+            _LME_Dencity             ("[LME] Dencity", Range(0.3, 4)) = 0.5
+            _LME_Glitter             ("[LME] Glitter", Range(0, 1)) = 0.5
+            _LME_MinDist             ("[LME] FadeOut Distance (Near)", Range(0, 5)) = 2.0
+            _LME_MaxDist             ("[LME] FadeOut Distance (Far)", Range(0, 5)) = 4.0
+            _LME_Spot                ("[LME] FadeOut Angle", Range(0, 16)) = 2.0
+            _LME_AnimSpeed           ("[LME] Anim Speed", Range(0, 1)) = 0.2
+        [NoScaleOffset]
+            _LME_MaskTex             ("[LME] Mask Texture (R)", 2D) = "white" {}
+        [Toggle(_)]
+            _LME_InvMaskVal          ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -321,7 +351,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
     SubShader {
         Tags {
             "RenderType" = "Transparent"
-            "Queue" = "Transparent+450"
+            "Queue" = "Transparent+460"
             "VRCFallback" = "UnlitTransparent"
         }
 
@@ -347,8 +377,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #pragma target 4.5
 
-            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_BLEND
             #define _WF_FACE_BACK
+            #define _WF_ALPHA_CUSTOM    alpha *= _AL_Power * _CGO_Power;
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
@@ -367,6 +398,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
@@ -397,7 +429,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #pragma target 4.5
 
-            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_BLEND
+            #define _WF_ALPHA_CUSTOM    alpha *= _AL_Power * _CGO_Power;
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
@@ -416,6 +449,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
@@ -427,28 +461,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
             #include "WF_UnToon.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #define _WF_ALPHA_BLEND
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ LOD_FADE_CROSSFADE
-
-            #include "WF_UnToon_ShadowCaster.cginc"
 
             ENDCG
         }

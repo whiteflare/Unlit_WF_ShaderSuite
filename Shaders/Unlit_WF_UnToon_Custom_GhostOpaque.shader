@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_GhostOpaque" {
+Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostOpaque" {
 
     Properties {
         // 基本
@@ -262,16 +262,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_GhostOpaque" {
         [Toggle(_)]
             _OVL_InvMaskVal          ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
-        // Distance Fade
-        [WFHeaderToggle(Distance Fade)]
-            _DFD_Enable              ("[DFD] Enable", Float) = 0
-            _DFD_Color               ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
-            _DFD_MinDist             ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
-            _DFD_MaxDist             ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
-            _DFD_Power               ("[DFD] Power", Range(0, 1)) = 1
-        [Toggle(_)]
-            _DFD_BackShadow          ("[DFD] BackFace Shadow", Float) = 1
-
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
@@ -348,7 +338,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_GhostOpaque" {
         Tags {
             "RenderType" = "Opaque"
             "Queue" = "Transparent+450"
-            "VRCFallback" = "UnlitTransparent"
+            "VRCFallback" = "Unlit"
         }
 
         GrabPass { "_UnToonGhostBack" }
@@ -381,7 +371,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_GhostOpaque" {
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
-            #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
