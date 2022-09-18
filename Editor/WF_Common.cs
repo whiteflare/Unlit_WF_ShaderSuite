@@ -1067,7 +1067,7 @@ namespace UnlitWF
 
             // 異なるVariantのShaderNameをotherに詰める
             other = new List<WFShaderName>();
-            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.Variant != "Custom"));
+            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly));
             other.RemoveAll(a => items.Contains(a.Variant));
 
             return result;
