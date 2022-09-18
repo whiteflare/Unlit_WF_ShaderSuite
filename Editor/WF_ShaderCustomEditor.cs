@@ -268,8 +268,8 @@ namespace UnlitWF
                             }
                         }
 #else
-                        var val = material.GetColor("_Color");
-                        material.SetColor("_Color", val.linear);
+                        var val = oldMat.GetColor("_Color");
+                        newMat.SetColor("_Color", val.linear);
 #endif
                     }
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう

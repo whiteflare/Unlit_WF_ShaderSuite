@@ -429,7 +429,11 @@ namespace UnlitWF
             var idx = FindPropertyIndex(shader, name);
             if (0 <= idx)
             {
+#if UNITY_2019_1_OR_NEWER
                 return shader.GetPropertyDescription(idx);
+#else
+                return ShaderUtil.GetPropertyDescription(shader, idx);
+#endif
             }
             return null;
         }
