@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: GrayGem
   m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
-  m_ShaderKeywords: _GB_ENABLE _GF_ENABLE _GL_AUTO_ENABLE _GR_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _GMB_ENABLE _GMF_ENABLE _GMR_ENABLE
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -27,7 +27,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _GR_Cubemap:
+    - _GMR_Cubemap:
         m_Texture: {fileID: 8900000, guid: bb9610632e748424586247724588439e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -47,16 +47,6 @@ Material:
     - _CurrentVersion: 0
     - _FallBack: 0
     - _FlipMirror: 0
-    - _GB_BackCulllMode: 1
-    - _GB_Enable: 1
-    - _GF_BlendNormal: 0.1
-    - _GF_Enable: 1
-    - _GF_FlakeBrighten: 4
-    - _GF_FlakeDarken: 0.2
-    - _GF_FlakeShear: 0.5
-    - _GF_FlakeSizeBack: 0.25
-    - _GF_FlakeSizeFront: 0.1
-    - _GF_Twinkle: 2
     - _GL_BlendPower: 0.8
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
@@ -65,19 +55,29 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
-    - _GR_BlendNormal: 0.1
-    - _GR_Brightness: 0
-    - _GR_CubemapHighCut: 0
-    - _GR_CubemapPower: 1
-    - _GR_Enable: 1
-    - _GR_Monochrome: 1
-    - _GR_Power: 1
+    - _GMB_BackCulllMode: 1
+    - _GMB_Enable: 1
+    - _GMF_BlendNormal: 0.1
+    - _GMF_Enable: 1
+    - _GMF_FlakeBrighten: 4
+    - _GMF_FlakeDarken: 0.2
+    - _GMF_FlakeShear: 0.5
+    - _GMF_FlakeSizeBack: 0.25
+    - _GMF_FlakeSizeFront: 0.1
+    - _GMF_Twinkle: 2
+    - _GMR_BlendNormal: 0.1
+    - _GMR_Brightness: 0
+    - _GMR_CubemapHighCut: 0
+    - _GMR_CubemapPower: 1
+    - _GMR_Enable: 1
+    - _GMR_Monochrome: 1
+    - _GMR_Power: 1
     - _NM_Enable: 0
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 0.385, g: 0.385, b: 0.385, a: 1}
-    - _GB_ColorBack: {r: 0.21, g: 0.21, b: 0.21, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
+    - _GMB_ColorBack: {r: 0.21, g: 0.21, b: 0.21, a: 1}
 --- !u!1002 &2100001
 EditorExtensionImpl:
   serializedVersion: 6

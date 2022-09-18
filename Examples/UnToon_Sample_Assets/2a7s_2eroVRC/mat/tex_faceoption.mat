@@ -9,8 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_faceoption
   m_Shader: {fileID: 4800000, guid: 0a7a6cdca16a38548a5d81aca8d4e3ba, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
+  m_ShaderKeywords: _GL_AUTO_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -75,10 +75,6 @@ Material:
     - _ES_Shape: 3
     - _ES_Sharpness: 1
     - _ES_Speed: 2
-    - _GI_EmissionMultiplier: 1
-    - _GI_Enable: 0
-    - _GI_IndirectChroma: 1
-    - _GI_IndirectMultiplier: 1
     - _GL_BlendPower: 0.8
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
@@ -94,6 +90,10 @@ Material:
     - _HL_MatcapMonochrome: 0
     - _HL_Parallax: 0.75
     - _HL_Power: 1
+    - _LBE_EmissionMultiplier: 1
+    - _LBE_Enable: 0
+    - _LBE_IndirectChroma: 1
+    - _LBE_IndirectMultiplier: 1
     - _MT_Brightness: 0.2
     - _MT_CubemapHighCut: 0
     - _MT_CubemapPower: 1

@@ -38,9 +38,10 @@ namespace UnlitWF
             PreChangeShader(material, oldShader, newShader);
 
             // newShaderの割り当て
+            var oldMat = new Material(material);
             base.AssignNewShaderToMaterial(material, oldShader, newShader);
 
-            PostChangeShader(material, oldShader, newShader);
+            PostChangeShader(oldMat, material, oldShader, newShader);
         }
 
         public static void PreChangeShader(Material material, Shader oldShader, Shader newShader)
@@ -53,7 +54,7 @@ namespace UnlitWF
             }
         }
 
-        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader)
+        public static void PostChangeShader(Material oldMat, Material material, Shader oldShader, Shader newShader)
         {
             // nop
         }
