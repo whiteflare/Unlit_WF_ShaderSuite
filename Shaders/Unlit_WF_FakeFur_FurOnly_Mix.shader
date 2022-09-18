@@ -155,11 +155,11 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _CLC_ENABLE
-            #pragma shader_feature_local_fragment _DFD_ENABLE
+
+            #define _TS_ENABLE
+
+            #define _CLC_ENABLE
+            #define _DFD_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase
@@ -185,11 +185,11 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _CLC_ENABLE
-            #pragma shader_feature_local_fragment _DFD_ENABLE
+
+            #define _TS_ENABLE
+
+            #define _CLC_ENABLE
+            #define _DFD_ENABLE
 
             #define _FUR_HEIGHT_PARAM _FUR_Height2
             #define _FUR_REPEAT_PARAM _FUR_Repeat2

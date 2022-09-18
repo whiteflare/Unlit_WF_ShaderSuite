@@ -106,11 +106,11 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
             #pragma target 4.5
             #pragma require geometry
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _ _TL_EDGE_ENABLE
-            #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _TFG_ENABLE
+
+
+            #define _TL_ENABLE
+            #define _VC_ENABLE
+            #define _TFG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
