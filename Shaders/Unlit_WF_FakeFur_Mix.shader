@@ -29,40 +29,40 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
 
         // ファー設定
         [WFHeader(Fake Fur)]
-            _FUR_Height              ("[FUR] Fur Height (Cutout)", Range(0, 0.2)) = 0.01
-            _FUR_Height2             ("[FUR] Fur Height (Transparent)", Range(0, 0.2)) = 0.02
+            _FUR_Height             ("[FUR] Fur Height (Cutout)", Range(0, 0.2)) = 0.01
+            _FUR_Height2            ("[FUR] Fur Height (Transparent)", Range(0, 0.2)) = 0.02
         [IntRange]
-            _FUR_Repeat              ("[FUR] Fur Repeat (Cutout)", Range(1, 6)) = 3
+            _FUR_Repeat             ("[FUR] Fur Repeat (Cutout)", Range(1, 6)) = 3
         [IntRange]
-            _FUR_Repeat2             ("[FUR] Fur Repeat (Transparent)", Range(1, 6)) = 2
+            _FUR_Repeat2            ("[FUR] Fur Repeat (Transparent)", Range(1, 6)) = 2
         [Header(Fur Shape)]
-            _FUR_NoiseTex            ("[FUR] Fur Noise Texture", 2D) = "white" {}
+            _FUR_NoiseTex           ("[FUR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
-            _FUR_Vector              ("[FUR] Fur Vector", Vector) = (0, 0, 1, 0)
-            _FUR_Random              ("[FUR] Fur Vector Randomize", Range(0, 5)) = 0
+            _FUR_Vector             ("[FUR] Fur Vector", Vector) = (0, 0, 1, 0)
+            _FUR_Random             ("[FUR] Fur Vector Randomize", Range(0, 5)) = 0
         [NoScaleOffset]
         [Normal]
-            _FUR_BumpMap             ("[FUR] NormalMap Texture", 2D) = "bump" {}
+            _FUR_BumpMap            ("[FUR] NormalMap Texture", 2D) = "bump" {}
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[FUR] Flip Mirror", Float) = 0
         [Header(Fur Color)]
-            _FUR_ShadowPower         ("[FUR] Fur ShadowPower", Range(0, 1)) = 0
-            _FUR_TintColorBase       ("[FUR] Tint Color (Base)", Color) = (1, 1, 1, 1)
-            _FUR_TintColorTip        ("[FUR] Tint Color (Tip)", Color) = (1, 1, 1, 1)
+            _FUR_ShadowPower        ("[FUR] Fur ShadowPower", Range(0, 1)) = 0
+            _FUR_TintColorBase      ("[FUR] Tint Color (Base)", Color) = (1, 1, 1, 1)
+            _FUR_TintColorTip       ("[FUR] Tint Color (Tip)", Color) = (1, 1, 1, 1)
         [Header(Fur Mask Texture)]
         [NoScaleOffset]
-            _FUR_MaskTex             ("[FUR] Mask Texture", 2D) = "white" {}
+            _FUR_MaskTex            ("[FUR] Mask Texture", 2D) = "white" {}
         [Toggle(_)]
-            _FUR_InvMaskVal          ("[FUR] Invert Mask Value", Range(0, 1)) = 0
+            _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 
         // 色変換
         [WFHeaderToggle(Color Change)]
-            _CLC_Enable              ("[CLC] Enable", Float) = 0
+            _CLC_Enable             ("[CLC] Enable", Float) = 0
         [Toggle(_)]
-            _CLC_Monochrome          ("[CLC] monochrome", Range(0, 1)) = 0
-            _CLC_DeltaH              ("[CLC] Hur", Range(0, 1)) = 0
-            _CLC_DeltaS              ("[CLC] Saturation", Range(-1, 1)) = 0
-            _CLC_DeltaV              ("[CLC] Brightness", Range(-1, 1)) = 0
+            _CLC_Monochrome         ("[CLC] monochrome", Range(0, 1)) = 0
+            _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
+            _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
+            _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
@@ -149,13 +149,13 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
 
         // Distance Fade
         [WFHeaderToggle(Distance Fade)]
-            _DFD_Enable              ("[DFD] Enable", Float) = 0
-            _DFD_Color               ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
-            _DFD_MinDist             ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
-            _DFD_MaxDist             ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
-            _DFD_Power               ("[DFD] Power", Range(0, 1)) = 1
+            _DFD_Enable             ("[DFD] Enable", Float) = 0
+            _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DFD_Power              ("[DFD] Power", Range(0, 1)) = 1
         [Toggle(_)]
-            _DFD_BackShadow          ("[DFD] BackFace Shadow", Float) = 1
+            _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
 
         // Lit
         [WFHeader(Lit)]

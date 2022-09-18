@@ -194,10 +194,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
-            _LBE_Enable              ("[LBE] Enable", Float) = 0
-            _LBE_IndirectMultiplier  ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
-            _LBE_EmissionMultiplier  ("[LBE] Emission Multiplier", Range(0, 2)) = 1
-            _LBE_IndirectChroma      ("[LBE] Indirect Chroma", Range(0, 2)) = 1
+            _LBE_Enable             ("[LBE] Enable", Float) = 0
+            _LBE_IndirectMultiplier ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
+            _LBE_EmissionMultiplier ("[LBE] Emission Multiplier", Range(0, 2)) = 1
+            _LBE_IndirectChroma     ("[LBE] Indirect Chroma", Range(0, 2)) = 1
 
         [HideInInspector]
         [WF_FixFloat(0.0)]

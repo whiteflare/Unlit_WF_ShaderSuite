@@ -41,24 +41,24 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
-            _BKT_Enable              ("[BKT] Enable", Float) = 0
+            _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _BKT_UVType              ("[BKT] UV Type", Float) = 0
-            _BKT_BackTex             ("[BKT] Back Texture", 2D) = "white" {}
+            _BKT_UVType             ("[BKT] UV Type", Float) = 0
+            _BKT_BackTex            ("[BKT] Back Texture", 2D) = "white" {}
         [HDR]
-            _BKT_BackColor           ("[BKT] Back Color", Color) = (1, 1, 1, 1)
+            _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
-            _CHM_Enable              ("[CHM] Enable", Float) = 0
+            _CHM_Enable             ("[CHM] Enable", Float) = 0
         [NoScaleOffset]
-            _CHM_3chMaskTex          ("[CHM] 3ch Mask Texture", 2D) = "black" {}
+            _CHM_3chMaskTex         ("[CHM] 3ch Mask Texture", 2D) = "black" {}
         [HDR]
-            _CHM_ColorR              ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorR             ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CHM_ColorG              ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorG             ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CHM_ColorB              ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
 
         // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
@@ -380,10 +380,10 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
-            _LBE_Enable              ("[LBE] Enable", Float) = 0
-            _LBE_IndirectMultiplier  ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
-            _LBE_EmissionMultiplier  ("[LBE] Emission Multiplier", Range(0, 2)) = 1
-            _LBE_IndirectChroma      ("[LBE] Indirect Chroma", Range(0, 2)) = 1
+            _LBE_Enable             ("[LBE] Enable", Float) = 0
+            _LBE_IndirectMultiplier ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
+            _LBE_EmissionMultiplier ("[LBE] Emission Multiplier", Range(0, 2)) = 1
+            _LBE_IndirectChroma     ("[LBE] Indirect Chroma", Range(0, 2)) = 1
 
         [HideInInspector]
         [WF_FixFloat(0.0)]

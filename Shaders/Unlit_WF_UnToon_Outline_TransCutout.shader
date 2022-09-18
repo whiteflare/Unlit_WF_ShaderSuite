@@ -58,33 +58,33 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
-            _BKT_Enable              ("[BKT] Enable", Float) = 0
+            _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _BKT_UVType              ("[BKT] UV Type", Float) = 0
-            _BKT_BackTex             ("[BKT] Back Texture", 2D) = "white" {}
+            _BKT_UVType             ("[BKT] UV Type", Float) = 0
+            _BKT_BackTex            ("[BKT] Back Texture", 2D) = "white" {}
         [HDR]
-            _BKT_BackColor           ("[BKT] Back Color", Color) = (1, 1, 1, 1)
+            _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
-            _CHM_Enable              ("[CHM] Enable", Float) = 0
+            _CHM_Enable             ("[CHM] Enable", Float) = 0
         [NoScaleOffset]
-            _CHM_3chMaskTex          ("[CHM] 3ch Mask Texture", 2D) = "black" {}
+            _CHM_3chMaskTex         ("[CHM] 3ch Mask Texture", 2D) = "black" {}
         [HDR]
-            _CHM_ColorR              ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorR             ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CHM_ColorG              ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorG             ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CHM_ColorB              ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
 
         // 色変換
         [WFHeaderToggle(Color Change)]
-            _CLC_Enable              ("[CLC] Enable", Float) = 0
+            _CLC_Enable             ("[CLC] Enable", Float) = 0
         [Toggle(_)]
-            _CLC_Monochrome          ("[CLC] monochrome", Range(0, 1)) = 0
-            _CLC_DeltaH              ("[CLC] Hur", Range(0, 1)) = 0
-            _CLC_DeltaS              ("[CLC] Saturation", Range(-1, 1)) = 0
-            _CLC_DeltaV              ("[CLC] Brightness", Range(-1, 1)) = 0
+            _CLC_Monochrome         ("[CLC] monochrome", Range(0, 1)) = 0
+            _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
+            _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
+            _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
 
         // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
@@ -183,29 +183,29 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
 
         // ラメ
         [WFHeaderToggle(Lame)]
-            _LME_Enable              ("[LME] Enable", Float) = 0
+            _LME_Enable             ("[LME] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _LME_UVType              ("[LME] UV Type", Float) = 0
+            _LME_UVType             ("[LME] UV Type", Float) = 0
         [HDR]
-            _LME_Color               ("[LME] Color", Color) = (1, 1, 1, 1)
-            _LME_Texture             ("[LME] Texture", 2D) = "white" {}
+            _LME_Color              ("[LME] Color", Color) = (1, 1, 1, 1)
+            _LME_Texture            ("[LME] Texture", 2D) = "white" {}
         [HDR]
-            _LME_RandColor           ("[LME] Random Color", Color) = (0, 0, 0, 1)
+            _LME_RandColor          ("[LME] Random Color", Color) = (0, 0, 0, 1)
         [Enum(POLYGON,0,POINT,1)]
-            _LME_Shape               ("[LME] Shape", Float) = 0
+            _LME_Shape              ("[LME] Shape", Float) = 0
         [PowerSlider(4.0)]
-            _LME_Scale               ("[LME] Scale", Range(0, 4)) = 0.5
+            _LME_Scale              ("[LME] Scale", Range(0, 4)) = 0.5
         [PowerSlider(4.0)]
-            _LME_Dencity             ("[LME] Dencity", Range(0.3, 4)) = 0.5
-            _LME_Glitter             ("[LME] Glitter", Range(0, 1)) = 0.5
-            _LME_MinDist             ("[LME] FadeOut Distance (Near)", Range(0, 5)) = 2.0
-            _LME_MaxDist             ("[LME] FadeOut Distance (Far)", Range(0, 5)) = 4.0
-            _LME_Spot                ("[LME] FadeOut Angle", Range(0, 16)) = 2.0
-            _LME_AnimSpeed           ("[LME] Anim Speed", Range(0, 1)) = 0.2
+            _LME_Dencity            ("[LME] Dencity", Range(0.3, 4)) = 0.5
+            _LME_Glitter            ("[LME] Glitter", Range(0, 1)) = 0.5
+            _LME_MinDist            ("[LME] FadeOut Distance (Near)", Range(0, 5)) = 2.0
+            _LME_MaxDist            ("[LME] FadeOut Distance (Far)", Range(0, 5)) = 4.0
+            _LME_Spot               ("[LME] FadeOut Angle", Range(0, 16)) = 2.0
+            _LME_AnimSpeed          ("[LME] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
-            _LME_MaskTex             ("[LME] Mask Texture (R)", 2D) = "white" {}
+            _LME_MaskTex            ("[LME] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
-            _LME_InvMaskVal          ("[LME] Invert Mask Value", Range(0, 1)) = 0
+            _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
@@ -265,36 +265,36 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
 
         // Overlay Texture
         [WFHeaderToggle(Overlay Texture)]
-            _OVL_Enable              ("[OVL] Enable", Float) = 0
+            _OVL_Enable             ("[OVL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
-            _OVL_UVType              ("[OVL] UV Type", Float) = 0
+            _OVL_UVType             ("[OVL] UV Type", Float) = 0
         [HDR]
-            _OVL_Color               ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
-            _OVL_OverlayTex          ("[OVL] Overlay Texture", 2D) = "white" {}
+            _OVL_Color              ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
+            _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
         [WF_Vector2]
-            _OVL_UVScroll            ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
+            _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [Toggle(_)]
-            _OVL_VertColToDecal      ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
+            _OVL_VertColToDecal     ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
         [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
-            _OVL_BlendType           ("[OVL] Blend Type", Float) = 0
-            _OVL_Power               ("[OVL] Blend Power", Range(0, 1)) = 1
-            _OVL_CustomParam1        ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
+            _OVL_BlendType          ("[OVL] Blend Type", Float) = 0
+            _OVL_Power              ("[OVL] Blend Power", Range(0, 1)) = 1
+            _OVL_CustomParam1       ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OVL_MaskTex             ("[OVL] Mask Texture (R)", 2D) = "white" {}
+            _OVL_MaskTex            ("[OVL] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
-            _OVL_VertColToMask       ("[OVL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
+            _OVL_VertColToMask      ("[OVL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
         [Toggle(_)]
-            _OVL_InvMaskVal          ("[OVL] Invert Mask Value", Range(0, 1)) = 0
+            _OVL_InvMaskVal         ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
         // Distance Fade
         [WFHeaderToggle(Distance Fade)]
-            _DFD_Enable              ("[DFD] Enable", Float) = 0
-            _DFD_Color               ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
-            _DFD_MinDist             ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
-            _DFD_MaxDist             ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
-            _DFD_Power               ("[DFD] Power", Range(0, 1)) = 1
+            _DFD_Enable             ("[DFD] Enable", Float) = 0
+            _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DFD_Power              ("[DFD] Power", Range(0, 1)) = 1
         [Toggle(_)]
-            _DFD_BackShadow          ("[DFD] BackFace Shadow", Float) = 1
+            _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -367,10 +367,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
-            _LBE_Enable              ("[LBE] Enable", Float) = 0
-            _LBE_IndirectMultiplier  ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
-            _LBE_EmissionMultiplier  ("[LBE] Emission Multiplier", Range(0, 2)) = 1
-            _LBE_IndirectChroma      ("[LBE] Indirect Chroma", Range(0, 2)) = 1
+            _LBE_Enable             ("[LBE] Enable", Float) = 0
+            _LBE_IndirectMultiplier ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
+            _LBE_EmissionMultiplier ("[LBE] Emission Multiplier", Range(0, 2)) = 1
+            _LBE_IndirectChroma     ("[LBE] Indirect Chroma", Range(0, 2)) = 1
 
         [HideInInspector]
         [WF_FixFloat(0.0)]

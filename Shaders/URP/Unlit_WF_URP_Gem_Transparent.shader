@@ -30,26 +30,26 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
 
         // Flake
         [WFHeaderToggle(Gem Flake)]
-            _GMF_Enable              ("[GMF] Enable", Float) = 1
+            _GMF_Enable             ("[GMF] Enable", Float) = 1
         [PowerSlider(2.0)]
-            _GMF_FlakeSizeFront      ("[GMF] Flake Size (front)", Range(0, 1)) = 0.1
-            _GMF_FlakeShear          ("[GMF] Shear", Range(0, 1)) = 0.5
-            _GMF_FlakeBrighten       ("[GMF] Brighten", Range(0, 8)) = 2
-            _GMF_FlakeDarken         ("[GMF] Darken", Range(0, 8)) = 0.5
-            _GMF_Twinkle             ("[GMF] Twinkle", Range(0, 4)) = 2
-            _GMF_BlendNormal         ("[GMF] Blend Normal", Range(0, 1)) = 0.1
+            _GMF_FlakeSizeFront     ("[GMF] Flake Size (front)", Range(0, 1)) = 0.1
+            _GMF_FlakeShear         ("[GMF] Shear", Range(0, 1)) = 0.5
+            _GMF_FlakeBrighten      ("[GMF] Brighten", Range(0, 8)) = 2
+            _GMF_FlakeDarken        ("[GMF] Darken", Range(0, 8)) = 0.5
+            _GMF_Twinkle            ("[GMF] Twinkle", Range(0, 4)) = 2
+            _GMF_BlendNormal        ("[GMF] Blend Normal", Range(0, 1)) = 0.1
 
         // Reflection
         [WFHeaderToggle(Gem Reflection)]
-            _GMR_Enable              ("[GMR] Enable", Float) = 1
-            _GMR_Power               ("[GMR] Blend Power", Range(0, 1)) = 1
+            _GMR_Enable             ("[GMR] Enable", Float) = 1
+            _GMR_Power              ("[GMR] Blend Power", Range(0, 1)) = 1
         [NoScaleOffset]
-            _GMR_Cubemap             ("[GMR] CubeMap", Cube) = "" {}
-            _GMR_Brightness          ("[GMR] Brightness", Range(0, 1)) = 0
-            _GMR_Monochrome          ("[GMR] Monochrome Reflection", Range(0, 1)) = 1
-            _GMR_CubemapPower        ("[GMR] 2nd CubeMap Power", Range(0, 2)) = 1
-            _GMR_CubemapHighCut      ("[GMR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
-            _GMR_BlendNormal         ("[GMR] Blend Normal", Range(0, 1)) = 0.1
+            _GMR_Cubemap            ("[GMR] CubeMap", Cube) = "" {}
+            _GMR_Brightness         ("[GMR] Brightness", Range(0, 1)) = 0
+            _GMR_Monochrome         ("[GMR] Monochrome Reflection", Range(0, 1)) = 1
+            _GMR_CubemapPower       ("[GMR] 2nd CubeMap Power", Range(0, 2)) = 1
+            _GMR_CubemapHighCut     ("[GMR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
+            _GMR_BlendNormal        ("[GMR] Blend Normal", Range(0, 1)) = 0.1
 
         // Alpha
         [WFHeader(Transparent Alpha)]

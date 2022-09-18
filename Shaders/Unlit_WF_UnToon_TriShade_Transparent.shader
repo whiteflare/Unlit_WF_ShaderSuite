@@ -57,12 +57,12 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
-            _BKT_Enable              ("[BKT] Enable", Float) = 0
+            _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _BKT_UVType              ("[BKT] UV Type", Float) = 0
-            _BKT_BackTex             ("[BKT] Back Texture", 2D) = "white" {}
+            _BKT_UVType             ("[BKT] UV Type", Float) = 0
+            _BKT_BackTex            ("[BKT] Back Texture", 2D) = "white" {}
         [HDR]
-            _BKT_BackColor           ("[BKT] Back Color", Color) = (1, 1, 1, 1)
+            _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
         // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
@@ -221,26 +221,26 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
 
         // Overlay Texture
         [WFHeaderToggle(Overlay Texture)]
-            _OVL_Enable              ("[OVL] Enable", Float) = 0
+            _OVL_Enable             ("[OVL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
-            _OVL_UVType              ("[OVL] UV Type", Float) = 0
+            _OVL_UVType             ("[OVL] UV Type", Float) = 0
         [HDR]
-            _OVL_Color               ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
-            _OVL_OverlayTex          ("[OVL] Overlay Texture", 2D) = "white" {}
+            _OVL_Color              ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
+            _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
         [WF_Vector2]
-            _OVL_UVScroll            ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
+            _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [Toggle(_)]
-            _OVL_VertColToDecal      ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
+            _OVL_VertColToDecal     ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
         [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
-            _OVL_BlendType           ("[OVL] Blend Type", Float) = 0
-            _OVL_Power               ("[OVL] Blend Power", Range(0, 1)) = 1
-            _OVL_CustomParam1        ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
+            _OVL_BlendType          ("[OVL] Blend Type", Float) = 0
+            _OVL_Power              ("[OVL] Blend Power", Range(0, 1)) = 1
+            _OVL_CustomParam1       ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
-            _OVL_MaskTex             ("[OVL] Mask Texture (R)", 2D) = "white" {}
+            _OVL_MaskTex            ("[OVL] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
-            _OVL_VertColToMask       ("[OVL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
+            _OVL_VertColToMask      ("[OVL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
         [Toggle(_)]
-            _OVL_InvMaskVal          ("[OVL] Invert Mask Value", Range(0, 1)) = 0
+            _OVL_InvMaskVal         ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -315,10 +315,10 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
-            _LBE_Enable              ("[LBE] Enable", Float) = 0
-            _LBE_IndirectMultiplier  ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
-            _LBE_EmissionMultiplier  ("[LBE] Emission Multiplier", Range(0, 2)) = 1
-            _LBE_IndirectChroma      ("[LBE] Indirect Chroma", Range(0, 2)) = 1
+            _LBE_Enable             ("[LBE] Enable", Float) = 0
+            _LBE_IndirectMultiplier ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
+            _LBE_EmissionMultiplier ("[LBE] Emission Multiplier", Range(0, 2)) = 1
+            _LBE_IndirectChroma     ("[LBE] Indirect Chroma", Range(0, 2)) = 1
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
