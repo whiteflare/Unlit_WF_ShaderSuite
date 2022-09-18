@@ -593,7 +593,11 @@ namespace UnlitWF
             {
                 return false;
             }
+#if UNITY_2019_1_OR_NEWER
             return shader.GetPropertyType(idx) == UnityEngine.Rendering.ShaderPropertyType.Texture;
+#else
+            return ShaderUtil.GetPropertyType(shader, idx) == ShaderUtil.ShaderPropertyType.TexEnv;
+#endif
         }
 
         private static HashSet<string> DeleteProperties(IEnumerable<ShaderSerializedProperty> props, Material material)
