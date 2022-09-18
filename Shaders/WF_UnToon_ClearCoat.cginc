@@ -24,15 +24,15 @@
     // vertex&fragment shader
     ////////////////////////////
 
-    float _CC_Width;
-    float _CC_Z_Shift;
+    float _CCT_Width;
+    float _CCT_Z_Shift;
 
     // vertex シェーダでアウトラインメッシュを張るタイプ。NORMALのみサポートする。
     v2f vert_clearcoat(appdata v) {
         // 通常の vert を使う
         v2f o = vert(v);
         // SV_POSITION を上書き
-        o.vs_vertex = shiftNormalAndDepthVertex(o.ws_vertex, o.normal, _CC_Width * 0.001, -_CC_Z_Shift);
+        o.vs_vertex = shiftNormalAndDepthVertex(o.ws_vertex, o.normal, _CCT_Width * 0.001, -_CCT_Z_Shift);
 
         return o;
     }

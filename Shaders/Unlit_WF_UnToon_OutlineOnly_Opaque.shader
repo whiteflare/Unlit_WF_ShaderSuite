@@ -27,32 +27,32 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
 
         // アウトライン
         [WFHeaderAlwaysOn(Outline)]
-            _TL_Enable              ("[LI] Enable", Float) = 1
-            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+            _TL_Enable              ("[TL] Enable", Float) = 1
+            _TL_LineColor           ("[TL] Line Color", Color) = (0.1, 0.1, 0.1, 1)
         [NoScaleOffset]
-            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
+            _TL_CustomColorTex      ("[TL] Custom Color Texture", 2D) = "white" {}
+            _TL_LineWidth           ("[TL] Line Width", Range(0, 1)) = 0.05
         [Enum(NORMAL,0,EDGE,1)]
-            _TL_LineType            ("[LI] Line Type", Float) = 0
-            _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
-            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
+            _TL_LineType            ("[TL] Line Type", Float) = 0
+            _TL_BlendCustom         ("[TL] Blend Custom Color Texture", Range(0, 1)) = 0
+            _TL_BlendBase           ("[TL] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Mask Texture (R)", 2D) = "white" {}
+            _TL_MaskTex             ("[TL] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
-            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+            _TL_InvMaskVal          ("[TL] Invert Mask Value", Float) = 0
+            _TL_Z_Shift             ("[TL] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
         // Fog
         [WFHeaderToggle(Fog)]
-            _FG_Enable              ("[FG] Enable", Float) = 0
-            _FG_Color               ("[FG] Color", Color) = (0.5, 0.5, 0.6, 1)
-            _FG_MinDist             ("[FG] FadeOut Distance (Near)", Float) = 0.5
-            _FG_MaxDist             ("[FG] FadeOut Distance (Far)", Float) = 0.8
-            _FG_Exponential         ("[FG] Exponential", Range(0.5, 4.0)) = 1.0
+            _TFG_Enable              ("[TFG] Enable", Float) = 0
+            _TFG_Color               ("[TFG] Color", Color) = (0.5, 0.5, 0.6, 1)
+            _TFG_MinDist             ("[TFG] FadeOut Distance (Near)", Float) = 0.5
+            _TFG_MaxDist             ("[TFG] FadeOut Distance (Far)", Float) = 0.8
+            _TFG_Exponential         ("[TFG] Exponential", Range(0.5, 4.0)) = 1.0
         [WF_Vector3]
-            _FG_BaseOffset          ("[FG] Base Offset", Vector) = (0, 0, 0, 0)
+            _TFG_BaseOffset          ("[TFG] Base Offset", Vector) = (0, 0, 0, 0)
         [WF_Vector3]
-            _FG_Scale               ("[FG] Scale", Vector) = (1, 1, 1, 0)
+            _TFG_Scale               ("[TFG] Scale", Vector) = (1, 1, 1, 0)
 
         // Lit
         [WFHeader(Lit)]
@@ -110,7 +110,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
             #pragma shader_feature_local _ _TL_EDGE_ENABLE
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _FG_ENABLE
+            #pragma shader_feature_local_fragment _TFG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

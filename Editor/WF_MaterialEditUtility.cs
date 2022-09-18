@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 namespace UnlitWF
 {
@@ -58,8 +59,6 @@ namespace UnlitWF
     public class CleanUpParameter : ScriptableObject
     {
         public Material[] materials = { };
-        public bool resetUnused = true;
-        public bool resetKeywords = true;
 
         public static CleanUpParameter Create()
         {
@@ -89,17 +88,91 @@ namespace UnlitWF
         }
     }
 
-    public class PropertyNameReplacement
+    public abstract class PropertyNameReplacement
     {
-        public readonly string beforeName;
-        public readonly string afterName;
         public readonly Action<ShaderSerializedProperty> onAfterCopy;
 
-        public PropertyNameReplacement(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null)
+        public PropertyNameReplacement(Action<ShaderSerializedProperty> onAfterCopy = null)
         {
-            this.beforeName = beforeName;
-            this.afterName = afterName;
             this.onAfterCopy = onAfterCopy ?? (p => { });
+        }
+
+        public abstract bool IsMatch(string beforeName);
+
+        protected abstract string Replace(string beforeName);
+
+        public virtual bool TryReplace(string beforeName, out string afterName)
+        {
+            if (IsMatch(beforeName))
+            {
+                afterName = Replace(beforeName);
+                return true;
+            }
+            else
+            {
+                afterName = null;
+                return false;
+            }
+        }
+
+        public static PropertyNameReplacement Match(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new MatchRename(bn, an, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement Prefix(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new PrefixRename(beforePrefix, afterPrefix, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement Regex(string pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new RegexRename(new Regex(pattern, RegexOptions.Compiled), replacement, onAfterCopy);
+        }
+
+        private class MatchRename : PropertyNameReplacement
+        {
+            private readonly string beforeName;
+            private readonly string afterName;
+
+            public MatchRename(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            {
+                this.beforeName = beforeName;
+                this.afterName = afterName;
+            }
+
+            public override bool IsMatch(string beforeName) => this.beforeName == beforeName;
+            protected override string Replace(string beforeName) => afterName;
+        }
+
+        private class PrefixRename : PropertyNameReplacement
+        {
+            private readonly string beforePrefix;
+            private readonly string afterPrefix;
+
+            public PrefixRename(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            {
+                this.beforePrefix = beforePrefix;
+                this.afterPrefix = afterPrefix;
+            }
+
+            public override bool IsMatch(string beforeName) => beforeName.StartsWith(beforePrefix);
+            protected override string Replace(string beforeName) => afterPrefix + beforeName.Substring(beforePrefix.Length);
+        }
+
+        private class RegexRename : PropertyNameReplacement
+        {
+            private readonly Regex pattern;
+            private readonly string replacement;
+
+            public RegexRename(Regex pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            {
+                this.pattern = pattern;
+                this.replacement = replacement;
+            }
+
+            public override bool IsMatch(string beforeName) => pattern.IsMatch(beforeName);
+            protected override string Replace(string beforeName) => pattern.Replace(beforeName, replacement);
         }
     }
 
@@ -121,91 +194,60 @@ namespace UnlitWF
         {
             Undo.RecordObjects(mats, "WF Migration materials");
             new Converter.WFMaterialMigrationConverter().ExecAutoConvertWithoutUndo(mats);
-        }
 
+            // 新旧キャッシュから指定のマテリアルを削除
+            WFMaterialCache.instance.ResetOldMaterialTable(mats);
+        }
 
         public static bool ReplacePropertyNamesWithoutUndo(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
-            var mats = new Material[] { mat };
-            return RenamePropNameWithoutUndo(CreateReplacePropertyList(mats, replacement));
+            return RenamePropNamesWithoutUndoInternal(mat, replacement);
         }
 
         public static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement)
         {
-            var mats = new Material[] { mat };
-            return RenamePropNameWithoutUndo(CreateReplacePropertyList(mats, replacement));
+            return RenamePropNamesWithoutUndoInternal(mat, replacement);
         }
 
-        private static bool RenamePropNameWithoutUndo(List<ReplacingPropertyMapping> replaceList)
+        private static bool RenamePropNamesWithoutUndoInternal(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
-            if (replaceList.Count == 0)
-            {
-                return false;
-            }
-
+            var props = ShaderSerializedProperty.AsList(mat);
             // 名称を全て変更
-            replaceList.ForEach(r => r.Execute());
-            // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.after));
-            // 旧プロパティは全て削除
-            foreach (var prop in replaceList.Where(p => p.after != null).Select(p => p.before))
+            foreach (var rep in replacement)
             {
-                prop.Remove();
+                var modified = false;
+                foreach (var before in props)
+                {
+                    if (!rep.TryReplace(before.name, out var afterName))
+                    {
+                        continue;
+                    }
+                    var after = props.Where(pn => pn.name == afterName).FirstOrDefault();
+                    if (after != null)
+                    {
+                        before.CopyTo(after);
+                        before.Remove();
+                        rep.onAfterCopy(after);
+                    }
+                    else
+                    {
+                        before.Rename(afterName);
+                        rep.onAfterCopy(before);
+                    }
+                    modified = true;
+                }
+                if (modified)
+                {
+                    // 保存
+                    ShaderSerializedProperty.AllApplyPropertyChange(props);
+                    // 再取得
+                    props = ShaderSerializedProperty.AsList(mat);
+                    // フラグクリア
+                    modified = false;
+                }
             }
-            // 保存
-            ShaderSerializedProperty.AllApplyPropertyChange(replaceList.Select(p => p.before));
 
             return true;
-        }
-
-        private static List<ReplacingPropertyMapping> CreateReplacePropertyList(Material[] mats, IEnumerable<PropertyNameReplacement> replacement)
-        {
-            var result = new List<ReplacingPropertyMapping>();
-            foreach (var mat in mats)
-            {
-                var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var pair in replacement)
-                {
-                    var before = props.GetValueOrNull(pair.beforeName);
-                    if (before != null)
-                    {
-                        result.Add(new ReplacingPropertyMapping(before, props.GetValueOrNull(pair.afterName), pair.afterName, pair.onAfterCopy));
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        struct ReplacingPropertyMapping
-        {
-            public readonly ShaderSerializedProperty before;
-            public readonly ShaderSerializedProperty after;
-            public readonly string afterName;
-            public readonly Action<ShaderSerializedProperty> onAfterCopy;
-
-            public ReplacingPropertyMapping(ShaderSerializedProperty before, ShaderSerializedProperty after, string afterName, Action<ShaderSerializedProperty> onAfterCopy = null)
-            {
-                this.before = before;
-                this.after = after;
-                this.afterName = afterName;
-                this.onAfterCopy = onAfterCopy ?? (p => { });
-            }
-
-            public void Execute()
-            {
-                if (after != null)
-                {
-                    before.CopyTo(after);
-                    onAfterCopy(after);
-                }
-                else
-                {
-                    before.Rename(afterName);
-                    onAfterCopy(before);
-                }
-
-            }
         }
 
         #endregion
@@ -328,67 +370,108 @@ namespace UnlitWF
 
             foreach (Material material in param.materials)
             {
-                if (material == null)
+                if (material != null)
                 {
-                    continue;
-                }
-                var props = ShaderSerializedProperty.AsList(material);
-
-                // 無効になってる機能のプレフィックスを集める
-                var delPrefix = new List<string>();
-                foreach (var p in props)
-                {
-                    WFCommonUtility.FormatPropName(p.name, out var label, out var name);
-                    if (label != null && name.ToLower() == "enable" && p.FloatValue == 0)
+                    if (IsUnlitWFMaterial(material))
                     {
-                        delPrefix.Add(label);
+                        CleanUpForWFMaterial(material); // WFマテリアルのクリンナップ
+                    }
+                    else
+                    {
+                        CleanUpForNonWFMaterial(material); // WFマテリアル以外のクリンナップ
                     }
                 }
-
-                var del_props = new HashSet<ShaderSerializedProperty>();
-
-                // プレフィックスに合致する設定値を消去
-                Predicate<ShaderSerializedProperty> predPrefix = p =>
-                {
-                    if (WFCommonUtility.IsEnableToggleFromPropName(p.name))
-                    {
-                        return false; // EnableToggle自体は削除しない
-                    }
-                    // ラベルを取得
-                    var label = WFCommonUtility.GetPrefixFromPropName(p.name);
-                    if (string.IsNullOrEmpty(label))
-                    {
-                        return false; // ラベルなしは削除しない
-                    }
-                    if (!delPrefix.Contains(label))
-                    {
-                        return false; // 削除対象でないラベルは削除しない
-                    }
-                    return true; // 削除する
-                };
-                props.FindAll(predPrefix).ForEach(p => del_props.Add(p));
-
-                // 未使用の値を削除
-                Predicate<ShaderSerializedProperty> predUnused = p => param.resetUnused && !p.HasPropertyInShader;
-                props.FindAll(predUnused).ForEach(p => del_props.Add(p));
-
-                // 削除実行
-                DeleteProperties(del_props);
-
-                // キーワードクリア
-                if (param.resetKeywords)
-                {
-                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
-                    {
-                        DeleteShaderKeyword(so);
-                    }
-                }
-
-                // キーワードを整理する
-                WFCommonUtility.SetupShaderKeyword(material);
-                // 反映
-                EditorUtility.SetDirty(material);
             }
+
+            // 新旧キャッシュから指定のマテリアルを削除
+            WFMaterialCache.instance.ResetOldMaterialTable(param.materials);
+        }
+
+        private static bool IsUnlitWFMaterial(Material mm)
+        {
+            if (mm != null && mm.shader != null)
+            {
+                return mm.shader.name.Contains("UnlitWF") && !mm.shader.name.Contains("Debug");
+            }
+            return false;
+        }
+
+        private static bool IsDisabledProperty(ShaderSerializedProperty p, List<string> disabledPrefixs)
+        {
+            // EnableToggle自体は削除しない
+            if (WFCommonUtility.IsEnableToggleFromPropName(p.name))
+            {
+                return false;
+            }
+
+            // ラベルを取得
+            var label = WFCommonUtility.GetPrefixFromPropName(p.name);
+
+            // ラベルなしは削除しない
+            if (string.IsNullOrEmpty(label))
+            {
+                return false;
+            }
+            // 削除対象でないラベルは削除しない
+            if (!disabledPrefixs.Contains(label))
+            {
+                return false;
+            }
+
+            // 削除する
+            return true;
+        }
+
+        private static void CleanUpForWFMaterial(Material material)
+        {
+            var props = ShaderSerializedProperty.AsList(material);
+
+            // 無効になってる機能のプレフィックスを集める
+            var delPrefix = new List<string>();
+            foreach (var p in props)
+            {
+                WFCommonUtility.FormatPropName(p.name, out var label, out var name);
+                if (label != null && name.ToLower() == "enable" && p.FloatValue == 0)
+                {
+                    delPrefix.Add(label);
+                }
+            }
+
+            var del_props = new HashSet<ShaderSerializedProperty>();
+
+            // プレフィックスに合致する設定値を消去
+            props.FindAll(p => IsDisabledProperty(p, delPrefix)).ForEach(p => del_props.Add(p));
+            // 未使用の値を削除
+            props.FindAll(p => !p.HasPropertyInShader).ForEach(p => del_props.Add(p));
+
+            // 削除実行
+            DeleteProperties(del_props, material);
+
+            // キーワードクリア
+            foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
+            {
+                DeleteShaderKeyword(so, material);
+            }
+
+            // キーワードを整理する
+            WFCommonUtility.SetupShaderKeyword(material);
+            // 反映
+            EditorUtility.SetDirty(material);
+        }
+
+        private static void CleanUpForNonWFMaterial(Material material)
+        {
+            var props = ShaderSerializedProperty.AsList(material);
+            var del_props = new HashSet<ShaderSerializedProperty>();
+
+            // 未使用の値を削除
+            props.FindAll(p => !p.HasPropertyInShader).ForEach(p => del_props.Add(p));
+
+            // 削除実行
+            DeleteProperties(del_props, material);
+
+            // 反映
+            EditorUtility.SetDirty(material);
         }
 
         public static void ResetProperties(ResetParameter param)
@@ -401,74 +484,119 @@ namespace UnlitWF
         {
             foreach (Material material in param.materials)
             {
-                if (material == null)
+                if (material != null)
                 {
-                    continue;
+                    ResetPropertiesWithoutUndo(param, material);
                 }
+            }
 
-                var props = ShaderSerializedProperty.AsList(material);
-                var del_props = new HashSet<ShaderSerializedProperty>();
+            // 新旧キャッシュから指定のマテリアルを削除
+            WFMaterialCache.instance.ResetOldMaterialTable(param.materials);
+        }
 
-                // ColorのAlphaチャンネルのみ変更
-                foreach (var p in props)
+        private static void ResetPropertiesWithoutUndo(ResetParameter param, Material material)
+        {
+            var props = ShaderSerializedProperty.AsList(material);
+            var del_props = new HashSet<ShaderSerializedProperty>();
+
+            // ColorのAlphaチャンネルのみ変更
+            foreach (var p in props)
+            {
+                if (p.HasPropertyInShader && p.Type == ShaderUtil.ShaderPropertyType.Color)
                 {
-                    if (p.HasPropertyInShader && p.Type == ShaderUtil.ShaderPropertyType.Color)
-                    {
-                        var c = p.ColorValue;
-                        c.a = 1;
-                        p.ColorValue = c;
-                    }
+                    var c = p.ColorValue;
+                    c.a = 1;
+                    p.ColorValue = c;
                 }
-                ShaderSerializedProperty.AllApplyPropertyChange(props);
+            }
+            ShaderSerializedProperty.AllApplyPropertyChange(props);
 
-                // 条件に合致するプロパティを削除
-                foreach (var p in props)
+            // 条件に合致するプロパティを削除
+            foreach (var p in props)
+            {
+                if (param.resetColor && p.Type == ShaderUtil.ShaderPropertyType.Color)
                 {
-                    if (param.resetColor && p.Type == ShaderUtil.ShaderPropertyType.Color)
-                    {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetFloat && p.Type == ShaderUtil.ShaderPropertyType.Float)
-                    {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetTexture && p.Type == ShaderUtil.ShaderPropertyType.TexEnv)
-                    {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetUnused && !p.HasPropertyInShader)
-                    {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetLit && p.name.StartsWith("_GL_"))
-                    {
-                        del_props.Add(p);
-                    }
-                    else if (param.resetPrefixs.Contains(WFCommonUtility.GetPrefixFromPropName(p.name)))
-                    {
-                        del_props.Add(p);
-                    }
+                    del_props.Add(p);
                 }
-                // 削除実行
-                DeleteProperties(del_props);
-
-                // キーワードクリア
-                if (param.resetKeywords)
+                else if (param.resetFloat && p.Type == ShaderUtil.ShaderPropertyType.Float)
                 {
-                    foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
+                    del_props.Add(p);
+                }
+                else if (param.resetTexture && p.Type == ShaderUtil.ShaderPropertyType.TexEnv)
+                {
+                    del_props.Add(p);
+                }
+                else if (param.resetUnused && !p.HasPropertyInShader)
+                {
+                    del_props.Add(p);
+                }
+                else if (param.resetLit && p.name.StartsWith("_GL_"))
+                {
+                    del_props.Add(p);
+                }
+                else if (param.resetPrefixs.Contains(WFCommonUtility.GetPrefixFromPropName(p.name)))
+                {
+                    del_props.Add(p);
+                }
+            }
+            // 削除実行
+            var del_names = DeleteProperties(del_props, material);
+
+            // キーワードクリア
+            if (param.resetKeywords)
+            {
+                foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
+                {
+                    DeleteShaderKeyword(so, material);
+                }
+            }
+
+            // キーワードを整理する
+            WFCommonUtility.SetupShaderKeyword(material);
+            // Default割り当てTextureを再設定する
+            ResetDefaultTextures(material, del_names);
+            // 反映
+            EditorUtility.SetDirty(material);
+        }
+
+        private static void ResetDefaultTextures(Material material, HashSet<string> del_names)
+        {
+            var shader = material.shader;
+            var path = AssetDatabase.GetAssetPath(shader);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+            var importer = AssetImporter.GetAtPath(path) as ShaderImporter;
+            if (importer == null)
+            {
+                return;
+            }
+
+            foreach (var pn in del_names)
+            {
+                if (IsShaderPropertyTexture(shader, pn))
+                {
+                    var tex = importer.GetDefaultTexture(pn);
+                    if (tex != null)
                     {
-                        DeleteShaderKeyword(so);
+                        material.SetTexture(pn, tex);
                     }
                 }
-
-                // キーワードを整理する
-                WFCommonUtility.SetupShaderKeyword(material);
-                // 反映
-                EditorUtility.SetDirty(material);
             }
         }
 
-        private static void DeleteProperties(IEnumerable<ShaderSerializedProperty> props)
+        private static bool IsShaderPropertyTexture(Shader shader, string name)
+        {
+            var idx = WFCommonUtility.FindPropertyIndex(shader, name);
+            if (idx < 0)
+            {
+                return false;
+            }
+            return shader.GetPropertyType(idx) == UnityEngine.Rendering.ShaderPropertyType.Texture;
+        }
+
+        private static HashSet<string> DeleteProperties(IEnumerable<ShaderSerializedProperty> props, Material material)
         {
             var del_names = new HashSet<string>();
             foreach (var p in props)
@@ -480,12 +608,14 @@ namespace UnlitWF
             {
                 var names = new List<string>(del_names);
                 names.Sort();
-                UnityEngine.Debug.Log("[WF][Tool] Deleted Property: " + string.Join(", ", names.ToArray()));
+                UnityEngine.Debug.LogFormat(material, "[WF][Tool] Deleted {0} Property: {1}", material, string.Join(", ", names.ToArray()));
             }
             ShaderSerializedProperty.AllApplyPropertyChange(props);
+
+            return del_names;
         }
 
-        public static void DeleteShaderKeyword(SerializedObject so)
+        public static void DeleteShaderKeyword(SerializedObject so, Material logTarget)
         {
             var prop = so.FindProperty("m_ShaderKeywords");
             if (prop == null || string.IsNullOrEmpty(prop.stringValue))
@@ -496,13 +626,13 @@ namespace UnlitWF
             keywords = string.Join(" ", keywords.Split(' ').Where(kwd => !WFCommonUtility.IsEnableKeyword(kwd)).OrderBy(kwd => kwd));
             if (!string.IsNullOrWhiteSpace(keywords))
             {
-                UnityEngine.Debug.Log("[WF][Tool] Deleted Shaderkeyword: " + keywords);
+                UnityEngine.Debug.LogFormat(logTarget, "[WF][Tool] Deleted {0} Shaderkeyword: {1}", logTarget, keywords);
             }
             prop.stringValue = "";
             so.ApplyModifiedProperties();
         }
 
-        #endregion
+#endregion
     }
 
     /// <summary>

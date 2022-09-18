@@ -33,10 +33,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _CurrentVersion: 0
-    - _FG_Enable: 0
-    - _FG_Exponential: 1
-    - _FG_MaxDist: 0.8
-    - _FG_MinDist: 0.5
     - _FallBack: 0
     - _GL_BlendPower: 0.8
     - _GL_CustomAltitude: 45
@@ -46,6 +42,10 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
+    - _TFG_Enable: 0
+    - _TFG_Exponential: 1
+    - _TFG_MaxDist: 0.8
+    - _TFG_MinDist: 0.5
     - _TL_BlendBase: 0
     - _TL_BlendCustom: 0
     - _TL_Enable: 1
@@ -56,8 +56,8 @@ Material:
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _FG_BaseOffset: {r: 0, g: 0, b: 0, a: 0}
-    - _FG_Color: {r: 0.5, g: 0.5, b: 0.6, a: 1}
-    - _FG_Scale: {r: 1, g: 1, b: 1, a: 0}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
+    - _TFG_BaseOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _TFG_Color: {r: 0.5, g: 0.5, b: 0.6, a: 1}
+    - _TFG_Scale: {r: 1, g: 1, b: 1, a: 0}
     - _TL_LineColor: {r: 0.7558129, g: 0.755, b: 1, a: 1}

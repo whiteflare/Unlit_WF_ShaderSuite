@@ -130,12 +130,12 @@
 
     float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
         // Static Fur Vector 計算
-        float3 vec_fur = SafeNormalizeVec3Normal(_FR_Vector.xyz);
+        float3 vec_fur = SafeNormalizeVec3Normal(_FUR_Vector.xyz);
 
-#ifndef _FR_DISABLE_NORMAL_MAP
+#ifndef _FUR_DISABLE_NORMAL_MAP
         // NormalMap Fur Vector 計算
         float2 uv_main = TRANSFORM_TEX(uv, _MainTex);
-        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FR_BumpMap, uv_main, 0) );
+        float3 vec_map = UnpackNormal( PICK_VERT_TEX2D_LOD(_FUR_BumpMap, uv_main, 0) );
         vec_fur = BlendNormals(vec_fur, vec_map);
 #endif
 
@@ -153,9 +153,9 @@
         {for (uint i = 0; i < 3; i++) {
             // 頂点移動
             vu[i].xyz += ws_fur_vector[i];
-            if (0 < _FR_Random) {
+            if (0 < _FUR_Random) {
                 float2 niz = random2to2(float2(-1, +1) + v[i].vid + rate) * 2 - 1;
-                niz *= 0.01 * _FR_Random;  // 1cm単位で±ランダム化
+                niz *= 0.01 * _FUR_Random;  // 1cm単位で±ランダム化
                 vu[i].xyz += v[i].ws_tangent * niz.x + v[i].ws_bitangent * niz.y;
             }
         }}
@@ -176,12 +176,12 @@
         // ファーを伸ばす方向を計算
         float3 ws_fur_vector[3];
         {for (uint i = 0; i < 3; i++) {
-            ws_fur_vector[i] = calcFurVector(v[i].ws_tangent, v[i].ws_bitangent, v[i].ws_normal, v[i].uv) * _FR_HEIGHT_PARAM;
+            ws_fur_vector[i] = calcFurVector(v[i].ws_tangent, v[i].ws_bitangent, v[i].ws_normal, v[i].uv) * _FUR_HEIGHT_PARAM;
         }}
 
         v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
-        {for (uint i = 0; i < _FR_REPEAT_PARAM; i++) {
-            float rate = i / (float) _FR_REPEAT_PARAM;
+        {for (uint i = 0; i < _FUR_REPEAT_PARAM; i++) {
+            float rate = i / (float) _FUR_REPEAT_PARAM;
             v2g v2[3] = {
                 lerp_v2g(v[0], c, rate),
                 lerp_v2g(v[1], c, rate),
@@ -228,15 +228,15 @@
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
-        float4 maskTex = SAMPLE_MASK_VALUE(_FR_MaskTex, uv_main, _FR_InvMaskVal);
+        float4 maskTex = SAMPLE_MASK_VALUE(_FUR_MaskTex, uv_main, _FUR_InvMaskVal);
         if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
             discard;
         }
 
         // ファーノイズを追加
-        float noise = PICK_MAIN_TEX2D(_FR_NoiseTex, TRANSFORM_TEX(i.uv, _FR_NoiseTex)).r;
-        color.rgb   *= lerp(_FR_TintColorBase.rgb, _FR_TintColorTip.rgb, gi.height);
-        color.rgb   *= saturate(1 - (1 - noise) * _FR_ShadowPower);
+        float noise = PICK_MAIN_TEX2D(_FUR_NoiseTex, TRANSFORM_TEX(i.uv, _FUR_NoiseTex)).r;
+        color.rgb   *= lerp(_FUR_TintColorBase.rgb, _FUR_TintColorTip.rgb, gi.height);
+        color.rgb   *= saturate(1 - (1 - noise) * _FUR_ShadowPower);
         color.a     = saturate(noise - pow(gi.height, 4));
 
         return color;
