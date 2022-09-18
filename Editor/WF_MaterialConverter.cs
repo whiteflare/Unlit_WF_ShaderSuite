@@ -752,6 +752,7 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Match("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
             // 2022/09/12
             PropertyNameReplacement.Prefix("_BK_", "_BKT_"),
+            PropertyNameReplacement.Prefix("_CC_", "_CCT_"),
             PropertyNameReplacement.Prefix("_CH_", "_CHM_"),
             PropertyNameReplacement.Prefix("_CL_", "_CLC_"),
             PropertyNameReplacement.Prefix("_DF_", "_DFD_"),

@@ -29,11 +29,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
 
         // クリアコート
         [WFHeaderAlwaysOn(ClearCoat)]
-            _CC_Enable              ("[CC] Enable", Float) = 1
-            _CC_Width               ("[CC] Thickness", Range(0, 5)) = 1
-            _CC_Z_Shift             ("[CC] Z-shift (tweak)", Range(-0.5, 0.5)) = 0
+            _CCT_Enable             ("[CCT] Enable", Float) = 1
+            _CCT_Width              ("[CCT] Thickness", Range(0, 5)) = 1
+            _CCT_Z_Shift            ("[CCT] Z-shift (tweak)", Range(-0.5, 0.5)) = 0
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CC_CullMode            ("[CC] Cull Mode", int) = 2
+            _CCT_CullMode           ("[CCT] Cull Mode", int) = 2
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
@@ -402,7 +402,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             Name "CLEARCOAT"
             Tags { "LightMode" = "ForwardBase" }
 
-            Cull [_CC_CullMode]
+            Cull [_CCT_CullMode]
             ZWrite OFF
             Blend One One, One OneMinusSrcAlpha
 

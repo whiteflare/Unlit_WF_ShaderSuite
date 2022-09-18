@@ -194,6 +194,7 @@ namespace UnlitWF
                 new WFShaderFunction("CRF", "CRF", "Refraction"),
                 new WFShaderFunction("CGL", "CGL", "Frosted Glass"),
                 new WFShaderFunction("CGO", "CGO", "Ghost Transparent"),
+                new WFShaderFunction("CCT", "CCT", "ClearCoat"),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF
