@@ -34,7 +34,7 @@ namespace UnlitWF
         private static readonly List<IPropertyHook> HOOKS = new List<IPropertyHook>() {
             // _TS_Power の直前に設定ボタンを追加する
             new CustomPropertyHook("_TS_Power", ctx => {
-                var guiContent = WFI18N.GetGUIContent("SH", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します");
+                var guiContent = WFI18N.GetGUIContent("TS", "Shade Color Suggest", "ベース色をもとに1影2影色を設定します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
                     ctx.editor.RegisterPropertyChangeUndo("Shade Color Suggest");
                     SuggestShadowColor(WFCommonUtility.AsMaterials(ctx.editor.targets));
@@ -45,7 +45,7 @@ namespace UnlitWF
                 if (GetShadowStepsFromMaterial(WFCommonUtility.AsMaterials(ctx.editor.targets)) < 2) {
                     return;
                 }
-                var guiContent = WFI18N.GetGUIContent("SH", "Align the boundaries equally", "影の境界線を等間隔に整列します");
+                var guiContent = WFI18N.GetGUIContent("TS", "Align the boundaries equally", "影の境界線を等間隔に整列します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
                     ctx.editor.RegisterPropertyChangeUndo("Align the boundaries equally");
                     SuggestShadowBorder(WFCommonUtility.AsMaterials(ctx.editor.targets));
@@ -55,7 +55,7 @@ namespace UnlitWF
             // 条件付きHide
             new ConditionVisiblePropertyHook("_TS_2ndColor|_TS_2ndBorder|_TS_2ndFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
             new ConditionVisiblePropertyHook("_TS_3rdColor|_TS_3rdBorder|_TS_3rdFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
-            new ConditionVisiblePropertyHook("_OL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)), // ANGEL_RING
+            new ConditionVisiblePropertyHook("_OVL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)), // ANGEL_RING
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
@@ -70,20 +70,20 @@ namespace UnlitWF
             new SingleLineTexPropertyHook( "_TS_3rdColor", "_TS_3rdTex" ),
             new SingleLineTexPropertyHook( "_ES_Color", "_ES_MaskTex" ),
             new SingleLineTexPropertyHook( "_EmissionColor", "_EmissionMap" ),
-            new SingleLineTexPropertyHook( "_LM_Color", "_LM_Texture" ),
+            new SingleLineTexPropertyHook( "_LME_Color", "_LME_Texture" ),
             new SingleLineTexPropertyHook( "_TL_LineColor", "_TL_CustomColorTex" ),
-            new SingleLineTexPropertyHook( "_OL_Color", "_OL_OverlayTex" ),
+            new SingleLineTexPropertyHook( "_OVL_Color", "_OVL_OverlayTex" ),
 
             // MinMaxSlider
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
-            new MinMaxSliderPropertyHook("_FG_MinDist", "_FG_MaxDist"),
-            new MinMaxSliderPropertyHook("_LM_MinDist", "_LM_MaxDist"),
+            new MinMaxSliderPropertyHook("_TFG_MinDist", "_TFG_MaxDist"),
+            new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist"),
             new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist"),
-            new MinMaxSliderPropertyHook("_DF_MinDist", "_DF_MaxDist"),
+            new MinMaxSliderPropertyHook("_DFD_MinDist", "_DFD_MaxDist"),
 
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
-            new CustomPropertyHook("_OL_CustomParam1", ctx => {
-                if (IsAnyIntValue(ctx, "_OL_UVType", p => p == 3)) {
+            new CustomPropertyHook("_OVL_CustomParam1", ctx => {
+                if (IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)) {
                     ctx.guiContent = WFI18N.GetGUIContent("OL", "UV2.y <-> Normal.y");
                 }
             }, null),
@@ -116,8 +116,8 @@ namespace UnlitWF
                 }
             }),
 
-            // _DetailNormalMap と _FR_NoiseTex の直後に設定ボタンを追加する
-            new CustomPropertyHook("_DetailNormalMap|_FR_NoiseTex", null, (ctx, changed) => {
+            // _DetailNormalMap と _FUR_NoiseTex の直後に設定ボタンを追加する
+            new CustomPropertyHook("_DetailNormalMap|_FUR_NoiseTex", null, (ctx, changed) => {
                 if (ctx.current.textureValue == null) {
                     return;
                 }
@@ -143,7 +143,7 @@ namespace UnlitWF
 
             // _TR_InvMaskVal の直後に設定ボタンを追加する
             new CustomPropertyHook("_TR_InvMaskVal", null, (ctx, changed) => {
-                var guiContent = WFI18N.GetGUIContent("RM", "Assign MainTex to MaskTexture", "メインテクスチャをリムライトマスクに設定します");
+                var guiContent = WFI18N.GetGUIContent("TR", "Assign MainTex to MaskTexture", "メインテクスチャをリムライトマスクに設定します");
                 if (DrawButtonFieldProperty(guiContent, "APPLY")) {
                     ctx.editor.RegisterPropertyChangeUndo("Assign MainTex to MaskTexture");
                     foreach(var mat in WFCommonUtility.AsMaterials(ctx.editor.targets))
@@ -231,9 +231,10 @@ namespace UnlitWF
             PreChangeShader(material, oldShader, newShader);
 
             // 割り当て
+            var oldMat = new Material(material);
             base.AssignNewShaderToMaterial(material, oldShader, newShader);
 
-            PostChangeShader(material, oldShader, newShader);
+            PostChangeShader(oldMat, material, oldShader, newShader);
         }
 
         public static void PreChangeShader(Material material, Shader oldShader, Shader newShader)
@@ -241,19 +242,19 @@ namespace UnlitWF
             // nop
         }
 
-        public static void PostChangeShader(Material material, Shader oldShader, Shader newShader)
+        public static void PostChangeShader(Material oldMat, Material newMat, Shader oldShader, Shader newShader)
         {
-            if (material != null)
+            if (newMat != null)
             {
                 // DebugViewの保存に使っているタグはクリア
-                WF_DebugViewEditor.ClearDebugOverrideTag(material);
+                WF_DebugViewEditor.ClearDebugOverrideTag(newMat);
                 // シェーダキーワードを整理する
-                WFCommonUtility.SetupShaderKeyword(material);
+                WFCommonUtility.SetupShaderKeyword(newMat);
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
                     // Color を sRGB -> Linear 変換して再設定する
-                    if (material.HasProperty("_Color"))
+                    if (newMat.HasProperty("_Color"))
                     {
 #if UNITY_2019_1_OR_NEWER
                         var idx = oldShader.FindPropertyIndex("_Color");
@@ -262,8 +263,8 @@ namespace UnlitWF
                             var flags = oldShader.GetPropertyFlags(idx);
                             if (!flags.HasFlag(UnityEngine.Rendering.ShaderPropertyFlags.HDR))
                             {
-                                var val = material.GetColor("_Color");
-                                material.SetColor("_Color", val.linear);
+                                var val = newMat.GetColor("_Color");
+                                newMat.SetColor("_Color", val.linear);
                             }
                         }
 #else
@@ -272,23 +273,23 @@ namespace UnlitWF
 #endif
                     }
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
-                    if (material.HasProperty("_EmissionColor"))
+                    if (newMat.HasProperty("_EmissionColor"))
                     {
-                        var val = material.GetColor("_EmissionColor");
+                        var val = newMat.GetColor("_EmissionColor");
                         if (val.a < 1e-4)
                         {
                             val.a = 1.0f;
-                            material.SetColor("_EmissionColor", val);
+                            newMat.SetColor("_EmissionColor", val);
                         }
                     }
                     // もし FakeFur への切り替えかつ _Cutoff が 0.5 だったら 0.2 を設定しちゃう
-                    if (newShader.name.Contains("FakeFur") && material.HasProperty("_Cutoff"))
+                    if (newShader.name.Contains("FakeFur") && newMat.HasProperty("_Cutoff"))
                     {
-                        var val = material.GetFloat("_Cutoff");
+                        var val = newMat.GetFloat("_Cutoff");
                         if (Mathf.Abs(val - 0.5f) < Mathf.Epsilon)
                         {
                             val = 0.2f;
-                            material.SetFloat("_Cutoff", val);
+                            newMat.SetFloat("_Cutoff", val);
                         }
                     }
                 }
@@ -301,11 +302,16 @@ namespace UnlitWF
                         if (!oldShader.name.Contains("_Mix") && newShader.name.Contains("_Mix"))
                         {
                             // Mixへの切り替えならば、FR_Height2とFR_Repeat2を設定する
-                            var height = material.GetFloat("_FR_Height");
-                            material.SetFloat("_FR_Height2", height * 1.25f);
-                            var repeat = material.GetInt("_FR_Repeat");
-                            material.SetInt("_FR_Repeat2", Math.Max(1, repeat - 1));
+                            var height = newMat.GetFloat("_FR_Height");
+                            newMat.SetFloat("_FR_Height2", height * 1.25f);
+                            var repeat = newMat.GetInt("_FR_Repeat");
+                            newMat.SetInt("_FR_Repeat2", Math.Max(1, repeat - 1));
                         }
+                    }
+                    // 同種シェーダの切替時には RenderQueue をコピーする
+                    if (oldShader.renderQueue == newShader.renderQueue && oldMat.renderQueue != oldShader.renderQueue)
+                    {
+                        newMat.renderQueue = oldMat.renderQueue;
                     }
                 }
             }
@@ -399,7 +405,13 @@ namespace UnlitWF
             // プロパティ表示
             if (!context.hidden && !context.custom)
             {
+                // プロパティ表示
                 context.editor.ShaderProperty(context.current, context.guiContent);
+                // Colorについては追加で出力
+                if (context.current.type == MaterialProperty.PropType.Color)
+                {
+                    DrawAdditionalColorCodeField(context.current);
+                }
             }
 
             // チェック終了
@@ -465,6 +477,24 @@ namespace UnlitWF
                 rect = EditorGUILayout.GetControlRect();
                 rect.y += 2;
                 GUI.Label(rect, "Current Shader Variants", EditorStyles.boldLabel);
+
+                // 一時的にフィールド幅を変更
+                EditorGUIUtility.labelWidth = 0;
+
+                // ファミリー
+                {
+                    var families = WFShaderNameDictionary.GetFamilyList();
+                    // ラベル文字列を作成
+                    var labels = families.Select(nm => nm == null ? "" : nm.Familly).ToArray();
+                    int idx = Array.IndexOf(labels, snm.Familly);
+
+                    EditorGUI.BeginChangeCheck();
+                    int select = EditorGUILayout.Popup("Family", idx, labels);
+                    if (EditorGUI.EndChangeCheck() && idx != select)
+                    {
+                        WFCommonUtility.ChangeShader(families[select].Name, targets);
+                    }
+                }
                 // バリアント
                 {
                     // 同じ Variant のシェーダをリストに
@@ -508,6 +538,9 @@ namespace UnlitWF
                         WFCommonUtility.ChangeShader(variants[select].Name, targets);
                     }
                 }
+
+                // フィールド幅を戻す
+                materialEditor.SetDefaultGUIWidths();
             }
         }
 
@@ -515,7 +548,7 @@ namespace UnlitWF
         {
             var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
 
-            if (IsOldMaterial(mats))
+            if (WFMaterialCache.instance.IsOldMaterial(mats))
             {
                 var message = WFI18N.Translate(WFMessageText.PlzMigration);
 
@@ -523,8 +556,6 @@ namespace UnlitWF
                 {
                     // 名称を全て変更
                     WFMaterialEditUtility.MigrationMaterial(mats);
-                    // リセット
-                    ResetOldMaterialTable(mats);
                 }
             }
         }
@@ -601,8 +632,6 @@ namespace UnlitWF
             {
                 var param = CleanUpParameter.Create();
                 param.materials = WFCommonUtility.AsMaterials(materialEditor.targets);
-                param.resetKeywords = true;
-                param.resetUnused = true;
                 WFMaterialEditUtility.CleanUpProperties(param);
             }
 
@@ -610,48 +639,6 @@ namespace UnlitWF
 
             WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
             WFEditorPrefs.MenuToBottom = EditorGUILayout.Toggle("Menu To Bottom", WFEditorPrefs.MenuToBottom);
-        }
-
-        static WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
-        static WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
-
-        private static bool IsOldMaterial(params object[] mats)
-        {
-            bool result = false;
-            foreach (Material mat in mats)
-            {
-                if (mat == null)
-                {
-                    continue;
-                }
-                if (newMaterialVersionCache.Contains(mat))
-                {
-                    continue;
-                }
-                if (oldMaterialVersionCache.Contains(mat))
-                {
-                    result |= true;
-                    return true;
-                }
-                bool old = WFMaterialEditUtility.ExistsOldNameProperty(mat);
-                if (old)
-                {
-                    oldMaterialVersionCache.Add(mat);
-                }
-                else
-                {
-                    newMaterialVersionCache.Add(mat);
-                }
-                result |= old;
-            }
-            return result;
-        }
-
-        public static void ResetOldMaterialTable(params object[] values)
-        {
-            var mats = values.Select(mat => mat as Material).Where(mat => mat != null).ToArray();
-            oldMaterialVersionCache.RemoveAll(mats);
-            newMaterialVersionCache.RemoveAll(mats);
         }
 
         private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor)
@@ -993,6 +980,8 @@ namespace UnlitWF
 
             // 1行テクスチャプロパティ
             materialEditor.TexturePropertySingleLine(label, propTexture, propColor);
+            // 追加のカラーコードフィールド
+            DrawAdditionalColorCodeField(propColor);
 
             // もしテクスチャが新たに設定されたならば、カラーを白にリセットする
             if (EditorGUI.EndChangeCheck() && oldTexture == null && propTexture.textureValue != null)
@@ -1078,7 +1067,13 @@ namespace UnlitWF
             }
         }
 
-        private static bool DrawButtonFieldProperty(GUIContent label, string buttonText)
+        /// <summary>
+        /// ラベル付きボタンフィールドを表示する。
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="buttonText"></param>
+        /// <returns></returns>
+        public static bool DrawButtonFieldProperty(GUIContent label, string buttonText)
         {
             Rect rect = EditorGUILayout.GetControlRect(true, 20);
             rect.y += 1;
@@ -1086,6 +1081,50 @@ namespace UnlitWF
             rect.y -= 2;
             rect.height = 18;
             return GUI.Button(rect, buttonText);
+        }
+
+        /// <summary>
+        /// 追加のカラーコードテキストフィールドを表示する。
+        /// </summary>
+        /// <param name="propColor"></param>
+        public static void DrawAdditionalColorCodeField(MaterialProperty propColor)
+        {
+            var color = propColor.colorValue;
+            var isHdr = (propColor.flags & MaterialProperty.PropFlags.HDR) != 0;
+            var intensity = isHdr ? Mathf.Max(1f, color.maxColorComponent) : 1f;
+
+            var color2 = color;
+            color2.r /= intensity;
+            color2.g /= intensity;
+            color2.b /= intensity;
+            var code = ColorUtility.ToHtmlStringRGB(color2);
+
+            // 位置合わせ
+            var rect2 = GUILayoutUtility.GetLastRect();
+            rect2.x = rect2.xMax - EditorGUIUtility.fieldWidth * 2 - 4;
+            rect2.y += Mathf.Max(0, rect2.height - 18);
+            rect2.width = EditorGUIUtility.fieldWidth;
+            rect2.height = 16;
+
+            var style = new GUIStyle(EditorStyles.miniTextField);
+            style.fontSize--;
+
+            // 表示
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = propColor.hasMixedValue;
+            code = EditorGUI.DelayedTextField(rect2, code, style);
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck())
+            {
+                // 回収
+                if (ColorUtility.TryParseHtmlString(code, out color) || ColorUtility.TryParseHtmlString("#" + code, out color))
+                {
+                    color.r *= intensity;
+                    color.g *= intensity;
+                    color.b *= intensity;
+                    propColor.colorValue = color;
+                }
+            }
         }
 
         internal static bool ButtonWithDropdownList(GUIContent content, Action<Rect> openMenuCallback)
@@ -1635,6 +1674,69 @@ namespace UnlitWF
     }
 
 #endregion
+
+    public class WFMaterialCache : ScriptableSingleton<WFMaterialCache>
+    {
+        private readonly WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
+        private readonly WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
+
+        public void OnEnable()
+        {
+            Undo.undoRedoPerformed += OnUndoOrRedo;
+        }
+
+        public void OnDestroy()
+        {
+            Undo.undoRedoPerformed -= OnUndoOrRedo;
+        }
+
+        private void OnUndoOrRedo()
+        {
+            // undo|redo のタイミングではキャッシュが当てにならないのでクリアする
+            oldMaterialVersionCache.Clear();
+            newMaterialVersionCache.Clear();
+        }
+
+        public bool IsOldMaterial(Material[] mats)
+        {
+            bool result = false;
+            foreach (Material mat in mats)
+            {
+                if (mat == null)
+                {
+                    continue;
+                }
+                if (newMaterialVersionCache.Contains(mat))
+                {
+                    continue;
+                }
+                if (oldMaterialVersionCache.Contains(mat))
+                {
+                    result |= true;
+                    return true;
+                }
+                bool old = WFMaterialEditUtility.ExistsOldNameProperty(mat);
+                if (old)
+                {
+                    oldMaterialVersionCache.Add(mat);
+                }
+                else
+                {
+                    newMaterialVersionCache.Add(mat);
+                }
+                result |= old;
+            }
+            return result;
+        }
+
+        public void ResetOldMaterialTable(params Material[] values)
+        {
+            var mats = values.Where(mat => mat != null).ToArray();
+            oldMaterialVersionCache.RemoveAll(mats);
+            newMaterialVersionCache.RemoveAll(mats);
+        }
+    }
+
 }
 
 #endif

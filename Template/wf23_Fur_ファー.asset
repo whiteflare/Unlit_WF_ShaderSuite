@@ -19,15 +19,15 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _FR_BumpMap:
+    - _FUR_BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _FR_MaskTex:
+    - _FUR_MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _FR_NoiseTex:
+    - _FUR_NoiseTex:
         m_Texture: {fileID: 2800000, guid: 0c90f262b70f7634ea0fb53f2912f537, type: 3}
         m_Scale: {x: 4, y: 4}
         m_Offset: {x: 0, y: 0}
@@ -77,25 +77,25 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AL_AlphaToMask: 0
-    - _CL_DeltaH: 0
-    - _CL_DeltaS: 0
-    - _CL_DeltaV: 0
-    - _CL_Enable: 0
-    - _CL_Monochrome: 0
+    - _CLC_DeltaH: 0
+    - _CLC_DeltaS: 0
+    - _CLC_DeltaV: 0
+    - _CLC_Enable: 0
+    - _CLC_Monochrome: 0
     - _CurrentVersion: 0
     - _Cutoff: 0.2
-    - _DF_BackShadow: 1
-    - _DF_Enable: 0
-    - _DF_MaxDist: 0.08
-    - _DF_MinDist: 0.02
-    - _DF_Power: 1
-    - _FR_Height: 0.02
-    - _FR_Height2: 0.03
-    - _FR_InvMaskVal: 0
-    - _FR_Random: 0
-    - _FR_Repeat: 3
-    - _FR_Repeat2: 2
-    - _FR_ShadowPower: 0.05
+    - _DFD_BackShadow: 1
+    - _DFD_Enable: 0
+    - _DFD_MaxDist: 0.08
+    - _DFD_MinDist: 0.02
+    - _DFD_Power: 1
+    - _FUR_Height: 0.01
+    - _FUR_Height2: 0.02
+    - _FUR_InvMaskVal: 0
+    - _FUR_Random: 0.2
+    - _FUR_Repeat: 3
+    - _FUR_Repeat2: 2
+    - _FUR_ShadowPower: 0
     - _FallBack: 0
     - _FlipMirror: 0
     - _GL_BlendPower: 0.8
@@ -140,10 +140,10 @@ Material:
     - _TS_Steps: 2
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DF_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
-    - _FR_TintColorBase: {r: 1, g: 1, b: 1, a: 1}
-    - _FR_TintColorTip: {r: 1, g: 1, b: 1, a: 1}
-    - _FR_Vector: {r: 0, g: 0, b: 1, a: 0}
+    - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
+    - _FUR_TintColorBase: {r: 1, g: 1, b: 1, a: 1}
+    - _FUR_TintColorTip: {r: 1, g: 1, b: 1, a: 1}
+    - _FUR_Vector: {r: 0, g: 0, b: 1, a: 0}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MatcapColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}

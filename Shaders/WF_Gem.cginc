@@ -26,21 +26,21 @@
     ////////////////////////////
 
     void affectGemFlake(v2f i, float3 ws_camera_dir, float3 ws_normal, float size, inout float4 color) {
-        if (TGL_ON(_GF_Enable)) {
+        if (TGL_ON(_GMF_Enable)) {
             float2 matcapVector = calcMatcapVector(ws_camera_dir, ws_normal).xy * size;
             float3 ls_camera_dir = SafeNormalizeVec3(worldSpaceViewPointPos() - calcWorldSpaceBasePos(i.ws_vertex));
 
-            float2 checker = step(0.5, frac(matcapVector.xy + matcapVector.yx * _GF_FlakeShear
-                + dot(ls_camera_dir.xyz, ls_camera_dir.yzx) * _GF_Twinkle
+            float2 checker = step(0.5, frac(matcapVector.xy + matcapVector.yx * _GMF_FlakeShear
+                + dot(ls_camera_dir.xyz, ls_camera_dir.yzx) * _GMF_Twinkle
             ));
-            color.rgb *= checker.x != checker.y ? _GF_FlakeBrighten : _GF_FlakeDarken;
+            color.rgb *= checker.x != checker.y ? _GMF_FlakeBrighten : _GMF_FlakeDarken;
 
             matcapVector *= float2(1, -1);
 
-            checker = step(0.5, frac(matcapVector.xy + matcapVector.yx * _GF_FlakeShear
-                + dot(ls_camera_dir.xyz, ls_camera_dir.zyx) * _GF_Twinkle
+            checker = step(0.5, frac(matcapVector.xy + matcapVector.yx * _GMF_FlakeShear
+                + dot(ls_camera_dir.xyz, ls_camera_dir.zyx) * _GMF_Twinkle
             ));
-            color.rgb *= checker.x != checker.y ? _GF_FlakeBrighten : _GF_FlakeDarken;
+            color.rgb *= checker.x != checker.y ? _GMF_FlakeBrighten : _GMF_FlakeDarken;
         }
     }
 
@@ -49,17 +49,17 @@
     ////////////////////////////
 
     void affectGemReflection(v2f i, float3 ws_normal, inout float4 color) {
-        if (TGL_ON(_GR_Enable)) {
+        if (TGL_ON(_GMR_Enable)) {
             // リフレクション
-            float3 cubemap = pickReflectionCubemap(_GR_Cubemap, _GR_Cubemap_HDR, i.ws_vertex, ws_normal, 0); // smoothnessは1固定
-            float3 reflection = lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _GR_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _GR_CubemapPower;
-            reflection = lerp(reflection, calcBrightness(reflection), _GR_Monochrome);
+            float3 cubemap = pickReflectionCubemap(_GMR_Cubemap, _GMR_Cubemap_HDR, i.ws_vertex, ws_normal, 0); // smoothnessは1固定
+            float3 reflection = lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _GMR_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _GMR_CubemapPower;
+            reflection = lerp(reflection, calcBrightness(reflection), _GMR_Monochrome);
 
             // 合成
             color.rgb = lerp(
                 color.rgb,
-                lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _GR_Brightness),
-                _GR_Power);
+                lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _GMR_Brightness),
+                _GMR_Power);
         }
     }
 
@@ -73,7 +73,7 @@
 
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
-        float4 color = TGL_ON(_GB_Enable) ? _GB_ColorBack : _Color;
+        float4 color = TGL_ON(_GMB_Enable) ? _GMB_ColorBack : _Color;
         float2 uv_main;
 
         i.normal = normalize(i.normal);
@@ -106,9 +106,9 @@
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // リフレクション
-        affectGemReflection(i, lerpNormals(ws_normal.zyx, ws_bump_normal.zyx, _GR_BlendNormal), color);
+        affectGemReflection(i, lerpNormals(ws_normal.zyx, ws_bump_normal.zyx, _GMR_BlendNormal), color);
         // フレーク
-        affectGemFlake(i, ws_camera_dir, lerpNormals(ws_normal, ws_bump_normal, _GF_BlendNormal), 1 / NON_ZERO_FLOAT(_GF_FlakeSizeBack), color);
+        affectGemFlake(i, ws_camera_dir, lerpNormals(ws_normal, ws_bump_normal, _GMF_BlendNormal), 1 / NON_ZERO_FLOAT(_GMF_FlakeSizeBack), color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
@@ -164,9 +164,9 @@
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
         // リフレクション
-        affectGemReflection(i, lerpNormals(ws_normal, ws_bump_normal, _GR_BlendNormal), color);
+        affectGemReflection(i, lerpNormals(ws_normal, ws_bump_normal, _GMR_BlendNormal), color);
         // フレーク
-        affectGemFlake(i, ws_camera_dir, lerpNormals(ws_normal, ws_bump_normal, _GF_BlendNormal), 1 / NON_ZERO_FLOAT(_GF_FlakeSizeFront), color);
+        affectGemFlake(i, ws_camera_dir, lerpNormals(ws_normal, ws_bump_normal, _GMF_BlendNormal), 1 / NON_ZERO_FLOAT(_GMF_FlakeSizeFront), color);
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
