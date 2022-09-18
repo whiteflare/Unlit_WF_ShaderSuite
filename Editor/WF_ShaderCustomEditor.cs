@@ -268,8 +268,8 @@ namespace UnlitWF
                             }
                         }
 #else
-                        var val = material.GetColor("_Color");
-                        material.SetColor("_Color", val.linear);
+                        var val = oldMat.GetColor("_Color");
+                        newMat.SetColor("_Color", val.linear);
 #endif
                     }
                     // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
@@ -866,7 +866,27 @@ namespace UnlitWF
             return hur;
         }
 
-#region GUI部品
+        #region GUI部品
+
+        private static void SetStyleFont(GUIStyle style, Font font, System.Func<int, int> fontSize, FontStyle fontStyle)
+        {
+            if (font != null)
+            {
+                // フォントが指定されているならそれを設定
+                style.font = font;
+            }
+            else if (style.font == null)
+            {
+                // フォントが null かつ、設定先も null ならば GUI.skin を設定
+                style.font = GUI.skin.font;
+            }
+            // ダイナミックフォントの場合に有効なプロパティを設定
+            if (style.font.dynamic)
+            {
+                style.fontSize = fontSize(style.fontSize != 0 ? style.fontSize : style.font.fontSize);
+                style.fontStyle = fontStyle;
+            }
+        }
 
         /// <summary>
         /// Shurikenスタイルのヘッダを表示する
@@ -879,9 +899,7 @@ namespace UnlitWF
         {
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
-            style.font = EditorStyles.boldLabel.font;
-            style.fontSize += 2;
-            style.fontStyle = FontStyle.Bold;
+            SetStyleFont(style, EditorStyles.boldLabel.font, s => s + 2, FontStyle.Bold);
             style.fixedHeight = 20;
             style.contentOffset = new Vector2(20, -2);
             // Draw
@@ -895,7 +913,7 @@ namespace UnlitWF
                 var titleSize = style.CalcSize(new GUIContent(text));
                 var rect = new Rect(position.x + titleSize.x + 24, position.y, position.width - titleSize.x - 24, 16f);
                 var style2 = new GUIStyle(EditorStyles.label);
-                style2.fontSize = style.fontSize - 1;
+                SetStyleFont(style2, null, s => style.fontSize - 1, FontStyle.Normal);
                 style2.contentOffset = new Vector2(4, 1);
                 GUI.Label(rect, helpText, style2);
             }
@@ -1107,7 +1125,7 @@ namespace UnlitWF
             rect2.height = 16;
 
             var style = new GUIStyle(EditorStyles.miniTextField);
-            style.fontSize--;
+            SetStyleFont(style, null, s => s - 1, FontStyle.Normal);
 
             // 表示
             EditorGUI.BeginChangeCheck();
