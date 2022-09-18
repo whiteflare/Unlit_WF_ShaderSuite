@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent
   m_Shader: {fileID: 4800000, guid: 4ba701b07ccc81e4aae7f053bf332eab, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE _TR_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
+  m_ShaderKeywords: _CGO_ENABLE _GL_AUTO_ENABLE _TR_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -56,6 +56,14 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HL_MatcapTex_1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LME_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LME_Texture:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -116,7 +124,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AL_Fresnel: 0
     - _AL_InvMaskVal: 0
     - _AL_Power: 0.5
     - _AL_Source: 0
@@ -129,6 +136,8 @@ Material:
     - _BKT_Enable: 0
     - _BKT_UVType: 0
     - _BumpScale: 1
+    - _CGO_Enable: 1
+    - _CGO_Power: 1
     - _CHM_Enable: 0
     - _CLC_DeltaH: 0
     - _CLC_DeltaS: 0
@@ -178,6 +187,17 @@ Material:
     - _LBE_Enable: 0
     - _LBE_IndirectChroma: 1
     - _LBE_IndirectMultiplier: 1
+    - _LME_AnimSpeed: 0.2
+    - _LME_Dencity: 0.5
+    - _LME_Enable: 0
+    - _LME_Glitter: 0.5
+    - _LME_InvMaskVal: 0
+    - _LME_MaxDist: 4
+    - _LME_MinDist: 2
+    - _LME_Scale: 0.5
+    - _LME_Shape: 0
+    - _LME_Spot: 2
+    - _LME_UVType: 0
     - _MT_BlendNormal: 0.1
     - _MT_BlendNormal2: 0.1
     - _MT_Brightness: 0.2
@@ -247,6 +267,8 @@ Material:
     - _HL_MatcapColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor_1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _LME_Color: {r: 1, g: 1, b: 1, a: 1}
+    - _LME_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OVL_Color: {r: 1, g: 1, b: 1, a: 1}
     - _OVL_UVScroll: {r: 0, g: 0, b: 0, a: 0}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
