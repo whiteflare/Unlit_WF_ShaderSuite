@@ -423,6 +423,7 @@ namespace UnlitWF
         {
             minSize = new Vector2(480, 640);
             param = CleanUpParameter.Create();
+            param.execNonWFMaterials = true; // ツール経由のときはNonWFマテリアルのクリンナップも行う
             ToolCommon.GetSelectedMaterials(ref param.materials);
             ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materials));
         }

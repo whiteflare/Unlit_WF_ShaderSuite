@@ -28,14 +28,39 @@ namespace UnlitWF
     {
         public int settingPriority = 0;
 
+        /// <summary>
+        /// ShaderStripping を有効にする
+        /// </summary>
         [Header("Shader Build Settings")]
         public bool enableStripping = true;
+        /// <summary>
+        /// ShaderStripping にて未使用バリアントを削除する
+        /// </summary>
         public bool stripUnusedVariant = true;
+        /// <summary>
+        /// ShaderStripping にてFallbackシェーダを削除する
+        /// </summary>
         public bool stripFallback = true;
+        /// <summary>
+        /// ShaderStripping にてMetaパスを削除する
+        /// </summary>
         public bool stripMetaPass = true;
+        /// <summary>
+        /// ShaderStripping にてLODGroupを使っていないなら対象コードを削除する
+        /// </summary>
         public bool stripUnusedLodFade = true;
+        /// <summary>
+        /// ビルド時に古いマテリアルが含まれていないか検査する
+        /// </summary>
         public bool validateSceneMaterials = true;
+        /// <summary>
+        /// アバタービルド前にマテリアルをクリンナップする
+        /// </summary>
+        public bool cleanupMaterialsBeforeAvatarBuild = true;
 
+        /// <summary>
+        /// shaderインポート時にプロジェクトをスキャンするかどうか
+        /// </summary>
         [Header("Editor Behaviour Settings")]
         public bool enableScanProjects = true;
 
@@ -81,16 +106,23 @@ namespace UnlitWF
         SerializedProperty p_stripUnusedLodFade;
         SerializedProperty p_validateSceneMaterials;
         SerializedProperty p_enableScanProjects;
+        SerializedProperty p_cleanupMaterialsBeforeAvatarBuild;
 
         private void OnEnable()
         {
             this.p_settingPriority = serializedObject.FindProperty(nameof(WFEditorSetting.settingPriority));
+
+            // Shader Build Settings
             this.p_enableStripping = serializedObject.FindProperty(nameof(WFEditorSetting.enableStripping));
             this.p_stripUnusedVariant = serializedObject.FindProperty(nameof(WFEditorSetting.stripUnusedVariant));
             this.p_stripUnusedLodFade = serializedObject.FindProperty(nameof(WFEditorSetting.stripUnusedLodFade));
             this.p_stripFallback = serializedObject.FindProperty(nameof(WFEditorSetting.stripFallback));
             this.p_stripMetaPass = serializedObject.FindProperty(nameof(WFEditorSetting.stripMetaPass));
+
             this.p_validateSceneMaterials = serializedObject.FindProperty(nameof(WFEditorSetting.validateSceneMaterials));
+            this.p_cleanupMaterialsBeforeAvatarBuild = serializedObject.FindProperty(nameof(WFEditorSetting.cleanupMaterialsBeforeAvatarBuild));
+
+            // Editor Behaviour Settings
             this.p_enableScanProjects = serializedObject.FindProperty(nameof(WFEditorSetting.enableScanProjects));
         }
 
@@ -115,6 +147,7 @@ namespace UnlitWF
                 EditorGUILayout.PropertyField(p_stripMetaPass);
             }
             EditorGUILayout.PropertyField(p_validateSceneMaterials);
+            EditorGUILayout.PropertyField(p_cleanupMaterialsBeforeAvatarBuild);
 
             // Editor Behaviour Settings
 
