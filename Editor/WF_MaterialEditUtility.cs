@@ -17,6 +17,8 @@
 
 #if UNITY_EDITOR
 
+//#define WF_EDIT_LOG_VERBOSE
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +61,7 @@ namespace UnlitWF
     public class CleanUpParameter : ScriptableObject
     {
         public Material[] materials = { };
+        public bool execNonWFMaterials = false;
 
         public static CleanUpParameter Create()
         {
@@ -364,9 +367,14 @@ namespace UnlitWF
 
         #region リセット・クリーンナップ
 
-        public static void CleanUpProperties(CleanUpParameter param)
+        public static bool CleanUpProperties(CleanUpParameter param)
         {
+            param.materials = param.materials.Where(m => m != null).Distinct().ToArray();
+
             Undo.RecordObjects(param.materials, "WF cleanup materials");
+
+            var matsWF = new List<Material>();
+            var matsNonWF = new List<Material>();
 
             foreach (Material material in param.materials)
             {
@@ -375,16 +383,25 @@ namespace UnlitWF
                     if (IsUnlitWFMaterial(material))
                     {
                         CleanUpForWFMaterial(material); // WFマテリアルのクリンナップ
+                        matsWF.Add(material);
                     }
-                    else
+                    else if (param.execNonWFMaterials)
                     {
                         CleanUpForNonWFMaterial(material); // WFマテリアル以外のクリンナップ
+                        matsNonWF.Add(material);
                     }
                 }
             }
 
             // 新旧キャッシュから指定のマテリアルを削除
-            WFMaterialCache.instance.ResetOldMaterialTable(param.materials);
+            WFMaterialCache.instance.ResetOldMaterialTable(matsWF.ToArray());
+
+            bool done = 0 < matsWF.Count || 0 < matsNonWF.Count;
+            if (done)
+            {
+                UnityEngine.Debug.LogFormat("[WF][Tool] CleanUp {0} materials, and {1} Non-WF materials", matsWF.Count, matsNonWF.Count);
+            }
+            return done;
         }
 
         private static bool IsUnlitWFMaterial(Material mm)
@@ -608,12 +625,17 @@ namespace UnlitWF
                 del_names.Add(p.name);
                 p.Remove();
             }
+
+            // 削除する内容のログを出す
+#if WF_EDIT_LOG_VERBOSE
             if (0 < del_names.Count)
             {
                 var names = new List<string>(del_names);
                 names.Sort();
                 UnityEngine.Debug.LogFormat(material, "[WF][Tool] Deleted {0} Property: {1}", material, string.Join(", ", names.ToArray()));
             }
+#endif
+
             ShaderSerializedProperty.AllApplyPropertyChange(props);
 
             return del_names;
@@ -626,12 +648,17 @@ namespace UnlitWF
             {
                 return;
             }
+
+            // 削除する内容のログを出す
+#if WF_EDIT_LOG_VERBOSE
             var keywords = prop.stringValue;
             keywords = string.Join(" ", keywords.Split(' ').Where(kwd => !WFCommonUtility.IsEnableKeyword(kwd)).OrderBy(kwd => kwd));
             if (!string.IsNullOrWhiteSpace(keywords))
             {
                 UnityEngine.Debug.LogFormat(logTarget, "[WF][Tool] Deleted {0} Shaderkeyword: {1}", logTarget, keywords);
             }
+#endif
+
             prop.stringValue = "";
             so.ApplyModifiedProperties();
         }
