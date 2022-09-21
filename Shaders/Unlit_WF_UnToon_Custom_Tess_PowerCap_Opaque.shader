@@ -41,48 +41,48 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         // アウトライン
         [WFHeaderToggle(Outline)]
-            _TL_Enable              ("[LI] Enable", Float) = 0
-            _TL_LineColor           ("[LI] Line Color", Color) = (0.1, 0.1, 0.1, 1)
+            _TL_Enable              ("[TL] Enable", Float) = 0
+            _TL_LineColor           ("[TL] Line Color", Color) = (0.1, 0.1, 0.1, 1)
         [NoScaleOffset]
-            _TL_CustomColorTex      ("[LI] Custom Color Texture", 2D) = "white" {}
-            _TL_LineWidth           ("[LI] Line Width", Range(0, 1)) = 0.05
-            _TL_BlendCustom         ("[LI] Blend Custom Color Texture", Range(0, 1)) = 0
-            _TL_BlendBase           ("[LI] Blend Base Color", Range(0, 1)) = 0
+            _TL_CustomColorTex      ("[TL] Custom Color Texture", 2D) = "white" {}
+            _TL_LineWidth           ("[TL] Line Width", Range(0, 1)) = 0.05
+            _TL_BlendCustom         ("[TL] Blend Custom Color Texture", Range(0, 1)) = 0
+            _TL_BlendBase           ("[TL] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TL_MaskTex             ("[LI] Mask Texture (R)", 2D) = "white" {}
+            _TL_MaskTex             ("[TL] Mask Texture (R)", 2D) = "white" {}
         [Toggle(_)]
-            _TL_InvMaskVal          ("[LI] Invert Mask Value", Float) = 0
-            _TL_Z_Shift             ("[LI] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
+            _TL_InvMaskVal          ("[TL] Invert Mask Value", Float) = 0
+            _TL_Z_Shift             ("[TL] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
         // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
-            _BK_Enable              ("[BK] Enable", Float) = 0
+            _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
-            _BK_UVType              ("[BK] UV Type", Float) = 0
-            _BK_BackTex             ("[BK] Back Texture", 2D) = "white" {}
+            _BKT_UVType             ("[BKT] UV Type", Float) = 0
+            _BKT_BackTex            ("[BKT] Back Texture", 2D) = "white" {}
         [HDR]
-            _BK_BackColor           ("[BK] Back Color", Color) = (1, 1, 1, 1)
+            _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
         // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
-            _CH_Enable              ("[CH] Enable", Float) = 0
+            _CHM_Enable             ("[CHM] Enable", Float) = 0
         [NoScaleOffset]
-            _CH_3chMaskTex          ("[CH] 3ch Mask Texture", 2D) = "black" {}
+            _CHM_3chMaskTex         ("[CHM] 3ch Mask Texture", 2D) = "black" {}
         [HDR]
-            _CH_ColorR              ("[CH] R ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorR             ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CH_ColorG              ("[CH] G ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorG             ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
         [HDR]
-            _CH_ColorB              ("[CH] B ch Color", Color) = (1, 1, 1, 1)
+            _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
 
         // 色変換
         [WFHeaderToggle(Color Change)]
-            _CL_Enable              ("[CL] Enable", Float) = 0
+            _CLC_Enable             ("[CLC] Enable", Float) = 0
         [Toggle(_)]
-            _CL_Monochrome          ("[CL] monochrome", Range(0, 1)) = 0
-            _CL_DeltaH              ("[CL] Hur", Range(0, 1)) = 0
-            _CL_DeltaS              ("[CL] Saturation", Range(-1, 1)) = 0
-            _CL_DeltaV              ("[CL] Brightness", Range(-1, 1)) = 0
+            _CLC_Monochrome         ("[CLC] monochrome", Range(0, 1)) = 0
+            _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
+            _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
+            _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
 
         // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
@@ -261,59 +261,59 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         // 階調影
         [WFHeaderToggle(ToonShade)]
-            _TS_Enable              ("[SH] Enable", Float) = 0
+            _TS_Enable              ("[TS] Enable", Float) = 0
         [IntRange]
-            _TS_Steps               ("[SH] Steps", Range(1, 3)) = 2
-            _TS_BaseColor           ("[SH] Base Color", Color) = (1, 1, 1, 1)
+            _TS_Steps               ("[TS] Steps", Range(1, 3)) = 2
+            _TS_BaseColor           ("[TS] Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
-            _TS_BaseTex             ("[SH] Base Shade Texture", 2D) = "white" {}
-            _TS_1stColor            ("[SH] 1st Shade Color", Color) = (0.81, 0.81, 0.9, 1)
+            _TS_BaseTex             ("[TS] Base Shade Texture", 2D) = "white" {}
+            _TS_1stColor            ("[TS] 1st Shade Color", Color) = (0.81, 0.81, 0.9, 1)
         [NoScaleOffset]
-            _TS_1stTex              ("[SH] 1st Shade Texture", 2D) = "white" {}
-            _TS_2ndColor            ("[SH] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
+            _TS_1stTex              ("[TS] 1st Shade Texture", 2D) = "white" {}
+            _TS_2ndColor            ("[TS] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
         [NoScaleOffset]
-            _TS_2ndTex              ("[SH] 2nd Shade Texture", 2D) = "white" {}
-            _TS_3rdColor            ("[SH] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
+            _TS_2ndTex              ("[TS] 2nd Shade Texture", 2D) = "white" {}
+            _TS_3rdColor            ("[TS] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
         [NoScaleOffset]
-            _TS_3rdTex              ("[SH] 3rd Shade Texture", 2D) = "white" {}
-            _TS_Power               ("[SH] Shade Power", Range(0, 2)) = 1
-            _TS_MinDist             ("[SH] FadeOut Distance (Near)", Range(0, 15)) = 1.0
-            _TS_MaxDist             ("[SH] FadeOut Distance (Far)", Range(0, 15)) = 4.0
+            _TS_3rdTex              ("[TS] 3rd Shade Texture", 2D) = "white" {}
+            _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
+            _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
+            _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
         [Toggle(_)]
-            _TS_FixContrast         ("[SH] Dont Ajust Contrast", Range(0, 1)) = 0
-            _TS_BlendNormal         ("[SH] Blend Normal", Range(0, 1)) = 0.1
-            _TS_BlendNormal2        ("[SH] Blend Normal 2nd", Range(0, 1)) = 0.1
+            _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
+            _TS_BlendNormal         ("[TS] Blend Normal", Range(0, 1)) = 0.1
+            _TS_BlendNormal2        ("[TS] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
-            _TS_MaskTex             ("[SH] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
+            _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [Toggle(_)]
-            _TS_InvMaskVal          ("[SH] Invert Mask Value", Range(0, 1)) = 0
+            _TS_InvMaskVal          ("[TS] Invert Mask Value", Range(0, 1)) = 0
         [Header(ToonShade Advance)]
-            _TS_1stBorder           ("[SH] 1st Border", Range(0, 1)) = 0.4
-            _TS_2ndBorder           ("[SH] 2nd Border", Range(0, 1)) = 0.2
-            _TS_3rdBorder           ("[SH] 3rd Border", Range(0, 1)) = 0.1
-            _TS_1stFeather          ("[SH] 1st Feather", Range(0, 0.2)) = 0.05
-            _TS_2ndFeather          ("[SH] 2nd Feather", Range(0, 0.2)) = 0.05
-            _TS_3rdFeather          ("[SH] 3rd Feather", Range(0, 0.2)) = 0.05
+            _TS_1stBorder           ("[TS] 1st Border", Range(0, 1)) = 0.4
+            _TS_2ndBorder           ("[TS] 2nd Border", Range(0, 1)) = 0.2
+            _TS_3rdBorder           ("[TS] 3rd Border", Range(0, 1)) = 0.1
+            _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
+            _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
+            _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
 
         // リムライト
         [WFHeaderToggle(RimLight)]
-            _TR_Enable              ("[RM] Enable", Float) = 0
+            _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
-            _TR_Color               ("[RM] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
+            _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
         [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
-            _TR_BlendType           ("[RM] Blend Type", Float) = 0
-            _TR_Power               ("[RM] Power", Range(0, 2)) = 1
-            _TR_Feather             ("[RM] Feather", Range(0, 0.2)) = 0.05
-            _TR_BlendNormal         ("[RM] Blend Normal", Range(0, 1)) = 0
-            _TR_BlendNormal2        ("[RM] Blend Normal 2nd", Range(0, 1)) = 0
+            _TR_BlendType           ("[TR] Blend Type", Float) = 0
+            _TR_Power               ("[TR] Power", Range(0, 2)) = 1
+            _TR_Feather             ("[TR] Feather", Range(0, 0.2)) = 0.05
+            _TR_BlendNormal         ("[TR] Blend Normal", Range(0, 1)) = 0
+            _TR_BlendNormal2        ("[TR] Blend Normal 2nd", Range(0, 1)) = 0
         [NoScaleOffset]
-            _TR_MaskTex             ("[RM] Mask Texture (RGB)", 2D) = "white" {}
+            _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
         [Toggle(_)]
-            _TR_InvMaskVal          ("[RM] Invert Mask Value", Range(0, 1)) = 0
+            _TR_InvMaskVal          ("[TR] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
-            _TR_PowerTop            ("[RM] Power Top", Range(0, 0.5)) = 0.05
-            _TR_PowerSide           ("[RM] Power Side", Range(0, 0.5)) = 0.1
-            _TR_PowerBottom         ("[RM] Power Bottom", Range(0, 0.5)) = 0.1
+            _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
+            _TR_PowerSide           ("[TR] Power Side", Range(0, 0.5)) = 0.1
+            _TR_PowerBottom         ("[TR] Power Bottom", Range(0, 0.5)) = 0.1
 
         // Lit
         [WFHeader(Lit)]
@@ -338,14 +338,14 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
-            _GI_Enable              ("[GI] Enable", Float) = 0
-            _GI_IndirectMultiplier  ("[GI] Indirect Multiplier", Range(0, 2)) = 1
-            _GI_EmissionMultiplier  ("[GI] Emission Multiplier", Range(0, 2)) = 1
-            _GI_IndirectChroma      ("[GI] Indirect Chroma", Range(0, 2)) = 1
+            _LBE_Enable             ("[LBE] Enable", Float) = 0
+            _LBE_IndirectMultiplier ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
+            _LBE_EmissionMultiplier ("[LBE] Emission Multiplier", Range(0, 2)) = 1
+            _LBE_IndirectChroma     ("[LBE] Indirect Chroma", Range(0, 2)) = 1
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/08/13", Float) = 0
+            _CurrentVersion         ("2022/09/23", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/WF_UnToon_Opaque", Float) = 0
@@ -417,8 +417,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _BK_ENABLE
-            #pragma shader_feature_local_fragment _CH_ENABLE
+            #pragma shader_feature_local_fragment _BKT_ENABLE
+            #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 

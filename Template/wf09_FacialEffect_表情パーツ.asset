@@ -58,10 +58,6 @@ Material:
     - _AO_UseLightMap: 1
     - _CullMode: 2
     - _CurrentVersion: 0
-    - _GI_EmissionMultiplier: 1
-    - _GI_Enable: 0
-    - _GI_IndirectChroma: 1
-    - _GI_IndirectMultiplier: 1
     - _GL_BlendPower: 0.8
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
@@ -70,6 +66,10 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
+    - _LBE_EmissionMultiplier: 1
+    - _LBE_Enable: 0
+    - _LBE_IndirectChroma: 1
+    - _LBE_IndirectMultiplier: 1
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

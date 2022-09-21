@@ -32,7 +32,7 @@
     #endif
 
     #ifndef _V2F_HAS_VERTEXCOLOR
-        #if defined(_VC_ENABLE) || defined(_OL_ENABLE)
+        #if defined(_VC_ENABLE) || defined(_OVL_ENABLE)
             #define _V2F_HAS_VERTEXCOLOR
         #endif
     #endif

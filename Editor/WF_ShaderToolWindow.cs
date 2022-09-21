@@ -17,6 +17,7 @@
 
 #if UNITY_EDITOR
 
+// VRCSDK有無の判定ここから //////
 #if VRC_SDK_VRCSDK3
 #define ENV_VRCSDK3
 #if UDON
@@ -25,6 +26,7 @@
 #define ENV_VRCSDK3_AVATAR
 #endif
 #endif
+// VRCSDK有無の判定ここまで //////
 
 using System;
 using System.Collections.Generic;
@@ -64,7 +66,7 @@ namespace UnlitWF
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "DebugView シェーダに切り替える";
         public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "モバイル向けシェーダに変換する";
 
-        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "マテリアルのクリンナップ";
+        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "UnlitWFマテリアルのクリンナップ";
 #else
         public const string ASSETS_AUTOCNV = PATH_ASSETS + "Convert UnlitWF Material";
 
@@ -88,7 +90,7 @@ namespace UnlitWF
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView Shader";
         public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "Change Mobile shader";
 
-        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "CleanUp Material Property";
+        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "CleanUp UnlitWF Material Property";
 #endif
 
         public const string TOOLS_LNG_EN = PATH_TOOLS + "Menu Language Change To English";
@@ -249,6 +251,11 @@ namespace UnlitWF
         public static Material[] FilterOnlyWFMaterial(Material[] array)
         {
             return array.Where(mat => IsUnlitWFMaterial(mat)).ToArray();
+        }
+
+        public static Material[] FilterOnlyNotWFMaterial(Material[] array)
+        {
+            return array.Where(mat => IsNotUnlitWFMaterial(mat)).ToArray();
         }
 
         public static bool NoticeIfIllegalMaterials(Material[] array, bool showRemoveButton = true)
@@ -416,6 +423,7 @@ namespace UnlitWF
         {
             minSize = new Vector2(480, 640);
             param = CleanUpParameter.Create();
+            param.execNonWFMaterials = true; // ツール経由のときはNonWFマテリアルのクリンナップも行う
             ToolCommon.GetSelectedMaterials(ref param.materials);
             ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materials));
         }
@@ -436,17 +444,18 @@ namespace UnlitWF
             bool removeOther = ToolCommon.NoticeIfIllegalMaterials(param.materials);
             EditorGUILayout.Space();
 
-            // オプション
-            EditorGUILayout.LabelField("options", EditorStyles.boldLabel);
-            param.resetUnused = GUILayout.Toggle(param.resetUnused, "UnUsed Properties (未使用の値) も一緒にクリアする");
-            param.resetKeywords = GUILayout.Toggle(param.resetKeywords, "ShaderKeywords (Shaderキーワード) も一緒にクリアする");
-
-            EditorGUILayout.Space();
-
             // UnlitWF 以外のマテリアルを除去
             if (removeOther)
             {
                 param.materials = ToolCommon.FilterOnlyWFMaterial(param.materials);
+            }
+
+            // マテリアルにUnlitWF以外のシェーダが紛れている場合は追加の情報を表示
+            if (param.materials.Any(ToolCommon.IsNotUnlitWFMaterial))
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.HelpBox("UnlitWF以外のマテリアルは、未使用の値のみ除去します。", MessageType.Info);
+                EditorGUILayout.Space();
             }
 
             if (ToolCommon.ExecuteButton("CleanUp", param.materials.Length == 0))
@@ -697,8 +706,6 @@ namespace UnlitWF
             {
                 // 変換
                 WFMaterialEditUtility.MigrationMaterial(param);
-                // ShaderGUI側のマテリアルキャッシュをリセット
-                ShaderCustomEditor.ResetOldMaterialTable();
                 // 変更したマテリアルを保存
                 AssetDatabase.SaveAssets();
             }

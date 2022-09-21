@@ -4,11 +4,13 @@ ShaderImporter:
   externalObjects: {}
   defaultTextures:
   - _MainTex: {instanceID: 0}
-  - _FR_NoiseTex: {fileID: 2800000, guid: 0c90f262b70f7634ea0fb53f2912f537, type: 3}
-  - _FR_BumpMap: {instanceID: 0}
-  - _FR_MaskTex: {instanceID: 0}
+  - _FUR_NoiseTex: {fileID: 2800000, guid: 0c90f262b70f7634ea0fb53f2912f537, type: 3}
+  - _FUR_BumpMap: {instanceID: 0}
+  - _FUR_MaskTex: {instanceID: 0}
   - _HL_MatcapTex: {instanceID: 0}
   - _HL_MaskTex: {instanceID: 0}
+  - _HL_MatcapTex_1: {instanceID: 0}
+  - _HL_MaskTex_1: {instanceID: 0}
   - _TS_BaseTex: {instanceID: 0}
   - _TS_1stTex: {instanceID: 0}
   - _TS_2ndTex: {instanceID: 0}

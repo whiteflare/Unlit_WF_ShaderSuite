@@ -191,6 +191,10 @@
         color.a = saturate(color.a);
         // リフラクション
         affectRefraction(i, facing, ws_normal, ws_bump_normal, color);
+        // すりガラス
+        affectFrostedGlass(i, color);
+        // GhostTransparent
+        affectGhostTransparent(i, color);
 
         // fog
         UNITY_APPLY_FOG(i.fogCoord, color);
