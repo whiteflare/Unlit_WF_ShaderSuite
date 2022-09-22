@@ -237,7 +237,7 @@ namespace UnlitWF
             { "_TS_FixContrast", new WFCustomKeywordSettingEnum("_TS_FixContrast", "_", "_TS_FIXC_ENABLE") {
                 enablePropName = "_TS_Enable",
             } },
-            { "_GS_BlurMode", new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
+            { "_CGL_BlurMode", new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
                 enablePropName = "_CGL_Enable",
             } },
         };
