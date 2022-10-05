@@ -1239,7 +1239,7 @@ FEATURE_TGL_ON_BEGIN(_AO_Enable)
             occlusion *= TGL_OFF(_AO_UseGreenMap) ? aomap_var.rgb : aomap_var.ggg;
             occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
-            #ifdef _LMAP_ENABLE
+            #if defined(_LMAP_ENABLE) && !defined(_WF_EDITOR_HIDE_LMAP)
             if (TGL_ON(_AO_UseLightMap)) {
                 occlusion *= pickLightmap(i.uv_lmap);
             }

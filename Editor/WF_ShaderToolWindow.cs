@@ -61,6 +61,7 @@ namespace UnlitWF
         public const string TOOLS_MIGRATION = PATH_TOOLS + "マテリアルを最新に変換する";
         public const string TOOLS_MIGALL = PATH_TOOLS + "全てのマテリアルを最新に変換する";
         public const string TOOLS_DLSET = PATH_TOOLS + "シーンDL方向をマテリアルに焼き込む";
+        public const string TOOLS_HIDELMAP = PATH_TOOLS + "ライトマップを一時的に非表示 %&L";
 
         public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "UnlitWF のマテリアルに変換する";
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "DebugView シェーダに切り替える";
@@ -85,6 +86,7 @@ namespace UnlitWF
         public const string TOOLS_MIGRATION = PATH_TOOLS + "Migration Material";
         public const string TOOLS_MIGALL = PATH_TOOLS + "Migration All Materials";
         public const string TOOLS_DLSET = PATH_TOOLS + "Bake DL into Material";
+        public const string TOOLS_HIDELMAP = PATH_TOOLS + "Hide LightMap temporarily %&L";
 
         public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "Convert UnlitWF Material";
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView Shader";
@@ -110,6 +112,7 @@ namespace UnlitWF
         public const int PRI_TOOLS_RESET = 103;
         public const int PRI_TOOLS_MIGRATION = 104;
         public const int PRI_TOOLS_DLSET = 105;
+        public const int PRI_TOOLS_HIDELMAP = 201;
         public const int PRI_TOOLS_MIGALL = 301;
         public const int PRI_TOOLS_CNGLANG = 501;
 
@@ -218,6 +221,25 @@ namespace UnlitWF
             PlayerSettings.SetScriptingDefineSymbolsForGroup(currentTarget, string.Join(";", symbols));
         }
 #endif
+
+        #endregion
+
+        #region Hide Lightmap
+
+        [MenuItem(TOOLS_HIDELMAP, priority = PRI_TOOLS_HIDELMAP)]
+        private static void Menu_HideLightmap()
+        {
+            var hideLmap = WFCommonUtility.IsKwdEnableHideLmap();
+            WFCommonUtility.SetKwdEnableHideLmap(!hideLmap);
+        }
+
+        [MenuItem(TOOLS_HIDELMAP, true)]
+        private static bool MenuValidation_HideLightmap()
+        {
+            var hideLmap = WFCommonUtility.IsKwdEnableHideLmap();
+            Menu.SetChecked(TOOLS_HIDELMAP, hideLmap);
+            return true;
+        }
 
         #endregion
 

@@ -188,6 +188,21 @@ namespace UnlitWF
                 }
             }
 
+            // _WF_EDITOR_HIDE_LMAP を除外する
+            {
+                var kwd_WF_EDITOR_HIDE_LMAP = new ShaderKeyword(shader, WFCommonUtility.KWD_EDITOR_HIDE_LMAP);
+                for (int i = data.Count - 1; 0 <= i; i--)
+                {
+                    var d = data[i];
+                    if (d.shaderKeywordSet.IsEnabled(kwd_WF_EDITOR_HIDE_LMAP))
+                    {
+                        data.RemoveAt(i);
+                        count++;
+                        continue;
+                    }
+                }
+            }
+
             // 使用していない Enable キーワードの組み合わせを除外する
             var existingKwds = GetExistingShaderKeywords(shader, data);
             if (existingKwds.Length != 0)

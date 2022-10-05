@@ -504,6 +504,25 @@ namespace UnlitWF
             return false;
 #endif
         }
+
+        public const string KWD_EDITOR_HIDE_LMAP = "_WF_EDITOR_HIDE_LMAP";
+
+        public static bool IsKwdEnableHideLmap()
+        {
+            return Shader.IsKeywordEnabled(KWD_EDITOR_HIDE_LMAP);
+        }
+
+        public static void SetKwdEnableHideLmap(bool value)
+        {
+            if (value)
+            {
+                Shader.EnableKeyword(KWD_EDITOR_HIDE_LMAP);
+            }
+            else
+            {
+                Shader.DisableKeyword(KWD_EDITOR_HIDE_LMAP);
+            }
+        }
     }
 
     public abstract class WFCustomKeywordSetting

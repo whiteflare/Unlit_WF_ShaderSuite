@@ -436,6 +436,8 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
+            #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
+
             // -------------------------------------
             // Lightweight Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS

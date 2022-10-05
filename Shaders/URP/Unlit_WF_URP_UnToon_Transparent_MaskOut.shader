@@ -405,6 +405,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
+            #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
+
             // -------------------------------------
             // Lightweight Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS

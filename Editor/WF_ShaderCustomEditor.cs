@@ -579,7 +579,7 @@ namespace UnlitWF
             EditorGUILayout.Space();
             DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Utility");
 
-
+            // テンプレート
             var rect = EditorGUILayout.GetControlRect();
             if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate)))
             {
@@ -617,7 +617,7 @@ namespace UnlitWF
                 menu.DropDown(rect);
             }
 
-            // cleanup
+            // クリンナップ
             if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageButton.Cleanup), new string[] { "Open Cleanup Utility" }, idx =>
             {
                 switch (idx)
@@ -634,6 +634,15 @@ namespace UnlitWF
                 param.materials = WFCommonUtility.AsMaterials(materialEditor.targets);
                 WFMaterialEditUtility.CleanUpProperties(param);
             }
+
+            // ライトマップ非表示
+            //var hideLmap = WFCommonUtility.IsKwdEnableHideLmap();
+            //EditorGUI.BeginChangeCheck();
+            //hideLmap = EditorGUILayout.Toggle("ライトマップを非表示", hideLmap);
+            //if (EditorGUI.EndChangeCheck())
+            //{
+            //    WFCommonUtility.SetKwdEnableHideLmap(hideLmap);
+            //}
 
             EditorGUILayout.Space();
 
