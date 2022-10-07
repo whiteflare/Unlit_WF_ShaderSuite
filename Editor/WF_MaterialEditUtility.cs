@@ -100,6 +100,11 @@ namespace UnlitWF
             this.onAfterCopy = onAfterCopy ?? (p => { });
         }
 
+        public virtual bool Test(string version)
+        {
+            return true;
+        }
+
         public abstract bool IsMatch(string beforeName);
 
         protected abstract string Replace(string beforeName);
@@ -132,6 +137,35 @@ namespace UnlitWF
         {
             return new RegexRename(new Regex(pattern, RegexOptions.Compiled), replacement, onAfterCopy);
         }
+
+        public static PropertyNameReplacement Group(string version)
+        {
+            return new GroupCondition(version);
+        }
+
+        private class GroupCondition : PropertyNameReplacement
+        {
+            private readonly string version;
+
+            public GroupCondition(string version) : base(null)
+            {
+                this.version = version;
+            }
+
+            public override bool Test(string version)
+            {
+                if (string.IsNullOrWhiteSpace(version))
+                {
+                    return true;
+                }
+                // このグループのバージョンが、指定されたバージョン以下である場合
+                return this.version.CompareTo(version) <= 0;
+            }
+
+            public override bool IsMatch(string beforeName) => false;
+            protected override string Replace(string beforeName) => beforeName;
+        }
+
 
         private class MatchRename : PropertyNameReplacement
         {
@@ -183,9 +217,33 @@ namespace UnlitWF
     {
         #region マイグレーション
 
-        public static bool ExistsOldNameProperty(params Material[] mats)
+        public static bool ExistsNeedsMigration(Material mat)
         {
-            return Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mats);
+            return Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat);
+        }
+
+        public static bool ExistsNeedsMigration(Material mat, IEnumerable<PropertyNameReplacement> replacement)
+        {
+            if (mat != null)
+            {
+                var version = WFCommonUtility.GetShaderCurrentVersion(mat);
+                var props = ShaderSerializedProperty.AsDict(mat);
+                foreach (var beforeName in props.Keys)
+                {
+                    foreach (var rep in replacement)
+                    {
+                        if (!rep.Test(version))
+                        {
+                            break;
+                        }
+                        if (rep.IsMatch(beforeName))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public static void MigrationMaterial(MigrationParameter param)
@@ -214,10 +272,15 @@ namespace UnlitWF
 
         private static bool RenamePropNamesWithoutUndoInternal(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
+            var version = WFCommonUtility.GetShaderCurrentVersion(mat);
             var props = ShaderSerializedProperty.AsList(mat);
             // 名称を全て変更
             foreach (var rep in replacement)
             {
+                if (!rep.Test(version))
+                {
+                    break;
+                }
                 var modified = false;
                 foreach (var before in props)
                 {

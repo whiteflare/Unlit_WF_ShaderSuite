@@ -709,15 +709,14 @@ namespace UnlitWF.Converter
 
         protected override bool Validate(Material mat)
         {
-            // UnlitWFのマテリアルを対象に変換する
-            return WFCommonUtility.IsSupportedShader(mat) && ExistsNeedsMigration(mat);
+            return ExistsNeedsMigration(mat);
         }
 
         /// <summary>
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
         public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
-            // 2020/01/28
+            PropertyNameReplacement.Group("2020/01/28"),
             PropertyNameReplacement.Match("_AL_CutOff", "_Cutoff"),
             PropertyNameReplacement.Match("_ES_Color", "_EmissionColor"),
             PropertyNameReplacement.Match("_ES_MaskTex", "_EmissionMap"),
@@ -726,20 +725,24 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Match("_MT_MaskTex", "_MetallicGlossMap"),
             PropertyNameReplacement.Match("_MT_Smoothness", "_MT_ReflSmooth"),
             PropertyNameReplacement.Match("_MT_Smoothness2", "_MT_SpecSmooth"),
-            // 2020/09/04
+
+            PropertyNameReplacement.Group("2020/09/04"),
             PropertyNameReplacement.Match("_CutOffLevel", "_Cutoff"),
             PropertyNameReplacement.Match("_FurHeight", "_FR_Height"),
             PropertyNameReplacement.Match("_FurMaskTex", "_FR_MaskTex"),
             PropertyNameReplacement.Match("_FurNoiseTex", "_FR_NoiseTex"),
             PropertyNameReplacement.Match("_FurRepeat", "_FR_Repeat"),
             PropertyNameReplacement.Match("_FurShadowPower", "_FR_ShadowPower"),
-            // 2020/12/18
+
+            PropertyNameReplacement.Group("2020/12/18"),
             PropertyNameReplacement.Match("_FG_BumpMap", "_FR_BumpMap"),
             PropertyNameReplacement.Match("_FG_FlipTangent", "_FR_FlipMirror"),
-            // 2021/01/11
+
+            PropertyNameReplacement.Group("2021/01/11"),
             PropertyNameReplacement.Match("_Smoothing", "_TE_SmoothPower"),
             PropertyNameReplacement.Match("_TessFactor", "_TE_Factor"),
-            // 2022/06/04
+
+            PropertyNameReplacement.Group("2022/06/04"),
             PropertyNameReplacement.Match("_FR_FlipMirror", "_FlipMirror"),
             PropertyNameReplacement.Match("_FR_FlipTangent", "_FlipMirror"),
             PropertyNameReplacement.Match("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
@@ -747,10 +750,12 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Match("_NM_2ndUVType", "_NS_2ndUVType"),
             PropertyNameReplacement.Match("_NM_FlipMirror", "_FlipMirror"),
             PropertyNameReplacement.Match("_NM_InvMaskVal", "_NS_InvMaskVal"),
-            // 2022/06/08
+
+            PropertyNameReplacement.Group("2022/06/08"),
             PropertyNameReplacement.Match("_NS_2ndUVType", "_NS_UVType"),
             PropertyNameReplacement.Match("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
-            // 2022/09/12
+
+            PropertyNameReplacement.Group("2022/09/12"),
             PropertyNameReplacement.Prefix("_BK_", "_BKT_"),
             PropertyNameReplacement.Prefix("_CC_", "_CCT_"),
             PropertyNameReplacement.Prefix("_CH_", "_CHM_"),
@@ -767,28 +772,10 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Prefix("_RF_", "_CRF_"),
         };
 
-        public static bool ExistsNeedsMigration(Material[] mats)
-        {
-            return mats.Any(ExistsNeedsMigration);
-        }
-
         public static bool ExistsNeedsMigration(Material mat)
         {
-            if (mat != null)
-            {
-                var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var beforeName in props.Keys)
-                {
-                    foreach (var rep in OldPropNameToNewPropNameList)
-                    {
-                        if (rep.IsMatch(beforeName))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            // UnlitWFのマテリアルを対象に変換する
+            return WFCommonUtility.IsSupportedShader(mat) && WFMaterialEditUtility.ExistsNeedsMigration(mat, OldPropNameToNewPropNameList);
         }
 
         protected static int GetIntOrDefault(Material mat, string name, int _default = default)

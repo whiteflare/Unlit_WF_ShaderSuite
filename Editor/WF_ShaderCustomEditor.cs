@@ -1742,7 +1742,7 @@ namespace UnlitWF
                     result |= true;
                     return true;
                 }
-                bool old = WFMaterialEditUtility.ExistsOldNameProperty(mat);
+                bool old = WFMaterialEditUtility.ExistsNeedsMigration(mat);
                 if (old)
                 {
                     oldMaterialVersionCache.Add(mat);
