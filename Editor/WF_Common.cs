@@ -230,7 +230,7 @@ namespace UnlitWF
             {
                 return; // なにもしない
             }
-            var newShader = Shader.Find(name);
+            var newShader = FindShader(name);
             if (newShader != null)
             {
                 Undo.RecordObjects(mats, "change shader");
@@ -267,6 +267,140 @@ namespace UnlitWF
             else
             {
                 Debug.LogErrorFormat("[WF][Common] Shader Not Found in this projects: {0}", name);
+            }
+        }
+
+        /// <summary>
+        /// 指定名称の Shader を検索して返す。
+        /// もし名称が UnlitWF/ で始まる場合、アセットパスを元に並び替えて先頭の Shader を返却する。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Shader FindShader(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return null;
+            }
+            if (!name.StartsWith("UnlitWF/"))
+            {
+                // もしシェーダ名が UnlitWF/ で始まらないならばサポート外シェーダへの切り替えなので通常の Shader.Find を使う
+                // IsSupportedShader はここでは使わない (Custom/UnlitWF/ のように ShaderCustomEditor を使う独自シェーダはこちらに倒す)
+                return Shader.Find(name);
+            }
+
+            // 全シェーダをロードしてしまうとAssetDatabase.FindAssetsでも高速に切り替えられるのでGetAllShaderInfoは使用しない
+            //var cnt = ShaderUtil.GetAllShaderInfo().Count(si => si.name == name);
+            //if (cnt <= 1)
+            //{
+            //    // もし同一名称の Shader が複数存在しないのであれば、通常の Shader.Find を使う
+            //    return Shader.Find(name);
+            //}
+
+            // 同一名称の Shader からひとつを選択する
+            var shaders = AssetDatabase.FindAssets("t:Shader")
+                // パスを取得
+                .Select(guid => AssetDatabase.GUIDToAssetPath(guid)).Where(path => !string.IsNullOrWhiteSpace(path))
+                // シェーダをロード
+                .Select(path => new ShaderAndAssetPath(path, AssetDatabase.LoadAssetAtPath<Shader>(path))).Where(sp => sp.shader != null)
+                // 名称の一致するシェーダのみリストアップする
+                .Where(sp => sp.shader.name == name)
+                // 優先度順に並び替える
+                .OrderBy(sp => sp).ToArray();
+            if (shaders.Length == 0)
+            {
+                return null;
+            }
+            if (2 <= shaders.Length)
+            {
+                string msg = "[WF][Common] Multiple Shaders hit: name = " + name;
+                foreach(var sh in shaders)
+                {
+                    msg += "\n  " + sh.path;
+                }
+                Debug.LogWarning(msg);
+            }
+
+            return shaders[0].shader;
+        }
+
+        private class ShaderAndAssetPath : IComparable<ShaderAndAssetPath>
+        {
+            public readonly string path;
+            public readonly Shader shader;
+
+            private readonly bool isMatch;
+            private readonly int root; // 0:Packages, 1:Assets
+            private readonly string parent;
+            private readonly string folder;
+            private readonly string tail;
+
+            public ShaderAndAssetPath(string path, Shader shader)
+            {
+                this.path = path;
+                this.shader = shader;
+
+                this.root = path.StartsWith("Packages/") ? 0 : 1;
+
+                var mm = pattern.Match(path);
+                this.isMatch = mm.Success;
+                if (isMatch)
+                {
+                    this.parent = mm.Groups["parent"].Value;
+                    this.folder = mm.Groups["folder"].Value;
+                    this.tail = mm.Groups["tail"].Value;
+                }
+                else
+                {
+                    this.parent = "";
+                    this.folder = "";
+                    this.tail = path;
+                }
+            }
+
+            private static readonly Regex pattern = new Regex(@"^(?<root>(?:Packages|Assets)(?<parent>/[^/]+)*)/(?<folder>Unlit_?WF_?Shader[A-Za-z]*)/(?<tail>.*)$", RegexOptions.Compiled);
+
+            public int CompareTo(ShaderAndAssetPath other)
+            {
+                int ret;
+
+                // マッチするものはマッチしないものよりも優先
+                ret = -this.isMatch.CompareTo(other.isMatch);
+                if (ret != 0)
+                {
+                    return ret;
+                }
+
+                // Packages は Assets よりも優先
+                ret = -this.root.CompareTo(other.root);
+                if (ret != 0)
+                {
+                    return ret;
+                }
+
+                // parent が浅いものほど優先
+                ret = this.parent.Count(c => c == '/').CompareTo(other.parent.Count(c => c == '/'));
+                if (ret != 0)
+                {
+                    return ret;
+                }
+
+                // parent + folder の辞書順で比較
+                ret = (this.parent + "/" + this.folder).CompareTo(other.parent + "/" + other.folder);
+                if (ret != 0)
+                {
+                    return ret;
+                }
+
+                // tail の長さ順で比較
+                ret = this.tail.Length.CompareTo(other.tail.Length);
+                if (ret != 0)
+                {
+                    return ret;
+                }
+
+                // tail の辞書順で比較
+                return this.tail.CompareTo(other.tail);
             }
         }
 

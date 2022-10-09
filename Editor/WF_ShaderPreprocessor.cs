@@ -487,7 +487,7 @@ namespace UnlitWF
                     if (settings == null || !settings.stripFallback)
                     {
                         var name = WFCommonUtility.GetShaderFallBackTarget(shader);
-                        var fallback = name == null ? null : Shader.Find(name);
+                        var fallback = WFCommonUtility.FindShader(name);
                         if (IsStripTargetShader(fallback))
                         {
                             AppendUsedShaderVariant(mat, fallback);
