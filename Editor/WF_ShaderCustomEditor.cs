@@ -62,6 +62,12 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
+            // 条件付きHide(Grass系列)
+            new ConditionVisiblePropertyHook("_GRS_WorldYBase|_GRS_WorldYScale", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 0)),
+            new ConditionVisiblePropertyHook("_GRS_HeightUVType", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1 || p == 2)),
+            new ConditionVisiblePropertyHook("_GRS_HeightMaskTex|_GRS_InvMaskVal", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 2)),
+            new ConditionVisiblePropertyHook("_GRS_UVFactor", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1)),
+            new ConditionVisiblePropertyHook("_GRS_ColorFactor", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 2 || p == 3)),
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),

@@ -101,6 +101,12 @@ namespace UnlitWF
             new WFShaderName("BRP", "Gem", "Basic", "Transparent",                     "UnlitWF/WF_Gem_Transparent", represent: true),
 
             // ================
+            // Grass 系列
+            // ================
+
+            new WFShaderName("BRP", "Grass", "Basic", "TransCutout",                   "UnlitWF/WF_Grass_TransCutout", represent: true),
+
+            // ================
             // UnToon 系列(URP)
             // ================
 
