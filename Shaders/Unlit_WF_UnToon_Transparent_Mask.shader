@@ -335,7 +335,10 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _ES_AuLinkEnable        ("[ES] Enable AudioLink", Float) = 0
             _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
             _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
-            _ES_AU_BandMixer        ("[ES] Band Mixer", Vector) = (1, 0, 1, 0)
+            _ES_AU_ChBass           ("[ES] Bass Channel", Range(0, 1)) = 1
+            _ES_AU_ChLowMids        ("[ES] Low-Mid Channel", Range(0, 1)) = 0
+            _ES_AU_ChHighMids       ("[ES] High-Mid Channel", Range(0, 1)) = 1
+            _ES_AU_ChTreble         ("[ES] Treble Channel", Range(0, 1)) = 0
 
         // Lit
         [WFHeader(Lit)]

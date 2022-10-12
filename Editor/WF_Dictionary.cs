@@ -438,7 +438,10 @@ namespace UnlitWF
             new WFI18NTranslation("ES", "Emission Multiplier", "エミッション倍率"),
             new WFI18NTranslation("ES", "Emission Multiplier (Min)", "エミッション倍率 (Min)"),
             new WFI18NTranslation("ES", "Emission Multiplier (Max)", "エミッション倍率 (Max)"),
-            new WFI18NTranslation("ES", "Band Mixer", "バンドミキサー"),
+            new WFI18NTranslation("ES", "Bass Channel", "BASSチャンネル"),
+            new WFI18NTranslation("ES", "Low-Mid Channel", "中低域チャンネル"),
+            new WFI18NTranslation("ES", "High-Mid Channel", "中高域チャンネル"),
+            new WFI18NTranslation("ES", "Treble Channel", "高音チャンネル"),
             // Outline
             new WFI18NTranslation("TL", "Line Color", "線の色"),
             new WFI18NTranslation("TL", "Line Width", "線の太さ"),

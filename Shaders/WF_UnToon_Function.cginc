@@ -472,21 +472,21 @@ FEATURE_TGL_END
         float   _ES_AuLinkEnable;
         float   _ES_AU_MinValue;
         float   _ES_AU_MaxValue;
-        float4  _ES_AU_BandMixer;
+        float   _ES_AU_ChBass;
+        float   _ES_AU_ChLowMids;
+        float   _ES_AU_ChHighMids;
+        float   _ES_AU_ChTreble;
 
         float calcEmissiveAudioLink(v2f i, float2 uv_main) {
             float delay = 0;
-            float4 value;
-            value.x = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 0 ) ).r;
-            value.y = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 1 ) ).r;
-            value.z = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 2 ) ).r;
-            value.w = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 3 ) ).r;
-            value *= _ES_AU_BandMixer;
-
-            float au = max(value.x, max(value.y, max(value.z, value.w)));
+            float au =
+                AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 0 ) ).r * _ES_AU_ChBass
+                + AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 1 ) ).r * _ES_AU_ChLowMids
+                + AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 2 ) ).r * _ES_AU_ChHighMids
+                + AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 3 ) ).r * _ES_AU_ChTreble;
             au = saturate(au);
 
-            return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, smoothstep(0, 1, au));
+            return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, au);
         }
 
         float enableEmissiveAudioLink(v2f i) {
