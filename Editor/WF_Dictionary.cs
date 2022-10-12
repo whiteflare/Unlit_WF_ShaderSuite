@@ -325,8 +325,9 @@ namespace UnlitWF
             new WFI18NTranslation("Roughen", "粗くする"),
             new WFI18NTranslation("Finer", "細かくする"),
             new WFI18NTranslation("Tint Color", "色調整"),
-            new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離"),
-            new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離"),
+            new WFI18NTranslation("FadeOut Distance", "フェードアウト距離"),
+            new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離 (Near)"),
+            new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離 (Far)"),
             // Lit
             new WFI18NTranslation("Unlit Intensity", "Unlit Intensity (最小明度)"),
             new WFI18NTranslation("Saturate Intensity", "Saturate Intensity (飽和明度)"),
@@ -432,6 +433,10 @@ namespace UnlitWF
             new WFI18NTranslation("ES", "LevelOffset", "ゼロ点調整"),
             new WFI18NTranslation("ES", "Sharpness", "鋭さ"),
             new WFI18NTranslation("ES", "ScrollSpeed", "スピード"),
+            new WFI18NTranslation("ES", "Emission Multiplier", "エミッション倍率"),
+            new WFI18NTranslation("ES", "Emission Multiplier (Min)", "エミッション倍率 (Min)"),
+            new WFI18NTranslation("ES", "Emission Multiplier (Max)", "エミッション倍率 (Max)"),
+            new WFI18NTranslation("ES", "Band Mixer", "バンドミキサー"),
             // Outline
             new WFI18NTranslation("TL", "Line Color", "線の色"),
             new WFI18NTranslation("TL", "Line Width", "線の太さ"),
@@ -447,8 +452,9 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
             // Distance Fade
             new WFI18NTranslation("DFD", "Color", "色"),
-            new WFI18NTranslation("DFD", "Fade Distance (Near)", "フェード距離"),
-            new WFI18NTranslation("DFD", "Fade Distance (Far)", "フェード距離"),
+            new WFI18NTranslation("DFD", "Fade Distance", "フェード距離"),
+            new WFI18NTranslation("DFD", "Fade Distance (Near)", "フェード距離 (Near)"),
+            new WFI18NTranslation("DFD", "Fade Distance (Far)", "フェード距離 (Far)"),
             new WFI18NTranslation("DFD", "Power", "強度"),
             new WFI18NTranslation("DFD", "BackFace Shadow", "裏面は影にする"),
             // Toon Fog

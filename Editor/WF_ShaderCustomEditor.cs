@@ -60,6 +60,7 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
+            new ConditionVisiblePropertyHook("_ES_AU_.*", ctx => IsAnyIntValue(ctx, "_ES_AuLinkEnable", p => p != 0)),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
             // 条件付きHide(Grass系列)
@@ -81,11 +82,12 @@ namespace UnlitWF
             new SingleLineTexPropertyHook( "_OVL_Color", "_OVL_OverlayTex" ),
 
             // MinMaxSlider
-            new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
-            new MinMaxSliderPropertyHook("_TFG_MinDist", "_TFG_MaxDist"),
-            new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist"),
-            new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist"),
-            new MinMaxSliderPropertyHook("_DFD_MinDist", "_DFD_MaxDist"),
+            new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist", "[TE] FadeOut Distance"),
+            new MinMaxSliderPropertyHook("_TFG_MinDist", "_TFG_MaxDist", "[TFG] FadeOut Distance"),
+            new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist", "[LME] FadeOut Distance"),
+            new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist", "[TS] FadeOut Distance"),
+            new MinMaxSliderPropertyHook("_DFD_MinDist", "_DFD_MaxDist", "[DFD] Fade Distance"),
+            new MinMaxSliderPropertyHook("_ES_AU_MinValue", "_ES_AU_MaxValue", "[ES] Emission Multiplier"),
 
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
             new CustomPropertyHook("_OVL_CustomParam1", ctx => {
@@ -1331,11 +1333,13 @@ namespace UnlitWF
         {
             private readonly string minName;
             private readonly string maxName;
+            private readonly string displayName;
 
-            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName + "|" + maxName)
+            public MinMaxSliderPropertyHook(string minName, string maxName, string displayName = null) : base(minName + "|" + maxName)
             {
                 this.minName = minName;
                 this.maxName = maxName;
+                this.displayName = displayName;
             }
 
             protected override void OnBeforeProp(PropertyGUIContext context)
@@ -1350,7 +1354,8 @@ namespace UnlitWF
                     MaterialProperty another = FindProperty(maxName, context.all, false);
                     if (another != null)
                     {
-                        DrawMinMaxProperty(context.editor, context.guiContent, context.current, another);
+                        var display = string.IsNullOrWhiteSpace(displayName) ? context.guiContent : WFI18N.GetGUIContent(displayName);
+                        DrawMinMaxProperty(context.editor, display, context.current, another);
                     }
                 }
                 context.custom = true;

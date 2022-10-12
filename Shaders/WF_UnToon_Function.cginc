@@ -470,9 +470,9 @@ FEATURE_TGL_END
         #include "WF_UnToon_AudioLink.cginc"
 
         float   _ES_AuLinkEnable;
-        float   _ES_AuMinValue;
-        float   _ES_AuMaxValue;
-        float4  _ES_AuBandMixer;
+        float   _ES_AU_MinValue;
+        float   _ES_AU_MaxValue;
+        float4  _ES_AU_BandMixer;
 
         float calcEmissiveAudioLink(v2f i, float2 uv_main) {
             float delay = 0;
@@ -481,12 +481,12 @@ FEATURE_TGL_END
             value.y = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 1 ) ).r;
             value.z = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 2 ) ).r;
             value.w = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 3 ) ).r;
-            value *= _ES_AuBandMixer;
+            value *= _ES_AU_BandMixer;
 
             float au = max(value.x, max(value.y, max(value.z, value.w)));
             au = saturate(au);
 
-            return lerp(_ES_AuMinValue, _ES_AuMaxValue, au);
+            return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, smoothstep(0, 1, au));
         }
 
         float enableEmissiveAudioLink(v2f i) {
