@@ -348,6 +348,13 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
+        [Header(Emissive AudioLink)]
+        [Toggle(_)]
+            _ES_AuLinkEnable        ("[ES] Enable AudioLink", Float) = 0
+            _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
+            _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
+            _ES_AU_BandMixer        ("[ES] Band Mixer", Vector) = (1, 0, 1, 0)
+
         // Fog
         [WFHeaderToggle(Fog)]
             _TFG_Enable              ("[TFG] Enable", Float) = 0
@@ -431,6 +438,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CHM_ENABLE
@@ -486,6 +494,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CHM_ENABLE
