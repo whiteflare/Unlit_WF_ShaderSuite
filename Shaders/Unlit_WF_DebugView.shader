@@ -36,7 +36,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         [Header(Lightmap)]
         [IntRange]
         _ModeLightMap               ("show LightMap", Range(0, 2))  = 0
-  
+
         [Header(Other Settings)]
         [ToggleUI]
         _GridEnable                 ("Grid Enable", Range(0, 1))    = 1

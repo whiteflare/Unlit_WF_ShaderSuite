@@ -83,7 +83,7 @@
         // ベース高の算出
 #if defined(_GRS_MASKTEX_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         if (_GRS_HeightType == 2) {    // MASK_TEX
-            float2 uv = 
+            float2 uv =
                 _GRS_HeightUVType == 1 ? v.uv2 :
                 _GRS_HeightUVType == 2 ? v.uv3 :
                 v.uv;
@@ -98,7 +98,7 @@
 #endif
 #if !defined(_GRS_MASKTEX_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         if (_GRS_HeightType == 1) { // UV
-            float2 uv = 
+            float2 uv =
                 _GRS_HeightUVType == 1 ? v.uv2 :
                 _GRS_HeightUVType == 2 ? v.uv3 :
                 v.uv;
