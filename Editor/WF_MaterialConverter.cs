@@ -770,6 +770,14 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Prefix("_LM_", "_LME_"),
             PropertyNameReplacement.Prefix("_OL_", "_OVL_"),
             PropertyNameReplacement.Prefix("_RF_", "_CRF_"),
+
+            PropertyNameReplacement.Match("_ES_Shape", "_ES_SC_Shape"),
+            PropertyNameReplacement.Match("_ES_DirType", "_ES_SC_DirType"),
+            PropertyNameReplacement.Match("_ES_Direction", "_ES_SC_Direction"),
+            PropertyNameReplacement.Match("_ES_LevelOffset", "_ES_SC_LevelOffset"),
+            PropertyNameReplacement.Match("_ES_Sharpness", "_ES_SC_Sharpness"),
+            PropertyNameReplacement.Match("_ES_Speed", "_ES_SC_Speed"),
+            PropertyNameReplacement.Match("_ES_AlphaScroll", "_ES_SC_AlphaScroll"),
         };
 
         public static bool ExistsNeedsMigration(Material mat)
@@ -838,10 +846,30 @@ namespace UnlitWF.Converter
                 },
                 ctx => {
                     // _TS_Featherありの状態から_TS_1stFeatherに変更されたならば、
-                    if (HasCustomValue(ctx, "_TS_Feather") && HasCustomValue(ctx, "_TS_1stFeather"))
+                    if (ctx.oldProps.ContainsKey("_TS_Feather") && HasCustomValue(ctx, "_TS_1stFeather"))
                     {
                         CopyFloatValue(ctx.target, "_TS_1stFeather", "_TS_2ndFeather");
                         CopyFloatValue(ctx.target, "_TS_1stFeather", "_TS_3rdFeather");
+                    }
+                },
+                ctx => {
+                    // _ES_Shapeありの状態から_ES_SC_Shapeに変更されたならば、
+                    if (ctx.oldProps.ContainsKey("_ES_Shape") && ctx.target.HasProperty("_ES_SC_Shape"))
+                    {
+                        // CONSTANTでないならばEmissiveScroll有効
+                        ctx.target.SetInt("_ES_ScrollEnable", ctx.target.GetInt("_ES_SC_Shape") != 3 ? 1 : 0);
+                    }
+                },
+                ctx => {
+                    // _ES_DirTypeありの状態から_ES_SC_DirTypeに変更されたならば、
+                    if (ctx.oldProps.ContainsKey("_ES_DirType") && ctx.target.HasProperty("_ES_SC_DirType"))
+                    {
+                        // 変更前で 3:UV2 だったなら、2:UV に変更してUVTypeを 1:UV2 にする
+                        if (ctx.target.GetInt("_ES_SC_DirType") == 3)
+                        {
+                            ctx.target.SetInt("_ES_SC_DirType", 2);
+                            ctx.target.SetInt("_ES_SC_UVType", 1);
+                        }
                     }
                 },
                 ctx => {

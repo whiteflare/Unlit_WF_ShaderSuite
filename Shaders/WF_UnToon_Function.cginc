@@ -432,35 +432,35 @@ FEATURE_TGL_END
 
     #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         float calcEmissiveWaving(v2f i, float2 uv_main) {
-            if (_ES_Shape == 3) {
-                // 定数
-                return saturate(1 + _ES_LevelOffset);
+            if (TGL_OFF(_ES_ScrollEnable)) {
+                return 1;
             }
             float3 uv =
-                    _ES_DirType == 1 ? UnityWorldToObjectPos(i.ws_vertex)   // ローカル座標
-                    : _ES_DirType == 2 ? float3(uv_main, 0)                 // UV1
-                    : _ES_DirType == 3 ? float3(i.uv_lmap, 0)               // UV2
-                    : i.ws_vertex                                           // ワールド座標
+                    _ES_SC_DirType == 1 ? UnityWorldToObjectPos(i.ws_vertex)    // ローカル座標
+                    : _ES_SC_DirType == 2 ? (                                   // UV
+                        _ES_SC_UVType == 1 ? float3(i.uv_lmap, 0) : float3(uv_main, 0)
+                    )
+                    : i.ws_vertex                                               // ワールド座標
                     ;
 
             // 0 -> 1 への時間関数
-            float time = _Time.y * _ES_Speed - dot(uv, _ES_Direction.xyz);
+            float time = _Time.y * _ES_SC_Speed - dot(uv, _ES_SC_Direction.xyz);
             time *= UNITY_INV_TWO_PI;
 
             // 周期 2PI、値域 [-1, +1]
             float waving = 0;
-            if (_ES_Shape == 0) {
-                float v = pow( 1 - frac(time), _ES_Sharpness + 2 );
+            if (_ES_SC_Shape == 0) {
+                float v = pow( 1 - frac(time), _ES_SC_Sharpness + 2 );
                 waving = 8 * v * (1 - v) - 1;
             }
-            else if (_ES_Shape == 1) {
-                waving = (1 - 2 * frac(time)) * _ES_Sharpness;
+            else if (_ES_SC_Shape == 1) {
+                waving = (1 - 2 * frac(time)) * _ES_SC_Sharpness;
             }
             else {
-                waving = sin( time * UNITY_TWO_PI ) * _ES_Sharpness;
+                waving = sin( time * UNITY_TWO_PI ) * _ES_SC_Sharpness;
             }
 
-            return saturate(waving + _ES_LevelOffset);
+            return saturate(waving + _ES_SC_LevelOffset);
         }
     #else
         #define calcEmissiveWaving(i, uv_main)   (1)
@@ -517,7 +517,7 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
                 #ifdef _ES_FORCE_ALPHASCROLL
                     color.a = max(color.a, waving);
                 #else
-                    if (TGL_ON(_ES_AlphaScroll)) {
+                    if (TGL_ON(_ES_SC_AlphaScroll)) {
                         color.a = max(color.a, waving);
                     }
                 #endif

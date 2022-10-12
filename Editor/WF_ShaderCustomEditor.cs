@@ -59,7 +59,8 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
-            new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
+            new ConditionVisiblePropertyHook("_ES_SC_.*", ctx => IsAnyIntValue(ctx, "_ES_ScrollEnable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_ES_SC_UVType", ctx => IsAnyIntValue(ctx, "_ES_SC_DirType", p => p == 2)),
             new ConditionVisiblePropertyHook("_ES_AU_.*", ctx => IsAnyIntValue(ctx, "_ES_AuLinkEnable", p => p != 0)),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),

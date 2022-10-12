@@ -237,7 +237,7 @@ namespace UnlitWF
             { "_TS_Steps", new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
                 enablePropName = "_TS_Enable",
             } },
-            { "_ES_Shape", new WFCustomKeywordSettingEnum("_ES_Shape", "_ES_SCROLL_ENABLE", "_ES_SCROLL_ENABLE", "_ES_SCROLL_ENABLE", "_") {
+            { "_ES_ScrollEnable", new WFCustomKeywordSettingBool("_ES_ScrollEnable", "_ES_SCROLL_ENABLE") {
                 enablePropName = "_ES_Enable",
             } },
             { "_ES_AuLinkEnable", new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
@@ -427,12 +427,14 @@ namespace UnlitWF
             // EmissiveScroll
             new WFI18NTranslation("ES", "Emission", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),
+            new WFI18NTranslation("ES", "Enable EmissiveScroll", "スクロールを使用する"),
             new WFI18NTranslation("ES", "Wave Type", "波形"),
             new WFI18NTranslation("ES", "Change Alpha Transparency", "透明度も反映する"),
             new WFI18NTranslation("ES", "Direction Type", "方向の種類"),
             new WFI18NTranslation("ES", "LevelOffset", "ゼロ点調整"),
             new WFI18NTranslation("ES", "Sharpness", "鋭さ"),
             new WFI18NTranslation("ES", "ScrollSpeed", "スピード"),
+            new WFI18NTranslation("ES", "Enable AudioLink", "AudioLink を使用する"),
             new WFI18NTranslation("ES", "Emission Multiplier", "エミッション倍率"),
             new WFI18NTranslation("ES", "Emission Multiplier (Min)", "エミッション倍率 (Min)"),
             new WFI18NTranslation("ES", "Emission Multiplier (Max)", "エミッション倍率 (Max)"),
