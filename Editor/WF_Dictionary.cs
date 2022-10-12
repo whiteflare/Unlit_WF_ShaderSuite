@@ -240,6 +240,9 @@ namespace UnlitWF
             { "_ES_Shape", new WFCustomKeywordSettingEnum("_ES_Shape", "_ES_SCROLL_ENABLE", "_ES_SCROLL_ENABLE", "_ES_SCROLL_ENABLE", "_") {
                 enablePropName = "_ES_Enable",
             } },
+            { "_ES_AuLinkEnable", new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
+                enablePropName = "_ES_Enable",
+            } },
             { "_TS_FixContrast", new WFCustomKeywordSettingEnum("_TS_FixContrast", "_", "_TS_FIXC_ENABLE") {
                 enablePropName = "_TS_Enable",
             } },

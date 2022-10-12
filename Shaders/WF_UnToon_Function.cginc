@@ -436,33 +436,72 @@ FEATURE_TGL_END
                 // 定数
                 return saturate(1 + _ES_LevelOffset);
             }
-            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
             float3 uv =
                     _ES_DirType == 1 ? UnityWorldToObjectPos(i.ws_vertex)   // ローカル座標
                     : _ES_DirType == 2 ? float3(uv_main, 0)                 // UV1
                     : _ES_DirType == 3 ? float3(i.uv_lmap, 0)               // UV2
                     : i.ws_vertex                                           // ワールド座標
                     ;
+
+            // 0 -> 1 への時間関数
             float time = _Time.y * _ES_Speed - dot(uv, _ES_Direction.xyz);
-            float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
-            float waving =
-                // 励起波
-                _ES_Shape == 0 ? 8 * v * (1 - v) - 1 :
-                // のこぎり波
-                _ES_Shape == 1 ? (1 - 2 * frac(time * UNITY_INV_TWO_PI)) * _ES_Sharpness :
-                // 正弦波
-                sin( time ) * _ES_Sharpness;
+            time *= UNITY_INV_TWO_PI;
+
+            // 周期 2PI、値域 [-1, +1]
+            float waving = 0;
+            if (_ES_Shape == 0) {
+                float v = pow( 1 - frac(time), _ES_Sharpness + 2 );
+                waving = 8 * v * (1 - v) - 1;
+            }
+            else if (_ES_Shape == 1) {
+                waving = (1 - 2 * frac(time)) * _ES_Sharpness;
+            }
+            else {
+                waving = sin( time * UNITY_TWO_PI ) * _ES_Sharpness;
+            }
+
             return saturate(waving + _ES_LevelOffset);
         }
     #else
         #define calcEmissiveWaving(i, uv_main)   (1)
     #endif
 
+    #if defined(_ES_AULINK_ENABLE) || (defined(_WF_LEGACY_FEATURE_SWITCH) && !defined(_WF_MOBILE))
+        #include "WF_UnToon_AudioLink.cginc"
+
+        float   _ES_AuLinkEnable;
+        float   _ES_AuMinValue;
+        float   _ES_AuMaxValue;
+        float4  _ES_AuBandMixer;
+
+        float calcEmissiveAudioLink(v2f i, float2 uv_main) {
+            float delay = 0;
+            float4 value;
+            value.x = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 0 ) ).r;
+            value.y = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 1 ) ).r;
+            value.z = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 2 ) ).r;
+            value.w = AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 3 ) ).r;
+            value *= _ES_AuBandMixer;
+
+            float au = max(value.x, max(value.y, max(value.z, value.w)));
+            au = saturate(au);
+
+            return lerp(_ES_AuMinValue, _ES_AuMaxValue, au);
+        }
+
+        float enableEmissiveAudioLink(v2f i) {
+            return _ES_AuLinkEnable && AudioLinkIsAvailable();
+        }
+    #else
+        #define calcEmissiveAudioLink(i, uv_main)   (1)
+        #define enableEmissiveAudioLink(i)          (0)
+    #endif
+
         void affectEmissiveScroll(v2f i, float2 uv_main, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
             float4 es_mask  = WF_TEX2D_EMISSION(uv_main);
             float4 es_color = _EmissionColor * es_mask;
-            float waving    = calcEmissiveWaving(i, uv_main) * es_color.a;
+            float waving    = (enableEmissiveAudioLink(i) ? calcEmissiveAudioLink(i, uv_main) : calcEmissiveWaving(i, uv_main)) * es_color.a;
 
             // RGB側の合成
             color.rgb =
