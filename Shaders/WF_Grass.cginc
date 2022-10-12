@@ -37,7 +37,7 @@
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
         float  height           : COLOR0;
-        float  light_color		: COLOR1;
+        float  light_color      : COLOR1;
 #ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR2;
 #endif
@@ -81,6 +81,22 @@
         float result = 0;
 
         // ベース高の算出
+#if defined(_GRS_MASKTEX_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+        if (_GRS_HeightType == 2) {    // MASK_TEX
+            float2 uv = 
+                _GRS_HeightUVType == 1 ? v.uv2 :
+                _GRS_HeightUVType == 2 ? v.uv3 :
+                v.uv;
+            uv = TRANSFORM_TEX(uv, _GRS_HeightMaskTex);
+            half4 color = SAMPLE_MASK_VALUE_LOD(_GRS_HeightMaskTex, uv, _GRS_InvMaskVal);
+            float3 height = color.rgb * _GRS_ColorFactor.rgb;
+            result = MAX_RGB(height);
+        }
+#endif
+#if defined(_WF_LEGACY_FEATURE_SWITCH)
+        else
+#endif
+#if !defined(_GRS_MASKTEX_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         if (_GRS_HeightType == 1) { // UV
             float2 uv = 
                 _GRS_HeightUVType == 1 ? v.uv2 :
@@ -88,16 +104,6 @@
                 v.uv;
             float2 height = uv * _GRS_UVFactor.xy + _GRS_UVFactor.zw;
             result = height.x + height.y;
-        }
-        else if (_GRS_HeightType == 2) {    // MASK_TEX
-            float2 uv = 
-                _GRS_HeightUVType == 1 ? v.uv2 :
-                _GRS_HeightUVType == 2 ? v.uv3 :
-                v.uv;
-            uv = TRANSFORM_TEX(uv, _GRS_HeightMaskTex);
-            half4 color = SAMPLE_MASK_VALUE_LOD(_GRS_HeightMaskTex, uv, _GRS_HeightMaskTex_ST);
-            float3 height = color.rgb * _GRS_ColorFactor.rgb;
-            result = MAX_RGB(height);
         }
         else if (_GRS_HeightType == 3) {    // VERTEX_COLOR
             half4 color = v.vertex_color;
@@ -107,6 +113,7 @@
         else { // WORLD_Y
             result = (ws_vertex.y - _GRS_WorldYBase) * _GRS_WorldYScale;
         }
+#endif
 
         return max(0, result);
     }
@@ -205,7 +212,7 @@ FEATURE_TGL_END
         o.vertex_color = v.vertex_color;
 #endif
 #ifdef _V2F_HAS_UV_LMAP
-		o.uv_lmap = v.uv2;
+        o.uv_lmap = v.uv2;
 #endif
 
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
@@ -223,7 +230,7 @@ FEATURE_TGL_END
 
         color.rgb *= lerp(_GRS_ColorBottom.rgb, _GRS_ColorTop.rgb, saturate(i.height));
 
-		color.rgb *= i.light_color;
+        color.rgb *= i.light_color;
         // Ambient Occlusion
         affectOcclusion(i, uv_main, color);
 

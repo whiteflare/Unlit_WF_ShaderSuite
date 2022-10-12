@@ -100,6 +100,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
 
+            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GRW_ENABLE
             #pragma shader_feature_local _VC_ENABLE
@@ -131,6 +132,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
 
+            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
             #pragma shader_feature_local _GRW_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
@@ -156,6 +158,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
 
             #define _WF_ALPHA_CUTOUT
 
+            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION

@@ -246,6 +246,7 @@ namespace UnlitWF
             { "_CGL_BlurMode", new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
                 enablePropName = "_CGL_Enable",
             } },
+            { "_GRS_HeightType", new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_") },
         };
 
         /// <summary>
