@@ -163,7 +163,6 @@ namespace UnlitWF
                 new WFShaderFunction("ES", "ES", "Emission"),
                 new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
                 new WFShaderFunction("TE", "TE", "Tessellation", (self, mat) => mat.shader.name.Contains("Tess")),
-                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
 
                 // Toon系機能
                 new WFShaderFunction("TS", "TS", "ToonShade"),
@@ -186,6 +185,8 @@ namespace UnlitWF
                 new WFShaderFunction("GMF", "GMF", "Gem Flake"),
                 new WFShaderFunction("GMR", "GMR", "Gem Reflection"),
                 new WFShaderFunction("FUR", "FUR", "Fake Fur", (self, mat) => mat.shader.name.Contains("Fur")),
+                new WFShaderFunction("GRS", "GRS", "Grass", (self, mat) => mat.shader.name.Contains("Grass")),
+                new WFShaderFunction("GRW", "GRW", "Grass Wave"),
 
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
@@ -201,6 +202,8 @@ namespace UnlitWF
                 new WFShaderFunction("CGL", "CGL", "Frosted Glass"),
                 new WFShaderFunction("CGO", "CGO", "Ghost Transparent"),
                 new WFShaderFunction("CCT", "CCT", "ClearCoat"),
+
+                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF
@@ -297,6 +300,8 @@ namespace UnlitWF
             new WFI18NTranslation("ToonShade", "トゥーン影"),
             new WFI18NTranslation("Transparent Alpha", "透過"),
             new WFI18NTranslation("Ghost Transparent", "ゴースト透過"),
+            new WFI18NTranslation("Grass", "草"),
+            new WFI18NTranslation("Grass Wave", "草の揺れ"),
             new WFI18NTranslation("Material Options", "マテリアル設定"),
             new WFI18NTranslation("Utility", "ユーティリティ"),
             // Base
@@ -514,6 +519,22 @@ namespace UnlitWF
             // Frosted Glass
             new WFI18NTranslation("CGL", "Blur", "ブラー"),
             new WFI18NTranslation("CGL", "Blur Mode", "ブラーモード"),
+            // Grass
+            new WFI18NTranslation("GRS", "Height Type", "高さ指定タイプ"),
+            new WFI18NTranslation("GRS", "Ground Y coordinate", "地面Y座標"),
+            new WFI18NTranslation("GRS", "Height scale", "高さスケール"),
+            new WFI18NTranslation("GRS", "Height UV Type", "高さ指定UVタイプ"),
+            new WFI18NTranslation("GRS", "Height Mask Tex", "高さ指定マスクテクスチャ"),
+            new WFI18NTranslation("GRS", "UV Factor", "UV係数"),
+            new WFI18NTranslation("GRS", "Color Factor", "カラー係数"),
+            new WFI18NTranslation("GRS", "Tint Color Top", "色調整(先端)"),
+            new WFI18NTranslation("GRS", "Tint Color Bottom", "色調整(根元)"),
+            // GrassWave
+            new WFI18NTranslation("GRW", "Wave Speed", "波スピード"),
+            new WFI18NTranslation("GRW", "Wave Amplitude", "波の振幅"),
+            new WFI18NTranslation("GRW", "Wave Exponent", "指数"),
+            new WFI18NTranslation("GRW", "Wave Offset", "オフセット"),
+            new WFI18NTranslation("GRW", "Wind Vector", "風ベクトル"),
 
             // メニュー
             new WFI18NTranslation("Copy material", "コピー"),

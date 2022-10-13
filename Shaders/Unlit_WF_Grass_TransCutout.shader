@@ -45,11 +45,11 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             _GRW_Enable             ("[GRW] Enable", Float) = 0
             _GRW_WaveSpeed          ("[GRW] Wave Speed", Range(0, 1)) = 0.2
         [WF_Vector3]
-            _GRW_WaveWidth          ("[GRW] Wave Width", Vector) = (0.2, 0, 0.2, 0)
+            _GRW_WaveWidth          ("[GRW] Wave Amplitude", Vector) = (0.2, 0, 0.2, 0)
             _GRW_WaveExponent       ("[GRW] Wave Exponent", Range(0.5, 4)) = 1
             _GRW_WaveOffset         ("[GRW] Wave Offset", Range(-1, 1)) = 0
         [WF_Vector3]
-            _GRW_WindVector         ("[GRW] Wind Vector", Vector) = (0.1, 0, 0.1, 0)
+            _GRW_WindVector         ("[GRW] Wind Vector", Vector) = (5, 0, 5, 0)
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]

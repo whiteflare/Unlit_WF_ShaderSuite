@@ -111,7 +111,7 @@
             result = MAX_RGB(height);
         }
         else { // WORLD_Y
-            result = (ws_vertex.y - _GRS_WorldYBase) * _GRS_WorldYScale;
+            result = SafeDiv(ws_vertex.y - _GRS_WorldYBase, _GRS_WorldYScale, 0.001);
         }
 #endif
 
@@ -127,7 +127,7 @@
         void calcGrassWaveVertex(float height, inout float3 ws_vertex) {
 FEATURE_TGL_ON_BEGIN(_GRW_Enable)
             // ウェーブ生成
-            float3 phase = ws_vertex.xyz * _GRW_WindVector.xyz;
+            float3 phase = SafeDivVec3(ws_vertex, _GRW_WindVector, 0.01);
             float time = _Time.y * _GRW_WaveSpeed + phase.x + phase.y + phase.z;
             float value = pow(sin(frac(time) * UNITY_TWO_PI) * 0.5 + 0.5, _GRW_WaveExponent) * 2 - 1 + _GRW_WaveOffset;
 
