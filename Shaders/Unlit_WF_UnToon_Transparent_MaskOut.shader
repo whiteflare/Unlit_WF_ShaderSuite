@@ -336,6 +336,8 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
             _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
         [Toggle(_)]
+            _ES_AU_AlphaLink        ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
+        [Toggle(_)]
             _ES_AU_BlackOut         ("[ES] Dont Emit when AudioLink is disabled", Range(0, 1)) = 0
         [Enum(TREBLE,3,HIGH_MIDS,2,LOW_MIDS,1,BASS,0)]
             _ES_AU_Band             ("[ES] Band", Float) = 0

@@ -477,6 +477,7 @@ FEATURE_TGL_END
         float   _ES_AU_MinThreshold;
         float   _ES_AU_MaxThreshold;
         float   _ES_AU_BlackOut;
+        float   _ES_AU_AlphaLink;
 
         float calcEmissiveAudioLink(v2f i, float2 uv_main) {
             float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( 0, _ES_AU_Band ) ).r);
@@ -485,9 +486,7 @@ FEATURE_TGL_END
         }
 
         float enableEmissiveAudioLink(v2f i) {
-            return TGL_ON(_ES_AuLinkEnable) ? (
-                AudioLinkIsAvailable() ? 1 : -1
-            ) : 0;
+            return TGL_ON(_ES_AuLinkEnable) ? ( AudioLinkIsAvailable() ? 1 : ( TGL_ON(_ES_AU_BlackOut) ? -1 : 0 ) ) : 0;
         }
     #else
         #define calcEmissiveAudioLink(i, uv_main)   (1)
@@ -515,15 +514,16 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
                 lerp(color.rgb, es_color.rgb, waving);
 
             // Alpha側の合成
-            #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
-                #ifdef _ES_FORCE_ALPHASCROLL
-                    color.a = max(color.a, waving);
-                #else
-                    if (TGL_ON(_ES_SC_AlphaScroll)) {
-                        color.a = max(color.a, waving);
-                    }
-                #endif
-            #endif
+        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
+            if (TGL_ON(_ES_SC_AlphaScroll)) {
+                color.a = max(color.a, waving);
+            }
+        #endif
+        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
+            if (TGL_ON(_ES_AU_AlphaLink)) {
+                color.a = max(color.a, waving);
+            }
+        #endif
 FEATURE_TGL_END
         }
 
