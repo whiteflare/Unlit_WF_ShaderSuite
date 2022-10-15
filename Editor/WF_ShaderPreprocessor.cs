@@ -89,7 +89,10 @@ namespace UnlitWF
             if (settings.cleanupMaterialsBeforeAvatarBuild)
             {
                 var param = CleanUpParameter.Create();
-                param.materials = new MaterialSeeker().GetAllMaterials(avatarGameObject).Distinct().ToArray();
+                param.materials = new MaterialSeeker().GetAllMaterials(avatarGameObject).Distinct()
+                    // 古いプロパティを含んでいるマテリアルはクリンナップしない
+                    .Where(mat => !Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat))
+                    .ToArray();
                 param.execNonWFMaterials = false; // ビルド時は NonWF マテリアルのクリンナップを行わない
                 if (WFMaterialEditUtility.CleanUpProperties(param))
                 {
