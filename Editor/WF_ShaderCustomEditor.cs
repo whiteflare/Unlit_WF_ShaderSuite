@@ -1072,12 +1072,12 @@ namespace UnlitWF
             // propMin の FloatField
 
             rect.width = EditorGUIUtility.fieldWidth / 2 - 1;
-            rect.x += oldLabelWidth;
+            rect.x += oldLabelWidth + 2;
             minValue = EditorGUI.FloatField(rect, minValue);
 
             // propMax の FloatField
 
-            rect.x += EditorGUIUtility.fieldWidth / 2 + 1;
+            rect.x += EditorGUIUtility.fieldWidth / 2 + 2;
             maxValue = EditorGUI.FloatField(rect, maxValue);
 
             EditorGUI.showMixedValue = false;
