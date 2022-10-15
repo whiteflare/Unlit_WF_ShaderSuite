@@ -472,25 +472,22 @@ FEATURE_TGL_END
         float   _ES_AuLinkEnable;
         float   _ES_AU_MinValue;
         float   _ES_AU_MaxValue;
-        float   _ES_AU_ChBass;
-        float   _ES_AU_ChLowMids;
-        float   _ES_AU_ChHighMids;
-        float   _ES_AU_ChTreble;
+        float   _ES_AU_Band;
+        float   _ES_AU_Slope;
+        float   _ES_AU_MinThreshold;
+        float   _ES_AU_MaxThreshold;
+        float   _ES_AU_BlackOut;
 
         float calcEmissiveAudioLink(v2f i, float2 uv_main) {
-            float delay = 0;
-            float au =
-                AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 0 ) ).r * _ES_AU_ChBass
-                + AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 1 ) ).r * _ES_AU_ChLowMids
-                + AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 2 ) ).r * _ES_AU_ChHighMids
-                + AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, 3 ) ).r * _ES_AU_ChTreble;
-            au = saturate(au);
-
+            float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( 0, _ES_AU_Band ) ).r);
+            au = lerp(au * _ES_AU_Slope, lerp(1, au, _ES_AU_Slope), smoothstep(_ES_AU_MinThreshold, _ES_AU_MaxThreshold, au));
             return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, au);
         }
 
         float enableEmissiveAudioLink(v2f i) {
-            return _ES_AuLinkEnable && AudioLinkIsAvailable();
+            return TGL_ON(_ES_AuLinkEnable) ? (
+                AudioLinkIsAvailable() ? 1 : -1
+            ) : 0;
         }
     #else
         #define calcEmissiveAudioLink(i, uv_main)   (1)
@@ -499,9 +496,14 @@ FEATURE_TGL_END
 
         void affectEmissiveScroll(v2f i, float2 uv_main, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
+            float au_status = enableEmissiveAudioLink(i);
+            if (au_status < 0) {
+                return; // Emission自体を無効にする
+            }
+            float waving    = 0 < au_status ? calcEmissiveAudioLink(i, uv_main) : calcEmissiveWaving(i, uv_main);
+
             float4 es_mask  = WF_TEX2D_EMISSION(uv_main);
             float4 es_color = _EmissionColor * es_mask;
-            float waving    = (enableEmissiveAudioLink(i) ? calcEmissiveAudioLink(i, uv_main) : calcEmissiveWaving(i, uv_main)) * es_color.a;
 
             // RGB側の合成
             color.rgb =
