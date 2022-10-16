@@ -89,7 +89,10 @@ namespace UnlitWF
             if (settings.cleanupMaterialsBeforeAvatarBuild)
             {
                 var param = CleanUpParameter.Create();
-                param.materials = new MaterialSeeker().GetAllMaterials(avatarGameObject).Distinct().ToArray();
+                param.materials = new MaterialSeeker().GetAllMaterials(avatarGameObject).Distinct()
+                    // 古いプロパティを含んでいるマテリアルはクリンナップしない
+                    .Where(mat => !Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat))
+                    .ToArray();
                 param.execNonWFMaterials = false; // ビルド時は NonWF マテリアルのクリンナップを行わない
                 if (WFMaterialEditUtility.CleanUpProperties(param))
                 {
@@ -180,6 +183,21 @@ namespace UnlitWF
                 {
                     var d = data[i];
                     if (d.shaderKeywordSet.IsEnabled(kwd_LOD_FADE_CROSSFADE))
+                    {
+                        data.RemoveAt(i);
+                        count++;
+                        continue;
+                    }
+                }
+            }
+
+            // _WF_EDITOR_HIDE_LMAP を除外する
+            {
+                var kwd_WF_EDITOR_HIDE_LMAP = new ShaderKeyword(shader, WFCommonUtility.KWD_EDITOR_HIDE_LMAP);
+                for (int i = data.Count - 1; 0 <= i; i--)
+                {
+                    var d = data[i];
+                    if (d.shaderKeywordSet.IsEnabled(kwd_WF_EDITOR_HIDE_LMAP))
                     {
                         data.RemoveAt(i);
                         count++;
@@ -472,7 +490,7 @@ namespace UnlitWF
                     if (settings == null || !settings.stripFallback)
                     {
                         var name = WFCommonUtility.GetShaderFallBackTarget(shader);
-                        var fallback = name == null ? null : Shader.Find(name);
+                        var fallback = WFCommonUtility.FindShader(name);
                         if (IsStripTargetShader(fallback))
                         {
                             AppendUsedShaderVariant(mat, fallback);

@@ -569,7 +569,7 @@ namespace UnlitWF.Converter
 
     public static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 4;
+        public const int VERSION = 5;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         public static void ExecuteAuto()
@@ -709,15 +709,14 @@ namespace UnlitWF.Converter
 
         protected override bool Validate(Material mat)
         {
-            // UnlitWFのマテリアルを対象に変換する
-            return WFCommonUtility.IsSupportedShader(mat) && ExistsNeedsMigration(mat);
+            return ExistsNeedsMigration(mat);
         }
 
         /// <summary>
         /// 古いマテリアルのマイグレーション：プロパティ名のリネーム辞書
         /// </summary>
         public static readonly List<PropertyNameReplacement> OldPropNameToNewPropNameList = new List<PropertyNameReplacement>() {
-            // 2020/01/28
+            PropertyNameReplacement.Group("2020/01/28"),
             PropertyNameReplacement.Match("_AL_CutOff", "_Cutoff"),
             PropertyNameReplacement.Match("_ES_Color", "_EmissionColor"),
             PropertyNameReplacement.Match("_ES_MaskTex", "_EmissionMap"),
@@ -726,20 +725,24 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Match("_MT_MaskTex", "_MetallicGlossMap"),
             PropertyNameReplacement.Match("_MT_Smoothness", "_MT_ReflSmooth"),
             PropertyNameReplacement.Match("_MT_Smoothness2", "_MT_SpecSmooth"),
-            // 2020/09/04
+
+            PropertyNameReplacement.Group("2020/09/04"),
             PropertyNameReplacement.Match("_CutOffLevel", "_Cutoff"),
             PropertyNameReplacement.Match("_FurHeight", "_FR_Height"),
             PropertyNameReplacement.Match("_FurMaskTex", "_FR_MaskTex"),
             PropertyNameReplacement.Match("_FurNoiseTex", "_FR_NoiseTex"),
             PropertyNameReplacement.Match("_FurRepeat", "_FR_Repeat"),
             PropertyNameReplacement.Match("_FurShadowPower", "_FR_ShadowPower"),
-            // 2020/12/18
+
+            PropertyNameReplacement.Group("2020/12/18"),
             PropertyNameReplacement.Match("_FG_BumpMap", "_FR_BumpMap"),
             PropertyNameReplacement.Match("_FG_FlipTangent", "_FR_FlipMirror"),
-            // 2021/01/11
+
+            PropertyNameReplacement.Group("2021/01/11"),
             PropertyNameReplacement.Match("_Smoothing", "_TE_SmoothPower"),
             PropertyNameReplacement.Match("_TessFactor", "_TE_Factor"),
-            // 2022/06/04
+
+            PropertyNameReplacement.Group("2022/06/04"),
             PropertyNameReplacement.Match("_FR_FlipMirror", "_FlipMirror"),
             PropertyNameReplacement.Match("_FR_FlipTangent", "_FlipMirror"),
             PropertyNameReplacement.Match("_NM_2ndMaskTex", "_NS_2ndMaskTex"),
@@ -747,10 +750,12 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Match("_NM_2ndUVType", "_NS_2ndUVType"),
             PropertyNameReplacement.Match("_NM_FlipMirror", "_FlipMirror"),
             PropertyNameReplacement.Match("_NM_InvMaskVal", "_NS_InvMaskVal"),
-            // 2022/06/08
+
+            PropertyNameReplacement.Group("2022/06/08"),
             PropertyNameReplacement.Match("_NS_2ndUVType", "_NS_UVType"),
             PropertyNameReplacement.Match("_TS_Feather", "_TS_1stFeather"), // 1stに名称変更して、2ndと3rdのコピーは別途行う
-            // 2022/09/12
+
+            PropertyNameReplacement.Group("2022/09/12"),
             PropertyNameReplacement.Prefix("_BK_", "_BKT_"),
             PropertyNameReplacement.Prefix("_CC_", "_CCT_"),
             PropertyNameReplacement.Prefix("_CH_", "_CHM_"),
@@ -765,30 +770,21 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Prefix("_LM_", "_LME_"),
             PropertyNameReplacement.Prefix("_OL_", "_OVL_"),
             PropertyNameReplacement.Prefix("_RF_", "_CRF_"),
-        };
 
-        public static bool ExistsNeedsMigration(Material[] mats)
-        {
-            return mats.Any(ExistsNeedsMigration);
-        }
+            PropertyNameReplacement.Group("2022/10/15"),
+            PropertyNameReplacement.Match("_ES_Shape", "_ES_SC_Shape"),
+            PropertyNameReplacement.Match("_ES_DirType", "_ES_SC_DirType"),
+            PropertyNameReplacement.Match("_ES_Direction", "_ES_SC_Direction"),
+            PropertyNameReplacement.Match("_ES_LevelOffset", "_ES_SC_LevelOffset"),
+            PropertyNameReplacement.Match("_ES_Sharpness", "_ES_SC_Sharpness"),
+            PropertyNameReplacement.Match("_ES_Speed", "_ES_SC_Speed"),
+            PropertyNameReplacement.Match("_ES_AlphaScroll", "_ES_SC_AlphaScroll"),
+        };
 
         public static bool ExistsNeedsMigration(Material mat)
         {
-            if (mat != null)
-            {
-                var props = ShaderSerializedProperty.AsDict(mat);
-                foreach (var beforeName in props.Keys)
-                {
-                    foreach (var rep in OldPropNameToNewPropNameList)
-                    {
-                        if (rep.IsMatch(beforeName))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            // UnlitWFのマテリアルを対象に変換する
+            return WFCommonUtility.IsSupportedShader(mat) && WFMaterialEditUtility.ExistsNeedsMigration(mat, OldPropNameToNewPropNameList);
         }
 
         protected static int GetIntOrDefault(Material mat, string name, int _default = default)
@@ -851,10 +847,30 @@ namespace UnlitWF.Converter
                 },
                 ctx => {
                     // _TS_Featherありの状態から_TS_1stFeatherに変更されたならば、
-                    if (HasCustomValue(ctx, "_TS_Feather") && HasCustomValue(ctx, "_TS_1stFeather"))
+                    if (ctx.oldProps.ContainsKey("_TS_Feather") && HasCustomValue(ctx, "_TS_1stFeather"))
                     {
                         CopyFloatValue(ctx.target, "_TS_1stFeather", "_TS_2ndFeather");
                         CopyFloatValue(ctx.target, "_TS_1stFeather", "_TS_3rdFeather");
+                    }
+                },
+                ctx => {
+                    // _ES_Shapeありの状態から_ES_SC_Shapeに変更されたならば、
+                    if (ctx.oldProps.ContainsKey("_ES_Shape") && ctx.target.HasProperty("_ES_SC_Shape"))
+                    {
+                        // CONSTANTでないならばEmissiveScroll有効
+                        ctx.target.SetInt("_ES_ScrollEnable", ctx.target.GetInt("_ES_SC_Shape") != 3 ? 1 : 0);
+                    }
+                },
+                ctx => {
+                    // _ES_DirTypeありの状態から_ES_SC_DirTypeに変更されたならば、
+                    if (ctx.oldProps.ContainsKey("_ES_DirType") && ctx.target.HasProperty("_ES_SC_DirType"))
+                    {
+                        // 変更前で 3:UV2 だったなら、2:UV に変更してUVTypeを 1:UV2 にする
+                        if (ctx.target.GetInt("_ES_SC_DirType") == 3)
+                        {
+                            ctx.target.SetInt("_ES_SC_DirType", 2);
+                            ctx.target.SetInt("_ES_SC_UVType", 1);
+                        }
                     }
                 },
                 ctx => {
