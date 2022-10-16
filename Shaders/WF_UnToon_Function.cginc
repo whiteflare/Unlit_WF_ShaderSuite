@@ -519,7 +519,7 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
                 color.a = max(color.a, waving);
             }
         #endif
-        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
+        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || (defined(_WF_LEGACY_FEATURE_SWITCH) && !defined(_WF_MOBILE)))
             if (TGL_ON(_ES_AU_AlphaLink)) {
                 color.a = max(color.a, waving);
             }
