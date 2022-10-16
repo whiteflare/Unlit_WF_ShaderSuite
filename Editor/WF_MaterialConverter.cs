@@ -771,6 +771,7 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Prefix("_OL_", "_OVL_"),
             PropertyNameReplacement.Prefix("_RF_", "_CRF_"),
 
+            PropertyNameReplacement.Group("2022/10/15"),
             PropertyNameReplacement.Match("_ES_Shape", "_ES_SC_Shape"),
             PropertyNameReplacement.Match("_ES_DirType", "_ES_SC_DirType"),
             PropertyNameReplacement.Match("_ES_Direction", "_ES_SC_Direction"),
