@@ -446,11 +446,11 @@ namespace UnlitWF
                 return false;
             }
             var name = shader.name;
-            if (name.Contains("FakeFur"))
+            if (name.Contains("_FakeFur_"))
             {
                 return false;
             }
-            if (name.Contains("Mobile") || name.Contains("_Gem_") || name.Contains("Hidden") || name.Contains("DebugView"))
+            if (name.Contains("_Mobile_") || name.Contains("_Gem_") || name.Contains("_Grass_") || name.Contains("Hidden") || name.Contains("DebugView"))
             {
                 return true;
             }
