@@ -317,15 +317,32 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
-            _ES_Shape               ("[ES] Wave Type", Float) = 3
-        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
-            _ES_DirType             ("[ES] Direction Type", Float) = 0
+        [Toggle(_)]
+            _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
+            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
+            _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _ES_SC_UVType           ("[ES] UV Type", Float) = 0
         [WF_Vector3]
-            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
-            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
-            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
-            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
+            _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
+            _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
+        [Header(Emissive AudioLink)]
+        [Toggle(_)]
+            _ES_AuLinkEnable        ("[ES] Enable AudioLink", Float) = 0
+            _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
+            _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
+        [Toggle(_)]
+            _ES_AU_BlackOut         ("[ES] Dont Emit when AudioLink is disabled", Range(0, 1)) = 0
+        [Enum(TREBLE,3,HIGH_MIDS,2,LOW_MIDS,1,BASS,0)]
+            _ES_AU_Band             ("[ES] Band", Float) = 0
+            _ES_AU_Slope            ("[ES] Slope", Range(0, 1)) = 0.2
+            _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
+            _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
 
         // Fog
         [WFHeaderToggle(Fog)]
@@ -369,7 +386,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/09/23", Float) = 0
+            _CurrentVersion         ("2022/10/22", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
@@ -409,6 +426,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #define _VC_ENABLE
 
 
+
             #define _BKT_ENABLE
             #define _CHM_ENABLE
             #define _ES_ENABLE
@@ -428,6 +446,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
+            #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 

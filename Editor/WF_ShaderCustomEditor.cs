@@ -59,9 +59,17 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
-            new ConditionVisiblePropertyHook("_ES_Direction|_ES_DirType|_ES_LevelOffset|_ES_Sharpness|_ES_Speed|_ES_AlphaScroll", ctx => IsAnyIntValue(ctx, "_ES_Shape", p => p != 3)), // not CONSTANT
+            new ConditionVisiblePropertyHook("_ES_SC_.*", ctx => IsAnyIntValue(ctx, "_ES_ScrollEnable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_ES_SC_UVType", ctx => IsAnyIntValue(ctx, "_ES_SC_DirType", p => p == 2)),
+            new ConditionVisiblePropertyHook("_ES_AU_.*", ctx => IsAnyIntValue(ctx, "_ES_AuLinkEnable", p => p != 0)),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
+            // 条件付きHide(Grass系列)
+            new ConditionVisiblePropertyHook("_GRS_WorldYBase|_GRS_WorldYScale", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 0)),
+            new ConditionVisiblePropertyHook("_GRS_HeightUVType", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1 || p == 2)),
+            new ConditionVisiblePropertyHook("_GRS_HeightMaskTex|_GRS_InvMaskVal", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 2)),
+            new ConditionVisiblePropertyHook("_GRS_UVFactor", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1)),
+            new ConditionVisiblePropertyHook("_GRS_ColorFactor", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 2 || p == 3)),
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
@@ -75,11 +83,13 @@ namespace UnlitWF
             new SingleLineTexPropertyHook( "_OVL_Color", "_OVL_OverlayTex" ),
 
             // MinMaxSlider
-            new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist"),
-            new MinMaxSliderPropertyHook("_TFG_MinDist", "_TFG_MaxDist"),
-            new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist"),
-            new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist"),
-            new MinMaxSliderPropertyHook("_DFD_MinDist", "_DFD_MaxDist"),
+            new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist", "[TE] FadeOut Distance"),
+            new MinMaxSliderPropertyHook("_TFG_MinDist", "_TFG_MaxDist", "[TFG] FadeOut Distance"),
+            new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist", "[LME] FadeOut Distance"),
+            new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist", "[TS] FadeOut Distance"),
+            new MinMaxSliderPropertyHook("_DFD_MinDist", "_DFD_MaxDist", "[DFD] Fade Distance"),
+            new MinMaxSliderPropertyHook("_ES_AU_MinValue", "_ES_AU_MaxValue", "[ES] Emission Multiplier"),
+            new MinMaxSliderPropertyHook("_ES_AU_MinThreshold", "_ES_AU_MaxThreshold", "[ES] Threshold"),
 
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
             new CustomPropertyHook("_OVL_CustomParam1", ctx => {
@@ -579,7 +589,7 @@ namespace UnlitWF
             EditorGUILayout.Space();
             DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Utility");
 
-
+            // テンプレート
             var rect = EditorGUILayout.GetControlRect();
             if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate)))
             {
@@ -617,7 +627,7 @@ namespace UnlitWF
                 menu.DropDown(rect);
             }
 
-            // cleanup
+            // クリンナップ
             if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageButton.Cleanup), new string[] { "Open Cleanup Utility" }, idx =>
             {
                 switch (idx)
@@ -634,6 +644,15 @@ namespace UnlitWF
                 param.materials = WFCommonUtility.AsMaterials(materialEditor.targets);
                 WFMaterialEditUtility.CleanUpProperties(param);
             }
+
+            // ライトマップ非表示
+            //var hideLmap = WFCommonUtility.IsKwdEnableHideLmap();
+            //EditorGUI.BeginChangeCheck();
+            //hideLmap = EditorGUILayout.Toggle("ライトマップを非表示", hideLmap);
+            //if (EditorGUI.EndChangeCheck())
+            //{
+            //    WFCommonUtility.SetKwdEnableHideLmap(hideLmap);
+            //}
 
             EditorGUILayout.Space();
 
@@ -1053,12 +1072,12 @@ namespace UnlitWF
             // propMin の FloatField
 
             rect.width = EditorGUIUtility.fieldWidth / 2 - 1;
-            rect.x += oldLabelWidth;
+            rect.x += oldLabelWidth + 2;
             minValue = EditorGUI.FloatField(rect, minValue);
 
             // propMax の FloatField
 
-            rect.x += EditorGUIUtility.fieldWidth / 2 + 1;
+            rect.x += EditorGUIUtility.fieldWidth / 2 + 2;
             maxValue = EditorGUI.FloatField(rect, maxValue);
 
             EditorGUI.showMixedValue = false;
@@ -1316,11 +1335,13 @@ namespace UnlitWF
         {
             private readonly string minName;
             private readonly string maxName;
+            private readonly string displayName;
 
-            public MinMaxSliderPropertyHook(string minName, string maxName) : base(minName + "|" + maxName)
+            public MinMaxSliderPropertyHook(string minName, string maxName, string displayName = null) : base(minName + "|" + maxName)
             {
                 this.minName = minName;
                 this.maxName = maxName;
+                this.displayName = displayName;
             }
 
             protected override void OnBeforeProp(PropertyGUIContext context)
@@ -1335,7 +1356,8 @@ namespace UnlitWF
                     MaterialProperty another = FindProperty(maxName, context.all, false);
                     if (another != null)
                     {
-                        DrawMinMaxProperty(context.editor, context.guiContent, context.current, another);
+                        var display = string.IsNullOrWhiteSpace(displayName) ? context.guiContent : WFI18N.GetGUIContent(displayName);
+                        DrawMinMaxProperty(context.editor, display, context.current, another);
                     }
                 }
                 context.custom = true;
@@ -1733,7 +1755,7 @@ namespace UnlitWF
                     result |= true;
                     return true;
                 }
-                bool old = WFMaterialEditUtility.ExistsOldNameProperty(mat);
+                bool old = WFMaterialEditUtility.ExistsNeedsMigration(mat);
                 if (old)
                 {
                     oldMaterialVersionCache.Add(mat);

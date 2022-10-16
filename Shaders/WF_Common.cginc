@@ -88,6 +88,14 @@
         #define FEATURE_TGL_END
     #endif
 
+    float SafeDiv(float x, float y, float eps) {
+        return abs(y) < eps ? 0 : x / y;
+    }
+
+    float3 SafeDivVec3(float3 x, float3 y, float eps) {
+        return float3(SafeDiv(x.x, y.x, eps), SafeDiv(x.y, y.y, eps), SafeDiv(x.z, y.z, eps));
+    }
+
     float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
         if (lenSq < NZF) {

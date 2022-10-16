@@ -14,40 +14,42 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
+Shader "UnlitWF/WF_Grass_TransCutout" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
-            _MainTex                ("Main Texture", 2D) = "white" {}
-        [HDR]
-            _Color                  ("Color", Color) = (1, 1, 1, 1)
-        [Enum(UnityEngine.Rendering.CullMode)]
+            _MainTex                ("Albedo (RGB)", 2D) = "white" {}
+            _Cutoff                 ("Cutoff", Range(0, 1)) = 0.8
+        [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 0
         [Toggle(_)]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-        [NoScaleOffset]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+        [WFHeader(Grass)]
+        [Enum(WORLD_Y,0,UV,1,MASK_TEX,2,VERTEX_COLOR,3)]
+            _GRS_HeightType         ("[GRS] Height Type", Int) = 0
+            _GRS_WorldYBase         ("[GRS] Ground Y coordinate", Float) = 0
+            _GRS_WorldYScale        ("[GRS] Height scale", Float) = 1
+        [Enum(UV1,0,UV2,1,UV3,2)]
+            _GRS_HeightUVType       ("[GRS] Height UV Type", Int) = 0
+            _GRS_HeightMaskTex      ("[GRS] Height Mask Tex", 2D) = "white" {}
         [Toggle(_)]
-            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
+            _GRS_InvMaskVal         ("[GRS] Invert Mask Value", Float) = 0
+            _GRS_UVFactor           ("[GRS] UV Factor", Vector) = (0, 1, 0, 0)
+        [WF_Vector3]
+            _GRS_ColorFactor        ("[GRS] Color Factor", Vector) = (0, 1, 0, 0)
+            _GRS_ColorTop           ("[GRS] Tint Color Top", Color) = (1, 1, 1, 1)
+            _GRS_ColorBottom        ("[GRS] Tint Color Bottom", Color) = (1, 1, 1, 1)
 
-        [Header(Transparent Detail)]
-        [Enum(UnityEngine.Rendering.CompareFunction)]
-            _AL_ZTest               ("[AL] Z Test", Float) = 4
-        [Enum(UnityEngine.Rendering.BlendMode)]
-            _AL_SrcAlpha            ("[AL] Blend Src Alpha", Float) = 5
-        [Enum(UnityEngine.Rendering.BlendMode)]
-            _AL_DstAlpha            ("[AL] Blend Dst Alpha", Float) = 10
-            _AL_Z_Offset            ("[AL] Z Offset", Range(-2, 2)) = 0
+        [WFHeaderToggle(Grass Wave)]
+            _GRW_Enable             ("[GRW] Enable", Float) = 0
+            _GRW_WaveSpeed          ("[GRW] Wave Speed", Range(0, 1)) = 0.2
+        [WF_Vector3]
+            _GRW_WaveWidth          ("[GRW] Wave Amplitude", Vector) = (0.2, 0, 0.2, 0)
+            _GRW_WaveExponent       ("[GRW] Wave Exponent", Range(0.5, 4)) = 1
+            _GRW_WaveOffset         ("[GRW] Wave Offset", Range(-1, 1)) = 0
+        [WF_Vector3]
+            _GRW_WindVector         ("[GRW] Wind Vector", Vector) = (5, 0, 5, 0)
 
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
@@ -64,18 +66,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-
-        [WFHeader(Lit Advance)]
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLD_DIR,3,CUSTOM_LOCAL_DIR,4,CUSTOM_WORLD_POS,5)]
-            _GL_LightMode           ("Sun Source", Float) = 0
-            _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
-            _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
-        [WF_Vector3]
-            _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [Toggle(_)]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
-            _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeaderToggle(Light Bake Effects)]
             _LBE_Enable             ("[LBE] Enable", Float) = 0
@@ -89,21 +81,14 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
     }
 
     SubShader {
-        Tags {
-            "RenderType" = "Transparent"
-            "Queue" = "Overlay"
-            "IgnoreProjector" = "True"
-            "VRCFallback" = "UnlitTransparent"
-        }
+        Tags { "RenderType"="TransparentCutout" "Queue"="AlphaTest" "IgnoreProjector"="True" }
 
         Pass {
             Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
-            ZTest [_AL_ZTest]
-            ZWrite [_AL_ZWrite]
-            Blend [_AL_SrcAlpha] [_AL_DstAlpha], One OneMinusSrcAlpha
+            ZWrite ON
 
             CGPROGRAM
 
@@ -112,31 +97,79 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_FRESNEL
-            #define _WF_MAIN_Z_SHIFT    (_AL_Z_Offset)
+            #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
 
 
             #define _AO_ENABLE
+            #define _GRW_ENABLE
             #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
-            #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #include "WF_UnToon.cginc"
+            #include "WF_Grass.cginc"
+
+            ENDCG
+
+        }
+
+        Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
+
+            CGPROGRAM
+
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
+
+            #define _WF_ALPHA_CUTOUT
+            #define _WF_MOBILE
+
+
+            #define _GRW_ENABLE
+            #define _VC_ENABLE
+
+            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #include "WF_Grass.cginc"
 
             ENDCG
         }
 
-        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent/META"
+        Pass {
+            Name "META"
+            Tags { "LightMode" = "Meta" }
+
+            Cull OFF
+
+            CGPROGRAM
+
+            #pragma vertex vert_meta
+            #pragma fragment frag_meta
+
+            #define _WF_ALPHA_CUTOUT
+
+
+            #define _VC_ENABLE
+
+            #pragma shader_feature EDITOR_VISUALIZATION
+
+            #include "WF_Grass.cginc"
+
+            ENDCG
+        }
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "Unlit/Transparent Cutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -166,13 +166,23 @@ Material:
     - _DFD_MinDist: 0.02
     - _DFD_Power: 1
     - _DetailNormalMapScale: 0.4
+    - _ES_AU_Band: 0
+    - _ES_AU_BlackOut: 0
+    - _ES_AU_MaxThreshold: 0.5
+    - _ES_AU_MaxValue: 2
+    - _ES_AU_MinThreshold: 0.1
+    - _ES_AU_MinValue: 0
+    - _ES_AU_Slope: 0.2
+    - _ES_AuLinkEnable: 0
     - _ES_BlendType: 0
-    - _ES_DirType: 0
     - _ES_Enable: 0
-    - _ES_LevelOffset: 0
-    - _ES_Shape: 3
-    - _ES_Sharpness: 1
-    - _ES_Speed: 2
+    - _ES_SC_DirType: 0
+    - _ES_SC_LevelOffset: 0
+    - _ES_SC_Shape: 3
+    - _ES_SC_Sharpness: 1
+    - _ES_SC_Speed: 2
+    - _ES_SC_UVType: 0
+    - _ES_ScrollEnable: 0
     - _FallBack: 0
     - _FlipMirror: 0
     - _GL_BlendPower: 0.8
@@ -289,7 +299,7 @@ Material:
     - _CHM_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
-    - _ES_Direction: {r: 0, g: -10, b: 0, a: 0}
+    - _ES_SC_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

@@ -75,7 +75,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/09/23", Float) = 0
+            _CurrentVersion         ("2022/10/22", Float) = 0
     }
 
     SubShader {

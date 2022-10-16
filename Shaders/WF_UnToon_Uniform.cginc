@@ -152,13 +152,16 @@
     FEATURE_TGL    (_ES_Enable);
     float4          _EmissionColor;
     uint            _ES_BlendType;
-    uint            _ES_Shape;
-    uint            _ES_DirType;
-    float4          _ES_Direction;
-    float           _ES_LevelOffset;
-    float           _ES_Sharpness;
-    float           _ES_Speed;
-    float           _ES_AlphaScroll;
+
+    float           _ES_ScrollEnable;
+    uint            _ES_SC_Shape;
+    uint            _ES_SC_DirType;
+    uint            _ES_SC_UVType;
+    float4          _ES_SC_Direction;
+    float           _ES_SC_LevelOffset;
+    float           _ES_SC_Sharpness;
+    float           _ES_SC_Speed;
+    float           _ES_SC_AlphaScroll;
 
     // -------------------------
 

@@ -432,37 +432,77 @@ FEATURE_TGL_END
 
     #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         float calcEmissiveWaving(v2f i, float2 uv_main) {
-            if (_ES_Shape == 3) {
-                // 定数
-                return saturate(1 + _ES_LevelOffset);
+            if (TGL_OFF(_ES_ScrollEnable)) {
+                return 1;
             }
-            // 周期 2PI、値域 [-1, +1] の関数で光量を決める
             float3 uv =
-                    _ES_DirType == 1 ? UnityWorldToObjectPos(i.ws_vertex)   // ローカル座標
-                    : _ES_DirType == 2 ? float3(uv_main, 0)                 // UV1
-                    : _ES_DirType == 3 ? float3(i.uv_lmap, 0)               // UV2
-                    : i.ws_vertex                                           // ワールド座標
+                    _ES_SC_DirType == 1 ? UnityWorldToObjectPos(i.ws_vertex)    // ローカル座標
+                    : _ES_SC_DirType == 2 ? (                                   // UV
+                        _ES_SC_UVType == 1 ? float3(i.uv_lmap, 0) : float3(uv_main, 0)
+                    )
+                    : i.ws_vertex                                               // ワールド座標
                     ;
-            float time = _Time.y * _ES_Speed - dot(uv, _ES_Direction.xyz);
-            float v = pow( 1 - frac(time * UNITY_INV_TWO_PI), _ES_Sharpness + 2 );
-            float waving =
-                // 励起波
-                _ES_Shape == 0 ? 8 * v * (1 - v) - 1 :
-                // のこぎり波
-                _ES_Shape == 1 ? (1 - 2 * frac(time * UNITY_INV_TWO_PI)) * _ES_Sharpness :
-                // 正弦波
-                sin( time ) * _ES_Sharpness;
-            return saturate(waving + _ES_LevelOffset);
+
+            // 0 -> 1 への時間関数
+            float time = _Time.y * _ES_SC_Speed - dot(uv, _ES_SC_Direction.xyz);
+            time *= UNITY_INV_TWO_PI;
+
+            // 周期 2PI、値域 [-1, +1]
+            float waving = 0;
+            if (_ES_SC_Shape == 0) {
+                float v = pow( 1 - frac(time), _ES_SC_Sharpness + 2 );
+                waving = 8 * v * (1 - v) - 1;
+            }
+            else if (_ES_SC_Shape == 1) {
+                waving = (1 - 2 * frac(time)) * _ES_SC_Sharpness;
+            }
+            else {
+                waving = sin( time * UNITY_TWO_PI ) * _ES_SC_Sharpness;
+            }
+
+            return saturate(waving + _ES_SC_LevelOffset);
         }
     #else
         #define calcEmissiveWaving(i, uv_main)   (1)
     #endif
 
+    #if defined(_ES_AULINK_ENABLE) || (defined(_WF_LEGACY_FEATURE_SWITCH) && !defined(_WF_MOBILE))
+        #include "WF_UnToon_AudioLink.cginc"
+
+        float   _ES_AuLinkEnable;
+        float   _ES_AU_MinValue;
+        float   _ES_AU_MaxValue;
+        float   _ES_AU_Band;
+        float   _ES_AU_Slope;
+        float   _ES_AU_MinThreshold;
+        float   _ES_AU_MaxThreshold;
+        float   _ES_AU_BlackOut;
+        float   _ES_AU_AlphaLink;
+
+        float calcEmissiveAudioLink(v2f i, float2 uv_main) {
+            float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( 0, _ES_AU_Band ) ).r);
+            au = lerp(au * _ES_AU_Slope, lerp(1, au, _ES_AU_Slope), smoothstep(_ES_AU_MinThreshold, _ES_AU_MaxThreshold, au));
+            return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, au);
+        }
+
+        float enableEmissiveAudioLink(v2f i) {
+            return TGL_ON(_ES_AuLinkEnable) ? ( AudioLinkIsAvailable() ? 1 : ( TGL_ON(_ES_AU_BlackOut) ? -1 : 0 ) ) : 0;
+        }
+    #else
+        #define calcEmissiveAudioLink(i, uv_main)   (1)
+        #define enableEmissiveAudioLink(i)          (0)
+    #endif
+
         void affectEmissiveScroll(v2f i, float2 uv_main, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
+            float au_status = enableEmissiveAudioLink(i);
+            if (au_status < 0) {
+                return; // Emission自体を無効にする
+            }
+            float waving    = 0 < au_status ? calcEmissiveAudioLink(i, uv_main) : calcEmissiveWaving(i, uv_main);
+
             float4 es_mask  = WF_TEX2D_EMISSION(uv_main);
             float4 es_color = _EmissionColor * es_mask;
-            float waving    = calcEmissiveWaving(i, uv_main) * es_color.a;
 
             // RGB側の合成
             color.rgb =
@@ -474,15 +514,16 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
                 lerp(color.rgb, es_color.rgb, waving);
 
             // Alpha側の合成
-            #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
-                #ifdef _ES_FORCE_ALPHASCROLL
-                    color.a = max(color.a, waving);
-                #else
-                    if (TGL_ON(_ES_AlphaScroll)) {
-                        color.a = max(color.a, waving);
-                    }
-                #endif
-            #endif
+        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
+            if (TGL_ON(_ES_SC_AlphaScroll)) {
+                color.a = max(color.a, waving);
+            }
+        #endif
+        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
+            if (TGL_ON(_ES_AU_AlphaLink)) {
+                color.a = max(color.a, waving);
+            }
+        #endif
 FEATURE_TGL_END
         }
 
@@ -1239,7 +1280,7 @@ FEATURE_TGL_ON_BEGIN(_AO_Enable)
             occlusion *= TGL_OFF(_AO_UseGreenMap) ? aomap_var.rgb : aomap_var.ggg;
             occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
-            #ifdef _LMAP_ENABLE
+            #if defined(_LMAP_ENABLE) && !defined(_WF_EDITOR_HIDE_LMAP)
             if (TGL_ON(_AO_UseLightMap)) {
                 occlusion *= pickLightmap(i.uv_lmap);
             }
