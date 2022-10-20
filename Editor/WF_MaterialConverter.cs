@@ -413,6 +413,11 @@ namespace UnlitWF.Converter
                         }
                     }
                 },
+                ctx =>
+                {
+                    // プロパティ名変更開始
+                    WFMaterialEditUtility.BeginReplacePropertyNames(ctx.target);
+                },
                 ctx => {
                     // アルファマスク
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
@@ -553,6 +558,11 @@ namespace UnlitWF.Converter
                         PropertyNameReplacement.Match("_OutlineMask", "_TL_MaskTex"),
                         PropertyNameReplacement.Match("_OutLineMask", "_TL_MaskTex")
                         );
+                },
+                ctx =>
+                {
+                    // プロパティ名変更終了
+                    WFMaterialEditUtility.EndReplacePropertyNames(ctx.target);
                 },
                 ctx => {
                     // アルファをリセットし、キーワードを整理する

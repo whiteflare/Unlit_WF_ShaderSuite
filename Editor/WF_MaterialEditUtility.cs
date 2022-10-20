@@ -260,6 +260,25 @@ namespace UnlitWF
             WFMaterialCache.instance.ResetOldMaterialTable(mats);
         }
 
+        private static Material editReplaceTarget = null;
+        private static List<string> editReplaceNamesCache = null;
+
+        public static void BeginReplacePropertyNames(Material mat)
+        {
+            editReplaceTarget = mat;
+            editReplaceNamesCache = null;
+        }
+
+        public static void EndReplacePropertyNames(Material mat)
+        {
+            if (mat == editReplaceTarget)
+            {
+                editReplaceTarget = null;
+                editReplaceNamesCache = null;
+            }
+        }
+
+
         public static bool ReplacePropertyNamesWithoutUndo(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
             return RenamePropNamesWithoutUndoInternal(mat, replacement);
@@ -292,12 +311,23 @@ namespace UnlitWF
                     if (after != null)
                     {
                         before.CopyTo(after);
-                        before.Remove();
+                        if (mat == editReplaceTarget)
+                        {
+                            before.Remove(ref editReplaceNamesCache);
+                        }
+                        else
+                        {
+                            before.Remove();
+                        }
                         rep.onAfterCopy(after);
                     }
                     else
                     {
                         before.Rename(afterName);
+                        if (mat == editReplaceTarget)
+                        {
+                            editReplaceNamesCache = null;
+                        }
                         rep.onAfterCopy(before);
                     }
                     modified = true;
@@ -683,10 +713,11 @@ namespace UnlitWF
         private static HashSet<string> DeleteProperties(IEnumerable<ShaderSerializedProperty> props, Material material)
         {
             var del_names = new HashSet<string>();
+            var cachedNames = new List<string>();
             foreach (var p in props)
             {
                 del_names.Add(p.name);
-                p.Remove();
+                p.Remove(ref cachedNames);
             }
 
             // 削除する内容のログを出す
@@ -973,12 +1004,28 @@ namespace UnlitWF
 
         public void Remove()
         {
+            List<string> cachedNames = null;
+            Remove(ref cachedNames);
+        }
+
+        public void Remove(ref List<string> cachedNames)
+        {
+            if (cachedNames == null || cachedNames.Count != parent.arraySize)
+            {
+                cachedNames = new List<string>();
+                for (int i = 0; i < parent.arraySize; i++)
+                {
+                    var prop = parent.GetArrayElementAtIndex(i);
+                    cachedNames.Add(GetSerializedName(prop));
+                }
+            }
+
             for (int i = parent.arraySize - 1; 0 <= i; i--)
             {
-                var prop = parent.GetArrayElementAtIndex(i);
-                if (GetSerializedName(prop) == this.name)
+                if (cachedNames[i] == this.name)
                 {
                     parent.DeleteArrayElementAtIndex(i);
+                    cachedNames.RemoveAt(i);
                 }
             }
         }
