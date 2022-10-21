@@ -100,6 +100,11 @@ namespace UnlitWF
             this.onAfterCopy = onAfterCopy ?? (p => { });
         }
 
+        public virtual bool Test(string version)
+        {
+            return true;
+        }
+
         public abstract bool IsMatch(string beforeName);
 
         protected abstract string Replace(string beforeName);
@@ -132,6 +137,35 @@ namespace UnlitWF
         {
             return new RegexRename(new Regex(pattern, RegexOptions.Compiled), replacement, onAfterCopy);
         }
+
+        public static PropertyNameReplacement Group(string version)
+        {
+            return new GroupCondition(version);
+        }
+
+        private class GroupCondition : PropertyNameReplacement
+        {
+            private readonly string version;
+
+            public GroupCondition(string version) : base(null)
+            {
+                this.version = version;
+            }
+
+            public override bool Test(string version)
+            {
+                if (string.IsNullOrWhiteSpace(version))
+                {
+                    return true;
+                }
+                // このグループのバージョンが、指定されたバージョン以下である場合
+                return this.version.CompareTo(version) <= 0;
+            }
+
+            public override bool IsMatch(string beforeName) => false;
+            protected override string Replace(string beforeName) => beforeName;
+        }
+
 
         private class MatchRename : PropertyNameReplacement
         {
@@ -183,9 +217,33 @@ namespace UnlitWF
     {
         #region マイグレーション
 
-        public static bool ExistsOldNameProperty(params Material[] mats)
+        public static bool ExistsNeedsMigration(Material mat)
         {
-            return Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mats);
+            return Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat);
+        }
+
+        public static bool ExistsNeedsMigration(Material mat, IEnumerable<PropertyNameReplacement> replacement)
+        {
+            if (mat != null)
+            {
+                var version = WFCommonUtility.GetShaderCurrentVersion(mat);
+                var props = ShaderSerializedProperty.AsDict(mat);
+                foreach (var beforeName in props.Keys)
+                {
+                    foreach (var rep in replacement)
+                    {
+                        if (!rep.Test(version))
+                        {
+                            break;
+                        }
+                        if (rep.IsMatch(beforeName))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public static void MigrationMaterial(MigrationParameter param)
@@ -202,6 +260,25 @@ namespace UnlitWF
             WFMaterialCache.instance.ResetOldMaterialTable(mats);
         }
 
+        private static Material editReplaceTarget = null;
+        private static List<string> editReplaceNamesCache = null;
+
+        public static void BeginReplacePropertyNames(Material mat)
+        {
+            editReplaceTarget = mat;
+            editReplaceNamesCache = null;
+        }
+
+        public static void EndReplacePropertyNames(Material mat)
+        {
+            if (mat == editReplaceTarget)
+            {
+                editReplaceTarget = null;
+                editReplaceNamesCache = null;
+            }
+        }
+
+
         public static bool ReplacePropertyNamesWithoutUndo(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
             return RenamePropNamesWithoutUndoInternal(mat, replacement);
@@ -214,10 +291,15 @@ namespace UnlitWF
 
         private static bool RenamePropNamesWithoutUndoInternal(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
+            var version = WFCommonUtility.GetShaderCurrentVersion(mat);
             var props = ShaderSerializedProperty.AsList(mat);
             // 名称を全て変更
             foreach (var rep in replacement)
             {
+                if (!rep.Test(version))
+                {
+                    break;
+                }
                 var modified = false;
                 foreach (var before in props)
                 {
@@ -229,12 +311,23 @@ namespace UnlitWF
                     if (after != null)
                     {
                         before.CopyTo(after);
-                        before.Remove();
+                        if (mat == editReplaceTarget)
+                        {
+                            before.Remove(ref editReplaceNamesCache);
+                        }
+                        else
+                        {
+                            before.Remove();
+                        }
                         rep.onAfterCopy(after);
                     }
                     else
                     {
                         before.Rename(afterName);
+                        if (mat == editReplaceTarget)
+                        {
+                            editReplaceNamesCache = null;
+                        }
                         rep.onAfterCopy(before);
                     }
                     modified = true;
@@ -620,10 +713,11 @@ namespace UnlitWF
         private static HashSet<string> DeleteProperties(IEnumerable<ShaderSerializedProperty> props, Material material)
         {
             var del_names = new HashSet<string>();
+            var cachedNames = new List<string>();
             foreach (var p in props)
             {
                 del_names.Add(p.name);
-                p.Remove();
+                p.Remove(ref cachedNames);
             }
 
             // 削除する内容のログを出す
@@ -910,12 +1004,28 @@ namespace UnlitWF
 
         public void Remove()
         {
+            List<string> cachedNames = null;
+            Remove(ref cachedNames);
+        }
+
+        public void Remove(ref List<string> cachedNames)
+        {
+            if (cachedNames == null || cachedNames.Count != parent.arraySize)
+            {
+                cachedNames = new List<string>();
+                for (int i = 0; i < parent.arraySize; i++)
+                {
+                    var prop = parent.GetArrayElementAtIndex(i);
+                    cachedNames.Add(GetSerializedName(prop));
+                }
+            }
+
             for (int i = parent.arraySize - 1; 0 <= i; i--)
             {
-                var prop = parent.GetArrayElementAtIndex(i);
-                if (GetSerializedName(prop) == this.name)
+                if (cachedNames[i] == this.name)
                 {
                     parent.DeleteArrayElementAtIndex(i);
+                    cachedNames.RemoveAt(i);
                 }
             }
         }

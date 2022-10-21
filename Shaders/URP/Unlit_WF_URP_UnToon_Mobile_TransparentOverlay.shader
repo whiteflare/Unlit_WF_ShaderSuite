@@ -85,7 +85,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/09/23", Float) = 0
+            _CurrentVersion         ("2022/10/22", Float) = 0
     }
 
     SubShader {
@@ -122,6 +122,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
             // -------------------------------------
             // Lightweight Pipeline keywords

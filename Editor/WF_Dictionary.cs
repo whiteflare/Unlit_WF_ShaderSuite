@@ -101,6 +101,12 @@ namespace UnlitWF
             new WFShaderName("BRP", "Gem", "Basic", "Transparent",                     "UnlitWF/WF_Gem_Transparent", represent: true),
 
             // ================
+            // Grass 系列
+            // ================
+
+            new WFShaderName("BRP", "Grass", "Basic", "TransCutout",                   "UnlitWF/WF_Grass_TransCutout", represent: true),
+
+            // ================
             // UnToon 系列(URP)
             // ================
 
@@ -157,7 +163,6 @@ namespace UnlitWF
                 new WFShaderFunction("ES", "ES", "Emission"),
                 new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
                 new WFShaderFunction("TE", "TE", "Tessellation", (self, mat) => mat.shader.name.Contains("Tess")),
-                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
 
                 // Toon系機能
                 new WFShaderFunction("TS", "TS", "ToonShade"),
@@ -180,6 +185,8 @@ namespace UnlitWF
                 new WFShaderFunction("GMF", "GMF", "Gem Flake"),
                 new WFShaderFunction("GMR", "GMR", "Gem Reflection"),
                 new WFShaderFunction("FUR", "FUR", "Fake Fur", (self, mat) => mat.shader.name.Contains("Fur")),
+                new WFShaderFunction("GRS", "GRS", "Grass", (self, mat) => mat.shader.name.Contains("Grass")),
+                new WFShaderFunction("GRW", "GRW", "Grass Wave"),
 
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
@@ -195,6 +202,8 @@ namespace UnlitWF
                 new WFShaderFunction("CGL", "CGL", "Frosted Glass"),
                 new WFShaderFunction("CGO", "CGO", "Ghost Transparent"),
                 new WFShaderFunction("CCT", "CCT", "ClearCoat"),
+
+                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF
@@ -231,7 +240,10 @@ namespace UnlitWF
             { "_TS_Steps", new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
                 enablePropName = "_TS_Enable",
             } },
-            { "_ES_Shape", new WFCustomKeywordSettingEnum("_ES_Shape", "_ES_SCROLL_ENABLE", "_ES_SCROLL_ENABLE", "_ES_SCROLL_ENABLE", "_") {
+            { "_ES_ScrollEnable", new WFCustomKeywordSettingBool("_ES_ScrollEnable", "_ES_SCROLL_ENABLE") {
+                enablePropName = "_ES_Enable",
+            } },
+            { "_ES_AuLinkEnable", new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
                 enablePropName = "_ES_Enable",
             } },
             { "_TS_FixContrast", new WFCustomKeywordSettingEnum("_TS_FixContrast", "_", "_TS_FIXC_ENABLE") {
@@ -240,6 +252,7 @@ namespace UnlitWF
             { "_CGL_BlurMode", new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
                 enablePropName = "_CGL_Enable",
             } },
+            { "_GRS_HeightType", new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_") },
         };
 
         /// <summary>
@@ -287,6 +300,8 @@ namespace UnlitWF
             new WFI18NTranslation("ToonShade", "トゥーン影"),
             new WFI18NTranslation("Transparent Alpha", "透過"),
             new WFI18NTranslation("Ghost Transparent", "ゴースト透過"),
+            new WFI18NTranslation("Grass", "草"),
+            new WFI18NTranslation("Grass Wave", "草の揺れ"),
             new WFI18NTranslation("Material Options", "マテリアル設定"),
             new WFI18NTranslation("Utility", "ユーティリティ"),
             // Base
@@ -315,8 +330,9 @@ namespace UnlitWF
             new WFI18NTranslation("Roughen", "粗くする"),
             new WFI18NTranslation("Finer", "細かくする"),
             new WFI18NTranslation("Tint Color", "色調整"),
-            new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離"),
-            new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離"),
+            new WFI18NTranslation("FadeOut Distance", "フェードアウト距離"),
+            new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離 (Near)"),
+            new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離 (Far)"),
             // Lit
             new WFI18NTranslation("Unlit Intensity", "Unlit Intensity (最小明度)"),
             new WFI18NTranslation("Saturate Intensity", "Saturate Intensity (飽和明度)"),
@@ -416,12 +432,23 @@ namespace UnlitWF
             // EmissiveScroll
             new WFI18NTranslation("ES", "Emission", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),
+            new WFI18NTranslation("ES", "Enable EmissiveScroll", "スクロールを使用する"),
             new WFI18NTranslation("ES", "Wave Type", "波形"),
             new WFI18NTranslation("ES", "Change Alpha Transparency", "透明度も反映する"),
             new WFI18NTranslation("ES", "Direction Type", "方向の種類"),
             new WFI18NTranslation("ES", "LevelOffset", "ゼロ点調整"),
             new WFI18NTranslation("ES", "Sharpness", "鋭さ"),
             new WFI18NTranslation("ES", "ScrollSpeed", "スピード"),
+            new WFI18NTranslation("ES", "Enable AudioLink", "AudioLink を使用する"),
+            new WFI18NTranslation("ES", "Emission Multiplier", "エミッション倍率"),
+            new WFI18NTranslation("ES", "Emission Multiplier (Min)", "エミッション倍率 (Min)"),
+            new WFI18NTranslation("ES", "Emission Multiplier (Max)", "エミッション倍率 (Max)"),
+            new WFI18NTranslation("ES", "Band", "バンド"),
+            new WFI18NTranslation("ES", "Slope", "傾き"),
+            new WFI18NTranslation("ES", "Threshold", "しきい値"),
+            new WFI18NTranslation("ES", "Threshold (Min)", "しきい値 (Min)"),
+            new WFI18NTranslation("ES", "Threshold (Max)", "しきい値 (Max)"),
+            new WFI18NTranslation("ES", "Dont Emit when AudioLink is disabled", "AudioLink無効時は光らせない"),
             // Outline
             new WFI18NTranslation("TL", "Line Color", "線の色"),
             new WFI18NTranslation("TL", "Line Width", "線の太さ"),
@@ -437,8 +464,9 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
             // Distance Fade
             new WFI18NTranslation("DFD", "Color", "色"),
-            new WFI18NTranslation("DFD", "Fade Distance (Near)", "フェード距離"),
-            new WFI18NTranslation("DFD", "Fade Distance (Far)", "フェード距離"),
+            new WFI18NTranslation("DFD", "Fade Distance", "フェード距離"),
+            new WFI18NTranslation("DFD", "Fade Distance (Near)", "フェード距離 (Near)"),
+            new WFI18NTranslation("DFD", "Fade Distance (Far)", "フェード距離 (Far)"),
             new WFI18NTranslation("DFD", "Power", "強度"),
             new WFI18NTranslation("DFD", "BackFace Shadow", "裏面は影にする"),
             // Toon Fog
@@ -493,6 +521,22 @@ namespace UnlitWF
             // Frosted Glass
             new WFI18NTranslation("CGL", "Blur", "ブラー"),
             new WFI18NTranslation("CGL", "Blur Mode", "ブラーモード"),
+            // Grass
+            new WFI18NTranslation("GRS", "Height Type", "高さ指定タイプ"),
+            new WFI18NTranslation("GRS", "Ground Y coordinate", "地面Y座標"),
+            new WFI18NTranslation("GRS", "Height scale", "高さスケール"),
+            new WFI18NTranslation("GRS", "Height UV Type", "高さ指定UVタイプ"),
+            new WFI18NTranslation("GRS", "Height Mask Tex", "高さ指定マスクテクスチャ"),
+            new WFI18NTranslation("GRS", "UV Factor", "UV係数"),
+            new WFI18NTranslation("GRS", "Color Factor", "カラー係数"),
+            new WFI18NTranslation("GRS", "Tint Color Top", "色調整(先端)"),
+            new WFI18NTranslation("GRS", "Tint Color Bottom", "色調整(根元)"),
+            // GrassWave
+            new WFI18NTranslation("GRW", "Wave Speed", "波スピード"),
+            new WFI18NTranslation("GRW", "Wave Amplitude", "波の振幅"),
+            new WFI18NTranslation("GRW", "Wave Exponent", "指数"),
+            new WFI18NTranslation("GRW", "Wave Offset", "オフセット"),
+            new WFI18NTranslation("GRW", "Wind Vector", "風ベクトル"),
 
             // メニュー
             new WFI18NTranslation("Copy material", "コピー"),
