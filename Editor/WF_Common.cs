@@ -145,6 +145,16 @@ namespace UnlitWF
             return label != null && name.ToLower() == "enable";
         }
 
+        public static bool IsPropertyTrue(Material mat, string prop_name)
+        {
+            return IsPropertyTrue(mat.GetFloat(prop_name));
+        }
+
+        public static bool IsPropertyTrue(float value)
+        {
+            return 0.001f < Math.Abs(value);
+        }
+
         /// <summary>
         /// 見つけ次第削除するシェーダキーワード
         /// </summary>
@@ -678,7 +688,7 @@ namespace UnlitWF
                 // 未指定のときはOK
                 return true;
             }
-            return IsPropTrue(mat, enablePropName);
+            return WFCommonUtility.IsPropertyTrue(mat, enablePropName);
         }
 
         protected bool ApplyKeyword(Material mat, string[] kwds, int value)
@@ -718,11 +728,6 @@ namespace UnlitWF
             }
             return true;
         }
-
-        protected static bool IsPropTrue(Material mat, string prop_name)
-        {
-            return 0.001f < Math.Abs(mat.GetFloat(prop_name));
-        }
     }
 
     public class WFCustomKeywordSettingBool : WFCustomKeywordSetting
@@ -736,7 +741,7 @@ namespace UnlitWF
 
         public override bool SetKeywordTo(Material mat)
         {
-            return ApplyKeywordByBool(mat, keyword, IsPropTrue(mat, propertyName));
+            return ApplyKeywordByBool(mat, keyword, WFCommonUtility.IsPropertyTrue(mat, propertyName));
         }
     }
 

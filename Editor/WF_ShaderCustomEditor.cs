@@ -376,13 +376,13 @@ namespace UnlitWF
                 // このタイミングで確認する理由は、ShaderProperty内でFix*Drawerが動作するため
                 if (WFCommonUtility.IsEnableToggle(label, name))
                 {
-                    if ((int)prop.floatValue == 0)
+                    if (WFCommonUtility.IsPropertyTrue(prop.floatValue))
                     {
-                        disable.Add(label);
+                        disable.Remove(label);
                     }
                     else
                     {
-                        disable.Remove(label);
+                        disable.Add(label);
                     }
                 }
             }
@@ -971,7 +971,7 @@ namespace UnlitWF
             }
             else
             {
-                bool value = 0.001f < Math.Abs(prop.floatValue);
+                bool value = WFCommonUtility.IsPropertyTrue(prop.floatValue);
 
                 // Toggle
                 {
