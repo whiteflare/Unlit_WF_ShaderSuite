@@ -148,15 +148,19 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2,CONSTANT,3)]
-            _ES_Shape               ("[ES] Wave Type", Float) = 3
-        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV1,2,UV2,3)]
-            _ES_DirType             ("[ES] Direction Type", Float) = 0
+        [Toggle(_)]
+            _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
+            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
+            _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _ES_SC_UVType           ("[ES] UV Type", Float) = 0
         [WF_Vector3]
-            _ES_Direction           ("[ES] Direction", Vector) = (0, -10, 0, 0)
-            _ES_LevelOffset         ("[ES] LevelOffset", Range(-1, 1)) = 0
-            _ES_Sharpness           ("[ES] Sharpness", Range(0, 4)) = 1
-            _ES_Speed               ("[ES] ScrollSpeed", Range(0, 8)) = 2
+            _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
+            _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         // Lit
         [WFHeader(Lit)]
@@ -186,7 +190,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/09/23", Float) = 0
+            _CurrentVersion         ("2022/10/22", Float) = 0
     }
 
     SubShader {
@@ -230,6 +234,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
+            #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 

@@ -36,7 +36,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         [Header(Lightmap)]
         [IntRange]
         _ModeLightMap               ("show LightMap", Range(0, 2))  = 0
-  
+
         [Header(Other Settings)]
         [ToggleUI]
         _GridEnable                 ("Grid Enable", Range(0, 1))    = 1
@@ -59,7 +59,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/09/23", Float) = 0
+            _CurrentVersion         ("2022/10/22", Float) = 0
     }
 
     SubShader
