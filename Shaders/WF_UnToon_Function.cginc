@@ -503,25 +503,26 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
 
             float4 es_mask  = WF_TEX2D_EMISSION(uv_main);
             float4 es_color = _EmissionColor * es_mask;
+            float es_power  = MAX_RGB(es_mask.rgb);
 
             // RGB側の合成
             color.rgb =
                 // 加算合成
                 _ES_BlendType == 0 ? color.rgb + es_color.rgb * waving :
                 // 旧形式のブレンド
-                _ES_BlendType == 1 ? lerp(color.rgb, es_color.rgb, waving * MAX_RGB(es_mask.rgb)) :
+                _ES_BlendType == 1 ? lerp(color.rgb, es_color.rgb, waving * es_power) :
                 // ブレンド
                 lerp(color.rgb, es_color.rgb, waving);
 
             // Alpha側の合成
         #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
             if (TGL_ON(_ES_SC_AlphaScroll)) {
-                color.a = max(color.a, waving);
+                color.a = max(color.a, waving * es_power);
             }
         #endif
         #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || (defined(_WF_LEGACY_FEATURE_SWITCH) && !defined(_WF_MOBILE)))
             if (TGL_ON(_ES_AU_AlphaLink) && 0 < au_status) {
-                color.a = max(color.a, waving);
+                color.a = max(color.a, waving * es_power);
             }
         #endif
 FEATURE_TGL_END
