@@ -37,7 +37,7 @@
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
         float  height           : COLOR0;
-        float  light_color      : COLOR1;
+        float3 light_color      : COLOR1;
 #ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR2;
 #endif
