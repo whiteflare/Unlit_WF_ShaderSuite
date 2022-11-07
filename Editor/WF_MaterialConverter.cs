@@ -130,35 +130,17 @@ namespace UnlitWF.Converter
             return new Regex(".*" + name + ".*", RegexOptions.IgnoreCase).IsMatch(shader.name);
         }
 
+        [Obsolete]
         private static bool hasCustomValue(Dictionary<string, ShaderSerializedProperty> props, string name)
         {
             if (props.TryGetValue(name, out var prop))
             {
-                switch (prop.Type)
-                {
-                    case ShaderUtil.ShaderPropertyType.Float:
-                    case ShaderUtil.ShaderPropertyType.Range:
-                        return 0.001f < Mathf.Abs(prop.FloatValue);
-
-                    case ShaderUtil.ShaderPropertyType.Color:
-                        var col = prop.ColorValue;
-                        return 0.001f < Mathf.Abs(col.r) || 0.001f < Mathf.Abs(col.g) || 0.001f < Mathf.Abs(col.b);
-
-                    case ShaderUtil.ShaderPropertyType.Vector:
-                        var vec = prop.VectorValue;
-                        return 0.001f < Mathf.Abs(vec.x) || 0.001f < Mathf.Abs(vec.y) || 0.001f < Mathf.Abs(vec.z);
-
-                    case ShaderUtil.ShaderPropertyType.TexEnv:
-                        var tex = prop.TextureValue;
-                        return tex != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex));
-
-                    default:
-                        return false;
-                }
+                return hasCustomValue(prop);
             }
             return false;
         }
 
+        [Obsolete]
         protected static bool HasCustomValue(ConvertContext ctx, params string[] names)
         {
             var newProp = ShaderSerializedProperty.AsDict(ctx.target);
@@ -177,6 +159,70 @@ namespace UnlitWF.Converter
                 }
             }
             return false;
+        }
+
+        protected static bool HasOldProperty(ConvertContext ctx, params string[] names)
+        {
+            return names.Any(name => ctx.oldProps.ContainsKey(name));
+        }
+
+        protected static bool HasOldPropertyValue(ConvertContext ctx, params string[] names)
+        {
+            return names.Any(name =>
+            {
+                if (ctx.oldProps.TryGetValue(name, out var prop))
+                {
+                    return hasCustomValue(prop);
+                }
+                return false;
+            });
+        }
+
+        protected static bool HasNewProperty(ConvertContext ctx, params string[] names)
+        {
+            return names.Any(name => 0 <= WFCommonUtility.FindPropertyIndex(ctx.target.shader, name));
+        }
+
+        protected static bool HasNewPropertyValue(ConvertContext ctx, params string[] names)
+        {
+            var newProp = ShaderSerializedProperty.AsDict(ctx.target);
+            return names.Any(name =>
+            {
+                if (newProp.TryGetValue(name, out var prop))
+                {
+                    return hasCustomValue(prop);
+                }
+                return false;
+            });
+        }
+
+        private static bool hasCustomValue(ShaderSerializedProperty prop)
+        {
+            if (prop == null)
+            {
+                return false;
+            }
+            switch (prop.Type)
+            {
+                case ShaderUtil.ShaderPropertyType.Float:
+                case ShaderUtil.ShaderPropertyType.Range:
+                    return 0.001f < Mathf.Abs(prop.FloatValue);
+
+                case ShaderUtil.ShaderPropertyType.Color:
+                    var col = prop.ColorValue;
+                    return 0.001f < Mathf.Abs(col.r) || 0.001f < Mathf.Abs(col.g) || 0.001f < Mathf.Abs(col.b);
+
+                case ShaderUtil.ShaderPropertyType.Vector:
+                    var vec = prop.VectorValue;
+                    return 0.001f < Mathf.Abs(vec.x) || 0.001f < Mathf.Abs(vec.y) || 0.001f < Mathf.Abs(vec.z);
+
+                case ShaderUtil.ShaderPropertyType.TexEnv:
+                    var tex = prop.TextureValue;
+                    return tex != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(tex));
+
+                default:
+                    return false;
+            }
         }
     }
 
@@ -290,7 +336,7 @@ namespace UnlitWF.Converter
                     if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {
                         ctx.outline = true;
                     }
-                    else if (HasCustomValue(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler", "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
+                    else if (HasOldPropertyValue(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler", "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
                         ctx.outline = true;
                     }
                 },
@@ -350,14 +396,19 @@ namespace UnlitWF.Converter
                 ctx => {
                     // _ClippingMask の有無からシェーダタイプを判定する
                     if (ctx.renderType == ShaderType.NoMatch) {
-                        if (HasCustomValue(ctx, "_ClippingMask")) {
+                        if (HasOldPropertyValue(ctx, "_ClippingMask")) {
                             ctx.renderType = ShaderType.Cutout;
                         }
-                        if (HasCustomValue(ctx, "_AlphaMask"))
+                        if (HasOldPropertyValue(ctx, "_AlphaMask"))
                         {
                             ctx.renderType = ShaderType.Transparent;
                         }
                     }
+                },
+                ctx => { 
+                    // シェーダ切り替える直前に、削除したいプロパティを削除
+                    WFMaterialEditUtility.RemovePropertiesWithoutUndo(ctx.target, "_GI_Intensity");
+                    // _GI_Intensity は UTS が保持しているが、UnToon でも過去に同名プロパティを持っていてマイグレーション対象にしているため削除する
                 },
                 ctx => {
                     if (WFCommonUtility.IsURP()) {
@@ -405,7 +456,7 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
-                    if (HasCustomValue(ctx, "_MainTex")) {
+                    if (HasOldPropertyValue(ctx, "_MainTex")) {
                         // メインテクスチャがあるならば _Color は白にする
                         if (!IsMatchShaderName(ctx, "Standard") && !IsMatchShaderName(ctx, "Autodesk") && !IsMatchShaderName(ctx, "Unlit/Color"))
                         {
@@ -423,7 +474,7 @@ namespace UnlitWF.Converter
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         PropertyNameReplacement.Match("_AlphaMask", "_AL_MaskTex"),
                         PropertyNameReplacement.Match("_ClippingMask", "_AL_MaskTex"));
-                    if (HasCustomValue(ctx, "_AL_MaskTex")) {
+                    if (HasOldPropertyValue(ctx, "_AlphaMask", "_ClippingMask")) {
                         ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
                     }
                 },
@@ -431,25 +482,25 @@ namespace UnlitWF.Converter
                     // ノーマルマップ
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         PropertyNameReplacement.Match("_NormalMap", "_BumpMap"));
-                    if (HasCustomValue(ctx, "_BumpMap")) {
+                    if (HasOldPropertyValue(ctx, "_NormalMap", "_BumpMap")) {
                         ctx.target.SetInt("_NM_Enable", 1);
                     }
                 },
                 ctx => {
                     // ノーマルマップ2nd
-                    if (HasCustomValue(ctx, "_DetailNormalMap")) {
+                    if (HasOldPropertyValue(ctx, "_DetailNormalMap")) {
                         ctx.target.SetInt("_NS_Enable", 1);
                     }
                 },
                 ctx => {
                     // メタリック
-                    if (HasCustomValue(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
+                    if (HasOldPropertyValue(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
                         ctx.target.SetInt("_MT_Enable", 1);
                     }
                 },
                 ctx => {
                     // AO
-                    if (HasCustomValue(ctx, "_OcclusionMap")) {
+                    if (HasOldPropertyValue(ctx, "_OcclusionMap")) {
                         ctx.target.SetInt("_AO_Enable", 1);
                     }
                 },
@@ -458,7 +509,7 @@ namespace UnlitWF.Converter
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         PropertyNameReplacement.Match("_Emissive_Tex", "_EmissionMap"),
                         PropertyNameReplacement.Match("_Emissive_Color", "_EmissionColor"));
-                    if (HasCustomValue(ctx, "_EmissionMap", "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
+                    if (HasOldPropertyValue(ctx, "_EmissionMap", "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
                         ctx.target.SetInt("_ES_Enable", 1);
                     }
                 },
@@ -482,7 +533,7 @@ namespace UnlitWF.Converter
                         PropertyNameReplacement.Match("_Shadow2ndColor", "_TS_2ndColor")
                         );
                     // 1影2影とも色相だけ反映して彩度・明度はリセットしてしまう
-                    if (HasCustomValue(ctx, "_TS_1stColor")) {
+                    if (HasNewProperty(ctx, "_TS_1stColor")) {
                         float hur, sat, val;
                         Color.RGBToHSV(ctx.target.GetColor("_TS_1stColor"), out hur, out sat, out val);
                         if (sat < 0.05f) {
@@ -490,7 +541,7 @@ namespace UnlitWF.Converter
                         }
                         ctx.target.SetColor("_TS_1stColor", Color.HSVToRGB(hur, 0.1f, 0.9f));
                     }
-                    if (HasCustomValue(ctx, "_TS_2ndColor")) {
+                    if (HasNewProperty(ctx, "_TS_2ndColor")) {
                         float hur, sat, val;
                         Color.RGBToHSV(ctx.target.GetColor("_TS_2ndColor"), out hur, out sat, out val);
                         if (sat < 0.05f) {
@@ -499,17 +550,17 @@ namespace UnlitWF.Converter
                         ctx.target.SetColor("_TS_2ndColor", Color.HSVToRGB(hur, 0.15f, 0.8f));
                     }
                     // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
-                    if (HasCustomValue(ctx, "_TS_1stTex", "_TS_2ndTex")) {
-                        if (!HasCustomValue(ctx, "_TS_BaseTex")) {
+                    if (HasNewPropertyValue(ctx, "_TS_1stTex", "_TS_2ndTex")) {
+                        if (!HasNewPropertyValue(ctx, "_TS_BaseTex")) {
                             ctx.target.SetTexture("_TS_BaseTex", ctx.target.GetTexture("_MainTex"));
                         }
-                        if (!HasCustomValue(ctx, "_TS_1stTex")) {
+                        if (!HasNewPropertyValue(ctx, "_TS_1stTex")) {
                             ctx.target.SetTexture("_TS_1stTex", ctx.target.GetTexture("_TS_BaseTex"));
                         }
-                        if (!HasCustomValue(ctx, "_TS_2ndTex")) {
+                        if (!HasNewPropertyValue(ctx, "_TS_2ndTex")) {
                             ctx.target.SetTexture("_TS_2ndTex", ctx.target.GetTexture("_TS_1stTex"));
                         }
-                        if (!HasCustomValue(ctx, "_TS_3rdTex")) {
+                        if (!HasNewPropertyValue(ctx, "_TS_3rdTex")) {
                             ctx.target.SetTexture("_TS_3rdTex", ctx.target.GetTexture("_TS_2ndTex"));
                         }
                         // ただし _TS_BaseTex, _TS_1stTex, _TS_2ndTex, _TS_3rdTex が全て同じ Texture を指しているならば全てクリアする
@@ -525,7 +576,7 @@ namespace UnlitWF.Converter
                 },
                 ctx => {
                     // リムライト
-                    if (HasCustomValue(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
+                    if (HasOldPropertyValue(ctx, "_UseRim", "_RimLight", "_RimLitEnable", "_EnableRimLighting")) {
                         ctx.target.SetInt("_TR_Enable", 1);
                         WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                             PropertyNameReplacement.Match("_RimColor", "_TR_Color"),
@@ -536,7 +587,7 @@ namespace UnlitWF.Converter
                             PropertyNameReplacement.Match("_Set_RimLightMask", "_TR_Color"),
                             PropertyNameReplacement.Match("_RimMask", "_TR_Color")
                             );
-                        if (HasCustomValue(ctx, "_TR_Color")) {
+                        if (HasNewPropertyValue(ctx, "_TR_Color")) {
                             ctx.target.SetInt("_TR_BlendType", 2);  // ADD
                         }
                     }
@@ -849,7 +900,7 @@ namespace UnlitWF.Converter
                             }
                         }
                         // BumpMap が未設定ならば _NM_Enable をオフにする
-                        if (!HasCustomValue(ctx, "_BumpMap"))
+                        if (!HasNewPropertyValue(ctx, "_BumpMap"))
                         {
                             ctx.target.SetInt("_NM_Enable", 0);
                         }
@@ -857,7 +908,7 @@ namespace UnlitWF.Converter
                 },
                 ctx => {
                     // _TS_Featherありの状態から_TS_1stFeatherに変更されたならば、
-                    if (ctx.oldProps.ContainsKey("_TS_Feather") && HasCustomValue(ctx, "_TS_1stFeather"))
+                    if (HasOldProperty(ctx, "_TS_Feather") && HasNewProperty(ctx, "_TS_1stFeather"))
                     {
                         CopyFloatValue(ctx.target, "_TS_1stFeather", "_TS_2ndFeather");
                         CopyFloatValue(ctx.target, "_TS_1stFeather", "_TS_3rdFeather");
@@ -865,7 +916,7 @@ namespace UnlitWF.Converter
                 },
                 ctx => {
                     // _ES_Shapeありの状態から_ES_SC_Shapeに変更されたならば、
-                    if (ctx.oldProps.ContainsKey("_ES_Shape") && ctx.target.HasProperty("_ES_SC_Shape"))
+                    if (HasOldProperty(ctx, "_ES_Shape") && HasNewProperty(ctx, "_ES_SC_Shape"))
                     {
                         // CONSTANTでないならばEmissiveScroll有効
                         ctx.target.SetInt("_ES_ScrollEnable", ctx.target.GetInt("_ES_SC_Shape") != 3 ? 1 : 0);
@@ -873,7 +924,7 @@ namespace UnlitWF.Converter
                 },
                 ctx => {
                     // _ES_DirTypeありの状態から_ES_SC_DirTypeに変更されたならば、
-                    if (ctx.oldProps.ContainsKey("_ES_DirType") && ctx.target.HasProperty("_ES_SC_DirType"))
+                    if (HasOldProperty(ctx, "_ES_DirType") && HasNewProperty(ctx, "_ES_SC_DirType"))
                     {
                         // 変更前で 3:UV2 だったなら、2:UV に変更してUVTypeを 1:UV2 にする
                         if (ctx.target.GetInt("_ES_SC_DirType") == 3)

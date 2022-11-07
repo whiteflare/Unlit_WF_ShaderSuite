@@ -669,6 +669,30 @@ namespace UnlitWF
             EditorUtility.SetDirty(material);
         }
 
+        public static void RemovePropertiesWithoutUndo(Material material, params string[] propNames)
+        {
+            var props = ShaderSerializedProperty.AsDict(material);
+            var del_props = new List<ShaderSerializedProperty>();
+            foreach (var name in propNames)
+            {
+                if (props.TryGetValue(name, out var p))
+                {
+                    del_props.Add(p);
+                }
+            }
+            if (del_props.Count == 0)
+            {
+                return;
+            }
+
+            // 削除実行
+            var del_names = DeleteProperties(del_props, material);
+            // Default割り当てTextureを再設定する
+            ResetDefaultTextures(material, del_names);
+            // 反映
+            EditorUtility.SetDirty(material);
+        }
+
         private static void ResetDefaultTextures(Material material, HashSet<string> del_names)
         {
             var shader = material.shader;
@@ -714,10 +738,18 @@ namespace UnlitWF
         {
             var del_names = new HashSet<string>();
             var cachedNames = new List<string>();
+
             foreach (var p in props)
             {
                 del_names.Add(p.name);
-                p.Remove(ref cachedNames);
+                if (material == editReplaceTarget)
+                {
+                    p.Remove(ref editReplaceNamesCache);
+                }
+                else
+                {
+                    p.Remove(ref cachedNames);
+                }
             }
 
             // 削除する内容のログを出す
