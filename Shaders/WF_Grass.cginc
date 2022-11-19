@@ -27,10 +27,10 @@
     struct appdata {
         float4 vertex           : POSITION;
         float4 vertex_color     : COLOR0;
-        float4 normal           : NORMAL;
         float2 uv               : TEXCOORD0;
         float2 uv2              : TEXCOORD1;
         float2 uv3              : TEXCOORD2;
+        float4 normal           : NORMAL; // ShadowCasterから使用される
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
@@ -44,6 +44,10 @@
         float2 uv               : TEXCOORD0;
 #ifdef _V2F_HAS_UV_LMAP
         float2 uv_lmap          : TEXCOORD1;
+#endif
+#ifdef _GRS_ERSSIDE_ENABLE
+        float3 ws_normal        : TEXCOORD2;
+        float3 ws_vertex        : TEXCOORD3;
 #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
@@ -208,6 +212,10 @@ FEATURE_TGL_END
 
         o.vs_vertex = UnityWorldToClipPos(ws_vertex);
         o.uv = v.uv;
+#ifdef _GRS_ERSSIDE_ENABLE
+        o.ws_vertex = ws_vertex;
+        o.ws_normal = UnityObjectToWorldNormal(v.normal);
+#endif
 #ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = v.vertex_color;
 #endif
@@ -236,6 +244,12 @@ FEATURE_TGL_END
 
         clip(color.a - _Cutoff);
 
+#ifdef _GRS_ERSSIDE_ENABLE
+        if (abs(dot(normalize(i.ws_normal), worldSpaceViewPointDir(i.ws_vertex))) < _GRS_EraseSide) {
+            discard;
+        }
+#endif
+
         UNITY_APPLY_FOG(i.fogCoord, color);
 
         return color;
@@ -248,6 +262,10 @@ FEATURE_TGL_END
     struct v2f_shadow {
         V2F_SHADOW_CASTER;  // TEXCOORD0
         float2 uv : TEXCOORD1;
+#ifdef _GRS_ERSSIDE_ENABLE
+        float3 ws_normal        : TEXCOORD2;
+        float3 ws_vertex        : TEXCOORD3;
+#endif
 #ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR1;
 #endif
@@ -274,6 +292,10 @@ FEATURE_TGL_END
         TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
 
         o.uv = v.uv;
+#ifdef _GRS_ERSSIDE_ENABLE
+        o.ws_vertex = ws_vertex;
+        o.ws_normal = UnityObjectToWorldNormal(v.normal);
+#endif
 #ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = v.vertex_color;
 #endif
@@ -294,6 +316,12 @@ FEATURE_TGL_END
         affectVertexColor(i.vertex_color, color);
 
         clip(color.a - _Cutoff);
+
+#ifdef _GRS_ERSSIDE_ENABLE
+        if (abs(dot(normalize(i.ws_normal), worldSpaceViewPointDir(i.ws_vertex))) < _GRS_EraseSide) {
+            discard;
+        }
+#endif
 
         return frag_shadow_caster(i);
     }

@@ -52,6 +52,7 @@
     half3           _GRS_ColorFactor;
     half4           _GRS_ColorBottom;
     half4           _GRS_ColorTop;
+    half            _GRS_EraseSide;
 
     // -------------------------
 

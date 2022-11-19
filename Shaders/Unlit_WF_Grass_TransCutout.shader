@@ -40,6 +40,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             _GRS_ColorFactor        ("[GRS] Color Factor", Vector) = (0, 1, 0, 0)
             _GRS_ColorTop           ("[GRS] Tint Color Top", Color) = (1, 1, 1, 1)
             _GRS_ColorBottom        ("[GRS] Tint Color Bottom", Color) = (1, 1, 1, 1)
+            _GRS_EraseSide          ("[GRS] Erase Side", Range(0, 1)) = 0
 
         [WFHeaderToggle(Grass Wave)]
             _GRW_Enable             ("[GRW] Enable", Float) = 0
@@ -101,6 +102,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #define _WF_MOBILE
 
             #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
+            #pragma shader_feature_local _ _GRS_ERSSIDE_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GRW_ENABLE
             #pragma shader_feature_local _VC_ENABLE
@@ -133,6 +135,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #define _WF_MOBILE
 
             #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
+            #pragma shader_feature_local _ _GRS_ERSSIDE_ENABLE
             #pragma shader_feature_local _GRW_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 

@@ -253,6 +253,7 @@ namespace UnlitWF
                 enablePropName = "_CGL_Enable",
             } },
             { "_GRS_HeightType", new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_") },
+            { "_GRS_EraseSide", new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE") },
         };
 
         /// <summary>
@@ -531,6 +532,7 @@ namespace UnlitWF
             new WFI18NTranslation("GRS", "Color Factor", "カラー係数"),
             new WFI18NTranslation("GRS", "Tint Color Top", "色調整(先端)"),
             new WFI18NTranslation("GRS", "Tint Color Bottom", "色調整(根元)"),
+            new WFI18NTranslation("GRS", "Erase Side", "側面を非表示"),
             // GrassWave
             new WFI18NTranslation("GRW", "Wave Speed", "波スピード"),
             new WFI18NTranslation("GRW", "Wave Amplitude", "波の振幅"),
