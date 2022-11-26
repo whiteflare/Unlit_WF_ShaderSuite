@@ -705,6 +705,7 @@ namespace UnlitWF
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
                 {
+                    Undo.RecordObjects(allNonStaticMaterials, "Fix BatchingStatic Materials");
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
                     foreach (var mat in allNonStaticMaterials)
                     {
@@ -759,6 +760,7 @@ namespace UnlitWF
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
                 {
+                    Undo.RecordObjects(allNonStaticMaterials, "Fix LightmapStatic Materials");
                     // _AO_Enable と _AO_UseLightMap をオンにする
                     foreach (var mat in allNonStaticMaterials)
                     {
@@ -771,17 +773,18 @@ namespace UnlitWF
 
         private static void OnGUISub_TransparentQueueHelpBox(MaterialEditor materialEditor)
         {
-            // 現在編集中のマテリアルの配列のうち、RenderType が Transparent であるもの
+            // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
             var targets = WFCommonUtility.AsMaterials(materialEditor.targets)
-                .Where(mat => mat.GetTag("RenderType", true, "Opaque") == "Transparent").ToArray();
+                .Where(mat => mat.GetTag("RenderType", true, "Opaque") == "Transparent" && mat.renderQueue < 2500).ToArray();
 
             // RenderGeometryTransparentでないものがある場合は
-            if (targets.Any(mat => mat.renderQueue < 2500))
+            if (0 < targets.Length)
             {
-                var message = WFI18N.Translate("半透明マテリアルのQueueが2500未満です。RenderQueueを修正しますか？");
+                var message = WFI18N.Translate(WFMessageText.PlzFixQueue);
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now")))
                 {
+                    Undo.RecordObjects(targets, "Fix RenderQueue Materials");
                     foreach (var mat in targets)
                     {
                         mat.renderQueue = -1;
