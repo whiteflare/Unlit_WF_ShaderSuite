@@ -340,6 +340,8 @@ namespace UnlitWF
             OnGuiSub_ShowCurrentShaderName(materialEditor, false);
             // マイグレーションHelpBox
             OnGUISub_MigrationHelpBox(materialEditor);
+            // Transparent RenderQueue対策HelpBox
+            OnGUISub_TransparentQueueHelpBox(materialEditor);
             // Batching Static対策HelpBox
             OnGUISub_BatchingStaticHelpBox(materialEditor);
             // Lightmap Static対策HelpBox
@@ -762,6 +764,27 @@ namespace UnlitWF
                     {
                         mat.SetInt("_AO_Enable", 1);
                         mat.SetInt("_AO_UseLightMap", 1);
+                    }
+                }
+            }
+        }
+
+        private static void OnGUISub_TransparentQueueHelpBox(MaterialEditor materialEditor)
+        {
+            // 現在編集中のマテリアルの配列のうち、RenderType が Transparent であるもの
+            var targets = WFCommonUtility.AsMaterials(materialEditor.targets)
+                .Where(mat => mat.GetTag("RenderType", true, "Opaque") == "Transparent").ToArray();
+
+            // RenderGeometryTransparentでないものがある場合は
+            if (targets.Any(mat => mat.renderQueue < 2500))
+            {
+                var message = WFI18N.Translate("半透明マテリアルのQueueが2500未満です。RenderQueueを修正しますか？");
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now")))
+                {
+                    foreach (var mat in targets)
+                    {
+                        mat.renderQueue = -1;
                     }
                 }
             }
