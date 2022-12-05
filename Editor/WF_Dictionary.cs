@@ -107,6 +107,13 @@ namespace UnlitWF
             new WFShaderName("BRP", "Grass", "Basic", "TransCutout",                   "UnlitWF/WF_Grass_TransCutout", represent: true),
 
             // ================
+            // Water 系列
+            // ================
+
+            new WFShaderName("BRP", "Water", "Surface", "Opaque",                      "UnlitWF/WF_Water_Surface_Opaque", represent: true),
+            new WFShaderName("BRP", "Water", "Surface", "Transparent",                 "UnlitWF/WF_Water_Surface_Transparent"),
+
+            // ================
             // UnToon 系列(URP)
             // ================
 
