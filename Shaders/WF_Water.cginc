@@ -121,7 +121,7 @@
         height += calcWavingHeight_1(i, cnt);
         height += calcWavingHeight_2(i, cnt);
         height += calcWavingHeight_3(i, cnt);
-        return cnt == 0 ? 1 : saturate( height / cnt / 0.5 + 0.5 );
+        return cnt == 0 ? 1 : saturate( height / max(1, cnt) / 0.5 + 0.5 );
     }
 
     float3 calcWavingNormal(v2f_surface i) {
@@ -130,7 +130,7 @@
         ws_bump_normal += calcWavingNormal_1(i, cnt);
         ws_bump_normal += calcWavingNormal_2(i, cnt);
         ws_bump_normal += calcWavingNormal_3(i, cnt);
-        return cnt == 0 ? i.ws_normal : normalize(ws_bump_normal / cnt);
+        return cnt == 0 ? i.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
     }
 
     ////////////////////////////

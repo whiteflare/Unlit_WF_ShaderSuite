@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_Water_Surface_Transparent" {
+Shader "UnlitWF/WF_Water_Surface_Opaque" {
 
     Properties {
         [WFHeader(Base)]
@@ -27,19 +27,6 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             _CullMode               ("Cull Mode", int) = 2
             _ShadowPower            ("Shadow Power", Range(0, 1)) = 0.5
 
-        // Alpha
-        [WFHeader(Transparent Alpha)]
-        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
-            _AL_Source              ("[AL] Alpha Source", Float) = 0
-        [NoScaleOffset]
-            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
-            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
-
         [WFHeaderToggle(Waving 1)]
             _WAV_Enable_1           ("[WA1] Enable", Float) = 1
             _WAV_Direction_1        ("[WA1] Direction", Range(0, 360)) = 0
@@ -51,7 +38,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
 
         [WFHeaderToggle(Waving 2)]
             _WAV_Enable_2           ("[WA2] Enable", Float) = 0
-            _WAV_Direction_2        ("[WA2] Direction", Range(0, 360)) = 0
+            _WAV_Direction_2        ("[WA2] Direction", Range(0, 360)) = 120
             _WAV_Speed_2            ("[WA2] Speed", Range(0, 10)) = 0
         [Normal]
             _WAV_NormalMap_2        ("[WA2] Wave Normal Map", 2D) = "bump" {}
@@ -60,7 +47,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
 
         [WFHeaderToggle(Waving 3)]
             _WAV_Enable_3           ("[WA3] Enable", Float) = 0
-            _WAV_Direction_3        ("[WA3] Direction", Range(0, 360)) = 0
+            _WAV_Direction_3        ("[WA3] Direction", Range(0, 360)) = 240
             _WAV_Speed_3            ("[WA3] Speed", Range(0, 10)) = 0
         [Normal]
             _WAV_NormalMap_3        ("[WA3] Wave Normal Map", 2D) = "bump" {}
@@ -121,15 +108,13 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-10" "DisableBatching"="True" }
+        Tags { "RenderType"="Opaque" "Queue"="Geometry-10" "DisableBatching"="True" }
 
         Pass {
             Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -137,8 +122,6 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             #pragma fragment frag_top
 
             #pragma target 3.0
-
-            #define _WF_ALPHA_FRESNEL
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE
