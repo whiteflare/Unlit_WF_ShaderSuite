@@ -226,7 +226,7 @@ FEATURE_TGL_END
         return o;
     }
 
-    half4 frag_top(v2f_surface i) : SV_Target {
+    half4 frag_top(v2f_surface i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         i.ws_normal        = normalize(i.ws_normal);
@@ -260,6 +260,8 @@ FEATURE_TGL_END
         affectFresnelAlpha(uv_main, ws_bump_normal, ws_view_dir, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
+        // リフラクション
+        affectRefraction(i, facing, ws_bump_normal, ws_bump_normal, color);
 
         UNITY_APPLY_FOG(i.fogCoord, color);
 

@@ -35,6 +35,10 @@
 
     DECL_MAIN_TEXCUBE   (_WAM_Cubemap);
 
+#ifdef _WF_PB_GRAB_TEXTURE
+    DECL_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE);   // URPではGrabがサポートされていないのでここで宣言する
+#endif
+
     ////////////////////////////
     // Other uniform variable
     ////////////////////////////
@@ -117,5 +121,16 @@
     float           _AO_Contrast;
     float           _AO_Brightness;
     float4          _AO_TintColor;
+
+    // -------------------------
+
+#ifndef _WF_MOBILE
+    FEATURE_TGL    (_CRF_Enable);
+    float           _CRF_RefractiveIndex;
+    float           _CRF_Distance;
+    float3          _CRF_Tint;
+    float           _CRF_BlendNormal;
+    float           _CRF_BlendNormal2;
+#endif
 
 #endif
