@@ -104,6 +104,11 @@ namespace UnlitWF
                     CompareAndSet(ctx.all, "_MT_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP
                 }
             }),
+            new DefValueSetPropertyHook("_WAM_Cubemap", ctx => {
+                if (ctx.current.textureValue != null) {
+                    CompareAndSet(ctx.all, "_WRL_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP
+                }
+            }),
             new DefValueSetPropertyHook("_AL_MaskTex", ctx => {
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_AL_Source", 0, 1); // MAIN_TEX_ALPHA -> MASK_TEX_RED

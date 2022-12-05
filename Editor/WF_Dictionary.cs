@@ -229,8 +229,10 @@ namespace UnlitWF
         /// ENABLEキーワードに対応していない特殊なプロパティ名 → キーワードの変換マップ。
         /// </summary>
         public static readonly Dictionary<string, WFCustomKeywordSetting> SpecialPropNameToKeywordMap = new Dictionary<string, WFCustomKeywordSetting>() {
-            { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE") },
-            { "_GL_LightMode", new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE") },
+            { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE")
+            },
+            { "_GL_LightMode", new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE") 
+            },
             { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             } },
@@ -252,8 +254,13 @@ namespace UnlitWF
             { "_CGL_BlurMode", new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
                 enablePropName = "_CGL_Enable",
             } },
-            { "_GRS_HeightType", new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_") },
-            { "_GRS_EraseSide", new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE") },
+            { "_GRS_HeightType", new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_") 
+            },
+            { "_GRS_EraseSide", new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE") 
+            },
+            { "_WRL_CubemapType", new WFCustomKeywordSettingEnum("_WRL_CubemapType", "_", "_", "_WAM_ONLY2ND_ENABLE") {
+                enablePropName = "_WAM_Enable",
+            } },
         };
 
         /// <summary>

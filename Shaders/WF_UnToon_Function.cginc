@@ -123,6 +123,10 @@
         #define WF_TEX2D_OCCLUSION(uv)          SAMPLE_MASK_VALUE(_OcclusionMap, uv, 0).rgb
     #endif
 
+    #ifndef IN_FRAG
+        #define IN_FRAG     v2f
+    #endif
+
     ////////////////////////////
     // Base Color
     ////////////////////////////
@@ -431,7 +435,7 @@ FEATURE_TGL_END
     #ifdef _ES_ENABLE
 
     #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-        float calcEmissiveWaving(v2f i, float2 uv_main) {
+        float calcEmissiveWaving(IN_FRAG i, float2 uv_main) {
             if (TGL_OFF(_ES_ScrollEnable)) {
                 return 1;
             }
@@ -479,13 +483,13 @@ FEATURE_TGL_END
         float   _ES_AU_BlackOut;
         float   _ES_AU_AlphaLink;
 
-        float calcEmissiveAudioLink(v2f i, float2 uv_main) {
+        float calcEmissiveAudioLink(IN_FRAG i, float2 uv_main) {
             float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( 0, _ES_AU_Band ) ).r);
             au = lerp(au * _ES_AU_Slope, lerp(1, au, _ES_AU_Slope), smoothstep(_ES_AU_MinThreshold, _ES_AU_MaxThreshold, au));
             return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, au);
         }
 
-        float enableEmissiveAudioLink(v2f i) {
+        float enableEmissiveAudioLink(IN_FRAG i) {
             return TGL_ON(_ES_AuLinkEnable) ? ( AudioLinkIsAvailable() ? 1 : ( TGL_ON(_ES_AU_BlackOut) ? -1 : 0 ) ) : 0;
         }
     #else
@@ -493,7 +497,7 @@ FEATURE_TGL_END
         #define enableEmissiveAudioLink(i)          (0)
     #endif
 
-        void affectEmissiveScroll(v2f i, float2 uv_main, inout float4 color) {
+        void affectEmissiveScroll(IN_FRAG i, float2 uv_main, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
             float au_status = enableEmissiveAudioLink(i);
             if (au_status < 0) {
@@ -539,7 +543,7 @@ FEATURE_TGL_END
 
     #ifdef _NM_ENABLE
 
-        float3 calcBumpNormal(v2f i, float2 uv_main) {
+        float3 calcBumpNormal(IN_FRAG i, float2 uv_main) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             if (TGL_ON(_NM_Enable)) {
 #endif
@@ -556,7 +560,7 @@ FEATURE_TGL_END
 #endif
         }
 
-        void affectBumpNormal(v2f i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
+        void affectBumpNormal(IN_FRAG i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
             // bump_normal 計算
             ws_bump_normal = calcBumpNormal(i, uv_main);
 
@@ -578,7 +582,7 @@ FEATURE_TGL_END
 
     #ifdef _NS_ENABLE
 
-        void affectDetailNormal(v2f i, float2 uv_main, out float3 ws_detail_normal, inout float4 color) {
+        void affectDetailNormal(IN_FRAG i, float2 uv_main, out float3 ws_detail_normal, inout float4 color) {
             ws_detail_normal = i.normal;
 
 FEATURE_TGL_ON_BEGIN(_NS_Enable)
@@ -641,7 +645,7 @@ FEATURE_TGL_END
             return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
         }
 
-        void affectMetallic(v2f i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, inout float4 color) {
+        void affectMetallic(IN_FRAG i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_MT_Enable)
             float metallic = _MT_Metallic;
             float monochrome = _MT_Monochrome;
@@ -895,7 +899,7 @@ FEATURE_TGL_END
 
     #ifdef _LME_ENABLE
 
-        void affectLame(v2f i, float2 uv_main, float3 ws_normal, inout float4 color) {
+        void affectLame(IN_FRAG i, float2 uv_main, float3 ws_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_LME_Enable)
             float power = WF_TEX2D_LAME_MASK(uv_main);
             if (0 < power) {
@@ -1009,7 +1013,7 @@ FEATURE_TGL_END
                 smoothstep(border, border + max(feather, 0.001), brightness) );
         }
 
-        void affectToonShade(v2f i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, float angle_light_camera, inout float4 color) {
+        void affectToonShade(IN_FRAG i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, float angle_light_camera, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_TS_Enable)
             if (isInMirror()) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
@@ -1099,7 +1103,7 @@ FEATURE_TGL_END
             return rimColor;
         }
 
-        void affectRimLight(v2f i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
+        void affectRimLight(IN_FRAG i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_TR_Enable)
             if (isInMirror()) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
@@ -1150,7 +1154,7 @@ FEATURE_TGL_END
                 ;
         }
 
-        void affectOverlayTexture(v2f i, float2 uv_main, float3 vs_normal, inout float4 color) {
+        void affectOverlayTexture(IN_FRAG i, float2 uv_main, float3 vs_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_OVL_Enable)
             float2 uv_overlay =
                 _OVL_UVType == 1 ? i.uv_lmap                                                 // UV2
@@ -1272,7 +1276,7 @@ FEATURE_TGL_END
 
     #ifdef _AO_ENABLE
 
-        void affectOcclusion(v2f i, float2 uv_main, inout float4 color) {
+        void affectOcclusion(IN_FRAG i, float2 uv_main, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_AO_Enable)
             float3 occlusion = ONE_VEC3;
 #ifndef _WF_MOBILE
@@ -1334,7 +1338,7 @@ FEATURE_TGL_END
             #endif
         }
 
-        void affectDistanceFade(v2f i, uint facing, inout float4 color) {
+        void affectDistanceFade(IN_FRAG i, uint facing, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_DFD_Enable)
             float dist = sqrt(calcDistanceFadeDistanceSq(i.ws_vertex.xyz));
             if (!facing && TGL_ON(_DFD_BackShadow)) {
@@ -1353,7 +1357,7 @@ FEATURE_TGL_END
 
     #ifdef _TFG_ENABLE
 
-        void affectToonFog(v2f i, float3 ws_view_dir, inout float4 color) {
+        void affectToonFog(IN_FRAG i, float3 ws_view_dir, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_TFG_Enable)
             float3 ws_base_position = UnityObjectToWorldPos(_TFG_BaseOffset);
             float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _TFG_Scale);
@@ -1377,7 +1381,7 @@ FEATURE_TGL_END
 
     #ifdef _CGO_ENABLE
 
-        void affectGhostTransparent(v2f i, inout float4 color) {
+        void affectGhostTransparent(IN_FRAG i, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_CGO_Enable)
             // GrabScreenPos 計算
             float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
@@ -1400,7 +1404,7 @@ FEATURE_TGL_END
 
     #ifdef _CRF_ENABLE
 
-        void affectRefraction(v2f i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+        void affectRefraction(IN_FRAG i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_CRF_Enable)
             float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
 
@@ -1467,7 +1471,7 @@ FEATURE_TGL_END
             return color;
         }
 
-        void affectFrostedGlass(v2f i, inout float4 color) {
+        void affectFrostedGlass(IN_FRAG i, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             // GrabScreenPos 計算
             float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
