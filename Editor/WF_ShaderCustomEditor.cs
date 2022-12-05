@@ -1553,11 +1553,6 @@ namespace UnlitWF
             this.text = text;
         }
 
-        public MaterialWFHeaderDecorator(string text, string helptext)
-        {
-            this.text = text;
-        }
-
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
             return 32;
@@ -1581,11 +1576,6 @@ namespace UnlitWF
             this.text = text;
         }
 
-        public MaterialWFHeaderToggleDrawer(string text, string helptext)
-        {
-            this.text = text;
-        }
-
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
             return 32;
@@ -1605,11 +1595,6 @@ namespace UnlitWF
         public readonly string text;
 
         public MaterialWFHeaderAlwaysOnDrawer(string text)
-        {
-            this.text = text;
-        }
-
-        public MaterialWFHeaderAlwaysOnDrawer(string text, string helptext)
         {
             this.text = text;
         }
@@ -1744,7 +1729,50 @@ namespace UnlitWF
         }
     }
 
-#endregion
+    /// <summary>
+    /// sin/cos計算済みDirectionのPropertyDrawer
+    /// </summary>
+    internal class MaterialWF_RotMatrixDrawer : MaterialPropertyDrawer
+    {
+        public readonly float min;
+        public readonly float max;
+
+        public MaterialWF_RotMatrixDrawer()
+        {
+            this.min = 0;
+            this.max = 360;
+        }
+
+        public MaterialWF_RotMatrixDrawer(float min, float max)
+        {
+            this.min = min;
+            this.max = max;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+            var value = prop.vectorValue;
+
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+            EditorGUI.BeginChangeCheck();
+            value.x = EditorGUI.Slider(position, label, value.x, min, max);
+            if (EditorGUI.EndChangeCheck())
+            {
+                value.y = Mathf.Sin(Mathf.Deg2Rad * value.x);
+                value.z = Mathf.Cos(Mathf.Deg2Rad * value.x);
+                value.w = 0;
+                prop.vectorValue = value;
+            }
+            EditorGUI.showMixedValue = false;
+
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+        }
+    }
+
+    #endregion
 
     public class WFMaterialCache : ScriptableSingleton<WFMaterialCache>
     {

@@ -63,10 +63,8 @@
     // Waving
     ////////////////////////////
 
-    float2 calcWavingUV(float2 uv, float direction, float speed, float4 map_ST) {
-        float dir = radians(direction);
-        float2 scroll = float2(cos(dir), sin(dir));
-        uv = uv + frac(_Time.xx * scroll * max(0, speed) + 1);
+    float2 calcWavingUV(float2 uv, float4 direction, float speed, float4 map_ST) {
+        uv = uv + frac(_Time.xx * direction.zy * max(0, speed) + 1);
         return uv * map_ST.xy + map_ST.zw;
     }
 

@@ -29,7 +29,8 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
 
         [WFHeaderToggle(Waving 1)]
             _WAV_Enable_1           ("[WA1] Enable", Float) = 1
-            _WAV_Direction_1        ("[WA1] Direction", Range(0, 360)) = 0
+        [WF_RotMatrix(0, 360)]
+            _WAV_Direction_1        ("[WA1] Direction", Vector) = (0, 0, 0, 0)
             _WAV_Speed_1            ("[WA1] Speed", Range(0, 10)) = 0
         [Normal]
             _WAV_NormalMap_1        ("[WA1] Wave Normal Map", 2D) = "bump" {}
@@ -38,7 +39,8 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
 
         [WFHeaderToggle(Waving 2)]
             _WAV_Enable_2           ("[WA2] Enable", Float) = 0
-            _WAV_Direction_2        ("[WA2] Direction", Range(0, 360)) = 120
+        [WF_RotMatrix(0, 360)]
+            _WAV_Direction_2        ("[WA2] Direction", Vector) = (120, 0.866, -0.5, 0)
             _WAV_Speed_2            ("[WA2] Speed", Range(0, 10)) = 0
         [Normal]
             _WAV_NormalMap_2        ("[WA2] Wave Normal Map", 2D) = "bump" {}
@@ -47,7 +49,8 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
 
         [WFHeaderToggle(Waving 3)]
             _WAV_Enable_3           ("[WA3] Enable", Float) = 0
-            _WAV_Direction_3        ("[WA3] Direction", Range(0, 360)) = 240
+        [WF_RotMatrix(0, 360)]
+            _WAV_Direction_3        ("[WA3] Direction", Vector) = (240, -0.866, -0.5, 0)
             _WAV_Speed_3            ("[WA3] Speed", Range(0, 10)) = 0
         [Normal]
             _WAV_NormalMap_3        ("[WA3] Wave Normal Map", 2D) = "bump" {}
