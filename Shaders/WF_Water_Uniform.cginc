@@ -28,10 +28,15 @@
 
     DECL_MAIN_TEX2D     (_WAV_NormalMap_1);
     DECL_MAIN_TEX2D     (_WAV_HeightMap_1);
+    DECL_MAIN_TEX2D     (_WAV_CausticsTex_1);
+
     DECL_MAIN_TEX2D     (_WAV_NormalMap_2);
     DECL_MAIN_TEX2D     (_WAV_HeightMap_2);
+    DECL_MAIN_TEX2D     (_WAV_CausticsTex_2);
+
     DECL_MAIN_TEX2D     (_WAV_NormalMap_3);
     DECL_MAIN_TEX2D     (_WAV_HeightMap_3);
+    DECL_MAIN_TEX2D     (_WAV_CausticsTex_3);
 
     DECL_MAIN_TEXCUBE   (_WAM_Cubemap);
 
@@ -57,6 +62,7 @@
     float4          _WAV_NormalMap_1_ST;
     float           _WAV_NormalScale_1;
     float4          _WAV_HeightMap_1_ST;
+    float4          _WAV_CausticsTex_1_ST;
 
     FEATURE_TGL    (_WAV_Enable_2);
     uint            _WAV_UVType_2;
@@ -65,6 +71,7 @@
     float4          _WAV_NormalMap_2_ST;
     float           _WAV_NormalScale_2;
     float4          _WAV_HeightMap_2_ST;
+    float4          _WAV_CausticsTex_2_ST;
 
     FEATURE_TGL    (_WAV_Enable_3);
     uint            _WAV_UVType_3;
@@ -73,6 +80,7 @@
     float4          _WAV_NormalMap_3_ST;
     float           _WAV_NormalScale_3;
     float4          _WAV_HeightMap_3_ST;
+    float4          _WAV_CausticsTex_3_ST;
 
     // -------------------------
 

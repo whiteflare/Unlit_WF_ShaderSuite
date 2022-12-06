@@ -112,12 +112,6 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
         [WF_FixFloat(0.0)]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Light Bake Effects)]
-            _LBE_Enable             ("[LBE] Enable", Float) = 0
-            _LBE_IndirectMultiplier ("[LBE] Indirect Multiplier", Range(0, 2)) = 1
-            _LBE_EmissionMultiplier ("[LBE] Emission Multiplier", Range(0, 2)) = 1
-            _LBE_IndirectChroma     ("[LBE] Indirect Chroma", Range(0, 2)) = 1
-
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2022/10/22", Float) = 0
@@ -156,6 +150,7 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
+            #define IN_FRAG v2f_surface
             #include "WF_Water.cginc"
 
             ENDCG

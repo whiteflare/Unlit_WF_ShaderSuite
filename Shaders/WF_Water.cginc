@@ -50,11 +50,32 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
+    struct appdata_caustics {
+        float4 vertex           : POSITION;
+        float2 uv               : TEXCOORD0;
+        float2 uv2              : TEXCOORD1;
+        float3 normal           : NORMAL;
+        float4 tangent          : TANGENT;
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+    };
+
+    struct v2f_caustics {
+        float4 vs_vertex        : SV_POSITION;
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 ws_normal        : TEXCOORD2;
+        float3 ws_vertex        : TEXCOORD3;
+        float3 ws_tangent       : TEXCOORD4;
+        float3 ws_bitangent     : TEXCOORD5;
+        float3 ws_light_dir     : TEXCOORD6;
+        UNITY_FOG_COORDS(7)
+        UNITY_VERTEX_OUTPUT_STEREO
+    };
+
     ////////////////////////////
     // UnToon function
     ////////////////////////////
 
-    #define IN_FRAG                         v2f_surface
     #define WF_TEX2D_OCCLUSION(uv)          float3(1, 1, 1)
 
     #include "WF_UnToon_Function.cginc"
@@ -74,19 +95,17 @@
 
     #define WF_DEF_WAVE_NORMAL(id)                                                                                              \
         float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                                \
-            float3 ws_bump_normal = ZERO_VEC3;                                                                                  \
             FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
                 float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);      \
                 float3 normalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv), _WAV_NormalScale##id ).xyz;  \
-                ws_bump_normal = transformTangentToWorldNormal(normalTangent, i.ws_normal, i.ws_tangent, i.ws_bitangent);       \
                 cnt++;                                                                                                          \
+                return transformTangentToWorldNormal(normalTangent, i.ws_normal, i.ws_tangent, i.ws_bitangent);                 \
             FEATURE_TGL_END                                                                                                     \
-            return ws_bump_normal;                                                                                              \
+            return ZERO_VEC3;                                                                                                   \
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                                              \
         float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                                \
-            float3 ws_bump_normal = ZERO_VEC3;                                                                                  \
             FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
                 float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);      \
                 cnt++;                                                                                                          \
@@ -95,26 +114,42 @@
             return 0;                                                                                                           \
         }
 
+    #define WF_DEF_WAVE_CAUSTICS(id)                                                                                            \
+        float3 calcWavingCaustics##id(IN_FRAG i, inout uint cnt) {                                                              \
+            FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
+                float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);    \
+                cnt++;                                                                                                          \
+                return PICK_MAIN_TEX2D(_WAV_CausticsTex##id, uv);                                                               \
+            FEATURE_TGL_END                                                                                                     \
+            return 0;                                                                                                           \
+        }
+
     #ifdef _WAV_ENABLE_1
         WF_DEF_WAVE_NORMAL(_1)
         WF_DEF_WAVE_HEIGHT(_1)
+        WF_DEF_WAVE_CAUSTICS(_1)
     #else
         #define calcWavingNormal_1(i, cnt)  ZERO_VEC3
         #define calcWavingHeight_1(i, cnt)  0
+        #define calcWavingCaustics_1(i, cnt)  ZERO_VEC3
     #endif
     #ifdef _WAV_ENABLE_2
         WF_DEF_WAVE_NORMAL(_2)
         WF_DEF_WAVE_HEIGHT(_2)
+        WF_DEF_WAVE_CAUSTICS(_2)
     #else
         #define calcWavingNormal_2(i, cnt)  ZERO_VEC3
         #define calcWavingHeight_2(i, cnt)  0
+        #define calcWavingCaustics_2(i, cnt)  ZERO_VEC3
     #endif
     #ifdef _WAV_ENABLE_3
         WF_DEF_WAVE_NORMAL(_3)
         WF_DEF_WAVE_HEIGHT(_3)
+        WF_DEF_WAVE_CAUSTICS(_3)
     #else
         #define calcWavingNormal_3(i, cnt)  ZERO_VEC3
         #define calcWavingHeight_3(i, cnt)  0
+        #define calcWavingCaustics_3(i, cnt)  ZERO_VEC3
     #endif
 
     float calcWavingHeight(IN_FRAG i) {
@@ -133,6 +168,15 @@
         ws_bump_normal += calcWavingNormal_2(i, cnt);
         ws_bump_normal += calcWavingNormal_3(i, cnt);
         return cnt == 0 ? i.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
+    }
+
+    float3 calcWavingCaustics(IN_FRAG i) {
+        uint cnt = 0;
+        float3 color = ZERO_VEC3;
+        color += calcWavingCaustics_1(i, cnt);
+        color += calcWavingCaustics_2(i, cnt);
+        color += calcWavingCaustics_3(i, cnt);
+        return color;
     }
 
     ////////////////////////////
@@ -289,7 +333,40 @@ FEATURE_TGL_END
         color.a = saturate(color.a);
         // リフラクション
         affectRefraction(i, facing, ws_bump_normal, ws_bump_normal, color);
-//color.rgb = calcWavingUV(i, _WAV_Direction_1, _WAV_Speed_1, _WAV_NormalMap_1_ST).xxy;
+
+        UNITY_APPLY_FOG(i.fogCoord, color);
+
+        return color;
+    }
+
+    v2f_caustics vert_caustics(appdata_surface v) {
+        v2f_caustics o;
+
+        UNITY_SETUP_INSTANCE_ID(v);
+        UNITY_INITIALIZE_OUTPUT(v2f_caustics, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+        float3 ws_vertex = UnityObjectToWorldPos(v.vertex);
+
+        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
+        o.uv = v.uv;
+        o.ws_vertex = ws_vertex;
+        o.uv_lmap = v.uv2;
+
+        UNITY_TRANSFER_FOG(o, o.vs_vertex);
+        return o;
+    }
+
+    half4 frag_caustics(v2f_caustics i, uint facing: SV_IsFrontFace) : SV_Target {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+		float3 caustics = calcWavingCaustics(i);
+        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color * float4(caustics, 1);
+
+        // Alpha は 0-1 にクランプ
+        color.a = saturate(color.a);
+
         UNITY_APPLY_FOG(i.fogCoord, color);
 
         return color;
