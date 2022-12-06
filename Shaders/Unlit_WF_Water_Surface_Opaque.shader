@@ -41,9 +41,9 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
         [WF_RotMatrix(0, 360)]
             _WAV_Direction_1        ("[WA1] Direction", Vector) = (0, 0, 1, 0)
             _WAV_Speed_1            ("[WA1] Speed", Range(0, 10)) = 0
+            _WAV_NormalScale_1      ("[WA1] Wave Normal Scale", Range(0, 8)) = 1
         [Normal]
             _WAV_NormalMap_1        ("[WA1] Wave Normal Map", 2D) = "bump" {}
-            _WAV_NormalScale_1      ("[WA1] Wave Normal Scale", Range(0, 2)) = 1
             _WAV_HeightMap_1        ("[WA1] Wave Height Map", 2D) = "white" {}
 
         [WFHeaderToggle(Waving 2)]
@@ -53,9 +53,9 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
         [WF_RotMatrix(0, 360)]
             _WAV_Direction_2        ("[WA2] Direction", Vector) = (120, 0.866, -0.5, 0)
             _WAV_Speed_2            ("[WA2] Speed", Range(0, 10)) = 0
+            _WAV_NormalScale_2      ("[WA2] Wave Normal Scale", Range(0, 8)) = 1
         [Normal]
             _WAV_NormalMap_2        ("[WA2] Wave Normal Map", 2D) = "bump" {}
-            _WAV_NormalScale_2      ("[WA2] Wave Normal Scale", Range(0, 2)) = 1
             _WAV_HeightMap_2        ("[WA2] Wave Height Map", 2D) = "white" {}
 
         [WFHeaderToggle(Waving 3)]
@@ -65,9 +65,9 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
         [WF_RotMatrix(0, 360)]
             _WAV_Direction_3        ("[WA3] Direction", Vector) = (240, -0.866, -0.5, 0)
             _WAV_Speed_3            ("[WA3] Speed", Range(0, 10)) = 0
+            _WAV_NormalScale_3      ("[WA3] Wave Normal Scale", Range(0, 8)) = 1
         [Normal]
             _WAV_NormalMap_3        ("[WA3] Wave Normal Map", 2D) = "bump" {}
-            _WAV_NormalScale_3      ("[WA3] Wave Normal Scale", Range(0, 2)) = 1
             _WAV_HeightMap_3        ("[WA3] Wave Height Map", 2D) = "white" {}
 
         [WFHeaderToggle(Specular)]
@@ -124,7 +124,7 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
     }
 
     SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry-10" "DisableBatching"="True" }
+        Tags { "RenderType"="Opaque" "Queue"="Geometry-10" }
 
         Pass {
             Name "MAIN"
@@ -160,9 +160,11 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
 
             ENDCG
         }
+
+        UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 
-    FallBack "Unlit/Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

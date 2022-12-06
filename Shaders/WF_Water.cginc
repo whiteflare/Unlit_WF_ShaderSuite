@@ -63,7 +63,7 @@
     // Waving
     ////////////////////////////
 
-    float2 calcWavingUV(v2f_surface i, uint uvType, float4 direction, float speed, float4 map_ST) {
+    float2 calcWavingUV(IN_FRAG i, uint uvType, float4 direction, float speed, float4 map_ST) {
         float2 uv =
             uvType == 0 ? i.uv :
             uvType == 1 ? i.uv_lmap :
@@ -73,7 +73,7 @@
     }
 
     #define WF_DEF_WAVE_NORMAL(id)                                                                                              \
-        float3 calcWavingNormal##id(v2f_surface i, inout uint cnt) {                                                            \
+        float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                                \
             float3 ws_bump_normal = ZERO_VEC3;                                                                                  \
             FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
                 float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);      \
@@ -85,7 +85,7 @@
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                                              \
-        float3 calcWavingHeight##id(v2f_surface i, inout uint cnt) {                                                            \
+        float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                                \
             float3 ws_bump_normal = ZERO_VEC3;                                                                                  \
             FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
                 float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);      \
@@ -117,7 +117,7 @@
         #define calcWavingHeight_3(i, cnt)  0
     #endif
 
-    float calcWavingHeight(v2f_surface i) {
+    float calcWavingHeight(IN_FRAG i) {
         uint cnt = 0;
         float height = 0;
         height += calcWavingHeight_1(i, cnt);
@@ -126,7 +126,7 @@
         return cnt == 0 ? 1 : saturate( height / max(1, cnt) / 0.5 + 0.5 );
     }
 
-    float3 calcWavingNormal(v2f_surface i) {
+    float3 calcWavingNormal(IN_FRAG i) {
         uint cnt = 0;
         float3 ws_bump_normal = ZERO_VEC3;
         ws_bump_normal += calcWavingNormal_1(i, cnt);
@@ -145,7 +145,7 @@
         return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
     }
 
-    void affectWaterSurfaceSpecular(v2f_surface i, float3 ws_bump_normal, inout float4 color) {
+    void affectWaterSurfaceSpecular(IN_FRAG i, float3 ws_bump_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_WAS_ENABLE)
         // カメラへの方向
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
@@ -192,7 +192,7 @@ FEATURE_TGL_END
         return color;
     }
 
-    void affectWaterSurfaceReflection(v2f_surface i, float3 ws_bump_normal, inout float4 color) {
+    void affectWaterSurfaceReflection(IN_FRAG i, float3 ws_bump_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_WAM_ENABLE)
         float3 reflection = pickReflection(i.ws_vertex, ws_bump_normal, _WAM_Smooth);
         reflection = lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _WAM_Bright);
