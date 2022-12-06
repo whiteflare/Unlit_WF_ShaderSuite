@@ -48,6 +48,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
 
         [WFHeaderToggle(Waving 1)]
             _WAV_Enable_1           ("[WA1] Enable", Float) = 1
+        [Enum(UV1,0,UV2,1,WORLD_XZ,2)]
+            _WAV_UVType_1           ("[WA1] UV Type", Float) = 0
         [WF_RotMatrix(0, 360)]
             _WAV_Direction_1        ("[WA1] Direction", Vector) = (0, 0, 0, 0)
             _WAV_Speed_1            ("[WA1] Speed", Range(0, 10)) = 0
@@ -58,6 +60,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
 
         [WFHeaderToggle(Waving 2)]
             _WAV_Enable_2           ("[WA2] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1,WORLD_XZ,2)]
+            _WAV_UVType_2           ("[WA2] UV Type", Float) = 0
         [WF_RotMatrix(0, 360)]
             _WAV_Direction_2        ("[WA2] Direction", Vector) = (120, 0.866, -0.5, 0)
             _WAV_Speed_2            ("[WA2] Speed", Range(0, 10)) = 0
@@ -68,6 +72,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
 
         [WFHeaderToggle(Waving 3)]
             _WAV_Enable_3           ("[WA3] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1,WORLD_XZ,2)]
+            _WAV_UVType_3           ("[WA3] UV Type", Float) = 0
         [WF_RotMatrix(0, 360)]
             _WAV_Direction_3        ("[WA3] Direction", Vector) = (240, -0.866, -0.5, 0)
             _WAV_Speed_3            ("[WA3] Speed", Range(0, 10)) = 0

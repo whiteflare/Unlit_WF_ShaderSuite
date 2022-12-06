@@ -51,6 +51,7 @@
     // -------------------------
 
     FEATURE_TGL    (_WAV_Enable_1);
+    uint            _WAV_UVType_1;
     float4          _WAV_Direction_1;
     float           _WAV_Speed_1;
     float4          _WAV_NormalMap_1_ST;
@@ -58,6 +59,7 @@
     float4          _WAV_HeightMap_1_ST;
 
     FEATURE_TGL    (_WAV_Enable_2);
+    uint            _WAV_UVType_2;
     float4          _WAV_Direction_2;
     float           _WAV_Speed_2;
     float4          _WAV_NormalMap_2_ST;
@@ -65,6 +67,7 @@
     float4          _WAV_HeightMap_2_ST;
 
     FEATURE_TGL    (_WAV_Enable_3);
+    uint            _WAV_UVType_3;
     float4          _WAV_Direction_3;
     float           _WAV_Speed_3;
     float4          _WAV_NormalMap_3_ST;

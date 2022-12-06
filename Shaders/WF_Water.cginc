@@ -63,8 +63,12 @@
     // Waving
     ////////////////////////////
 
-    float2 calcWavingUV(float2 uv, float4 direction, float speed, float4 map_ST) {
-        uv = uv + frac(_Time.xx * direction.zy * max(0, speed) + 1);
+    float2 calcWavingUV(v2f_surface i, uint uvType, float4 direction, float speed, float4 map_ST) {
+        float2 uv =
+            uvType == 0 ? i.uv :
+            uvType == 1 ? i.uv_lmap :
+            i.ws_vertex.xz;
+        uv += _Time.xx * direction.zy * max(0, speed);
         return uv * map_ST.xy + map_ST.zw;
     }
 
@@ -72,7 +76,7 @@
         float3 calcWavingNormal##id(v2f_surface i, inout uint cnt) {                                                            \
             float3 ws_bump_normal = ZERO_VEC3;                                                                                  \
             FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
-                float2 uv = calcWavingUV(i.uv, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);                    \
+                float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);      \
                 float3 normalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv), _WAV_NormalScale##id ).xyz;  \
                 ws_bump_normal = transformTangentToWorldNormal(normalTangent, i.ws_normal, i.ws_tangent, i.ws_bitangent);       \
                 cnt++;                                                                                                          \
@@ -84,7 +88,7 @@
         float3 calcWavingHeight##id(v2f_surface i, inout uint cnt) {                                                            \
             float3 ws_bump_normal = ZERO_VEC3;                                                                                  \
             FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
-                float2 uv = calcWavingUV(i.uv, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);                    \
+                float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);      \
                 cnt++;                                                                                                          \
                 return PICK_MAIN_TEX2D(_WAV_HeightMap##id, uv).r * 2 - 0.5;                                                     \
             FEATURE_TGL_END                                                                                                     \
@@ -262,7 +266,7 @@ FEATURE_TGL_END
         color.a = saturate(color.a);
         // リフラクション
         affectRefraction(i, facing, ws_bump_normal, ws_bump_normal, color);
-
+//color.rgb = calcWavingUV(i, _WAV_Direction_1, _WAV_Speed_1, _WAV_NormalMap_1_ST).xxy;
         UNITY_APPLY_FOG(i.fogCoord, color);
 
         return color;
