@@ -136,4 +136,13 @@
     float           _CRF_BlendNormal2;
 #endif
 
+    // -------------------------
+
+    FEATURE_TGL    (_WAD_Enable);
+    float4          _WAD_Color;
+    float           _WAD_MinDist;
+    float           _WAD_MaxDist;
+    float           _WAD_Power;
+    float           _WAD_BackShadow;
+
 #endif

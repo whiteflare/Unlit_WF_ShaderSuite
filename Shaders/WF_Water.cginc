@@ -205,6 +205,27 @@ FEATURE_TGL_END
 #endif
 
     ////////////////////////////
+    // Distance Fade (Water)
+    ////////////////////////////
+
+    #ifdef _WAD_ENABLE
+
+        float calcDistanceFadeDistanceSq(float3 ws_vertex) {
+            float3 cam_vec1 = ws_vertex - worldSpaceViewPointPos();
+            return dot(cam_vec1, cam_vec1);
+        }
+
+        void affectWaterDistanceFade(IN_FRAG i, inout float4 color) {
+FEATURE_TGL_ON_BEGIN(_WAD_Enable)
+            float dist = sqrt(calcDistanceFadeDistanceSq(i.ws_vertex.xyz));
+            color.rgb *= lerp(ONE_VEC3, _WAD_Color.rgb * unity_ColorSpaceDouble.rgb, _WAD_Power * smoothstep(_WAD_MinDist, max(_WAD_MinDist + NZF, _WAD_MaxDist), dist));
+FEATURE_TGL_END
+        }
+    #else
+        #define affectWaterDistanceFade(i, color)
+    #endif
+
+    ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
 
@@ -245,6 +266,8 @@ FEATURE_TGL_END
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * lerp(_Color2, _Color, height);
 
+		// 距離フェード
+		affectWaterDistanceFade(i, color);
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
 

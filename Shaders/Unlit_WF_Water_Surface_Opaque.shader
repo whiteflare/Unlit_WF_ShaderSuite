@@ -27,12 +27,19 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
             _CullMode               ("Cull Mode", int) = 2
             _ShadowPower            ("Shadow Power", Range(0, 1)) = 0.5
 
+        [WFHeaderToggle(Distance Fade)]
+            _WAD_Enable             ("[WAD] Enable", Float) = 0
+            _WAD_Color              ("[WAD] Tint Color", Color) = (0.7, 0.7, 1, 1)
+            _WAD_MinDist            ("[WAD] Fade Distance (Near)", Float) = 100
+            _WAD_MaxDist            ("[WAD] Fade Distance (Far)", Float) = 200
+            _WAD_Power              ("[WAD] Power", Range(0, 1)) = 1
+
         [WFHeaderToggle(Waving 1)]
             _WAV_Enable_1           ("[WA1] Enable", Float) = 1
         [Enum(UV1,0,UV2,1,WORLD_XZ,2)]
             _WAV_UVType_1           ("[WA1] UV Type", Float) = 0
         [WF_RotMatrix(0, 360)]
-            _WAV_Direction_1        ("[WA1] Direction", Vector) = (0, 0, 0, 0)
+            _WAV_Direction_1        ("[WA1] Direction", Vector) = (0, 0, 1, 0)
             _WAV_Speed_1            ("[WA1] Speed", Range(0, 10)) = 0
         [Normal]
             _WAV_NormalMap_1        ("[WA1] Wave Normal Map", 2D) = "bump" {}
@@ -135,6 +142,7 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE
             #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _WAD_ENABLE
             #pragma shader_feature_local _WAM_ENABLE
             #pragma shader_feature_local _WAS_ENABLE
             #pragma shader_feature_local _WAV_ENABLE_1
