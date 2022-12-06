@@ -132,7 +132,7 @@ namespace UnlitWF
             }),
 
             // _DetailNormalMap と _FUR_NoiseTex の直後に設定ボタンを追加する
-            new CustomPropertyHook("_DetailNormalMap|_FUR_NoiseTex", null, (ctx, changed) => {
+            new CustomPropertyHook("_DetailNormalMap|_FUR_NoiseTex|_WAV_NormalMap(_[0-9]+)?|_WAV_HeightMap(_[0-9]+)", null, (ctx, changed) => {
                 if (ctx.current.textureValue == null) {
                     return;
                 }
