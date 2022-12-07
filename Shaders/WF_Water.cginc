@@ -55,7 +55,6 @@
         float2 uv               : TEXCOORD0;
         float2 uv2              : TEXCOORD1;
         float3 normal           : NORMAL;
-        float4 tangent          : TANGENT;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
@@ -63,12 +62,8 @@
         float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
         float2 uv_lmap          : TEXCOORD1;
-        float3 ws_normal        : TEXCOORD2;
-        float3 ws_vertex        : TEXCOORD3;
-        float3 ws_tangent       : TEXCOORD4;
-        float3 ws_bitangent     : TEXCOORD5;
-        float3 ws_light_dir     : TEXCOORD6;
-        UNITY_FOG_COORDS(7)
+        float3 ws_vertex        : TEXCOORD2;
+        UNITY_FOG_COORDS(3)
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -84,44 +79,48 @@
     // Waving
     ////////////////////////////
 
-    float2 calcWavingUV(IN_FRAG i, uint uvType, float4 direction, float speed, float4 map_ST) {
+    float2 calcWavingUV(float2 uv1, float2 uv2, float3 ws_vertex, uint uvType, float4 direction, float speed, float4 map_ST) {
         float2 uv =
-            uvType == 0 ? i.uv :
-            uvType == 1 ? i.uv_lmap :
-            i.ws_vertex.xz;
+            uvType == 0 ? uv1 :
+            uvType == 1 ? uv2 :
+            ws_vertex.xz;
         uv += _Time.xx * direction.zy * max(0, speed);
         return uv * map_ST.xy + map_ST.zw;
     }
 
-    #define WF_DEF_WAVE_NORMAL(id)                                                                                              \
-        float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                                \
-            FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
-                float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);      \
-                float3 normalTangent = UnpackScaleNormal( PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv), _WAV_NormalScale##id ).xyz;  \
-                cnt++;                                                                                                          \
-                return transformTangentToWorldNormal(normalTangent, i.ws_normal, i.ws_tangent, i.ws_bitangent);                 \
-            FEATURE_TGL_END                                                                                                     \
-            return ZERO_VEC3;                                                                                                   \
+    #define WF_DEF_WAVE_NORMAL(id)                                                                              \
+        float3 calcWavingNormal##id(v2f_surface i, inout uint cnt) {                                            \
+            FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                               \
+                float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
+                    _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);              \
+                float4 tex = PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv);                                           \
+                float3 normalTangent = UnpackScaleNormal( tex, _WAV_NormalScale##id ).xyz;                      \
+                cnt++;                                                                                          \
+                return transformTangentToWorldNormal(normalTangent, i.ws_normal, i.ws_tangent, i.ws_bitangent); \
+            FEATURE_TGL_END                                                                                     \
+            return ZERO_VEC3;                                                                                   \
         }
 
-    #define WF_DEF_WAVE_HEIGHT(id)                                                                                              \
-        float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                                \
-            FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
-                float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);      \
-                cnt++;                                                                                                          \
-                return PICK_MAIN_TEX2D(_WAV_HeightMap##id, uv).r * 2 - 0.5;                                                     \
-            FEATURE_TGL_END                                                                                                     \
-            return 0;                                                                                                           \
+    #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
+        float3 calcWavingHeight##id(v2f_surface i, inout uint cnt) {                                            \
+            FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                               \
+                float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
+                    _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);              \
+                cnt++;                                                                                          \
+                return PICK_MAIN_TEX2D(_WAV_HeightMap##id, uv).r * 2 - 0.5;                                     \
+            FEATURE_TGL_END                                                                                     \
+            return 0;                                                                                           \
         }
 
-    #define WF_DEF_WAVE_CAUSTICS(id)                                                                                            \
-        float3 calcWavingCaustics##id(IN_FRAG i, inout uint cnt) {                                                              \
-            FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                                               \
-                float2 uv = calcWavingUV(i, _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);    \
-                cnt++;                                                                                                          \
-                return PICK_MAIN_TEX2D(_WAV_CausticsTex##id, uv);                                                               \
-            FEATURE_TGL_END                                                                                                     \
-            return 0;                                                                                                           \
+    #define WF_DEF_WAVE_CAUSTICS(id)                                                                            \
+        float3 calcWavingCaustics##id(v2f_caustics i, inout uint cnt) {                                         \
+            FEATURE_TGL_ON_BEGIN(_WAV_Enable##id)                                                               \
+                float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
+                    _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);            \
+                cnt++;                                                                                          \
+                return PICK_MAIN_TEX2D(_WAV_CausticsTex##id, uv);                                               \
+            FEATURE_TGL_END                                                                                     \
+            return 0;                                                                                           \
         }
 
     #ifdef _WAV_ENABLE_1
@@ -129,30 +128,30 @@
         WF_DEF_WAVE_HEIGHT(_1)
         WF_DEF_WAVE_CAUSTICS(_1)
     #else
-        #define calcWavingNormal_1(i, cnt)  ZERO_VEC3
-        #define calcWavingHeight_1(i, cnt)  0
-        #define calcWavingCaustics_1(i, cnt)  ZERO_VEC3
+        #define calcWavingNormal_1(i, cnt)      ZERO_VEC3
+        #define calcWavingHeight_1(i, cnt)      0
+        #define calcWavingCaustics_1(i, cnt)    ZERO_VEC3
     #endif
     #ifdef _WAV_ENABLE_2
         WF_DEF_WAVE_NORMAL(_2)
         WF_DEF_WAVE_HEIGHT(_2)
         WF_DEF_WAVE_CAUSTICS(_2)
     #else
-        #define calcWavingNormal_2(i, cnt)  ZERO_VEC3
-        #define calcWavingHeight_2(i, cnt)  0
-        #define calcWavingCaustics_2(i, cnt)  ZERO_VEC3
+        #define calcWavingNormal_2(i, cnt)      ZERO_VEC3
+        #define calcWavingHeight_2(i, cnt)      0
+        #define calcWavingCaustics_2(i, cnt)    ZERO_VEC3
     #endif
     #ifdef _WAV_ENABLE_3
         WF_DEF_WAVE_NORMAL(_3)
         WF_DEF_WAVE_HEIGHT(_3)
         WF_DEF_WAVE_CAUSTICS(_3)
     #else
-        #define calcWavingNormal_3(i, cnt)  ZERO_VEC3
-        #define calcWavingHeight_3(i, cnt)  0
-        #define calcWavingCaustics_3(i, cnt)  ZERO_VEC3
+        #define calcWavingNormal_3(i, cnt)      ZERO_VEC3
+        #define calcWavingHeight_3(i, cnt)      0
+        #define calcWavingCaustics_3(i, cnt)    ZERO_VEC3
     #endif
 
-    float calcWavingHeight(IN_FRAG i) {
+    float calcWavingHeight(v2f_surface i) {
         uint cnt = 0;
         float height = 0;
         height += calcWavingHeight_1(i, cnt);
@@ -161,7 +160,7 @@
         return cnt == 0 ? 1 : saturate( height / max(1, cnt) / 0.5 + 0.5 );
     }
 
-    float3 calcWavingNormal(IN_FRAG i) {
+    float3 calcWavingNormal(v2f_surface i) {
         uint cnt = 0;
         float3 ws_bump_normal = ZERO_VEC3;
         ws_bump_normal += calcWavingNormal_1(i, cnt);
@@ -170,7 +169,7 @@
         return cnt == 0 ? i.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
     }
 
-    float3 calcWavingCaustics(IN_FRAG i) {
+    float3 calcWavingCaustics(v2f_caustics i) {
         uint cnt = 0;
         float3 color = ZERO_VEC3;
         color += calcWavingCaustics_1(i, cnt);
@@ -310,8 +309,8 @@ FEATURE_TGL_END
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * lerp(_Color2, _Color, height);
 
-		// 距離フェード
-		affectWaterDistanceFade(i, color);
+        // 距離フェード
+        affectWaterDistanceFade(i, color);
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
 
@@ -360,14 +359,11 @@ FEATURE_TGL_END
     half4 frag_caustics(v2f_caustics i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-		float3 caustics = calcWavingCaustics(i);
+        float3 caustics = calcWavingCaustics(i);
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color * float4(caustics, 1);
 
-        // Alpha は 0-1 にクランプ
-        color.a = saturate(color.a);
-
-        UNITY_APPLY_FOG(i.fogCoord, color);
+        UNITY_APPLY_FOG_COLOR(i.fogCoord, color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
 
         return color;
     }
