@@ -24,6 +24,11 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
 
+        [WFHeader(Water)]
+            _WaterLevel             ("Water Level (World Y Coord)", Float) = 0
+        [Toggle(_)]
+            _HideCausticAbove       ("Hide Caustic above water", Float) = 0
+
         [WFHeaderToggle(Waving 1)]
             _WAV_Enable_1           ("[WA1] Enable", Float) = 1
         [Enum(UV1,0,UV2,1,WORLD_XZ,2)]
@@ -66,6 +71,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
             Cull [_CullMode]
             ZWrite OFF
             Blend One One
+            Offset -1, -1
 
             CGPROGRAM
 

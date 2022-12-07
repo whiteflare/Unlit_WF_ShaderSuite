@@ -363,6 +363,10 @@ FEATURE_TGL_END
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color * float4(caustics, 1);
 
+        if (TGL_ON(_HideCausticAbove) && _WaterLevel < i.ws_vertex.y) {
+            discard;
+        }
+
         UNITY_APPLY_FOG_COLOR(i.fogCoord, color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
 
         return color;

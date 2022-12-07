@@ -53,6 +53,9 @@
     float4          _Color2;
     float           _ShadowPower;
 
+    float           _WaterLevel;
+    float           _HideCausticAbove;
+
     // -------------------------
 
     FEATURE_TGL    (_WAV_Enable_1);
@@ -112,16 +115,18 @@
 
     // -------------------------
 
-    float           _GL_CastShadow;
-    float           _GL_LevelMin;
-    float           _GL_LevelMax;
-    float           _GL_BlendPower;
     uint            _GL_LightMode;
     float           _GL_CustomAzimuth;
     float           _GL_CustomAltitude;
     float3          _GL_CustomLitPos;
-    float           _GL_DisableBackLit;
-    float           _GL_DisableBasePos;
+
+    // 使わない変数は define で固定値を設定
+    #define _GL_CastShadow      0
+    #define _GL_LevelMin        0
+    #define _GL_LevelMax        1
+    #define _GL_BlendPower      1
+    #define _GL_DisableBackLit  0
+    #define _GL_DisableBasePos  0
 
     // -------------------------
 

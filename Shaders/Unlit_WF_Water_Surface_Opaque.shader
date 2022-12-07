@@ -107,10 +107,6 @@ Shader "UnlitWF/WF_Water_Surface_Opaque" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [WF_FixFloat(0.0)]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [WF_FixFloat(0.0)]
-            _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
