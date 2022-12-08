@@ -172,7 +172,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #define IN_FRAG v2f_surface
+            #define _WF_WATER_SURFACE
             #include "WF_Water.cginc"
 
             ENDCG

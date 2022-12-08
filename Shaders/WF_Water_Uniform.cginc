@@ -54,6 +54,7 @@
     float           _ShadowPower;
 
     float           _WaterLevel;
+    float           _WaterTransparency;
     float           _HideCausticAbove;
 
     // -------------------------

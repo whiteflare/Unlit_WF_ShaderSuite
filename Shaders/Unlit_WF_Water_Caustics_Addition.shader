@@ -56,6 +56,13 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
             _WAV_Speed_3            ("[WA3] Speed", Range(0, 10)) = 0
             _WAV_CausticsTex_3      ("[WA3] Caustics Tex", 2D) = "black" {}
 
+        [WFHeaderToggle(Ambient Occlusion)]
+            _AO_Enable              ("[AO] Enable", Float) = 0
+        [Toggle(_)]
+            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
+            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2022/10/22", Float) = 0
@@ -71,7 +78,6 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
             Cull [_CullMode]
             ZWrite OFF
             Blend One One
-            Offset -1, -1
 
             CGPROGRAM
 
@@ -80,6 +86,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
 
             #pragma target 3.0
 
+            #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _WAV_ENABLE_1
             #pragma shader_feature_local _WAV_ENABLE_2
             #pragma shader_feature_local _WAV_ENABLE_3
@@ -91,7 +98,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
 
-            #define IN_FRAG v2f_caustics
+            #define _WF_WATER_CAUSTICS
             #include "WF_Water.cginc"
 
             ENDCG

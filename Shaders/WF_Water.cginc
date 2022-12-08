@@ -28,6 +28,8 @@
     // main structure
     ////////////////////////////
 
+#ifdef _WF_WATER_SURFACE
+
     struct appdata_surface {
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
@@ -50,6 +52,12 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
+    #define IN_FRAG v2f_surface
+
+#endif
+
+#ifdef _WF_WATER_CAUSTICS
+
     struct appdata_caustics {
         float4 vertex           : POSITION;
         float2 uv               : TEXCOORD0;
@@ -66,6 +74,28 @@
         UNITY_FOG_COORDS(3)
         UNITY_VERTEX_OUTPUT_STEREO
     };
+
+    #define IN_FRAG v2f_caustics
+
+#endif
+
+#ifdef _WF_WATER_DEPTHFOG
+
+    struct appdata_depthfog {
+        float4 vertex           : POSITION;
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+    };
+
+    struct v2f_depthfog {
+        float4 vs_vertex        : SV_POSITION;
+        float3 ws_vertex        : TEXCOORD0;
+        UNITY_FOG_COORDS(1)
+        UNITY_VERTEX_OUTPUT_STEREO
+    };
+
+    #define IN_FRAG v2f_depthfog
+
+#endif
 
     ////////////////////////////
     // UnToon function
@@ -123,32 +153,28 @@
             return 0;                                                                                           \
         }
 
+#ifdef _WF_WATER_SURFACE
+
     #ifdef _WAV_ENABLE_1
         WF_DEF_WAVE_NORMAL(_1)
         WF_DEF_WAVE_HEIGHT(_1)
-        WF_DEF_WAVE_CAUSTICS(_1)
     #else
         #define calcWavingNormal_1(i, cnt)      ZERO_VEC3
         #define calcWavingHeight_1(i, cnt)      0
-        #define calcWavingCaustics_1(i, cnt)    ZERO_VEC3
     #endif
     #ifdef _WAV_ENABLE_2
         WF_DEF_WAVE_NORMAL(_2)
         WF_DEF_WAVE_HEIGHT(_2)
-        WF_DEF_WAVE_CAUSTICS(_2)
     #else
         #define calcWavingNormal_2(i, cnt)      ZERO_VEC3
         #define calcWavingHeight_2(i, cnt)      0
-        #define calcWavingCaustics_2(i, cnt)    ZERO_VEC3
     #endif
     #ifdef _WAV_ENABLE_3
         WF_DEF_WAVE_NORMAL(_3)
         WF_DEF_WAVE_HEIGHT(_3)
-        WF_DEF_WAVE_CAUSTICS(_3)
     #else
         #define calcWavingNormal_3(i, cnt)      ZERO_VEC3
         #define calcWavingHeight_3(i, cnt)      0
-        #define calcWavingCaustics_3(i, cnt)    ZERO_VEC3
     #endif
 
     float calcWavingHeight(v2f_surface i) {
@@ -169,6 +195,26 @@
         return cnt == 0 ? i.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
     }
 
+#endif
+
+#ifdef _WF_WATER_CAUSTICS
+
+    #ifdef _WAV_ENABLE_1
+        WF_DEF_WAVE_CAUSTICS(_1)
+    #else
+        #define calcWavingCaustics_1(i, cnt)    ZERO_VEC3
+    #endif
+    #ifdef _WAV_ENABLE_2
+        WF_DEF_WAVE_CAUSTICS(_2)
+    #else
+        #define calcWavingCaustics_2(i, cnt)    ZERO_VEC3
+    #endif
+    #ifdef _WAV_ENABLE_3
+        WF_DEF_WAVE_CAUSTICS(_3)
+    #else
+        #define calcWavingCaustics_3(i, cnt)    ZERO_VEC3
+    #endif
+
     float3 calcWavingCaustics(v2f_caustics i) {
         uint cnt = 0;
         float3 color = ZERO_VEC3;
@@ -177,6 +223,8 @@
         color += calcWavingCaustics_3(i, cnt);
         return color;
     }
+
+#endif
 
     ////////////////////////////
     // Waving Specular
@@ -272,6 +320,8 @@ FEATURE_TGL_END
     // vertex&fragment shader
     ////////////////////////////
 
+#ifdef _WF_WATER_SURFACE
+
     v2f_surface vert_top(appdata_surface v) {
         v2f_surface o;
 
@@ -338,7 +388,11 @@ FEATURE_TGL_END
         return color;
     }
 
-    v2f_caustics vert_caustics(appdata_surface v) {
+#endif
+
+#ifdef _WF_WATER_CAUSTICS
+
+    v2f_caustics vert_caustics(appdata_caustics v) {
         v2f_caustics o;
 
         UNITY_SETUP_INSTANCE_ID(v);
@@ -367,9 +421,58 @@ FEATURE_TGL_END
             discard;
         }
 
+        // Ambient Occlusion
+        affectOcclusion(i, uv_main, color);
+
         UNITY_APPLY_FOG_COLOR(i.fogCoord, color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
 
         return color;
     }
+
+#endif
+
+#ifdef _WF_WATER_DEPTHFOG
+
+    v2f_depthfog vert_depthfog(appdata_depthfog v) {
+        v2f_depthfog o;
+
+        UNITY_SETUP_INSTANCE_ID(v);
+        UNITY_INITIALIZE_OUTPUT(v2f_depthfog, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+        float3 ws_vertex = UnityObjectToWorldPos(v.vertex);
+
+        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
+        o.ws_vertex = ws_vertex;
+
+        UNITY_TRANSFER_FOG(o, o.vs_vertex);
+        return o;
+    }
+
+    half4 frag_depthfog(v2f_depthfog i, uint facing: SV_IsFrontFace) : SV_Target {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+        half4 color = _Color;
+
+        float y = _WaterLevel - i.ws_vertex.y;
+        if (y <= NZF) {
+            // メッシュが水上のときは描画しない
+            return half4(1, 1, 1, 0);
+        }
+        else {
+            float3 ws_viewpos = worldSpaceViewPointPos();
+            float ey = ws_viewpos.y - _WaterLevel;
+            float dist = length(i.ws_vertex - ws_viewpos);
+
+            dist *= ey <= NZF ? 1   // 視点が水面下のときは dist をそのまま採用する
+                : y / (y + ey);     // そうではないときは水中の距離を計算する
+            color.a *= saturate(dist / NON_ZERO_FLOAT(_WaterTransparency));
+
+            // UNITY_APPLY_FOG(i.fogCoord, color); // DepthFog は Fog には対応しない
+            return color;
+        }
+    }
+
+#endif
 
 #endif
