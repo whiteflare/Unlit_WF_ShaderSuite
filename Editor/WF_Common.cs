@@ -194,7 +194,7 @@ namespace UnlitWF
                     continue;
                 }
                 bool changed = false;
-                foreach (var prop_name in getAllPropertyNames(mat.shader))
+                foreach (var prop_name in GetAllPropertyNames(mat.shader))
                 {
                     // 対応するキーワードが指定されているならばそれを設定する
                     var kwd = WFShaderDictionary.SpecialPropNameToKeywordMap.GetValueOrNull(prop_name);
@@ -547,7 +547,7 @@ namespace UnlitWF
 #endif
         }
 
-        private static IEnumerable<string> getAllPropertyNames(Shader shader)
+        public static IEnumerable<string> GetAllPropertyNames(Shader shader)
         {
 #if UNITY_2019_1_OR_NEWER
             for (int idx = 0; idx < shader.GetPropertyCount(); idx++)

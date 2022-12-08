@@ -18,6 +18,7 @@
 #if UNITY_EDITOR
 
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace UnlitWF
 {
@@ -113,6 +114,9 @@ namespace UnlitWF
             new WFShaderName("BRP", "Water", "Surface", "Opaque",                      "UnlitWF/WF_Water_Surface_Opaque", represent: true),
             new WFShaderName("BRP", "Water", "Surface", "Transparent",                 "UnlitWF/WF_Water_Surface_Transparent"),
             new WFShaderName("BRP", "Water", "Surface", "Transparent_Refracted",       "UnlitWF/WF_Water_Surface_Transparent_Refracted"),
+            new WFShaderName("BRP", "Water", "FX_Caustics", "Addition",                "UnlitWF/WF_Water_Caustics_Addition"),
+            new WFShaderName("BRP", "Water", "FX_DepthFog", "Transparent",             "UnlitWF/WF_Water_DepthFog_Fade"),
+            new WFShaderName("BRP", "Water", "Option", "Capture",                      "UnlitWF/WF_Water_Option_BackgroundCapture"),
 
             // ================
             // UnToon 系列(URP)
@@ -159,6 +163,22 @@ namespace UnlitWF
             new WFShaderName("URP", "Gem", "Basic", "Transparent",                     "UnlitWF_URP/WF_Gem_Transparent", represent: true),
         };
 
+        private static bool HasPropertyPrefix(Material mat, string prefix)
+        {
+            if (mat == null || mat.shader == null)
+            {
+                return false;
+            }
+            foreach(var pn in WFCommonUtility.GetAllPropertyNames(mat.shader))
+            {
+                if (pn.StartsWith(prefix))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// シェーダ機能のリスト。
         /// </summary>
@@ -196,6 +216,13 @@ namespace UnlitWF
                 new WFShaderFunction("GRS", "GRS", "Grass", (self, mat) => mat.shader.name.Contains("Grass")),
                 new WFShaderFunction("GRW", "GRW", "Grass Wave"),
 
+                new WFShaderFunction("WAD", "WAD", "Distance Fade"),
+                new WFShaderFunction("WA1", "WAV_1", "Waving 1", (self, mat) => WFShaderFunction.IsEnable("_WAV_Enable_1", mat)),
+                new WFShaderFunction("WA2", "WAV_2", "Waving 2", (self, mat) => WFShaderFunction.IsEnable("_WAV_Enable_2", mat)),
+                new WFShaderFunction("WA3", "WAV_3", "Waving 3", (self, mat) => WFShaderFunction.IsEnable("_WAV_Enable_3", mat)),
+                new WFShaderFunction("WAS", "WAS", "Water Specular"),
+                new WFShaderFunction("WAM", "WAM", "Water Reflection"),
+
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
                 new WFShaderFunction("CHM", "CHM", "3ch Color Mask"),
@@ -211,7 +238,7 @@ namespace UnlitWF
                 new WFShaderFunction("CGO", "CGO", "Ghost Transparent"),
                 new WFShaderFunction("CCT", "CCT", "ClearCoat"),
 
-                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
+                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => HasPropertyPrefix(mat, "_GL")),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF
@@ -287,13 +314,16 @@ namespace UnlitWF
             new WFI18NTranslation("Emission", "エミッション"),
             new WFI18NTranslation("Fake Fur", "ファー"),
             new WFI18NTranslation("Fog", "フォグ"),
+            new WFI18NTranslation("FrostedGlass", "すりガラス"),
             new WFI18NTranslation("Gem Background", "ジェム(裏面)"),
             new WFI18NTranslation("Gem Flake", "ジェム(フレーク)"),
             new WFI18NTranslation("Gem Reflection", "ジェム(反射)"),
             new WFI18NTranslation("Gem Surface", "ジェム(表面)"),
+            new WFI18NTranslation("Ghost Transparent", "ゴースト透過"),
+            new WFI18NTranslation("Grass Wave", "草の揺れ"),
+            new WFI18NTranslation("Grass", "草"),
             new WFI18NTranslation("Lame", "ラメ"),
             new WFI18NTranslation("Light Bake Effects", "ライトベイク調整"),
-            new WFI18NTranslation("Light Matcap", "マットキャップ"),
             new WFI18NTranslation("Light Matcap 2", "マットキャップ2"),
             new WFI18NTranslation("Light Matcap 3", "マットキャップ3"),
             new WFI18NTranslation("Light Matcap 4", "マットキャップ4"),
@@ -301,25 +331,28 @@ namespace UnlitWF
             new WFI18NTranslation("Light Matcap 6", "マットキャップ6"),
             new WFI18NTranslation("Light Matcap 7", "マットキャップ7"),
             new WFI18NTranslation("Light Matcap 8", "マットキャップ8"),
-            new WFI18NTranslation("Lit", "ライト設定"),
+            new WFI18NTranslation("Light Matcap", "マットキャップ"),
             new WFI18NTranslation("Lit Advance", "ライト設定(拡張)"),
+            new WFI18NTranslation("Lit", "ライト設定"),
+            new WFI18NTranslation("Material Options", "マテリアル設定"),
             new WFI18NTranslation("Metallic", "メタリック"),
             new WFI18NTranslation("Mirror Control", "ミラー制御"),
             new WFI18NTranslation("NormalMap", "ノーマルマップ"),
             new WFI18NTranslation("Outline", "アウトライン"),
             new WFI18NTranslation("Overlay Texture", "オーバーレイテクスチャ"),
+            new WFI18NTranslation("Reflection", "反射(リフレクション)"),
             new WFI18NTranslation("Refraction", "屈折"),
-            new WFI18NTranslation("FrostedGlass", "すりガラス"),
             new WFI18NTranslation("RimLight", "リムライト"),
+            new WFI18NTranslation("Specular", "光沢(スペキュラ)"),
             new WFI18NTranslation("Stencil Mask", "ステンシル"),
             new WFI18NTranslation("Tessellation", "細分化"),
             new WFI18NTranslation("ToonShade", "トゥーン影"),
             new WFI18NTranslation("Transparent Alpha", "透過"),
-            new WFI18NTranslation("Ghost Transparent", "ゴースト透過"),
-            new WFI18NTranslation("Grass", "草"),
-            new WFI18NTranslation("Grass Wave", "草の揺れ"),
-            new WFI18NTranslation("Material Options", "マテリアル設定"),
             new WFI18NTranslation("Utility", "ユーティリティ"),
+            new WFI18NTranslation("Water", "水"),
+            new WFI18NTranslation("Waving 1", "波面の生成1"),
+            new WFI18NTranslation("Waving 2", "波面の生成2"),
+            new WFI18NTranslation("Waving 3", "波面の生成3"),
             // Base
             new WFI18NTranslation("Main Texture", "メイン テクスチャ"),
             new WFI18NTranslation("Color", "マテリアルカラー"),
