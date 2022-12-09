@@ -456,11 +456,11 @@ namespace UnlitWF
                 return false;
             }
             var name = shader.name;
-            if (name.Contains("_FakeFur_"))
+            if (name.Contains("_Mobile_") || name.Contains("WF_UnToon_Hidden") || name.Contains("WF_DebugView"))
             {
-                return false;
+                return true;
             }
-            if (name.Contains("_Mobile_") || name.Contains("_Gem_") || name.Contains("_Grass_") || name.Contains("Hidden") || name.Contains("DebugView"))
+            if (GetShaderQuestSupported(shader))
             {
                 return true;
             }
@@ -568,7 +568,7 @@ namespace UnlitWF
         /// <param name="shader"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        private static string getPropertyDescription(Shader shader, string name)
+        private static string getPropertyDescription(Shader shader, string name, string _default = null)
         {
             var idx = FindPropertyIndex(shader, name);
             if (0 <= idx)
@@ -579,7 +579,7 @@ namespace UnlitWF
                 return ShaderUtil.GetPropertyDescription(shader, idx);
 #endif
             }
-            return null;
+            return _default;
         }
 
         /// <summary>
@@ -620,6 +620,16 @@ namespace UnlitWF
         public static string GetShaderFallBackTarget(Material mat)
         {
             return mat == null ? null : GetShaderFallBackTarget(mat.shader);
+        }
+
+        /// <summary>
+        /// Shader から QuestSupported の値を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static bool GetShaderQuestSupported(Shader shader)
+        {
+            return getPropertyDescription(shader, "_QuestSupported", "false").ToLower() == "true";
         }
 
         public static int GetMaterialRenderQueueValue(Material mat)
