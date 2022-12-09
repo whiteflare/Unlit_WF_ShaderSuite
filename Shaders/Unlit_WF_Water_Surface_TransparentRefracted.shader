@@ -23,9 +23,9 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _Color                  ("Water Color", Color) = (1, 1, 1, 1)
         [HDR]
             _Color2                 ("Water Color 2", Color) = (0.7, 0.7, 1, 1)
+            _ShadowPower            ("Shadow Power", Range(0, 1)) = 0.5
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
-            _ShadowPower            ("Shadow Power", Range(0, 1)) = 0.5
 
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
@@ -61,8 +61,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _WAV_Speed_1            ("[WA1] Speed", Range(0, 10)) = 0
             _WAV_NormalScale_1      ("[WA1] Wave Normal Scale", Range(0, 8)) = 1
         [Normal]
-            _WAV_NormalMap_1        ("[WA1] Wave Normal Map", 2D) = "bump" {}
-            _WAV_HeightMap_1        ("[WA1] Wave Height Map", 2D) = "white" {}
+            _WAV_NormalMap_1        ("[WA1] Wave NormalMap", 2D) = "bump" {}
+            _WAV_HeightMap_1        ("[WA1] Wave HeightMap", 2D) = "white" {}
 
         [WFHeaderToggle(Waving 2)]
             _WAV_Enable_2           ("[WA2] Enable", Float) = 0
@@ -73,8 +73,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _WAV_Speed_2            ("[WA2] Speed", Range(0, 10)) = 0
             _WAV_NormalScale_2      ("[WA2] Wave Normal Scale", Range(0, 8)) = 1
         [Normal]
-            _WAV_NormalMap_2        ("[WA2] Wave Normal Map", 2D) = "bump" {}
-            _WAV_HeightMap_2        ("[WA2] Wave Height Map", 2D) = "white" {}
+            _WAV_NormalMap_2        ("[WA2] Wave NormalMap", 2D) = "bump" {}
+            _WAV_HeightMap_2        ("[WA2] Wave HeightMap", 2D) = "white" {}
 
         [WFHeaderToggle(Waving 3)]
             _WAV_Enable_3           ("[WA3] Enable", Float) = 0
@@ -85,17 +85,17 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _WAV_Speed_3            ("[WA3] Speed", Range(0, 10)) = 0
             _WAV_NormalScale_3      ("[WA3] Wave Normal Scale", Range(0, 8)) = 1
         [Normal]
-            _WAV_NormalMap_3        ("[WA3] Wave Normal Map", 2D) = "bump" {}
-            _WAV_HeightMap_3        ("[WA3] Wave Height Map", 2D) = "white" {}
+            _WAV_NormalMap_3        ("[WA3] Wave NormalMap", 2D) = "bump" {}
+            _WAV_HeightMap_3        ("[WA3] Wave HeightMap", 2D) = "white" {}
 
         [WFHeaderToggle(Specular)]
             _WAS_Enable             ("[WAS] Enable", Float) = 0
-            _WAS_Power              ("[WAS] Specular power", Range(0, 2)) = 1
+            _WAS_Power              ("[WAS] Specular Power", Range(0, 2)) = 1
         [HDR]
             _WAS_Color              ("[WAS] Specular Color", Color) = (1, 1, 1, 1)
             _WAS_Smooth             ("[WAS] Specular Smoothness", Range(0, 1)) = 0.9
         [Header(Specular 2)]
-            _WAS_Power2             ("[WAS] Specular 2 power", Range(0, 2)) = 1
+            _WAS_Power2             ("[WAS] Specular 2 Power", Range(0, 2)) = 1
         [HDR]
             _WAS_Color2             ("[WAS] Specular 2 Color", Color) = (0.7, 0.7, 1, 1)
             _WAS_Smooth2            ("[WAS] Specular 2 Smoothness", Range(0, 1)) = 0.7

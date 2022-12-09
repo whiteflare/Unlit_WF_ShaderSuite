@@ -20,14 +20,14 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
-            _Color                  ("Coastic Color", Color) = (1, 1, 1, 1)
+            _Color                  ("Caustics Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
 
         [WFHeader(Water)]
-            _WaterLevel             ("Water Level (World Y Coord)", Float) = 0
+            _WaterLevel             ("[WA] Water Level (World Y Coord)", Float) = 0
         [Toggle(_)]
-            _HideCausticAbove       ("Hide Caustic above water", Float) = 0
+            _HideCausticsAbove      ("[WA] Hide Caustics above water", Float) = 0
 
         [WFHeaderToggle(Waving 1)]
             _WAV_Enable_1           ("[WA1] Enable", Float) = 1

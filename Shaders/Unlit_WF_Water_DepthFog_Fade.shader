@@ -24,8 +24,8 @@ Shader "UnlitWF/WF_Water_DepthFog_Fade" {
             _CullMode               ("Cull Mode", int) = 2
 
         [WFHeader(Water)]
-            _WaterLevel             ("Water Level (World Y Coord)", Float) = 0
-            _WaterTransparency      ("Water Transparency", Float) = 1
+            _WaterLevel             ("[WA] Water Level (World Y Coord)", Float) = 0
+            _WaterTransparency      ("[WA] Water Transparency", Float) = 1
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
