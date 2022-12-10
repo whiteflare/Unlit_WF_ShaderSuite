@@ -633,7 +633,10 @@ namespace UnlitWF.Converter
         public const int VERSION = 5;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
-        public static void ExecuteAuto()
+        /// <summary>
+        /// shader インポート時に全スキャンする。
+        /// </summary>
+        public static void ExecuteScanWhenImportShader()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
@@ -675,7 +678,10 @@ namespace UnlitWF.Converter
             SaveCurrentMigrationVersion();
         }
 
-        public static void ExecuteByManual()
+        /// <summary>
+        /// 手動で全スキャンする。
+        /// </summary>
+        public static void ExecuteScanByManual()
         {
             var msg = WFI18N.Translate(WFMessageText.DgMigrationManual);
             var lang = WFEditorPrefs.LangMode;
@@ -688,33 +694,18 @@ namespace UnlitWF.Converter
             }
         }
 
-        public static int GetCurrentMigrationVersion()
+        /// <summary>
+        /// material インポート時にそのマテリアルをマイグレーションする。
+        /// </summary>
+        /// <param name="paths"></param>
+        public static void ExecuteMigrationWhenImportMaterial(string[] paths)
         {
-            if (int.TryParse(EditorUserSettings.GetConfigValue(KEY_MIG_VERSION) ?? "0", out var version))
+            if (!WFEditorSetting.GetOneOfSettings().enableMigrationWhenImport)
             {
-                return version;
+                // 設定で無効化されているならば何もしない
+                return;
             }
-            return 0;
-        }
 
-        public static void SaveCurrentMigrationVersion()
-        {
-            EditorUserSettings.SetConfigValue(KEY_MIG_VERSION, VERSION.ToString());
-        }
-
-        public static void ScanAndMigration()
-        {
-            // Go Ahead
-            var done = new MaterialSeeker().SeekProjectAllMaterial("migration materials", Migration);
-            if (0 < done)
-            {
-                AssetDatabase.SaveAssets();
-                Debug.LogFormat("[WF] Scan And Migration {0} materials", done);
-            }
-        }
-
-        public static void ImportAndMigration(string[] paths)
-        {
             var done = 0;
             foreach (var path in paths)
             {
@@ -726,6 +717,31 @@ namespace UnlitWF.Converter
             if (0 < done)
             {
                 Debug.LogFormat("[WF] Import And Migration {0} materials", done);
+            }
+        }
+
+        private static int GetCurrentMigrationVersion()
+        {
+            if (int.TryParse(EditorUserSettings.GetConfigValue(KEY_MIG_VERSION) ?? "0", out var version))
+            {
+                return version;
+            }
+            return 0;
+        }
+
+        private static void SaveCurrentMigrationVersion()
+        {
+            EditorUserSettings.SetConfigValue(KEY_MIG_VERSION, VERSION.ToString());
+        }
+
+        private static void ScanAndMigration()
+        {
+            // Go Ahead
+            var done = new MaterialSeeker().SeekProjectAllMaterial("migration materials", Migration);
+            if (0 < done)
+            {
+                AssetDatabase.SaveAssets();
+                Debug.LogFormat("[WF] Scan And Migration {0} materials", done);
             }
         }
 
