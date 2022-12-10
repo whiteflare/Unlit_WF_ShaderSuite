@@ -101,7 +101,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_CUTOUT
+            // #define _WF_ALPHA_CUTOUT // UnToon の AlphaCutout は使用せず自前でclipする
             #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
@@ -135,7 +135,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _WF_ALPHA_CUTOUT
+            // #define _WF_ALPHA_CUTOUT // UnToon の AlphaCutout は使用せず自前でclipする
             #define _WF_MOBILE
 
             #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
@@ -163,7 +163,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #define _WF_ALPHA_CUTOUT
+            // #define _WF_ALPHA_CUTOUT // UnToon の AlphaCutout は使用せず自前でclipする
             #define _WF_MOBILE
 
             #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE

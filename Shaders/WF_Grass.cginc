@@ -62,20 +62,10 @@
     #endif
 
     ////////////////////////////
-    // Anti Glare & Light Configuration
+    // UnToon function
     ////////////////////////////
 
-    float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
-        float3 lightColorMain = sampleMainLightColor();
-        float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
-
-        float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
-        float power = MAX_RGB(color);                       // 明度
-        color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
-        color /= power;                                     // 正規化(colorはゼロではないのでpowerが0除算になることはない)
-        color *= lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // 明度のsaturateと書き戻し
-        return color;
-    }
+    #include "WF_UnToon_Function.cginc"
 
     ////////////////////////////
     // Grass
@@ -145,47 +135,6 @@ FEATURE_TGL_END
     #else
         #define calcGrassWaveVertex(height, ws_vertex)
     #endif
-
-    ////////////////////////////
-    // Ambient Occlusion
-    ////////////////////////////
-
-    #ifdef _AO_ENABLE
-
-        void affectOcclusion(v2f i, float2 uv_main, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_AO_Enable)
-            float3 occlusion = ONE_VEC3;
-            #ifdef _LMAP_ENABLE
-            if (TGL_ON(_AO_UseLightMap)) {
-                occlusion *= pickLightmap(i.uv_lmap);
-            }
-            #endif
-            occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BlendPower); // 色の混合
-            occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
-            color.rgb *= max(ZERO_VEC3, occlusion.rgb);
-FEATURE_TGL_END
-        }
-    #else
-        #define affectOcclusion(i, uv_main, color)
-    #endif
-
-    float3 calcAmbientColorVertex(float2 uv_lmap) {
-        // ライトマップもしくは環境光を取得
-        #ifdef _LMAP_ENABLE
-            #if defined(_AO_ENABLE)
-                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので固定値を返す
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-                return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
-#else
-                return TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
-#endif
-            #else
-                return pickLightmapLod(uv_lmap);
-            #endif
-        #else
-            return sampleSHLightColor();
-        #endif
-    }
 
     ////////////////////////////
     // vertex&fragment shader

@@ -30,6 +30,7 @@
     ////////////////////////////
 
     half4           _MainTex_ST;
+    half            _Color;
     half            _Cutoff;
     half            _UseVertexColor;
 
@@ -39,6 +40,14 @@
     float           _GL_LevelMin;
     float           _GL_LevelMax;
     float           _GL_BlendPower;
+
+    // 使わない変数は define で固定値を設定
+    #define _GL_LightMode		0
+    #define _GL_CustomAzimuth	0
+    #define _GL_CustomAltitude	0
+    #define _GL_CustomLitPos	0
+    #define _GL_DisableBackLit  0
+    #define _GL_DisableBasePos  0
 
     // -------------------------
 
