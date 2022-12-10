@@ -101,8 +101,6 @@
     // UnToon function
     ////////////////////////////
 
-    #define WF_TEX2D_OCCLUSION(uv)          float3(1, 1, 1)
-
     #include "WF_UnToon_Function.cginc"
 
     ////////////////////////////
