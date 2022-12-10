@@ -39,6 +39,9 @@
     DECL_SUB_TEX2D      (_OVL_MaskTex);
     DECL_SUB_TEX2D      (_TL_CustomColorTex);
     DECL_SUB_TEX2D      (_CHM_3chMaskTex);
+#ifndef _WF_AO_ONLY_LMAP
+    DECL_SUB_TEX2D      (_OcclusionMap);
+#endif
 #ifndef _WF_MOBILE
     DECL_SUB_TEX2D      (_NS_2ndMaskTex);
     DECL_SUB_TEX2D      (_SpecGlossMap);
@@ -46,7 +49,6 @@
     DECL_SUB_TEX2D      (_TS_1stTex);
     DECL_SUB_TEX2D      (_TS_2ndTex);
     DECL_SUB_TEX2D      (_TS_3rdTex);
-    DECL_SUB_TEX2D      (_OcclusionMap);
     DECL_SUB_TEX2D      (_LME_Texture);
     DECL_SUB_TEX2D      (_LME_MaskTex);
 #endif

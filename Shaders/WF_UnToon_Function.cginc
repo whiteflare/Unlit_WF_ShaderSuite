@@ -120,7 +120,7 @@
     #endif
 
     #ifndef WF_TEX2D_OCCLUSION
-        #define WF_TEX2D_OCCLUSION(uv)          SAMPLE_MASK_VALUE(_OcclusionMap, uv, 0).rgb
+	    #define WF_TEX2D_OCCLUSION(uv)          SAMPLE_MASK_VALUE(_OcclusionMap, uv, 0).rgb
     #endif
 
     #ifndef IN_FRAG
@@ -1279,17 +1279,21 @@ FEATURE_TGL_END
         void affectOcclusion(IN_FRAG i, float2 uv_main, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_AO_Enable)
             float3 occlusion = ONE_VEC3;
-#ifndef _WF_MOBILE
+#ifndef _WF_AO_ONLY_LMAP
             float2 uv_aomap = _AO_UVType == 1 ? i.uv_lmap : uv_main;
             float3 aomap_var = WF_TEX2D_OCCLUSION(uv_aomap);
             occlusion *= TGL_OFF(_AO_UseGreenMap) ? aomap_var.rgb : aomap_var.ggg;
             occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
-            #if defined(_LMAP_ENABLE) && !defined(_WF_EDITOR_HIDE_LMAP)
+#if defined(_LMAP_ENABLE) && !defined(_WF_EDITOR_HIDE_LMAP)
+    #ifndef _WF_AO_ONLY_LMAP
             if (TGL_ON(_AO_UseLightMap)) {
+    #endif
                 occlusion *= pickLightmap(i.uv_lmap);
+    #ifndef _WF_AO_ONLY_LMAP
             }
-            #endif
+    #endif
+#endif
             occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BlendPower); // 色の混合
             occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
             color.rgb *= max(ZERO_VEC3, occlusion.rgb);
@@ -1302,18 +1306,21 @@ FEATURE_TGL_END
     float3 calcAmbientColorVertex(float2 uv_lmap) {
         // ライトマップもしくは環境光を取得
         #ifdef _LMAP_ENABLE
-            #if defined(_AO_ENABLE)
-                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので固定値を返す
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-                return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
-#else
-                return TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
-#endif
+            #ifdef _AO_ENABLE
+                #ifdef _WF_AO_ONLY_LMAP
+                    return ONE_VEC3;    // Lightmap が使えてAOが有効、かつONLYのときはAO側で色を合成するので白を返す
+                #else
+                    #ifndef _WF_LEGACY_FEATURE_SWITCH
+                        return TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
+                    #else
+                        return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
+                    #endif
+                #endif
             #else
-                return pickLightmapLod(uv_lmap);
+                return pickLightmapLod(uv_lmap);    // Lightmap が使えるがAOが無効のときは、Lightmap から明るさを取得
             #endif
         #else
-            return sampleSHLightColor();
+            return sampleSHLightColor();    // Lightmap が使えないときは SH を返す
         #endif
     }
 

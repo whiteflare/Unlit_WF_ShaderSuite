@@ -1828,6 +1828,36 @@ namespace UnlitWF
         }
     }
 
+    /// <summary>
+    /// 常に指定のfloat値にプロパティを固定する、非活性Toggle表示のPropertyDrawer
+    /// </summary>
+    internal class MaterialWF_FixUIToggleDrawer : MaterialPropertyDrawer
+    {
+        public readonly float value;
+
+        public MaterialWF_FixUIToggleDrawer()
+        {
+            this.value = 0;
+        }
+
+        public MaterialWF_FixUIToggleDrawer(float value)
+        {
+            this.value = value;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+            prop.floatValue = this.value;
+            bool value = (Math.Abs(prop.floatValue) > 0.001f);
+
+            EditorGUI.LabelField(position, label);
+            using (new EditorGUI.DisabledGroupScope(true))
+            {
+                EditorGUI.Toggle(position, " ", value);
+            }
+        }
+    }
+
     #endregion
 
     public class WFMaterialCache : ScriptableSingleton<WFMaterialCache>

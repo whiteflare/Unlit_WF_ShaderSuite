@@ -132,7 +132,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
-        [Toggle(_)]
+        [WF_FixUIToggle(1.0)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
@@ -218,6 +218,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma target 3.0
 
             #define _WF_ALPHA_CUTOUT
+            #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
@@ -258,6 +259,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma fragment frag_meta
 
             #define _WF_ALPHA_CUTOUT
+            #define _WF_MOBILE
 
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _VC_ENABLE
