@@ -129,7 +129,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-10" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent+100" }
 
         Pass {
             Name "MAIN"

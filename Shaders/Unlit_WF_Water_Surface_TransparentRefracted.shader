@@ -36,6 +36,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         [WFHeaderAlwaysOn(Refraction)]
             _CRF_Enable             ("[CRF] Enable", Float) = 1
@@ -135,7 +137,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-10" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent+100" }
 
         GrabPass { "_UnToonWaterRefraction" }
 
@@ -144,7 +146,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
-            ZWrite ON
+            ZWrite [_AL_ZWrite]
 
             CGPROGRAM
 
