@@ -180,7 +180,7 @@ namespace UnlitWF.Converter
 
         protected static bool HasNewProperty(ConvertContext ctx, params string[] names)
         {
-            return names.Any(name => 0 <= WFCommonUtility.FindPropertyIndex(ctx.target.shader, name));
+            return names.Any(name => WFAccessor.HasShaderProperty(ctx.target.shader, name));
         }
 
         protected static bool HasNewPropertyValue(ConvertContext ctx, params string[] names)
@@ -259,7 +259,7 @@ namespace UnlitWF.Converter
                     var shader = ctx.target.shader;
                     while (WFCommonUtility.IsSupportedShader(shader) && !WFCommonUtility.IsMobileSupportedShader(shader)) {
                         // シェーダ切り替え
-                        var fallback = WFCommonUtility.GetShaderFallBackTarget(shader) ?? "Hidden/UnlitWF/WF_UnToon_Hidden";
+                        var fallback = WFAccessor.GetShaderFallBackTarget(shader) ?? "Hidden/UnlitWF/WF_UnToon_Hidden";
                         WFCommonUtility.ChangeShader(fallback, ctx.target);
 
                         // シェーダ切り替え後に RenderQueue をコピー

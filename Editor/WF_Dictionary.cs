@@ -169,7 +169,7 @@ namespace UnlitWF
             {
                 return false;
             }
-            foreach(var pn in WFCommonUtility.GetAllPropertyNames(mat.shader))
+            foreach(var pn in WFAccessor.GetAllPropertyNames(mat.shader))
             {
                 if (pn.StartsWith(prefix))
                 {

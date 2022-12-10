@@ -345,12 +345,15 @@ namespace UnlitWF
             OnGuiSub_ShowCurrentShaderName(materialEditor, false);
             // マイグレーションHelpBox
             OnGUISub_MigrationHelpBox(materialEditor);
+
             // Transparent RenderQueue対策HelpBox
             OnGUISub_TransparentQueueHelpBox(materialEditor);
             // Batching Static対策HelpBox
             OnGUISub_BatchingStaticHelpBox(materialEditor);
             // Lightmap Static対策HelpBox
             OnGUISub_LightmapStaticHelpBox(materialEditor);
+            // DoubleSidedGI対策HelpBox
+            OnGUISub_DoubleSidedGIHelpBox(materialEditor);
 
             // 現在無効なラベルを保持するリスト
             var disable = new HashSet<string>();
@@ -467,7 +470,7 @@ namespace UnlitWF
             var snm = WFShaderNameDictionary.TryFindFromName(mat.shader.name);
 
             // CurrentVersion プロパティがあるなら表示
-            var currentVersion = WFCommonUtility.GetShaderCurrentVersion(mat);
+            var currentVersion = WFAccessor.GetShaderCurrentVersion(mat);
             if (!string.IsNullOrWhiteSpace(currentVersion))
             {
                 rect = EditorGUILayout.GetControlRect();
@@ -776,11 +779,64 @@ namespace UnlitWF
             }
         }
 
+        private static void OnGUISub_DoubleSidedGIHelpBox(MaterialEditor materialEditor)
+        {
+            // ターゲットが設定用プロパティを持っていないならば何もしない
+            var target = materialEditor.target as Material;
+            if (target == null)
+            {
+                return;
+            }
+            // 現在のシェーダ
+            var shader = target.shader;
+
+            // 現在編集中のマテリアルの配列
+            var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
+            // 現在編集中のマテリアルのうち、DoubleSidedGI が付いていない、かつ Transparent か TransparentCutout なマテリアル
+            var allNonStaticMaterials = targets.Where(mat => !mat.doubleSidedGI)
+                .Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent", "TransparentCutout"))
+                .ToArray();
+
+            if (allNonStaticMaterials.Length == 0)
+            {
+                return;
+            }
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            // 現在のシーンにある LightmapStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
+            var allStaticMaterialsInScene = scene.GetRootGameObjects()
+                .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
+#if UNITY_2019_1_OR_NEWER
+                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.ContributeGI)) // ここではReceiveGIがLightProbesも扱う
+#else
+                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.LightmapStatic))
+#endif
+                .SelectMany(mf => mf.sharedMaterials)
+                .Where(mat => mat != null && mat.shader == shader)
+                .ToArray();
+
+            // Lightmap Static の付いているマテリアルが targets 内にあるならば警告
+            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat)))
+            {
+                var message = WFI18N.Translate("マテリアルの DoubleSidedGI がチェックされていません。\nこのマテリアルは片面メッシュとしてライトベイクされます。\nDoubleSidedGI を修正しますか？");
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
+                {
+                    Undo.RecordObjects(allNonStaticMaterials, "Fix DoubleSidedGI");
+                    // DoubleSidedGI をオンにする
+                    foreach (var mat in allNonStaticMaterials)
+                    {
+                        mat.doubleSidedGI = true;
+                    }
+                }
+            }
+        }
+
         private static void OnGUISub_TransparentQueueHelpBox(MaterialEditor materialEditor)
         {
             // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
             var targets = WFCommonUtility.AsMaterials(materialEditor.targets)
-                .Where(mat => mat.GetTag("RenderType", true, "Opaque") == "Transparent" && mat.renderQueue < 2500).ToArray();
+                .Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent") && mat.renderQueue < 2500).ToArray();
 
             // RenderGeometryTransparentでないものがある場合は
             if (0 < targets.Length)
