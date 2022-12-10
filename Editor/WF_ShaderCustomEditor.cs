@@ -104,6 +104,11 @@ namespace UnlitWF
                     CompareAndSet(ctx.all, "_MT_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP
                 }
             }),
+            new DefValueSetPropertyHook("_WAM_Cubemap", ctx => {
+                if (ctx.current.textureValue != null) {
+                    CompareAndSet(ctx.all, "_WRL_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP
+                }
+            }),
             new DefValueSetPropertyHook("_AL_MaskTex", ctx => {
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_AL_Source", 0, 1); // MAIN_TEX_ALPHA -> MASK_TEX_RED
@@ -127,7 +132,7 @@ namespace UnlitWF
             }),
 
             // _DetailNormalMap と _FUR_NoiseTex の直後に設定ボタンを追加する
-            new CustomPropertyHook("_DetailNormalMap|_FUR_NoiseTex", null, (ctx, changed) => {
+            new CustomPropertyHook("_DetailNormalMap|_FUR_NoiseTex|(_WAV_NormalMap|_WAV_HeightMap|_WAV_CausticsTex)(_[0-9]+)?", null, (ctx, changed) => {
                 if (ctx.current.textureValue == null) {
                     return;
                 }
@@ -340,10 +345,15 @@ namespace UnlitWF
             OnGuiSub_ShowCurrentShaderName(materialEditor, false);
             // マイグレーションHelpBox
             OnGUISub_MigrationHelpBox(materialEditor);
+
+            // Transparent RenderQueue対策HelpBox
+            OnGUISub_TransparentQueueHelpBox(materialEditor);
             // Batching Static対策HelpBox
             OnGUISub_BatchingStaticHelpBox(materialEditor);
             // Lightmap Static対策HelpBox
             OnGUISub_LightmapStaticHelpBox(materialEditor);
+            // DoubleSidedGI対策HelpBox
+            OnGUISub_DoubleSidedGIHelpBox(materialEditor);
 
             // 現在無効なラベルを保持するリスト
             var disable = new HashSet<string>();
@@ -460,7 +470,7 @@ namespace UnlitWF
             var snm = WFShaderNameDictionary.TryFindFromName(mat.shader.name);
 
             // CurrentVersion プロパティがあるなら表示
-            var currentVersion = WFCommonUtility.GetShaderCurrentVersion(mat);
+            var currentVersion = WFAccessor.GetShaderCurrentVersion(mat);
             if (!string.IsNullOrWhiteSpace(currentVersion))
             {
                 rect = EditorGUILayout.GetControlRect();
@@ -703,6 +713,7 @@ namespace UnlitWF
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
                 {
+                    Undo.RecordObjects(allNonStaticMaterials, "Fix BatchingStatic Materials");
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
                     foreach (var mat in allNonStaticMaterials)
                     {
@@ -757,11 +768,87 @@ namespace UnlitWF
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
                 {
+                    Undo.RecordObjects(allNonStaticMaterials, "Fix LightmapStatic Materials");
                     // _AO_Enable と _AO_UseLightMap をオンにする
                     foreach (var mat in allNonStaticMaterials)
                     {
                         mat.SetInt("_AO_Enable", 1);
                         mat.SetInt("_AO_UseLightMap", 1);
+                    }
+                }
+            }
+        }
+
+        private static void OnGUISub_DoubleSidedGIHelpBox(MaterialEditor materialEditor)
+        {
+            // ターゲットが設定用プロパティを持っていないならば何もしない
+            var target = materialEditor.target as Material;
+            if (target == null)
+            {
+                return;
+            }
+            // 現在のシェーダ
+            var shader = target.shader;
+
+            // 現在編集中のマテリアルの配列
+            var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
+            // 現在編集中のマテリアルのうち、DoubleSidedGI が付いていない、かつ Transparent か TransparentCutout なマテリアル
+            var allNonStaticMaterials = targets.Where(mat => !mat.doubleSidedGI)
+                .Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent", "TransparentCutout"))
+                .ToArray();
+
+            if (allNonStaticMaterials.Length == 0)
+            {
+                return;
+            }
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            // 現在のシーンにある LightmapStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
+            var allStaticMaterialsInScene = scene.GetRootGameObjects()
+                .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
+#if UNITY_2019_1_OR_NEWER
+                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.ContributeGI)) // ここではReceiveGIがLightProbesも扱う
+#else
+                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.LightmapStatic))
+#endif
+                .SelectMany(mf => mf.sharedMaterials)
+                .Where(mat => mat != null && mat.shader == shader)
+                .ToArray();
+
+            // Lightmap Static の付いているマテリアルが targets 内にあるならば警告
+            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat)))
+            {
+                var message = WFI18N.Translate(WFMessageText.PlzFixDoubleSidedGI);
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
+                {
+                    Undo.RecordObjects(allNonStaticMaterials, "Fix DoubleSidedGI");
+                    // DoubleSidedGI をオンにする
+                    foreach (var mat in allNonStaticMaterials)
+                    {
+                        mat.doubleSidedGI = true;
+                    }
+                }
+            }
+        }
+
+        private static void OnGUISub_TransparentQueueHelpBox(MaterialEditor materialEditor)
+        {
+            // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
+            var targets = WFCommonUtility.AsMaterials(materialEditor.targets)
+                .Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent") && mat.renderQueue < 2500).ToArray();
+
+            // RenderGeometryTransparentでないものがある場合は
+            if (0 < targets.Length)
+            {
+                var message = WFI18N.Translate(WFMessageText.PlzFixQueue);
+
+                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now")))
+                {
+                    Undo.RecordObjects(targets, "Fix RenderQueue Materials");
+                    foreach (var mat in targets)
+                    {
+                        mat.renderQueue = -1;
                     }
                 }
             }
@@ -1522,11 +1609,6 @@ namespace UnlitWF
             this.text = text;
         }
 
-        public MaterialWFHeaderDecorator(string text, string helptext)
-        {
-            this.text = text;
-        }
-
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
             return 32;
@@ -1550,11 +1632,6 @@ namespace UnlitWF
             this.text = text;
         }
 
-        public MaterialWFHeaderToggleDrawer(string text, string helptext)
-        {
-            this.text = text;
-        }
-
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
             return 32;
@@ -1574,11 +1651,6 @@ namespace UnlitWF
         public readonly string text;
 
         public MaterialWFHeaderAlwaysOnDrawer(string text)
-        {
-            this.text = text;
-        }
-
-        public MaterialWFHeaderAlwaysOnDrawer(string text, string helptext)
         {
             this.text = text;
         }
@@ -1713,7 +1785,80 @@ namespace UnlitWF
         }
     }
 
-#endregion
+    /// <summary>
+    /// sin/cos計算済みDirectionのPropertyDrawer
+    /// </summary>
+    internal class MaterialWF_RotMatrixDrawer : MaterialPropertyDrawer
+    {
+        public readonly float min;
+        public readonly float max;
+
+        public MaterialWF_RotMatrixDrawer()
+        {
+            this.min = 0;
+            this.max = 360;
+        }
+
+        public MaterialWF_RotMatrixDrawer(float min, float max)
+        {
+            this.min = min;
+            this.max = max;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+            var value = prop.vectorValue;
+
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
+
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+            EditorGUI.BeginChangeCheck();
+            value.x = EditorGUI.Slider(position, label, value.x, min, max);
+            if (EditorGUI.EndChangeCheck())
+            {
+                value.y = Mathf.Sin(Mathf.Deg2Rad * value.x);
+                value.z = Mathf.Cos(Mathf.Deg2Rad * value.x);
+                value.w = 0;
+                prop.vectorValue = value;
+            }
+            EditorGUI.showMixedValue = false;
+
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+        }
+    }
+
+    /// <summary>
+    /// 常に指定のfloat値にプロパティを固定する、非活性Toggle表示のPropertyDrawer
+    /// </summary>
+    internal class MaterialWF_FixUIToggleDrawer : MaterialPropertyDrawer
+    {
+        public readonly float value;
+
+        public MaterialWF_FixUIToggleDrawer()
+        {
+            this.value = 0;
+        }
+
+        public MaterialWF_FixUIToggleDrawer(float value)
+        {
+            this.value = value;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+            prop.floatValue = this.value;
+            bool value = (Math.Abs(prop.floatValue) > 0.001f);
+
+            EditorGUI.LabelField(position, label);
+            using (new EditorGUI.DisabledGroupScope(true))
+            {
+                EditorGUI.Toggle(position, " ", value);
+            }
+        }
+    }
+
+    #endregion
 
     public class WFMaterialCache : ScriptableSingleton<WFMaterialCache>
     {

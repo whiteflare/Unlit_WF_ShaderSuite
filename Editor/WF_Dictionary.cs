@@ -18,6 +18,7 @@
 #if UNITY_EDITOR
 
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace UnlitWF
 {
@@ -107,6 +108,17 @@ namespace UnlitWF
             new WFShaderName("BRP", "Grass", "Basic", "TransCutout",                   "UnlitWF/WF_Grass_TransCutout", represent: true),
 
             // ================
+            // Water 系列
+            // ================
+
+            new WFShaderName("BRP", "Water", "Surface", "Opaque",                      "UnlitWF/WF_Water_Surface_Opaque", represent: true),
+            new WFShaderName("BRP", "Water", "Surface", "Transparent",                 "UnlitWF/WF_Water_Surface_Transparent"),
+            new WFShaderName("BRP", "Water", "Surface", "Transparent_Refracted",       "UnlitWF/WF_Water_Surface_Transparent_Refracted"),
+            new WFShaderName("BRP", "Water", "FX_Caustics", "Addition",                "UnlitWF/WF_Water_Caustics_Addition"),
+            new WFShaderName("BRP", "Water", "FX_DepthFog", "Transparent",             "UnlitWF/WF_Water_DepthFog_Fade"),
+            new WFShaderName("BRP", "Water", "Option", "Capture",                      "UnlitWF/WF_Water_Option_BackgroundCapture"),
+
+            // ================
             // UnToon 系列(URP)
             // ================
 
@@ -151,6 +163,22 @@ namespace UnlitWF
             new WFShaderName("URP", "Gem", "Basic", "Transparent",                     "UnlitWF_URP/WF_Gem_Transparent", represent: true),
         };
 
+        private static bool HasPropertyPrefix(Material mat, string prefix)
+        {
+            if (mat == null || mat.shader == null)
+            {
+                return false;
+            }
+            foreach(var pn in WFAccessor.GetAllPropertyNames(mat.shader))
+            {
+                if (pn.StartsWith(prefix))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// シェーダ機能のリスト。
         /// </summary>
@@ -188,6 +216,13 @@ namespace UnlitWF
                 new WFShaderFunction("GRS", "GRS", "Grass", (self, mat) => mat.shader.name.Contains("Grass")),
                 new WFShaderFunction("GRW", "GRW", "Grass Wave"),
 
+                new WFShaderFunction("WAD", "WAD", "Distance Fade"),
+                new WFShaderFunction("WA1", "WAV_1", "Waving 1", (self, mat) => WFShaderFunction.IsEnable("_WAV_Enable_1", mat)),
+                new WFShaderFunction("WA2", "WAV_2", "Waving 2", (self, mat) => WFShaderFunction.IsEnable("_WAV_Enable_2", mat)),
+                new WFShaderFunction("WA3", "WAV_3", "Waving 3", (self, mat) => WFShaderFunction.IsEnable("_WAV_Enable_3", mat)),
+                new WFShaderFunction("WAS", "WAS", "Water Specular"),
+                new WFShaderFunction("WAM", "WAM", "Water Reflection"),
+
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
                 new WFShaderFunction("CHM", "CHM", "3ch Color Mask"),
@@ -203,7 +238,7 @@ namespace UnlitWF
                 new WFShaderFunction("CGO", "CGO", "Ghost Transparent"),
                 new WFShaderFunction("CCT", "CCT", "ClearCoat"),
 
-                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => true),
+                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => HasPropertyPrefix(mat, "_GL")),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF
@@ -229,8 +264,10 @@ namespace UnlitWF
         /// ENABLEキーワードに対応していない特殊なプロパティ名 → キーワードの変換マップ。
         /// </summary>
         public static readonly Dictionary<string, WFCustomKeywordSetting> SpecialPropNameToKeywordMap = new Dictionary<string, WFCustomKeywordSetting>() {
-            { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE") },
-            { "_GL_LightMode", new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE") },
+            { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE")
+            },
+            { "_GL_LightMode", new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE") 
+            },
             { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             } },
@@ -252,7 +289,13 @@ namespace UnlitWF
             { "_CGL_BlurMode", new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
                 enablePropName = "_CGL_Enable",
             } },
-            { "_GRS_HeightType", new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_") },
+            { "_GRS_HeightType", new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_") 
+            },
+            { "_GRS_EraseSide", new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE") 
+            },
+            { "_WRL_CubemapType", new WFCustomKeywordSettingEnum("_WRL_CubemapType", "_", "_", "_WAM_ONLY2ND_ENABLE") {
+                enablePropName = "_WAM_Enable",
+            } },
         };
 
         /// <summary>
@@ -271,13 +314,16 @@ namespace UnlitWF
             new WFI18NTranslation("Emission", "エミッション"),
             new WFI18NTranslation("Fake Fur", "ファー"),
             new WFI18NTranslation("Fog", "フォグ"),
+            new WFI18NTranslation("FrostedGlass", "すりガラス"),
             new WFI18NTranslation("Gem Background", "ジェム(裏面)"),
             new WFI18NTranslation("Gem Flake", "ジェム(フレーク)"),
             new WFI18NTranslation("Gem Reflection", "ジェム(反射)"),
             new WFI18NTranslation("Gem Surface", "ジェム(表面)"),
+            new WFI18NTranslation("Ghost Transparent", "ゴースト透過"),
+            new WFI18NTranslation("Grass Wave", "草の揺れ"),
+            new WFI18NTranslation("Grass", "草"),
             new WFI18NTranslation("Lame", "ラメ"),
             new WFI18NTranslation("Light Bake Effects", "ライトベイク調整"),
-            new WFI18NTranslation("Light Matcap", "マットキャップ"),
             new WFI18NTranslation("Light Matcap 2", "マットキャップ2"),
             new WFI18NTranslation("Light Matcap 3", "マットキャップ3"),
             new WFI18NTranslation("Light Matcap 4", "マットキャップ4"),
@@ -285,25 +331,28 @@ namespace UnlitWF
             new WFI18NTranslation("Light Matcap 6", "マットキャップ6"),
             new WFI18NTranslation("Light Matcap 7", "マットキャップ7"),
             new WFI18NTranslation("Light Matcap 8", "マットキャップ8"),
-            new WFI18NTranslation("Lit", "ライト設定"),
+            new WFI18NTranslation("Light Matcap", "マットキャップ"),
             new WFI18NTranslation("Lit Advance", "ライト設定(拡張)"),
+            new WFI18NTranslation("Lit", "ライト設定"),
+            new WFI18NTranslation("Material Options", "マテリアル設定"),
             new WFI18NTranslation("Metallic", "メタリック"),
             new WFI18NTranslation("Mirror Control", "ミラー制御"),
             new WFI18NTranslation("NormalMap", "ノーマルマップ"),
             new WFI18NTranslation("Outline", "アウトライン"),
             new WFI18NTranslation("Overlay Texture", "オーバーレイテクスチャ"),
+            new WFI18NTranslation("Reflection", "反射(リフレクション)"),
             new WFI18NTranslation("Refraction", "屈折"),
-            new WFI18NTranslation("FrostedGlass", "すりガラス"),
             new WFI18NTranslation("RimLight", "リムライト"),
+            new WFI18NTranslation("Specular", "光沢(スペキュラ)"),
             new WFI18NTranslation("Stencil Mask", "ステンシル"),
             new WFI18NTranslation("Tessellation", "細分化"),
             new WFI18NTranslation("ToonShade", "トゥーン影"),
             new WFI18NTranslation("Transparent Alpha", "透過"),
-            new WFI18NTranslation("Ghost Transparent", "ゴースト透過"),
-            new WFI18NTranslation("Grass", "草"),
-            new WFI18NTranslation("Grass Wave", "草の揺れ"),
-            new WFI18NTranslation("Material Options", "マテリアル設定"),
             new WFI18NTranslation("Utility", "ユーティリティ"),
+            new WFI18NTranslation("Water", "水"),
+            new WFI18NTranslation("Waving 1", "波面の生成1"),
+            new WFI18NTranslation("Waving 2", "波面の生成2"),
+            new WFI18NTranslation("Waving 3", "波面の生成3"),
             // Base
             new WFI18NTranslation("Main Texture", "メイン テクスチャ"),
             new WFI18NTranslation("Color", "マテリアルカラー"),
@@ -327,12 +376,18 @@ namespace UnlitWF
             new WFI18NTranslation("Scale", "スケール"),
             new WFI18NTranslation("Direction", "方向"),
             new WFI18NTranslation("Distance", "距離"),
+            new WFI18NTranslation("Speed", "スピード"),
+            new WFI18NTranslation("Power", "強度"),
             new WFI18NTranslation("Roughen", "粗くする"),
             new WFI18NTranslation("Finer", "細かくする"),
             new WFI18NTranslation("Tint Color", "色調整"),
+            new WFI18NTranslation("Fade Distance", "フェード距離"),
+            new WFI18NTranslation("Fade Distance (Near)", "フェード距離 (Near)"),
+            new WFI18NTranslation("Fade Distance (Far)", "フェード距離 (Far)"),
             new WFI18NTranslation("FadeOut Distance", "フェードアウト距離"),
             new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離 (Near)"),
             new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離 (Far)"),
+            new WFI18NTranslation("Shadow Power", "影の濃さ"),
             // Lit
             new WFI18NTranslation("Unlit Intensity", "Unlit Intensity (最小明度)"),
             new WFI18NTranslation("Saturate Intensity", "Saturate Intensity (飽和明度)"),
@@ -355,7 +410,6 @@ namespace UnlitWF
             // Normal
             new WFI18NTranslation("NM", "NormalMap Texture", "ノーマルマップ").AddTag("FUR"),
             new WFI18NTranslation("NM", "Bump Scale", "凹凸スケール"),
-            new WFI18NTranslation("NM", "Shadow Power", "影の濃さ"),
             new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("NS", "FUR"),
             // Normal 2nd
             new WFI18NTranslation("NS", "2nd Normal Blend", "2ndマップの混合タイプ"),
@@ -531,12 +585,34 @@ namespace UnlitWF
             new WFI18NTranslation("GRS", "Color Factor", "カラー係数"),
             new WFI18NTranslation("GRS", "Tint Color Top", "色調整(先端)"),
             new WFI18NTranslation("GRS", "Tint Color Bottom", "色調整(根元)"),
+            new WFI18NTranslation("GRS", "Erase Side", "側面を非表示"),
             // GrassWave
             new WFI18NTranslation("GRW", "Wave Speed", "波スピード"),
             new WFI18NTranslation("GRW", "Wave Amplitude", "波の振幅"),
             new WFI18NTranslation("GRW", "Wave Exponent", "指数"),
             new WFI18NTranslation("GRW", "Wave Offset", "オフセット"),
             new WFI18NTranslation("GRW", "Wind Vector", "風ベクトル"),
+            // Water
+            new WFI18NTranslation("Water Color", "水面の色"),
+            new WFI18NTranslation("Water Color 2", "水面の色 2"),
+            new WFI18NTranslation("Caustics Color", "コースティクスの色"),
+            new WFI18NTranslation("Fog Color", "フォグの色"),
+            new WFI18NTranslation("WA", "Water Level (World Y Coord)", "水面高 (ワールドY座標)"),
+            new WFI18NTranslation("WA", "Hide Caustics above water", "水上ではコースティクスを非表示"),
+            new WFI18NTranslation("WA", "Water Transparency", "水の透明度"),
+            new WFI18NTranslation("WA1", "Wave NormalMap", "波面ノーマルマップ").AddTag("WA2", "WA3"),
+            new WFI18NTranslation("WA1", "Wave Normal Scale", "凹凸スケール").AddTag("WA2", "WA3"),
+            new WFI18NTranslation("WA1", "Wave HeightMap", "波面ハイトマップ").AddTag("WA2", "WA3"),
+            new WFI18NTranslation("WA1", "Caustics Tex", "コースティクステクスチャ").AddTag("WA2", "WA3"),
+            new WFI18NTranslation("WAM", "Smoothness", "滑らかさ"),
+            new WFI18NTranslation("WAM", "2nd CubeMap Blend", "キューブマップ混合タイプ"),
+            new WFI18NTranslation("WAM", "Cube Map", "キューブマップ"),
+            new WFI18NTranslation("WAS", "Specular Power", "スペキュラ強度"),
+            new WFI18NTranslation("WAS", "Specular Color", "スペキュラ色"),
+            new WFI18NTranslation("WAS", "Specular Smoothness", "滑らかさ"),
+            new WFI18NTranslation("WAS", "Specular 2 Power", "スペキュラ強度 2"),
+            new WFI18NTranslation("WAS", "Specular 2 Color", "スペキュラ色 2"),
+            new WFI18NTranslation("WAS", "Specular 2 Smoothness", "滑らかさ 2"),
 
             // メニュー
             new WFI18NTranslation("Copy material", "コピー"),
@@ -549,6 +625,8 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PlzMigration, "このマテリアルは古いバージョンで作成されたようです。\n最新版に変換しますか？"),
             new WFI18NTranslation(WFMessageText.PlzBatchingStatic, "このマテリアルは Batching Static な MeshRenderer から使われているようです。\nBatching Static 用の設定へ変更しますか？"),
             new WFI18NTranslation(WFMessageText.PlzLightmapStatic, "このマテリアルは Lightmap Static な MeshRenderer から使われているようです。\nライトマップを有効にしますか？"),
+            new WFI18NTranslation(WFMessageText.PlzFixQueue, "半透明マテリアルのQueueが2500未満です。\nRenderQueueを修正しますか？"),
+            new WFI18NTranslation(WFMessageText.PlzFixDoubleSidedGI, "マテリアルの DoubleSidedGI がチェックされていません。\nこのマテリアルは片面としてライトベイクされます。\nDoubleSidedGI を修正しますか？"),
             new WFI18NTranslation(WFMessageText.PsAntiShadowMask, "アンチシャドウマスクにはアバターの顔を白く塗ったマスクテクスチャを指定してください。マスク反転をチェックすることでマテリアル全体を顔とみなすこともできます。"),
 
             new WFI18NTranslation(WFMessageText.PsCapTypeMedian, "MEDIAN_CAPは灰色を基準とした加算＆減算合成を行うmatcapです"),
@@ -556,7 +634,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PsCapTypeShade, "SHADE_CAPは白色を基準とした乗算合成を行うmatcapです"),
 
             new WFI18NTranslation(WFMessageText.DgChangeMobile, "シェーダをMobile向けに切り替えますか？\n\nこの操作はUndoできますが、バックアップを取ることをお勧めします。"),
-            new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダのバージョンが更新されました。\nプロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
+            new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダがインポートされました。\nプロジェクト内に古いマテリアルが残っていないかスキャンしますか？"),
             new WFI18NTranslation(WFMessageText.DgMigrationManual, "プロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
 
             new WFI18NTranslation(WFMessageText.LgWarnOlderVersion, "古いバージョンで作成されたマテリアルがあります。"),
@@ -798,12 +876,14 @@ namespace UnlitWF
         public static readonly string PlzMigration = "This Material may have been created in an older version.\nConvert to new version?";
         public static readonly string PlzBatchingStatic = "This material seems to be used by the Batching Static MeshRenderer.\nDo you want to change the settings for Batching Static?";
         public static readonly string PlzLightmapStatic = "This material seems to be used by the Lightmap Static MeshRenderer.\nDo you want to enable Lightmap?";
+        public static readonly string PlzFixQueue = "The Queue for the transparency material is less than 2500, do you want to fix the RenderQueue?";
+        public static readonly string PlzFixDoubleSidedGI = "The material's DoubleSidedGI is unchecked.\nThis material will be lightbaked as single sided.\nDo you want to fix DoubleSidedGI?";
         public static readonly string PsAntiShadowMask = "In the Anti-Shadow Mask field, specify a mask texture with the avatar face painted white. You can also check the InvertMask checkbox to make the entire material a face.";
         public static readonly string PsCapTypeMedian = "MEDIAN_CAP is a matcap that performs gray-based additive and subtractive blending.";
         public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";
         public static readonly string PsCapTypeShade = "SHADE_CAP is a matcap that performs white-based multiply blending.";
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
-        public static readonly string DgMigrationAuto = "The version of the UnlitWF shader has been updated.\nDo you want to scan the materials in your project and update them to the latest material values?";
+        public static readonly string DgMigrationAuto = "UnlitWF shaders have been imported.\nDo you want to scan for old materials still in the project?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
         public static readonly string LgWarnOlderVersion = "A material was created with an older shader version.";
         public static readonly string LgWarnNotSupportAndroid = "A material uses a shader that is not supported by Android.";
