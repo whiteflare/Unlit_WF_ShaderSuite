@@ -137,7 +137,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent+100" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent-50" }
 
         GrabPass { "_UnToonWaterRefraction" }
 

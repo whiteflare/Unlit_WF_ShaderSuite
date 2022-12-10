@@ -72,7 +72,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-20" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent-80" }
 
         Pass {
             Name "MAIN"
