@@ -818,7 +818,7 @@ namespace UnlitWF
             // Lightmap Static の付いているマテリアルが targets 内にあるならば警告
             if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat)))
             {
-                var message = WFI18N.Translate("マテリアルの DoubleSidedGI がチェックされていません。\nこのマテリアルは片面メッシュとしてライトベイクされます。\nDoubleSidedGI を修正しますか？");
+                var message = WFI18N.Translate(WFMessageText.PlzFixDoubleSidedGI);
 
                 if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
                 {
