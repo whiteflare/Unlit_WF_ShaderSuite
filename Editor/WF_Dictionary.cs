@@ -634,7 +634,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PsCapTypeShade, "SHADE_CAPは白色を基準とした乗算合成を行うmatcapです"),
 
             new WFI18NTranslation(WFMessageText.DgChangeMobile, "シェーダをMobile向けに切り替えますか？\n\nこの操作はUndoできますが、バックアップを取ることをお勧めします。"),
-            new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダのバージョンが更新されました。\nプロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
+            new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダがインポートされました。\nプロジェクト内に古いマテリアルが残っていないかスキャンしますか？"),
             new WFI18NTranslation(WFMessageText.DgMigrationManual, "プロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
 
             new WFI18NTranslation(WFMessageText.LgWarnOlderVersion, "古いバージョンで作成されたマテリアルがあります。"),
@@ -883,7 +883,7 @@ namespace UnlitWF
         public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";
         public static readonly string PsCapTypeShade = "SHADE_CAP is a matcap that performs white-based multiply blending.";
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
-        public static readonly string DgMigrationAuto = "The version of the UnlitWF shader has been updated.\nDo you want to scan the materials in your project and update them to the latest material values?";
+        public static readonly string DgMigrationAuto = "UnlitWF shaders have been imported.\nDo you want to scan for old materials still in the project?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
         public static readonly string LgWarnOlderVersion = "A material was created with an older shader version.";
         public static readonly string LgWarnNotSupportAndroid = "A material uses a shader that is not supported by Android.";
