@@ -9,8 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_Night_ClearWater (Transparent)
   m_Shader: {fileID: 4800000, guid: a3641cf3b665bec468ac868660864d64, type: 3}
-  m_ShaderKeywords: _AO_ENABLE _CRF_ENABLE _GL_AUTO_ENABLE _WAM_ENABLE _WAM_ONLY2ND_ENABLE
-    _WAS_ENABLE _WAV_ENABLE_1 _WAV_ENABLE_2 _WAV_ENABLE_3
+  m_ShaderKeywords: _AO_ENABLE _GL_AUTO_ENABLE _WAM_ENABLE _WAM_ONLY2ND_ENABLE _WAS_ENABLE
+    _WAV_ENABLE_1 _WAV_ENABLE_2 _WAV_ENABLE_3
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1
@@ -66,21 +66,16 @@ Material:
     - _AO_Contrast: 0.5
     - _AO_Enable: 1
     - _AO_UseLightMap: 1
-    - _CRF_BlendNormal: 1
-    - _CRF_Distance: 0.2
-    - _CRF_Enable: 1
-    - _CRF_RefractiveIndex: 1.33
     - _CullMode: 0
     - _CurrentVersion: 0
-    - _FallBack: 0
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
     - _GL_LightMode: 0
     - _QuestSupported: 0
     - _ShadowPower: 0.5
     - _WAD_Enable: 0
-    - _WAD_MaxDist: 15
-    - _WAD_MinDist: 5
+    - _WAD_MaxDist: 200
+    - _WAD_MinDist: 100
     - _WAD_Power: 1
     - _WAM_Bright: 0.2
     - _WAM_CubemapHighCut: 0
@@ -106,11 +101,10 @@ Material:
     - _WAV_UVType_3: 2
     - _WRL_CubemapType: 2
     m_Colors:
-    - _CRF_Tint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _Color: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _Color2: {r: 0.16000001, g: 0.17176472, b: 0.2, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
-    - _WAD_Color: {r: 0.44, g: 0.525, b: 0.55, a: 1}
+    - _WAD_Color: {r: 0.7, g: 0.7, b: 1, a: 1}
     - _WAS_Color: {r: 0.3, g: 0.3, b: 0.3, a: 1}
     - _WAS_Color2: {r: 0.20941179, g: 0.20941179, b: 0.3, a: 1}
     - _WAV_Direction_1: {r: 0, g: 0, b: 1, a: 0}

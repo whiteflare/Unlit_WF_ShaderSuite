@@ -42,7 +42,6 @@ Material:
     - _AO_UseLightMap: 1
     - _CullMode: 2
     - _CurrentVersion: 0
-    - _HideCausticAbove: 0
     - _HideCausticsAbove: 1
     - _QuestSupported: 0
     - _WAV_Enable_1: 1

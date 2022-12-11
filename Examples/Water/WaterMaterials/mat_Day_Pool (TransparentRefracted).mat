@@ -61,6 +61,7 @@ Material:
     - _AL_InvMaskVal: 0
     - _AL_Power: 0.6
     - _AL_Source: 0
+    - _AL_ZWrite: 0
     - _AO_Brightness: 0
     - _AO_Contrast: 0.5
     - _AO_Enable: 1

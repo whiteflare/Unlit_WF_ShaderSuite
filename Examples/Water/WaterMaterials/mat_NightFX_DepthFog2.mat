@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_NightFX_DepthFog2
   m_Shader: {fileID: 4800000, guid: 0c20402a658b66444a95461b76f367b2, type: 3}
-  m_ShaderKeywords: _WAV_ENABLE_1 _WAV_ENABLE_2
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1
@@ -18,42 +18,12 @@ Material:
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _WAV_CausticsTex_1:
-        m_Texture: {fileID: 2800000, guid: 3dc3b246520274646989d6e4fc7089c1, type: 3}
-        m_Scale: {x: 5, y: 5}
-        m_Offset: {x: 0, y: 0}
-    - _WAV_CausticsTex_2:
-        m_Texture: {fileID: 2800000, guid: 3dc3b246520274646989d6e4fc7089c1, type: 3}
-        m_Scale: {x: 5, y: 5}
-        m_Offset: {x: 0, y: 0}
-    - _WAV_CausticsTex_3:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+    m_TexEnvs: []
     m_Floats:
     - _CullMode: 2
     - _CurrentVersion: 0
-    - _HideCausticAbove: 0
     - _QuestSupported: 0
-    - _WAV_Enable_1: 1
-    - _WAV_Enable_2: 1
-    - _WAV_Enable_3: 0
-    - _WAV_Speed_1: 0.5
-    - _WAV_Speed_2: 0.5
-    - _WAV_Speed_3: 0
-    - _WAV_UVType_1: 0
-    - _WAV_UVType_2: 0
-    - _WAV_UVType_3: 0
-    - _WaterDepth: 0.8
     - _WaterLevel: 0
     - _WaterTransparency: 5
     m_Colors:
     - _Color: {r: 0.0072368416, g: 0.012500001, b: 0.025, a: 1}
-    - _WAV_Direction_1: {r: 0, g: 0, b: 1, a: 0}
-    - _WAV_Direction_2: {r: 120, g: 0.866, b: -0.5, a: 0}
-    - _WAV_Direction_3: {r: 240, g: -0.866, b: -0.5, a: 0}
