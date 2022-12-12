@@ -78,6 +78,7 @@ Material:
     - _WAD_Power: 1
     - _WAM_Bright: 0.2
     - _WAM_CubemapHighCut: 0
+    - _WAM_CubemapType: 0
     - _WAM_Enable: 1
     - _WAM_Power: 0.5
     - _WAM_Smooth: 0.9
@@ -98,7 +99,6 @@ Material:
     - _WAV_UVType_1: 2
     - _WAV_UVType_2: 2
     - _WAV_UVType_3: 0
-    - _WRL_CubemapType: 0
     m_Colors:
     - _Color: {r: 0.26759183, g: 0.29799998, b: 0.29191834, a: 1}
     - _Color2: {r: 0.2542222, g: 0.338, b: 0.32355556, a: 1}

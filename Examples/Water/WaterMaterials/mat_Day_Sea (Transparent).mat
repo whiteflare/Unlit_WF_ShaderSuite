@@ -41,7 +41,7 @@ Material:
         m_Scale: {x: 0.015625, y: 0.015625}
         m_Offset: {x: 0.1, y: 0.1}
     - _WAV_HeightMap_3:
-        m_Texture: {fileID: 2800000, guid: 85ffbe629c1736d49b22c059ad134322, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _WAV_NormalMap_1:
@@ -53,7 +53,7 @@ Material:
         m_Scale: {x: 0.125, y: 0.125}
         m_Offset: {x: 0, y: 0}
     - _WAV_NormalMap_3:
-        m_Texture: {fileID: 2800000, guid: 6aa39f0cbabc2d34eb842e2881d4f50e, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
@@ -79,6 +79,7 @@ Material:
     - _WAD_Power: 1
     - _WAM_Bright: 0
     - _WAM_CubemapHighCut: 0
+    - _WAM_CubemapType: 2
     - _WAM_Enable: 1
     - _WAM_Power: 0.5
     - _WAM_Smooth: 0.9
@@ -99,7 +100,6 @@ Material:
     - _WAV_UVType_1: 2
     - _WAV_UVType_2: 2
     - _WAV_UVType_3: 0
-    - _WRL_CubemapType: 2
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color2: {r: 0.6509804, g: 0.76227146, b: 1, a: 1}
