@@ -25,7 +25,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _WAM_Cubemap:
-        m_Texture: {fileID: 8900000, guid: 43328cca6c4b93c4a95b1a5ee7d26c2d, type: 3}
+        m_Texture: {fileID: 8900000, guid: 90a1204de067e0a4991a09af5e1883b4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _WAV_HeightMap_1:
@@ -70,6 +70,7 @@ Material:
     - _WAD_Power: 1
     - _WAM_Bright: 0
     - _WAM_CubemapHighCut: 0
+    - _WAM_CubemapType: 2
     - _WAM_Enable: 1
     - _WAM_Power: 0.5
     - _WAM_Smooth: 0.9
@@ -90,7 +91,6 @@ Material:
     - _WAV_UVType_1: 2
     - _WAV_UVType_2: 2
     - _WAV_UVType_3: 0
-    - _WRL_CubemapType: 2
     m_Colors:
     - _Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}
     - _Color2: {r: 0.065789476, g: 0.07631578, b: 0.1, a: 1}
