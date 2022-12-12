@@ -112,6 +112,7 @@
     float           _WAM_Power;
     float           _WAM_Smooth;
     float           _WAM_Bright;
+    float           _WAM_CubemapType;
     float           _WAM_CubemapHighCut;
 
     // -------------------------

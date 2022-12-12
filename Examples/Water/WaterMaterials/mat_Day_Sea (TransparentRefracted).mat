@@ -76,7 +76,6 @@ Material:
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
     - _GL_LightMode: 0
-    - _QuestSupported: 0
     - _ShadowPower: 0.5
     - _WAD_Enable: 1
     - _WAD_MaxDist: 100

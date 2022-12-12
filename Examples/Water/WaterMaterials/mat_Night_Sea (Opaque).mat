@@ -20,10 +20,6 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _AL_MaskTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -41,7 +37,7 @@ Material:
         m_Scale: {x: 0.015625, y: 0.015625}
         m_Offset: {x: 0.1, y: 0.1}
     - _WAV_HeightMap_3:
-        m_Texture: {fileID: 2800000, guid: 85ffbe629c1736d49b22c059ad134322, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _WAV_NormalMap_1:
@@ -53,15 +49,10 @@ Material:
         m_Scale: {x: 0.125, y: 0.125}
         m_Offset: {x: 0, y: 0}
     - _WAV_NormalMap_3:
-        m_Texture: {fileID: 2800000, guid: 6aa39f0cbabc2d34eb842e2881d4f50e, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AL_Fresnel: 1
-    - _AL_InvMaskVal: 0
-    - _AL_Power: 0.7
-    - _AL_Source: 0
-    - _AL_ZWrite: 0
     - _AO_Brightness: 0
     - _AO_Contrast: 0.5
     - _AO_Enable: 1

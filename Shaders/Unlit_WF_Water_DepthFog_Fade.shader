@@ -36,7 +36,7 @@ Shader "UnlitWF/WF_Water_DepthFog_Fade" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-15" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent-70" }
 
         Pass {
             Name "MAIN"

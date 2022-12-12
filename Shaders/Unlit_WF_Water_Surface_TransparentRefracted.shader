@@ -36,6 +36,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWrite              ("[AL] ZWrite", int) = 0
 
         [WFHeaderAlwaysOn(Refraction)]
             _CRF_Enable             ("[CRF] Enable", Float) = 1
@@ -105,8 +107,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _WAM_Power              ("[WAM] Power", Range(0, 1)) = 0.5
             _WAM_Smooth             ("[WAM] Smoothness", Range(0, 1)) = 0.9
             _WAM_Bright             ("[WAM] Brightness", Range(0, 1)) = 0.2
-        [Enum(OFF,0,ONLY_SECOND_MAP,2)]
-            _WRL_CubemapType        ("[WAM] 2nd CubeMap Blend", Float) = 0
+        [Enum(REFLECTION_PROBE,0,CUSTOM,2)]
+            _WAM_CubemapType        ("[WAM] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _WAM_Cubemap            ("[WAM] Cube Map", Cube) = "" {}
             _WAM_CubemapHighCut     ("[WAM] Hi-Cut Filter", Range(0, 1)) = 0
@@ -135,7 +137,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-10" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent-50" }
 
         GrabPass { "_UnToonWaterRefraction" }
 
@@ -144,7 +146,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
-            ZWrite ON
+            ZWrite [_AL_ZWrite]
 
             CGPROGRAM
 

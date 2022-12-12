@@ -53,14 +53,6 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    #ifdef _VC_ENABLE
-        void affectVertexColor(float4 vertex_color, inout float4 color) {
-            color.rgb *= lerp(ONE_VEC4, vertex_color.rgb, _UseVertexColor);
-        }
-    #else
-        #define affectVertexColor(vertex_color, color)
-    #endif
-
     ////////////////////////////
     // UnToon function
     ////////////////////////////
