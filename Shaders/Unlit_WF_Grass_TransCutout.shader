@@ -40,6 +40,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             _GRS_ColorFactor        ("[GRS] Color Factor", Vector) = (0, 1, 0, 0)
             _GRS_ColorTop           ("[GRS] Tint Color Top", Color) = (1, 1, 1, 1)
             _GRS_ColorBottom        ("[GRS] Tint Color Bottom", Color) = (1, 1, 1, 1)
+            _GRS_EraseSide          ("[GRS] Erase Side", Range(0, 1)) = 0
 
         [WFHeaderToggle(Grass Wave)]
             _GRW_Enable             ("[GRW] Enable", Float) = 0
@@ -54,7 +55,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
-        [Toggle(_)]
+        [WF_FixUIToggle(1.0)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
@@ -78,6 +79,9 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2022/10/22", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _QuestSupported         ("True", Float) = 0
     }
 
     SubShader {
@@ -97,13 +101,15 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_CUTOUT
+            // #define _WF_ALPHA_CUTOUT // UnToon の AlphaCutout は使用せず自前でclipする
+            #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
-
-            #define _AO_ENABLE
-            #define _GRW_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
+            #pragma shader_feature_local _ _GRS_ERSSIDE_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _GRW_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -129,12 +135,13 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
-            #define _WF_ALPHA_CUTOUT
+            // #define _WF_ALPHA_CUTOUT // UnToon の AlphaCutout は使用せず自前でclipする
             #define _WF_MOBILE
 
-
-            #define _GRW_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
+            #pragma shader_feature_local _ _GRS_ERSSIDE_ENABLE
+            #pragma shader_feature_local _GRW_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
@@ -156,10 +163,11 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #define _WF_ALPHA_CUTOUT
+            // #define _WF_ALPHA_CUTOUT // UnToon の AlphaCutout は使用せず自前でclipする
+            #define _WF_MOBILE
 
-
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

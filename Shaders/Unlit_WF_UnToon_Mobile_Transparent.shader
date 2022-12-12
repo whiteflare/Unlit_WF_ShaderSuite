@@ -135,7 +135,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
-        [Toggle(_)]
+        [WF_FixUIToggle(1.0)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
@@ -196,6 +196,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2022/10/22", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _QuestSupported         ("True", Float) = 0
     }
 
     SubShader {
@@ -222,6 +225,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
 
             #define _WF_ALPHA_FRESNEL
+            #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
 
@@ -262,6 +266,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #pragma fragment frag_meta
 
             #define _WF_ALPHA_BLEND
+            #define _WF_MOBILE
 
             #define _ES_ENABLE
             #define _VC_ENABLE

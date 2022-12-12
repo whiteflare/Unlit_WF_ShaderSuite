@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fb639668f92376a4786d635258ae96da
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _MainTex: {instanceID: 0}
+  - _WAV_CausticsTex_1: {fileID: 2800000, guid: 3dc3b246520274646989d6e4fc7089c1,
+      type: 3}
+  - _WAV_CausticsTex_2: {fileID: 2800000, guid: 3dc3b246520274646989d6e4fc7089c1,
+      type: 3}
+  - _WAV_CausticsTex_3: {fileID: 2800000, guid: 3dc3b246520274646989d6e4fc7089c1,
+      type: 3}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

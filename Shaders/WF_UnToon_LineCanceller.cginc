@@ -66,8 +66,7 @@
 #else
         o.vs_vertex     = shiftDepthVertex(o.ws_vertex, _WF_MAIN_Z_SHIFT);     // Zシフトした値を使う
 #endif
-        o.uv_grab       = o.vs_vertex;
-        o.uv_grab.xy    = ComputeGrabScreenPos(o.vs_vertex);
+        o.uv_grab       = ComputeGrabScreenPos(o.vs_vertex);
 
         return o;
     }
@@ -79,7 +78,7 @@
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
         i.uv_grab.xy /= i.uv_grab.w;
-        return PICK_GRAB_TEX2D(_TL_CANCEL_GRAB_TEXTURE, i.uv_grab);
+        return PICK_GRAB_TEX2D(_TL_CANCEL_GRAB_TEXTURE, i.uv_grab.xy);
     }
 
 #endif

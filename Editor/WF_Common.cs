@@ -194,7 +194,7 @@ namespace UnlitWF
                     continue;
                 }
                 bool changed = false;
-                foreach (var prop_name in getAllPropertyNames(mat.shader))
+                foreach (var prop_name in WFAccessor.GetAllPropertyNames(mat.shader))
                 {
                     // 対応するキーワードが指定されているならばそれを設定する
                     var kwd = WFShaderDictionary.SpecialPropNameToKeywordMap.GetValueOrNull(prop_name);
@@ -456,11 +456,11 @@ namespace UnlitWF
                 return false;
             }
             var name = shader.name;
-            if (name.Contains("_FakeFur_"))
+            if (name.Contains("_Mobile_") || name.Contains("WF_UnToon_Hidden") || name.Contains("WF_DebugView"))
             {
-                return false;
+                return true;
             }
-            if (name.Contains("_Mobile_") || name.Contains("_Gem_") || name.Contains("_Grass_") || name.Contains("Hidden") || name.Contains("DebugView"))
+            if (WFAccessor.GetShaderQuestSupported(shader))
             {
                 return true;
             }
@@ -531,108 +531,46 @@ namespace UnlitWF
             Application.OpenURL(LatestVersion.downloadPage);
         }
 
-        public static int FindPropertyIndex(Shader shader, string name)
+        [Obsolete("use WFAccessor")]
+        public static IEnumerable<string> GetAllPropertyNames(Shader shader)
         {
-#if UNITY_2019_1_OR_NEWER
-            return shader.FindPropertyIndex(name);
-#else
-            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--)
-            {
-                if (name == ShaderUtil.GetPropertyName(shader, idx))
-                {
-                    return idx;
-                }
-            }
-            return -1;
-#endif
+            return WFAccessor.GetAllPropertyNames(shader);
         }
 
-        private static IEnumerable<string> getAllPropertyNames(Shader shader)
-        {
-#if UNITY_2019_1_OR_NEWER
-            for (int idx = 0; idx < shader.GetPropertyCount(); idx++)
-            {
-                yield return shader.GetPropertyName(idx);
-            }
-#else
-            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--)
-            {
-                yield return ShaderUtil.GetPropertyName(shader, idx);
-            }
-#endif
-        }
-
-        /// <summary>
-        /// Shaderから指定のnameのプロパティの description を取得する。
-        /// </summary>
-        /// <param name="shader"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private static string getPropertyDescription(Shader shader, string name)
-        {
-            var idx = FindPropertyIndex(shader, name);
-            if (0 <= idx)
-            {
-#if UNITY_2019_1_OR_NEWER
-                return shader.GetPropertyDescription(idx);
-#else
-                return ShaderUtil.GetPropertyDescription(shader, idx);
-#endif
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Shader から _CurrentVersion の値を取得する。
-        /// </summary>
-        /// <param name="shader"></param>
-        /// <returns></returns>
+        [Obsolete("use WFAccessor")]
         public static string GetShaderCurrentVersion(Shader shader)
         {
-            return getPropertyDescription(shader, "_CurrentVersion");
+            return WFAccessor.GetShaderCurrentVersion(shader);
         }
 
-        /// <summary>
-        /// Material から _CurrentVersion の値を取得する。
-        /// </summary>
-        /// <param name="mat"></param>
-        /// <returns></returns>
+        [Obsolete("use WFAccessor")]
         public static string GetShaderCurrentVersion(Material mat)
         {
-            return mat == null ? null : GetShaderCurrentVersion(mat.shader);
+            return WFAccessor.GetShaderCurrentVersion(mat);
         }
 
-        /// <summary>
-        /// Shader から _FallBack の値を取得する。
-        /// </summary>
-        /// <param name="shader"></param>
-        /// <returns></returns>
+        [Obsolete("use WFAccessor")]
         public static string GetShaderFallBackTarget(Shader shader)
         {
-            return getPropertyDescription(shader, "_FallBack");
+            return WFAccessor.GetShaderFallBackTarget(shader);
         }
 
-        /// <summary>
-        /// Material から _FallBack の値を取得する。
-        /// </summary>
-        /// <param name="mat"></param>
-        /// <returns></returns>
+        [Obsolete("use WFAccessor")]
         public static string GetShaderFallBackTarget(Material mat)
         {
-            return mat == null ? null : GetShaderFallBackTarget(mat.shader);
+            return WFAccessor.GetShaderFallBackTarget(mat);
         }
 
+        [Obsolete("use WFAccessor")]
+        public static bool GetShaderQuestSupported(Shader shader)
+        {
+            return WFAccessor.GetShaderQuestSupported(shader);
+        }
+
+        [Obsolete("use WFAccessor")]
         public static int GetMaterialRenderQueueValue(Material mat)
         {
-            // Material.renderQueue の値を単に参照すると -1 (FromShader) が取れないので SerializedObject から取得する
-            var so = new SerializedObject(mat);
-            so.Update();
-            var prop = so.FindProperty("m_CustomRenderQueue");
-            if (prop != null)
-            {
-                return prop.intValue;
-            }
-            return mat.renderQueue;
+            return WFAccessor.GetMaterialRenderQueueValue(mat);
         }
 
         public static string GetCurrentRenderPipeline()
@@ -666,6 +604,194 @@ namespace UnlitWF
             {
                 Shader.DisableKeyword(KWD_EDITOR_HIDE_LMAP);
             }
+        }
+    }
+
+    public static class WFAccessor
+    {
+        /// <summary>
+        /// Shader に指定のプロパティが存在するかどうか返す。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool HasShaderProperty(Shader shader, string name)
+        {
+            return 0 <= findPropertyIndex(shader, name);
+        }
+
+        /// <summary>
+        /// Shader に指定のプロパティが Texture タイプで存在するかどうか返す。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool HasShaderPropertyTexture(Shader shader, string name)
+        {
+            var idx = findPropertyIndex(shader, name);
+            if (idx < 0)
+            {
+                return false;
+            }
+#if UNITY_2019_1_OR_NEWER
+            return shader.GetPropertyType(idx) == UnityEngine.Rendering.ShaderPropertyType.Texture;
+#else
+            return ShaderUtil.GetPropertyType(shader, idx) == ShaderUtil.ShaderPropertyType.TexEnv;
+#endif
+        }
+
+        /// <summary>
+        /// Shader の全てのプロパティ名を返す。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAllPropertyNames(Shader shader)
+        {
+#if UNITY_2019_1_OR_NEWER
+            for (int idx = 0; idx < shader.GetPropertyCount(); idx++)
+            {
+                yield return shader.GetPropertyName(idx);
+            }
+#else
+            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--)
+            {
+                yield return ShaderUtil.GetPropertyName(shader, idx);
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Shader から 指定の名前のプロパティの PropertyIndex を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private static int findPropertyIndex(Shader shader, string name)
+        {
+#if UNITY_2019_1_OR_NEWER
+            return shader.FindPropertyIndex(name);
+#else
+            for (int idx = ShaderUtil.GetPropertyCount(shader) - 1; 0 <= idx; idx--)
+            {
+                if (name == ShaderUtil.GetPropertyName(shader, idx))
+                {
+                    return idx;
+                }
+            }
+            return -1;
+#endif
+        }
+
+        /// <summary>
+        /// Shader から 指定の名前のプロパティの description を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private static string getPropertyDescription(Shader shader, string name, string _default = null)
+        {
+            var idx = findPropertyIndex(shader, name);
+            if (0 <= idx)
+            {
+#if UNITY_2019_1_OR_NEWER
+                return shader.GetPropertyDescription(idx);
+#else
+                return ShaderUtil.GetPropertyDescription(shader, idx);
+#endif
+            }
+            return _default;
+        }
+
+        /// <summary>
+        /// Shader から _CurrentVersion の値を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static string GetShaderCurrentVersion(Shader shader)
+        {
+            return getPropertyDescription(shader, "_CurrentVersion");
+        }
+
+        /// <summary>
+        /// Shader から _FallBack の値を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static string GetShaderFallBackTarget(Shader shader)
+        {
+            return getPropertyDescription(shader, "_FallBack");
+        }
+
+        /// <summary>
+        /// Shader から QuestSupported の値を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static bool GetShaderQuestSupported(Shader shader)
+        {
+            return getPropertyDescription(shader, "_QuestSupported", "false").ToLower() == "true";
+        }
+
+
+        /// <summary>
+        /// Material から _CurrentVersion の値を取得する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static string GetShaderCurrentVersion(Material mat)
+        {
+            return mat == null ? null : GetShaderCurrentVersion(mat.shader);
+        }
+
+        /// <summary>
+        /// Material から _FallBack の値を取得する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static string GetShaderFallBackTarget(Material mat)
+        {
+            return mat == null ? null : GetShaderFallBackTarget(mat.shader);
+        }
+
+        public static int GetMaterialRenderQueueValue(Material mat)
+        {
+            // Material.renderQueue の値を単に参照すると -1 (FromShader) が取れないので SerializedObject から取得する
+            var so = new SerializedObject(mat);
+            so.Update();
+            var prop = so.FindProperty("m_CustomRenderQueue");
+            if (prop != null)
+            {
+                return prop.intValue;
+            }
+            return mat.renderQueue;
+        }
+
+        public static string GetMaterialRenderType(Material mat)
+        {
+            return mat.GetTag("RenderType", true, "Opaque");
+        }
+
+        public static bool IsMaterialRenderType(Material mat, params string[] tags)
+        {
+            return tags.Contains(GetMaterialRenderType(mat));
+        }
+
+        public static int GetInt(Material mat, string name, int _default)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetInt(name);
+            }
+            return _default;
+        }
+
+        public static float GetFloat(Material mat, string name, float _default)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetFloat(name);
+            }
+            return _default;
         }
     }
 
