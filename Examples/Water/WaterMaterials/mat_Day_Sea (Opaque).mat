@@ -54,7 +54,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AO_Brightness: 0
-    - _AO_Contrast: 0.5
+    - _AO_Contrast: 0.9
     - _AO_Enable: 1
     - _AO_UseLightMap: 1
     - _CullMode: 0
@@ -70,9 +70,10 @@ Material:
     - _WAD_Power: 1
     - _WAM_Bright: 0
     - _WAM_CubemapHighCut: 0
+    - _WAM_CubemapType: 2
     - _WAM_Enable: 1
     - _WAM_Power: 0.5
-    - _WAM_Smooth: 0.9
+    - _WAM_Smooth: 1
     - _WAS_Enable: 1
     - _WAS_Power: 0.5
     - _WAS_Power2: 0.5
@@ -90,7 +91,6 @@ Material:
     - _WAV_UVType_1: 2
     - _WAV_UVType_2: 2
     - _WAV_UVType_3: 0
-    - _WRL_CubemapType: 2
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color2: {r: 0.6509804, g: 0.76227146, b: 1, a: 1}

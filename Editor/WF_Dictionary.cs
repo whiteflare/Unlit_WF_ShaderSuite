@@ -292,7 +292,7 @@ namespace UnlitWF
             },
             { "_GRS_EraseSide", new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE") 
             },
-            { "_WRL_CubemapType", new WFCustomKeywordSettingEnum("_WRL_CubemapType", "_", "_", "_WAM_ONLY2ND_ENABLE") {
+            { "_WAM_CubemapType", new WFCustomKeywordSettingEnum("_WAM_CubemapType", "_", "_", "_WAM_ONLY2ND_ENABLE") {
                 enablePropName = "_WAM_Enable",
             } },
         };
