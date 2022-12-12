@@ -120,7 +120,7 @@
     #endif
 
     #ifndef WF_TEX2D_OCCLUSION
-	    #define WF_TEX2D_OCCLUSION(uv)          SAMPLE_MASK_VALUE(_OcclusionMap, uv, 0).rgb
+        #define WF_TEX2D_OCCLUSION(uv)          SAMPLE_MASK_VALUE(_OcclusionMap, uv, 0).rgb
     #endif
 
     #ifndef IN_FRAG

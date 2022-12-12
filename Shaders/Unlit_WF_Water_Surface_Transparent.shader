@@ -100,7 +100,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             _WAM_Smooth             ("[WAM] Smoothness", Range(0, 1)) = 0.9
             _WAM_Bright             ("[WAM] Brightness", Range(0, 1)) = 0.2
         [Enum(REFLECTION_PROBE,0,CUSTOM,2)]
-            _WRL_CubemapType        ("[WAM] 2nd CubeMap Blend", Float) = 0
+            _WAM_CubemapType        ("[WAM] 2nd CubeMap Blend", Float) = 0
         [NoScaleOffset]
             _WAM_Cubemap            ("[WAM] Cube Map", Cube) = "" {}
             _WAM_CubemapHighCut     ("[WAM] Hi-Cut Filter", Range(0, 1)) = 0
