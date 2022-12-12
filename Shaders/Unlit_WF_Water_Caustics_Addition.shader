@@ -91,10 +91,10 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
 
             #define _WF_AO_ONLY_LMAP
 
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _WAV_ENABLE_1
-            #pragma shader_feature_local _WAV_ENABLE_2
-            #pragma shader_feature_local _WAV_ENABLE_3
+            #define _AO_ENABLE
+            #define _WAV_ENABLE_1
+            #define _WAV_ENABLE_2
+            #define _WAV_ENABLE_3
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

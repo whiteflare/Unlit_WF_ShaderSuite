@@ -158,16 +158,16 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_AO_ONLY_LMAP
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _WAD_ENABLE
-            #pragma shader_feature_local _WAM_ENABLE
-            #pragma shader_feature_local _WAS_ENABLE
-            #pragma shader_feature_local _WAV_ENABLE_1
-            #pragma shader_feature_local _WAV_ENABLE_2
-            #pragma shader_feature_local _WAV_ENABLE_3
-            #pragma shader_feature_local_fragment _CRF_ENABLE
+
+
+            #define _AO_ENABLE
+            #define _WAD_ENABLE
+            #define _WAM_ENABLE
+            #define _WAS_ENABLE
+            #define _WAV_ENABLE_1
+            #define _WAV_ENABLE_2
+            #define _WAV_ENABLE_3
+            #define _CRF_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonWaterRefraction
 
