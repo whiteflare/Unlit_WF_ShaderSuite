@@ -489,7 +489,7 @@ namespace UnlitWF
                     // 直接のシェーダではなく、そのフォールバックを利用できるならばそれも追加する
                     if (settings == null || !settings.stripFallback)
                     {
-                        var name = WFCommonUtility.GetShaderFallBackTarget(shader);
+                        var name = WFAccessor.GetShaderFallBackTarget(shader);
                         var fallback = WFCommonUtility.FindShader(name);
                         if (IsStripTargetShader(fallback))
                         {
