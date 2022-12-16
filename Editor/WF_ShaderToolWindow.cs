@@ -142,7 +142,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.TOOLS_MIGALL, priority = WFMenu.PRI_TOOLS_MIGALL)]
         private static void Menu_ScanAndAllMigration()
         {
-            Converter.ScanAndMigrationExecutor.ExecuteByManual();
+            Converter.ScanAndMigrationExecutor.ExecuteScanByManual();
         }
 
         #endregion

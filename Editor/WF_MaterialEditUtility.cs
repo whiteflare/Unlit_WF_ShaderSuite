@@ -226,7 +226,7 @@ namespace UnlitWF
         {
             if (mat != null)
             {
-                var version = WFCommonUtility.GetShaderCurrentVersion(mat);
+                var version = WFAccessor.GetShaderCurrentVersion(mat);
                 var props = ShaderSerializedProperty.AsDict(mat);
                 foreach (var beforeName in props.Keys)
                 {
@@ -291,7 +291,7 @@ namespace UnlitWF
 
         private static bool RenamePropNamesWithoutUndoInternal(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
-            var version = WFCommonUtility.GetShaderCurrentVersion(mat);
+            var version = WFAccessor.GetShaderCurrentVersion(mat);
             var props = ShaderSerializedProperty.AsList(mat);
             // 名称を全て変更
             foreach (var rep in replacement)
@@ -669,6 +669,30 @@ namespace UnlitWF
             EditorUtility.SetDirty(material);
         }
 
+        public static void RemovePropertiesWithoutUndo(Material material, params string[] propNames)
+        {
+            var props = ShaderSerializedProperty.AsDict(material);
+            var del_props = new List<ShaderSerializedProperty>();
+            foreach (var name in propNames)
+            {
+                if (props.TryGetValue(name, out var p))
+                {
+                    del_props.Add(p);
+                }
+            }
+            if (del_props.Count == 0)
+            {
+                return;
+            }
+
+            // 削除実行
+            var del_names = DeleteProperties(del_props, material);
+            // Default割り当てTextureを再設定する
+            ResetDefaultTextures(material, del_names);
+            // 反映
+            EditorUtility.SetDirty(material);
+        }
+
         private static void ResetDefaultTextures(Material material, HashSet<string> del_names)
         {
             var shader = material.shader;
@@ -685,7 +709,7 @@ namespace UnlitWF
 
             foreach (var pn in del_names)
             {
-                if (IsShaderPropertyTexture(shader, pn))
+                if (WFAccessor.HasShaderPropertyTexture(shader, pn))
                 {
                     var tex = importer.GetDefaultTexture(pn);
                     if (tex != null)
@@ -696,28 +720,22 @@ namespace UnlitWF
             }
         }
 
-        private static bool IsShaderPropertyTexture(Shader shader, string name)
-        {
-            var idx = WFCommonUtility.FindPropertyIndex(shader, name);
-            if (idx < 0)
-            {
-                return false;
-            }
-#if UNITY_2019_1_OR_NEWER
-            return shader.GetPropertyType(idx) == UnityEngine.Rendering.ShaderPropertyType.Texture;
-#else
-            return ShaderUtil.GetPropertyType(shader, idx) == ShaderUtil.ShaderPropertyType.TexEnv;
-#endif
-        }
-
         private static HashSet<string> DeleteProperties(IEnumerable<ShaderSerializedProperty> props, Material material)
         {
             var del_names = new HashSet<string>();
             var cachedNames = new List<string>();
+
             foreach (var p in props)
             {
                 del_names.Add(p.name);
-                p.Remove(ref cachedNames);
+                if (material == editReplaceTarget)
+                {
+                    p.Remove(ref editReplaceNamesCache);
+                }
+                else
+                {
+                    p.Remove(ref cachedNames);
+                }
             }
 
             // 削除する内容のログを出す

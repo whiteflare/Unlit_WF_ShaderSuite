@@ -27,17 +27,17 @@
     struct appdata {
         float4 vertex           : POSITION;
         float4 vertex_color     : COLOR0;
-        float4 normal           : NORMAL;
         float2 uv               : TEXCOORD0;
         float2 uv2              : TEXCOORD1;
         float2 uv3              : TEXCOORD2;
+        float4 normal           : NORMAL; // ShadowCasterから使用される
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f {
         float4 vs_vertex        : SV_POSITION;
         float  height           : COLOR0;
-        float  light_color      : COLOR1;
+        float3 light_color      : COLOR1;
 #ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR2;
 #endif
@@ -45,33 +45,19 @@
 #ifdef _V2F_HAS_UV_LMAP
         float2 uv_lmap          : TEXCOORD1;
 #endif
+#ifdef _GRS_ERSSIDE_ENABLE
+        float3 ws_normal        : TEXCOORD2;
+        float3 ws_vertex        : TEXCOORD3;
+#endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
-    #ifdef _VC_ENABLE
-        void affectVertexColor(float4 vertex_color, inout float4 color) {
-            color.rgb *= lerp(ONE_VEC4, vertex_color.rgb, _UseVertexColor);
-        }
-    #else
-        #define affectVertexColor(vertex_color, color)
-    #endif
-
     ////////////////////////////
-    // Anti Glare & Light Configuration
+    // UnToon function
     ////////////////////////////
 
-    float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
-        float3 lightColorMain = sampleMainLightColor();
-        float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
-
-        float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
-        float power = MAX_RGB(color);                       // 明度
-        color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
-        color /= power;                                     // 正規化(colorはゼロではないのでpowerが0除算になることはない)
-        color *= lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // 明度のsaturateと書き戻し
-        return color;
-    }
+    #include "WF_UnToon_Function.cginc"
 
     ////////////////////////////
     // Grass
@@ -143,47 +129,6 @@ FEATURE_TGL_END
     #endif
 
     ////////////////////////////
-    // Ambient Occlusion
-    ////////////////////////////
-
-    #ifdef _AO_ENABLE
-
-        void affectOcclusion(v2f i, float2 uv_main, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_AO_Enable)
-            float3 occlusion = ONE_VEC3;
-            #ifdef _LMAP_ENABLE
-            if (TGL_ON(_AO_UseLightMap)) {
-                occlusion *= pickLightmap(i.uv_lmap);
-            }
-            #endif
-            occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BlendPower); // 色の混合
-            occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
-            color.rgb *= max(ZERO_VEC3, occlusion.rgb);
-FEATURE_TGL_END
-        }
-    #else
-        #define affectOcclusion(i, uv_main, color)
-    #endif
-
-    float3 calcAmbientColorVertex(float2 uv_lmap) {
-        // ライトマップもしくは環境光を取得
-        #ifdef _LMAP_ENABLE
-            #if defined(_AO_ENABLE)
-                // ライトマップが使えてAOが有効の場合は、AO側で色を合成するので固定値を返す
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-                return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
-#else
-                return TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
-#endif
-            #else
-                return pickLightmapLod(uv_lmap);
-            #endif
-        #else
-            return sampleSHLightColor();
-        #endif
-    }
-
-    ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
 
@@ -208,6 +153,10 @@ FEATURE_TGL_END
 
         o.vs_vertex = UnityWorldToClipPos(ws_vertex);
         o.uv = v.uv;
+#ifdef _GRS_ERSSIDE_ENABLE
+        o.ws_vertex = ws_vertex;
+        o.ws_normal = UnityObjectToWorldNormal(v.normal);
+#endif
 #ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = v.vertex_color;
 #endif
@@ -236,6 +185,12 @@ FEATURE_TGL_END
 
         clip(color.a - _Cutoff);
 
+#ifdef _GRS_ERSSIDE_ENABLE
+        if (abs(dot(normalize(i.ws_normal), worldSpaceViewPointDir(i.ws_vertex))) < _GRS_EraseSide) {
+            discard;
+        }
+#endif
+
         UNITY_APPLY_FOG(i.fogCoord, color);
 
         return color;
@@ -248,6 +203,10 @@ FEATURE_TGL_END
     struct v2f_shadow {
         V2F_SHADOW_CASTER;  // TEXCOORD0
         float2 uv : TEXCOORD1;
+#ifdef _GRS_ERSSIDE_ENABLE
+        float3 ws_normal        : TEXCOORD2;
+        float3 ws_vertex        : TEXCOORD3;
+#endif
 #ifdef _V2F_HAS_VERTEXCOLOR
         float4 vertex_color     : COLOR1;
 #endif
@@ -274,6 +233,10 @@ FEATURE_TGL_END
         TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
 
         o.uv = v.uv;
+#ifdef _GRS_ERSSIDE_ENABLE
+        o.ws_vertex = ws_vertex;
+        o.ws_normal = UnityObjectToWorldNormal(v.normal);
+#endif
 #ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = v.vertex_color;
 #endif
@@ -294,6 +257,12 @@ FEATURE_TGL_END
         affectVertexColor(i.vertex_color, color);
 
         clip(color.a - _Cutoff);
+
+#ifdef _GRS_ERSSIDE_ENABLE
+        if (abs(dot(normalize(i.ws_normal), worldSpaceViewPointDir(i.ws_vertex))) < _GRS_EraseSide) {
+            discard;
+        }
+#endif
 
         return frag_shadow_caster(i);
     }

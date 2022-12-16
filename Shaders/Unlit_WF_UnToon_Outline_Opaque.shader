@@ -379,7 +379,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/10/22", Float) = 0
+            _CurrentVersion         ("2022/12/17", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque", Float) = 0
