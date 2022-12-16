@@ -320,10 +320,10 @@ namespace UnlitWF
                         if (!oldShader.name.Contains("_Mix") && newShader.name.Contains("_Mix"))
                         {
                             // Mixへの切り替えならば、FR_Height2とFR_Repeat2を設定する
-                            var height = newMat.GetFloat("_FR_Height");
-                            newMat.SetFloat("_FR_Height2", height * 1.25f);
-                            var repeat = newMat.GetInt("_FR_Repeat");
-                            newMat.SetInt("_FR_Repeat2", Math.Max(1, repeat - 1));
+                            var height = newMat.GetFloat("_FUR_Height");
+                            newMat.SetFloat("_FUR_Height2", height * 1.25f);
+                            var repeat = newMat.GetInt("_FUR_Repeat");
+                            newMat.SetInt("_FUR_Repeat2", Math.Max(1, repeat - 1));
                         }
                     }
                     // 同種シェーダの切替時には RenderQueue をコピーする
