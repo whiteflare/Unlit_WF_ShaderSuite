@@ -84,6 +84,13 @@ namespace UnlitWF
         [Tooltip("materialインポート時にマイグレーションする")]
         public bool enableMigrationWhenImport = true;
 
+        /// <summary>
+        /// Quest向けシーンビルド時にMobile非対応シェーダを対応シェーダに置換する
+        /// </summary>
+        [Header("Quest Build Support")]
+        [Tooltip("Quest向けシーンビルド時にMobile非対応シェーダを対応シェーダに置換する")]
+        public bool autoSwitchQuestShader = true;
+
         public static WFEditorSetting GetOneOfSettings()
         {
             var settings = LoadAllSettingsFromAssetDatabase();
@@ -128,6 +135,7 @@ namespace UnlitWF
         SerializedProperty p_enableScanProjects;
         SerializedProperty p_cleanupMaterialsBeforeAvatarBuild;
         SerializedProperty p_enableMigrationWhenImport;
+        SerializedProperty p_autoSwitchQuestShader;
 
         private void OnEnable()
         {
@@ -146,6 +154,9 @@ namespace UnlitWF
             // Editor Behaviour Settings
             this.p_enableScanProjects = serializedObject.FindProperty(nameof(WFEditorSetting.enableScanProjects));
             this.p_enableMigrationWhenImport = serializedObject.FindProperty(nameof(WFEditorSetting.enableMigrationWhenImport));
+
+            // Quest Build Support
+            this.p_autoSwitchQuestShader = serializedObject.FindProperty(nameof(WFEditorSetting.autoSwitchQuestShader));
         }
 
         public override void OnInspectorGUI()
@@ -175,6 +186,10 @@ namespace UnlitWF
 
             EditorGUILayout.PropertyField(p_enableScanProjects);
             EditorGUILayout.PropertyField(p_enableMigrationWhenImport);
+
+            // Quest Build Support
+
+            EditorGUILayout.PropertyField(p_autoSwitchQuestShader);
 
             if (EditorGUI.EndChangeCheck())
             {
