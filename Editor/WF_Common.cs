@@ -31,6 +31,8 @@ namespace UnlitWF
 {
     internal static class WFCommonUtility
     {
+        #region プロパティ判定
+
         /// <summary>
         /// GUIに表示されるDisplayNameのパターン
         /// </summary>
@@ -155,6 +157,10 @@ namespace UnlitWF
             return 0.001f < Math.Abs(value);
         }
 
+        #endregion
+
+        #region シェーダキーワード整理
+
         /// <summary>
         /// 見つけ次第削除するシェーダキーワード
         /// </summary>
@@ -228,6 +234,10 @@ namespace UnlitWF
                 }
             }
         }
+
+        #endregion
+
+        #region シェーダ切り替え
 
         /// <summary>
         /// マテリアルの shader を指定の名前のものに変更する。
@@ -414,15 +424,9 @@ namespace UnlitWF
             }
         }
 
-        /// <summary>
-        /// Object[] -> Material[] のユーティリティ関数。
-        /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
-        public static Material[] AsMaterials(params UnityEngine.Object[] array)
-        {
-            return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
-        }
+        #endregion
+
+        #region シェーダ・マテリアル判定
 
         /// <summary>
         /// ShaderがUnlitWFでサポートされるものかどうか判定する。
@@ -477,10 +481,19 @@ namespace UnlitWF
             return mat != null && IsMobileSupportedShader(mat.shader);
         }
 
+        /// <summary>
+        /// マテリアルがマイグレーション必要なプロパティを含んでいるかどうか判定する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
         public static bool IsMigrationRequiredMaterial(Material mat)
         {
             return mat != null && Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat);
         }
+
+        #endregion
+
+        #region バージョンチェック
 
         /// <summary>
         /// 最新リリースのVersionInfo
@@ -531,46 +544,18 @@ namespace UnlitWF
             Application.OpenURL(LatestVersion.downloadPage);
         }
 
-        [Obsolete("use WFAccessor")]
-        public static IEnumerable<string> GetAllPropertyNames(Shader shader)
-        {
-            return WFAccessor.GetAllPropertyNames(shader);
-        }
+        #endregion
 
-        [Obsolete("use WFAccessor")]
-        public static string GetShaderCurrentVersion(Shader shader)
-        {
-            return WFAccessor.GetShaderCurrentVersion(shader);
-        }
+        #region その他の汎用ユーティリティ
 
-        [Obsolete("use WFAccessor")]
-        public static string GetShaderCurrentVersion(Material mat)
+        /// <summary>
+        /// Object[] -> Material[] のユーティリティ関数。
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static Material[] AsMaterials(params UnityEngine.Object[] array)
         {
-            return WFAccessor.GetShaderCurrentVersion(mat);
-        }
-
-        [Obsolete("use WFAccessor")]
-        public static string GetShaderFallBackTarget(Shader shader)
-        {
-            return WFAccessor.GetShaderFallBackTarget(shader);
-        }
-
-        [Obsolete("use WFAccessor")]
-        public static string GetShaderFallBackTarget(Material mat)
-        {
-            return WFAccessor.GetShaderFallBackTarget(mat);
-        }
-
-        [Obsolete("use WFAccessor")]
-        public static bool GetShaderQuestSupported(Shader shader)
-        {
-            return WFAccessor.GetShaderQuestSupported(shader);
-        }
-
-        [Obsolete("use WFAccessor")]
-        public static int GetMaterialRenderQueueValue(Material mat)
-        {
-            return WFAccessor.GetMaterialRenderQueueValue(mat);
+            return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
         }
 
         public static string GetCurrentRenderPipeline()
@@ -605,6 +590,35 @@ namespace UnlitWF
                 Shader.DisableKeyword(KWD_EDITOR_HIDE_LMAP);
             }
         }
+
+        private static bool? inSpecialProject = null;
+
+        /// <summary>
+        /// UnlitWFが特殊なプロジェクト内にあるかどうか判定する。
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsInSpecialProject()
+        {
+            var result = inSpecialProject;
+            if (result == null)
+            {
+                var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets/VketTools");
+                if (asset == null)
+                {
+                    asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets/VitDeck");
+                }
+                result = inSpecialProject = (asset != null);
+            }
+            return (bool)result;
+        }
+
+        [InitializeOnLoadMethod]
+        private static void ClearSpecialProjectFlag()
+        {
+            inSpecialProject = null;
+        }
+
+        #endregion
     }
 
     public static class WFAccessor

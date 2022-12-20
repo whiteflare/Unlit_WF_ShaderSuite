@@ -653,6 +653,11 @@ namespace UnlitWF.Converter
                 // 設定で無効化されているならば何もしない
                 return;
             }
+            if (WFCommonUtility.IsInSpecialProject())
+            {
+                // 特殊なプロジェクト内ならば何もしない
+                return;
+            }
 
             var msg = WFI18N.Translate(WFMessageText.DgMigrationAuto);
             var lang = WFEditorPrefs.LangMode;
