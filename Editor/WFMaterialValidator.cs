@@ -27,43 +27,42 @@ namespace UnlitWF
     public class WFMaterialValidator
     {
         private readonly Func<Material[], Material[]> validate;
-        private readonly Func<Material[], string> getMessage;
         private readonly MessageType messageType;
+        private readonly Func<Material[], string> getMessage;
         private readonly Action<Material[]> action;
 
-        public WFMaterialValidator(Func<Material[], Material[]> validate, Func<Material[], string> getMessage, MessageType messageType, Action<Material[]> action)
+        public WFMaterialValidator(Func<Material[], Material[]> validate, MessageType messageType, Func<Material[], string> getMessage, Action<Material[]> action)
         {
             this.validate = validate;
-            this.getMessage = getMessage;
             this.messageType = messageType;
+            this.getMessage = getMessage;
             this.action = action;
         }
 
-        public Result Validate(params Material[] targets)
+        public Advice Validate(params Material[] mats)
         {
-            targets = targets.Where(mat => mat != null && WFCommonUtility.IsSupportedShader(mat)).ToArray();
-            targets = validate(targets);
+            var targets = validate(mats.Where(mat => mat != null && WFCommonUtility.IsSupportedShader(mat)).ToArray());
             if (targets == null || targets.Length == 0)
             {
-                return Result.Success;
+                return null;
             }
-            return new Result(false, getMessage(targets), messageType, () => action(targets));
+            return new Advice(this, targets, messageType, getMessage(targets), () => action(targets));
         }
 
-        public struct Result
+        public class Advice
         {
-            public static readonly Result Success = new Result(true, "", MessageType.None, () => { });
-
-            public readonly bool valid;
+            public readonly WFMaterialValidator source;
+            public readonly Material[] targets;
             public readonly string message;
             public readonly MessageType messageType;
             public readonly Action action;
 
-            public Result(bool valid, string message, MessageType messageType, Action action)
+            public Advice(WFMaterialValidator source, Material[] targets, MessageType messageType, string message, Action action)
             {
-                this.valid = valid;
-                this.message = message;
+                this.source = source;
+                this.targets = targets;
                 this.messageType = messageType;
+                this.message = message;
                 this.action = action;
             }
         }
@@ -75,8 +74,8 @@ namespace UnlitWF
             // マイグレーション
             new WFMaterialValidator(
                 targets => WFMaterialCache.instance.FilterOldMaterial(targets),
-                targets => WFI18N.Translate(WFMessageText.PlzMigration),
                 MessageType.Warning,
+                targets => WFI18N.Translate(WFMessageText.PlzMigration),
                 targets => {
                     WFMaterialEditUtility.MigrationMaterial(targets);
                 }
@@ -108,8 +107,8 @@ namespace UnlitWF
                     // BatchingStatic 付きのマテリアルを返却
                     return FilterBatchingStaticMaterials(targets);
                 },
-                targets => WFI18N.Translate(WFMessageText.PlzBatchingStatic),
                 MessageType.Info,
+                targets => WFI18N.Translate(WFMessageText.PlzBatchingStatic),
                 targets => {
                     Undo.RecordObjects(targets, "Fix BatchingStatic Materials");
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
@@ -141,8 +140,8 @@ namespace UnlitWF
                     // LightmapStatic 付きのマテリアルを返却
                     return FilterLightmapStaticMaterials(targets);
                 },
-                targets => WFI18N.Translate(WFMessageText.PlzLightmapStatic),
                 MessageType.Info,
+                targets => WFI18N.Translate(WFMessageText.PlzLightmapStatic),
                 targets => {
                     Undo.RecordObjects(targets, "Fix LightmapStatic Materials");
                     // _AO_Enable と _AO_UseLightMap をオンにする
@@ -164,8 +163,8 @@ namespace UnlitWF
                     // LightmapStatic 付きのマテリアルを返却
                     return FilterLightmapStaticMaterials(targets);
                 },
-                targets => WFI18N.Translate(WFMessageText.PlzFixDoubleSidedGI),
                 MessageType.Info,
+                targets => WFI18N.Translate(WFMessageText.PlzFixDoubleSidedGI),
                 targets => {
                     Undo.RecordObjects(targets, "Fix DoubleSidedGI");
                     // DoubleSidedGI をオンにする
@@ -180,8 +179,8 @@ namespace UnlitWF
             new WFMaterialValidator(
                 // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
                 targets => targets.Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent") && mat.renderQueue < 2500).ToArray(),
-                targets => WFI18N.Translate(WFMessageText.PlzFixQueue),
                 MessageType.Warning,
+                targets => WFI18N.Translate(WFMessageText.PlzFixQueue),
                 targets => {
                     Undo.RecordObjects(targets, "Fix RenderQueue Materials");
                     foreach (var mat in targets)

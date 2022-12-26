@@ -651,7 +651,7 @@ namespace UnlitWF
         private static void OnGUISub_MaterialValidation(MaterialEditor materialEditor)
         {
             var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
-            foreach (var result in WFMaterialValidators.Validators.Select(v => v.Validate(targets)).Where(r => !r.valid))
+            foreach (var result in WFMaterialValidators.Validators.Select(v => v.Validate(targets)).Where(r => r != null))
             {
                 var styles = result.messageType == MessageType.Warning ? Styles.warnIcon : Styles.infoIcon;
                 if (materialEditor.HelpBoxWithButton(new GUIContent(result.message, styles), new GUIContent("Fix Now")))
