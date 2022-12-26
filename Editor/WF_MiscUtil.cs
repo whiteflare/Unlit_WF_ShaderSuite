@@ -256,6 +256,15 @@ namespace UnlitWF
                 }
             }
 
+            // Projector -> Material
+            foreach (var projector in go.GetComponentsInChildren<Projector>(true))
+            {
+                if (FilterHierarchy(projector))
+                {
+                    GetAllMaterials(projector, result);
+                }
+            }
+
 #if ENV_VRCSDK3_AVATAR
             // VRCAvatarDescriptor -> Controller -> AnimationClip -> Material
             foreach (var desc in go.GetComponentsInChildren<VRC.SDK3.Avatars.Components.VRCAvatarDescriptor>(true))
@@ -294,6 +303,27 @@ namespace UnlitWF
                 {
                     result.Add(mat);
                 }
+            }
+            if (renderer is ParticleSystemRenderer psr)
+            {
+                if (psr.trailMaterial != null)
+                {
+                    result.Add(psr.trailMaterial);
+                }
+            }
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(Projector projector, List<Material> result = null)
+        {
+            InitList(ref result);
+            if (projector == null)
+            {
+                return result;
+            }
+            if (projector.material != null)
+            {
+                result.Add(projector.material);
             }
             return result;
         }
