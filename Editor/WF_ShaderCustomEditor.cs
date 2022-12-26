@@ -346,17 +346,8 @@ namespace UnlitWF
 
             // 情報(トップ)
             OnGuiSub_ShowCurrentShaderName(materialEditor, false);
-            // マイグレーションHelpBox
-            OnGUISub_MigrationHelpBox(materialEditor);
-
-            // Transparent RenderQueue対策HelpBox
-            OnGUISub_TransparentQueueHelpBox(materialEditor);
-            // Batching Static対策HelpBox
-            OnGUISub_BatchingStaticHelpBox(materialEditor);
-            // Lightmap Static対策HelpBox
-            OnGUISub_LightmapStaticHelpBox(materialEditor);
-            // DoubleSidedGI対策HelpBox
-            OnGUISub_DoubleSidedGIHelpBox(materialEditor);
+            // バリデーション
+            OnGUISub_MaterialValidation(materialEditor);
 
             // 現在無効なラベルを保持するリスト
             var disable = new HashSet<string>();
@@ -567,22 +558,6 @@ namespace UnlitWF
             }
         }
 
-        private void OnGUISub_MigrationHelpBox(MaterialEditor materialEditor)
-        {
-            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
-
-            if (WFMaterialCache.instance.IsOldMaterial(mats))
-            {
-                var message = WFI18N.Translate(WFMessageText.PlzMigration);
-
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now")))
-                {
-                    // 名称を全て変更
-                    WFMaterialEditUtility.MigrationMaterial(mats);
-                }
-            }
-        }
-
         private struct GuidAndPath
         {
             public string guid;
@@ -673,186 +648,15 @@ namespace UnlitWF
             WFEditorPrefs.MenuToBottom = EditorGUILayout.Toggle("Menu To Bottom", WFEditorPrefs.MenuToBottom);
         }
 
-        private static void OnGUISub_BatchingStaticHelpBox(MaterialEditor materialEditor)
+        private static void OnGUISub_MaterialValidation(MaterialEditor materialEditor)
         {
-            // 現在のシェーダが DisableBatching == False のとき以外は何もしない (Batching されないので)
-            var target = materialEditor.target as Material;
-            if (target == null || !target.GetTag("DisableBatching", false, "False").Equals("False", StringComparison.OrdinalIgnoreCase))
-            {
-                return;
-            }
-            // ターゲットが設定用プロパティをどちらも持っていないならば何もしない
-            if (!target.HasProperty("_GL_DisableBackLit") && !target.HasProperty("_GL_DisableBasePos"))
-            {
-                return;
-            }
-            // 現在のシェーダ
-            var shader = target.shader;
-
-            // 現在編集中のマテリアルの配列
             var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
-            // 現在編集中のマテリアルのうち、Batching Static のときにオンにしたほうがいい設定がオフになっているマテリアル
-            var allNonStaticMaterials = targets.Where(mat => mat.GetInt("_GL_DisableBackLit") == 0 || mat.GetInt("_GL_DisableBasePos") == 0).ToArray();
-
-            if (allNonStaticMaterials.Length == 0)
+            foreach (var result in WFMaterialValidators.Validators.Select(v => v.Validate(targets)).Where(r => !r.valid))
             {
-                return;
-            }
-
-            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
-            // 現在のシーンにある BatchingStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
-            var allStaticMaterialsInScene = scene.GetRootGameObjects()
-                .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
-                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.BatchingStatic))
-                .SelectMany(mf => mf.sharedMaterials)
-                .Where(mat => mat != null && mat.shader == shader)
-                .ToArray();
-
-            // Batching Static の付いているマテリアルが targets 内にあるならば警告
-            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat)))
-            {
-
-                var message = WFI18N.Translate(WFMessageText.PlzBatchingStatic);
-
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
+                var styles = result.messageType == MessageType.Warning ? Styles.warnIcon : Styles.infoIcon;
+                if (materialEditor.HelpBoxWithButton(new GUIContent(result.message, styles), new GUIContent("Fix Now")))
                 {
-                    Undo.RecordObjects(allNonStaticMaterials, "Fix BatchingStatic Materials");
-                    // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
-                    foreach (var mat in allNonStaticMaterials)
-                    {
-                        mat.SetInt("_GL_DisableBackLit", 1);
-                        mat.SetInt("_GL_DisableBasePos", 1);
-                    }
-                }
-            }
-        }
-
-        private static void OnGUISub_LightmapStaticHelpBox(MaterialEditor materialEditor)
-        {
-            // ターゲットが設定用プロパティを持っていないならば何もしない
-            var target = materialEditor.target as Material;
-            if (target == null || !target.HasProperty("_AO_Enable") || !target.HasProperty("_AO_UseLightMap"))
-            {
-                return;
-            }
-            // 現在のシェーダ
-            var shader = target.shader;
-
-            // 現在編集中のマテリアルの配列
-            var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
-            // 現在編集中のマテリアルのうち、Lightmap Static のときにオンにしたほうがいい設定がオフになっているマテリアル
-            var allNonStaticMaterials = targets.Where(mat => mat.GetInt("_AO_Enable") == 0 || mat.GetInt("_AO_UseLightMap") == 0).ToArray();
-
-            if (allNonStaticMaterials.Length == 0)
-            {
-                return;
-            }
-
-            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
-            // 現在のシーンにある LightmapStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
-            var allStaticMaterialsInScene = scene.GetRootGameObjects()
-                .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
-#if UNITY_2019_1_OR_NEWER
-                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.ContributeGI))
-                .Where(mf => mf.receiveGI == ReceiveGI.Lightmaps)
-                .Where(mf => 0 < mf.scaleInLightmap) // Unity2018では見えない
-#else
-                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.LightmapStatic))
-#endif
-                .SelectMany(mf => mf.sharedMaterials)
-                .Where(mat => mat != null && mat.shader == shader)
-                .ToArray();
-
-            // Lightmap Static の付いているマテリアルが targets 内にあるならば警告
-            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat)))
-            {
-
-                var message = WFI18N.Translate(WFMessageText.PlzLightmapStatic);
-
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
-                {
-                    Undo.RecordObjects(allNonStaticMaterials, "Fix LightmapStatic Materials");
-                    // _AO_Enable と _AO_UseLightMap をオンにする
-                    foreach (var mat in allNonStaticMaterials)
-                    {
-                        mat.SetInt("_AO_Enable", 1);
-                        mat.SetInt("_AO_UseLightMap", 1);
-                    }
-                }
-            }
-        }
-
-        private static void OnGUISub_DoubleSidedGIHelpBox(MaterialEditor materialEditor)
-        {
-            // ターゲットが設定用プロパティを持っていないならば何もしない
-            var target = materialEditor.target as Material;
-            if (target == null)
-            {
-                return;
-            }
-            // 現在のシェーダ
-            var shader = target.shader;
-
-            // 現在編集中のマテリアルの配列
-            var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
-            // 現在編集中のマテリアルのうち、DoubleSidedGI が付いていない、かつ Transparent か TransparentCutout なマテリアル
-            var allNonStaticMaterials = targets.Where(mat => !mat.doubleSidedGI)
-                .Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent", "TransparentCutout"))
-                .ToArray();
-
-            if (allNonStaticMaterials.Length == 0)
-            {
-                return;
-            }
-
-            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
-            // 現在のシーンにある LightmapStatic の付いた MeshRenderer が使っているマテリアルのうち、このShaderGUIが扱うマテリアルの配列
-            var allStaticMaterialsInScene = scene.GetRootGameObjects()
-                .SelectMany(go => go.GetComponentsInChildren<MeshRenderer>(true))
-#if UNITY_2019_1_OR_NEWER
-                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.ContributeGI)) // ここではReceiveGIがLightProbesも扱う
-#else
-                .Where(mf => GameObjectUtility.AreStaticEditorFlagsSet(mf.gameObject, StaticEditorFlags.LightmapStatic))
-#endif
-                .SelectMany(mf => mf.sharedMaterials)
-                .Where(mat => mat != null && mat.shader == shader)
-                .ToArray();
-
-            // Lightmap Static の付いているマテリアルが targets 内にあるならば警告
-            if (allNonStaticMaterials.Any(mat => allStaticMaterialsInScene.Contains(mat)))
-            {
-                var message = WFI18N.Translate(WFMessageText.PlzFixDoubleSidedGI);
-
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Fix Now")))
-                {
-                    Undo.RecordObjects(allNonStaticMaterials, "Fix DoubleSidedGI");
-                    // DoubleSidedGI をオンにする
-                    foreach (var mat in allNonStaticMaterials)
-                    {
-                        mat.doubleSidedGI = true;
-                    }
-                }
-            }
-        }
-
-        private static void OnGUISub_TransparentQueueHelpBox(MaterialEditor materialEditor)
-        {
-            // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
-            var targets = WFCommonUtility.AsMaterials(materialEditor.targets)
-                .Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent") && mat.renderQueue < 2500).ToArray();
-
-            // RenderGeometryTransparentでないものがある場合は
-            if (0 < targets.Length)
-            {
-                var message = WFI18N.Translate(WFMessageText.PlzFixQueue);
-
-                if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.warnIcon), new GUIContent("Fix Now")))
-                {
-                    Undo.RecordObjects(targets, "Fix RenderQueue Materials");
-                    foreach (var mat in targets)
-                    {
-                        mat.renderQueue = -1;
-                    }
+                    result.action();
                 }
             }
         }
@@ -1861,69 +1665,7 @@ namespace UnlitWF
         }
     }
 
-    #endregion
-
-    public class WFMaterialCache : ScriptableSingleton<WFMaterialCache>
-    {
-        private readonly WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
-        private readonly WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();
-
-        public void OnEnable()
-        {
-            Undo.undoRedoPerformed += OnUndoOrRedo;
-        }
-
-        public void OnDestroy()
-        {
-            Undo.undoRedoPerformed -= OnUndoOrRedo;
-        }
-
-        private void OnUndoOrRedo()
-        {
-            // undo|redo のタイミングではキャッシュが当てにならないのでクリアする
-            oldMaterialVersionCache.Clear();
-            newMaterialVersionCache.Clear();
-        }
-
-        public bool IsOldMaterial(Material[] mats)
-        {
-            bool result = false;
-            foreach (Material mat in mats)
-            {
-                if (mat == null)
-                {
-                    continue;
-                }
-                if (newMaterialVersionCache.Contains(mat))
-                {
-                    continue;
-                }
-                if (oldMaterialVersionCache.Contains(mat))
-                {
-                    result |= true;
-                    return true;
-                }
-                bool old = WFMaterialEditUtility.ExistsNeedsMigration(mat);
-                if (old)
-                {
-                    oldMaterialVersionCache.Add(mat);
-                }
-                else
-                {
-                    newMaterialVersionCache.Add(mat);
-                }
-                result |= old;
-            }
-            return result;
-        }
-
-        public void ResetOldMaterialTable(params Material[] values)
-        {
-            var mats = values.Where(mat => mat != null).ToArray();
-            oldMaterialVersionCache.RemoveAll(mats);
-            newMaterialVersionCache.RemoveAll(mats);
-        }
-    }
+#endregion
 
 }
 
