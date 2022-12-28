@@ -57,6 +57,10 @@ namespace UnlitWF
             {
                 return;
             }
+#if ENV_VRCSDK3_AVATAR
+            // もしAvatarのときはここに来ても何もしない(再生ボタンを押したときに発生する)
+            return;
+#endif
 
             // シーン内からMobile非対応のWFマテリアルを全て検索する
             var allUnmobileMaterials = new MaterialSeeker().GetAllMaterials(scene).Distinct()
@@ -85,8 +89,18 @@ namespace UnlitWF
                     renderer.sharedMaterials = mats;
                 }
 
+                foreach (var renderer in go.GetComponentsInChildren<ParticleSystemRenderer>(true))
+                {
+                    renderer.trailMaterial = Replace(allUnmobileMaterials, allMobiledMaterials, renderer.trailMaterial);
+                }
+
+                foreach (var projector in go.GetComponentsInChildren<Projector>(true))
+                {
+                    projector.material = Replace(allUnmobileMaterials, allMobiledMaterials, projector.material);
+                }
+
 #if ENV_VRCSDK3_WORLD
-                foreach (var desc in go.GetComponentsInChildren<VRC.SDK3.Components.VRCSceneDescriptor>())
+                foreach (var desc in go.GetComponentsInChildren<VRC.SDK3.Components.VRCSceneDescriptor>(true))
                 {
                     Replace(allUnmobileMaterials, allMobiledMaterials, desc.DynamicMaterials);
                 }
