@@ -94,6 +94,9 @@ namespace UnlitWF
             new MinMaxSliderPropertyHook("_ES_AU_MinValue", "_ES_AU_MaxValue", "[ES] Emission Multiplier"),
             new MinMaxSliderPropertyHook("_ES_AU_MinThreshold", "_ES_AU_MaxThreshold", "[ES] Threshold"),
 
+            // ZWrite
+            new ZWriteFrontBackPropertyHook("_AL_ZWrite", "_AL_ZWriteBack"),
+
             // _OL_CustomParam1のディスプレイ名をカスタマイズ
             new CustomPropertyHook("_OVL_CustomParam1", ctx => {
                 if (IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)) {
@@ -998,6 +1001,23 @@ namespace UnlitWF
             }
         }
 
+        public static void DrawZWriteProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty front, MaterialProperty back)
+        {
+            var value = front.floatValue < 0.001 ? 0 : back.floatValue < 0.001 ? 1 : 2;
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = front.hasMixedValue || back.hasMixedValue;
+
+            value = EditorGUILayout.Popup(label, value, new string[] { "OFF", "ON", "TwoSided" });
+
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck())
+            {
+                front.floatValue = value != 0 ? 1 : 0;
+                back.floatValue = value == 2 ? 1 : 0;
+            }
+        }
+
         /// <summary>
         /// ラベル付きボタンフィールドを表示する。
         /// </summary>
@@ -1256,6 +1276,51 @@ namespace UnlitWF
                 }
                 context.custom = true;
                 // 相方の側は何もしない
+            }
+        }
+
+        /// <summary>
+        /// ZWrite と ZWriteBack をひとつのプロパティとして表示する
+        /// </summary>
+        class ZWriteFrontBackPropertyHook : AbstractPropertyHook
+        {
+            private readonly string frontName;
+            private readonly string backName;
+            private readonly string displayName;
+
+            public ZWriteFrontBackPropertyHook(string frontName, string backName, string displayName = null) : base(frontName + "|" + backName)
+            {
+                this.frontName = frontName;
+                this.backName = backName;
+                this.displayName = displayName;
+            }
+
+            protected override void OnBeforeProp(PropertyGUIContext context)
+            {
+                if (context.hidden)
+                {
+                    return;
+                }
+                if (frontName == context.current.name)
+                {
+                    MaterialProperty another = FindProperty(backName, context.all, false);
+                    if (another != null)
+                    {
+                        var display = string.IsNullOrWhiteSpace(displayName) ? context.guiContent : WFI18N.GetGUIContent(displayName);
+                        DrawZWriteProperty(context.editor, display, context.current, another);
+                        context.custom = true;
+                    }
+                    else
+                    {
+                        // 相方がいない場合は単独で表示する
+                        context.custom = false;
+                    }
+                }
+                else
+                {
+                    // 相方の側は何もしない
+                    context.custom = true;
+                }
             }
         }
 

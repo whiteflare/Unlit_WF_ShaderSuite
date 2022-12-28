@@ -42,6 +42,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 1
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWriteBack          ("[AL] ZWrite (Back)", int) = 0
 
         // アウトライン
         [WFHeaderAlwaysOn(Outline)]
@@ -497,7 +499,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
-            ZWrite OFF
+            ZWrite [_AL_ZWriteBack]
             Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             Stencil {
@@ -617,7 +619,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
-            ZWrite OFF
+            ZWrite [_AL_ZWriteBack]
             Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             Stencil {

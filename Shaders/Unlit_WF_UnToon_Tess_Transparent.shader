@@ -37,6 +37,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWriteBack          ("[AL] ZWrite (Back)", int) = 0
 
         // Tessellation
         [WFHeader(Tessellation)]
@@ -414,7 +416,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
-            ZWrite OFF
+            ZWrite [_AL_ZWriteBack]
             Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM

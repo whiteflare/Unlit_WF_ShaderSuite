@@ -38,6 +38,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWriteBack          ("[AL] ZWrite (Back)", int) = 0
 
         // アウトライン
         [WFHeaderAlwaysOn(Outline)]
@@ -544,7 +546,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
-            ZWrite OFF
+            ZWrite [_AL_ZWriteBack]
             Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM

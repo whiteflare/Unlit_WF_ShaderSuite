@@ -73,6 +73,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWriteBack          ("[AL] ZWrite (Back)", int) = 0
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -126,7 +128,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_GMB_BackCulllMode]
-            ZWrite [_AL_ZWrite]
+            ZWrite [_AL_ZWriteBack]
             Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
