@@ -44,7 +44,10 @@ namespace UnlitWF
 
         public void OnProcessScene(Scene scene, BuildReport report)
         {
+#if !ENV_VRCSDK3_AVATAR
+            // もしAvatarのときはここに来ても何もしない(再生ボタンを押したときに発生する)
             ReplaceQuestSupportShader(scene);
+#endif
         }
 
         private void ReplaceQuestSupportShader(Scene scene)
@@ -57,10 +60,6 @@ namespace UnlitWF
             {
                 return;
             }
-#if ENV_VRCSDK3_AVATAR
-            // もしAvatarのときはここに来ても何もしない(再生ボタンを押したときに発生する)
-            return;
-#endif
 
             // シーン内からMobile非対応のWFマテリアルを全て検索する
             var allUnmobileMaterials = new MaterialSeeker().GetAllMaterials(scene).Distinct()
