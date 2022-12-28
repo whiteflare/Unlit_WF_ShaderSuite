@@ -40,6 +40,10 @@ namespace UnlitWF
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                return;
+            }
             CoroutineHandler.StartStaticCoroutine(Execute());
         }
 
