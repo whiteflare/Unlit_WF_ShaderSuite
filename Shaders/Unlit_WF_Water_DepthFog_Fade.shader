@@ -44,7 +44,7 @@ Shader "UnlitWF/WF_Water_DepthFog_Fade" {
 
             Cull [_CullMode]
             ZWrite OFF
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 

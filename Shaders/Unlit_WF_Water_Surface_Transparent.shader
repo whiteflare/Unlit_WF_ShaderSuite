@@ -137,7 +137,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
 
             Cull [_CullMode]
             ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 

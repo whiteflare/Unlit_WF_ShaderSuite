@@ -80,7 +80,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
 
             Cull [_CullMode]
             ZWrite OFF
-            Blend One One
+            Blend One One, One OneMinusSrcAlpha
 
             CGPROGRAM
 
