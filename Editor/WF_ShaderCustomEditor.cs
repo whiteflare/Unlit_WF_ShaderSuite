@@ -498,61 +498,34 @@ namespace UnlitWF
                 // 一時的にフィールド幅を変更
                 EditorGUIUtility.labelWidth = 0;
 
+                // バリアントリストを作成
+                WFVariantList lists = WFShaderNameDictionary.CreateVariantList(snm);
+
                 // ファミリー
                 {
-                    var families = WFShaderNameDictionary.GetFamilyList();
-                    // ラベル文字列を作成
-                    var labels = families.Select(nm => nm == null ? "" : nm.Familly).ToArray();
-                    int idx = Array.IndexOf(labels, snm.Familly);
-
                     EditorGUI.BeginChangeCheck();
-                    int select = EditorGUILayout.Popup("Family", idx, labels);
-                    if (EditorGUI.EndChangeCheck() && idx != select)
+                    int idxFamily = EditorGUILayout.Popup("Family", lists.idxFamily, lists.LabelFamilyList);
+                    if (EditorGUI.EndChangeCheck() && lists.idxFamily != idxFamily)
                     {
-                        WFCommonUtility.ChangeShader(families[select].Name, targets);
+                        WFCommonUtility.ChangeShader(lists.familyList[idxFamily].Name, targets);
                     }
                 }
                 // バリアント
                 {
-                    // 同じ Variant のシェーダをリストに
-                    var variants = WFShaderNameDictionary.GetVariantList(snm, out var other);
-                    // その他の Variant もリストに追加する
-                    if (0 < other.Count)
-                    {
-                        variants.Add(null);
-                        variants.AddRange(other.Distinct(new WFShaderNameVariantComparer()));
-                    }
-
-                    // ラベル文字列を作成
-                    var labels = variants.Select(nm => nm == null ? "" : nm.Variant).ToArray();
-                    int idx = Array.IndexOf(labels, snm.Variant);
-
                     EditorGUI.BeginChangeCheck();
-                    int select = EditorGUILayout.Popup("Variant", idx, labels);
-                    if (EditorGUI.EndChangeCheck() && idx != select)
+                    int idxVariant = EditorGUILayout.Popup("Variant", lists.idxVariant, lists.LabelVariantList);
+                    if (EditorGUI.EndChangeCheck() && lists.idxVariant != idxVariant)
                     {
-                        WFCommonUtility.ChangeShader(variants[select].Name, targets);
+                        WFCommonUtility.ChangeShader(lists.variantList[idxVariant].Name, targets);
                     }
                 }
                 // Render Type
                 {
-                    // 同じ RenderType のシェーダをリストに
-                    var variants = WFShaderNameDictionary.GetRenderTypeList(snm, out List<WFShaderName> other);
-                    // その他の RenderType もリストに追加する
-                    if (0 < other.Count)
-                    {
-                        variants.Add(null);
-                        variants.AddRange(other.Distinct(new WFShaderNameRenderTypeComparer()));
-                    }
-
-                    var labels = variants.Select(nm => nm == null ? "" : nm.RenderType).ToArray();
-                    int idx = Array.IndexOf(labels, snm.RenderType);
-
                     EditorGUI.BeginChangeCheck();
-                    int select = EditorGUILayout.Popup("RenderType", idx, labels);
-                    if (EditorGUI.EndChangeCheck() && idx != select)
+                    int idxRenderType = EditorGUILayout.Popup("RenderType", lists.idxRenderType, lists.LabelRenderTypeList);
+                    if (EditorGUI.EndChangeCheck() && lists.idxRenderType != idxRenderType)
                     {
-                        WFCommonUtility.ChangeShader(variants[select].Name, targets);
+                        WFCommonUtility.ChangeShader(lists.renderTypeList[idxRenderType].Name, targets);
                     }
                 }
 

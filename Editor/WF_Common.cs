@@ -1275,54 +1275,26 @@ namespace UnlitWF
         }
     }
 
-    internal class WFShaderNameVariantComparer : IEqualityComparer<WFShaderName>
+    internal class WFVariantList
     {
-        public bool Equals(WFShaderName x, WFShaderName y)
+        public readonly WFShaderName current;
+
+        public readonly List<WFShaderName> familyList = new List<WFShaderName>();
+        public readonly List<WFShaderName> variantList = new List<WFShaderName>();
+        public readonly List<WFShaderName> renderTypeList = new List<WFShaderName>();
+
+        public int idxFamily = -1;
+        public int idxVariant = -1;
+        public int idxRenderType = -1;
+
+        public WFVariantList(WFShaderName current)
         {
-            if (System.Object.ReferenceEquals(x, y))
-            {
-                return true;
-            }
-            if (x == null || y == null)
-            {
-                return false;
-            }
-            return x.RenderPipeline == y.RenderPipeline && x.Familly == y.Familly && x.Variant == y.Variant;
+            this.current = current;
         }
 
-        public int GetHashCode(WFShaderName x)
-        {
-            if (System.Object.ReferenceEquals(x, null))
-            {
-                return 0;
-            }
-            return x.RenderPipeline.GetHashCode() ^ x.Familly.GetHashCode() ^ x.Variant.GetHashCode();
-        }
-    }
-
-    internal class WFShaderNameRenderTypeComparer : IEqualityComparer<WFShaderName>
-    {
-        public bool Equals(WFShaderName x, WFShaderName y)
-        {
-            if (System.Object.ReferenceEquals(x, y))
-            {
-                return true;
-            }
-            if (x == null || y == null)
-            {
-                return false;
-            }
-            return x.RenderPipeline == y.RenderPipeline && x.Familly == y.Familly && x.RenderType == y.RenderType;
-        }
-
-        public int GetHashCode(WFShaderName x)
-        {
-            if (System.Object.ReferenceEquals(x, null))
-            {
-                return 0;
-            }
-            return x.RenderPipeline.GetHashCode() ^ x.Familly.GetHashCode() ^ x.Variant.GetHashCode();
-        }
+        public string[] LabelFamilyList { get => familyList.Select(nm => nm == null ? "" : nm.Familly).ToArray(); }
+        public string[] LabelVariantList { get => variantList.Select(nm => nm == null ? "" : nm.Variant).ToArray(); }
+        public string[] LabelRenderTypeList { get => renderTypeList.Select(nm => nm == null ? "" : nm.RenderType).ToArray(); }
     }
 
     internal static class WFShaderNameDictionary
@@ -1355,45 +1327,109 @@ namespace UnlitWF
 
         public static List<WFShaderName> GetVariantList(WFShaderName name)
         {
+            var first = new List<WFShaderName>();
             if (name == null)
             {
-                return new List<WFShaderName>();
+                return first;
             }
-            return GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.RenderType == name.RenderType).ToList();
-        }
 
-        public static List<WFShaderName> GetVariantList(WFShaderName name, out List<WFShaderName> other)
-        {
-            var result = GetVariantList(name);
-            var items = result.Select(p => p.Variant).ToList();
+            var second = new List<WFShaderName>();
+            var third = new List<WFShaderName>();
 
-            // 異なるVariantのShaderNameをotherに詰める
-            other = new List<WFShaderName>();
-            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly));
-            other.RemoveAll(a => items.Contains(a.Variant));
+            // Variant でグループ化して、RenderType の一致するものを first に、一致しないものを second に追加
+            foreach (var group in GetCurrentRpNames().Where(nm => nm.Familly == name.Familly).GroupBy(nm => nm.Variant))
+            {
+                if (!group.Key.StartsWith("Custom/") && !group.Key.StartsWith("Legacy/"))
+                {
+                    var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
+                    if (snm != null)
+                    {
+                        first.Add(snm);
+                    }
+                    else
+                    {
+                        second.Add(group.First());
+                    }
+                }
+                else
+                {
+                    var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
+                    if (snm != null)
+                    {
+                        third.Add(snm);
+                    }
+                    else
+                    {
+                        third.Add(group.First());
+                    }
+                }
+            }
 
-            return result;
+            if (0 < first.Count && 0 < second.Count)
+            {
+                first.Add(null);
+                first.AddRange(second);
+            }
+            if (0 < first.Count && 0 < third.Count)
+            {
+                first.Add(null);
+                first.AddRange(third);
+            }
+            return first;
         }
 
         public static List<WFShaderName> GetRenderTypeList(WFShaderName name)
         {
+            var first = new List<WFShaderName>();
             if (name == null)
             {
-                return new List<WFShaderName>();
+                return first;
             }
-            return GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.Variant == name.Variant).ToList();
+
+            var second = new List<WFShaderName>();
+
+            // RenderType でグループ化して、Variant の一致するものを first に、一致しないものを second に追加
+            foreach (var group in GetCurrentRpNames().Where(nm => nm.Familly == name.Familly).GroupBy(nm => nm.RenderType))
+            {
+                var snm = group.Where(nm => nm.Variant == name.Variant).FirstOrDefault();
+                if (snm != null)
+                {
+                    first.Add(snm);
+                }
+                else
+                {
+                    // ただし一致しない場合では Custom と Legacy は無視する
+                    snm = group.Where(nm => !group.Key.StartsWith("Custom/") && !group.Key.StartsWith("Legacy/")).FirstOrDefault();
+                    if (snm != null)
+                    {
+                        second.Add(snm);
+                    }
+                }
+            }
+
+            if (0 < first.Count && 0 < second.Count)
+            {
+                first.Add(null);
+                first.AddRange(second);
+            }
+            return first;
         }
 
-        public static List<WFShaderName> GetRenderTypeList(WFShaderName name, out List<WFShaderName> other)
+        public static WFVariantList CreateVariantList(WFShaderName current)
         {
-            var result = GetRenderTypeList(name);
-            var items = result.Select(p => p.RenderType).ToList();
-
-            // 異なるRenderTypeのShaderNameをotherに詰める
-            other = new List<WFShaderName>();
-            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.Variant != "Custom"));
-            other.RemoveAll(a => items.Contains(a.RenderType));
-
+            WFVariantList result = new WFVariantList(current);
+            {
+                result.familyList.AddRange(GetFamilyList());
+                result.idxFamily = Array.IndexOf(result.LabelFamilyList, current.Familly);
+            }
+            {
+                result.variantList.AddRange(GetVariantList(current));
+                result.idxVariant = Array.IndexOf(result.LabelVariantList, current.Variant);
+            }
+            {
+                result.renderTypeList.AddRange(GetRenderTypeList(current));
+                result.idxRenderType = Array.IndexOf(result.LabelRenderTypeList, current.RenderType);
+            }
             return result;
         }
     }
