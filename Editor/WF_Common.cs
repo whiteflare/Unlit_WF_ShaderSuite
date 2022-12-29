@@ -1377,6 +1377,19 @@ namespace UnlitWF
                         }
                         return new WFShaderName[0];
                     }));
+
+                /********************
+                 * _Category プロパティの仕様
+                 * 
+                 * - `_Category` の名前で shader プロパティとして用意して、DisplayName 部分を読み取る。
+                 * - '|' で4要素以上に分解できるものを有効なカテゴリとして使用する。
+                 * - フォーマットは `RenderPipeline|Family|Variant|RenderType`
+                 * - RenderPipeline は利用するパイプライン。`BRP` あるいは `URP` が有効。
+                 * - Family は既存の Family に一致するものを有効とする。`UnToon` とか `FakeFur` とか。
+                 * - 具体例: "BRP|UnToon|Custom/ClearCoat|Transparent"
+                 * 
+                 ********************/
+
                 additionalShaderNamesCache = result;
             }
             return result;
