@@ -1356,22 +1356,23 @@ namespace UnlitWF
                     .Where(shader => WFCommonUtility.IsSupportedShader(shader))
                     // result内に名称が一致するものがないこと
                     .Where(shader => !wellknownShaders.Any(snm => shader.name == snm.Name))
+                    // Categoryプロパティを正しく分解できること
+                    .Where(shader =>
+                    {
+                        var categoryString = WFAccessor.GetPropertyDescription(shader, "_Category");
+                        return categoryString != null && 4 <= categoryString.Split('|').Length;
+                    })
+                    // Categoryプロパティの文字列で並び替える
+                    .OrderBy(shader => WFAccessor.GetPropertyDescription(shader, "_Category"))
                     // WFShaderName を作成して追加
                     .SelectMany(shader =>
                     {
-                        var categoryString = WFAccessor.GetPropertyDescription(shader, "_Category");
-                        if (categoryString != null)
+                        var category = WFAccessor.GetPropertyDescription(shader, "_Category").Split('|');
+                        if (rp == category[0] && wellknownShaders.Select(snm => snm.Familly).Contains(category[1]))
                         {
-                            var category = categoryString.Split('|');
-                            if (4 <= category.Length)
+                            if (category[2] != "" && category[3] != "")
                             {
-                                if (rp == category[0])
-                                {
-                                    if (wellknownShaders.Select(snm => snm.Familly).Contains(category[1]))
-                                    {
-                                        return new WFShaderName[] { new WFShaderName(category[0], category[1], category[2], category[3], shader.name) };
-                                    }
-                                }
+                                return new WFShaderName[] { new WFShaderName(category[0], category[1], category[2], category[3], shader.name) };
                             }
                         }
                         return new WFShaderName[0];
@@ -1428,7 +1429,7 @@ namespace UnlitWF
             // Variant でグループ化して、RenderType の一致するものを first に、一致しないものを second に追加
             foreach (var group in GetCurrentRpNames().Where(nm => nm.Familly == name.Familly).GroupBy(nm => nm.Variant))
             {
-                if (!group.Key.StartsWith("Custom/") && !group.Key.StartsWith("Legacy/"))
+                if (!IsVariantCustomOrLegacy(group.Key))
                 {
                     var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
                     if (snm != null)
@@ -1454,16 +1455,18 @@ namespace UnlitWF
                 }
             }
 
+            // 結合
             if (0 < first.Count && 0 < second.Count)
             {
                 first.Add(null);
-                first.AddRange(second);
             }
+            first.AddRange(second);
             if (0 < first.Count && 0 < third.Count)
             {
                 first.Add(null);
-                first.AddRange(third);
             }
+            first.AddRange(third);
+
             return first;
         }
 
@@ -1488,7 +1491,7 @@ namespace UnlitWF
                 else
                 {
                     // ただし一致しない場合では Custom と Legacy は無視する
-                    snm = group.Where(nm => !group.Key.StartsWith("Custom/") && !group.Key.StartsWith("Legacy/")).FirstOrDefault();
+                    snm = group.Where(nm => !(IsVariantCustomOrLegacy(nm))).FirstOrDefault();
                     if (snm != null)
                     {
                         second.Add(snm);
@@ -1499,9 +1502,20 @@ namespace UnlitWF
             if (0 < first.Count && 0 < second.Count)
             {
                 first.Add(null);
-                first.AddRange(second);
             }
+            first.AddRange(second);
+
             return first;
+        }
+
+        private static bool IsVariantCustomOrLegacy(WFShaderName nm)
+        {
+            return nm != null && IsVariantCustomOrLegacy(nm.Variant);
+        }
+
+        private static bool IsVariantCustomOrLegacy(string variant)
+        {
+            return variant != null && (variant.StartsWith("Custom/") || variant.StartsWith("Legacy/"));
         }
 
         public static WFVariantList CreateVariantList(WFShaderName current)
