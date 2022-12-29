@@ -167,6 +167,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2022/12/17", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _Category               ("BRP|UnToon|Custom/ClearCoat|Addition", Float) = 0
     }
 
     SubShader {

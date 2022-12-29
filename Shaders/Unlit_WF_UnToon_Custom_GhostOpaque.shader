@@ -349,6 +349,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostOpaque" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _Category               ("BRP|UnToon|Custom/Ghost|Opaque", Float) = 0
     }
 
     SubShader {

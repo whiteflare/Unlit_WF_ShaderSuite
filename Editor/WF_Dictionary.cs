@@ -77,11 +77,6 @@ namespace UnlitWF
             new WFShaderName("BRP", "UnToon", "Tessellation", "Transparent",           "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
             new WFShaderName("BRP", "UnToon", "Tessellation", "Transparent3Pass",      "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
 
-            new WFShaderName("BRP", "UnToon", "Custom/Refracted", "Transparent",       "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted"),
-            new WFShaderName("BRP", "UnToon", "Custom/FrostedGlass", "Transparent",    "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass"),
-            new WFShaderName("BRP", "UnToon", "Custom/Ghost", "Opaque",                "UnlitWF/Custom/WF_UnToon_Custom_GhostOpaque"),
-            new WFShaderName("BRP", "UnToon", "Custom/Ghost", "Transparent",           "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent"),
-
             // ================
             // FakeFur 系列
             // ================
