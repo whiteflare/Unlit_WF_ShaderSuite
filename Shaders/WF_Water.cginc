@@ -414,7 +414,7 @@ FEATURE_TGL_END
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
         // リフラクション
-        affectRefraction(i, facing, ws_bump_normal, ws_bump_normal, color);
+        affectRefraction(i, facing, i.ws_normal, ws_bump_normal, color);
 
         UNITY_APPLY_FOG(i.fogCoord, color);
 

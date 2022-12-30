@@ -44,8 +44,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _CRF_RefractiveIndex    ("[CRF] Refractive Index", Range(1.0, 3.0)) = 1.33
             _CRF_Distance           ("[CRF] Distance", Range(0, 10)) = 1.0
             _CRF_Tint               ("[CRF] Tint Color", Color) = (0.5, 0.5, 0.5)
-        [WF_FixFloat(1.0)]
-            _CRF_BlendNormal        ("[CRF] Blend Normal", Range(0, 1)) = 1.0
+            _CRF_BlendNormal        ("[CRF] Blend Normal", Range(0, 1)) = 0.1
 
         [WFHeaderToggle(Distance Fade)]
             _WAD_Enable             ("[WAD] Enable", Float) = 0
