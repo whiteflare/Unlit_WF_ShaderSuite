@@ -148,7 +148,6 @@
     float           _CRF_Distance;
     float3          _CRF_Tint;
     float           _CRF_BlendNormal;
-    float           _CRF_BlendNormal2;
 #endif
 
     // -------------------------
