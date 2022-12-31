@@ -403,6 +403,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
             Cull [_CullMode]
             ZWrite ON
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
