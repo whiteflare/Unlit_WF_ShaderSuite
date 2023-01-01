@@ -339,14 +339,14 @@ namespace UnlitWF
                 {
                     foreach (var keyFrame in AnimationUtility.GetObjectReferenceCurve(clip, binding))
                     {
-                        GetAllMaterials(keyFrame.value as Material);
+                        GetAllMaterials(keyFrame.value as Material, result);
                     }
                 }
             }
             return result;
         }
 
-        public IEnumerable<Material> GetAllMaterials(IEnumerable<Material> materials, List<Material> result = null)
+        public IEnumerable<Material> GetAllMaterials(IEnumerable<Material> materials, List<Material> result)
         {
             InitList(ref result);
             if (materials == null)
@@ -357,7 +357,7 @@ namespace UnlitWF
             return result;
         }
 
-        public IEnumerable<Material> GetAllMaterials(Material mat, List<Material> result = null)
+        public IEnumerable<Material> GetAllMaterials(Material mat, List<Material> result)
         {
             InitList(ref result);
             if (mat != null)
