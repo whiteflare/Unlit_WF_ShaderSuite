@@ -625,12 +625,21 @@ namespace UnlitWF
         private static void OnGUISub_MaterialValidation(MaterialEditor materialEditor)
         {
             var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
-            foreach (var result in WFMaterialValidators.ValidateAll(targets))
+            foreach (var advice in WFMaterialValidators.ValidateAll(targets))
             {
-                var messageContent = ToolCommon.GetMessageContent(result.messageType, result.message);
-                if (materialEditor.HelpBoxWithButton(messageContent, new GUIContent("Fix Now")))
+                if (advice.action != null)
                 {
-                    result.action();
+                    // 修正 action ありの場合はボタン付き
+                    var messageContent = ToolCommon.GetMessageContent(advice.messageType, advice.message);
+                    if (materialEditor.HelpBoxWithButton(messageContent, new GUIContent("Fix Now")))
+                    {
+                        advice.action();
+                    }
+                }
+                else
+                {
+                    // 修正 action なしの場合はボタンなし
+                    EditorGUILayout.HelpBox(advice.message, advice.messageType, true);
                 }
             }
         }

@@ -919,10 +919,15 @@ namespace UnlitWF
                 var contentRect = GUILayoutUtility.GetRect(messageContent, EditorStyles.label);
                 GUI.Label(contentRect, messageContent);
 
-                var buttonContent = new GUIContent("Fix Now");
-                var buttonRect = GUILayoutUtility.GetRect(1, 25);
-                buttonRect = new Rect(buttonRect.xMax - 64, buttonRect.y, 60, 20);
-                var exec = GUI.Button(buttonRect, buttonContent);
+                var exec = false;
+
+                if (advice.action != null)
+                {
+                    var buttonContent = new GUIContent("Fix Now");
+                    var buttonRect = GUILayoutUtility.GetRect(1, 25);
+                    buttonRect = new Rect(buttonRect.xMax - 64, buttonRect.y, 60, 20);
+                    exec = GUI.Button(buttonRect, buttonContent);
+                }
 
                 using (new EditorGUI.IndentLevelScope())
                 using (new EditorGUI.DisabledGroupScope(true))
