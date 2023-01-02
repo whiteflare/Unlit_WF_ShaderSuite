@@ -897,11 +897,19 @@ namespace UnlitWF
             rootObject = EditorGUILayout.ObjectField("Root GameObject", rootObject, typeof(GameObject), true) as GameObject;
 
             var materials = rootObject != null ? new MaterialSeeker().GetAllMaterials(rootObject).Distinct().ToArray() : new MaterialSeeker().GetAllSceneAllMaterial().Distinct().ToArray();
+            var advices = WFMaterialValidators.ValidateAll(materials);
+
+            if (advices.Count == 0)
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.HelpBox("問題は見つかりませんでした。 / No problems were found.", MessageType.Info, true);
+                return;
+            }
 
             // スクロール開始
             scroll = EditorGUILayout.BeginScrollView(scroll);
 
-            foreach (var advice in WFMaterialValidators.ValidateAll(materials))
+            foreach (var advice in advices)
             {
                 EditorGUILayout.Space();
                 GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
