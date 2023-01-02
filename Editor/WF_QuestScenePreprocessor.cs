@@ -52,7 +52,7 @@ namespace UnlitWF
 
         private void ReplaceQuestSupportShader(Scene scene)
         {
-            if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
+            if (!WFCommonUtility.IsQuestPlatform())
             {
                 return;
             }

@@ -194,7 +194,7 @@ namespace UnlitWF
             // モバイル向けではないシェーダを使用している場合にメッセージ
             new WFMaterialValidator(
                 // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
-                targets => EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android ? targets.Where(tgt => !WFCommonUtility.IsMobileSupportedShader(tgt)).ToArray() : new Material[0],
+                targets => WFCommonUtility.IsQuestPlatform() ? targets.Where(tgt => !WFCommonUtility.IsMobileSupportedShader(tgt)).ToArray() : new Material[0],
                 MessageType.Info,
                 targets => WFI18N.Translate(WFMessageText.PlzQuestSupport),
                 null // アクションなし、変えると戻すのが大変なので

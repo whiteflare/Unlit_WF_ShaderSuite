@@ -601,6 +601,11 @@ namespace UnlitWF
 #endif
         }
 
+        public static bool IsQuestPlatform()
+        {
+            return EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android;
+        }
+
         public const string KWD_EDITOR_HIDE_LMAP = "_WF_EDITOR_HIDE_LMAP";
 
         public static bool IsKwdEnableHideLmap()
