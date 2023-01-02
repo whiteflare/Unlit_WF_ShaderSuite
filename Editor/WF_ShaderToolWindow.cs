@@ -417,6 +417,11 @@ namespace UnlitWF
                     return new GUIContent(msg);
             }
         }
+
+        public static void SetupSize(EditorWindow window)
+        {
+            window.minSize = new Vector2(480, 640);
+        }
     }
 
     #region クリンナップ系
@@ -462,7 +467,7 @@ namespace UnlitWF
 
         private void OnEnable()
         {
-            minSize = new Vector2(480, 640);
+            ToolCommon.SetupSize(this);
             param = CleanUpParameter.Create();
             param.execNonWFMaterials = true; // ツール経由のときはNonWFマテリアルのクリンナップも行う
             ToolCommon.GetSelectedMaterials(ref param.materials);
@@ -535,7 +540,7 @@ namespace UnlitWF
 
         private void OnEnable()
         {
-            minSize = new Vector2(480, 640);
+            ToolCommon.SetupSize(this);
             param = ResetParameter.Create();
             ToolCommon.GetSelectedMaterials(ref param.materials);
             ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materials));
@@ -623,7 +628,7 @@ namespace UnlitWF
 
         private void OnEnable()
         {
-            minSize = new Vector2(480, 640);
+            ToolCommon.SetupSize(this);
             param = CopyPropParameter.Create();
             ToolCommon.GetSelectedMaterials(ref param.materialDestination);
             ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materialDestination));
@@ -715,7 +720,7 @@ namespace UnlitWF
 
         private void OnEnable()
         {
-            minSize = new Vector2(480, 640);
+            ToolCommon.SetupSize(this);
             param = MigrationParameter.Create();
             ToolCommon.GetSelectedMaterials(ref param.materials);
             ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materials));
@@ -788,7 +793,7 @@ namespace UnlitWF
 
         private void OnEnable()
         {
-            minSize = new Vector2(480, 640);
+            ToolCommon.SetupSize(this);
             directionalLight = RenderSettings.sun;
             ToolCommon.GetSelectedMaterials(ref materials);
             ToolCommon.SetArrayPropertyExpanded(this, nameof(this.materials));
@@ -882,7 +887,7 @@ namespace UnlitWF
 
         private void OnEnable()
         {
-            minSize = new Vector2(480, 640);
+            ToolCommon.SetupSize(this);
         }
 
         private void OnGUI()
