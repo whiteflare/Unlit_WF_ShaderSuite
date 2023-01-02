@@ -62,6 +62,7 @@ namespace UnlitWF
         public const string TOOLS_MIGALL = PATH_TOOLS + "全てのマテリアルを最新に変換する";
         public const string TOOLS_DLSET = PATH_TOOLS + "シーンDL方向をマテリアルに焼き込む";
         public const string TOOLS_HIDELMAP = PATH_TOOLS + "ライトマップを一時的に非表示 %&L";
+        public const string TOOLS_VALIDATE = PATH_TOOLS + "シーン内のマテリアルを検査";
 
         public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "UnlitWF のマテリアルに変換する";
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "DebugView シェーダに切り替える";
@@ -87,6 +88,7 @@ namespace UnlitWF
         public const string TOOLS_MIGALL = PATH_TOOLS + "Migration All Materials";
         public const string TOOLS_DLSET = PATH_TOOLS + "Bake DL into Material";
         public const string TOOLS_HIDELMAP = PATH_TOOLS + "Hide LightMap temporarily %&L";
+        public const string TOOLS_VALIDATE = PATH_TOOLS + "Validate Materials in Scene";
 
         public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "Convert UnlitWF Material";
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView Shader";
@@ -111,7 +113,8 @@ namespace UnlitWF
         public const int PRI_TOOLS_COPY = 102;
         public const int PRI_TOOLS_RESET = 103;
         public const int PRI_TOOLS_MIGRATION = 104;
-        public const int PRI_TOOLS_DLSET = 105;
+        public const int PRI_TOOLS_VALIDATE = 105;
+        public const int PRI_TOOLS_DLSET = 106;
         public const int PRI_TOOLS_HIDELMAP = 201;
         public const int PRI_TOOLS_MIGALL = 301;
         public const int PRI_TOOLS_CNGLANG = 501;
@@ -252,6 +255,9 @@ namespace UnlitWF
 
     internal static class ToolCommon
     {
+        public static readonly Texture2D infoIcon = EditorGUIUtility.Load("icons/console.infoicon.png") as Texture2D;
+        public static readonly Texture2D warnIcon = EditorGUIUtility.Load("icons/console.warnicon.png") as Texture2D;
+
         public static bool IsUnlitWFMaterial(Material mm)
         {
             if (mm != null && mm.shader != null)
@@ -397,6 +403,19 @@ namespace UnlitWF
                 return;
             }
             property.isExpanded = property.arraySize <= 10;
+        }
+
+        public static GUIContent GetMessageContent(MessageType type, string msg)
+        {
+            switch(type)
+            {
+                case MessageType.Warning:
+                    return new GUIContent(msg, warnIcon);
+                case MessageType.Info:
+                    return new GUIContent(msg, infoIcon);
+                default:
+                    return new GUIContent(msg);
+            }
         }
     }
 
@@ -842,6 +861,74 @@ namespace UnlitWF
                 mat.SetFloat("_GL_CustomAltitude", alt);
                 EditorUtility.SetDirty(mat);
             }
+        }
+    }
+
+    #endregion
+
+    #region バリデート系
+
+    public class ToolValidateSceneMaterial : EditorWindow
+    {
+        [MenuItem(WFMenu.TOOLS_VALIDATE, priority = WFMenu.PRI_TOOLS_VALIDATE)]
+        private static void OpenWindowFromMenu_Tool()
+        {
+            var window = GetWindow<ToolValidateSceneMaterial>("UnlitWF/Material Validation");
+            window.rootObject = Selection.activeGameObject;
+        }
+
+        Vector2 scroll = Vector2.zero;
+        private GameObject rootObject;
+
+        private void OnEnable()
+        {
+            minSize = new Vector2(480, 640);
+        }
+
+        private void OnGUI()
+        {
+            ToolCommon.WindowHeader("UnlitWF / Material Validation", "List material validation result", "UnlitWF のマテリアルの警告を一覧表示します。");
+
+            rootObject = EditorGUILayout.ObjectField("Root GameObject", rootObject, typeof(GameObject), true) as GameObject;
+
+            var materials = rootObject != null ? new MaterialSeeker().GetAllMaterials(rootObject).Distinct().ToArray() : new MaterialSeeker().GetAllSceneAllMaterial().Distinct().ToArray();
+
+            // スクロール開始
+            scroll = EditorGUILayout.BeginScrollView(scroll);
+
+            foreach (var advice in WFMaterialValidators.ValidateAll(materials))
+            {
+                EditorGUILayout.Space();
+                GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
+                EditorGUILayout.Space();
+
+                var messageContent = ToolCommon.GetMessageContent(advice.messageType, advice.message);
+                var contentRect = GUILayoutUtility.GetRect(messageContent, EditorStyles.label);
+                GUI.Label(contentRect, messageContent);
+
+                var buttonContent = new GUIContent("Fix Now");
+                var buttonRect = GUILayoutUtility.GetRect(1, 25);
+                buttonRect = new Rect(buttonRect.xMax - 64, buttonRect.y, 60, 20);
+                var exec = GUI.Button(buttonRect, buttonContent);
+
+                using (new EditorGUI.IndentLevelScope())
+                using (new EditorGUI.DisabledGroupScope(true))
+                {
+                    for (int i = 0; i < advice.targets.Length; i++)
+                    {
+                        EditorGUILayout.ObjectField("Material " + i, advice.targets[i], typeof(Material), false);
+                    }
+                }
+
+                if (exec)
+                {
+                    advice.action();
+                }
+            }
+            EditorGUILayout.Space();
+
+            // スクロール終了
+            EditorGUILayout.EndScrollView();
         }
     }
 

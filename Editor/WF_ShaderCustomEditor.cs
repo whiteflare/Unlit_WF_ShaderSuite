@@ -232,8 +232,6 @@ namespace UnlitWF
 
         static class Styles
         {
-            public static readonly Texture2D infoIcon = EditorGUIUtility.Load("icons/console.infoicon.png") as Texture2D;
-            public static readonly Texture2D warnIcon = EditorGUIUtility.Load("icons/console.warnicon.png") as Texture2D;
             public static readonly Texture2D menuTex = LoadTextureByFileName("wf_icon_menu");
         }
 
@@ -479,7 +477,7 @@ namespace UnlitWF
                 if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion) && !WFCommonUtility.IsInSpecialProject())
                 {
                     var message = WFI18N.Translate(WFMessageText.NewerVersion) + WFCommonUtility.GetLatestVersion()?.latestVersion;
-                    if (materialEditor.HelpBoxWithButton(new GUIContent(message, Styles.infoIcon), new GUIContent("Go")))
+                    if (materialEditor.HelpBoxWithButton(ToolCommon.GetMessageContent(MessageType.Info, message), new GUIContent("Go")))
                     {
                         WFCommonUtility.OpenDownloadPage();
                     }
@@ -627,10 +625,10 @@ namespace UnlitWF
         private static void OnGUISub_MaterialValidation(MaterialEditor materialEditor)
         {
             var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
-            foreach (var result in WFMaterialValidators.Validators.Select(v => v.Validate(targets)).Where(r => r != null))
+            foreach (var result in WFMaterialValidators.ValidateAll(targets))
             {
-                var styles = result.messageType == MessageType.Warning ? Styles.warnIcon : Styles.infoIcon;
-                if (materialEditor.HelpBoxWithButton(new GUIContent(result.message, styles), new GUIContent("Fix Now")))
+                var messageContent = ToolCommon.GetMessageContent(result.messageType, result.message);
+                if (materialEditor.HelpBoxWithButton(messageContent, new GUIContent("Fix Now")))
                 {
                     result.action();
                 }

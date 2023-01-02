@@ -18,6 +18,7 @@
 #if UNITY_EDITOR
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -190,6 +191,20 @@ namespace UnlitWF
                 }
             ),
         };
+
+        public static List<WFMaterialValidator.Advice> ValidateAll(params Material[] mats)
+        {
+            var result = new List<WFMaterialValidator.Advice>();
+            foreach(var v in Validators)
+            {
+                var advice = v.Validate(mats);
+                if (advice != null)
+                {
+                    result.Add(advice);
+                }
+            }
+            return result.OrderByDescending(adv => adv.messageType).ToList();
+        }
 
         /// <summary>
         /// 引数のマテリアルのうち、BatchingStatic 付き MeshRenderer から使用されているものを返却する。
