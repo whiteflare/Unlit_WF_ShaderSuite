@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -22,8 +22,6 @@
 
 #if UNITY_EDITOR
 
-using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEditor;
 
 namespace UnlitWF
@@ -39,21 +37,10 @@ namespace UnlitWF
             Converter.ScanAndMigrationExecutor.ExecuteMigrationWhenImportMaterial(importedAssets);
 
             // もしshaderファイルがimportされたなら、そのタイミングで全スキャンも動作させる
-            if (importedAssets.Any(IsSupportedShaderPath))
+            if (WFCommonUtility.IsSupportedShaderPath(importedAssets))
             {
                 Converter.ScanAndMigrationExecutor.ExecuteScanWhenImportShader();
             }
-        }
-
-        private static readonly Regex regexPath = new Regex(@".*WF_.*\.shader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        private static bool IsSupportedShaderPath(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                return false;
-            }
-            return regexPath.IsMatch(path);
         }
     }
 }

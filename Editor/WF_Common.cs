@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -31,6 +31,8 @@ namespace UnlitWF
 {
     internal static class WFCommonUtility
     {
+        #region プロパティ判定
+
         /// <summary>
         /// GUIに表示されるDisplayNameのパターン
         /// </summary>
@@ -155,6 +157,10 @@ namespace UnlitWF
             return 0.001f < Math.Abs(value);
         }
 
+        #endregion
+
+        #region シェーダキーワード整理
+
         /// <summary>
         /// 見つけ次第削除するシェーダキーワード
         /// </summary>
@@ -228,6 +234,10 @@ namespace UnlitWF
                 }
             }
         }
+
+        #endregion
+
+        #region シェーダ切り替え
 
         /// <summary>
         /// マテリアルの shader を指定の名前のものに変更する。
@@ -414,15 +424,9 @@ namespace UnlitWF
             }
         }
 
-        /// <summary>
-        /// Object[] -> Material[] のユーティリティ関数。
-        /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
-        public static Material[] AsMaterials(params UnityEngine.Object[] array)
-        {
-            return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
-        }
+        #endregion
+
+        #region シェーダ・マテリアル判定
 
         /// <summary>
         /// ShaderがUnlitWFでサポートされるものかどうか判定する。
@@ -477,10 +481,48 @@ namespace UnlitWF
             return mat != null && IsMobileSupportedShader(mat.shader);
         }
 
+        /// <summary>
+        /// マテリアルがマイグレーション必要なプロパティを含んでいるかどうか判定する。
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
         public static bool IsMigrationRequiredMaterial(Material mat)
         {
             return mat != null && Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat);
         }
+
+        /// <summary>
+        /// UnlitWFのシェーダアセットパスに一致するアセットパスの正規表現
+        /// </summary>
+        private static readonly Regex regexPath = new Regex(@".*WF_.*\.shader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// 指定のアセットパスがUnlitWFのシェーダのものかどうか判定する。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool IsSupportedShaderPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+            return regexPath.IsMatch(path);
+        }
+
+        /// <summary>
+        /// 指定のアセットパスがUnlitWFのシェーダのものかどうか判定する。
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
+        public static bool IsSupportedShaderPath(IEnumerable<string> paths)
+        {
+            return paths.Any(IsSupportedShaderPath);
+        }
+
+        #endregion
+
+        #region バージョンチェック
 
         /// <summary>
         /// 最新リリースのVersionInfo
@@ -531,46 +573,18 @@ namespace UnlitWF
             Application.OpenURL(LatestVersion.downloadPage);
         }
 
-        [Obsolete("use WFAccessor")]
-        public static IEnumerable<string> GetAllPropertyNames(Shader shader)
-        {
-            return WFAccessor.GetAllPropertyNames(shader);
-        }
+        #endregion
 
-        [Obsolete("use WFAccessor")]
-        public static string GetShaderCurrentVersion(Shader shader)
-        {
-            return WFAccessor.GetShaderCurrentVersion(shader);
-        }
+        #region その他の汎用ユーティリティ
 
-        [Obsolete("use WFAccessor")]
-        public static string GetShaderCurrentVersion(Material mat)
+        /// <summary>
+        /// Object[] -> Material[] のユーティリティ関数。
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static Material[] AsMaterials(params UnityEngine.Object[] array)
         {
-            return WFAccessor.GetShaderCurrentVersion(mat);
-        }
-
-        [Obsolete("use WFAccessor")]
-        public static string GetShaderFallBackTarget(Shader shader)
-        {
-            return WFAccessor.GetShaderFallBackTarget(shader);
-        }
-
-        [Obsolete("use WFAccessor")]
-        public static string GetShaderFallBackTarget(Material mat)
-        {
-            return WFAccessor.GetShaderFallBackTarget(mat);
-        }
-
-        [Obsolete("use WFAccessor")]
-        public static bool GetShaderQuestSupported(Shader shader)
-        {
-            return WFAccessor.GetShaderQuestSupported(shader);
-        }
-
-        [Obsolete("use WFAccessor")]
-        public static int GetMaterialRenderQueueValue(Material mat)
-        {
-            return WFAccessor.GetMaterialRenderQueueValue(mat);
+            return array == null ? new Material[0] : array.Select(obj => obj as Material).Where(m => m != null).ToArray();
         }
 
         public static string GetCurrentRenderPipeline()
@@ -585,6 +599,11 @@ namespace UnlitWF
 #else
             return false;
 #endif
+        }
+
+        public static bool IsQuestPlatform()
+        {
+            return EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android;
         }
 
         public const string KWD_EDITOR_HIDE_LMAP = "_WF_EDITOR_HIDE_LMAP";
@@ -605,6 +624,35 @@ namespace UnlitWF
                 Shader.DisableKeyword(KWD_EDITOR_HIDE_LMAP);
             }
         }
+
+        private static bool? inSpecialProject = null;
+
+        /// <summary>
+        /// UnlitWFが特殊なプロジェクト内にあるかどうか判定する。
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsInSpecialProject()
+        {
+            var result = inSpecialProject;
+            if (result == null)
+            {
+                var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets/VketTools");
+                if (asset == null)
+                {
+                    asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets/VitDeck");
+                }
+                result = inSpecialProject = (asset != null);
+            }
+            return (bool)result;
+        }
+
+        [InitializeOnLoadMethod]
+        private static void ClearSpecialProjectFlag()
+        {
+            inSpecialProject = null;
+        }
+
+        #endregion
     }
 
     public static class WFAccessor
@@ -688,7 +736,7 @@ namespace UnlitWF
         /// <param name="shader"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        private static string getPropertyDescription(Shader shader, string name, string _default = null)
+        public static string GetPropertyDescription(Shader shader, string name, string _default = null)
         {
             var idx = findPropertyIndex(shader, name);
             if (0 <= idx)
@@ -709,7 +757,7 @@ namespace UnlitWF
         /// <returns></returns>
         public static string GetShaderCurrentVersion(Shader shader)
         {
-            return getPropertyDescription(shader, "_CurrentVersion");
+            return GetPropertyDescription(shader, "_CurrentVersion");
         }
 
         /// <summary>
@@ -719,7 +767,7 @@ namespace UnlitWF
         /// <returns></returns>
         public static string GetShaderFallBackTarget(Shader shader)
         {
-            return getPropertyDescription(shader, "_FallBack");
+            return GetPropertyDescription(shader, "_FallBack");
         }
 
         /// <summary>
@@ -729,7 +777,7 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool GetShaderQuestSupported(Shader shader)
         {
-            return getPropertyDescription(shader, "_QuestSupported", "false").ToLower() == "true";
+            return GetPropertyDescription(shader, "_QuestSupported", "false").ToLower() == "true";
         }
 
 
@@ -1261,62 +1309,108 @@ namespace UnlitWF
         }
     }
 
-    internal class WFShaderNameVariantComparer : IEqualityComparer<WFShaderName>
+    internal class WFVariantList
     {
-        public bool Equals(WFShaderName x, WFShaderName y)
+        public readonly WFShaderName current;
+
+        public readonly List<WFShaderName> familyList = new List<WFShaderName>();
+        public readonly List<WFShaderName> variantList = new List<WFShaderName>();
+        public readonly List<WFShaderName> renderTypeList = new List<WFShaderName>();
+
+        public int idxFamily = -1;
+        public int idxVariant = -1;
+        public int idxRenderType = -1;
+
+        public WFVariantList(WFShaderName current)
         {
-            if (System.Object.ReferenceEquals(x, y))
-            {
-                return true;
-            }
-            if (x == null || y == null)
-            {
-                return false;
-            }
-            return x.RenderPipeline == y.RenderPipeline && x.Familly == y.Familly && x.Variant == y.Variant;
+            this.current = current;
         }
 
-        public int GetHashCode(WFShaderName x)
-        {
-            if (System.Object.ReferenceEquals(x, null))
-            {
-                return 0;
-            }
-            return x.RenderPipeline.GetHashCode() ^ x.Familly.GetHashCode() ^ x.Variant.GetHashCode();
-        }
-    }
-
-    internal class WFShaderNameRenderTypeComparer : IEqualityComparer<WFShaderName>
-    {
-        public bool Equals(WFShaderName x, WFShaderName y)
-        {
-            if (System.Object.ReferenceEquals(x, y))
-            {
-                return true;
-            }
-            if (x == null || y == null)
-            {
-                return false;
-            }
-            return x.RenderPipeline == y.RenderPipeline && x.Familly == y.Familly && x.RenderType == y.RenderType;
-        }
-
-        public int GetHashCode(WFShaderName x)
-        {
-            if (System.Object.ReferenceEquals(x, null))
-            {
-                return 0;
-            }
-            return x.RenderPipeline.GetHashCode() ^ x.Familly.GetHashCode() ^ x.Variant.GetHashCode();
-        }
+        public string[] LabelFamilyList { get => familyList.Select(nm => nm == null ? "" : nm.Familly).ToArray(); }
+        public string[] LabelVariantList { get => variantList.Select(nm => nm == null ? "" : nm.Variant).ToArray(); }
+        public string[] LabelRenderTypeList { get => renderTypeList.Select(nm => nm == null ? "" : nm.RenderType).ToArray(); }
     }
 
     internal static class WFShaderNameDictionary
     {
+        private static volatile List<WFShaderName> additionalShaderNamesCache = null;
+
+        public class CacheCleaner : AssetPostprocessor
+        {
+            public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
+            {
+                if (WFCommonUtility.IsSupportedShaderPath(importedAssets))
+                {
+                    additionalShaderNamesCache = null;
+                }
+            }
+        }
+
+        private static IEnumerable<WFShaderName> GetAdditionalShaderNames(string rp, List<WFShaderName> wellknownShaders)
+        {
+            var result = additionalShaderNamesCache;
+            if (result == null)
+            {
+                // カスタムシェーダをAssetDatabaseから検索
+                result = new List<WFShaderName>(AssetDatabase.FindAssets("t:Shader")
+                    // パスを取得
+                    .Select(guid => AssetDatabase.GUIDToAssetPath(guid)).Where(path => !string.IsNullOrWhiteSpace(path))
+                    // シェーダをロード
+                    .Select(path => AssetDatabase.LoadAssetAtPath<Shader>(path)).Where(shader => shader != null)
+                    // UnlitWFのシェーダであること
+                    .Where(shader => WFCommonUtility.IsSupportedShader(shader))
+                    // result内に名称が一致するものがないこと
+                    .Where(shader => !wellknownShaders.Any(snm => shader.name == snm.Name))
+                    // Categoryプロパティを正しく分解できること
+                    .Where(shader =>
+                    {
+                        var categoryString = WFAccessor.GetPropertyDescription(shader, "_Category");
+                        return categoryString != null && 4 <= categoryString.Split('|').Length;
+                    })
+                    // Categoryプロパティの文字列で並び替える
+                    .OrderBy(shader => WFAccessor.GetPropertyDescription(shader, "_Category"))
+                    // WFShaderName を作成して追加
+                    .SelectMany(shader =>
+                    {
+                        var category = WFAccessor.GetPropertyDescription(shader, "_Category").Split('|');
+                        if (rp == category[0] && wellknownShaders.Select(snm => snm.Familly).Contains(category[1]))
+                        {
+                            if (category[2] != "" && category[3] != "")
+                            {
+                                return new WFShaderName[] { new WFShaderName(category[0], category[1], category[2], category[3], shader.name) };
+                            }
+                        }
+                        return new WFShaderName[0];
+                    }));
+
+                /********************
+                 * _Category プロパティの仕様
+                 * 
+                 * - `_Category` の名前で shader プロパティとして用意して、DisplayName 部分を読み取る。
+                 * - '|' で4要素以上に分解できるものを有効なカテゴリとして使用する。
+                 * - フォーマットは `RenderPipeline|Family|Variant|RenderType`
+                 * - RenderPipeline は利用するパイプライン。`BRP` あるいは `URP` が有効。
+                 * - Family は既存の Family に一致するものを有効とする。`UnToon` とか `FakeFur` とか。
+                 * - 具体例: "BRP|UnToon|Custom/ClearCoat|Transparent"
+                 * 
+                 ********************/
+
+                additionalShaderNamesCache = result;
+            }
+            return result;
+        }
+
         private static IEnumerable<WFShaderName> GetCurrentRpNames()
         {
+            var result = new List<WFShaderName>();
             var rp = WFCommonUtility.GetCurrentRenderPipeline();
-            return WFShaderDictionary.ShaderNameList.Where(nm => nm.RenderPipeline == rp);
+
+            // ShaderNameList からRPが一致するものを列挙
+            result.AddRange(WFShaderDictionary.ShaderNameList.Where(nm => nm.RenderPipeline == rp));
+            // カスタムシェーダをAssetDatabaseから検索
+            result.AddRange(GetAdditionalShaderNames(rp, result));
+
+            return result;
         }
 
         public static WFShaderName TryFindFromName(string name)
@@ -1341,45 +1435,122 @@ namespace UnlitWF
 
         public static List<WFShaderName> GetVariantList(WFShaderName name)
         {
+            var first = new List<WFShaderName>();
             if (name == null)
             {
-                return new List<WFShaderName>();
+                return first;
             }
-            return GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.RenderType == name.RenderType).ToList();
-        }
 
-        public static List<WFShaderName> GetVariantList(WFShaderName name, out List<WFShaderName> other)
-        {
-            var result = GetVariantList(name);
-            var items = result.Select(p => p.Variant).ToList();
+            var second = new List<WFShaderName>();
+            var third = new List<WFShaderName>();
 
-            // 異なるVariantのShaderNameをotherに詰める
-            other = new List<WFShaderName>();
-            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly));
-            other.RemoveAll(a => items.Contains(a.Variant));
+            // Variant でグループ化して、RenderType の一致するものを first に、一致しないものを second に追加
+            foreach (var group in GetCurrentRpNames().Where(nm => nm.Familly == name.Familly).GroupBy(nm => nm.Variant))
+            {
+                if (!IsVariantCustomOrLegacy(group.Key))
+                {
+                    var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
+                    if (snm != null)
+                    {
+                        first.Add(snm);
+                    }
+                    else
+                    {
+                        second.Add(group.First());
+                    }
+                }
+                else
+                {
+                    var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
+                    if (snm != null)
+                    {
+                        third.Add(snm);
+                    }
+                    else
+                    {
+                        third.Add(group.First());
+                    }
+                }
+            }
 
-            return result;
+            // 結合
+            if (0 < first.Count && 0 < second.Count)
+            {
+                first.Add(null);
+            }
+            first.AddRange(second);
+            if (0 < first.Count && 0 < third.Count)
+            {
+                first.Add(null);
+            }
+            first.AddRange(third);
+
+            return first;
         }
 
         public static List<WFShaderName> GetRenderTypeList(WFShaderName name)
         {
+            var first = new List<WFShaderName>();
             if (name == null)
             {
-                return new List<WFShaderName>();
+                return first;
             }
-            return GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.Variant == name.Variant).ToList();
+
+            var second = new List<WFShaderName>();
+
+            // RenderType でグループ化して、Variant の一致するものを first に、一致しないものを second に追加
+            foreach (var group in GetCurrentRpNames().Where(nm => nm.Familly == name.Familly).GroupBy(nm => nm.RenderType))
+            {
+                var snm = group.Where(nm => nm.Variant == name.Variant).FirstOrDefault();
+                if (snm != null)
+                {
+                    first.Add(snm);
+                }
+                else
+                {
+                    // ただし一致しない場合では Custom と Legacy は無視する
+                    snm = group.Where(nm => !(IsVariantCustomOrLegacy(nm))).FirstOrDefault();
+                    if (snm != null)
+                    {
+                        second.Add(snm);
+                    }
+                }
+            }
+
+            if (0 < first.Count && 0 < second.Count)
+            {
+                first.Add(null);
+            }
+            first.AddRange(second);
+
+            return first;
         }
 
-        public static List<WFShaderName> GetRenderTypeList(WFShaderName name, out List<WFShaderName> other)
+        private static bool IsVariantCustomOrLegacy(WFShaderName nm)
         {
-            var result = GetRenderTypeList(name);
-            var items = result.Select(p => p.RenderType).ToList();
+            return nm != null && IsVariantCustomOrLegacy(nm.Variant);
+        }
 
-            // 異なるRenderTypeのShaderNameをotherに詰める
-            other = new List<WFShaderName>();
-            other.AddRange(GetCurrentRpNames().Where(nm => nm.Familly == name.Familly && nm.Variant != "Custom"));
-            other.RemoveAll(a => items.Contains(a.RenderType));
+        private static bool IsVariantCustomOrLegacy(string variant)
+        {
+            return variant != null && (variant.StartsWith("Custom/") || variant.StartsWith("Legacy/"));
+        }
 
+        public static WFVariantList CreateVariantList(WFShaderName current)
+        {
+            WFVariantList result = new WFVariantList(current);
+            {
+                result.familyList.AddRange(GetFamilyList());
+                result.idxFamily = Array.IndexOf(result.LabelFamilyList, current.Familly);
+            }
+            {
+                result.variantList.AddRange(GetVariantList(current));
+                result.idxVariant = Array.IndexOf(result.LabelVariantList, current.Variant);
+            }
+            {
+                result.renderTypeList.AddRange(GetRenderTypeList(current));
+                result.idxRenderType = Array.IndexOf(result.LabelRenderTypeList, current.RenderType);
+            }
             return result;
         }
     }

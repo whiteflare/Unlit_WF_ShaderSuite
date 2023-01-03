@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -44,8 +44,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
             _CRF_RefractiveIndex    ("[CRF] Refractive Index", Range(1.0, 3.0)) = 1.33
             _CRF_Distance           ("[CRF] Distance", Range(0, 10)) = 1.0
             _CRF_Tint               ("[CRF] Tint Color", Color) = (0.5, 0.5, 0.5)
-        [WF_FixFloat(1.0)]
-            _CRF_BlendNormal        ("[CRF] Blend Normal", Range(0, 1)) = 1.0
+            _CRF_BlendNormal        ("[CRF] Blend Normal", Range(0, 1)) = 0.1
 
         [WFHeaderToggle(Distance Fade)]
             _WAD_Enable             ("[WAD] Enable", Float) = 0
@@ -130,7 +129,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/12/17", Float) = 0
+            _CurrentVersion         ("2023/01/07", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/WF_Water_Surface_Transparent", Float) = 0
@@ -147,6 +146,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
 
             Cull [_CullMode]
             ZWrite [_AL_ZWrite]
+            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
