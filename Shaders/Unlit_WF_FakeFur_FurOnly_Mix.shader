@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *  Copyright 2021 ma1on.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
