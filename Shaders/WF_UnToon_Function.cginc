@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -1424,10 +1424,11 @@ FEATURE_TGL_ON_BEGIN(_CRF_Enable)
 
             float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
             grab_uv.xy /= grab_uv.w;
-            float3 back_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv).rgb * (_CRF_Tint.rgb * unity_ColorSpaceDouble.rgb);
+            float4 grab_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv.xy);
+            float3 back_color = grab_color.rgb * (_CRF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
-            color.rgb = lerp(back_color.rgb, color.rgb, color.a);
-            color.a = 1;
+            color.rgb = lerp(lerp(color.rgb, back_color.rgb, grab_color.a), color.rgb, color.a);
+            color.a = lerp(color.a, 1, grab_color.a);
 FEATURE_TGL_END
         }
 

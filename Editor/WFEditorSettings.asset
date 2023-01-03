@@ -21,3 +21,5 @@ MonoBehaviour:
   validateSceneMaterials: 1
   cleanupMaterialsBeforeAvatarBuild: 1
   enableScanProjects: 1
+  enableMigrationWhenImport: 1
+  autoSwitchQuestShader: 1

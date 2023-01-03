@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -169,27 +169,14 @@ namespace UnlitWF
             return result;
         }
 
-        public IEnumerable<Material> GetAllMaterials(Material[] mats, List<Material> result = null)
-        {
-            InitList(ref result);
-            foreach (var mat in mats)
-            {
-                if (mat != null)
-                {
-                    result.Add(mat);
-                }
-            }
-            return result;
-        }
-
         public IEnumerable<Material> GetAllMaterials(WFMaterialTemplate[] temps, List<Material> result = null)
         {
             InitList(ref result);
             foreach (var temp in temps)
             {
-                if (temp != null && temp.material != null)
+                if (temp != null)
                 {
-                    result.Add(temp.material);
+                    GetAllMaterials(temp.material, result);
                 }
             }
             return result;
@@ -256,6 +243,15 @@ namespace UnlitWF
                 }
             }
 
+            // Projector -> Material
+            foreach (var projector in go.GetComponentsInChildren<Projector>(true))
+            {
+                if (FilterHierarchy(projector))
+                {
+                    GetAllMaterials(projector, result);
+                }
+            }
+
 #if ENV_VRCSDK3_AVATAR
             // VRCAvatarDescriptor -> Controller -> AnimationClip -> Material
             foreach (var desc in go.GetComponentsInChildren<VRC.SDK3.Avatars.Components.VRCAvatarDescriptor>(true))
@@ -276,6 +272,15 @@ namespace UnlitWF
                 }
             }
 #endif
+#if ENV_VRCSDK3_WORLD
+            foreach (var desc in go.GetComponentsInChildren<VRC.SDK3.Components.VRCSceneDescriptor>(true))
+            {
+                if (FilterHierarchy(desc))
+                {
+                    GetAllMaterials(desc.DynamicMaterials, result);
+                }
+            }
+#endif
 
             return result;
         }
@@ -288,13 +293,22 @@ namespace UnlitWF
             {
                 return result;
             }
-            foreach (var mat in renderer.sharedMaterials)
+            GetAllMaterials(renderer.sharedMaterials, result);
+            if (renderer is ParticleSystemRenderer psr)
             {
-                if (mat != null)
-                {
-                    result.Add(mat);
-                }
+                GetAllMaterials(psr.trailMaterial, result);
             }
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(Projector projector, List<Material> result = null)
+        {
+            InitList(ref result);
+            if (projector == null)
+            {
+                return result;
+            }
+            GetAllMaterials(projector.material, result);
             return result;
         }
 
@@ -325,12 +339,30 @@ namespace UnlitWF
                 {
                     foreach (var keyFrame in AnimationUtility.GetObjectReferenceCurve(clip, binding))
                     {
-                        if (keyFrame.value is Material mat)
-                        {
-                            result.Add(mat);
-                        }
+                        GetAllMaterials(keyFrame.value as Material, result);
                     }
                 }
+            }
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(IEnumerable<Material> materials, List<Material> result)
+        {
+            InitList(ref result);
+            if (materials == null)
+            {
+                return result;
+            }
+            result.AddRange(materials.Where(mat => mat != null));
+            return result;
+        }
+
+        public IEnumerable<Material> GetAllMaterials(Material mat, List<Material> result)
+        {
+            InitList(ref result);
+            if (mat != null)
+            {
+                result.Add(mat);
             }
             return result;
         }

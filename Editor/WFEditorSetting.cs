@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -84,6 +84,13 @@ namespace UnlitWF
         [Tooltip("materialインポート時にマイグレーションする")]
         public bool enableMigrationWhenImport = true;
 
+        /// <summary>
+        /// Quest向けシーンビルド時にMobile非対応シェーダを対応シェーダに置換する
+        /// </summary>
+        [Header("Quest Build Support")]
+        [Tooltip("Quest向けシーンビルド時にMobile非対応シェーダを対応シェーダに置換する")]
+        public bool autoSwitchQuestShader = true;
+
         public static WFEditorSetting GetOneOfSettings()
         {
             var settings = LoadAllSettingsFromAssetDatabase();
@@ -128,6 +135,7 @@ namespace UnlitWF
         SerializedProperty p_enableScanProjects;
         SerializedProperty p_cleanupMaterialsBeforeAvatarBuild;
         SerializedProperty p_enableMigrationWhenImport;
+        SerializedProperty p_autoSwitchQuestShader;
 
         private void OnEnable()
         {
@@ -146,6 +154,9 @@ namespace UnlitWF
             // Editor Behaviour Settings
             this.p_enableScanProjects = serializedObject.FindProperty(nameof(WFEditorSetting.enableScanProjects));
             this.p_enableMigrationWhenImport = serializedObject.FindProperty(nameof(WFEditorSetting.enableMigrationWhenImport));
+
+            // Quest Build Support
+            this.p_autoSwitchQuestShader = serializedObject.FindProperty(nameof(WFEditorSetting.autoSwitchQuestShader));
         }
 
         public override void OnInspectorGUI()
@@ -175,6 +186,10 @@ namespace UnlitWF
 
             EditorGUILayout.PropertyField(p_enableScanProjects);
             EditorGUILayout.PropertyField(p_enableMigrationWhenImport);
+
+            // Quest Build Support
+
+            EditorGUILayout.PropertyField(p_autoSwitchQuestShader);
 
             if (EditorGUI.EndChangeCheck())
             {

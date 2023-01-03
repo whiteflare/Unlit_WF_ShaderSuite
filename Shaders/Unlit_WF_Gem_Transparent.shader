@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -73,6 +73,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
+        [Enum(OFF,0,ON,1)]
+            _AL_ZWriteBack          ("[AL] ZWrite (Back)", int) = 0
 
         // 法線マップ
         [WFHeaderToggle(NormalMap)]
@@ -105,7 +107,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2022/12/17", Float) = 0
+            _CurrentVersion         ("2023/01/07", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -126,7 +128,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_GMB_BackCulllMode]
-            ZWrite [_AL_ZWrite]
+            ZWrite [_AL_ZWriteBack]
             Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
