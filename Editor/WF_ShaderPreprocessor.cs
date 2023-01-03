@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2022 whiteflare.
+ *  Copyright 2018-2023 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -38,32 +38,72 @@ using UnityEditor.Build;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
-#if ENV_VRCSDK3
-using VRC.SDKBase.Editor.BuildPipeline;
-#endif
+using UnityEngine.SceneManagement;
 
 namespace UnlitWF
 {
 #if UNITY_2019_1_OR_NEWER
 
     public class WF_ShaderPreprocessor : IPreprocessShaders
-#if ENV_VRCSDK3_AVATAR
-        , IVRCSDKPreprocessAvatarCallback
-#endif
-#if ENV_VRCSDK3_WORLD
-        , IVRCSDKBuildRequestedCallback
-#endif
     {
-        private static readonly Singleton Core = new Singleton();
-
-        public int callbackOrder
+#if ENV_VRCSDK3_AVATAR
+        public class WF_PreprocessorForVRCSDK3Avatar : VRC.SDKBase.Editor.BuildPipeline.IVRCSDKPreprocessAvatarCallback
         {
-            get
+            public int callbackOrder => 100;
+
+            public bool OnPreprocessAvatar(GameObject avatarGameObject)
             {
-                Core.ClearUsedShaderVariantListIfOtherPlatform(); // 他プラットフォームの場合はここでクリアする
-                return 100;
+                // VRCSDK3 Avatars からビルドリクエストされた場合は先にクリンナップ処理を動かす。
+                CleanupMaterialsBeforeAvatarBuild(avatarGameObject);
+
+                // avatarGameObject からマテリアルを回収
+                Core.InitUsedShaderVariantListForVRCSDK3Avatar(avatarGameObject);
+
+                return true;
+            }
+
+            private void CleanupMaterialsBeforeAvatarBuild(GameObject avatarGameObject)
+            {
+                if (WFEditorSetting.GetOneOfSettings().cleanupMaterialsBeforeAvatarBuild)
+                {
+                    var param = CleanUpParameter.Create();
+                    param.materials = new MaterialSeeker().GetAllMaterials(avatarGameObject).Distinct()
+                        // 古いプロパティを含んでいるマテリアルはクリンナップしない
+                        .Where(mat => !Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat))
+                        .ToArray();
+                    param.execNonWFMaterials = false; // ビルド時は NonWF マテリアルのクリンナップを行わない
+                    if (WFMaterialEditUtility.CleanUpProperties(param))
+                    {
+                        AssetDatabase.SaveAssets(); // 未保存のマテリアルを保存
+                    }
+                }
             }
         }
+#elif ENV_VRCSDK3_WORLD
+        public class WF_PreprocessorForVRCSDK3World : IProcessSceneWithReport
+        {
+            public int callbackOrder => 100;
+
+            public void OnProcessScene(Scene scene, UnityEditor.Build.Reporting.BuildReport report)
+            {
+                Core.InitUsedShaderVariantListForVRCSDK3World(scene);
+            }
+        }
+#else
+        public class WF_PreprocessorForOther : IPreprocessShaders
+        {
+            public int callbackOrder => 100;
+
+            public void OnProcessShader(Shader shader, ShaderSnippetData snippet, IList<ShaderCompilerData> data)
+            {
+                Core.ClearUsedShaderVariantListIfOtherPlatform(); // 他プラットフォームの場合はここでクリアする
+                return true;
+            }
+        }
+#endif
+
+        private static readonly Singleton Core = new Singleton();
+        private readonly WFEditorSetting settings = WFEditorSetting.GetOneOfSettings();
 
         public enum WFBuildPlatformType
         {
@@ -72,55 +112,7 @@ namespace UnlitWF
             OtherEnvs,
         }
 
-#if ENV_VRCSDK3_AVATAR
-        bool IVRCSDKPreprocessAvatarCallback.OnPreprocessAvatar(GameObject avatarGameObject)
-        {
-            // VRCSDK3 Avatars からビルドリクエストされた場合は先にクリンナップ処理を動かす。
-            CleanupMaterialsBeforeAvatarBuild(avatarGameObject);
-
-            // avatarGameObject からマテリアルを回収
-            Core.InitUsedShaderVariantList(WFBuildPlatformType.VRCSDK3_Avatar, avatarGameObject);
-
-            return true;
-        }
-
-        private void CleanupMaterialsBeforeAvatarBuild(GameObject avatarGameObject)
-        {
-            if (settings.cleanupMaterialsBeforeAvatarBuild)
-            {
-                var param = CleanUpParameter.Create();
-                param.materials = new MaterialSeeker().GetAllMaterials(avatarGameObject).Distinct()
-                    // 古いプロパティを含んでいるマテリアルはクリンナップしない
-                    .Where(mat => !Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat))
-                    .ToArray();
-                param.execNonWFMaterials = false; // ビルド時は NonWF マテリアルのクリンナップを行わない
-                if (WFMaterialEditUtility.CleanUpProperties(param))
-                {
-                    AssetDatabase.SaveAssets(); // 未保存のマテリアルを保存
-                }
-            }
-        }
-#endif
-#if ENV_VRCSDK3_WORLD
-        bool IVRCSDKBuildRequestedCallback.OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
-        {
-            // VRCSDK3 からビルドリクエストされた場合はここでクリア＆初期化する
-            switch (requestedBuildType)
-            {
-                case VRCSDKRequestedBuildType.Avatar:
-                    Core.InitUsedShaderVariantList(WFBuildPlatformType.VRCSDK3_Avatar);
-                    break;
-                case VRCSDKRequestedBuildType.Scene:
-                    Core.InitUsedShaderVariantList(WFBuildPlatformType.VRCSDK3_World);
-                    break;
-            }
-            return true;
-        }
-#endif
-
-        private readonly WFEditorSetting settings = WFEditorSetting.GetOneOfSettings();
-
-
+        public int callbackOrder => 101;
 
         public void OnProcessShader(Shader shader, ShaderSnippetData snippet, IList<ShaderCompilerData> data)
         {
@@ -128,7 +120,7 @@ namespace UnlitWF
             if (IsStripTargetShader(shader))
             {
                 // 設定はここで読み込む
-                Core.InitUsedShaderVariantList();
+                Core.InitUsedShaderVariantListForOtherPlatform();
 
                 if (settings == null || !settings.enableStripping)
                 {
@@ -364,7 +356,22 @@ namespace UnlitWF
                 }
             }
 
-            public void InitUsedShaderVariantList(WFBuildPlatformType? currentPlatform = null, GameObject rootObject = null)
+            public void InitUsedShaderVariantListForVRCSDK3Avatar(GameObject avatar)
+            {
+                InitUsedShaderVariantList(WFBuildPlatformType.VRCSDK3_Avatar, avatar, null);
+            }
+
+            public void InitUsedShaderVariantListForVRCSDK3World(Scene scene)
+            {
+                InitUsedShaderVariantList(WFBuildPlatformType.VRCSDK3_World, null, scene);
+            }
+
+            public void InitUsedShaderVariantListForOtherPlatform()
+            {
+                InitUsedShaderVariantList(null, null, null);
+            }
+
+            private void InitUsedShaderVariantList(WFBuildPlatformType? currentPlatform, GameObject rootObject, Scene? scene)
             {
                 lock (lockToken)
                 {
@@ -381,21 +388,40 @@ namespace UnlitWF
                     }
 
                     // 作成する
-                    usedShaderVariantList = new UsedShaderVariantSeeker().CreateUsedShaderVariantList(out materialCount, rootObject);
+                    usedShaderVariantList = new UsedShaderVariantSeeker().CreateUsedShaderVariantList(out materialCount, rootObject, scene);
                     // その他の変数も一緒に初期化
-                    existLodGroupInScene = ExistsLodGroupInScene();
+                    existLodGroupInScene = ExistsLodGroupInScene(scene);
 #if WF_STRIP_LOG_SCAN_RESULT
                     Debug.LogFormat("[WF][Preprocess] InitUsedShaderVariantList, this = {0}, currentPlatform = {1}", base.GetHashCode(), this.currentPlatform);
 #endif
                 }
             }
 
-            private bool ExistsLodGroupInScene()
+            private bool ExistsLodGroupInScene(Scene? scene)
             {
-                for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCount; i++)
+                if (scene != null)
                 {
-                    var scene = UnityEditor.SceneManagement.EditorSceneManager.GetSceneAt(i);
-                    if (scene.GetRootGameObjects().SelectMany(rt => rt.GetComponentsInChildren<LODGroup>(true)).Any(lod => lod != null))
+                    return ExistsLodGroupInScene((Scene)scene);
+                }
+                else
+                {
+                    for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCount; i++)
+                    {
+                        if (ExistsLodGroupInScene(UnityEditor.SceneManagement.EditorSceneManager.GetSceneAt(i)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            private bool ExistsLodGroupInScene(Scene scene)
+            {
+                if (scene != null)
+                {
+                    var sc = (Scene)scene;
+                    if (sc.GetRootGameObjects().SelectMany(rt => rt.GetComponentsInChildren<LODGroup>(true)).Any(lod => lod != null))
                     {
                         return true;
                     }
@@ -403,13 +429,12 @@ namespace UnlitWF
                 return false;
             }
         }
-
-        public class UsedShaderVariantSeeker
+            public class UsedShaderVariantSeeker
         {
             private WFEditorSetting settings = WFEditorSetting.GetOneOfSettings(); // Assets 内に WF_EditorSetting があるならば読み込み
             private List<UsedShaderVariant> usedShaderVariantList = new List<UsedShaderVariant>();
 
-            public List<UsedShaderVariant> CreateUsedShaderVariantList(out int materialCount, GameObject rootObject = null)
+            public List<UsedShaderVariant> CreateUsedShaderVariantList(out int materialCount, GameObject rootObject = null, Scene? scene = null)
             {
                 var materials = new List<Material>();
 
@@ -418,21 +443,17 @@ namespace UnlitWF
 
                 // シーンから UsedShaderVariant を回収
                 var materialSeeker = new MaterialSeeker();
-#if ENV_VRCSDK3_AVATAR
-                if (Core.CurrentPlatform == WFBuildPlatformType.VRCSDK3_Avatar)
+                if (rootObject != null)
                 {
-                    // もしSDK3Avatarからのリクエストならば、非アクティブのAvatarDescriptorを親に持つGameObjectは無視するようにする
-                    materialSeeker.FilterHierarchy = cmp =>
-                        !(cmp.GetComponentsInParent<VRC.SDK3.Avatars.Components.VRCAvatarDescriptor>(true).Any(d => !d.isActiveAndEnabled));
+                    materials.AddRange(materialSeeker.GetAllMaterials(rootObject));
                 }
-#endif
-                if (rootObject == null)
+                else if (scene != null)
                 {
-                    materials.AddRange(materialSeeker.GetAllSceneAllMaterial());
+                    materials.AddRange(materialSeeker.GetAllMaterials((Scene)scene));
                 }
                 else
                 {
-                    materials.AddRange(materialSeeker.GetAllMaterials(rootObject));
+                    materials.AddRange(materialSeeker.GetAllSceneAllMaterial());
                 }
                 materials = materials.Distinct()
                     .Where(mat => mat != null && IsStripTargetShader(mat.shader))
@@ -463,7 +484,8 @@ namespace UnlitWF
 #endif
 
                 Debug.LogFormat("[WF][Preprocess] finish material scan from {3}: {0} ms, {1} materials, {2} usedShaderVariantList",
-                    sw.ElapsedMilliseconds, materialCount, result.Count, rootObject == null ? "Scene" : "" + rootObject);
+                    sw.ElapsedMilliseconds, materialCount, result.Count,
+                    rootObject != null ? "Avatar[" + rootObject.name + "]" : scene != null ? "Scene[" + ((Scene)scene).name + "]" : "All Scene");
 
                 return result;
             }
@@ -513,7 +535,7 @@ namespace UnlitWF
                 {
                     Debug.LogWarningFormat(mat, "[WF][Preprocess] {0}, mat = {1}", WFI18N.Translate(WFMessageText.LgWarnOlderVersion), mat);
                 }
-                if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android && !WFCommonUtility.IsMobileSupportedShader(mat))
+                if (WFCommonUtility.IsQuestPlatform() && !WFCommonUtility.IsMobileSupportedShader(mat))
                 {
                     Debug.LogWarningFormat(mat, "[WF][Preprocess] {0}, mat = {1}", WFI18N.Translate(WFMessageText.LgWarnNotSupportAndroid), mat);
                 }
