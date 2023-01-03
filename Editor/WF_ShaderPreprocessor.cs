@@ -97,7 +97,6 @@ namespace UnlitWF
             public void OnProcessShader(Shader shader, ShaderSnippetData snippet, IList<ShaderCompilerData> data)
             {
                 Core.ClearUsedShaderVariantListIfOtherPlatform(); // 他プラットフォームの場合はここでクリアする
-                return true;
             }
         }
 #endif
