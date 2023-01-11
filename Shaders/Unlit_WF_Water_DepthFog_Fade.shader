@@ -58,7 +58,7 @@ Shader "UnlitWF/WF_Water_DepthFog_Fade" {
             #pragma multi_compile_instancing
             // #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP // ライトマップは使わない
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #define _WF_WATER_DEPTHFOG
             #include "WF_Water.cginc"

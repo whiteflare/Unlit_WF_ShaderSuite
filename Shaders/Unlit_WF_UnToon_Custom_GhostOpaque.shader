@@ -408,7 +408,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostOpaque" {
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #include "WF_UnToon.cginc"
 
