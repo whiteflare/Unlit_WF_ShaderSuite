@@ -350,6 +350,33 @@ FEATURE_TGL_END
     #endif
 
     ////////////////////////////
+    // VRC Mirror Reflection
+    ////////////////////////////
+
+    #ifdef _WMI_ENABLE
+
+        sampler2D _ReflectionTex0;
+        sampler2D _ReflectionTex1;
+        float4 _WMI_Color;
+        float  _WMI_Power;
+        float  _WMI_BlendNormal;
+
+        void affectVRCMirrorReflection(IN_FRAG i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+FEATURE_TGL_ON_BEGIN(_WMI_Enable)
+            if (facing) {
+                float4 mirror_scr_pos = mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz + (ws_bump_normal - ws_normal * dot(ws_normal, ws_bump_normal)) * _WMI_BlendNormal, 1));
+                float4 refl_pos = ComputeNonStereoScreenPos(mirror_scr_pos);
+                float4 refl = unity_StereoEyeIndex == 0 ? tex2Dproj(_ReflectionTex0, UNITY_PROJ_COORD(refl_pos)) : tex2Dproj(_ReflectionTex1, UNITY_PROJ_COORD(refl_pos));
+                refl.rgb *= _WMI_Color.rgb * unity_ColorSpaceDouble.rgb;
+                color.rgb = lerp(color.rgb, refl.rgb, _WMI_Power * refl.a);
+            }
+FEATURE_TGL_END
+        }
+    #else
+        #define affectVRCMirrorReflection(i, facing, ws_normal, ws_bump_normal, color)
+    #endif
+
+    ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
 
@@ -391,6 +418,9 @@ FEATURE_TGL_END
 
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * lerp(_Color2, _Color, height);
+
+        // VRC Mirror Reflection
+        affectVRCMirrorReflection(i, facing, i.ws_normal, ws_bump_normal, color);
 
         // 距離フェード
         affectWaterDistanceFade(i, color);

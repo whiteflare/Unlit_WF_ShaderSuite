@@ -1710,7 +1710,23 @@ namespace UnlitWF
         }
     }
 
-#endregion
+    /// <summary>
+    /// 常に非表示のMaterialPropertyDrawer
+    /// </summary>
+    internal class MaterialWF_HidePropDrawer : MaterialPropertyDrawer
+    {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
+            return 0;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+        }
+    }
+
+
+    #endregion
 
 }
 
