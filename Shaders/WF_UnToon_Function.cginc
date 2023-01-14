@@ -1274,14 +1274,14 @@ FEATURE_TGL_END
     // Ambient Occlusion
     ////////////////////////////
 
-    #ifdef _LMAP_SUBTRACTIVE
+    #ifndef SHADOWS_SHADOWMASK
         #define _AO_PICK_LMAP(uv_lmap)      pickLightmap(uv_lmap)
         #define _AO_PICK_LMAP_LOD(uv_lmap)  pickLightmapLod(uv_lmap)
-        #define _AO_LMAP_BASE_COLOR         ONE_VEC3
     #else
         #define _AO_PICK_LMAP(uv_lmap)      (pickLightmap(uv_lmap) + ONE_VEC3)
         #define _AO_PICK_LMAP_LOD(uv_lmap)  (pickLightmapLod(uv_lmap) + ONE_VEC3)
-        #define _AO_LMAP_BASE_COLOR         ZERO_VEC3
+        // SHADOWS_SHADOWMASK が有るときは、ライトマップに直接光はベイクされていないので白色を加算する
+        // BakedIndirect もここを通したかったが MixedLight 無しの場合と区別できなかったので妥協
     #endif
 
     #ifdef _AO_ENABLE
@@ -1318,12 +1318,12 @@ FEATURE_TGL_END
         #ifdef _LMAP_ENABLE
             #ifdef _AO_ENABLE
                 #ifdef _WF_AO_ONLY_LMAP
-                    return _AO_LMAP_BASE_COLOR;    // Lightmap が使えてAOが有効、かつONLYのときはAO側で色を合成するので白を返す
+                    return ONE_VEC3;    // Lightmap が使えてAOが有効、かつONLYのときはAO側で色を合成するので白を返す
                 #else
                     #ifndef _WF_LEGACY_FEATURE_SWITCH
-                        return TGL_ON(_AO_UseLightMap) ? _AO_LMAP_BASE_COLOR : _AO_PICK_LMAP_LOD(uv_lmap);
+                        return TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : _AO_PICK_LMAP_LOD(uv_lmap);
                     #else
-                        return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? _AO_LMAP_BASE_COLOR : _AO_PICK_LMAP_LOD(uv_lmap);
+                        return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : _AO_PICK_LMAP_LOD(uv_lmap);
                     #endif
                 #endif
             #else

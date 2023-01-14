@@ -72,18 +72,6 @@
 
     #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
         #define _LMAP_ENABLE
-
-        // ShadowMask mode          = LIGHTMAP_ON + SHADOWS_SHADOWMASK + LIGHTMAP_SHADOW_MIXING
-        // Distance shadowmask mode = LIGHTMAP_ON + SHADOWS_SHADOWMASK
-        // Subtractive mode         = LIGHTMAP_ON + LIGHTMAP_SHADOW_MIXING
-        // Pure realtime direct lit = LIGHTMAP_ON
-        #if defined(SHADOWS_SHADOWMASK)
-            #define _LMAP_SHADOWMASK
-        #elif defined(LIGHTMAP_SHADOW_MIXING)
-            #define _LMAP_SUBTRACTIVE
-        #else
-            #define _LMAP_BAKEDIND
-        #endif
     #endif
 
     #ifdef _WF_LEGACY_FEATURE_SWITCH
