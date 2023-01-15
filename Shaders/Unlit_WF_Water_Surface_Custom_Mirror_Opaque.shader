@@ -90,6 +90,17 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_Opaque" {
             _WAS_Color2             ("[WAS] Specular 2 Color", Color) = (0.7, 0.7, 1, 1)
             _WAS_Smooth2            ("[WAS] Specular 2 Smoothness", Range(0, 1)) = 0.7
 
+        [WFHeaderToggle(Reflection)]
+            _WAM_Enable             ("[WAM] Enable", Float) = 0
+            _WAM_Power              ("[WAM] Power", Range(0, 1)) = 0.5
+            _WAM_Smooth             ("[WAM] Smoothness", Range(0, 1)) = 0.9
+            _WAM_Bright             ("[WAM] Brightness", Range(0, 1)) = 0.2
+        [Enum(REFLECTION_PROBE,0,CUSTOM,2)]
+            _WAM_CubemapType        ("[WAM] 2nd CubeMap Blend", Float) = 0
+        [NoScaleOffset]
+            _WAM_Cubemap            ("[WAM] Cube Map", Cube) = "" {}
+            _WAM_CubemapHighCut     ("[WAM] Hi-Cut Filter", Range(0, 1)) = 0
+
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
         [WF_FixUIToggle(1.0)]
@@ -138,6 +149,7 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_Opaque" {
             #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _WAD_ENABLE
+            #pragma shader_feature_local _WAM_ENABLE
             #pragma shader_feature_local _WAS_ENABLE
             #pragma shader_feature_local _WAV_ENABLE_1
             #pragma shader_feature_local _WAV_ENABLE_2
