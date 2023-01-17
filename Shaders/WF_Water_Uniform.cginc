@@ -52,6 +52,7 @@
     float4          _Color;
     float4          _Color2;
     float           _ShadowPower;
+    float           _Cutoff;
 
     float           _WaterLevel;
     float           _WaterTransparency;

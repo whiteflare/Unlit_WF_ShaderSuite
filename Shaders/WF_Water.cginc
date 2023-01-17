@@ -427,6 +427,13 @@ FEATURE_TGL_END
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
 
+        #ifdef _WF_WATER_CUTOUT
+            if (color.a < _Cutoff) {
+                discard;
+                return half4(color.rgb, 0);
+            }
+        #endif
+
         // リフレクション
         affectWaterSurfaceReflection(i, ws_bump_normal, color);
         // スペキュラ

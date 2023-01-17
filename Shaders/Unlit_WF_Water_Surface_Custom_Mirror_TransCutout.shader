@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_Water_Surface_Transparent" {
+Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_TransCutout" {
 
     Properties {
         [WFHeader(Base)]
@@ -34,11 +34,17 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.05
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
+        [WF_FixFloat(0.0)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
+
+        [WFHeaderAlwaysOn(VRC Mirror Reflection)]
+            _WMI_Enable             ("[WMI] Enable", Float) = 1
+            _WMI_Power              ("[WMI] Power", Range(0, 1)) = 0.8
+            _WMI_Color              ("[WMI] Tint Color", Color) = (0.5, 0.5, 0.5, 1)
+            _WMI_BlendNormal        ("[WMI] Blend Normal", Range(0, 1)) = 0.05
+        [HideInInspector][WF_HideProp] _ReflectionTex0("", 2D) = "white" {}
+        [HideInInspector][WF_HideProp] _ReflectionTex1("", 2D) = "white" {}
 
         [WFHeaderToggle(Distance Fade)]
             _WAD_Enable             ("[WAD] Enable", Float) = 0
@@ -127,18 +133,19 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _Category               ("BRP|Water|Custom/Surface_VRCMirror|TransCutout", Float) = 0
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-50" }
+        Tags { "RenderType"="TransparentCutout" "Queue"="AlphaTest-10" }
 
         Pass {
             Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -147,9 +154,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUTOUT
             #define _WF_AO_ONLY_LMAP
-            #define _WF_WATER_CUTOUT
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE
@@ -160,6 +166,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             #pragma shader_feature_local _WAV_ENABLE_1
             #pragma shader_feature_local _WAV_ENABLE_2
             #pragma shader_feature_local _WAV_ENABLE_3
+            #pragma shader_feature_local _WMI_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -177,7 +184,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
         UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

@@ -35,6 +35,7 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_Transparent" {
         [Toggle(_)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.05
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
@@ -159,6 +160,7 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_AO_ONLY_LMAP
+            #define _WF_WATER_CUTOUT
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE

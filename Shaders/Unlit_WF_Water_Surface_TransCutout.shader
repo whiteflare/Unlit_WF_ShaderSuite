@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_Water_Surface_Transparent" {
+Shader "UnlitWF/WF_Water_Surface_TransCutout" {
 
     Properties {
         [WFHeader(Base)]
@@ -34,11 +34,9 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [Toggle(_)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-            _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.05
-            _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
-        [Enum(OFF,0,ON,1)]
-            _AL_ZWrite              ("[AL] ZWrite", int) = 0
+        [WF_FixFloat(0.0)]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         [WFHeaderToggle(Distance Fade)]
             _WAD_Enable             ("[WAD] Enable", Float) = 0
@@ -130,15 +128,13 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-50" }
+        Tags { "RenderType"="TransparentCutout" "Queue"="AlphaTest-10" }
 
         Pass {
             Name "MAIN"
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
-            ZWrite [_AL_ZWrite]
-            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -147,9 +143,8 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_FRESNEL
+            #define _WF_ALPHA_CUTOUT
             #define _WF_AO_ONLY_LMAP
-            #define _WF_WATER_CUTOUT
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE
@@ -177,7 +172,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
         UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }
