@@ -67,6 +67,7 @@ Material:
     - _AO_UseLightMap: 1
     - _CullMode: 2
     - _CurrentVersion: 0
+    - _Cutoff: 0.05
     - _GL_CustomAltitude: 59.999996
     - _GL_CustomAzimuth: 140
     - _GL_LightMode: 3

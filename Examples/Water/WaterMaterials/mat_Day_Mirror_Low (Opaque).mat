@@ -7,24 +7,28 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: mat_Day_Pool (Transparent)
-  m_Shader: {fileID: 4800000, guid: a3641cf3b665bec468ac868660864d64, type: 3}
-  m_ShaderKeywords: _AO_ENABLE _GL_AUTO_ENABLE _WAD_ENABLE _WAM_ENABLE _WAM_ONLY2ND_ENABLE
-    _WAS_ENABLE _WAV_ENABLE_1 _WAV_ENABLE_2 _WAV_ENABLE_3
+  m_Name: mat_Day_Mirror_Low (Opaque)
+  m_Shader: {fileID: 4800000, guid: ffa6a9ecd57d50a4db625f7ed4fabeeb, type: 3}
+  m_ShaderKeywords: _GL_AUTO_ENABLE _WAD_ENABLE _WAM_ENABLE _WAM_ONLY2ND_ENABLE _WAS_ENABLE
+    _WAV_ENABLE_1 _WAV_ENABLE_2 _WAV_ENABLE_3 _WMI_ENABLE
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 1
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _AL_MaskTex:
+    - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MainTex:
+    - _ReflectionTex0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ReflectionTex1:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -57,18 +61,9 @@ Material:
         m_Scale: {x: 0.125, y: 0.125}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AL_Fresnel: 0.8
-    - _AL_InvMaskVal: 0
-    - _AL_Power: 0.6
-    - _AL_Source: 0
-    - _AL_ZWrite: 0
-    - _AO_Brightness: 0
-    - _AO_Contrast: 0.5
-    - _AO_Enable: 1
-    - _AO_UseLightMap: 1
+    - _Category: 0
     - _CullMode: 0
     - _CurrentVersion: 0
-    - _Cutoff: 0.05
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
     - _GL_LightMode: 0
@@ -101,6 +96,9 @@ Material:
     - _WAV_UVType_1: 2
     - _WAV_UVType_2: 2
     - _WAV_UVType_3: 2
+    - _WMI_BlendNormal: 0.05
+    - _WMI_Enable: 1
+    - _WMI_Power: 0.8
     m_Colors:
     - _Color: {r: 0.575, g: 0.8752442, b: 1, a: 1}
     - _Color2: {r: 0.227, g: 0.46689683, b: 1, a: 1}
@@ -111,3 +109,4 @@ Material:
     - _WAV_Direction_1: {r: 0, g: 0, b: 1, a: 0}
     - _WAV_Direction_2: {r: 120, g: 0.866, b: -0.5, a: 0}
     - _WAV_Direction_3: {r: 240, g: -0.866, b: -0.5, a: 0}
+    - _WMI_Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}

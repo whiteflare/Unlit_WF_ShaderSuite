@@ -72,6 +72,7 @@ Material:
     - _CRF_RefractiveIndex: 1.33
     - _CullMode: 0
     - _CurrentVersion: 0
+    - _Cutoff: 0.05
     - _FallBack: 0
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
