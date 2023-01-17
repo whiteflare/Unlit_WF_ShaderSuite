@@ -112,13 +112,6 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_TransCutout" {
             _WAM_Cubemap            ("[WAM] Cube Map", Cube) = "" {}
             _WAM_CubemapHighCut     ("[WAM] Hi-Cut Filter", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Ambient Occlusion)]
-            _AO_Enable              ("[AO] Enable", Float) = 0
-        [WF_FixUIToggle(1.0)]
-            _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
-            _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
-            _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
-
         [WFHeader(Lit Advance)]
         [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLD_DIR,3,CUSTOM_LOCAL_DIR,4,CUSTOM_WORLD_POS,5)]
             _GL_LightMode           ("Sun Source", Float) = 0
@@ -155,11 +148,9 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_TransCutout" {
             #pragma target 3.0
 
             #define _WF_ALPHA_CUTOUT
-            #define _WF_AO_ONLY_LMAP
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE
-            #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _WAD_ENABLE
             #pragma shader_feature_local _WAM_ENABLE
             #pragma shader_feature_local _WAS_ENABLE
