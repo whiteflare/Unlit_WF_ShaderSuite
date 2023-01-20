@@ -270,7 +270,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [Toggle(_)]
             _OVL_VertColToDecal     ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
-        [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
+        [WF_Enum(UnlitWF.BlendModeOVL)]
             _OVL_BlendType          ("[OVL] Blend Type", Float) = 0
             _OVL_Power              ("[OVL] Blend Power", Range(0, 1)) = 1
             _OVL_CustomParam1       ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
