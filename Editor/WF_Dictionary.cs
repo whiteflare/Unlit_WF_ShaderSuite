@@ -615,6 +615,15 @@ namespace UnlitWF
             new WFI18NTranslation("Paste (without Textures)", "貼り付け (Texture除く)"),
             new WFI18NTranslation("Reset", "リセット"),
 
+            // 列挙体
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.ALPHA", "アルファ合成"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.MUL", "乗算"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.ADD_AND_SUB", "加算・減算"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.SCREEN", "スクリーン"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.OVERLAY", "オーバーレイ"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.HARD_LIGHT", "ハードライト"),
+
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
             new WFI18NTranslation(WFMessageText.PlzMigration, "このマテリアルは古いバージョンで作成されたようです。\n最新版に変換しますか？"),

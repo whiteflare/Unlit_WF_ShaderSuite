@@ -793,6 +793,8 @@ namespace UnlitWF
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
         public static Rect DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null)
         {
+            var content = new GUIContent(text);
+
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             SetStyleFont(style, EditorStyles.boldLabel.font, s => s + 2, FontStyle.Bold);
@@ -801,12 +803,11 @@ namespace UnlitWF
             // Draw
             position.y += 8;
             position = EditorGUI.IndentedRect(position);
-            GUI.Box(position, text, style);
+            GUI.Box(position, content, style);
 
             // ヘルプテキスト
-            var helpText = WFI18N.Translate(text);
-            if (!string.IsNullOrWhiteSpace(helpText) && helpText != text) {
-                var titleSize = style.CalcSize(new GUIContent(text));
+            if (WFI18N.TryTranslate(text, out var helpText)) {
+                var titleSize = style.CalcSize(content);
                 var rect = new Rect(position.x + titleSize.x + 24, position.y, position.width - titleSize.x - 24, 16f);
                 var style2 = new GUIStyle(EditorStyles.label);
                 SetStyleFont(style2, null, s => style.fontSize - 1, FontStyle.Normal);
@@ -1725,9 +1726,97 @@ namespace UnlitWF
         }
     }
 
+    internal class MaterialWF_EnumDrawer : MaterialPropertyDrawer
+    {
+        private readonly string enumName;
+        private readonly string[] names;
+        private readonly int[] values;
+
+        public MaterialWF_EnumDrawer(string enumName)
+        {
+            this.enumName = enumName;
+            var loadedTypes = TypeCache.GetTypesDerivedFrom(typeof(Enum));
+            try
+            {
+                var enumType = loadedTypes.FirstOrDefault(x => x.Name == enumName || x.FullName == enumName);
+                var enumNames = Enum.GetNames(enumType);
+                this.names = new string[enumNames.Length];
+                for (int i = 0; i < enumNames.Length; ++i)
+                {
+                    this.names[i] = enumNames[i];
+                }
+                var enumVals = Enum.GetValues(enumType);
+                values = new int[enumVals.Length];
+                for (var i = 0; i < enumVals.Length; ++i)
+                {
+                    values[i] = (int)enumVals.GetValue(i);
+                }
+            }
+            catch (Exception)
+            {
+                Debug.LogWarningFormat("Failed to create MaterialEnum, enum {0} not found", enumName);
+                throw;
+            }
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+
+            var value = (int)prop.floatValue;
+            int selectedIndex = -1;
+            for (var index = 0; index < values.Length; index++)
+            {
+                var i = values[index];
+                if (i == value)
+                {
+                    selectedIndex = index;
+                    break;
+                }
+            }
+
+            var names = Translate(this.names);
+            var selIndex = EditorGUI.Popup(position, label, selectedIndex, names);
+
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck())
+            {
+                prop.floatValue = (float)values[selIndex];
+            }
+        }
+
+        private GUIContent[] Translate(string[] names)
+        {
+            var result = new GUIContent[names.Length];
+            for(int i = 0; i < result.Length; i++)
+            {
+                var key = enumName + "." + names[i];
+                if (WFI18N.TryTranslate(key, out var after))
+                {
+                    result[i] = new GUIContent(after);
+                }
+                else
+                {
+                    result[i] = new GUIContent(names[i]);
+                }
+            }
+            return result;
+        }
+    }
 
     #endregion
 
+    public enum BlendModeOVL
+    {
+        ALPHA = 0,
+        ADD = 1,
+        MUL = 2,
+        ADD_AND_SUB = 3,
+        SCREEN = 4, 
+        OVERLAY = 5,
+        HARD_LIGHT = 6
+    }
 }
 
 #endif
