@@ -359,7 +359,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLD_DIR,3,CUSTOM_LOCAL_DIR,4,CUSTOM_WORLD_POS,5)]
+        [WF_Enum(UnlitWF.SunSourceMode)]
             _GL_LightMode           ("Sun Source", Float) = 0
             _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45

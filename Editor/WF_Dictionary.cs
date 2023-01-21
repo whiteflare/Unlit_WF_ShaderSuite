@@ -632,6 +632,12 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.BlendModeTR.ADD", "加算"),
             new WFI18NTranslation("UnlitWF.BlendModeTR.ALPHA", "アルファ合成"),
             new WFI18NTranslation("UnlitWF.BlendModeTR.ADD_AND_SUB", "加算・減算"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.AUTO", "自動"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_DIRECTIONAL_LIT", "DirectionalLightのみ"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_POINT_LIT", "PointLightのみ"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_DIR", "カスタム(ワールド方向)"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_LOCAL_DIR", "カスタム(ローカル方向)"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_POS", "カスタム(ワールド座標)"),
 
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),

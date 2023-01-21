@@ -1892,6 +1892,16 @@ namespace UnlitWF
         ALPHA = 1,
         ADD_AND_SUB = 0,
     }
+
+    public enum SunSourceMode
+    {
+        AUTO = 0, 
+        ONLY_DIRECTIONAL_LIT = 1,
+        ONLY_POINT_LIT = 2,
+        CUSTOM_WORLD_DIR = 3,
+        CUSTOM_LOCAL_DIR = 4,
+        CUSTOM_WORLD_POS = 5
+    }
 }
 
 #endif
