@@ -183,7 +183,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
-        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
+        [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]

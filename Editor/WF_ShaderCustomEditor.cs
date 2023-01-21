@@ -1735,15 +1735,53 @@ namespace UnlitWF
         public MaterialWF_EnumDrawer(string enumName)
         {
             this.enumName = enumName;
+            ReadEnumValue(enumName, out this.names, out this.values);
+        }
+
+        public MaterialWF_EnumDrawer(string enumName, string e1) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4, string e5) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4, e5);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4, string e5, string e6) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4, e5, e6);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4, string e5, string e6, string e7) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4, e5, e6, e7);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4, string e5, string e6, string e7, string e8) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4, e5, e6, e7, e8);
+        }
+
+        private static void ReadEnumValue(string enumName, out string[] names, out int[] values)
+        {
             var loadedTypes = TypeCache.GetTypesDerivedFrom(typeof(Enum));
             try
             {
                 var enumType = loadedTypes.FirstOrDefault(x => x.Name == enumName || x.FullName == enumName);
                 var enumNames = Enum.GetNames(enumType);
-                this.names = new string[enumNames.Length];
+                names = new string[enumNames.Length];
                 for (int i = 0; i < enumNames.Length; ++i)
                 {
-                    this.names[i] = enumNames[i];
+                    names[i] = enumNames[i];
                 }
                 var enumVals = Enum.GetValues(enumType);
                 values = new int[enumVals.Length];
@@ -1759,6 +1797,23 @@ namespace UnlitWF
             }
         }
 
+        private static void FilterEnumValue(ref string[] names, ref int[] values, params string[] actual)
+        {
+            var names2 = new List<string>();
+            var values2 = new List<int>();
+            foreach(var nm in actual)
+            {
+                var idx = ArrayUtility.IndexOf(names, nm);
+                if (0 <= idx)
+                {
+                    names2.Add(names[idx]);
+                    values2.Add(values[idx]);
+                }
+            }
+            names = names2.ToArray();
+            values = values2.ToArray();
+        }
+
         public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
         {
             EditorGUI.BeginChangeCheck();
@@ -1768,8 +1823,7 @@ namespace UnlitWF
             int selectedIndex = -1;
             for (var index = 0; index < values.Length; index++)
             {
-                var i = values[index];
-                if (i == value)
+                if (values[index] == value)
                 {
                     selectedIndex = index;
                     break;
@@ -1823,6 +1877,20 @@ namespace UnlitWF
         ADD_AND_SUB = 0,
         ADD = 1,
         MUL = 2,
+    }
+    
+    public enum BlendModeES
+    {
+        ADD = 0,
+        ALPHA = 2,
+        LEGACY_ALPHA = 1,
+    }
+
+    public enum BlendModeTR
+    {
+        ADD = 2,
+        ALPHA = 1,
+        ADD_AND_SUB = 0,
     }
 }
 

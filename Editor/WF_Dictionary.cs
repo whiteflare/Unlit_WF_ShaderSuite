@@ -626,6 +626,12 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.BlendModeHL.ADD_AND_SUB", "加算・減算"),
             new WFI18NTranslation("UnlitWF.BlendModeHL.ADD", "加算"),
             new WFI18NTranslation("UnlitWF.BlendModeHL.MUL", "乗算"),
+            new WFI18NTranslation("UnlitWF.BlendModeES.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeES.ALPHA", "アルファ合成"),
+            new WFI18NTranslation("UnlitWF.BlendModeES.LEGACY_ALPHA", "アルファ合成(旧タイプ)"),
+            new WFI18NTranslation("UnlitWF.BlendModeTR.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeTR.ALPHA", "アルファ合成"),
+            new WFI18NTranslation("UnlitWF.BlendModeTR.ADD_AND_SUB", "加算・減算"),
 
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
