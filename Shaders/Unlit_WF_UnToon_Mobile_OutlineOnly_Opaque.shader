@@ -22,7 +22,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
-        [Toggle(_)]
+        [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // アウトライン
@@ -36,7 +36,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             _TL_BlendBase           ("[TL] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[TL] Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TL_InvMaskVal          ("[TL] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[TL] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
@@ -55,9 +55,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]

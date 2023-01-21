@@ -32,7 +32,7 @@ Shader "UnlitWF/WF_Water_Surface_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.05
         [WF_FixFloat(0.0)]

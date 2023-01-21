@@ -50,7 +50,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _DetailNormalMapScale   ("[NS] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
             _NS_2ndMaskTex          ("[NS] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
         // メタリックマップ
@@ -63,17 +63,17 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_BlendNormal2        ("[MT] Blend Normal 2nd", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
         [Enum(MASK,0,METALLIC,1)]
             _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
         [NoScaleOffset]
             _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
-        [Toggle(_)]
+        [ToggleUI]
             _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
@@ -101,7 +101,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _HL_BlendNormal2        ("[HL] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -120,7 +120,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _HL_BlendNormal2_1      ("[HA] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
@@ -134,10 +134,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
+        [ToggleUI]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
@@ -149,7 +149,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
+        [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
@@ -159,9 +159,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]

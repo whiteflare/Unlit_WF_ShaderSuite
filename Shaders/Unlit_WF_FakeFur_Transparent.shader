@@ -45,13 +45,13 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [Header(Fur Mask Texture)]
         [NoScaleOffset]
             _FUR_MaskTex            ("[FUR] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 
         // 色変換
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _CLC_Monochrome         ("[CLC] monochrome", Range(0, 1)) = 0
             _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
@@ -69,7 +69,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
@@ -84,7 +84,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
@@ -108,11 +108,11 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
             _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
             _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
-        [Toggle(_)]
+        [ToggleUI]
             _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TS_InvMaskVal          ("[TS] Invert Mask Value", Range(0, 1)) = 0
         [Header(ToonShade Advance)]
             _TS_1stBorder           ("[TS] 1st Border", Range(0, 1)) = 0.4
@@ -133,7 +133,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _TR_Feather             ("[TR] Feather", Range(0, 0.2)) = 0.05
         [NoScaleOffset]
             _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TR_InvMaskVal          ("[TR] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
             _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
@@ -147,7 +147,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
             _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
             _DFD_Power              ("[DFD] Power", Range(0, 1)) = 1
-        [Toggle(_)]
+        [ToggleUI]
             _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
 
         // Lit
@@ -157,7 +157,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
+        [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
@@ -167,9 +167,9 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]

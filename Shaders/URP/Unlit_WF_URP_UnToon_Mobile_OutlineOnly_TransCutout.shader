@@ -24,7 +24,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
-        [Toggle(_)]
+        [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // アウトライン
@@ -38,7 +38,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             _TL_BlendBase           ("[TL] Blend Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TL_MaskTex             ("[TL] Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TL_InvMaskVal          ("[TL] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[TL] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
@@ -48,10 +48,10 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
-        [Toggle(_)]
+        [ToggleUI]
             _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // Lit
@@ -69,9 +69,9 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]

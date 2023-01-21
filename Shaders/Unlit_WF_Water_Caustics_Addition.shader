@@ -26,7 +26,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
 
         [WFHeader(Water)]
             _WaterLevel             ("[WA] Water Level (World Y Coord)", Float) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _HideCausticsAbove      ("[WA] Hide Caustics above water", Float) = 0
 
         [WFHeaderToggle(Waving 1)]

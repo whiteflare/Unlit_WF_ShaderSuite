@@ -48,7 +48,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             _LME_Spot               ("[LME] FadeOut Angle", Range(0, 16)) = 2.0
             _LME_AnimSpeed          ("[LME] Anim Speed", Range(0, 1)) = 0.2
             _LME_MaskTex            ("[LME] Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
         // Lit
@@ -58,7 +58,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
+        [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
@@ -68,9 +68,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]

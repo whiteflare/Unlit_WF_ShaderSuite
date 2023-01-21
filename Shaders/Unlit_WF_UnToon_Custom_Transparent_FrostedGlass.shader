@@ -22,7 +22,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
-        [Toggle(_)]
+        [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
@@ -33,7 +33,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
@@ -73,7 +73,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _DetailNormalMapScale   ("[NS] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
             _NS_2ndMaskTex          ("[NS] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
         // メタリックマップ
@@ -85,17 +85,17 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_BlendNormal2        ("[MT] Blend Normal 2nd", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
         [Enum(MASK,0,METALLIC,1)]
             _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
         [NoScaleOffset]
             _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
-        [Toggle(_)]
+        [ToggleUI]
             _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
@@ -120,7 +120,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _LME_Texture            ("[LME] Texture", 2D) = "white" {}
         [HDR]
             _LME_RandColor          ("[LME] Random Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
+        [ToggleUI]
             _LME_ChangeAlpha        ("[LME] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(POLYGON,0,POINT,1)]
             _LME_Shape              ("[LME] Shape", Float) = 0
@@ -135,7 +135,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _LME_AnimSpeed          ("[LME] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
             _LME_MaskTex            ("[LME] Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
         // Overlay Texture
@@ -148,7 +148,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
         [WF_Vector2]
             _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _OVL_VertColToDecal     ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
         [WF_Enum(UnlitWF.BlendModeOVL)]
             _OVL_BlendType          ("[OVL] Blend Type", Float) = 0
@@ -156,9 +156,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _OVL_CustomParam1       ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
             _OVL_MaskTex            ("[OVL] Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _OVL_VertColToMask      ("[OVL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _OVL_InvMaskVal         ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
         // Ambient Occlusion
@@ -168,10 +168,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
+        [ToggleUI]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
@@ -187,11 +187,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]
-        [Toggle(_)]
+        [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _ES_SC_AlphaScroll      ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
             _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
@@ -204,13 +204,13 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         [Header(Emissive AudioLink)]
-        [Toggle(_)]
+        [ToggleUI]
             _ES_AuLinkEnable        ("[ES] Enable AudioLink", Float) = 0
             _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
             _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
-        [Toggle(_)]
+        [ToggleUI]
             _ES_AU_AlphaLink        ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _ES_AU_BlackOut         ("[ES] Dont Emit when AudioLink is disabled", Range(0, 1)) = 0
         [Enum(TREBLE,3,HIGH_MIDS,2,LOW_MIDS,1,BASS,0)]
             _ES_AU_Band             ("[ES] Band", Float) = 0
@@ -225,7 +225,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
+        [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
@@ -235,9 +235,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
