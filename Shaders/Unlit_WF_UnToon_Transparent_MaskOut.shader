@@ -133,7 +133,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -154,7 +154,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
 
         [WFHeaderToggle(Light Matcap 2)]
             _HL_Enable_1            ("[HA] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}

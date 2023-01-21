@@ -623,6 +623,9 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.BlendModeOVL.SCREEN", "スクリーン"),
             new WFI18NTranslation("UnlitWF.BlendModeOVL.OVERLAY", "オーバーレイ"),
             new WFI18NTranslation("UnlitWF.BlendModeOVL.HARD_LIGHT", "ハードライト"),
+            new WFI18NTranslation("UnlitWF.BlendModeHL.ADD_AND_SUB", "加算・減算"),
+            new WFI18NTranslation("UnlitWF.BlendModeHL.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeHL.MUL", "乗算"),
 
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),

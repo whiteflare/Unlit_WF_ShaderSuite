@@ -109,7 +109,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -128,7 +128,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [WFHeaderToggle(Light Matcap 2)]
             _HL_Enable_1            ("[HA] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
@@ -147,7 +147,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [WFHeaderToggle(Light Matcap 3)]
             _HL_Enable_2            ("[HB] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_2           ("[HB] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_2         ("[HB] Matcap Sampler", 2D) = "gray" {}
@@ -166,7 +166,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [WFHeaderToggle(Light Matcap 4)]
             _HL_Enable_3            ("[HC] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_3           ("[HC] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_3         ("[HC] Matcap Sampler", 2D) = "gray" {}
@@ -185,7 +185,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [WFHeaderToggle(Light Matcap 5)]
             _HL_Enable_4            ("[HD] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_4           ("[HD] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_4         ("[HD] Matcap Sampler", 2D) = "gray" {}
@@ -204,7 +204,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [WFHeaderToggle(Light Matcap 6)]
             _HL_Enable_5            ("[HE] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_5           ("[HE] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_5         ("[HE] Matcap Sampler", 2D) = "gray" {}
@@ -223,7 +223,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [WFHeaderToggle(Light Matcap 7)]
             _HL_Enable_6            ("[HF] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_6           ("[HF] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_6         ("[HF] Matcap Sampler", 2D) = "gray" {}
@@ -242,7 +242,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [WFHeaderToggle(Light Matcap 8)]
             _HL_Enable_7            ("[HG] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_7           ("[HG] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_7         ("[HG] Matcap Sampler", 2D) = "gray" {}

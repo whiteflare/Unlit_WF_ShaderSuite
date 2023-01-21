@@ -1817,6 +1817,13 @@ namespace UnlitWF
         OVERLAY = 5,
         HARD_LIGHT = 6
     }
+
+    public enum BlendModeHL
+    {
+        ADD_AND_SUB = 0,
+        ADD = 1,
+        MUL = 2,
+    }
 }
 
 #endif
