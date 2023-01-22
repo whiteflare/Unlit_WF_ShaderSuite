@@ -112,6 +112,7 @@ namespace UnlitWF
             new WFShaderName("BRP", "Water", "Surface", "Transparent_Refracted",       "UnlitWF/WF_Water_Surface_Transparent_Refracted"),
             new WFShaderName("BRP", "Water", "FX_Caustics", "Addition",                "UnlitWF/WF_Water_Caustics_Addition"),
             new WFShaderName("BRP", "Water", "FX_DepthFog", "Transparent",             "UnlitWF/WF_Water_DepthFog_Fade"),
+            new WFShaderName("BRP", "Water", "FX_Lamp", "Addition",                    "UnlitWF/WF_Water_Lamp_Addition"),
 
             // ================
             // UnToon 系列(URP)
