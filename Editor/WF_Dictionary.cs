@@ -112,6 +112,7 @@ namespace UnlitWF
             new WFShaderName("BRP", "Water", "Surface", "Transparent_Refracted",       "UnlitWF/WF_Water_Surface_Transparent_Refracted"),
             new WFShaderName("BRP", "Water", "FX_Caustics", "Addition",                "UnlitWF/WF_Water_Caustics_Addition"),
             new WFShaderName("BRP", "Water", "FX_DepthFog", "Transparent",             "UnlitWF/WF_Water_DepthFog_Fade"),
+            new WFShaderName("BRP", "Water", "FX_Sun", "Addition",                     "UnlitWF/WF_Water_Sun_Addition"),
             new WFShaderName("BRP", "Water", "FX_Lamp", "Addition",                    "UnlitWF/WF_Water_Lamp_Addition"),
 
             // ================
@@ -218,6 +219,8 @@ namespace UnlitWF
                 new WFShaderFunction("WA3", "WAV_3", "Waving 3", (self, mat) => WFShaderFunction.IsEnable("_WAV_Enable_3", mat)),
                 new WFShaderFunction("WAS", "WAS", "Water Specular"),
                 new WFShaderFunction("WAM", "WAM", "Water Reflection"),
+                new WFShaderFunction("WAR", "WAR", "Water Lamp&Sun Reflection"),
+                new WFShaderFunction("WMI", "WMI", "Water VRC Mirror Reflection"),
 
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
@@ -609,6 +612,12 @@ namespace UnlitWF
             new WFI18NTranslation("WAS", "Specular 2 Power", "スペキュラ強度 2"),
             new WFI18NTranslation("WAS", "Specular 2 Color", "スペキュラ色 2"),
             new WFI18NTranslation("WAS", "Specular 2 Smoothness", "滑らかさ 2"),
+            new WFI18NTranslation("WAR", "Sun Azimuth", "太陽の方角"),
+            new WFI18NTranslation("WAR", "Sun Altitude", "太陽の高度"),
+            new WFI18NTranslation("WAR", "Size", "サイズ"),
+            new WFI18NTranslation("WAR", "Feather", "境界ぼかし強度"),
+            new WFI18NTranslation("WAR", "Base Pos", "位置"),
+            new WFI18NTranslation("WAR", "Hide Back", "後側を非表示"),
 
             // メニュー
             new WFI18NTranslation("Copy material", "コピー"),

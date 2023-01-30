@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/WF_Water_Lamp_Addition" {
+Shader "UnlitWF/WF_Water_Sun_Addition" {
 
     Properties {
         [WFHeader(Base)]
@@ -24,15 +24,11 @@ Shader "UnlitWF/WF_Water_Lamp_Addition" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
 
-        [WFHeaderAlwaysOn(Lamp Reflection)]
+        [WFHeaderAlwaysOn(Sun Reflection)]
             _WAR_Enable             ("[WAR] Enable", Float) = 1
             _WAR_Power              ("[WAR] Power", Range(0, 2)) = 1
-        [WF_Vector3]
-            _WAR_BasePosOffset      ("[WAR] Base Pos", Vector) = (0, 0, 0)
-        [ToggleUI]
-            _WAR_CullBack           ("[WAR] Hide Back", Float) = 1
-            _WAR_MinDist            ("[WAR] FadeOut Distance (Near)", Range(0, 15)) = 1
-            _WAR_MaxDist            ("[WAR] FadeOut Distance (Far)", Range(0, 15)) = 2
+            _WAR_Azimuth            ("[WAR] Sun Azimuth", Range(0, 360)) = 0
+            _WAR_Altitude           ("[WAR] Sun Altitude", Range(-90, 90)) = 5
             _WAR_Size               ("[WAR] Size", Range(0, 1)) = 0.1
             _WAR_Feather            ("[WAR] Feather", Range(0, 1)) = 0.1
             _WAR_BlendNormal        ("[WAR] Blend Normal", Range(0, 1)) = 0.2
@@ -82,7 +78,7 @@ Shader "UnlitWF/WF_Water_Lamp_Addition" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-39" "DisableBatching"="True" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent-40" }
 
         Pass {
             Name "MAIN"
@@ -109,7 +105,7 @@ Shader "UnlitWF/WF_Water_Lamp_Addition" {
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
-            #define _WF_WATER_LAMP_POINT
+            #define _WF_WATER_LAMP_DIR
             #include "WF_Water.cginc"
 
             ENDCG

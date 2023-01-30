@@ -97,7 +97,7 @@
 
 #endif
 
-#ifdef _WF_WATER_LAMP
+#if defined(_WF_WATER_LAMP_DIR) || defined(_WF_WATER_LAMP_POINT)
 
     struct appdata_lamp {
         float4 vertex           : POSITION;
@@ -116,7 +116,9 @@
         float3 ws_vertex        : TEXCOORD3;
         float3 ws_tangent       : TEXCOORD4;
         float3 ws_bitangent     : TEXCOORD5;
+#ifdef _WF_WATER_LAMP_POINT
         float3 ws_base_pos      : TEXCOORD6;
+#endif
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -286,7 +288,7 @@
 
 #endif
 
-#ifdef _WF_WATER_LAMP
+#if defined(_WF_WATER_LAMP_DIR) || defined(_WF_WATER_LAMP_POINT)
 
     #ifdef _WAV_ENABLE_1
         WF_DEF_WAVE_NORMAL(_1)
@@ -430,6 +432,39 @@ FEATURE_TGL_END
         }
     #else
         #define affectVRCMirrorReflection(i, facing, ws_normal, ws_bump_normal, color)
+    #endif
+
+    ////////////////////////////
+    // Lamp&Sun Reflection
+    ////////////////////////////
+
+    #ifdef _WAR_ENABLE
+
+        void affectLampReflection(IN_FRAG i, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+FEATURE_TGL_ON_BEGIN(_WAR_Enable)
+            float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
+            float3 refl_dir = normalize(reflect(view_dir, lerpNormals(ws_normal, ws_bump_normal, _WAR_BlendNormal)));
+
+#ifdef _WF_WATER_LAMP_DIR
+            float3 base_dir = calcHorizontalCoordSystem(_WAR_Azimuth, _WAR_Altitude);
+            float range = length(base_dir - refl_dir * dot(base_dir, refl_dir));
+            float power = _WAR_Power;
+#endif
+#ifdef _WF_WATER_LAMP_POINT
+            float3 base_vec = i.ws_base_pos.xyz - i.ws_vertex.xyz;
+            float3 base_dir = SafeNormalizeVec3(base_vec);
+            if (TGL_ON(_WAR_CullBack) && dot(view_dir, base_dir) < 0) {
+                discard;
+            }
+            float range = length(base_dir - refl_dir * dot(base_dir, refl_dir));
+            float power = _WAR_Power * (1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_MaxDist - _WAR_MinDist), length(base_vec) - _WAR_MinDist));
+#endif
+
+            color.rgb *= power * pow(1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_Feather), range - _WAR_Size), 4);
+FEATURE_TGL_END
+        }
+    #else
+        #define affectLampReflection(i, ws_normal, ws_bump_normal, color)
     #endif
 
     ////////////////////////////
@@ -601,12 +636,7 @@ FEATURE_TGL_END
 
 #endif
 
-#ifdef _WF_WATER_LAMP
-
-    float3  _CLS_BasePosOffset;
-    float   _CLS_BlendNormal;
-    float   _CLS_CullBack;
-    float   _CLS_Size;
+#if defined(_WF_WATER_LAMP_DIR) || defined(_WF_WATER_LAMP_POINT)
 
     v2f_lamp vert_lamp(appdata_lamp v) {
         v2f_lamp o;
@@ -621,7 +651,9 @@ FEATURE_TGL_END
         o.uv = v.uv;
         o.ws_vertex = ws_vertex;
         o.uv_lmap = v.uv2;
-        o.ws_base_pos = UnityObjectToWorldPos(_CLS_BasePosOffset);
+#ifdef _WF_WATER_LAMP_POINT
+        o.ws_base_pos = UnityObjectToWorldPos(_WAR_BasePosOffset);
+#endif
 
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, 0);
 
@@ -639,19 +671,10 @@ FEATURE_TGL_END
         float3 ws_bump_normal = calcWavingNormal(i);
 
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-        half4 color = half4(0, 0, 0, 1);
+        half4 color = float4(PICK_MAIN_TEX2D(_MainTex, uv_main).rgb * _Color.rgb, 1);
 
-        float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
-        float3 refl_dir = normalize(reflect(view_dir, lerpNormals(i.ws_normal, ws_bump_normal, _CLS_BlendNormal)));
-
-        float3 base_dir = SafeNormalizeVec3(i.ws_base_pos - i.ws_vertex.xyz);
-
-        float len = length(base_dir - refl_dir * dot(base_dir, refl_dir));
-        color.rgb += len < _CLS_Size ? _Color.rgb : ZERO_VEC3;
-
-        if (TGL_ON(_CLS_CullBack) && dot(view_dir, base_dir) < 0) {
-            discard;
-        }
+        // Lamp&Sun リフレクション
+        affectLampReflection(i, i.ws_normal, ws_bump_normal, color);
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);

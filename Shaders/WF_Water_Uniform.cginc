@@ -160,4 +160,18 @@
     float           _WAD_Power;
     float           _WAD_BackShadow;
 
+    // -------------------------
+
+    FEATURE_TGL    (_WAR_Enable);
+    float           _WAR_Power;
+    float           _WAR_Azimuth;
+    float           _WAR_Altitude;
+    float3          _WAR_BasePosOffset;
+    float           _WAR_CullBack;
+    float           _WAR_Size;
+    float           _WAR_Feather;
+    float           _WAR_BlendNormal;
+    float           _WAR_MinDist;
+    float           _WAR_MaxDist;
+
 #endif
