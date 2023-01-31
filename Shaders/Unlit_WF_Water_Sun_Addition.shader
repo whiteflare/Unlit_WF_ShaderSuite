@@ -29,8 +29,9 @@ Shader "UnlitWF/WF_Water_Sun_Addition" {
             _WAR_Power              ("[WAR] Power", Range(0, 2)) = 1
             _WAR_Azimuth            ("[WAR] Sun Azimuth", Range(0, 360)) = 0
             _WAR_Altitude           ("[WAR] Sun Altitude", Range(-90, 90)) = 5
+        [NoScaleOffset]
+            _WAR_CookieTex          ("[WAR] Cookie", 2D) = "white" {}
             _WAR_Size               ("[WAR] Size", Range(0, 1)) = 0.1
-            _WAR_Feather            ("[WAR] Feather", Range(0, 1)) = 0.1
             _WAR_BlendNormal        ("[WAR] Blend Normal", Range(0, 1)) = 0.2
 
         [WFHeaderToggle(Waving 1)]
@@ -78,7 +79,7 @@ Shader "UnlitWF/WF_Water_Sun_Addition" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-40" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent+51" }
 
         Pass {
             Name "MAIN"

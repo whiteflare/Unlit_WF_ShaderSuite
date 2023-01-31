@@ -28,6 +28,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _CookieTex:
+        m_Texture: {fileID: 2800000, guid: 8a48db2e83469024789112bf721b2c2e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -62,6 +66,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _WAM_Cubemap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _WAR_CookieTex:
+        m_Texture: {fileID: 2800000, guid: 8a48db2e83469024789112bf721b2c2e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _WAV_HeightMap_1:
@@ -140,8 +148,9 @@ Material:
     - _WAR_Azimuth: 135
     - _WAR_BlendNormal: 0.1
     - _WAR_Enable: 1
-    - _WAR_Feather: 0.1
-    - _WAR_Size: 0.07
+    - _WAR_Feather: 0
+    - _WAR_Power: 1
+    - _WAR_Size: 0.1
     - _WAS_Enable: 1
     - _WAS_Power: 0.4
     - _WAS_Power2: 0.4

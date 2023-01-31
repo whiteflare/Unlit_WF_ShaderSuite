@@ -440,27 +440,36 @@ FEATURE_TGL_END
 
     #ifdef _WAR_ENABLE
 
+sampler2D _WAR_CookieTex;
+
         void affectLampReflection(IN_FRAG i, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_WAR_Enable)
             float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
-            float3 refl_dir = normalize(reflect(view_dir, lerpNormals(ws_normal, ws_bump_normal, _WAR_BlendNormal)));
+            float3 refl_dir = normalize(reflect(view_dir, lerpNormals(ws_normal, ws_bump_normal, _WAR_BlendNormal))) / NON_ZERO_FLOAT(_WAR_Size);
 
 #ifdef _WF_WATER_LAMP_DIR
             float3 base_dir = calcHorizontalCoordSystem(_WAR_Azimuth, _WAR_Altitude);
-            float range = length(base_dir - refl_dir * dot(base_dir, refl_dir));
             float power = _WAR_Power;
 #endif
 #ifdef _WF_WATER_LAMP_POINT
-            float3 base_vec = i.ws_base_pos.xyz - i.ws_vertex.xyz;
-            float3 base_dir = SafeNormalizeVec3(base_vec);
+            float3 base_dir = SafeNormalizeVec3(i.ws_base_pos.xyz - i.ws_vertex.xyz);
             if (TGL_ON(_WAR_CullBack) && dot(view_dir, base_dir) < 0) {
                 discard;
+                return;
             }
-            float range = length(base_dir - refl_dir * dot(base_dir, refl_dir));
-            float power = _WAR_Power * (1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_MaxDist - _WAR_MinDist), length(base_vec) - _WAR_MinDist));
+            float power = _WAR_Power * (1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_MaxDist - _WAR_MinDist), length(i.ws_base_pos.xyz - i.ws_vertex.xyz) - _WAR_MinDist));
 #endif
 
-            color.rgb *= power * pow(1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_Feather), range - _WAR_Size), 4);
+            // リフレクション空間の三軸を計算(うち一軸はbase_dir)
+            float3 rs_tangent = SafeNormalizeVec3(cross(ws_normal, base_dir));
+            float3 rs_bitangent = SafeNormalizeVec3(cross(base_dir, rs_tangent));
+            float2 uv_refl = float2(dot(rs_tangent, refl_dir), dot(rs_bitangent, refl_dir));
+            if (uv_refl.x < -1 || 1 < uv_refl.x || uv_refl.y < -1 || 1 < uv_refl.y) {
+                discard;
+                return;
+            }
+            color.rgb *= power * tex2D(_WAR_CookieTex, uv_refl / 2 + 0.5).rgb;
+
 FEATURE_TGL_END
         }
     #else

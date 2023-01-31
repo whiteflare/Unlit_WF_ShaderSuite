@@ -615,7 +615,6 @@ namespace UnlitWF
             new WFI18NTranslation("WAR", "Sun Azimuth", "太陽の方角"),
             new WFI18NTranslation("WAR", "Sun Altitude", "太陽の高度"),
             new WFI18NTranslation("WAR", "Size", "サイズ"),
-            new WFI18NTranslation("WAR", "Feather", "境界ぼかし強度"),
             new WFI18NTranslation("WAR", "Base Pos", "位置"),
             new WFI18NTranslation("WAR", "Hide Back", "後側を非表示"),
 

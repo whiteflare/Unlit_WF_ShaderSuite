@@ -33,8 +33,9 @@ Shader "UnlitWF/WF_Water_Lamp_Addition" {
             _WAR_CullBack           ("[WAR] Hide Back", Float) = 1
             _WAR_MinDist            ("[WAR] FadeOut Distance (Near)", Range(0, 15)) = 1
             _WAR_MaxDist            ("[WAR] FadeOut Distance (Far)", Range(0, 15)) = 2
+        [NoScaleOffset]
+            _WAR_CookieTex          ("[WAR] Cookie", 2D) = "white" {}
             _WAR_Size               ("[WAR] Size", Range(0, 1)) = 0.1
-            _WAR_Feather            ("[WAR] Feather", Range(0, 1)) = 0.1
             _WAR_BlendNormal        ("[WAR] Blend Normal", Range(0, 1)) = 0.2
 
         [WFHeaderToggle(Waving 1)]
@@ -82,7 +83,7 @@ Shader "UnlitWF/WF_Water_Lamp_Addition" {
     }
 
     SubShader {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent-39" "DisableBatching"="True" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent+52" "DisableBatching"="True" }
 
         Pass {
             Name "MAIN"
