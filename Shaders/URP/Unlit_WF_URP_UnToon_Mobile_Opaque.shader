@@ -194,7 +194,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/01/07", Float) = 0
+            _CurrentVersion         ("2023/02/04", Float) = 0
     }
 
     SubShader {

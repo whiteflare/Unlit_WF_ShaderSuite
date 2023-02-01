@@ -59,7 +59,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/01/07", Float) = 0
+            _CurrentVersion         ("2023/02/04", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
