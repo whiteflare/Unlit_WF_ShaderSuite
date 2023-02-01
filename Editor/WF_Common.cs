@@ -1202,48 +1202,63 @@ namespace UnlitWF
 
         public static string Translate(string before)
         {
-            before = before ?? "";
-
-            var current = GetDict();
-            if (current == null || current.Count == 0)
-            {
-                return before; // 無いなら変換しない
-            }
-
-            // ラベルなしでテキストが一致するものを検索する
-            if (current.TryGetValue(before, out var list))
-            {
-                var after = list.Where(t => t.HasNoTag()).Select(t => t.After).FirstOrDefault();
-                if (after != null)
-                {
-                    return after;
-                }
-            }
-            // マッチするものがないなら変換しない
-            return before;
+            TryTranslate(null, before, out var after);
+            return after;
         }
 
         public static string Translate(string label, string before)
         {
-            before = before ?? "";
+            TryTranslate(label, before, out var after);
+            return after;
+        }
+
+        public static bool TryTranslate(string before, out string after)
+        {
+            return TryTranslate(null, before, out after);
+        }
+
+        public static bool TryTranslate(string label, string before, out string after)
+        {
+            if (string.IsNullOrWhiteSpace(before))
+            {
+                // 空白のときは空文字にして変換失敗とする
+                after = "";
+                return false;
+            }
 
             var current = GetDict();
             if (current == null || current.Count == 0)
             {
-                return before; // 無いなら変換しない
+                after = before; // 無いなら変換しない
+                return false;
             }
 
-            // テキストと一致する変換のなかからラベルも一致するものを翻訳にする
             if (current.TryGetValue(before, out var list))
             {
-                var after = list.Where(t => t.ContainsTag(label)).Select(t => t.After).FirstOrDefault();
-                if (after != null)
+                string text;
+                // テキストと一致する変換のなかからラベルも一致するものを翻訳にする
+                if (!string.IsNullOrWhiteSpace(label))
                 {
-                    return after;
+                    text = list.Where(t => t.ContainsTag(label)).Select(t => t.After).FirstOrDefault();
+                    if (text != null)
+                    {
+                        after = text;
+                        return true;
+                    }
+                }
+
+                // ラベルなしでテキストが一致するものを検索する
+                text = list.Where(t => t.HasNoTag()).Select(t => t.After).FirstOrDefault();
+                if (text != null)
+                {
+                    after = text;
+                    return true;
                 }
             }
+
             // マッチするものがないなら変換しない
-            return before;
+            after = before;
+            return false;
         }
 
         private static string SplitAndTranslate(string before)

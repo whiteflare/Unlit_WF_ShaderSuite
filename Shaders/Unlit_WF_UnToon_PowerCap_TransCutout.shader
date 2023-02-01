@@ -24,7 +24,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Alpha
@@ -33,10 +33,10 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
-        [Toggle(_)]
+        [ToggleUI]
             _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // 裏面テクスチャ
@@ -79,13 +79,13 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _DetailNormalMapScale   ("[NS] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
             _NS_2ndMaskTex          ("[NS] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -95,7 +95,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_BlendNormal2        ("[HL] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -104,7 +104,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [WFHeaderToggle(Light Matcap 2)]
             _HL_Enable_1            ("[HA] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
@@ -114,7 +114,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_BlendNormal2_1      ("[HA] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
@@ -123,7 +123,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [WFHeaderToggle(Light Matcap 3)]
             _HL_Enable_2            ("[HB] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_2           ("[HB] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_2         ("[HB] Matcap Sampler", 2D) = "gray" {}
@@ -133,7 +133,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_BlendNormal2_2      ("[HB] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_2           ("[HB] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_2        ("[HB] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_2          ("[HB] Parallax", Range(0, 1)) = 0.75
@@ -142,7 +142,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [WFHeaderToggle(Light Matcap 4)]
             _HL_Enable_3            ("[HC] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_3           ("[HC] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_3         ("[HC] Matcap Sampler", 2D) = "gray" {}
@@ -152,7 +152,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_BlendNormal2_3      ("[HC] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_3           ("[HC] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_3        ("[HC] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_3          ("[HC] Parallax", Range(0, 1)) = 0.75
@@ -161,7 +161,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [WFHeaderToggle(Light Matcap 5)]
             _HL_Enable_4            ("[HD] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_4           ("[HD] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_4         ("[HD] Matcap Sampler", 2D) = "gray" {}
@@ -171,7 +171,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_BlendNormal2_4      ("[HD] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_4           ("[HD] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_4        ("[HD] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_4          ("[HD] Parallax", Range(0, 1)) = 0.75
@@ -180,7 +180,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [WFHeaderToggle(Light Matcap 6)]
             _HL_Enable_5            ("[HE] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_5           ("[HE] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_5         ("[HE] Matcap Sampler", 2D) = "gray" {}
@@ -190,7 +190,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_BlendNormal2_5      ("[HE] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_5           ("[HE] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_5        ("[HE] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_5          ("[HE] Parallax", Range(0, 1)) = 0.75
@@ -199,7 +199,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [WFHeaderToggle(Light Matcap 7)]
             _HL_Enable_6            ("[HF] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_6           ("[HF] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_6         ("[HF] Matcap Sampler", 2D) = "gray" {}
@@ -209,7 +209,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_BlendNormal2_6      ("[HF] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_6           ("[HF] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_6        ("[HF] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_6          ("[HF] Parallax", Range(0, 1)) = 0.75
@@ -218,7 +218,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [WFHeaderToggle(Light Matcap 8)]
             _HL_Enable_7            ("[HG] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_7           ("[HG] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_7         ("[HG] Matcap Sampler", 2D) = "gray" {}
@@ -228,7 +228,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_BlendNormal2_7      ("[HG] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_7           ("[HG] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_7        ("[HG] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_7          ("[HG] Parallax", Range(0, 1)) = 0.75
@@ -255,13 +255,13 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
             _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
             _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
-        [Toggle(_)]
+        [ToggleUI]
             _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_BlendNormal         ("[TS] Blend Normal", Range(0, 1)) = 0.1
             _TS_BlendNormal2        ("[TS] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TS_InvMaskVal          ("[TS] Invert Mask Value", Range(0, 1)) = 0
         [Header(ToonShade Advance)]
             _TS_1stBorder           ("[TS] 1st Border", Range(0, 1)) = 0.4
@@ -276,7 +276,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
+        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB)]
             _TR_BlendType           ("[TR] Blend Type", Float) = 0
             _TR_Power               ("[TR] Power", Range(0, 2)) = 1
             _TR_Feather             ("[TR] Feather", Range(0, 0.2)) = 0.05
@@ -284,7 +284,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _TR_BlendNormal2        ("[TR] Blend Normal 2nd", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TR_InvMaskVal          ("[TR] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
             _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
@@ -298,10 +298,10 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
+        [ToggleUI]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
@@ -313,11 +313,11 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
-        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
+        [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]
-        [Toggle(_)]
+        [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
@@ -332,11 +332,11 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         [Header(Emissive AudioLink)]
-        [Toggle(_)]
+        [ToggleUI]
             _ES_AuLinkEnable        ("[ES] Enable AudioLink", Float) = 0
             _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
             _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
-        [Toggle(_)]
+        [ToggleUI]
             _ES_AU_BlackOut         ("[ES] Dont Emit when AudioLink is disabled", Range(0, 1)) = 0
         [Enum(TREBLE,3,HIGH_MIDS,2,LOW_MIDS,1,BASS,0)]
             _ES_AU_Band             ("[ES] Band", Float) = 0
@@ -363,19 +363,19 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
+        [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLD_DIR,3,CUSTOM_LOCAL_DIR,4,CUSTOM_WORLD_POS,5)]
+        [WF_Enum(UnlitWF.SunSourceMode)]
             _GL_LightMode           ("Sun Source", Float) = 0
             _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
@@ -448,7 +448,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #include "WF_UnToon.cginc"
 
