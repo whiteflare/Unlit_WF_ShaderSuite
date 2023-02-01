@@ -1774,7 +1774,7 @@ namespace UnlitWF
 
         private static void ReadEnumValue(string enumName, out string[] names, out int[] values)
         {
-            var loadedTypes = TypeCache.GetTypesDerivedFrom(typeof(Enum));
+            var loadedTypes = GetTypesDerivedFrom(typeof(Enum));
             try
             {
                 var enumType = loadedTypes.FirstOrDefault(x => x.Name == enumName || x.FullName == enumName);
@@ -1796,6 +1796,32 @@ namespace UnlitWF
                 Debug.LogWarningFormat("Failed to create MaterialEnum, enum {0} not found", enumName);
                 throw;
             }
+        }
+
+        private static IEnumerable<Type> GetTypesDerivedFrom(Type type)
+        {
+#if UNITY_2019_1_OR_NEWER
+            return TypeCache.GetTypesDerivedFrom(type);
+#else
+            var types = new List<Type>();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                Type[] allAssemblyTypes;
+                try
+                {
+                    allAssemblyTypes = assembly.GetTypes();
+                }
+                catch (System.Reflection.ReflectionTypeLoadException e)
+                {
+                    allAssemblyTypes = e.Types;
+                }
+
+                var typesInAssembly = allAssemblyTypes.Where(t => !t.IsAbstract && t.IsSubclassOf(type));
+                types.AddRange(typesInAssembly);
+            }
+            return types;
+#endif
         }
 
         private static void FilterEnumValue(ref string[] names, ref int[] values, params string[] actual)
@@ -1860,7 +1886,7 @@ namespace UnlitWF
         }
     }
 
-    #endregion
+#endregion
 
     public enum BlendModeOVL
     {
