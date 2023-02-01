@@ -24,7 +24,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // Alpha
@@ -33,10 +33,10 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
-        [Toggle(_)]
+        [ToggleUI]
             _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // メタリックマップ
@@ -46,13 +46,13 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
         [Enum(MASK,0,METALLIC,1)]
             _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
@@ -70,7 +70,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -78,7 +78,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _HL_Power               ("[HL] Power", Range(0, 2)) = 1
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -97,11 +97,11 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
             _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
             _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
-        [Toggle(_)]
+        [ToggleUI]
             _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TS_InvMaskVal          ("[TS] Invert Mask Value", Range(0, 1)) = 0
         [Header(ToonShade Advance)]
             _TS_1stBorder           ("[TS] 1st Border", Range(0, 1)) = 0.4
@@ -116,13 +116,13 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
+        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB)]
             _TR_BlendType           ("[TR] Blend Type", Float) = 0
             _TR_Power               ("[TR] Power", Range(0, 2)) = 1
             _TR_Feather             ("[TR] Feather", Range(0, 0.2)) = 0.05
         [NoScaleOffset]
             _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TR_InvMaskVal          ("[TR] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
             _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
@@ -144,11 +144,11 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
-        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
+        [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]
-        [Toggle(_)]
+        [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
@@ -169,19 +169,19 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
+        [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLD_DIR,3,CUSTOM_LOCAL_DIR,4,CUSTOM_WORLD_POS,5)]
+        [WF_Enum(UnlitWF.SunSourceMode)]
             _GL_LightMode           ("Sun Source", Float) = 0
             _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]

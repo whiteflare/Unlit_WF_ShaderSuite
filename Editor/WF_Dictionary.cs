@@ -107,10 +107,13 @@ namespace UnlitWF
             // ================
 
             new WFShaderName("BRP", "Water", "Surface", "Opaque",                      "UnlitWF/WF_Water_Surface_Opaque", represent: true),
+            new WFShaderName("BRP", "Water", "Surface", "TransCutout",                 "UnlitWF/WF_Water_Surface_TransCutout"),
             new WFShaderName("BRP", "Water", "Surface", "Transparent",                 "UnlitWF/WF_Water_Surface_Transparent"),
             new WFShaderName("BRP", "Water", "Surface", "Transparent_Refracted",       "UnlitWF/WF_Water_Surface_Transparent_Refracted"),
             new WFShaderName("BRP", "Water", "FX_Caustics", "Addition",                "UnlitWF/WF_Water_Caustics_Addition"),
             new WFShaderName("BRP", "Water", "FX_DepthFog", "Transparent",             "UnlitWF/WF_Water_DepthFog_Fade"),
+            new WFShaderName("BRP", "Water", "FX_Sun", "Addition",                     "UnlitWF/WF_Water_Sun_Addition"),
+            new WFShaderName("BRP", "Water", "FX_Lamp", "Addition",                    "UnlitWF/WF_Water_Lamp_Addition"),
 
             // ================
             // UnToon 系列(URP)
@@ -216,6 +219,8 @@ namespace UnlitWF
                 new WFShaderFunction("WA3", "WAV_3", "Waving 3", (self, mat) => WFShaderFunction.IsEnable("_WAV_Enable_3", mat)),
                 new WFShaderFunction("WAS", "WAS", "Water Specular"),
                 new WFShaderFunction("WAM", "WAM", "Water Reflection"),
+                new WFShaderFunction("WAR", "WAR", "Water Lamp&Sun Reflection"),
+                new WFShaderFunction("WMI", "WMI", "Water VRC Mirror Reflection"),
 
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
@@ -607,12 +612,41 @@ namespace UnlitWF
             new WFI18NTranslation("WAS", "Specular 2 Power", "スペキュラ強度 2"),
             new WFI18NTranslation("WAS", "Specular 2 Color", "スペキュラ色 2"),
             new WFI18NTranslation("WAS", "Specular 2 Smoothness", "滑らかさ 2"),
+            new WFI18NTranslation("WAR", "Sun Azimuth", "太陽の方角"),
+            new WFI18NTranslation("WAR", "Sun Altitude", "太陽の高度"),
+            new WFI18NTranslation("WAR", "Size", "サイズ"),
+            new WFI18NTranslation("WAR", "Base Pos", "位置"),
+            new WFI18NTranslation("WAR", "Hide Back", "後側を非表示"),
 
             // メニュー
             new WFI18NTranslation("Copy material", "コピー"),
             new WFI18NTranslation("Paste value", "貼り付け"),
             new WFI18NTranslation("Paste (without Textures)", "貼り付け (Texture除く)"),
             new WFI18NTranslation("Reset", "リセット"),
+
+            // 列挙体
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.ALPHA", "アルファ合成"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.MUL", "乗算"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.ADD_AND_SUB", "加算・減算"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.SCREEN", "スクリーン"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.OVERLAY", "オーバーレイ"),
+            new WFI18NTranslation("UnlitWF.BlendModeOVL.HARD_LIGHT", "ハードライト"),
+            new WFI18NTranslation("UnlitWF.BlendModeHL.ADD_AND_SUB", "加算・減算"),
+            new WFI18NTranslation("UnlitWF.BlendModeHL.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeHL.MUL", "乗算"),
+            new WFI18NTranslation("UnlitWF.BlendModeES.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeES.ALPHA", "アルファ合成"),
+            new WFI18NTranslation("UnlitWF.BlendModeES.LEGACY_ALPHA", "アルファ合成(旧タイプ)"),
+            new WFI18NTranslation("UnlitWF.BlendModeTR.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeTR.ALPHA", "アルファ合成"),
+            new WFI18NTranslation("UnlitWF.BlendModeTR.ADD_AND_SUB", "加算・減算"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.AUTO", "自動"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_DIRECTIONAL_LIT", "DirectionalLightのみ"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_POINT_LIT", "PointLightのみ"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_DIR", "カスタム(ワールド方向)"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_LOCAL_DIR", "カスタム(ローカル方向)"),
+            new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_POS", "カスタム(ワールド座標)"),
 
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
