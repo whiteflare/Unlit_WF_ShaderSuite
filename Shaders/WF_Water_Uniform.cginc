@@ -38,6 +38,8 @@
     DECL_MAIN_TEX2D     (_WAV_HeightMap_3);
     DECL_MAIN_TEX2D     (_WAV_CausticsTex_3);
 
+    DECL_MAIN_TEX2D     (_WAR_CookieTex);
+
     DECL_MAIN_TEXCUBE   (_WAM_Cubemap);
 
 #ifdef _WF_PB_GRAB_TEXTURE

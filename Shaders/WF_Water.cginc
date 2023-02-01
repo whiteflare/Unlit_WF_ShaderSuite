@@ -413,11 +413,12 @@ FEATURE_TGL_END
 
     #ifdef _WMI_ENABLE
 
-        sampler2D _ReflectionTex0;
-        sampler2D _ReflectionTex1;
-        float4 _WMI_Color;
-        float  _WMI_Power;
-        float  _WMI_BlendNormal;
+        FEATURE_TGL    (_WMI_Enable);
+        sampler2D       _ReflectionTex0;
+        sampler2D       _ReflectionTex1;
+        float4          _WMI_Color;
+        float           _WMI_Power;
+        float           _WMI_BlendNormal;
 
         void affectVRCMirrorReflection(IN_FRAG i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_WMI_Enable)
@@ -439,8 +440,6 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _WAR_ENABLE
-
-sampler2D _WAR_CookieTex;
 
         void affectLampReflection(IN_FRAG i, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_WAR_Enable)
@@ -468,7 +467,7 @@ FEATURE_TGL_ON_BEGIN(_WAR_Enable)
                 discard;
                 return;
             }
-            color.rgb *= power * tex2D(_WAR_CookieTex, uv_refl / 2 + 0.5).rgb;
+            color.rgb *= power * PICK_MAIN_TEX2D(_WAR_CookieTex, uv_refl / 2 + 0.5).rgb;
 
 FEATURE_TGL_END
         }
