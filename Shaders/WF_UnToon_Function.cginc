@@ -1274,6 +1274,16 @@ FEATURE_TGL_END
     // Ambient Occlusion
     ////////////////////////////
 
+    #ifndef SHADOWS_SHADOWMASK
+        #define _AO_PICK_LMAP(uv_lmap)      pickLightmap(uv_lmap)
+        #define _AO_PICK_LMAP_LOD(uv_lmap)  pickLightmapLod(uv_lmap)
+    #else
+        #define _AO_PICK_LMAP(uv_lmap)      (pickLightmap(uv_lmap) + ONE_VEC3)
+        #define _AO_PICK_LMAP_LOD(uv_lmap)  (pickLightmapLod(uv_lmap) + ONE_VEC3)
+        // SHADOWS_SHADOWMASK が有るときは、ライトマップに直接光はベイクされていないので白色を加算する
+        // BakedIndirect もここを通したかったが MixedLight 無しの場合と区別できなかったので妥協
+    #endif
+
     #ifdef _AO_ENABLE
 
         void affectOcclusion(IN_FRAG i, float2 uv_main, inout float4 color) {
@@ -1289,7 +1299,7 @@ FEATURE_TGL_ON_BEGIN(_AO_Enable)
     #ifndef _WF_AO_ONLY_LMAP
             if (TGL_ON(_AO_UseLightMap)) {
     #endif
-                occlusion *= pickLightmap(i.uv_lmap);
+                occlusion *= _AO_PICK_LMAP(i.uv_lmap);
     #ifndef _WF_AO_ONLY_LMAP
             }
     #endif
@@ -1311,13 +1321,13 @@ FEATURE_TGL_END
                     return ONE_VEC3;    // Lightmap が使えてAOが有効、かつONLYのときはAO側で色を合成するので白を返す
                 #else
                     #ifndef _WF_LEGACY_FEATURE_SWITCH
-                        return TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
+                        return TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : _AO_PICK_LMAP_LOD(uv_lmap);
                     #else
-                        return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : pickLightmapLod(uv_lmap);
+                        return TGL_ON(_AO_Enable) && TGL_ON(_AO_UseLightMap) ? ONE_VEC3 : _AO_PICK_LMAP_LOD(uv_lmap);
                     #endif
                 #endif
             #else
-                return pickLightmapLod(uv_lmap);    // Lightmap が使えるがAOが無効のときは、Lightmap から明るさを取得
+                return _AO_PICK_LMAP_LOD(uv_lmap);    // Lightmap が使えるがAOが無効のときは、Lightmap から明るさを取得
             #endif
         #else
             return sampleSHLightColor();    // Lightmap が使えないときは SH を返す

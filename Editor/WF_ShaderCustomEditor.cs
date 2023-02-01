@@ -91,6 +91,7 @@ namespace UnlitWF
             new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist", "[LME] FadeOut Distance"),
             new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist", "[TS] FadeOut Distance"),
             new MinMaxSliderPropertyHook("_DFD_MinDist", "_DFD_MaxDist", "[DFD] Fade Distance"),
+            new MinMaxSliderPropertyHook("_WAR_MinDist", "_WAR_MaxDist", "[WAR] FadeOut Distance"),
             new MinMaxSliderPropertyHook("_ES_AU_MinValue", "_ES_AU_MaxValue", "[ES] Emission Multiplier"),
             new MinMaxSliderPropertyHook("_ES_AU_MinThreshold", "_ES_AU_MaxThreshold", "[ES] Threshold"),
 
@@ -793,6 +794,8 @@ namespace UnlitWF
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
         public static Rect DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null)
         {
+            var content = new GUIContent(text);
+
             // SurikenStyleHeader
             var style = new GUIStyle("ShurikenModuleTitle");
             SetStyleFont(style, EditorStyles.boldLabel.font, s => s + 2, FontStyle.Bold);
@@ -801,12 +804,11 @@ namespace UnlitWF
             // Draw
             position.y += 8;
             position = EditorGUI.IndentedRect(position);
-            GUI.Box(position, text, style);
+            GUI.Box(position, content, style);
 
             // ヘルプテキスト
-            var helpText = WFI18N.Translate(text);
-            if (!string.IsNullOrWhiteSpace(helpText) && helpText != text) {
-                var titleSize = style.CalcSize(new GUIContent(text));
+            if (WFI18N.TryTranslate(text, out var helpText)) {
+                var titleSize = style.CalcSize(content);
                 var rect = new Rect(position.x + titleSize.x + 24, position.y, position.width - titleSize.x - 24, 16f);
                 var style2 = new GUIStyle(EditorStyles.label);
                 SetStyleFont(style2, null, s => style.fontSize - 1, FontStyle.Normal);
@@ -1710,8 +1712,223 @@ namespace UnlitWF
         }
     }
 
+    /// <summary>
+    /// 常に非表示のMaterialPropertyDrawer
+    /// </summary>
+    internal class MaterialWF_HidePropDrawer : MaterialPropertyDrawer
+    {
+        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
+        {
+            return 0;
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+        }
+    }
+
+    internal class MaterialWF_EnumDrawer : MaterialPropertyDrawer
+    {
+        private readonly string enumName;
+        private readonly string[] names;
+        private readonly int[] values;
+
+        public MaterialWF_EnumDrawer(string enumName)
+        {
+            this.enumName = enumName;
+            ReadEnumValue(enumName, out this.names, out this.values);
+        }
+
+        public MaterialWF_EnumDrawer(string enumName, string e1) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4, string e5) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4, e5);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4, string e5, string e6) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4, e5, e6);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4, string e5, string e6, string e7) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4, e5, e6, e7);
+        }
+        public MaterialWF_EnumDrawer(string enumName, string e1, string e2, string e3, string e4, string e5, string e6, string e7, string e8) : this(enumName)
+        {
+            FilterEnumValue(ref this.names, ref this.values, e1, e2, e3, e4, e5, e6, e7, e8);
+        }
+
+        private static void ReadEnumValue(string enumName, out string[] names, out int[] values)
+        {
+            var loadedTypes = GetTypesDerivedFrom(typeof(Enum));
+            try
+            {
+                var enumType = loadedTypes.FirstOrDefault(x => x.Name == enumName || x.FullName == enumName);
+                var enumNames = Enum.GetNames(enumType);
+                names = new string[enumNames.Length];
+                for (int i = 0; i < enumNames.Length; ++i)
+                {
+                    names[i] = enumNames[i];
+                }
+                var enumVals = Enum.GetValues(enumType);
+                values = new int[enumVals.Length];
+                for (var i = 0; i < enumVals.Length; ++i)
+                {
+                    values[i] = (int)enumVals.GetValue(i);
+                }
+            }
+            catch (Exception)
+            {
+                Debug.LogWarningFormat("Failed to create MaterialEnum, enum {0} not found", enumName);
+                throw;
+            }
+        }
+
+        private static IEnumerable<Type> GetTypesDerivedFrom(Type type)
+        {
+#if UNITY_2019_1_OR_NEWER
+            return TypeCache.GetTypesDerivedFrom(type);
+#else
+            var types = new List<Type>();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                Type[] allAssemblyTypes;
+                try
+                {
+                    allAssemblyTypes = assembly.GetTypes();
+                }
+                catch (System.Reflection.ReflectionTypeLoadException e)
+                {
+                    allAssemblyTypes = e.Types;
+                }
+
+                var typesInAssembly = allAssemblyTypes.Where(t => !t.IsAbstract && t.IsSubclassOf(type));
+                types.AddRange(typesInAssembly);
+            }
+            return types;
+#endif
+        }
+
+        private static void FilterEnumValue(ref string[] names, ref int[] values, params string[] actual)
+        {
+            var names2 = new List<string>();
+            var values2 = new List<int>();
+            foreach(var nm in actual)
+            {
+                var idx = ArrayUtility.IndexOf(names, nm);
+                if (0 <= idx)
+                {
+                    names2.Add(names[idx]);
+                    values2.Add(values[idx]);
+                }
+            }
+            names = names2.ToArray();
+            values = values2.ToArray();
+        }
+
+        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        {
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = prop.hasMixedValue;
+
+            var value = (int)prop.floatValue;
+            int selectedIndex = -1;
+            for (var index = 0; index < values.Length; index++)
+            {
+                if (values[index] == value)
+                {
+                    selectedIndex = index;
+                    break;
+                }
+            }
+
+            var names = Translate(this.names);
+            var selIndex = EditorGUI.Popup(position, label, selectedIndex, names);
+
+            EditorGUI.showMixedValue = false;
+            if (EditorGUI.EndChangeCheck())
+            {
+                prop.floatValue = (float)values[selIndex];
+            }
+        }
+
+        private GUIContent[] Translate(string[] names)
+        {
+            var result = new GUIContent[names.Length];
+            for(int i = 0; i < result.Length; i++)
+            {
+                var key = enumName + "." + names[i];
+                if (WFI18N.TryTranslate(key, out var after))
+                {
+                    result[i] = new GUIContent(after);
+                }
+                else
+                {
+                    result[i] = new GUIContent(names[i]);
+                }
+            }
+            return result;
+        }
+    }
+
 #endregion
 
+    public enum BlendModeOVL
+    {
+        ALPHA = 0,
+        ADD = 1,
+        MUL = 2,
+        ADD_AND_SUB = 3,
+        SCREEN = 4, 
+        OVERLAY = 5,
+        HARD_LIGHT = 6
+    }
+
+    public enum BlendModeHL
+    {
+        ADD_AND_SUB = 0,
+        ADD = 1,
+        MUL = 2,
+    }
+    
+    public enum BlendModeES
+    {
+        ADD = 0,
+        ALPHA = 2,
+        LEGACY_ALPHA = 1,
+    }
+
+    public enum BlendModeTR
+    {
+        ADD = 2,
+        ALPHA = 1,
+        ADD_AND_SUB = 0,
+    }
+
+    public enum SunSourceMode
+    {
+        AUTO = 0, 
+        ONLY_DIRECTIONAL_LIT = 1,
+        ONLY_POINT_LIT = 2,
+        CUSTOM_WORLD_DIR = 3,
+        CUSTOM_LOCAL_DIR = 4,
+        CUSTOM_WORLD_POS = 5
+    }
 }
 
 #endif

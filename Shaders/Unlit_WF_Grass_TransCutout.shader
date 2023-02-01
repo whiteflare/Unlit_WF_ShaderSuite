@@ -22,7 +22,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             _Cutoff                 ("Cutoff", Range(0, 1)) = 0.8
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         [WFHeader(Grass)]
@@ -33,7 +33,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
         [Enum(UV1,0,UV2,1,UV3,2)]
             _GRS_HeightUVType       ("[GRS] Height UV Type", Int) = 0
             _GRS_HeightMaskTex      ("[GRS] Height Mask Tex", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _GRS_InvMaskVal         ("[GRS] Invert Mask Value", Float) = 0
             _GRS_UVFactor           ("[GRS] UV Factor", Vector) = (0, 1, 0, 0)
         [WF_Vector3]
@@ -67,7 +67,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
+        [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeaderToggle(Light Bake Effects)]
@@ -116,7 +116,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #include "WF_Grass.cginc"
 
