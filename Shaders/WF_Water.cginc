@@ -119,6 +119,7 @@
 #ifdef _WF_WATER_LAMP_POINT
         float3 ws_base_pos      : TEXCOORD6;
 #endif
+        UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -148,7 +149,7 @@
 #ifndef _WF_LEGACY_FEATURE_SWITCH
 
     #define WF_DEF_WAVE_NORMAL(id)                                                                              \
-        float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                            \
+        float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                \
             float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);                  \
             float4 tex = PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv);                                               \
@@ -158,7 +159,7 @@
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
-        float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                            \
+        float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                \
             float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);                  \
             cnt++;                                                                                              \
@@ -665,6 +666,7 @@ FEATURE_TGL_END
 
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, 0);
 
+        UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
     }
 
@@ -686,6 +688,8 @@ FEATURE_TGL_END
 
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
+
+        UNITY_APPLY_FOG_COLOR(i.fogCoord, color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
 
         return color;
     }
