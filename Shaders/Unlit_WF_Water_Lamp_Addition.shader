@@ -106,6 +106,7 @@ Shader "UnlitWF/WF_Water_Lamp_Addition" {
             #define _WAV_ENABLE_3
 
             #pragma multi_compile_fwdbase
+            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
