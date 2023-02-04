@@ -32,9 +32,10 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             _AL_Source              ("[AL] Alpha Source", Float) = 0
         [NoScaleOffset]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.05
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 0
@@ -113,7 +114,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         [WFHeader(Lit Advance)]
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLD_DIR,3,CUSTOM_LOCAL_DIR,4,CUSTOM_WORLD_POS,5)]
+        [WF_Enum(UnlitWF.SunSourceMode)]
             _GL_LightMode           ("Sun Source", Float) = 0
             _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
@@ -122,7 +123,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/01/07", Float) = 0
+            _CurrentVersion         ("2023/02/04", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -148,6 +149,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_AO_ONLY_LMAP
+            #define _WF_WATER_CUTOUT
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _WAM_ONLY2ND_ENABLE
@@ -164,7 +166,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent" {
             #pragma multi_compile_instancing
             #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #define _WF_WATER_SURFACE
             #include "WF_Water.cginc"

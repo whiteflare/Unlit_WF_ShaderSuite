@@ -24,7 +24,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
-        [Toggle(_)]
+        [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
         // クリアコート
@@ -59,7 +59,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
         // 色変換
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _CLC_Monochrome         ("[CLC] monochrome", Range(0, 1)) = 0
             _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
@@ -84,7 +84,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _DetailNormalMapScale   ("[NS] 2nd Bump Scale", Range(0, 2)) = 0.4
         [NoScaleOffset]
             _NS_2ndMaskTex          ("[NS] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
         // メタリックマップ
@@ -97,17 +97,17 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_BlendNormal2        ("[MT] Blend Normal 2nd", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
         [Enum(MASK,0,METALLIC,1)]
             _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
         [NoScaleOffset]
             _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
-        [Toggle(_)]
+        [ToggleUI]
             _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
@@ -125,7 +125,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
         // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType             ("[HL] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
@@ -135,7 +135,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _HL_BlendNormal2        ("[HL] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
@@ -144,7 +144,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
 
         [WFHeaderToggle(Light Matcap 2)]
             _HL_Enable_1            ("[HA] Enable", Float) = 0
-        [Enum(MEDIAN_CAP,0,LIGHT_CAP,1,SHADE_CAP,2)]
+        [WF_Enum(UnlitWF.BlendModeHL)]
             _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
         [NoScaleOffset]
             _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
@@ -154,7 +154,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _HL_BlendNormal2_1      ("[HA] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
         [Header(Matcap Advance)]
             _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
@@ -184,7 +184,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _LME_AnimSpeed          ("[LME] Anim Speed", Range(0, 1)) = 0.2
         [NoScaleOffset]
             _LME_MaskTex            ("[LME] Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
         // 階調影
@@ -207,13 +207,13 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
             _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
             _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
-        [Toggle(_)]
+        [ToggleUI]
             _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_BlendNormal         ("[TS] Blend Normal", Range(0, 1)) = 0.1
             _TS_BlendNormal2        ("[TS] Blend Normal 2nd", Range(0, 1)) = 0.1
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TS_InvMaskVal          ("[TS] Invert Mask Value", Range(0, 1)) = 0
         [Header(ToonShade Advance)]
             _TS_1stBorder           ("[TS] 1st Border", Range(0, 1)) = 0.4
@@ -228,7 +228,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [Enum(ADD,2,ALPHA,1,ADD_AND_SUB,0)]
+        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB)]
             _TR_BlendType           ("[TR] Blend Type", Float) = 0
             _TR_Power               ("[TR] Power", Range(0, 2)) = 1
             _TR_Feather             ("[TR] Feather", Range(0, 0.2)) = 0.05
@@ -236,7 +236,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _TR_BlendNormal2        ("[TR] Blend Normal 2nd", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _TR_InvMaskVal          ("[TR] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
             _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
@@ -253,17 +253,17 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
         [WF_Vector2]
             _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _OVL_VertColToDecal     ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
-        [Enum(ALPHA,0,ADD,1,MUL,2,ADD_AND_SUB,3,SCREEN,4,OVERLAY,5,HARD_LIGHT,6)]
+        [WF_Enum(UnlitWF.BlendModeOVL)]
             _OVL_BlendType          ("[OVL] Blend Type", Float) = 0
             _OVL_Power              ("[OVL] Blend Power", Range(0, 1)) = 1
             _OVL_CustomParam1       ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
         [NoScaleOffset]
             _OVL_MaskTex            ("[OVL] Mask Texture (R)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _OVL_VertColToMask      ("[OVL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _OVL_InvMaskVal         ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
         // Distance Fade
@@ -273,7 +273,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
             _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
             _DFD_Power              ("[DFD] Power", Range(0, 1)) = 1
-        [Toggle(_)]
+        [ToggleUI]
             _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
 
         // Ambient Occlusion
@@ -283,10 +283,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _AO_UVType              ("[AO] UV Type", Float) = 0
         [NoScaleOffset]
             _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
-        [Toggle(_)]
+        [ToggleUI]
             _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
             _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
-        [Toggle(_)]
+        [ToggleUI]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
@@ -298,11 +298,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
-        [Enum(ADD,0,ALPHA,2,LEGACY_ALPHA,1)]
+        [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
         [Header(Emissive Scroll)]
-        [Toggle(_)]
+        [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
@@ -317,11 +317,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         [Header(Emissive AudioLink)]
-        [Toggle(_)]
+        [ToggleUI]
             _ES_AuLinkEnable        ("[ES] Enable AudioLink", Float) = 0
             _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
             _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
-        [Toggle(_)]
+        [ToggleUI]
             _ES_AU_BlackOut         ("[ES] Dont Emit when AudioLink is disabled", Range(0, 1)) = 0
         [Enum(TREBLE,3,HIGH_MIDS,2,LOW_MIDS,1,BASS,0)]
             _ES_AU_Band             ("[ES] Band", Float) = 0
@@ -336,19 +336,19 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
-        [Toggle(_)]
+        [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
-        [Enum(AUTO,0,ONLY_DIRECTIONAL_LIT,1,ONLY_POINT_LIT,2,CUSTOM_WORLD_DIR,3,CUSTOM_LOCAL_DIR,4,CUSTOM_WORLD_POS,5)]
+        [WF_Enum(UnlitWF.SunSourceMode)]
             _GL_LightMode           ("Sun Source", Float) = 0
             _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
@@ -359,7 +359,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/01/07", Float) = 0
+            _CurrentVersion         ("2023/02/04", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
@@ -413,7 +413,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #include "WF_UnToon.cginc"
 
@@ -451,7 +451,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #include "WF_UnToon_ClearCoat.cginc"
 

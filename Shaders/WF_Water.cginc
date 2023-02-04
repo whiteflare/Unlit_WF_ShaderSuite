@@ -97,6 +97,36 @@
 
 #endif
 
+#if defined(_WF_WATER_LAMP_DIR) || defined(_WF_WATER_LAMP_POINT)
+
+    struct appdata_lamp {
+        float4 vertex           : POSITION;
+        float2 uv               : TEXCOORD0;
+        float2 uv2              : TEXCOORD1;
+        float3 normal           : NORMAL;
+        float4 tangent          : TANGENT;
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+    };
+
+    struct v2f_lamp {
+        float4 vs_vertex        : SV_POSITION;
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 ws_normal        : TEXCOORD2;
+        float3 ws_vertex        : TEXCOORD3;
+        float3 ws_tangent       : TEXCOORD4;
+        float3 ws_bitangent     : TEXCOORD5;
+#ifdef _WF_WATER_LAMP_POINT
+        float3 ws_base_pos      : TEXCOORD6;
+#endif
+        UNITY_FOG_COORDS(7)
+        UNITY_VERTEX_OUTPUT_STEREO
+    };
+
+    #define IN_FRAG v2f_lamp
+
+#endif
+
     ////////////////////////////
     // UnToon function
     ////////////////////////////
@@ -119,7 +149,7 @@
 #ifndef _WF_LEGACY_FEATURE_SWITCH
 
     #define WF_DEF_WAVE_NORMAL(id)                                                                              \
-        float3 calcWavingNormal##id(v2f_surface i, inout uint cnt) {                                            \
+        float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                \
             float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);                  \
             float4 tex = PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv);                                               \
@@ -129,7 +159,7 @@
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
-        float3 calcWavingHeight##id(v2f_surface i, inout uint cnt) {                                            \
+        float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                \
             float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);                  \
             cnt++;                                                                                              \
@@ -137,7 +167,7 @@
         }
 
     #define WF_DEF_WAVE_CAUSTICS(id)                                                                            \
-        float3 calcWavingCaustics##id(v2f_caustics i, inout uint cnt) {                                         \
+        float3 calcWavingCaustics##id(IN_FRAG i, inout uint cnt) {                                              \
             float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);                \
             cnt++;                                                                                              \
@@ -147,7 +177,7 @@
 #else
 
     #define WF_DEF_WAVE_NORMAL(id)                                                                              \
-        float3 calcWavingNormal##id(v2f_surface i, inout uint cnt) {                                            \
+        float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                \
             if (_WAV_Enable##id) {                                                                              \
                 float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);              \
@@ -161,7 +191,7 @@
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
-        float3 calcWavingHeight##id(v2f_surface i, inout uint cnt) {                                            \
+        float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                \
             if (_WAV_Enable##id) {                                                                              \
                 float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);              \
@@ -173,7 +203,7 @@
         }
 
     #define WF_DEF_WAVE_CAUSTICS(id)                                                                            \
-        float3 calcWavingCaustics##id(v2f_caustics i, inout uint cnt) {                                         \
+        float3 calcWavingCaustics##id(IN_FRAG i, inout uint cnt) {                                              \
             if (_WAV_Enable##id) {                                                                              \
                 float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);            \
@@ -255,6 +285,35 @@
         color += calcWavingCaustics_2(i, cnt);
         color += calcWavingCaustics_3(i, cnt);
         return color;
+    }
+
+#endif
+
+#if defined(_WF_WATER_LAMP_DIR) || defined(_WF_WATER_LAMP_POINT)
+
+    #ifdef _WAV_ENABLE_1
+        WF_DEF_WAVE_NORMAL(_1)
+    #else
+        #define calcWavingNormal_1(i, cnt)      ZERO_VEC3
+    #endif
+    #ifdef _WAV_ENABLE_2
+        WF_DEF_WAVE_NORMAL(_2)
+    #else
+        #define calcWavingNormal_2(i, cnt)      ZERO_VEC3
+    #endif
+    #ifdef _WAV_ENABLE_3
+        WF_DEF_WAVE_NORMAL(_3)
+    #else
+        #define calcWavingNormal_3(i, cnt)      ZERO_VEC3
+    #endif
+
+    float3 calcWavingNormal(v2f_lamp i) {
+        uint cnt = 0;
+        float3 ws_bump_normal = ZERO_VEC3;
+        ws_bump_normal += calcWavingNormal_1(i, cnt);
+        ws_bump_normal += calcWavingNormal_2(i, cnt);
+        ws_bump_normal += calcWavingNormal_3(i, cnt);
+        return cnt == 0 ? i.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
     }
 
 #endif
@@ -350,6 +409,74 @@ FEATURE_TGL_END
     #endif
 
     ////////////////////////////
+    // VRC Mirror Reflection
+    ////////////////////////////
+
+    #ifdef _WMI_ENABLE
+
+        FEATURE_TGL    (_WMI_Enable);
+        sampler2D       _ReflectionTex0;
+        sampler2D       _ReflectionTex1;
+        float4          _WMI_Color;
+        float           _WMI_Power;
+        float           _WMI_BlendNormal;
+
+        void affectVRCMirrorReflection(IN_FRAG i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+FEATURE_TGL_ON_BEGIN(_WMI_Enable)
+            if (facing) {
+                float4 mirror_scr_pos = mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz + (ws_bump_normal - ws_normal * dot(ws_normal, ws_bump_normal)) * _WMI_BlendNormal, 1));
+                float4 refl_pos = ComputeNonStereoScreenPos(mirror_scr_pos);
+                float4 refl = unity_StereoEyeIndex == 0 ? tex2Dproj(_ReflectionTex0, UNITY_PROJ_COORD(refl_pos)) : tex2Dproj(_ReflectionTex1, UNITY_PROJ_COORD(refl_pos));
+                refl.rgb *= _WMI_Color.rgb * unity_ColorSpaceDouble.rgb;
+                color.rgb = lerp(color.rgb, refl.rgb, _WMI_Power * refl.a);
+            }
+FEATURE_TGL_END
+        }
+    #else
+        #define affectVRCMirrorReflection(i, facing, ws_normal, ws_bump_normal, color)
+    #endif
+
+    ////////////////////////////
+    // Lamp&Sun Reflection
+    ////////////////////////////
+
+    #ifdef _WAR_ENABLE
+
+        void affectLampReflection(IN_FRAG i, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+FEATURE_TGL_ON_BEGIN(_WAR_Enable)
+            float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
+            float3 refl_dir = normalize(reflect(view_dir, lerpNormals(ws_normal, ws_bump_normal, _WAR_BlendNormal))) / NON_ZERO_FLOAT(_WAR_Size);
+
+#ifdef _WF_WATER_LAMP_DIR
+            float3 base_dir = calcHorizontalCoordSystem(_WAR_Azimuth, _WAR_Altitude);
+            float power = _WAR_Power;
+#endif
+#ifdef _WF_WATER_LAMP_POINT
+            float3 base_dir = SafeNormalizeVec3(i.ws_base_pos.xyz - i.ws_vertex.xyz);
+            if (TGL_ON(_WAR_CullBack) && dot(view_dir, base_dir) < 0) {
+                discard;
+                return;
+            }
+            float power = _WAR_Power * (1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_MaxDist - _WAR_MinDist), length(i.ws_base_pos.xyz - i.ws_vertex.xyz) - _WAR_MinDist));
+#endif
+
+            // リフレクション空間の三軸を計算(うち一軸はbase_dir)
+            float3 rs_tangent = SafeNormalizeVec3(cross(ws_normal, base_dir));
+            float3 rs_bitangent = SafeNormalizeVec3(cross(base_dir, rs_tangent));
+            float2 uv_refl = float2(dot(rs_tangent, refl_dir), dot(rs_bitangent, refl_dir));
+            if (uv_refl.x < -1 || 1 < uv_refl.x || uv_refl.y < -1 || 1 < uv_refl.y) {
+                discard;
+                return;
+            }
+            color.rgb *= power * PICK_MAIN_TEX2D(_WAR_CookieTex, uv_refl / 2 + 0.5).rgb;
+
+FEATURE_TGL_END
+        }
+    #else
+        #define affectLampReflection(i, ws_normal, ws_bump_normal, color)
+    #endif
+
+    ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
 
@@ -392,10 +519,20 @@ FEATURE_TGL_END
         float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * lerp(_Color2, _Color, height);
 
+        // VRC Mirror Reflection
+        affectVRCMirrorReflection(i, facing, i.ws_normal, ws_bump_normal, color);
+
         // 距離フェード
         affectWaterDistanceFade(i, color);
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
+
+        #ifdef _WF_WATER_CUTOUT
+            if (color.a < _Cutoff) {
+                discard;
+                return half4(color.rgb, 0);
+            }
+        #endif
 
         // リフレクション
         affectWaterSurfaceReflection(i, ws_bump_normal, color);
@@ -504,6 +641,57 @@ FEATURE_TGL_END
             // UNITY_APPLY_FOG(i.fogCoord, color); // DepthFog は Fog には対応しない
             return color;
         }
+    }
+
+#endif
+
+#if defined(_WF_WATER_LAMP_DIR) || defined(_WF_WATER_LAMP_POINT)
+
+    v2f_lamp vert_lamp(appdata_lamp v) {
+        v2f_lamp o;
+
+        UNITY_SETUP_INSTANCE_ID(v);
+        UNITY_INITIALIZE_OUTPUT(v2f_lamp, o);
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+        float3 ws_vertex = UnityObjectToWorldPos(v.vertex);
+
+        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
+        o.uv = v.uv;
+        o.ws_vertex = ws_vertex;
+        o.uv_lmap = v.uv2;
+#ifdef _WF_WATER_LAMP_POINT
+        o.ws_base_pos = UnityObjectToWorldPos(_WAR_BasePosOffset);
+#endif
+
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, 0);
+
+        UNITY_TRANSFER_FOG(o, o.vs_vertex);
+        return o;
+    }
+
+    half4 frag_lamp(v2f_lamp i, uint facing: SV_IsFrontFace) : SV_Target {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+        i.ws_normal        = normalize(i.ws_normal);
+        i.ws_tangent       = normalize(i.ws_tangent);
+        i.ws_bitangent     = normalize(i.ws_bitangent);
+
+        // ノーマルマップ
+        float3 ws_bump_normal = calcWavingNormal(i);
+
+        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        half4 color = float4(PICK_MAIN_TEX2D(_MainTex, uv_main).rgb * _Color.rgb, 1);
+
+        // Lamp&Sun リフレクション
+        affectLampReflection(i, i.ws_normal, ws_bump_normal, color);
+
+        // Alpha は 0-1 にクランプ
+        color.a = saturate(color.a);
+
+        UNITY_APPLY_FOG_COLOR(i.fogCoord, color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
+
+        return color;
     }
 
 #endif

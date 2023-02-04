@@ -26,7 +26,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
 
         [WFHeader(Water)]
             _WaterLevel             ("[WA] Water Level (World Y Coord)", Float) = 0
-        [Toggle(_)]
+        [ToggleUI]
             _HideCausticsAbove      ("[WA] Hide Caustics above water", Float) = 0
 
         [WFHeaderToggle(Waving 1)]
@@ -65,7 +65,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/01/07", Float) = 0
+            _CurrentVersion         ("2023/02/04", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -101,7 +101,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
             #pragma multi_compile_instancing
             #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
 
-            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE SHADOWS_SHADOWMASK
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #define _WF_WATER_CAUSTICS
             #include "WF_Water.cginc"
