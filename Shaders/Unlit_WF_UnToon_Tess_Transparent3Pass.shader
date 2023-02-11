@@ -516,7 +516,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
             Cull OFF
             ZWrite ON
-            Blend Off
+            Blend One Zero, One OneMinusSrcAlpha
 
             CGPROGRAM
 

@@ -421,7 +421,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
             Cull OFF
             ZWrite ON
-            Blend Off
+            Blend One Zero, One OneMinusSrcAlpha
 
             CGPROGRAM
 

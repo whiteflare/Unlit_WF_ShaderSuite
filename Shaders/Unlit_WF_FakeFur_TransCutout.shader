@@ -242,6 +242,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull OFF
+            Blend One Zero, One OneMinusSrcAlpha
             AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM

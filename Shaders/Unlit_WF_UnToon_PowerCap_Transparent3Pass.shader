@@ -441,7 +441,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
             Cull OFF
             ZWrite ON
-            Blend Off
+            Blend One Zero, One OneMinusSrcAlpha
 
             CGPROGRAM
 

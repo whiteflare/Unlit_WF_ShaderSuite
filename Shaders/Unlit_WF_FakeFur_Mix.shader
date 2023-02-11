@@ -246,6 +246,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull OFF
+            Blend One Zero, One OneMinusSrcAlpha
             AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
