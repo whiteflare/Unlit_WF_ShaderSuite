@@ -339,6 +339,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
         [ToggleUI]
             _DSV_Invert             ("[DSV] Invert", Range(0, 1)) = 0
             _DSV_CtrlTex            ("[DSV] Control Texture (R)", 2D) = "black" {}
+        [ToggleUI]
+            _DSV_TexIsSRGB          ("[DSV] sRGB", Range(0, 1)) = 1
         [HDR]
             _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
             _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0

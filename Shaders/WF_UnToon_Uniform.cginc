@@ -352,6 +352,7 @@
     float           _DSV_SparkWidth;
     DECL_MAIN_TEX2D(_DSV_CtrlTex);
     float4          _DSV_CtrlTex_ST;
+    float           _DSV_TexIsSRGB;
 
     // -------------------------
 

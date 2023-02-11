@@ -1387,7 +1387,8 @@ FEATURE_TGL_ON_BEGIN(_DSV_Enable)
         else {
             float spark = NON_ZERO_FLOAT(_DSV_SparkWidth);
             float2 uv   = TRANSFORM_TEX(uv1, _DSV_CtrlTex);
-            float3 tex  = LinearToGammaSpace(PICK_MAIN_TEX2D(_DSV_CtrlTex, uv));
+            float3 tex  = PICK_MAIN_TEX2D(_DSV_CtrlTex, uv);
+            tex = TGL_OFF(_DSV_TexIsSRGB) ? tex : LinearToGammaSpace(tex);
 
             float pos = _DSV_Dissolve / (1 - spark * 2) - (TGL_OFF(_DSV_Invert) ? tex.r : 1 - tex.r);
             color.a *= smoothstep(0, spark, pos);
