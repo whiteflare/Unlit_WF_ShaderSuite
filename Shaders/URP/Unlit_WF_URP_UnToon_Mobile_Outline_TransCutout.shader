@@ -222,6 +222,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             Tags { "LightMode" = "SRPDefaultUnlit" }
 
             Cull Front
+            Blend One Zero, One OneMinusSrcAlpha
+            AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM
 
