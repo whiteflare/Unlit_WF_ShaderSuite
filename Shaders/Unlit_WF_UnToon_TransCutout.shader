@@ -456,6 +456,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
 
             #define _WF_ALPHA_CUTOUT
 
+            #pragma shader_feature_local _DSV_ENABLE
+
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
