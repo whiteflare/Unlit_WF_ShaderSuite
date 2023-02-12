@@ -521,8 +521,6 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _DSV_ENABLE
-
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE

@@ -345,7 +345,7 @@
 
     // -------------------------
 
-    FEATURE_TGL    (_DSV_Enable);
+    float           _DSV_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
     float           _DSV_Dissolve;
     float           _DSV_Invert;
     float4          _DSV_SparkColor;
