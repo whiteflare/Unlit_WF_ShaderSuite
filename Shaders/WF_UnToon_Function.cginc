@@ -1381,24 +1381,19 @@ FEATURE_TGL_ON_BEGIN(_DSV_Enable)
             // nop
         }
         else if (_DSV_Dissolve < NZF) {
-            color.a = 0;
             discard;
         }
         else {
-            float spark = NON_ZERO_FLOAT(_DSV_SparkWidth);
             float2 uv   = TRANSFORM_TEX(uv1, _DSV_CtrlTex);
             float3 tex  = PICK_MAIN_TEX2D(_DSV_CtrlTex, uv);
             tex = TGL_OFF(_DSV_TexIsSRGB) ? tex : LinearToGammaSpace(tex);
 
-            float pos = _DSV_Dissolve / (1 - spark * 2) - (TGL_OFF(_DSV_Invert) ? tex.r : 1 - tex.r);
-            color.a *= smoothstep(0, spark, pos);
-#ifndef _WF_ALPHA_BLEND
-            if (color.a < 0.5) {
-                color.a = 0;
+            float pos = _DSV_Dissolve / (1 - _DSV_SparkWidth) - (TGL_OFF(_DSV_Invert) ? tex.r : 1 - tex.r);
+            if (pos < 0) {
                 discard;
             }
-#endif
-            color.rgb += _DSV_SparkColor * saturate(1 - abs(pos - spark) / spark);
+
+            color.rgb += _DSV_SparkColor * (1 - smoothstep(0, NON_ZERO_FLOAT(_DSV_SparkWidth), pos));
         }
 
 FEATURE_TGL_END
