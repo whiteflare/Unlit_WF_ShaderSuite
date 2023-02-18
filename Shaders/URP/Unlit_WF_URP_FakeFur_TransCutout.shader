@@ -236,6 +236,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             Tags { "LightMode" = "SRPDefaultUnlit" }
 
             Cull OFF
+            Blend One Zero, One OneMinusSrcAlpha
             AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM

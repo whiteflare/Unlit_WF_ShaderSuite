@@ -132,6 +132,7 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
             Tags { "LightMode" = "UniversalForward" }
 
             Cull OFF
+            Blend One Zero, One OneMinusSrcAlpha
             AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM

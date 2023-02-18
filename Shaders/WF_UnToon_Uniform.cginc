@@ -345,6 +345,17 @@
 
     // -------------------------
 
+    FEATURE_TGL    (_DSV_Enable);
+    float           _DSV_Dissolve;
+    float           _DSV_Invert;
+    float4          _DSV_SparkColor;
+    float           _DSV_SparkWidth;
+    DECL_MAIN_TEX2D(_DSV_CtrlTex);
+    float4          _DSV_CtrlTex_ST;
+    float           _DSV_TexIsSRGB;
+
+    // -------------------------
+
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_TFG_Enable);
     float4          _TFG_Color;
