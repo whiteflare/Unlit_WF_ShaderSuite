@@ -228,7 +228,6 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma shader_feature_local_fragment _DSV_ENABLE
 
             #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
 
