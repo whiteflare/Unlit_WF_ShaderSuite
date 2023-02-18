@@ -137,6 +137,7 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_TransCutout" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
+            Blend One Zero, One OneMinusSrcAlpha
 
             CGPROGRAM
 
