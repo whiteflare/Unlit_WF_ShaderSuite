@@ -125,6 +125,7 @@
 
     // -------------------------
 
+    #define _WF_DEFINED_LBE
     float           _LBE_Enable;
     float           _LBE_IndirectChroma;
     float           _LBE_IndirectMultiplier;

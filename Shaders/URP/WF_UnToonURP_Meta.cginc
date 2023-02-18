@@ -82,9 +82,13 @@
 #endif
 
         // 単色化
+#ifdef _WF_DEFINED_LBE
         color.rgb = max(ZERO_VEC3, lerp(AVE_RGB(color.rgb).xxx, color.rgb, lerp(1, _LBE_IndirectChroma, _LBE_Enable)));
+        o.Albedo  = color.rgb * lerp(1, _LBE_IndirectMultiplier, _LBE_Enable);
+#else
+        o.Albedo  = color.rgb;
+#endif
 
-        o.Albedo        = color.rgb * lerp(1, _LBE_IndirectMultiplier, _LBE_Enable);
 #if UNITY_VERSION < 202103
         o.SpecularColor = o.Albedo;
 #endif
@@ -95,7 +99,11 @@
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
         float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv_main).rgba;
         float4 es_color = _EmissionColor * es_mask;
+#ifdef _WF_DEFINED_LBE
         o.Emission  = es_color.rgb * es_color.a * lerp(1, _LBE_EmissionMultiplier, _LBE_Enable);
+#else
+        o.Emission  = es_color.rgb * es_color.a;
+#endif
 FEATURE_TGL_END
 
 #endif
