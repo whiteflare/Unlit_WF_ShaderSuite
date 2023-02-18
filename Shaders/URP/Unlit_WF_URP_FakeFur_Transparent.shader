@@ -217,7 +217,6 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
             // Unity defined keywords
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile _ LIGHTMAP_ON
-            #pragma multi_compile_fog
 
             //--------------------------------------
             #pragma multi_compile_instancing
@@ -267,7 +266,6 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
             // Unity defined keywords
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile _ LIGHTMAP_ON
-            #pragma multi_compile_fog
 
             //--------------------------------------
             #pragma multi_compile_instancing

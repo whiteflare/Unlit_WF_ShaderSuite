@@ -94,6 +94,8 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             Tags { "LightMode" = "UniversalForward" }
 
             Cull Front
+            Blend One Zero, One OneMinusSrcAlpha
+            AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM
 
@@ -106,7 +108,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
             #define _WF_PLATFORM_LWRP
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
@@ -145,6 +147,8 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             ZWrite On
             ColorMask 0
             Cull[_CullMode]
+            Blend One Zero, One OneMinusSrcAlpha
+            AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM
 
@@ -154,7 +158,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             #pragma geometry geom_outline
             #pragma fragment frag
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
             #define _WF_PLATFORM_LWRP
 
             #pragma shader_feature_local _TL_ENABLE

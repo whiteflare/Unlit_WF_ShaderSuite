@@ -89,14 +89,10 @@
         #endif
 
         // ディゾルブの考慮
-        #ifdef _DSV_ENABLE
-FEATURE_TGL_ON_BEGIN(_DSV_Enable)
-            if (_DSV_Dissolve < 1 - 0.05) {
-                discard;
-                return float4(0, 0, 0, 0);
-            }
-FEATURE_TGL_END
-        #endif
+        if (TGL_ON(_DSV_Enable) && _DSV_Dissolve < 1 - 0.05) {
+            discard;
+            return float4(0, 0, 0, 0);
+        }
 
         return frag_shadow_caster(i);
     }
