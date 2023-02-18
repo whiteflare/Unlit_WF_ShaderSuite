@@ -100,9 +100,9 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
         float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv_main).rgba;
         float4 es_color = _EmissionColor * es_mask;
 #ifdef _WF_DEFINED_LBE
-        o.Emission  = es_color.rgb * es_color.a * lerp(1, _LBE_EmissionMultiplier, _LBE_Enable);
+        o.Emission  = es_color.rgb * lerp(1, _LBE_EmissionMultiplier, _LBE_Enable);
 #else
-        o.Emission  = es_color.rgb * es_color.a;
+        o.Emission  = es_color.rgb;
 #endif
 FEATURE_TGL_END
 
