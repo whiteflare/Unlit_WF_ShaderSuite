@@ -176,7 +176,7 @@ FEATURE_TGL_END
         #endif
     #endif
 
-    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_CUTOUT) || defined(_WF_ALPHA_CUSTOM)
+    #if defined(_WF_ALPHA_BLEND) || defined(_WF_ALPHA_CUTOUT) || defined(_WF_ALPHA_CUTFADE) || defined(_WF_ALPHA_CUSTOM)
         #ifndef _AL_ENABLE
             #define _AL_ENABLE
         #endif
@@ -205,16 +205,20 @@ FEATURE_TGL_END
 
             #if defined(_WF_ALPHA_CUSTOM)
                 _WF_ALPHA_CUSTOM
-            #elif defined(_WF_ALPHA_CUTOUT)
+            #elif defined(_WF_ALPHA_CUTOUT) || defined(_WF_ALPHA_CUTFADE)
                 alpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, alpha);
-                if (TGL_OFF(_AL_AlphaToMask)) {
+                #if defined(_WF_ALPHA_CUTFADE)
+	                if (TGL_OFF(_AL_AlphaToMask)) {
+                #endif
                     if (alpha < 0.5) {
                         discard;
                         alpha = 0;
                     } else {
                         alpha = 1;
                     }
-                }
+                #if defined(_WF_ALPHA_CUTFADE)
+    	            }
+                #endif
             #else
                 alpha *= _AL_Power;
             #endif

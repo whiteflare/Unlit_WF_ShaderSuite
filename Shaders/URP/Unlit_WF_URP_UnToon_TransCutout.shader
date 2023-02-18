@@ -354,6 +354,8 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             Tags { "LightMode" = "UniversalForward" }
 
             Cull [_CullMode]
+            Blend One Zero, One OneMinusSrcAlpha
+            AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM
 
@@ -364,7 +366,7 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
             #define _WF_PLATFORM_LWRP
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
@@ -421,6 +423,8 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             ZWrite On
             ColorMask 0
             Cull[_CullMode]
+            Blend One Zero, One OneMinusSrcAlpha
+            AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM
 
@@ -429,7 +433,7 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             #pragma vertex vert_depth
             #pragma fragment frag_depth
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
             #define _WF_PLATFORM_LWRP
 
             #pragma shader_feature_local _VC_ENABLE

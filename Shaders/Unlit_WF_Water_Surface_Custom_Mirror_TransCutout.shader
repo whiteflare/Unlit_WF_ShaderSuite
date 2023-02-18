@@ -35,8 +35,6 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_TransCutout" {
         [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.05
-        [WF_FixFloat(0.0)]
-            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         [WFHeaderAlwaysOn(VRC Mirror Reflection)]
             _WMI_Enable             ("[WMI] Enable", Float) = 1

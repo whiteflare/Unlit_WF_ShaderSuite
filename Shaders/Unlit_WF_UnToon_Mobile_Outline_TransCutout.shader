@@ -233,7 +233,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
             #define _WF_MOBILE
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
@@ -267,7 +267,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
             #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 

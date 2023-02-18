@@ -103,7 +103,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _TL_ENABLE

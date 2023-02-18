@@ -218,7 +218,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
             #pragma target 3.0
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
             #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
