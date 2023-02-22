@@ -158,6 +158,14 @@ namespace UnlitWF
 
             new WFShaderName("URP", "Gem", "Basic", "Opaque",                          "UnlitWF_URP/WF_Gem_Opaque"),
             new WFShaderName("URP", "Gem", "Basic", "Transparent",                     "UnlitWF_URP/WF_Gem_Transparent", represent: true),
+
+            // ================
+            // Water 系列(URP)
+            // ================
+
+            new WFShaderName("URP", "Water", "Surface", "Opaque",                      "UnlitWF_URP/WF_Water_Surface_Opaque", represent: true),
+            new WFShaderName("URP", "Water", "Surface", "TransCutout",                 "UnlitWF_URP/WF_Water_Surface_TransCutout"),
+            new WFShaderName("URP", "Water", "Surface", "Transparent",                 "UnlitWF_URP/WF_Water_Surface_Transparent"),
         };
 
         private static bool HasPropertyPrefix(Material mat, string prefix)
@@ -310,6 +318,7 @@ namespace UnlitWF
             new WFI18NTranslation("Color Change", "色変更"),
             new WFI18NTranslation("Detail NormalMap", "ディテールノーマルマップ"),
             new WFI18NTranslation("Distance Fade", "距離フェード"),
+            new WFI18NTranslation("Dissolve", "ディゾルブ"),
             new WFI18NTranslation("Emission", "エミッション"),
             new WFI18NTranslation("Fake Fur", "ファー"),
             new WFI18NTranslation("Fog", "フォグ"),
@@ -522,6 +531,12 @@ namespace UnlitWF
             new WFI18NTranslation("DFD", "Fade Distance (Far)", "フェード距離 (Far)"),
             new WFI18NTranslation("DFD", "Power", "強度"),
             new WFI18NTranslation("DFD", "BackFace Shadow", "裏面は影にする"),
+            // Dissolve
+            new WFI18NTranslation("DSV", "Dissolve", "ディゾルブ"),
+            new WFI18NTranslation("DSV", "Invert", "反転"),
+            new WFI18NTranslation("DSV", "Control Texture (R)", "制御テクスチャ (R)"),
+            new WFI18NTranslation("DSV", "Spark Color", "スパーク色"),
+            new WFI18NTranslation("DSV", "Spark Width", "スパーク幅"),
             // Toon Fog
             new WFI18NTranslation("TFG", "Color", "フォグの色"),
             new WFI18NTranslation("TFG", "Exponential", "変化の鋭さ"),

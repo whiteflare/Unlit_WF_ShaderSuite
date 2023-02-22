@@ -88,6 +88,12 @@
             }
         #endif
 
+        // ディゾルブの考慮
+        if (TGL_ON(_DSV_Enable) && _DSV_Dissolve < 1 - 0.05) {
+            discard;
+            return float4(0, 0, 0, 0);
+        }
+
         return frag_shadow_caster(i);
     }
 
