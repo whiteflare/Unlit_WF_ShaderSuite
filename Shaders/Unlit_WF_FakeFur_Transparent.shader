@@ -150,6 +150,19 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [ToggleUI]
             _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
 
+        // Dissolve
+        [WFHeaderToggle(Dissolve)]
+            _DSV_Enable             ("[DSV] Enable", Float) = 0
+            _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
+        [ToggleUI]
+            _DSV_Invert             ("[DSV] Invert", Range(0, 1)) = 0
+            _DSV_CtrlTex            ("[DSV] Control Texture (R)", 2D) = "black" {}
+        [ToggleUI]
+            _DSV_TexIsSRGB          ("[DSV] sRGB", Range(0, 1)) = 1
+        [HDR]
+            _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
+            _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -174,7 +187,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/02/04", Float) = 0
+            _CurrentVersion         ("2023/02/25", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
@@ -201,17 +214,17 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
 
             #pragma target 4.5
 
-
-            #define _TS_ENABLE
-
-            #define _CLC_ENABLE
-            #define _HL_ENABLE
-            #define _HL_ENABLE_1
-            #define _TR_ENABLE
-            #define _DFD_ENABLE
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CLC_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _DFD_ENABLE
+            #pragma shader_feature_local_fragment _DSV_ENABLE
 
             #pragma multi_compile_fwdbase
-            #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
 
@@ -234,11 +247,12 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur
 
-
-            #define _TS_ENABLE
-
-            #define _CLC_ENABLE
-            #define _DFD_ENABLE
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CLC_ENABLE
+            #pragma shader_feature_local_fragment _DFD_ENABLE
+            #pragma shader_feature_local_fragment _DSV_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase

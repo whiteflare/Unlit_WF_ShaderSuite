@@ -321,7 +321,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/02/04", Float) = 0
+            _CurrentVersion         ("2023/02/25", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
@@ -343,6 +343,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
+            Blend One Zero, One OneMinusSrcAlpha
             AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
@@ -354,7 +355,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             #pragma target 4.5
             #pragma require geometry
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
 
 
 
@@ -379,6 +380,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
+            Blend One Zero, One OneMinusSrcAlpha
             AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
@@ -388,7 +390,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
 
             #pragma target 4.5
 
-            #define _WF_ALPHA_CUTOUT
+            #define _WF_ALPHA_CUTFADE
 
 
 
