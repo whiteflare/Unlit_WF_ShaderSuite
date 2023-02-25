@@ -225,6 +225,8 @@
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
+        // ディゾルブ
+        affectDissolve(i.uv, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 

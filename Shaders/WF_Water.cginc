@@ -159,7 +159,7 @@
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
-        float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                \
+        float calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                 \
             float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);                  \
             cnt++;                                                                                              \
@@ -191,14 +191,14 @@
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
-        float3 calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                \
+        float calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                 \
             if (_WAV_Enable##id) {                                                                              \
                 float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);              \
                 cnt++;                                                                                          \
                 return PICK_MAIN_TEX2D(_WAV_HeightMap##id, uv).r * 2 - 0.5;                                     \
             } else {                                                                                            \
-                return ZERO_VEC3;                                                                               \
+                return 0;                                                                                       \
             }                                                                                                   \
         }
 
@@ -489,16 +489,14 @@ FEATURE_TGL_END
         UNITY_INITIALIZE_OUTPUT(v2f_surface, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        float3 ws_vertex = UnityObjectToWorldPos(v.vertex);
-
-        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
         o.uv = v.uv;
-        o.ws_vertex = ws_vertex;
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
         o.uv_lmap = v.uv2;
 
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, 0);
 
-        o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+        o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex).xyz;
 
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
@@ -569,11 +567,9 @@ FEATURE_TGL_END
         UNITY_INITIALIZE_OUTPUT(v2f_caustics, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        float3 ws_vertex = UnityObjectToWorldPos(v.vertex);
-
-        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
         o.uv = v.uv;
-        o.ws_vertex = ws_vertex;
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
         o.uv_lmap = v.uv2;
 
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
@@ -610,10 +606,8 @@ FEATURE_TGL_END
         UNITY_INITIALIZE_OUTPUT(v2f_depthfog, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        float3 ws_vertex = UnityObjectToWorldPos(v.vertex);
-
-        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
-        o.ws_vertex = ws_vertex;
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
 
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
@@ -654,11 +648,9 @@ FEATURE_TGL_END
         UNITY_INITIALIZE_OUTPUT(v2f_lamp, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        float3 ws_vertex = UnityObjectToWorldPos(v.vertex);
-
-        o.vs_vertex = UnityWorldToClipPos(ws_vertex);
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
         o.uv = v.uv;
-        o.ws_vertex = ws_vertex;
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
         o.uv_lmap = v.uv2;
 #ifdef _WF_WATER_LAMP_POINT
         o.ws_base_pos = UnityObjectToWorldPos(_WAR_BasePosOffset);

@@ -125,6 +125,7 @@
 
     // -------------------------
 
+    #define _WF_DEFINED_LBE
     float           _LBE_Enable;
     float           _LBE_IndirectChroma;
     float           _LBE_IndirectMultiplier;
@@ -342,6 +343,17 @@
     float           _DFD_Power;
     float           _DFD_BackShadow;
 #endif
+
+    // -------------------------
+
+    float           _DSV_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
+    float           _DSV_Dissolve;
+    float           _DSV_Invert;
+    float4          _DSV_SparkColor;
+    float           _DSV_SparkWidth;
+    DECL_MAIN_TEX2D(_DSV_CtrlTex);
+    float4          _DSV_CtrlTex_ST;
+    float           _DSV_TexIsSRGB;
 
     // -------------------------
 

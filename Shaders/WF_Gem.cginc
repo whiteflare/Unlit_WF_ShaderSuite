@@ -115,6 +115,8 @@
 
         // フレネル
         affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
+        // ディゾルブ
+        affectDissolve(i.uv, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
@@ -173,6 +175,8 @@
 
         // フレネル
         affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
+        // ディゾルブ
+        affectDissolve(i.uv, color);
         // Alpha は 0-1 にクランプ
         color.a = saturate(color.a);
 
