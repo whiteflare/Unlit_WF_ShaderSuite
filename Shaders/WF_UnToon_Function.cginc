@@ -1534,7 +1534,8 @@ FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             grab_uv.xy /= grab_uv.w;
 
             // Scale 計算
-            float2 scale = _CGL_Blur / 100;
+            float2 scale = max(_CGL_BlurMin.xx, _CGL_Blur.xx / max(1, length( i.ws_vertex.xyz - worldSpaceViewPointPos() )));
+            scale *= UNITY_MATRIX_P._m11 / 100;
             scale.y *= _ScreenParams.x / _ScreenParams.y;
 
             float3 back_color =

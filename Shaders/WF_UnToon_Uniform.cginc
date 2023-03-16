@@ -387,6 +387,7 @@
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_CGL_Enable);
     float           _CGL_Blur;
+    float           _CGL_BlurMin;
     uint            _CGL_BlurMode;
 #endif
 

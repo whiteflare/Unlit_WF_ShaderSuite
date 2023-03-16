@@ -153,6 +153,7 @@ Material:
     - _BKT_UVType: 0
     - _BumpScale: 1
     - _CGL_Blur: 0.4
+    - _CGL_BlurMin: 0.1
     - _CGL_BlurMode: 0
     - _CGL_Enable: 1
     - _CHM_Enable: 0
@@ -165,6 +166,7 @@ Material:
     - _CRF_Distance: 10
     - _CRF_Enable: 1
     - _CRF_RefractiveIndex: 1.33
+    - _Category: 0
     - _CullMode: 2
     - _CurrentVersion: 0
     - _DFD_BackShadow: 1
@@ -173,6 +175,7 @@ Material:
     - _DFD_MinDist: 0.02
     - _DFD_Power: 1
     - _DetailNormalMapScale: 0.4
+    - _ES_AU_AlphaLink: 0
     - _ES_AU_Band: 0
     - _ES_AU_BlackOut: 0
     - _ES_AU_MaxThreshold: 0.5

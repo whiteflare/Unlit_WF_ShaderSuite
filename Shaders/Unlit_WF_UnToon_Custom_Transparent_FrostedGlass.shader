@@ -42,6 +42,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [WFHeaderAlwaysOn(FrostedGlass)]
             _CGL_Enable             ("[CGL] Enable", Float) = 1
             _CGL_Blur               ("[CGL] Blur", Range(0, 2)) = 0.4
+            _CGL_BlurMin            ("[CGL] Blur Min", Range(0, 2)) = 0
         [Enum(NORMAL,0,FAST,1)]
             _CGL_BlurMode           ("[CGL] Blur Mode", Float) = 0
 

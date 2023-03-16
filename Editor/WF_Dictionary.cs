@@ -588,6 +588,7 @@ namespace UnlitWF
             new WFI18NTranslation("CRF", "Refractive Index", "屈折率"),
             // Frosted Glass
             new WFI18NTranslation("CGL", "Blur", "ブラー"),
+            new WFI18NTranslation("CGL", "Blur Min", "ブラー(下限)"),
             new WFI18NTranslation("CGL", "Blur Mode", "ブラーモード"),
             // Grass
             new WFI18NTranslation("GRS", "Height Type", "高さ指定タイプ"),
