@@ -144,8 +144,10 @@ Material:
     - _CLC_DeltaV: 0
     - _CLC_Enable: 0
     - _CLC_Monochrome: 0
+    - _Category: 0
     - _CurrentVersion: 0
     - _DetailNormalMapScale: 0.4
+    - _ES_AU_AlphaLink: 0
     - _ES_AU_Band: 0
     - _ES_AU_BlackOut: 0
     - _ES_AU_MaxThreshold: 0.5
@@ -159,7 +161,7 @@ Material:
     - _ES_SC_AlphaScroll: 0
     - _ES_SC_DirType: 0
     - _ES_SC_LevelOffset: 0
-    - _ES_SC_Shape: 3
+    - _ES_SC_Shape: 0
     - _ES_SC_Sharpness: 1
     - _ES_SC_Speed: 2
     - _ES_SC_UVType: 0
