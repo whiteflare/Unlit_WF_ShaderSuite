@@ -208,7 +208,7 @@ FEATURE_TGL_END
             #elif defined(_WF_ALPHA_CUTOUT) || defined(_WF_ALPHA_CUTFADE)
                 alpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, alpha);
                 #if defined(_WF_ALPHA_CUTFADE)
-	                if (TGL_OFF(_AL_AlphaToMask)) {
+                    if (TGL_OFF(_AL_AlphaToMask)) {
                 #endif
                     if (alpha < 0.5) {
                         discard;
@@ -217,7 +217,7 @@ FEATURE_TGL_END
                         alpha = 1;
                     }
                 #if defined(_WF_ALPHA_CUTFADE)
-    	            }
+                    }
                 #endif
             #else
                 alpha *= _AL_Power;
@@ -1536,7 +1536,11 @@ FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             // Scale 計算
             float2 scale = max(_CGL_BlurMin.xx, _CGL_Blur.xx / max(1, length( i.ws_vertex.xyz - worldSpaceViewPointPos() )));
             scale *= UNITY_MATRIX_P._m11 / 100;
-            scale.y *= _ScreenParams.x / _ScreenParams.y;
+            scale.y *= _ScreenParams.x / _ScreenParams.y
+#ifdef UNITY_SINGLE_PASS_STEREO
+                / 2
+#endif
+            ;
 
             float3 back_color =
 #ifdef _WF_LEGACY_FEATURE_SWITCH
