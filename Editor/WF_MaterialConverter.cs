@@ -469,6 +469,14 @@ namespace UnlitWF.Converter
                         }
                     }
                 },
+                ctx =>
+                {
+                    // 半透明はアウトライン付きには変換しない
+                    if (ctx.renderType == ShaderType.Transparent && ctx.outline)
+                    {
+                        ctx.outline = false;
+                    }
+                },
                 ctx => { 
                     // シェーダ切り替える直前に、削除したいプロパティを削除
                     WFMaterialEditUtility.RemovePropertiesWithoutUndo(ctx.target, "_GI_Intensity");
@@ -670,7 +678,7 @@ namespace UnlitWF.Converter
                         PropertyNameReplacement.MatchIgnoreCase("_Outline_Sampler", "_TL_MaskTex"),
                         PropertyNameReplacement.MatchIgnoreCase("_OutlineMask", "_TL_MaskTex")
                         );
-                    if (!HasNewPropertyValue(ctx, "_TL_CustomColorTex")) {
+                    if (HasNewPropertyValue(ctx, "_TL_CustomColorTex")) {
                         if (ctx.target.GetTexture("_TL_CustomColorTex") == ctx.target.GetTexture("_MainTex"))
                         {
                             // CustomColorTex と MainTex が同一の場合、CustomColorTex を削除して BlendBase を調整する
