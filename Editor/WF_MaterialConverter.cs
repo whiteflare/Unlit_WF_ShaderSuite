@@ -469,8 +469,7 @@ namespace UnlitWF.Converter
                         }
                     }
                 },
-                ctx =>
-                {
+                ctx => {
                     // 半透明はアウトライン付きには変換しない
                     if (ctx.renderType == ShaderType.Transparent && ctx.outline)
                     {
@@ -528,6 +527,13 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    // アウトライン付きかつ _CullMode が BACK の場合、OFF に変更する
+                    if (ctx.outline && ctx.target.HasProperty("_CullMode") && ctx.target.GetInt("_CullMode") == 2)
+                    {
+                        ctx.target.SetInt("_CullMode", 0);
+                    }
+                },
+                ctx => {
                     if (HasOldPropertyValue(ctx, "_MainTex")) {
                         // メインテクスチャがあるならば _Color は白にする
                         if (!IsMatchShaderName(ctx, "Standard") && !IsMatchShaderName(ctx, "Autodesk") && !IsMatchShaderName(ctx, "Unlit/Color"))
@@ -536,8 +542,7 @@ namespace UnlitWF.Converter
                         }
                     }
                 },
-                ctx =>
-                {
+                ctx => {
                     // プロパティ名変更開始
                     WFMaterialEditUtility.BeginReplacePropertyNames(ctx.target);
                 },
@@ -692,8 +697,7 @@ namespace UnlitWF.Converter
                         }
                     }
                 },
-                ctx =>
-                {
+                ctx => {
                     // プロパティ名変更終了
                     WFMaterialEditUtility.EndReplacePropertyNames(ctx.target);
                 },
