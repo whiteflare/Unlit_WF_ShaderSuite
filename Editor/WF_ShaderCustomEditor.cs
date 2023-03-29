@@ -275,6 +275,11 @@ namespace UnlitWF
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
+                    // OverrideTag を掃除する
+                    newMat.SetOverrideTag("RenderType", "");
+                    newMat.SetOverrideTag("VRCFallback", "");
+                    newMat.SetOverrideTag("DisableBatching", ""); // DisableBatching は OverrideTag にしても動かないが
+                    newMat.SetOverrideTag("IgnoreProjector", "");
                     // Color を sRGB -> Linear 変換して再設定する
                     if (newMat.HasProperty("_Color"))
                     {
