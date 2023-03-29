@@ -491,6 +491,7 @@ namespace UnlitWF
             new WFI18NTranslation("OVL", "Multiply VertexColor To Overlay Texture", "頂点カラーをオーバーレイテクスチャに乗算する"),
             new WFI18NTranslation("OVL", "Multiply VertexColor To Mask Texture", "頂点カラーをマスクに乗算する"),
             new WFI18NTranslation("OVL", "UV Scroll", "UVスクロール"),
+            new WFI18NTranslation("OVL", "Out of UV Mode", "UV外の扱い"),
             // EmissiveScroll
             new WFI18NTranslation("ES", "Emission", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),

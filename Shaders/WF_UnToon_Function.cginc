@@ -1168,7 +1168,14 @@ FEATURE_TGL_ON_BEGIN(_OVL_Enable)
                 : i.uv                                                                      // UV1
                 ;
             uv_overlay = TRANSFORM_TEX(uv_overlay, _OVL_OverlayTex);
-            uv_overlay += frac(_OVL_UVScroll * _Time.xx);
+            if (_OVL_OutUVType == 1) {  // Clip
+                if (uv_overlay.x < 0 || 1 < uv_overlay.x || uv_overlay.y < 0 || 1 < uv_overlay.y) {
+                    return;
+                }
+            }
+            else {  // Repeat
+                uv_overlay += frac(_OVL_UVScroll * _Time.xx);
+            }
             float4 ov_color = PICK_MAIN_TEX2D(_OVL_OverlayTex, uv_overlay) * _OVL_Color;
             float ov_power = _OVL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
 

@@ -265,6 +265,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
         [HDR]
             _OVL_Color              ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
             _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
+        [Enum(REPEAT,0,CLIP,1)]
+            _OVL_OutUVType          ("[OVL] Out of UV Mode", Float) = 0
         [WF_Vector2]
             _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [ToggleUI]
