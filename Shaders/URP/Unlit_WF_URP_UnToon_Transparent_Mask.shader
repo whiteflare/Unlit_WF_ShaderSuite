@@ -265,6 +265,8 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
         [HDR]
             _OVL_Color              ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
             _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
+        [Enum(REPEAT,0,CLIP,1)]
+            _OVL_OutUVType          ("[OVL] Out of UV Mode", Float) = 0
         [WF_Vector2]
             _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [ToggleUI]
@@ -352,7 +354,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/02/25", Float) = 0
+            _CurrentVersion         ("2023/04/01", Float) = 0
     }
 
     SubShader {

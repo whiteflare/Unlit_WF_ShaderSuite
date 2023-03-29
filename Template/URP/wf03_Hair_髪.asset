@@ -150,7 +150,7 @@ Material:
     - _ES_Enable: 0
     - _ES_SC_DirType: 0
     - _ES_SC_LevelOffset: 0
-    - _ES_SC_Shape: 3
+    - _ES_SC_Shape: 0
     - _ES_SC_Sharpness: 1
     - _ES_SC_Speed: 2
     - _ES_SC_UVType: 0

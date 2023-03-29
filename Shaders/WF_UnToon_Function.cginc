@@ -208,7 +208,7 @@ FEATURE_TGL_END
             #elif defined(_WF_ALPHA_CUTOUT) || defined(_WF_ALPHA_CUTFADE)
                 alpha = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, alpha);
                 #if defined(_WF_ALPHA_CUTFADE)
-	                if (TGL_OFF(_AL_AlphaToMask)) {
+                    if (TGL_OFF(_AL_AlphaToMask)) {
                 #endif
                     if (alpha < 0.5) {
                         discard;
@@ -217,7 +217,7 @@ FEATURE_TGL_END
                         alpha = 1;
                     }
                 #if defined(_WF_ALPHA_CUTFADE)
-    	            }
+                    }
                 #endif
             #else
                 alpha *= _AL_Power;
@@ -1168,7 +1168,14 @@ FEATURE_TGL_ON_BEGIN(_OVL_Enable)
                 : i.uv                                                                      // UV1
                 ;
             uv_overlay = TRANSFORM_TEX(uv_overlay, _OVL_OverlayTex);
-            uv_overlay += frac(_OVL_UVScroll * _Time.xx);
+            if (_OVL_OutUVType == 1) {  // Clip
+                if (uv_overlay.x < 0 || 1 < uv_overlay.x || uv_overlay.y < 0 || 1 < uv_overlay.y) {
+                    return;
+                }
+            }
+            else {  // Repeat
+                uv_overlay += frac(_OVL_UVScroll * _Time.xx);
+            }
             float4 ov_color = PICK_MAIN_TEX2D(_OVL_OverlayTex, uv_overlay) * _OVL_Color;
             float ov_power = _OVL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
 
@@ -1534,8 +1541,13 @@ FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             grab_uv.xy /= grab_uv.w;
 
             // Scale 計算
-            float2 scale = _CGL_Blur / 100;
-            scale.y *= _ScreenParams.x / _ScreenParams.y;
+            float2 scale = max(_CGL_BlurMin.xx, _CGL_Blur.xx / max(1, length( i.ws_vertex.xyz - worldSpaceViewPointPos() )));
+            scale *= UNITY_MATRIX_P._m11 / 100;
+            scale.y *= _ScreenParams.x / _ScreenParams.y
+#ifdef UNITY_SINGLE_PASS_STEREO
+                / 2
+#endif
+            ;
 
             float3 back_color =
 #ifdef _WF_LEGACY_FEATURE_SWITCH
