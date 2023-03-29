@@ -56,6 +56,7 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_TS_2ndColor|_TS_2ndBorder|_TS_2ndFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
             new ConditionVisiblePropertyHook("_TS_3rdColor|_TS_3rdBorder|_TS_3rdFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
             new ConditionVisiblePropertyHook("_OVL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)), // ANGEL_RING
+            new ConditionVisiblePropertyHook("_OVL_UVScroll", ctx => IsAnyIntValue(ctx, "_OVL_OutUVType", p => p != 1)), // Clip
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
@@ -91,6 +92,7 @@ namespace UnlitWF
             new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist", "[LME] FadeOut Distance"),
             new MinMaxSliderPropertyHook("_TS_MinDist", "_TS_MaxDist", "[TS] FadeOut Distance"),
             new MinMaxSliderPropertyHook("_DFD_MinDist", "_DFD_MaxDist", "[DFD] Fade Distance"),
+            new MinMaxSliderPropertyHook("_CGL_BlurMin", "_CGL_Blur", "[CGL] Blur"),
             new MinMaxSliderPropertyHook("_WAR_MinDist", "_WAR_MaxDist", "[WAR] FadeOut Distance"),
             new MinMaxSliderPropertyHook("_ES_AU_MinValue", "_ES_AU_MaxValue", "[ES] Emission Multiplier"),
             new MinMaxSliderPropertyHook("_ES_AU_MinThreshold", "_ES_AU_MaxThreshold", "[ES] Threshold"),
@@ -273,6 +275,11 @@ namespace UnlitWF
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
+                    // OverrideTag を掃除する
+                    newMat.SetOverrideTag("RenderType", "");
+                    newMat.SetOverrideTag("VRCFallback", "");
+                    newMat.SetOverrideTag("DisableBatching", ""); // DisableBatching は OverrideTag にしても動かないが
+                    newMat.SetOverrideTag("IgnoreProjector", "");
                     // Color を sRGB -> Linear 変換して再設定する
                     if (newMat.HasProperty("_Color"))
                     {

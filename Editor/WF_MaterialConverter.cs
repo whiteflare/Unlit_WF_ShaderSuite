@@ -161,16 +161,72 @@ namespace UnlitWF.Converter
             return false;
         }
 
-        protected static bool HasOldProperty(ConvertContext ctx, params string[] names)
+        private static ShaderSerializedProperty GetProperty(Dictionary<string, ShaderSerializedProperty> props, string name, bool ignoreCase = false)
         {
-            return names.Any(name => ctx.oldProps.ContainsKey(name));
+            if (ignoreCase)
+            {
+                foreach(var item in props)
+                {
+                    if (item.Key.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return item.Value;
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                return props.GetValueOrNull(name);
+            }
         }
 
-        protected static bool HasOldPropertyValue(ConvertContext ctx, params string[] names)
+        /// <summary>
+        /// 変換前マテリアルにプロパティが存在する。
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        protected static bool HasOldProperty(ConvertContext ctx, params string[] names)
+        {
+            return HasOldProperty(ctx, names, false);
+        }
+
+        protected static bool HasOldPropertyIgnoreCase(ConvertContext ctx, params string[] names)
+        {
+            return HasOldProperty(ctx, names, true);
+        }
+
+        private static bool HasOldProperty(ConvertContext ctx, string[] names, bool ignoreCase)
         {
             return names.Any(name =>
             {
-                if (ctx.oldProps.TryGetValue(name, out var prop))
+                var prop = GetProperty(ctx.oldProps, name, ignoreCase);
+                return prop != null;
+            });
+        }
+
+        /// <summary>
+        /// 変換前マテリアルにプロパティが存在し、何らかの値が設定されている。
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        protected static bool HasOldPropertyValue(ConvertContext ctx, params string[] names)
+        {
+            return HasOldPropertyValue(ctx, names, false);
+        }
+
+        protected static bool HasOldPropertyValueIgnoreCase(ConvertContext ctx, params string[] names)
+        {
+            return HasOldPropertyValue(ctx, names, true);
+        }
+
+        private static bool HasOldPropertyValue(ConvertContext ctx, string[] names, bool ignoreCase)
+        {
+            return names.Any(name =>
+            {
+                var prop = GetProperty(ctx.oldProps, name, ignoreCase);
+                if (prop != null)
                 {
                     return hasCustomValue(prop);
                 }
@@ -336,7 +392,15 @@ namespace UnlitWF.Converter
                     if (IsMatchShaderName(ctx, "outline") && !IsMatchShaderName(ctx, "nooutline")) {
                         ctx.outline = true;
                     }
-                    else if (HasOldPropertyValue(ctx, "_OutlineMask", "_OutLineMask", "_OutlineWidthMask", "_Outline_Sampler", "_OutLineEnable", "_OutlineMode", "_UseOutline")) {
+                    else if (HasOldPropertyValueIgnoreCase(ctx,
+                        "_OutlineMask",
+                        "_OutlineWidthMask",
+                        "_Outline_Sampler",
+                        "_OutLineEnable",
+                        "_OutlineTex",
+                        "_OutlineTexture",
+                        "_OutlineMode",
+                        "_UseOutline")) {
                         ctx.outline = true;
                     }
                 },
@@ -396,13 +460,20 @@ namespace UnlitWF.Converter
                 ctx => {
                     // _ClippingMask の有無からシェーダタイプを判定する
                     if (ctx.renderType == ShaderType.NoMatch) {
-                        if (HasOldPropertyValue(ctx, "_ClippingMask")) {
+                        if (HasOldPropertyValueIgnoreCase(ctx, "_ClippingMask")) {
                             ctx.renderType = ShaderType.Cutout;
                         }
-                        if (HasOldPropertyValue(ctx, "_AlphaMask"))
+                        if (HasOldPropertyValueIgnoreCase(ctx, "_AlphaMask"))
                         {
                             ctx.renderType = ShaderType.Transparent;
                         }
+                    }
+                },
+                ctx => {
+                    // 半透明はアウトライン付きには変換しない
+                    if (ctx.renderType == ShaderType.Transparent && ctx.outline)
+                    {
+                        ctx.outline = false;
                     }
                 },
                 ctx => { 
@@ -456,6 +527,13 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    // アウトライン付きかつ _CullMode が BACK の場合、OFF に変更する
+                    if (ctx.outline && ctx.target.HasProperty("_CullMode") && ctx.target.GetInt("_CullMode") == 2)
+                    {
+                        ctx.target.SetInt("_CullMode", 0);
+                    }
+                },
+                ctx => {
                     if (HasOldPropertyValue(ctx, "_MainTex")) {
                         // メインテクスチャがあるならば _Color は白にする
                         if (!IsMatchShaderName(ctx, "Standard") && !IsMatchShaderName(ctx, "Autodesk") && !IsMatchShaderName(ctx, "Unlit/Color"))
@@ -464,17 +542,16 @@ namespace UnlitWF.Converter
                         }
                     }
                 },
-                ctx =>
-                {
+                ctx => {
                     // プロパティ名変更開始
                     WFMaterialEditUtility.BeginReplacePropertyNames(ctx.target);
                 },
                 ctx => {
                     // アルファマスク
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        PropertyNameReplacement.Match("_AlphaMask", "_AL_MaskTex"),
-                        PropertyNameReplacement.Match("_ClippingMask", "_AL_MaskTex"));
-                    if (HasOldPropertyValue(ctx, "_AlphaMask", "_ClippingMask")) {
+                        PropertyNameReplacement.MatchIgnoreCase("_AlphaMask", "_AL_MaskTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_ClippingMask", "_AL_MaskTex"));
+                    if (HasNewPropertyValue(ctx, "_AL_MaskTex")) {
                         ctx.target.SetInt("_AL_Source", 1); // AlphaSource = MASK_TEX_RED
                     }
                 },
@@ -482,33 +559,33 @@ namespace UnlitWF.Converter
                     // ノーマルマップ
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         PropertyNameReplacement.Match("_NormalMap", "_BumpMap"));
-                    if (HasOldPropertyValue(ctx, "_NormalMap", "_BumpMap")) {
+                    if (HasNewPropertyValue(ctx, "_BumpMap")) {
                         ctx.target.SetInt("_NM_Enable", 1);
                     }
                 },
                 ctx => {
                     // ノーマルマップ2nd
-                    if (HasOldPropertyValue(ctx, "_DetailNormalMap")) {
+                    if (HasNewPropertyValue(ctx, "_DetailNormalMap")) {
                         ctx.target.SetInt("_NS_Enable", 1);
                     }
                 },
                 ctx => {
                     // メタリック
-                    if (HasOldPropertyValue(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
+                    if (HasNewPropertyValue(ctx, "_MetallicGlossMap", "_SpecGlossMap")) {
                         ctx.target.SetInt("_MT_Enable", 1);
                     }
                 },
                 ctx => {
                     // AO
-                    if (HasOldPropertyValue(ctx, "_OcclusionMap")) {
+                    if (HasNewPropertyValue(ctx, "_OcclusionMap")) {
                         ctx.target.SetInt("_AO_Enable", 1);
                     }
                 },
                 ctx => {
                     // Emission
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        PropertyNameReplacement.Match("_Emissive_Tex", "_EmissionMap"),
-                        PropertyNameReplacement.Match("_Emissive_Color", "_EmissionColor"));
+                        PropertyNameReplacement.MatchIgnoreCase("_Emissive_Tex", "_EmissionMap"),
+                        PropertyNameReplacement.MatchIgnoreCase("_Emissive_Color", "_EmissionColor"));
                     if (HasOldPropertyValue(ctx, "_EmissionMap", "_UseEmission", "_EmissionEnable", "_EnableEmission")) {
                         ctx.target.SetInt("_ES_Enable", 1);
                     }
@@ -522,15 +599,15 @@ namespace UnlitWF.Converter
                     ctx.target.SetInt("_TS_Enable", 1);
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
                         // 1影
-                        PropertyNameReplacement.Match("_1st_ShadeMap", "_TS_1stTex"),
-                        PropertyNameReplacement.Match("_ShadowColorTex", "_TS_1stTex"),
-                        PropertyNameReplacement.Match("_1st_ShadeColor", "_TS_1stColor"),
-                        PropertyNameReplacement.Match("_ShadowColor", "_TS_1stColor"),
+                        PropertyNameReplacement.MatchIgnoreCase("_1st_ShadeMap", "_TS_1stTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_ShadowColorTex", "_TS_1stTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_1st_ShadeColor", "_TS_1stColor"),
+                        PropertyNameReplacement.MatchIgnoreCase("_ShadowColor", "_TS_1stColor"),
                         // 2影
-                        PropertyNameReplacement.Match("_2nd_ShadeMap", "_TS_2ndTex"),
-                        PropertyNameReplacement.Match("_Shadow2ndColorTex", "_TS_2ndTex"),
-                        PropertyNameReplacement.Match("_2nd_ShadeColor", "_TS_2ndColor"),
-                        PropertyNameReplacement.Match("_Shadow2ndColor", "_TS_2ndColor")
+                        PropertyNameReplacement.MatchIgnoreCase("_2nd_ShadeMap", "_TS_2ndTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_Shadow2ndColorTex", "_TS_2ndTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_2nd_ShadeColor", "_TS_2ndColor"),
+                        PropertyNameReplacement.MatchIgnoreCase("_Shadow2ndColor", "_TS_2ndColor")
                         );
                     // 1影2影とも色相だけ反映して彩度・明度はリセットしてしまう
                     if (HasNewProperty(ctx, "_TS_1stColor")) {
@@ -595,23 +672,32 @@ namespace UnlitWF.Converter
                 ctx => {
                     // アウトライン
                     WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
-                        PropertyNameReplacement.Match("_OutlineColor", "_TL_LineColor"),
-                        PropertyNameReplacement.Match("_Outline_Color", "_TL_LineColor"),
-                        PropertyNameReplacement.Match("_OutLineColor", "_TL_LineColor"),
-                        PropertyNameReplacement.Match("_LineColor", "_TL_LineColor"),
+                        PropertyNameReplacement.MatchIgnoreCase("_OutlineColor", "_TL_LineColor"),
+                        PropertyNameReplacement.MatchIgnoreCase("_Outline_Color", "_TL_LineColor"),
+                        PropertyNameReplacement.MatchIgnoreCase("_LineColor", "_TL_LineColor"),
                         // ColorTex
-                        PropertyNameReplacement.Match("_OutlineTex", "_TL_CustomColorTex"),
-                        PropertyNameReplacement.Match("_OutLineTexture", "_TL_CustomColorTex"),
-                        PropertyNameReplacement.Match("_OutlineTexture", "_TL_CustomColorTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_OutlineTex", "_TL_CustomColorTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_OutlineTexture", "_TL_CustomColorTex"),
                         // MaskTex
-                        PropertyNameReplacement.Match("_OutlineWidthMask", "_TL_MaskTex"),
-                        PropertyNameReplacement.Match("_Outline_Sampler", "_TL_MaskTex"),
-                        PropertyNameReplacement.Match("_OutlineMask", "_TL_MaskTex"),
-                        PropertyNameReplacement.Match("_OutLineMask", "_TL_MaskTex")
+                        PropertyNameReplacement.MatchIgnoreCase("_OutlineWidthMask", "_TL_MaskTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_Outline_Sampler", "_TL_MaskTex"),
+                        PropertyNameReplacement.MatchIgnoreCase("_OutlineMask", "_TL_MaskTex")
                         );
+                    if (HasNewPropertyValue(ctx, "_TL_CustomColorTex")) {
+                        if (ctx.target.GetTexture("_TL_CustomColorTex") == ctx.target.GetTexture("_MainTex"))
+                        {
+                            // CustomColorTex と MainTex が同一の場合、CustomColorTex を削除して BlendBase を調整する
+                            ctx.target.SetTexture("_TL_CustomColorTex", null);
+                            ctx.target.SetFloat("_TL_BlendBase", 0.5f);
+                        }
+                        else
+                        {
+                            // そうではない場合 BlendCustom を調整する
+                            ctx.target.SetFloat("_TL_BlendCustom", 0.5f);
+                        }
+                    }
                 },
-                ctx =>
-                {
+                ctx => {
                     // プロパティ名変更終了
                     WFMaterialEditUtility.EndReplacePropertyNames(ctx.target);
                 },

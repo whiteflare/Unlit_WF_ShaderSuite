@@ -42,6 +42,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [WFHeaderAlwaysOn(FrostedGlass)]
             _CGL_Enable             ("[CGL] Enable", Float) = 1
             _CGL_Blur               ("[CGL] Blur", Range(0, 2)) = 0.4
+            _CGL_BlurMin            ("[CGL] Blur Min", Range(0, 2)) = 0
         [Enum(NORMAL,0,FAST,1)]
             _CGL_BlurMode           ("[CGL] Blur Mode", Float) = 0
 
@@ -110,6 +111,49 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
             _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
 
+        // Matcapハイライト
+        [WFHeaderToggle(Light Matcap)]
+            _HL_Enable              ("[HL] Enable", Float) = 0
+        [WF_Enum(UnlitWF.BlendModeHL)]
+            _HL_CapType             ("[HL] Matcap Type", Float) = 0
+        [NoScaleOffset]
+            _HL_MatcapTex           ("[HL] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor         ("[HL] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power               ("[HL] Power", Range(0, 2)) = 1
+            _HL_BlendNormal         ("[HL] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2        ("[HL] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [ToggleUI]
+            _HL_ChangeAlpha         ("[HL] Change Alpha Transparency", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _HL_MaskTex             ("[HL] Mask Texture (RGB)", 2D) = "white" {}
+        [ToggleUI]
+            _HL_InvMaskVal          ("[HL] Invert Mask Value", Range(0, 1)) = 0
+        [Header(Matcap Advance)]
+            _HL_Parallax            ("[HL] Parallax", Range(0, 1)) = 0.75
+            _HL_MatcapMonochrome    ("[HL] Matcap Monochrome", Range(0, 1)) = 0
+            _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
+
+        [WFHeaderToggle(Light Matcap 2)]
+            _HL_Enable_1            ("[HA] Enable", Float) = 0
+        [WF_Enum(UnlitWF.BlendModeHL)]
+            _HL_CapType_1           ("[HA] Matcap Type", Float) = 0
+        [NoScaleOffset]
+            _HL_MatcapTex_1         ("[HA] Matcap Sampler", 2D) = "gray" {}
+            _HL_MedianColor_1       ("[HA] Matcap Base Color", Color) = (0.5, 0.5, 0.5, 1)
+            _HL_Power_1             ("[HA] Power", Range(0, 2)) = 1
+            _HL_BlendNormal_1       ("[HA] Blend Normal", Range(0, 1)) = 0.1
+            _HL_BlendNormal2_1      ("[HA] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [ToggleUI]
+            _HL_ChangeAlpha_1       ("[HA] Change Alpha Transparency", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _HL_MaskTex_1           ("[HA] Mask Texture", 2D) = "white" {}
+        [ToggleUI]
+            _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
+        [Header(Matcap Advance)]
+            _HL_Parallax_1          ("[HA] Parallax", Range(0, 1)) = 0.75
+            _HL_MatcapMonochrome_1  ("[HA] Matcap Monochrome", Range(0, 1)) = 0
+            _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
+
         // ラメ
         [WFHeaderToggle(Lame)]
             _LME_Enable             ("[LME] Enable", Float) = 0
@@ -138,6 +182,62 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [ToggleUI]
             _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
+        // 階調影
+        [WFHeaderToggle(ToonShade)]
+            _TS_Enable              ("[TS] Enable", Float) = 0
+        [IntRange]
+            _TS_Steps               ("[TS] Steps", Range(1, 3)) = 2
+            _TS_BaseColor           ("[TS] Base Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _TS_BaseTex             ("[TS] Base Shade Texture", 2D) = "white" {}
+            _TS_1stColor            ("[TS] 1st Shade Color", Color) = (0.81, 0.81, 0.9, 1)
+        [NoScaleOffset]
+            _TS_1stTex              ("[TS] 1st Shade Texture", 2D) = "white" {}
+            _TS_2ndColor            ("[TS] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
+        [NoScaleOffset]
+            _TS_2ndTex              ("[TS] 2nd Shade Texture", 2D) = "white" {}
+            _TS_3rdColor            ("[TS] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
+        [NoScaleOffset]
+            _TS_3rdTex              ("[TS] 3rd Shade Texture", 2D) = "white" {}
+            _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
+            _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
+            _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
+        [ToggleUI]
+            _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
+            _TS_BlendNormal         ("[TS] Blend Normal", Range(0, 1)) = 0.1
+            _TS_BlendNormal2        ("[TS] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [NoScaleOffset]
+            _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
+        [ToggleUI]
+            _TS_InvMaskVal          ("[TS] Invert Mask Value", Range(0, 1)) = 0
+        [Header(ToonShade Advance)]
+            _TS_1stBorder           ("[TS] 1st Border", Range(0, 1)) = 0.4
+            _TS_2ndBorder           ("[TS] 2nd Border", Range(0, 1)) = 0.2
+            _TS_3rdBorder           ("[TS] 3rd Border", Range(0, 1)) = 0.1
+            _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
+            _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
+            _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+
+        // リムライト
+        [WFHeaderToggle(RimLight)]
+            _TR_Enable              ("[TR] Enable", Float) = 0
+        [HDR]
+            _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
+        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB)]
+            _TR_BlendType           ("[TR] Blend Type", Float) = 0
+            _TR_Power               ("[TR] Power", Range(0, 2)) = 1
+            _TR_Feather             ("[TR] Feather", Range(0, 0.2)) = 0.05
+            _TR_BlendNormal         ("[TR] Blend Normal", Range(0, 1)) = 0
+            _TR_BlendNormal2        ("[TR] Blend Normal 2nd", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
+        [ToggleUI]
+            _TR_InvMaskVal          ("[TR] Invert Mask Value", Range(0, 1)) = 0
+        [Header(RimLight Advance)]
+            _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
+            _TR_PowerSide           ("[TR] Power Side", Range(0, 0.5)) = 0.1
+            _TR_PowerBottom         ("[TR] Power Bottom", Range(0, 0.5)) = 0.1
+
         // Overlay Texture
         [WFHeaderToggle(Overlay Texture)]
             _OVL_Enable             ("[OVL] Enable", Float) = 0
@@ -146,6 +246,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [HDR]
             _OVL_Color              ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
             _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
+        [Enum(REPEAT,0,CLIP,1)]
+            _OVL_OutUVType          ("[OVL] Out of UV Mode", Float) = 0
         [WF_Vector2]
             _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [ToggleUI]
@@ -248,7 +350,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/02/25", Float) = 0
+            _CurrentVersion         ("2023/04/01", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -272,6 +374,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
             Cull [_CullMode]
             ZWrite ON
+            Blend One Zero, One OneMinusSrcAlpha
 
             CGPROGRAM
 
@@ -282,20 +385,26 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #define _AO_ENABLE
-            #define _NM_ENABLE
-            #define _NS_ENABLE
-            #define _OVL_ENABLE
-            #define _VC_ENABLE
-
-
-
-            #define _BKT_ENABLE
-            #define _ES_ENABLE
-            #define _CGL_ENABLE
-            #define _LME_ENABLE
-            #define _MT_ENABLE
-
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _NS_ENABLE
+            #pragma shader_feature_local _OVL_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _CGL_BLURFAST_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _BKT_ENABLE
+            #pragma shader_feature_local_fragment _CGL_ENABLE
+            #pragma shader_feature_local_fragment _ES_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _LME_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonFrostedGlass
 
@@ -345,8 +454,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
             #define _WF_ALPHA_BLEND
 
-            #define _ES_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 
