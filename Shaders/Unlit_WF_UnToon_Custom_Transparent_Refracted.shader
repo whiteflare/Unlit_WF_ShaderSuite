@@ -267,6 +267,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
         [HDR]
             _OVL_Color              ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
             _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
+        [Enum(REPEAT,0,CLIP,1)]
+            _OVL_OutUVType          ("[OVL] Out of UV Mode", Float) = 0
         [WF_Vector2]
             _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [ToggleUI]
@@ -379,7 +381,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/02/25", Float) = 0
+            _CurrentVersion         ("2023/04/01", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -421,20 +423,20 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
+            #pragma shader_feature_local_fragment _CRF_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _CRF_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonRefractionBack

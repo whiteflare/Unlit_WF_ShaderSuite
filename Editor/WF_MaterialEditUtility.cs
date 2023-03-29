@@ -125,7 +125,12 @@ namespace UnlitWF
 
         public static PropertyNameReplacement Match(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
         {
-            return new MatchRename(bn, an, onAfterCopy);
+            return new MatchRename(bn, false, an, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement MatchIgnoreCase(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new MatchRename(bn, true, an, onAfterCopy);
         }
 
         public static PropertyNameReplacement Prefix(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy = null)
@@ -171,14 +176,17 @@ namespace UnlitWF
         {
             private readonly string beforeName;
             private readonly string afterName;
+            private readonly bool ignoreCase;
 
-            public MatchRename(string beforeName, string afterName, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            public MatchRename(string beforeName, bool ignoreCase, string afterName, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
             {
                 this.beforeName = beforeName;
                 this.afterName = afterName;
+                this.ignoreCase = ignoreCase;
             }
 
-            public override bool IsMatch(string beforeName) => this.beforeName == beforeName;
+            public override bool IsMatch(string beforeName) => string.Equals(this.beforeName, beforeName, 
+                ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
             protected override string Replace(string beforeName) => afterName;
         }
 

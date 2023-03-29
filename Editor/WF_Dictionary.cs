@@ -491,6 +491,7 @@ namespace UnlitWF
             new WFI18NTranslation("OVL", "Multiply VertexColor To Overlay Texture", "頂点カラーをオーバーレイテクスチャに乗算する"),
             new WFI18NTranslation("OVL", "Multiply VertexColor To Mask Texture", "頂点カラーをマスクに乗算する"),
             new WFI18NTranslation("OVL", "UV Scroll", "UVスクロール"),
+            new WFI18NTranslation("OVL", "Out of UV Mode", "UV外の扱い"),
             // EmissiveScroll
             new WFI18NTranslation("ES", "Emission", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),
@@ -588,6 +589,7 @@ namespace UnlitWF
             new WFI18NTranslation("CRF", "Refractive Index", "屈折率"),
             // Frosted Glass
             new WFI18NTranslation("CGL", "Blur", "ブラー"),
+            new WFI18NTranslation("CGL", "Blur Min", "ブラー(下限)"),
             new WFI18NTranslation("CGL", "Blur Mode", "ブラーモード"),
             // Grass
             new WFI18NTranslation("GRS", "Height Type", "高さ指定タイプ"),

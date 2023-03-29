@@ -49,6 +49,7 @@
         float3 ws_bitangent     : TEXCOORD5;
         float3 ws_light_dir     : TEXCOORD6;
         UNITY_FOG_COORDS(7)
+        UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -498,11 +499,13 @@ FEATURE_TGL_END
 
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex).xyz;
 
+        UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
     }
 
     half4 frag_top(v2f_surface i, uint facing: SV_IsFrontFace) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         i.ws_normal        = normalize(i.ws_normal);

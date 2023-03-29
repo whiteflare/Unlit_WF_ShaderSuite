@@ -300,6 +300,7 @@
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_OVL_Enable);
     uint            _OVL_UVType;
+    uint            _OVL_OutUVType;
     float4          _OVL_Color;
     float4          _OVL_OverlayTex_ST;
     float2          _OVL_UVScroll;
@@ -387,6 +388,7 @@
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_CGL_Enable);
     float           _CGL_Blur;
+    float           _CGL_BlurMin;
     uint            _CGL_BlurMode;
 #endif
 

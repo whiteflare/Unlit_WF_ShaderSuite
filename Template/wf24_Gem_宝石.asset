@@ -27,6 +27,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DSV_CtrlTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _GMR_Cubemap:
         m_Texture: {fileID: 8900000, guid: bb9610632e748424586247724588439e, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -41,10 +45,16 @@ Material:
     - _AL_Power: 1
     - _AL_Source: 0
     - _AL_ZWrite: 0
+    - _AL_ZWriteBack: 0
     - _AlphaBack: 0.8
     - _AlphaFront: 0.5
     - _BumpScale: 1
     - _CurrentVersion: 0
+    - _DSV_Dissolve: 1
+    - _DSV_Enable: 0
+    - _DSV_Invert: 0
+    - _DSV_SparkWidth: 0
+    - _DSV_TexIsSRGB: 1
     - _FallBack: 0
     - _FlipMirror: 0
     - _GL_BlendPower: 0.8
@@ -73,9 +83,11 @@ Material:
     - _GMR_Monochrome: 1
     - _GMR_Power: 1
     - _NM_Enable: 0
+    - _QuestSupported: 0
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 0.6952468, g: 0.64161134, b: 1, a: 1}
+    - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _GMB_ColorBack: {r: 0.3948571, g: 0.29400003, b: 1, a: 1}
 --- !u!114 &11400000
