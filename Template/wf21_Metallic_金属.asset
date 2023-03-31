@@ -31,6 +31,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DSV_CtrlTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailNormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -142,6 +146,11 @@ Material:
     - _DFD_MaxDist: 0.08
     - _DFD_MinDist: 0.02
     - _DFD_Power: 1
+    - _DSV_Dissolve: 1
+    - _DSV_Enable: 0
+    - _DSV_Invert: 0
+    - _DSV_SparkWidth: 0
+    - _DSV_TexIsSRGB: 1
     - _DetailNormalMapScale: 0.4
     - _ES_AU_Band: 0
     - _ES_AU_BlackOut: 0
@@ -155,7 +164,7 @@ Material:
     - _ES_Enable: 0
     - _ES_SC_DirType: 0
     - _ES_SC_LevelOffset: 0
-    - _ES_SC_Shape: 3
+    - _ES_SC_Shape: 0
     - _ES_SC_Sharpness: 1
     - _ES_SC_Speed: 2
     - _ES_SC_UVType: 0
@@ -265,6 +274,7 @@ Material:
     - _CHM_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
+    - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
     - _ES_SC_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}

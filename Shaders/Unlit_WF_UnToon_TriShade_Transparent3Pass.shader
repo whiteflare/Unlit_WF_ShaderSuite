@@ -232,6 +232,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
         [HDR]
             _OVL_Color              ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
             _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
+        [Enum(REPEAT,0,CLIP,1)]
+            _OVL_OutUVType          ("[OVL] Out of UV Mode", Float) = 0
         [WF_Vector2]
             _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
         [ToggleUI]
@@ -331,7 +333,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent3Pass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/02/25", Float) = 0
+            _CurrentVersion         ("2023/04/01", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0

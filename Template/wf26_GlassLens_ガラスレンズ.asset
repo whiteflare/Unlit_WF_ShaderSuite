@@ -162,6 +162,7 @@ Material:
     - _CRF_Distance: 0.05
     - _CRF_Enable: 1
     - _CRF_RefractiveIndex: 1.53
+    - _Category: 0
     - _CullMode: 0
     - _CurrentVersion: 0
     - _DFD_BackShadow: 1
@@ -170,6 +171,7 @@ Material:
     - _DFD_MinDist: 0.02
     - _DFD_Power: 1
     - _DetailNormalMapScale: 0.4
+    - _ES_AU_AlphaLink: 0
     - _ES_AU_Band: 0
     - _ES_AU_BlackOut: 0
     - _ES_AU_MaxThreshold: 0.5
@@ -183,7 +185,7 @@ Material:
     - _ES_SC_AlphaScroll: 0
     - _ES_SC_DirType: 0
     - _ES_SC_LevelOffset: 0
-    - _ES_SC_Shape: 3
+    - _ES_SC_Shape: 0
     - _ES_SC_Sharpness: 1
     - _ES_SC_Speed: 2
     - _ES_SC_UVType: 0
