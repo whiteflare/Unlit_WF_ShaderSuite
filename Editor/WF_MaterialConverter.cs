@@ -534,6 +534,16 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    // 半透明の場合はZWriteをコピー
+                    if (ctx.renderType == ShaderType.Transparent)
+                    {
+                        WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                            PropertyNameReplacement.MatchIgnoreCase("_ZWrite", "_AL_ZWrite"),
+                            PropertyNameReplacement.MatchIgnoreCase("_EnableZWrite", "_AL_ZWrite"),
+                            PropertyNameReplacement.MatchIgnoreCase("_ZWriteMode", "_AL_ZWrite"));
+                    }
+                },
+                ctx => {
                     if (HasOldPropertyValue(ctx, "_MainTex")) {
                         // メインテクスチャがあるならば _Color は白にする
                         if (!IsMatchShaderName(ctx, "Standard") && !IsMatchShaderName(ctx, "Autodesk") && !IsMatchShaderName(ctx, "Unlit/Color"))
