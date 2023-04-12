@@ -303,3 +303,4 @@ MonoBehaviour:
   memo: "\u5E7D\u970A\u306E\u3088\u3046\u306B\u534A\u900F\u660E\u306B\u3057\u305F\u4E0D\u900F\u660E\u30DE\u30C6\u30EA\u30A2\u30EB\u306E\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: -3833280127741941228}
   copyMaterialColor: 0
+  forceChangeShader: 1
