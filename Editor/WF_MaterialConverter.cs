@@ -527,6 +527,16 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    // _CullModeのコピー
+                    if (ctx.target.HasProperty("_CullMode"))
+                    {
+                        WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                            PropertyNameReplacement.MatchIgnoreCase("_CullMode", "_CullMode"),
+                            PropertyNameReplacement.MatchIgnoreCase("_Culling", "_CullMode"),
+                            PropertyNameReplacement.MatchIgnoreCase("_Cull", "_CullMode"));
+                    }
+                },
+                ctx => {
                     // アウトライン付きかつ _CullMode が BACK の場合、OFF に変更する
                     if (ctx.outline && ctx.target.HasProperty("_CullMode") && ctx.target.GetInt("_CullMode") == 2)
                     {
