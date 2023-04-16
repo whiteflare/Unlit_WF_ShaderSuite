@@ -154,15 +154,16 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            ZWrite On
+            Cull [_CullMode]
+            ZTest [_AL_ZTest]
+            ZWrite [_AL_ZWrite]
             ColorMask 0
-            Cull[_CullMode]
 
             HLSLPROGRAM
 
             #pragma exclude_renderers d3d11_9x gles
 
-            #pragma vertex vert_depth
+            #pragma vertex vert
             #pragma fragment frag_depth
 
             #define _WF_ALPHA_BLEND
@@ -172,11 +173,40 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
             #pragma shader_feature_local _VC_ENABLE
 
-            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_UnToon.cginc"
-            #include "../WF_UnToon_DepthOnly.cginc"
+            #include "../WF_UnToon.cginc"
+
+            ENDHLSL
+        }
+
+        Pass {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            Cull [_CullMode]
+            ZTest [_AL_ZTest]
+            ZWrite [_AL_ZWrite]
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert
+            #pragma fragment frag_depth
+
+            #define _WF_ALPHA_BLEND
+            #define _WF_MAIN_Z_SHIFT    (_AL_Z_Offset)
+            #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
+
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_instancing
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }

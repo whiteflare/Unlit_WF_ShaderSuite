@@ -144,10 +144,37 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            ZWrite On
+            Cull Front
+            AlphaToMask [_AL_AlphaToMask]
             ColorMask 0
-            Cull[_CullMode]
-            Blend One Zero, One OneMinusSrcAlpha
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert
+            #pragma geometry geom_outline
+            #pragma fragment frag_depth
+
+            #define _WF_ALPHA_CUTFADE
+            #define _WF_PLATFORM_LWRP
+
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_instancing
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
+
+            ENDHLSL
+        }
+
+        Pass {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            Cull Front
             AlphaToMask [_AL_AlphaToMask]
 
             HLSLPROGRAM
@@ -156,7 +183,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
 
             #pragma vertex vert
             #pragma geometry geom_outline
-            #pragma fragment frag
+            #pragma fragment frag_depth
 
             #define _WF_ALPHA_CUTFADE
             #define _WF_PLATFORM_LWRP
@@ -164,12 +191,10 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
-            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_UnToon.cginc"
             #include "../WF_UnToon.cginc"
-            // WF_UnToon_DepthOnly.cginc ではなく、アウトライン処理を持っている WF_UnToon.cginc を使う
 
             ENDHLSL
         }

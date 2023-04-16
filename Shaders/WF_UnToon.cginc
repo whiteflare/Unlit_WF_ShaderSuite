@@ -305,4 +305,51 @@ FEATURE_TGL_END
     }
 #endif  // SHADER_TARGET >= 40
 
+    ////////////////////////////
+    // Depth&Normal のみ描く fragment shader
+    ////////////////////////////
+
+    float4 frag_depth(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+        UNITY_SETUP_INSTANCE_ID(i);
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
+
+        float4 color;
+        float2 uv_main;
+
+        // メイン
+        affectBaseColor(i.uv, i.uv_lmap, facing, uv_main, color);
+        // 頂点カラー
+        affectVertexColor(i.vertex_color, color);
+
+        // アルファ計算
+        #ifdef _AL_ENABLE
+            // アルファマスク
+            affectAlphaMask(uv_main, color);
+
+            if (color.a < 0.5) {
+                discard;
+                return ZERO_VEC4;
+            }
+        #endif
+
+        i.normal = normalize(i.normal);
+        float3 ws_normal = i.normal;
+
+#ifdef _V2F_HAS_TANGENT
+        i.tangent = normalize(i.tangent);
+        i.bitangent = normalize(i.bitangent);
+#endif
+
+#ifdef _NM_ENABLE
+        float3 ws_bump_normal;
+        affectBumpNormal(i, uv_main, ws_bump_normal, color);
+        ws_normal = ws_bump_normal;
+#endif
+
+        return float4(ws_normal, 0);
+    }
+
+
 #endif

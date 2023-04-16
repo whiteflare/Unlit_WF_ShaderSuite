@@ -141,15 +141,14 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            ZWrite On
-            ColorMask 0
             Cull[_CullMode]
+            ColorMask 0
 
             HLSLPROGRAM
 
             #pragma exclude_renderers d3d11_9x gles
 
-            #pragma vertex vert_depth
+            #pragma vertex vert
             #pragma fragment frag_depth
 
             #define _WF_MOBILE
@@ -160,7 +159,33 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_Gem.cginc"
-            #include "../WF_UnToon_DepthOnly.cginc"
+            #include "../WF_UnToon.cginc"
+
+            ENDHLSL
+        }
+
+        Pass {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            Cull[_CullMode]
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert
+            #pragma fragment frag_depth
+
+            #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
+
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_instancing
+
+            #include "../WF_INPUT_Gem.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }
