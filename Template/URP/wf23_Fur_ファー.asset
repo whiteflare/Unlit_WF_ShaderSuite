@@ -162,3 +162,4 @@ MonoBehaviour:
   memo: "\u30D5\u30A1\u30FC\u3092\u7528\u3044\u305F\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: -8874921283336520688}
   copyMaterialColor: 0
+  forceChangeShader: 1

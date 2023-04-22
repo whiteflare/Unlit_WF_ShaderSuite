@@ -527,10 +527,30 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    // _CullModeのコピー
+                    if (ctx.target.HasProperty("_CullMode"))
+                    {
+                        WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                            PropertyNameReplacement.MatchIgnoreCase("_CullMode", "_CullMode"),
+                            PropertyNameReplacement.MatchIgnoreCase("_Culling", "_CullMode"),
+                            PropertyNameReplacement.MatchIgnoreCase("_Cull", "_CullMode"));
+                    }
+                },
+                ctx => {
                     // アウトライン付きかつ _CullMode が BACK の場合、OFF に変更する
                     if (ctx.outline && ctx.target.HasProperty("_CullMode") && ctx.target.GetInt("_CullMode") == 2)
                     {
                         ctx.target.SetInt("_CullMode", 0);
+                    }
+                },
+                ctx => {
+                    // 半透明の場合はZWriteをコピー
+                    if (ctx.renderType == ShaderType.Transparent)
+                    {
+                        WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                            PropertyNameReplacement.MatchIgnoreCase("_ZWrite", "_AL_ZWrite"),
+                            PropertyNameReplacement.MatchIgnoreCase("_EnableZWrite", "_AL_ZWrite"),
+                            PropertyNameReplacement.MatchIgnoreCase("_ZWriteMode", "_AL_ZWrite"));
                     }
                 },
                 ctx => {

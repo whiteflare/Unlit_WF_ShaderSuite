@@ -283,15 +283,14 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            ZWrite On
+            Cull OFF
             ColorMask 0
-            Cull[_CullMode]
 
             HLSLPROGRAM
 
             #pragma exclude_renderers d3d11_9x gles
 
-            #pragma vertex vert_depth
+            #pragma vertex vert
             #pragma fragment frag_depth
 
             #define _WF_PLATFORM_LWRP
@@ -299,7 +298,30 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_FakeFur.cginc"
-            #include "../WF_UnToon_DepthOnly.cginc"
+            #include "../WF_UnToon.cginc"
+
+            ENDHLSL
+        }
+
+        Pass {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            Cull OFF
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert
+            #pragma fragment frag_depth
+
+            #define _WF_PLATFORM_LWRP
+
+            #pragma multi_compile_instancing
+
+            #include "../WF_INPUT_FakeFur.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }

@@ -384,7 +384,7 @@ namespace UnlitWF
                 if (prefix != null)
                 {
                     // Prefixの一致判定
-                    if (copy_target.Any(prefix.Contains))
+                    if (copy_target.Contains(prefix))
                     {
                         if (!param.withoutTextures || src_prop.Type != ShaderUtil.ShaderPropertyType.TexEnv)
                         {

@@ -125,16 +125,15 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             Name "DepthOnly"
             Tags{"LightMode" = "DepthOnly"}
 
-            ZWrite On
+            Cull Front
             ColorMask 0
-            Cull[_CullMode]
 
             HLSLPROGRAM
 
             #pragma exclude_renderers d3d11_9x gles
 
             #pragma vertex vert_outline
-            #pragma fragment frag
+            #pragma fragment frag_depth
 
             #define _WF_MOBILE
             #define _WF_PLATFORM_LWRP
@@ -142,12 +141,37 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque" {
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
-            #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_UnToon.cginc"
             #include "../WF_UnToon.cginc"
-            // WF_UnToon_DepthOnly.cginc ではなく、アウトライン処理を持っている WF_UnToon.cginc を使う
+
+            ENDHLSL
+        }
+
+        Pass {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            Cull Front
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert_outline
+            #pragma fragment frag_depth
+
+            #define _WF_MOBILE
+            #define _WF_PLATFORM_LWRP
+
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_instancing
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }

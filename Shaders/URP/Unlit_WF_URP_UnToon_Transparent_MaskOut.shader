@@ -455,7 +455,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
 
             #pragma exclude_renderers d3d11_9x gles
 
-            #pragma vertex vert_depth
+            #pragma vertex vert
             #pragma fragment frag_depth
 
             #define _WF_ALPHA_BLEND
@@ -466,7 +466,41 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_UnToon.cginc"
-            #include "../WF_UnToon_DepthOnly.cginc"
+            #include "../WF_UnToon.cginc"
+
+            ENDHLSL
+        }
+
+        Pass {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            Cull[_CullMode]
+            ZWrite [_AL_ZWrite]
+
+            Stencil {
+                Ref [_StencilMaskID]
+                ReadMask 15
+                Comp notEqual
+            }
+
+            HLSLPROGRAM
+
+            #pragma exclude_renderers d3d11_9x gles
+
+            #pragma vertex vert
+            #pragma fragment frag_depth
+
+            #define _WF_ALPHA_BLEND
+            #define _WF_PLATFORM_LWRP
+
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+
+            #pragma multi_compile_instancing
+
+            #include "../WF_INPUT_UnToon.cginc"
+            #include "../WF_UnToon.cginc"
 
             ENDHLSL
         }

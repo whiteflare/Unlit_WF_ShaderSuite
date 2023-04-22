@@ -293,7 +293,11 @@ namespace UnlitWF
         {
             return data.SelectMany(d => d.shaderKeywordSet.GetShaderKeywords())
                 .Where(k => ShaderKeyword.IsKeywordLocal(k))
+#if UNITY_2021_2_OR_NEWER
+                .Select(k => k.name)
+#else
                 .Select(k => ShaderKeyword.GetKeywordName(shader, k))
+#endif
                 .Where(kwd => WFCommonUtility.IsEnableKeyword(kwd)).Distinct().ToArray();
         }
 
@@ -588,4 +592,4 @@ namespace UnlitWF
     }
 
 #endif
-}
+        }
