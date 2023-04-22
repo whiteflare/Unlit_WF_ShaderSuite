@@ -89,7 +89,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
         Pass {
             Name "OUTLINE"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull Front
             Blend One Zero, One OneMinusSrcAlpha
@@ -168,7 +168,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
         Pass {
             Name "DepthNormals"
-            Tags{"LightMode" = "DepthNormals"}
+            Tags{"LightMode" = "DepthNormalsOnly"}
 
             Cull Front
             AlphaToMask [_AL_AlphaToMask]

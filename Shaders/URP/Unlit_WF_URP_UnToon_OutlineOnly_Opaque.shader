@@ -79,7 +79,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
 
         Pass {
             Name "OUTLINE"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull Front
 
@@ -159,7 +159,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
 
         Pass {
             Name "DepthNormals"
-            Tags{"LightMode" = "DepthNormals"}
+            Tags{"LightMode" = "DepthNormalsOnly"}
 
             Cull Front
 

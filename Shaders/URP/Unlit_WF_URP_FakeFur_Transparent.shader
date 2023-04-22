@@ -180,7 +180,7 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull OFF
 
@@ -302,7 +302,7 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
 
         Pass {
             Name "DepthNormals"
-            Tags{"LightMode" = "DepthNormals"}
+            Tags{"LightMode" = "DepthNormalsOnly"}
 
             Cull OFF
 

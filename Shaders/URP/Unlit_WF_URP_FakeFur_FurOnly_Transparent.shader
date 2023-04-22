@@ -126,7 +126,7 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent" {
 
         Pass {
             Name "FUR"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull OFF
             ZWrite OFF

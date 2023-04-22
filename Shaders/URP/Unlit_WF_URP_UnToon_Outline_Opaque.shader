@@ -406,7 +406,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull [_CullMode]
 
@@ -496,7 +496,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_Opaque" {
 
         Pass {
             Name "DepthNormals"
-            Tags{"LightMode" = "DepthNormals"}
+            Tags{"LightMode" = "DepthNormalsOnly"}
 
             Cull[_CullMode]
 

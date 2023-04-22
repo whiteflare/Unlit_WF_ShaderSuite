@@ -98,7 +98,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull [_CullMode]
             ZTest [_AL_ZTest]
@@ -183,7 +183,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         Pass {
             Name "DepthNormals"
-            Tags{"LightMode" = "DepthNormals"}
+            Tags{"LightMode" = "DepthNormalsOnly"}
 
             Cull [_CullMode]
             ZTest [_AL_ZTest]

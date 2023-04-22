@@ -362,7 +362,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull [_CullMode]
             ZWrite [_AL_ZWrite]
@@ -457,7 +457,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
         Pass {
             Name "DepthNormals"
-            Tags{"LightMode" = "DepthNormals"}
+            Tags{"LightMode" = "DepthNormalsOnly"}
 
             Cull[_CullMode]
             ZWrite [_AL_ZWrite]

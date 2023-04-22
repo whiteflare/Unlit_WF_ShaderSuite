@@ -134,7 +134,7 @@ Shader "UnlitWF_URP/WF_Water_Surface_TransCutout" {
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull [_CullMode]
             Blend One Zero, One OneMinusSrcAlpha
@@ -216,7 +216,7 @@ Shader "UnlitWF_URP/WF_Water_Surface_TransCutout" {
 
         Pass {
             Name "DepthNormals"
-            Tags{"LightMode" = "DepthNormals"}
+            Tags{"LightMode" = "DepthNormalsOnly"}
 
             Cull[_CullMode]
 

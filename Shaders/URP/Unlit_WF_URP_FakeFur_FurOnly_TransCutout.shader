@@ -129,7 +129,7 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
 
         Pass {
             Name "FUR"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull OFF
             Blend One Zero, One OneMinusSrcAlpha

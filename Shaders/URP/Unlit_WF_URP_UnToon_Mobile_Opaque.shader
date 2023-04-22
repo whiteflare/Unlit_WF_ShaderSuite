@@ -206,7 +206,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
         Pass {
             Name "MAIN"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
 
             Cull [_CullMode]
 
@@ -292,7 +292,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
         Pass {
             Name "DepthNormals"
-            Tags{"LightMode" = "DepthNormals"}
+            Tags{"LightMode" = "DepthNormalsOnly"}
 
             Cull[_CullMode]
 
