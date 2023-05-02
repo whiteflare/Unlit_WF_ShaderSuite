@@ -25,7 +25,7 @@ namespace UnlitWF
     /// <summary>
     /// 辞書本体。ユーティリティ関数は他のクラスにて定義する。
     /// </summary>
-    internal static class WFShaderDictionary
+    static class WFShaderDictionary
     {
         /// <summary>
         /// シェーダ名のリスト。
@@ -916,7 +916,7 @@ namespace UnlitWF
         };
     }
 
-    internal static class WFMessageText
+    static class WFMessageText
     {
         public static readonly string NewerVersion = "A newer version is available now!\nLatest version: ";
         public static readonly string PlzMigration = "This Material may have been created in an older version.\nConvert to new version?";
@@ -936,7 +936,7 @@ namespace UnlitWF
         public static readonly string LgWarnNotSupportAndroid = "A material uses a shader that is not supported by Android.";
     }
 
-    internal static class WFMessageButton
+    static class WFMessageButton
     {
         public static readonly string Cleanup = "Remove unused properties from Materials";
         public static readonly string ApplyTemplate = "Apply from Template";

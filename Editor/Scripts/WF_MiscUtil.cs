@@ -38,7 +38,7 @@ using UnityEngine.SceneManagement;
 
 namespace UnlitWF
 {
-    internal enum MatSelectMode
+    enum MatSelectMode
     {
         FromScene = 1,
         FromAsset = 2,
@@ -46,7 +46,7 @@ namespace UnlitWF
         FromAssetDeep = 6,
     }
 
-    internal class MaterialSeeker
+    class MaterialSeeker
     {
         public System.Func<Component, bool> FilterHierarchy = cmp => true;
 
@@ -451,7 +451,7 @@ namespace UnlitWF
 
     }
 
-    internal static class CollectionUtility
+    static class CollectionUtility
     {
         public static T GetValueOrNull<K, T>(this Dictionary<K, T> dict, K key) where T : class
         {
@@ -464,7 +464,7 @@ namespace UnlitWF
         }
     }
 
-    internal class WeakRefCache<T> where T : class
+    class WeakRefCache<T> where T : class
     {
         private readonly List<System.WeakReference> refs = new List<System.WeakReference>();
 

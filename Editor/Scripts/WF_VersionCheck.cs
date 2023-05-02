@@ -24,7 +24,7 @@ using UnityEngine.Networking;
 
 namespace UnlitWF
 {
-    public class WF_VersionCheck
+    class WF_VersionCheck
     {
         private const string URI_HEAD = @"https://github.com/whiteflare/Unlit_WF_ShaderSuite";
 
@@ -86,7 +86,7 @@ namespace UnlitWF
         }
     }
 
-    public class CoroutineHandler : MonoBehaviour
+    class CoroutineHandler : MonoBehaviour
     {
         private static CoroutineHandler m_Instance;
         private static CoroutineHandler instance

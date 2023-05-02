@@ -36,7 +36,7 @@ using UnityEngine;
 
 namespace UnlitWF
 {
-    internal static class WFMenu
+    static class WFMenu
     {
         public const string PATH_ASSETS = "Assets/UnlitWF Material Tools/";
         public const string PATH_TOOLS = "Tools/UnlitWF/";
@@ -253,7 +253,7 @@ namespace UnlitWF
         }
     }
 
-    internal static class ToolCommon
+    static class ToolCommon
     {
         public static readonly Texture2D infoIcon = EditorGUIUtility.Load("icons/console.infoicon.png") as Texture2D;
         public static readonly Texture2D warnIcon = EditorGUIUtility.Load("icons/console.warnicon.png") as Texture2D;
@@ -426,7 +426,7 @@ namespace UnlitWF
 
     #region クリンナップ系
 
-    public class ToolCreanUpWindow : EditorWindow
+    class ToolCreanUpWindow : EditorWindow
     {
         [MenuItem(WFMenu.ASSETS_CREANUP, priority = WFMenu.PRI_ASSETS_CREANUP)]
         private static void OpenWindowFromMenu_Asset()
@@ -519,7 +519,7 @@ namespace UnlitWF
 
     #region リセット系
 
-    public class ToolResetWindow : EditorWindow
+    class ToolResetWindow : EditorWindow
     {
         [MenuItem(WFMenu.ASSETS_RESET, priority = WFMenu.PRI_ASSETS_RESET)]
         private static void OpenWindowFromMenu_Asset()
@@ -606,7 +606,7 @@ namespace UnlitWF
 
     #region コピー系
 
-    public class ToolCopyWindow : EditorWindow
+    class ToolCopyWindow : EditorWindow
     {
 
         [MenuItem(WFMenu.ASSETS_COPY, priority = WFMenu.PRI_ASSETS_COPY)]
@@ -699,7 +699,7 @@ namespace UnlitWF
 
     #region マイグレーション系
 
-    public class ToolMigrationWindow : EditorWindow
+    class ToolMigrationWindow : EditorWindow
     {
         [MenuItem(WFMenu.ASSETS_MIGRATION, priority = WFMenu.PRI_ASSETS_MIGRATION)]
         private static void OpenWindowFromMenu_Asset()
@@ -767,7 +767,7 @@ namespace UnlitWF
 
     #region DL焼き込み系
 
-    public class ToolDirectionalSetWindow : EditorWindow
+    class ToolDirectionalSetWindow : EditorWindow
     {
 
 #if ENV_VRCSDK3_WORLD
@@ -873,7 +873,7 @@ namespace UnlitWF
 
     #region バリデート系
 
-    public class ToolValidateSceneMaterial : EditorWindow
+    class ToolValidateSceneMaterial : EditorWindow
     {
         [MenuItem(WFMenu.TOOLS_VALIDATE, priority = WFMenu.PRI_TOOLS_VALIDATE)]
         private static void OpenWindowFromMenu_Tool()
