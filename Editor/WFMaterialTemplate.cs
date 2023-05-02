@@ -114,7 +114,7 @@ namespace UnlitWF
     }
 
     [CustomEditor(typeof(WFMaterialTemplate))]
-    public class WFMaterialTemplateEditor : Editor
+    class WFMaterialTemplateEditor : Editor
     {
         void OnEnable()
         {

@@ -26,7 +26,7 @@ using UnityEngine;
 
 namespace UnlitWF
 {
-    public class ShaderCustomEditor : ShaderGUI
+    class ShaderCustomEditor : ShaderGUI
     {
         /// <summary>
         /// プロパティの前後に実行されるフック処理
@@ -1099,14 +1099,14 @@ namespace UnlitWF
             });
         }
 
-#endregion
+        #endregion
 
-#region PropertyHook
+        #region PropertyHook
 
         /// <summary>
         /// PropertyHookで使用する表示コンテキスト
         /// </summary>
-        class PropertyGUIContext
+        internal class PropertyGUIContext
         {
             /// <summary>
             /// 動作中のMaterialEditor
@@ -1145,14 +1145,14 @@ namespace UnlitWF
         /// <summary>
         /// プロパティの前後に実行されるフック処理のインタフェース
         /// </summary>
-        interface IPropertyHook
+        internal interface IPropertyHook
         {
             void OnBefore(PropertyGUIContext context);
 
             void OnAfter(PropertyGUIContext context, bool changed);
         }
 
-        abstract class AbstractPropertyHook : IPropertyHook
+        internal abstract class AbstractPropertyHook : IPropertyHook
         {
             protected readonly Regex matcher;
 
@@ -1318,7 +1318,7 @@ namespace UnlitWF
         /// </summary>
         class DefValueSetPropertyHook : AbstractPropertyHook
         {
-            public delegate void DefValueSetDelegate(PropertyGUIContext context);
+            internal delegate void DefValueSetDelegate(PropertyGUIContext context);
 
             private readonly DefValueSetDelegate setter;
 
@@ -1362,8 +1362,8 @@ namespace UnlitWF
         /// </summary>
         class CustomPropertyHook : AbstractPropertyHook
         {
-            public delegate void OnBeforeDelegate(PropertyGUIContext context);
-            public delegate void OnAfterDelegate(PropertyGUIContext context, bool changed);
+            internal delegate void OnBeforeDelegate(PropertyGUIContext context);
+            internal delegate void OnAfterDelegate(PropertyGUIContext context, bool changed);
 
             private readonly OnBeforeDelegate before;
             private readonly OnAfterDelegate after;
@@ -1396,7 +1396,7 @@ namespace UnlitWF
 
 #region MaterialPropertyDrawer
 
-    internal static class WFHeaderMenuController
+    static class WFHeaderMenuController
     {
         private static Material copiedMaterial = null;
 
@@ -1461,7 +1461,7 @@ namespace UnlitWF
     /// <summary>
     /// Shurikenヘッダを表示する
     /// </summary>
-    internal class MaterialWFHeaderDecorator : MaterialPropertyDrawer
+    class MaterialWFHeaderDecorator : MaterialPropertyDrawer
     {
         public readonly string text;
 
@@ -1484,7 +1484,7 @@ namespace UnlitWF
     /// <summary>
     /// Enableトグル付きのShurikenヘッダを表示する
     /// </summary>
-    internal class MaterialWFHeaderToggleDrawer : MaterialPropertyDrawer
+    class MaterialWFHeaderToggleDrawer : MaterialPropertyDrawer
     {
         public readonly string text;
 
@@ -1507,7 +1507,7 @@ namespace UnlitWF
     /// <summary>
     /// 常時trueなEnableトグル付きのShurikenヘッダを表示する
     /// </summary>
-    internal class MaterialWFHeaderAlwaysOnDrawer : MaterialPropertyDrawer
+    class MaterialWFHeaderAlwaysOnDrawer : MaterialPropertyDrawer
     {
         public readonly string text;
 
@@ -1528,7 +1528,7 @@ namespace UnlitWF
     }
 
     [Obsolete]
-    internal class MaterialFixFloatDrawer : MaterialWF_FixFloatDrawer
+    class MaterialFixFloatDrawer : MaterialWF_FixFloatDrawer
     {
         public MaterialFixFloatDrawer() : base()
         {
@@ -1542,7 +1542,7 @@ namespace UnlitWF
     /// <summary>
     /// 常に指定のfloat値にプロパティを固定する、非表示のPropertyDrawer
     /// </summary>
-    internal class MaterialWF_FixFloatDrawer : MaterialPropertyDrawer
+    class MaterialWF_FixFloatDrawer : MaterialPropertyDrawer
     {
         public readonly float value;
 
@@ -1568,14 +1568,14 @@ namespace UnlitWF
     }
 
     [Obsolete]
-    internal class MaterialFixNoTextureDrawer : MaterialWF_FixNoTextureDrawer
+    class MaterialFixNoTextureDrawer : MaterialWF_FixNoTextureDrawer
     {
     }
 
     /// <summary>
     /// 常にテクスチャNoneにプロパティを固定する、非表示のPropertyDrawer
     /// </summary>
-    internal class MaterialWF_FixNoTextureDrawer : MaterialPropertyDrawer
+    class MaterialWF_FixNoTextureDrawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
@@ -1591,7 +1591,7 @@ namespace UnlitWF
     /// <summary>
     /// 入力欄が2個あるVectorのPropertyDrawer
     /// </summary>
-    internal class MaterialWF_Vector2Drawer : MaterialPropertyDrawer
+    class MaterialWF_Vector2Drawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
@@ -1620,7 +1620,7 @@ namespace UnlitWF
     /// <summary>
     /// 入力欄が3個あるVectorのPropertyDrawer
     /// </summary>
-    internal class MaterialWF_Vector3Drawer : MaterialPropertyDrawer
+    class MaterialWF_Vector3Drawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
@@ -1649,7 +1649,7 @@ namespace UnlitWF
     /// <summary>
     /// sin/cos計算済みDirectionのPropertyDrawer
     /// </summary>
-    internal class MaterialWF_RotMatrixDrawer : MaterialPropertyDrawer
+    class MaterialWF_RotMatrixDrawer : MaterialPropertyDrawer
     {
         public readonly float min;
         public readonly float max;
@@ -1692,7 +1692,7 @@ namespace UnlitWF
     /// <summary>
     /// 常に指定のfloat値にプロパティを固定する、非活性Toggle表示のPropertyDrawer
     /// </summary>
-    internal class MaterialWF_FixUIToggleDrawer : MaterialPropertyDrawer
+    class MaterialWF_FixUIToggleDrawer : MaterialPropertyDrawer
     {
         public readonly float value;
 
@@ -1722,7 +1722,7 @@ namespace UnlitWF
     /// <summary>
     /// 常に非表示のMaterialPropertyDrawer
     /// </summary>
-    internal class MaterialWF_HidePropDrawer : MaterialPropertyDrawer
+    class MaterialWF_HidePropDrawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
@@ -1734,7 +1734,7 @@ namespace UnlitWF
         }
     }
 
-    internal class MaterialWF_EnumDrawer : MaterialPropertyDrawer
+    class MaterialWF_EnumDrawer : MaterialPropertyDrawer
     {
         private readonly string enumName;
         private readonly string[] names;
@@ -1893,7 +1893,7 @@ namespace UnlitWF
         }
     }
 
-#endregion
+    #endregion
 
     public enum BlendModeOVL
     {
