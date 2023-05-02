@@ -15,6 +15,7 @@ MonoBehaviour:
   memo: "\u30EF\u30FC\u30EB\u30C9\u5236\u4F5C\u5411\u3051\u3001\u304F\u3082\u308A\u30AC\u30E9\u30B9\u306E\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: 1044217848226071522}
   copyMaterialColor: 0
+  forceChangeShader: 1
 --- !u!21 &1044217848226071522
 Material:
   serializedVersion: 6

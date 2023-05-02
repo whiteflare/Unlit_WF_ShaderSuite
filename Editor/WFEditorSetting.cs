@@ -123,7 +123,7 @@ namespace UnlitWF
     }
 
     [CustomEditor(typeof(WFEditorSetting))]
-    public class WFEditorSettingEditor : Editor
+    class WFEditorSettingEditor : Editor
     {
         SerializedProperty p_settingPriority;
         SerializedProperty p_enableStripping;

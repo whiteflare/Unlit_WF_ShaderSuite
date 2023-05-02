@@ -24,7 +24,7 @@ using UnityEngine.Networking;
 
 namespace UnlitWF
 {
-    public class WF_VersionCheck
+    class WF_VersionCheck
     {
         private const string URI_HEAD = @"https://github.com/whiteflare/Unlit_WF_ShaderSuite";
 
@@ -57,7 +57,11 @@ namespace UnlitWF
                 {
                     yield return req.SendWebRequest();
 
+#if UNITY_2020_1_OR_NEWER
+                    if (req.result == UnityWebRequest.Result.ProtocolError || req.result == UnityWebRequest.Result.ConnectionError)
+#else
                     if (req.isHttpError || req.isNetworkError)
+#endif
                     {
                         Debug.LogWarningFormat("[WF][Version] An NetworkError was occured in version checking: {0}", req.error);
                         yield break;
@@ -82,7 +86,7 @@ namespace UnlitWF
         }
     }
 
-    public class CoroutineHandler : MonoBehaviour
+    class CoroutineHandler : MonoBehaviour
     {
         private static CoroutineHandler m_Instance;
         private static CoroutineHandler instance
