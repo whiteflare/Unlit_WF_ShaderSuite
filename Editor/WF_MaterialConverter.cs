@@ -29,7 +29,7 @@ namespace UnlitWF.Converter
     /// <summary>
     /// 変換コンテキスト
     /// </summary>
-    public class ConvertContext
+    class ConvertContext
     {
         /// <summary>
         /// 変換中のマテリアル
@@ -52,7 +52,7 @@ namespace UnlitWF.Converter
         }
     }
 
-    public abstract class AbstractMaterialConverter<CTX> where CTX : ConvertContext
+    abstract class AbstractMaterialConverter<CTX> where CTX : ConvertContext
     {
         private readonly List<Action<CTX>> converters;
 
@@ -285,7 +285,7 @@ namespace UnlitWF.Converter
     /// <summary>
     /// WFマテリアルをMobile系に変換するコンバータ
     /// </summary>
-    public class WFMaterialToMobileShaderConverter : AbstractMaterialConverter<ConvertContext>
+    class WFMaterialToMobileShaderConverter : AbstractMaterialConverter<ConvertContext>
     {
         public WFMaterialToMobileShaderConverter() : base(CreateConverterList())
         {
@@ -346,7 +346,7 @@ namespace UnlitWF.Converter
     /// <summary>
     /// WF系ではないマテリアルをWF系に変換するコンバータ
     /// </summary>
-    public class WFMaterialFromOtherShaderConverter : AbstractMaterialConverter<WFMaterialFromOtherShaderConverter.SelectShaderContext>
+    class WFMaterialFromOtherShaderConverter : AbstractMaterialConverter<WFMaterialFromOtherShaderConverter.SelectShaderContext>
     {
         public WFMaterialFromOtherShaderConverter() : base(CreateConverterList())
         {
@@ -368,7 +368,7 @@ namespace UnlitWF.Converter
             return !WFCommonUtility.IsSupportedShader(mat);
         }
 
-        public class SelectShaderContext : ConvertContext
+        internal class SelectShaderContext : ConvertContext
         {
             public ShaderType renderType = ShaderType.NoMatch;
             public bool outline = false;
@@ -379,7 +379,7 @@ namespace UnlitWF.Converter
             }
         }
 
-        public enum ShaderType
+        internal enum ShaderType
         {
             NoMatch, Opaque, Cutout, Transparent
         }
@@ -734,7 +734,7 @@ namespace UnlitWF.Converter
         }
     }
 
-    public static class ScanAndMigrationExecutor
+    static class ScanAndMigrationExecutor
     {
         public const int VERSION = 5;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
@@ -771,7 +771,7 @@ namespace UnlitWF.Converter
             var cancel = lang == EditorLanguage.日本語 ? "結構です" : "No Thanks";
             var alt = lang == EditorLanguage.日本語 ? "後で聞いて" : "Ask Me Later";
 
-            switch (EditorUtility.DisplayDialogComplex("WF migration materials", msg, ok, cancel, alt))
+            switch (EditorUtility.DisplayDialogComplex(WFCommonUtility.DialogTitle, msg, ok, cancel, alt))
             {
                 case 0:
                     // 実行してバージョン上書き
@@ -798,7 +798,7 @@ namespace UnlitWF.Converter
             var lang = WFEditorPrefs.LangMode;
             var ok = lang == EditorLanguage.日本語 ? "実行する" : "Go Ahead";
             var cancel = lang == EditorLanguage.日本語 ? "結構です" : "No Thanks";
-            if (EditorUtility.DisplayDialog("WF migration materials", msg, ok, cancel))
+            if (EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, msg, ok, cancel))
             {
                 ScanAndMigration();
                 SaveCurrentMigrationVersion();
@@ -879,7 +879,7 @@ namespace UnlitWF.Converter
     /// <summary>
     /// 古いWFマテリアルをマイグレーションするコンバータ
     /// </summary>
-    public class WFMaterialMigrationConverter : AbstractMaterialConverter<ConvertContext>
+    class WFMaterialMigrationConverter : AbstractMaterialConverter<ConvertContext>
     {
         public WFMaterialMigrationConverter() : base(CreateConverterList())
         {

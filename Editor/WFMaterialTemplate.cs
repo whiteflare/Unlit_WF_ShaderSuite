@@ -26,8 +26,9 @@ namespace UnlitWF
 {
     public class WFMaterialTemplate : ScriptableObject
     {
-        public string memo;
         public Material material;
+        public string displayName;
+        public string memo;
         public bool copyMaterialColor;
         public bool forceChangeShader;
 
@@ -67,6 +68,20 @@ namespace UnlitWF
 
             AssetDatabase.CreateAsset(tmp, path);
             AssetDatabase.AddObjectToAsset(tmp.material, tmp);
+        }
+
+        public static bool IsAvailable(WFMaterialTemplate template)
+        {
+            if (template == null || template.material == null)
+            {
+                return false;
+            }
+            return WFCommonUtility.IsSupportedShader(template.material);
+        }
+
+        public string GetDisplayString()
+        {
+            return string.IsNullOrWhiteSpace(displayName) ? this.name : displayName;
         }
 
         public void ApplyToMaterial(IEnumerable<Material> mats)
@@ -114,7 +129,7 @@ namespace UnlitWF
     }
 
     [CustomEditor(typeof(WFMaterialTemplate))]
-    public class WFMaterialTemplateEditor : Editor
+    class WFMaterialTemplateEditor : Editor
     {
         void OnEnable()
         {
@@ -131,6 +146,7 @@ namespace UnlitWF
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.material)));
             }
 
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.displayName)));
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.copyMaterialColor)));
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.forceChangeShader)));
 

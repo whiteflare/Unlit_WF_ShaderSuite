@@ -294,7 +294,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e2b056a1e7bff1489e0ce6676d2ac92, type: 3}
   m_Name: "wf03_Hair_\u9AEA"
   m_EditorClassIdentifier: 
+  material: {fileID: -2162631518589955970}
+  displayName: 
   memo: "\u9AEA\u306B\u4F7F\u7528\u3059\u308B\u30A2\u30A6\u30C8\u30E9\u30A4\u30F3\u4ED8\u304D\u306E\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002matcap
     \u306B\u3088\u308B\u30A8\u30F3\u30B8\u30A7\u30EB\u30EA\u30F3\u30B0\u304C\u8A2D\u5B9A\u3055\u308C\u3066\u3044\u307E\u3059\u3002"
-  material: {fileID: -2162631518589955970}
   copyMaterialColor: 0
+  forceChangeShader: 0
