@@ -44,7 +44,7 @@ namespace UnlitWF
 {
 #if UNITY_2019_1_OR_NEWER
 
-    public class WF_ShaderPreprocessor : IPreprocessShaders
+    class WF_ShaderPreprocessor : IPreprocessShaders
     {
 #if ENV_VRCSDK3_AVATAR
         public class WF_PreprocessorForVRCSDK3Avatar : VRC.SDKBase.Editor.BuildPipeline.IVRCSDKPreprocessAvatarCallback
@@ -80,7 +80,7 @@ namespace UnlitWF
             }
         }
 #elif ENV_VRCSDK3_WORLD
-        public class WF_PreprocessorForVRCSDK3World : IProcessSceneWithReport
+        internal class WF_PreprocessorForVRCSDK3World : IProcessSceneWithReport
         {
             public int callbackOrder => 100;
 
@@ -90,7 +90,7 @@ namespace UnlitWF
             }
         }
 #else
-        public class WF_PreprocessorForOther : IPreprocessShaders
+        internal class WF_PreprocessorForOther : IPreprocessShaders
         {
             public int callbackOrder => 100;
 
@@ -104,7 +104,7 @@ namespace UnlitWF
         private static readonly Singleton Core = new Singleton();
         private readonly WFEditorSetting settings = WFEditorSetting.GetOneOfSettings();
 
-        public enum WFBuildPlatformType
+        internal enum WFBuildPlatformType
         {
             VRCSDK3_Avatar,
             VRCSDK3_World,
@@ -301,7 +301,7 @@ namespace UnlitWF
                 .Where(kwd => WFCommonUtility.IsEnableKeyword(kwd)).Distinct().ToArray();
         }
 
-        public class Singleton
+        internal class Singleton
         {
             private readonly object lockToken = new object();
 
@@ -432,7 +432,8 @@ namespace UnlitWF
                 return false;
             }
         }
-            public class UsedShaderVariantSeeker
+
+        internal class UsedShaderVariantSeeker
         {
             private WFEditorSetting settings = WFEditorSetting.GetOneOfSettings(); // Assets 内に WF_EditorSetting があるならば読み込み
             private List<UsedShaderVariant> usedShaderVariantList = new List<UsedShaderVariant>();
@@ -545,7 +546,7 @@ namespace UnlitWF
             }
         }
 
-        public class UsedShaderVariant : System.IEquatable<UsedShaderVariant>
+        internal class UsedShaderVariant : System.IEquatable<UsedShaderVariant>
         {
             public readonly string shaderName;
             public readonly List<string> keywords;
