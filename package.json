@@ -5,6 +5,8 @@
   "description": "General Shader Pack for VRChat, Unity.",
   "gitDependencies": {},
   "vpmDependencies": {},
-  "legacyFolders": {},
+  "legacyFolders": {
+    "Assets\\Unlit_WF_ShaderSuite": "b5436846737a8334180590963a0a20e1"
+  },
   "legacyFiles": {}
 }
