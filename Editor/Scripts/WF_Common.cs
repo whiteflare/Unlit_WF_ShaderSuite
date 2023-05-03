@@ -31,6 +31,11 @@ namespace UnlitWF
 {
     static class WFCommonUtility
     {
+        /// <summary>
+        /// DisplayDialogのタイトル文字列。汎用的に使うもの。
+        /// </summary>
+        public static readonly string DialogTitle = "UnlitWF Shader";
+
         #region プロパティ判定
 
         /// <summary>
@@ -359,7 +364,6 @@ namespace UnlitWF
             {
                 this.path = path;
                 this.shader = shader;
-
                 this.root = path.StartsWith("Packages/") ? 0 : 1;
 
                 var mm = pattern.Match(path);
@@ -378,7 +382,7 @@ namespace UnlitWF
                 }
             }
 
-            private static readonly Regex pattern = new Regex(@"^(?<root>(?:Packages|Assets)(?<parent>/[^/]+)*)/(?<folder>Unlit_?WF_?Shader[A-Za-z]*)/(?<tail>.*)$", RegexOptions.Compiled);
+            private static readonly Regex pattern = new Regex(@"^(?<root>(?:Packages|Assets)(?<parent>/[^/]+)*)/(?<folder>Unlit_?WF_?Shader[A-Za-z]*|jp\.whiteflare\.unlitwf[A-Za-z0-9\.]*)/(?<tail>.*)$", RegexOptions.Compiled);
 
             public int CompareTo(ShaderAndAssetPath other)
             {
@@ -604,6 +608,11 @@ namespace UnlitWF
         public static bool IsQuestPlatform()
         {
             return EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android;
+        }
+
+        public static bool IsManagedUPM()
+        {
+            return AssetDatabase.IsValidFolder("Packages/jp.whiteflare.unlitwf");
         }
 
         public const string KWD_EDITOR_HIDE_LMAP = "_WF_EDITOR_HIDE_LMAP";

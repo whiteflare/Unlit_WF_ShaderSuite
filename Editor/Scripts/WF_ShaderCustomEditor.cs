@@ -485,9 +485,18 @@ namespace UnlitWF
                 if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion) && !WFCommonUtility.IsInSpecialProject())
                 {
                     var message = WFI18N.Translate(WFMessageText.NewerVersion) + WFCommonUtility.GetLatestVersion()?.latestVersion;
-                    if (materialEditor.HelpBoxWithButton(ToolCommon.GetMessageContent(MessageType.Info, message), new GUIContent("Go")))
+                    if (!WFCommonUtility.IsManagedUPM())
                     {
-                        WFCommonUtility.OpenDownloadPage();
+                        // UPM管理ではないときは、Goボタン付きのヘルプボックス
+                        if (materialEditor.HelpBoxWithButton(ToolCommon.GetMessageContent(MessageType.Info, message), new GUIContent("Go")))
+                        {
+                            WFCommonUtility.OpenDownloadPage();
+                        }
+                    }
+                    else
+                    {
+                        // UPM管理のときは、Goボタン無しのヘルプボックス
+                        EditorGUILayout.HelpBox(ToolCommon.GetMessageContent(MessageType.Info, message));
                     }
                 }
             }

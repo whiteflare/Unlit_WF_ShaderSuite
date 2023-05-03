@@ -186,7 +186,7 @@ namespace UnlitWF
 
         private static void ChangeMobileShader(params Material[] mats)
         {
-            if (0 < mats.Length && EditorUtility.DisplayDialog("WF change Mobile shader", WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel"))
+            if (0 < mats.Length && EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel"))
             {
                 new Converter.WFMaterialToMobileShaderConverter().ExecAutoConvert(mats);
             }
@@ -200,7 +200,7 @@ namespace UnlitWF
         [MenuItem(TOOLS_LNG_EN, priority = WFMenu.PRI_TOOLS_CNGLANG)]
         private static void Menu_ChangeLang()
         {
-            if (!EditorUtility.DisplayDialog("WF", "Do you want to switch the menu about UnlitWF to English?\nIt may take a few minutes to switch.", "OK", "Cancel"))
+            if (!EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, "Do you want to switch the menu about UnlitWF to English?\nIt may take a few minutes to switch.", "OK", "Cancel"))
             {
                 return;
             }
@@ -213,7 +213,7 @@ namespace UnlitWF
         [MenuItem(TOOLS_LNG_JP, priority = WFMenu.PRI_TOOLS_CNGLANG)]
         private static void Menu_ChangeLang()
         {
-            if (!EditorUtility.DisplayDialog("WF", "UnlitWF に関するメニューを日本語にしますか？\n切り替えには数分の時間がかかる場合があります。", "OK", "Cancel"))
+            if (!EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, "UnlitWF に関するメニューを日本語にしますか？\n切り替えには数分の時間がかかる場合があります。", "OK", "Cancel"))
             {
                 return;
             }
