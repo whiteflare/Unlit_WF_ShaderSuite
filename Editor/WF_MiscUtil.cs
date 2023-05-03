@@ -529,6 +529,36 @@ namespace UnlitWF
         }
     }
 
+    class CoroutineHandler : MonoBehaviour
+    {
+        private static CoroutineHandler m_Instance;
+        private static CoroutineHandler instance
+        {
+            get
+            {
+                if (m_Instance == null)
+                {
+                    GameObject o = new GameObject("CoroutineHandler");
+                    o.hideFlags = HideFlags.HideAndDontSave;
+                    m_Instance = o.AddComponent<CoroutineHandler>();
+                }
+                return m_Instance;
+            }
+        }
+
+        public void OnDisable()
+        {
+            if (m_Instance)
+            {
+                Destroy(m_Instance.gameObject);
+            }
+        }
+
+        public static Coroutine StartStaticCoroutine(System.Collections.IEnumerator coroutine)
+        {
+            return instance.StartCoroutine(coroutine);
+        }
+    }
 }
 
 #endif

@@ -771,7 +771,7 @@ namespace UnlitWF.Converter
             var cancel = lang == EditorLanguage.日本語 ? "結構です" : "No Thanks";
             var alt = lang == EditorLanguage.日本語 ? "後で聞いて" : "Ask Me Later";
 
-            switch (EditorUtility.DisplayDialogComplex("WF migration materials", msg, ok, cancel, alt))
+            switch (EditorUtility.DisplayDialogComplex(WFCommonUtility.DialogTitle, msg, ok, cancel, alt))
             {
                 case 0:
                     // 実行してバージョン上書き
@@ -798,7 +798,7 @@ namespace UnlitWF.Converter
             var lang = WFEditorPrefs.LangMode;
             var ok = lang == EditorLanguage.日本語 ? "実行する" : "Go Ahead";
             var cancel = lang == EditorLanguage.日本語 ? "結構です" : "No Thanks";
-            if (EditorUtility.DisplayDialog("WF migration materials", msg, ok, cancel))
+            if (EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, msg, ok, cancel))
             {
                 ScanAndMigration();
                 SaveCurrentMigrationVersion();
