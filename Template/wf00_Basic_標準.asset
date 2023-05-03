@@ -303,6 +303,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e2b056a1e7bff1489e0ce6676d2ac92, type: 3}
   m_Name: "wf00_Basic_\u6A19\u6E96"
   m_EditorClassIdentifier: 
+  displayName: 
   memo: "\u9670\u3068\u30EA\u30E0\u30E9\u30A4\u30C8\u3092\u4ED8\u3051\u305F\u3001\u6A19\u6E96\u7684\u306A\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: -5904725250093424410}
   copyMaterialColor: 0
+  forceChangeShader: 0
