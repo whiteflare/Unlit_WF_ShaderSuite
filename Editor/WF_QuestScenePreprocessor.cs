@@ -38,7 +38,7 @@ namespace UnlitWF
 {
 #if UNITY_2019_1_OR_NEWER
 
-    public class WF_QuestScenePreprocessor : IProcessSceneWithReport
+    class WF_QuestScenePreprocessor : IProcessSceneWithReport
     {
         public int callbackOrder => 90;
 

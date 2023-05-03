@@ -29,7 +29,7 @@ namespace UnlitWF
     /// <summary>
     /// マテリアルとシェーダが新規インポートされたタイミングでプロジェクト内をスキャンしてマテリアルをマイグレーションするAssetPostprocessor
     /// </summary>
-    public class WF_AutoMigrationPostprocessor : AssetPostprocessor
+    class WF_AutoMigrationPostprocessor : AssetPostprocessor
     {
         public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
         {

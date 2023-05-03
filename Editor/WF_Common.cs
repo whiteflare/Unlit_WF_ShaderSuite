@@ -29,8 +29,13 @@ using UnityEngine;
 
 namespace UnlitWF
 {
-    internal static class WFCommonUtility
+    static class WFCommonUtility
     {
+        /// <summary>
+        /// DisplayDialogのタイトル文字列。汎用的に使うもの。
+        /// </summary>
+        public static readonly string DialogTitle = "UnlitWF Shader";
+
         #region プロパティ判定
 
         /// <summary>
@@ -359,7 +364,6 @@ namespace UnlitWF
             {
                 this.path = path;
                 this.shader = shader;
-
                 this.root = path.StartsWith("Packages/") ? 0 : 1;
 
                 var mm = pattern.Match(path);
@@ -378,7 +382,7 @@ namespace UnlitWF
                 }
             }
 
-            private static readonly Regex pattern = new Regex(@"^(?<root>(?:Packages|Assets)(?<parent>/[^/]+)*)/(?<folder>Unlit_?WF_?Shader[A-Za-z]*)/(?<tail>.*)$", RegexOptions.Compiled);
+            private static readonly Regex pattern = new Regex(@"^(?<root>(?:Packages|Assets)(?<parent>/[^/]+)*)/(?<folder>Unlit_?WF_?Shader[A-Za-z]*|jp\.whiteflare\.unlitwf[A-Za-z0-9\.]*)/(?<tail>.*)$", RegexOptions.Compiled);
 
             public int CompareTo(ShaderAndAssetPath other)
             {
@@ -435,7 +439,20 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool IsSupportedShader(Shader shader)
         {
-            return shader != null && shader.name.Contains("UnlitWF");
+            if (shader == null)
+            {
+                return false;
+            }
+            var name = shader.name;
+            if (!name.Contains("UnlitWF"))
+            {
+                return false;
+            }
+            if (IsURP())
+            {
+                return name.Contains("_URP");
+            }
+            return !name.Contains("_URP");
         }
 
         /// <summary>
@@ -606,6 +623,11 @@ namespace UnlitWF
             return EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android;
         }
 
+        public static bool IsManagedUPM()
+        {
+            return AssetDatabase.IsValidFolder("Packages/jp.whiteflare.unlitwf");
+        }
+
         public const string KWD_EDITOR_HIDE_LMAP = "_WF_EDITOR_HIDE_LMAP";
 
         public static bool IsKwdEnableHideLmap()
@@ -655,7 +677,7 @@ namespace UnlitWF
         #endregion
     }
 
-    public static class WFAccessor
+    static class WFAccessor
     {
         /// <summary>
         /// Shader に指定のプロパティが存在するかどうか返す。
@@ -843,7 +865,7 @@ namespace UnlitWF
         }
     }
 
-    public abstract class WFCustomKeywordSetting
+    abstract class WFCustomKeywordSetting
     {
         public readonly string propertyName;
         public string enablePropName;
@@ -904,7 +926,7 @@ namespace UnlitWF
         }
     }
 
-    public class WFCustomKeywordSettingBool : WFCustomKeywordSetting
+    class WFCustomKeywordSettingBool : WFCustomKeywordSetting
     {
         public readonly string keyword;
 
@@ -919,7 +941,7 @@ namespace UnlitWF
         }
     }
 
-    public class WFCustomKeywordSettingEnum : WFCustomKeywordSetting
+    class WFCustomKeywordSettingEnum : WFCustomKeywordSetting
     {
         public readonly string[] keywords;
         public readonly int[] index;
@@ -954,7 +976,7 @@ namespace UnlitWF
     }
 
     [Serializable]
-    public class WFVersionInfo
+    class WFVersionInfo
     {
         public string latestVersion;
         public string downloadPage;
@@ -965,7 +987,7 @@ namespace UnlitWF
         }
     }
 
-    public class WFShaderFunction
+    class WFShaderFunction
     {
         private static List<string> uniqueLabel = new List<string>();
 
@@ -1042,12 +1064,12 @@ namespace UnlitWF
         }
     }
 
-    internal enum EditorLanguage
+    enum EditorLanguage
     {
         English, 日本語, 한국어
     }
 
-    internal class WFI18NTranslation
+    class WFI18NTranslation
     {
         public readonly string Before;
         public readonly string After;
@@ -1087,7 +1109,7 @@ namespace UnlitWF
         }
     }
 
-    internal static class WFEditorPrefs
+    static class WFEditorPrefs
     {
         private static readonly string KEY_EDITOR_LANG = "UnlitWF.ShaderEditor/Lang";
         private static readonly string KEY_MENU_TO_BOTTOM = "UnlitWF.ShaderEditor/MenuToBottom";
@@ -1181,7 +1203,7 @@ namespace UnlitWF
         }
     }
 
-    internal static class WFI18N
+    static class WFI18N
     {
         private static readonly Dictionary<string, List<WFI18NTranslation>> EN = new Dictionary<string, List<WFI18NTranslation>>();
         private static readonly Dictionary<string, List<WFI18NTranslation>> JA = ToDict(WFShaderDictionary.LangEnToJa);
@@ -1304,7 +1326,7 @@ namespace UnlitWF
         }
     }
 
-    internal class WFShaderName
+    class WFShaderName
     {
         public readonly string RenderPipeline;
         public readonly string Familly;
@@ -1324,7 +1346,7 @@ namespace UnlitWF
         }
     }
 
-    internal class WFVariantList
+    class WFVariantList
     {
         public readonly WFShaderName current;
 
@@ -1346,11 +1368,11 @@ namespace UnlitWF
         public string[] LabelRenderTypeList { get => renderTypeList.Select(nm => nm == null ? "" : nm.RenderType).ToArray(); }
     }
 
-    internal static class WFShaderNameDictionary
+    static class WFShaderNameDictionary
     {
         private static volatile List<WFShaderName> additionalShaderNamesCache = null;
 
-        public class CacheCleaner : AssetPostprocessor
+        internal class CacheCleaner : AssetPostprocessor
         {
             public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
             {
