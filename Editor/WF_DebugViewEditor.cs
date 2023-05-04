@@ -26,7 +26,7 @@ using UnityEditor;
 namespace UnlitWF
 {
 
-    public class WF_DebugViewEditor : ShaderGUI
+    class WF_DebugViewEditor : ShaderGUI
     {
         public const string SHADER_NAME_DEBUGVIEW = "UnlitWF/Debug/WF_DebugView";
 

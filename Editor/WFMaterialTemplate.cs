@@ -26,9 +26,11 @@ namespace UnlitWF
 {
     public class WFMaterialTemplate : ScriptableObject
     {
-        public string memo;
         public Material material;
+        public string displayName;
+        public string memo;
         public bool copyMaterialColor;
+        public bool forceChangeShader;
 
         //[MenuItem(WFMenu.ASSETS_TEMPLATE, priority = WFMenu.PRI_ASSETS_TEMPLATE)]
         //public static void CreateAsset()
@@ -68,6 +70,20 @@ namespace UnlitWF
             AssetDatabase.AddObjectToAsset(tmp.material, tmp);
         }
 
+        public static bool IsAvailable(WFMaterialTemplate template)
+        {
+            if (template == null || template.material == null)
+            {
+                return false;
+            }
+            return WFCommonUtility.IsSupportedShader(template.material);
+        }
+
+        public string GetDisplayString()
+        {
+            return string.IsNullOrWhiteSpace(displayName) ? this.name : displayName;
+        }
+
         public void ApplyToMaterial(IEnumerable<Material> mats)
         {
             if (material == null)
@@ -77,11 +93,18 @@ namespace UnlitWF
             }
             Undo.RecordObjects(mats.ToArray(), "WF apply Template");
 
-            // シェーダを揃える
+            // テンプレートからコピーする機能の特定
+            var activeLabels = WFShaderFunction.GetEnableFunctionList(material).Select(f => f.Label).ToArray();
+
+            // 適用先のプロパティが揃っているかを確認し、揃っていないならシェーダを変更する
             foreach (var mat in mats)
             {
                 if (mat.shader != material.shader)
                 {
+                    if (!forceChangeShader && IsMatchFeature(mat, activeLabels))
+                    {
+                        continue;
+                    }
                     mat.shader = material.shader;
                     mat.renderQueue = WFAccessor.GetMaterialRenderQueueValue(material);
                 }
@@ -91,16 +114,22 @@ namespace UnlitWF
             var prm = CopyPropParameter.Create();
             prm.materialSource = material;
             prm.materialDestination = mats.ToArray();
-            prm.labels = WFShaderFunction.GetEnableFunctionList(material).Select(f => f.Label).ToArray();
+            prm.labels = activeLabels;
             prm.onlyOverrideBuiltinTextures = true; // テクスチャ類はビルトインテクスチャのみ上書き可能
             prm.copyMaterialColor = copyMaterialColor; // チェックされている場合は Material Color 他もコピーする
 
             WFMaterialEditUtility.CopyPropertiesWithoutUndo(prm);
         }
+
+        private bool IsMatchFeature(Material mat, string[] activeLabels)
+        {
+            var pns = WFAccessor.GetAllPropertyNames(mat.shader).Select(WFCommonUtility.GetPrefixFromPropName).Where(lb => lb != null).Distinct().ToArray();
+            return activeLabels.All(pns.Contains);
+        }
     }
 
     [CustomEditor(typeof(WFMaterialTemplate))]
-    public class WFMaterialTemplateEditor : Editor
+    class WFMaterialTemplateEditor : Editor
     {
         void OnEnable()
         {
@@ -112,14 +141,14 @@ namespace UnlitWF
 
             EditorGUI.BeginChangeCheck();
 
-            var m_material = serializedObject.FindProperty(nameof(WFMaterialTemplate.material));
             using (new EditorGUI.DisabledGroupScope(true))
             {
-                EditorGUILayout.PropertyField(m_material);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.material)));
             }
 
-            var m_copy = serializedObject.FindProperty(nameof(WFMaterialTemplate.copyMaterialColor));
-            EditorGUILayout.PropertyField(m_copy);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.displayName)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.copyMaterialColor)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.forceChangeShader)));
 
             var style = new GUIStyle(EditorStyles.textArea);
             style.wordWrap = true;

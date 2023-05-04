@@ -26,7 +26,7 @@ using UnityEngine;
 
 namespace UnlitWF
 {
-    public class ShaderCustomEditor : ShaderGUI
+    class ShaderCustomEditor : ShaderGUI
     {
         /// <summary>
         /// プロパティの前後に実行されるフック処理
@@ -485,9 +485,18 @@ namespace UnlitWF
                 if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion) && !WFCommonUtility.IsInSpecialProject())
                 {
                     var message = WFI18N.Translate(WFMessageText.NewerVersion) + WFCommonUtility.GetLatestVersion()?.latestVersion;
-                    if (materialEditor.HelpBoxWithButton(ToolCommon.GetMessageContent(MessageType.Info, message), new GUIContent("Go")))
+                    if (!WFCommonUtility.IsManagedUPM())
                     {
-                        WFCommonUtility.OpenDownloadPage();
+                        // UPM管理ではないときは、Goボタン付きのヘルプボックス
+                        if (materialEditor.HelpBoxWithButton(ToolCommon.GetMessageContent(MessageType.Info, message), new GUIContent("Go")))
+                        {
+                            WFCommonUtility.OpenDownloadPage();
+                        }
+                    }
+                    else
+                    {
+                        // UPM管理のときは、Goボタン無しのヘルプボックス
+                        EditorGUILayout.HelpBox(ToolCommon.GetMessageContent(MessageType.Info, message));
                     }
                 }
             }
@@ -540,20 +549,6 @@ namespace UnlitWF
             }
         }
 
-        private struct GuidAndPath
-        {
-            public string guid;
-            public string path;
-            public string name;
-
-            public GuidAndPath(string guid)
-            {
-                this.guid = guid;
-                this.path = AssetDatabase.GUIDToAssetPath(guid) ?? "";
-                this.name = string.IsNullOrWhiteSpace(path) ? "" : new Regex(@"^.*/|\.[^\.]+$").Replace(this.path, "");
-            }
-        }
-
         private static void OnGUISub_Utilities(MaterialEditor materialEditor)
         {
             EditorGUILayout.Space();
@@ -564,21 +559,21 @@ namespace UnlitWF
             if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate)))
             {
                 // WFMaterialTemplate を検索
-                var guids = AssetDatabase.FindAssets("t:" + typeof(WFMaterialTemplate))
-                    .Select(guid => new GuidAndPath(guid))
-                    .Where(guid => !string.IsNullOrWhiteSpace(guid.path))
-                    .OrderBy(guid => guid.name);
+                var temps = AssetDatabase.FindAssets("t:" + typeof(WFMaterialTemplate))
+                    .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                    .Where(path => !string.IsNullOrWhiteSpace(path))
+                    .Select(path => AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(path))
+                    .Where(WFMaterialTemplate.IsAvailable)
+                    .OrderBy(temp => temp.GetDisplayString());
+                
                 // メニュー作成
                 var menu = new GenericMenu();
-                foreach (var guid in guids)
+                foreach (var temp in temps)
                 {
-                    menu.AddItem(new GUIContent(guid.name), false, () =>
+                    Debug.Log(temp.material.shader);
+                    menu.AddItem(new GUIContent(temp.GetDisplayString()), false, () =>
                     {
-                        var temp = AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(guid.path);
-                        if (temp != null)
-                        {
-                            temp.ApplyToMaterial(WFCommonUtility.AsMaterials(materialEditor.targets));
-                        }
+                        temp.ApplyToMaterial(WFCommonUtility.AsMaterials(materialEditor.targets));
                     });
                 }
                 menu.AddSeparator("");
@@ -1099,14 +1094,14 @@ namespace UnlitWF
             });
         }
 
-#endregion
+        #endregion
 
-#region PropertyHook
+        #region PropertyHook
 
         /// <summary>
         /// PropertyHookで使用する表示コンテキスト
         /// </summary>
-        class PropertyGUIContext
+        internal class PropertyGUIContext
         {
             /// <summary>
             /// 動作中のMaterialEditor
@@ -1145,14 +1140,14 @@ namespace UnlitWF
         /// <summary>
         /// プロパティの前後に実行されるフック処理のインタフェース
         /// </summary>
-        interface IPropertyHook
+        internal interface IPropertyHook
         {
             void OnBefore(PropertyGUIContext context);
 
             void OnAfter(PropertyGUIContext context, bool changed);
         }
 
-        abstract class AbstractPropertyHook : IPropertyHook
+        internal abstract class AbstractPropertyHook : IPropertyHook
         {
             protected readonly Regex matcher;
 
@@ -1318,7 +1313,7 @@ namespace UnlitWF
         /// </summary>
         class DefValueSetPropertyHook : AbstractPropertyHook
         {
-            public delegate void DefValueSetDelegate(PropertyGUIContext context);
+            internal delegate void DefValueSetDelegate(PropertyGUIContext context);
 
             private readonly DefValueSetDelegate setter;
 
@@ -1362,8 +1357,8 @@ namespace UnlitWF
         /// </summary>
         class CustomPropertyHook : AbstractPropertyHook
         {
-            public delegate void OnBeforeDelegate(PropertyGUIContext context);
-            public delegate void OnAfterDelegate(PropertyGUIContext context, bool changed);
+            internal delegate void OnBeforeDelegate(PropertyGUIContext context);
+            internal delegate void OnAfterDelegate(PropertyGUIContext context, bool changed);
 
             private readonly OnBeforeDelegate before;
             private readonly OnAfterDelegate after;
@@ -1396,7 +1391,7 @@ namespace UnlitWF
 
 #region MaterialPropertyDrawer
 
-    internal static class WFHeaderMenuController
+    static class WFHeaderMenuController
     {
         private static Material copiedMaterial = null;
 
@@ -1461,7 +1456,7 @@ namespace UnlitWF
     /// <summary>
     /// Shurikenヘッダを表示する
     /// </summary>
-    internal class MaterialWFHeaderDecorator : MaterialPropertyDrawer
+    class MaterialWFHeaderDecorator : MaterialPropertyDrawer
     {
         public readonly string text;
 
@@ -1484,7 +1479,7 @@ namespace UnlitWF
     /// <summary>
     /// Enableトグル付きのShurikenヘッダを表示する
     /// </summary>
-    internal class MaterialWFHeaderToggleDrawer : MaterialPropertyDrawer
+    class MaterialWFHeaderToggleDrawer : MaterialPropertyDrawer
     {
         public readonly string text;
 
@@ -1507,7 +1502,7 @@ namespace UnlitWF
     /// <summary>
     /// 常時trueなEnableトグル付きのShurikenヘッダを表示する
     /// </summary>
-    internal class MaterialWFHeaderAlwaysOnDrawer : MaterialPropertyDrawer
+    class MaterialWFHeaderAlwaysOnDrawer : MaterialPropertyDrawer
     {
         public readonly string text;
 
@@ -1528,7 +1523,7 @@ namespace UnlitWF
     }
 
     [Obsolete]
-    internal class MaterialFixFloatDrawer : MaterialWF_FixFloatDrawer
+    class MaterialFixFloatDrawer : MaterialWF_FixFloatDrawer
     {
         public MaterialFixFloatDrawer() : base()
         {
@@ -1542,7 +1537,7 @@ namespace UnlitWF
     /// <summary>
     /// 常に指定のfloat値にプロパティを固定する、非表示のPropertyDrawer
     /// </summary>
-    internal class MaterialWF_FixFloatDrawer : MaterialPropertyDrawer
+    class MaterialWF_FixFloatDrawer : MaterialPropertyDrawer
     {
         public readonly float value;
 
@@ -1568,14 +1563,14 @@ namespace UnlitWF
     }
 
     [Obsolete]
-    internal class MaterialFixNoTextureDrawer : MaterialWF_FixNoTextureDrawer
+    class MaterialFixNoTextureDrawer : MaterialWF_FixNoTextureDrawer
     {
     }
 
     /// <summary>
     /// 常にテクスチャNoneにプロパティを固定する、非表示のPropertyDrawer
     /// </summary>
-    internal class MaterialWF_FixNoTextureDrawer : MaterialPropertyDrawer
+    class MaterialWF_FixNoTextureDrawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
@@ -1591,7 +1586,7 @@ namespace UnlitWF
     /// <summary>
     /// 入力欄が2個あるVectorのPropertyDrawer
     /// </summary>
-    internal class MaterialWF_Vector2Drawer : MaterialPropertyDrawer
+    class MaterialWF_Vector2Drawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
@@ -1620,7 +1615,7 @@ namespace UnlitWF
     /// <summary>
     /// 入力欄が3個あるVectorのPropertyDrawer
     /// </summary>
-    internal class MaterialWF_Vector3Drawer : MaterialPropertyDrawer
+    class MaterialWF_Vector3Drawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
@@ -1649,7 +1644,7 @@ namespace UnlitWF
     /// <summary>
     /// sin/cos計算済みDirectionのPropertyDrawer
     /// </summary>
-    internal class MaterialWF_RotMatrixDrawer : MaterialPropertyDrawer
+    class MaterialWF_RotMatrixDrawer : MaterialPropertyDrawer
     {
         public readonly float min;
         public readonly float max;
@@ -1692,7 +1687,7 @@ namespace UnlitWF
     /// <summary>
     /// 常に指定のfloat値にプロパティを固定する、非活性Toggle表示のPropertyDrawer
     /// </summary>
-    internal class MaterialWF_FixUIToggleDrawer : MaterialPropertyDrawer
+    class MaterialWF_FixUIToggleDrawer : MaterialPropertyDrawer
     {
         public readonly float value;
 
@@ -1722,7 +1717,7 @@ namespace UnlitWF
     /// <summary>
     /// 常に非表示のMaterialPropertyDrawer
     /// </summary>
-    internal class MaterialWF_HidePropDrawer : MaterialPropertyDrawer
+    class MaterialWF_HidePropDrawer : MaterialPropertyDrawer
     {
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
         {
@@ -1734,7 +1729,7 @@ namespace UnlitWF
         }
     }
 
-    internal class MaterialWF_EnumDrawer : MaterialPropertyDrawer
+    class MaterialWF_EnumDrawer : MaterialPropertyDrawer
     {
         private readonly string enumName;
         private readonly string[] names;
@@ -1893,7 +1888,7 @@ namespace UnlitWF
         }
     }
 
-#endregion
+    #endregion
 
     public enum BlendModeOVL
     {

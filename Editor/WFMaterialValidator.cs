@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace UnlitWF
 {
-    public class WFMaterialValidator
+    class WFMaterialValidator
     {
         private readonly Func<Material[], Material[]> validate;
         private readonly MessageType messageType;
@@ -50,7 +50,7 @@ namespace UnlitWF
             return new Advice(this, targets, messageType, getMessage(targets), action == null ? (Action)null : () => action(targets));
         }
 
-        public class Advice
+        internal class Advice
         {
             public readonly WFMaterialValidator source;
             public readonly Material[] targets;
@@ -69,7 +69,7 @@ namespace UnlitWF
         }
     }
 
-    public static class WFMaterialValidators
+    static class WFMaterialValidators
     {
         public static WFMaterialValidator[] Validators = {
             // マイグレーション
@@ -260,7 +260,7 @@ namespace UnlitWF
         }
     }
 
-    public class WFMaterialCache : ScriptableSingleton<WFMaterialCache>
+    class WFMaterialCache : ScriptableSingleton<WFMaterialCache>
     {
         private readonly WeakRefCache<Material> oldMaterialVersionCache = new WeakRefCache<Material>();
         private readonly WeakRefCache<Material> newMaterialVersionCache = new WeakRefCache<Material>();

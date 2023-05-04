@@ -91,7 +91,7 @@ namespace UnlitWF
         }
     }
 
-    public abstract class PropertyNameReplacement
+    abstract class PropertyNameReplacement
     {
         public readonly Action<ShaderSerializedProperty> onAfterCopy;
 
@@ -230,7 +230,7 @@ namespace UnlitWF
             return Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat);
         }
 
-        public static bool ExistsNeedsMigration(Material mat, IEnumerable<PropertyNameReplacement> replacement)
+        internal static bool ExistsNeedsMigration(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
             if (mat != null)
             {
@@ -287,12 +287,12 @@ namespace UnlitWF
         }
 
 
-        public static bool ReplacePropertyNamesWithoutUndo(Material mat, IEnumerable<PropertyNameReplacement> replacement)
+        internal static bool ReplacePropertyNamesWithoutUndo(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
             return RenamePropNamesWithoutUndoInternal(mat, replacement);
         }
 
-        public static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement)
+        internal static bool ReplacePropertyNamesWithoutUndo(Material mat, params PropertyNameReplacement[] replacement)
         {
             return RenamePropNamesWithoutUndoInternal(mat, replacement);
         }
@@ -362,11 +362,13 @@ namespace UnlitWF
         {
             copyProperties(param, true);
         }
-        public static void CopyPropertiesWithoutUndo(CopyPropParameter param)
+
+        internal static void CopyPropertiesWithoutUndo(CopyPropParameter param)
         {
             copyProperties(param, false);
         }
-        public static void copyProperties(CopyPropParameter param, bool undo)
+
+        private static void copyProperties(CopyPropParameter param, bool undo)
         {
             if (param.materialSource == null)
             {
@@ -384,7 +386,7 @@ namespace UnlitWF
                 if (prefix != null)
                 {
                     // Prefixの一致判定
-                    if (copy_target.Any(prefix.Contains))
+                    if (copy_target.Contains(prefix))
                     {
                         if (!param.withoutTextures || src_prop.Type != ShaderUtil.ShaderPropertyType.TexEnv)
                         {
@@ -598,7 +600,7 @@ namespace UnlitWF
             ResetPropertiesWithoutUndo(param);
         }
 
-        public static void ResetPropertiesWithoutUndo(ResetParameter param)
+        internal static void ResetPropertiesWithoutUndo(ResetParameter param)
         {
             foreach (Material material in param.materials)
             {
@@ -677,7 +679,7 @@ namespace UnlitWF
             EditorUtility.SetDirty(material);
         }
 
-        public static void RemovePropertiesWithoutUndo(Material material, params string[] propNames)
+        internal static void RemovePropertiesWithoutUndo(Material material, params string[] propNames)
         {
             var props = ShaderSerializedProperty.AsDict(material);
             var del_props = new List<ShaderSerializedProperty>();
@@ -761,7 +763,7 @@ namespace UnlitWF
             return del_names;
         }
 
-        public static void DeleteShaderKeyword(SerializedObject so, Material logTarget)
+        internal static void DeleteShaderKeyword(SerializedObject so, Material logTarget)
         {
             var prop = so.FindProperty("m_ShaderKeywords");
             if (prop == null || string.IsNullOrEmpty(prop.stringValue))
@@ -789,7 +791,7 @@ namespace UnlitWF
     /// <summary>
     /// マテリアルのプロパティを編集するためのユーティリティ
     /// </summary>
-    public class ShaderMaterialProperty
+    class ShaderMaterialProperty
     {
         public readonly Material Material;
         private readonly Shader shader;
@@ -871,7 +873,7 @@ namespace UnlitWF
     /// <summary>
     /// シリアライズされたマテリアルのプロパティを編集するためのユーティリティ
     /// </summary>
-    public class ShaderSerializedProperty
+    class ShaderSerializedProperty
     {
         public readonly string name;
         public readonly ShaderMaterialProperty materialProperty;
