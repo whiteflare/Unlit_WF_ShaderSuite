@@ -485,9 +485,18 @@ namespace UnlitWF
                 if (snm != null && WFCommonUtility.IsOlderShaderVersion(currentVersion) && !WFCommonUtility.IsInSpecialProject())
                 {
                     var message = WFI18N.Translate(WFMessageText.NewerVersion) + WFCommonUtility.GetLatestVersion()?.latestVersion;
-                    if (materialEditor.HelpBoxWithButton(ToolCommon.GetMessageContent(MessageType.Info, message), new GUIContent("Go")))
+                    if (!WFCommonUtility.IsManagedUPM())
                     {
-                        WFCommonUtility.OpenDownloadPage();
+                        // UPM管理ではないときは、Goボタン付きのヘルプボックス
+                        if (materialEditor.HelpBoxWithButton(ToolCommon.GetMessageContent(MessageType.Info, message), new GUIContent("Go")))
+                        {
+                            WFCommonUtility.OpenDownloadPage();
+                        }
+                    }
+                    else
+                    {
+                        // UPM管理のときは、Goボタン無しのヘルプボックス
+                        EditorGUILayout.HelpBox(ToolCommon.GetMessageContent(MessageType.Info, message));
                     }
                 }
             }
@@ -540,20 +549,6 @@ namespace UnlitWF
             }
         }
 
-        private struct GuidAndPath
-        {
-            public string guid;
-            public string path;
-            public string name;
-
-            public GuidAndPath(string guid)
-            {
-                this.guid = guid;
-                this.path = AssetDatabase.GUIDToAssetPath(guid) ?? "";
-                this.name = string.IsNullOrWhiteSpace(path) ? "" : new Regex(@"^.*/|\.[^\.]+$").Replace(this.path, "");
-            }
-        }
-
         private static void OnGUISub_Utilities(MaterialEditor materialEditor)
         {
             EditorGUILayout.Space();
@@ -564,21 +559,21 @@ namespace UnlitWF
             if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate)))
             {
                 // WFMaterialTemplate を検索
-                var guids = AssetDatabase.FindAssets("t:" + typeof(WFMaterialTemplate))
-                    .Select(guid => new GuidAndPath(guid))
-                    .Where(guid => !string.IsNullOrWhiteSpace(guid.path))
-                    .OrderBy(guid => guid.name);
+                var temps = AssetDatabase.FindAssets("t:" + typeof(WFMaterialTemplate))
+                    .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                    .Where(path => !string.IsNullOrWhiteSpace(path))
+                    .Select(path => AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(path))
+                    .Where(WFMaterialTemplate.IsAvailable)
+                    .OrderBy(temp => temp.GetDisplayString());
+                
                 // メニュー作成
                 var menu = new GenericMenu();
-                foreach (var guid in guids)
+                foreach (var temp in temps)
                 {
-                    menu.AddItem(new GUIContent(guid.name), false, () =>
+                    Debug.Log(temp.material.shader);
+                    menu.AddItem(new GUIContent(temp.GetDisplayString()), false, () =>
                     {
-                        var temp = AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(guid.path);
-                        if (temp != null)
-                        {
-                            temp.ApplyToMaterial(WFCommonUtility.AsMaterials(materialEditor.targets));
-                        }
+                        temp.ApplyToMaterial(WFCommonUtility.AsMaterials(materialEditor.targets));
                     });
                 }
                 menu.AddSeparator("");

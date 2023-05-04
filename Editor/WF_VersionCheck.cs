@@ -17,6 +17,7 @@
 
 #if UNITY_EDITOR
 
+using System;
 using System.Collections;
 using UnityEditor;
 using UnityEngine;
@@ -83,37 +84,6 @@ namespace UnlitWF
                 WFCommonUtility.SetLatestVersion(version);
                 Debug.LogFormat("[WF][Version] VersionCheck Succeed, LatestVersion is {0}", version.latestVersion);
             }
-        }
-    }
-
-    class CoroutineHandler : MonoBehaviour
-    {
-        private static CoroutineHandler m_Instance;
-        private static CoroutineHandler instance
-        {
-            get
-            {
-                if (m_Instance == null)
-                {
-                    GameObject o = new GameObject("CoroutineHandler");
-                    o.hideFlags = HideFlags.HideAndDontSave;
-                    m_Instance = o.AddComponent<CoroutineHandler>();
-                }
-                return m_Instance;
-            }
-        }
-
-        public void OnDisable()
-        {
-            if (m_Instance)
-            {
-                Destroy(m_Instance.gameObject);
-            }
-        }
-
-        static public Coroutine StartStaticCoroutine(IEnumerator coroutine)
-        {
-            return instance.StartCoroutine(coroutine);
         }
     }
 }

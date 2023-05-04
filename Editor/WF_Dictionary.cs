@@ -682,6 +682,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.DgChangeMobile, "シェーダをMobile向けに切り替えますか？\n\nこの操作はUndoできますが、バックアップを取ることをお勧めします。"),
             new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダがインポートされました。\nプロジェクト内に古いマテリアルが残っていないかスキャンしますか？"),
             new WFI18NTranslation(WFMessageText.DgMigrationManual, "プロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
+            new WFI18NTranslation(WFMessageText.DgDontImportUnityPackage, "パッケージは UPM(VPM) で管理されています。\nunitypackage からインポートするかわりに VCC 等の管理ツールを使用してください。"),
 
             new WFI18NTranslation(WFMessageText.LgWarnOlderVersion, "古いバージョンで作成されたマテリアルがあります。"),
             new WFI18NTranslation(WFMessageText.LgWarnNotSupportAndroid, "Android非対応のシェーダが使われているマテリアルがあります。"),
@@ -932,6 +933,7 @@ namespace UnlitWF
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
         public static readonly string DgMigrationAuto = "UnlitWF shaders have been imported.\nDo you want to scan for old materials still in the project?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
+        public static readonly string DgDontImportUnityPackage = "The package is managed by UPM(VPM).\nUse a management tool such as VCC instead of importing from unitypackage.";
         public static readonly string LgWarnOlderVersion = "A material was created with an older shader version.";
         public static readonly string LgWarnNotSupportAndroid = "A material uses a shader that is not supported by Android.";
     }

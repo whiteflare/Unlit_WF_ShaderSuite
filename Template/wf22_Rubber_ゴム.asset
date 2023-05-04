@@ -303,6 +303,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e2b056a1e7bff1489e0ce6676d2ac92, type: 3}
   m_Name: "wf22_Rubber_\u30B4\u30E0"
   m_EditorClassIdentifier: 
-  memo: "\u30B4\u30E0\u306E\u8CEA\u611F\u3092\u30A4\u30E1\u30FC\u30B8\u3057\u305F\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   material: {fileID: -3930553153085618222}
+  displayName: 
+  memo: "\u30B4\u30E0\u306E\u8CEA\u611F\u3092\u30A4\u30E1\u30FC\u30B8\u3057\u305F\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
   copyMaterialColor: 1
+  forceChangeShader: 0
