@@ -439,7 +439,20 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool IsSupportedShader(Shader shader)
         {
-            return shader != null && shader.name.Contains("UnlitWF");
+            if (shader == null)
+            {
+                return false;
+            }
+            var name = shader.name;
+            if (!name.Contains("UnlitWF"))
+            {
+                return false;
+            }
+            if (IsURP())
+            {
+                return name.Contains("_URP");
+            }
+            return !name.Contains("_URP");
         }
 
         /// <summary>
