@@ -128,7 +128,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
         private static void Menu_AutoConvertMaterial()
         {
-            var mats = new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
+            var mats = new MaterialSeeker().GetAllMaterialsInSelection(MatSelectMode.FromAssetDeep);
             new Converter.WFMaterialFromOtherShaderConverter().ExecAutoConvert(mats.ToArray());
         }
 
@@ -161,7 +161,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, priority = WFMenu.PRI_ASSETS_DEBUGVIEW)]
         private static void Menu_DebugView()
         {
-            foreach (var mat in new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAsset))
+            foreach (var mat in new MaterialSeeker().GetAllMaterialsInSelection(MatSelectMode.FromAsset))
             {
                 WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, mat);
             }
@@ -180,7 +180,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_CNGMOBILE, priority = WFMenu.PRI_ASSETS_CNGMOBILE)]
         private static void Menu_ChangeMobileShader()
         {
-            var mats = new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
+            var mats = new MaterialSeeker().GetAllMaterialsInSelection(MatSelectMode.FromAssetDeep);
             ChangeMobileShader(mats.ToArray());
         }
 
@@ -345,7 +345,7 @@ namespace UnlitWF
         public static void SetSelectedMaterials(MatSelectMode mode)
         {
             arguments.Clear();
-            arguments.AddRange(new MaterialSeeker().GetSelectionAllMaterial(mode));
+            arguments.AddRange(new MaterialSeeker().GetAllMaterialsInSelection(mode));
         }
 
         public static void SetMaterials(Material[] mats)
@@ -440,7 +440,7 @@ namespace UnlitWF
         {
             if (Selection.GetFiltered<GameObject>(SelectionMode.Unfiltered).Length == 0)
             {
-                ToolCommon.SetMaterials(new MaterialSeeker().GetAllSceneAllMaterial().ToArray());
+                ToolCommon.SetMaterials(new MaterialSeeker().GetAllMaterialsInScene().ToArray());
             }
             else
             {
@@ -896,7 +896,7 @@ namespace UnlitWF
 
             rootObject = EditorGUILayout.ObjectField("Root GameObject", rootObject, typeof(GameObject), true) as GameObject;
 
-            var materials = rootObject != null ? new MaterialSeeker().GetAllMaterials(rootObject).Distinct().ToArray() : new MaterialSeeker().GetAllSceneAllMaterial().Distinct().ToArray();
+            var materials = rootObject != null ? new MaterialSeeker().GetAllMaterials(rootObject).Distinct().ToArray() : new MaterialSeeker().GetAllMaterialsInScene().Distinct().ToArray();
             var advices = WFMaterialValidators.ValidateAll(materials);
 
             if (advices.Count == 0)
