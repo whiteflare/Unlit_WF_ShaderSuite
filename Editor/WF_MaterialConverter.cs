@@ -848,7 +848,10 @@ namespace UnlitWF.Converter
         private static void ScanAndMigration()
         {
             // Go Ahead
-            var done = new MaterialSeeker().SeekProjectAllMaterial("migration materials", Migration);
+            var seeker = new MaterialSeeker();
+            seeker.progressBarTitle = WFCommonUtility.DialogTitle;
+            seeker.progressBarText = "migration materials";
+            var done = seeker.VisitAllMaterialsFromProject(Migration);
             if (0 < done)
             {
                 AssetDatabase.SaveAssets();
