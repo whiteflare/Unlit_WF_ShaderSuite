@@ -171,6 +171,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
+        [ToggleUI]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
@@ -244,6 +246,26 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #include "WF_UnToon.cginc"
+
+            ENDCG
+        }
+
+        Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
+
+            CGPROGRAM
+
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
+
+            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #include "WF_UnToon_ShadowCaster.cginc"
 
             ENDCG
         }
