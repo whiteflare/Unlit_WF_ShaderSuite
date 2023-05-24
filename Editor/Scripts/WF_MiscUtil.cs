@@ -104,7 +104,7 @@ namespace UnlitWF
             {
                 var guids = folderPaths.Length == 0 ?
                     AssetDatabase.FindAssets("t:" + seeker.ComponentType.Name) :
-                    AssetDatabase.FindAssets("t:" + seeker.ComponentType.Name);
+                    AssetDatabase.FindAssets("t:" + seeker.ComponentType.Name, folderPaths);
                 var paths = guids
                         .Select(AssetDatabase.GUIDToAssetPath)
                         .Where(seeker.IsValidPath)
