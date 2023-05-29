@@ -47,6 +47,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TR_MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -103,12 +107,14 @@ Material:
     - _MT_Enable: 0
     - _MT_GeomSpecAA: 1
     - _MT_InvMaskVal: 0
+    - _MT_InvRoughnessMaskVal: 0
     - _MT_Metallic: 1
     - _MT_MetallicMapType: 0
     - _MT_Monochrome: 0
     - _MT_ReflSmooth: 1
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
+    - _QuestSupported: 0
     - _TR_BlendType: 0
     - _TR_Enable: 0
     - _TR_Feather: 0.05

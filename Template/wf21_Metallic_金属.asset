@@ -9,7 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_UnToon_Opaque
   m_Shader: {fileID: 4800000, guid: a3678756e883b9349ac22fce33313139, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE _MT_ENABLE _MT_ONLY2ND_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _MT_ENABLE _MT_NORHMAP_ENABLE _MT_ONLY2ND_ENABLE
+    _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -236,6 +237,7 @@ Material:
     - _OVL_CustomParam1: 0
     - _OVL_Enable: 0
     - _OVL_InvMaskVal: 0
+    - _OVL_OutUVType: 0
     - _OVL_Power: 1
     - _OVL_UVType: 0
     - _OVL_VertColToDecal: 0
