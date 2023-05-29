@@ -853,6 +853,9 @@ namespace UnlitWF.Converter
 
         private static void ScanAndMigration()
         {
+            // 先に未保存分は全て書き出す
+            AssetDatabase.SaveAssets();
+
             // Go Ahead
             var seeker = new MaterialSeeker();
             seeker.progressBarTitle = WFCommonUtility.DialogTitle;
@@ -881,7 +884,15 @@ namespace UnlitWF.Converter
             {
                 return false;
             }
-            return new WFMaterialMigrationConverter().ExecAutoConvert(mat) != 0;
+            // 変換
+            bool done = new WFMaterialMigrationConverter().ExecAutoConvert(mat) != 0;
+            // 変換要否にかかわらずシェーダキーワードを整理する
+            done |= WFCommonUtility.SetupShaderKeyword(mat);
+            if (done)
+            {
+                EditorUtility.SetDirty(mat);
+            }
+            return done;
         }
     }
 
@@ -1003,9 +1014,6 @@ namespace UnlitWF.Converter
 
         protected override void OnAfterConvert(ConvertContext ctx)
         {
-            // シェーダキーワードを整理
-            WFCommonUtility.SetupShaderKeyword(ctx.target);
-            EditorUtility.SetDirty(ctx.target);
             // 大量に変換すると大量にログが出るので出さない
         }
 
@@ -1016,9 +1024,6 @@ namespace UnlitWF.Converter
 
         protected override void OnSkipConvert(Material mat)
         {
-            // スキップした場合でもシェーダキーワードは整理する
-            WFCommonUtility.SetupShaderKeyword(mat);
-            EditorUtility.SetDirty(mat);
         }
 
         protected static List<Action<ConvertContext>> CreateConverterList()

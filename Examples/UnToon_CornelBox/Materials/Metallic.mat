@@ -176,7 +176,7 @@ Material:
     - _ES_Enable: 0
     - _ES_SC_DirType: 0
     - _ES_SC_LevelOffset: 0
-    - _ES_SC_Shape: 3
+    - _ES_SC_Shape: 0
     - _ES_SC_Sharpness: 1
     - _ES_SC_Speed: 2
     - _ES_SC_UVType: 0
@@ -301,7 +301,7 @@ Material:
     - _CHM_ColorG: {r: 1, g: 1, b: 1, a: 1}
     - _CHM_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
+    - _DFD_Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}
     - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
     - _ES_SC_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
@@ -317,7 +317,7 @@ Material:
     - _TFG_BaseOffset: {r: 0, g: 0, b: 0, a: 0}
     - _TFG_Color: {r: 0.5, g: 0.5, b: 0.6, a: 1}
     - _TFG_Scale: {r: 1, g: 1, b: 1, a: 0}
-    - _TL_LineColor: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
+    - _TL_LineColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.81, g: 0.81, b: 0.9, a: 1}
     - _TS_2ndColor: {r: 0.68, g: 0.68, b: 0.8, a: 1}

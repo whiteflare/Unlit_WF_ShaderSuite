@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_DayFX_Caustics
   m_Shader: {fileID: 4800000, guid: fb639668f92376a4786d635258ae96da, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _AO_ENABLE _WAV_ENABLE_1 _WAV_ENABLE_2
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1
