@@ -122,12 +122,13 @@ namespace UnlitWF
                         {
                             done++;
                         }
-                        if (!string.IsNullOrWhiteSpace(progressBarTitle) && !string.IsNullOrWhiteSpace(progressBarText))
+                    }
+                    current++;
+                    if (!string.IsNullOrWhiteSpace(progressBarTitle) && !string.IsNullOrWhiteSpace(progressBarText))
+                    {
+                        if (current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarText, current / (float)paths.Length))
                         {
-                            if (++current % 50 == 0 && EditorUtility.DisplayCancelableProgressBar(progressBarTitle, progressBarText, current / (float)path.Length))
-                            {
-                                goto EXIT;
-                            }
+                            goto EXIT;
                         }
                     }
                 }

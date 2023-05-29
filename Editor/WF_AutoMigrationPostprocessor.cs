@@ -39,7 +39,7 @@ namespace UnlitWF
             // もしshaderファイルがimportされたなら、そのタイミングで全スキャンも動作させる
             if (WFCommonUtility.IsSupportedShaderPath(importedAssets))
             {
-                Converter.ScanAndMigrationExecutor.ExecuteScanWhenImportShader();
+                EditorApplication.delayCall += Converter.ScanAndMigrationExecutor.ExecuteScanWhenImportShader;
             }
         }
     }

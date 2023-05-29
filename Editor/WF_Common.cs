@@ -154,7 +154,7 @@ namespace UnlitWF
 
         public static bool IsPropertyTrue(Material mat, string prop_name)
         {
-            return IsPropertyTrue(mat.GetFloat(prop_name));
+            return mat != null && mat.HasProperty(prop_name) && IsPropertyTrue(mat.GetFloat(prop_name));
         }
 
         public static bool IsPropertyTrue(float value)
@@ -180,64 +180,70 @@ namespace UnlitWF
         /// 各マテリアルのEnableキーワードを設定する
         /// </summary>
         /// <param name="mats"></param>
-        public static void SetupShaderKeyword(params Material[] mats)
+        public static bool SetupShaderKeyword(params Material[] mats)
         {
-            // 不要なシェーダキーワードは削除
-            foreach (var mat in mats)
+            bool changed = false;
+            foreach(var mat in mats)
             {
-                if (!IsSupportedShader(mat))
+                changed |= SetupShaderKeyword(mat);
+            }
+            return changed;
+        }
+
+        /// <summary>
+        /// 各マテリアルのEnableキーワードを設定する
+        /// </summary>
+        /// <param name="mats"></param>
+        public static bool SetupShaderKeyword(Material mat)
+        {
+            if (!IsSupportedShader(mat))
+            {
+                return false;
+            }
+            // 不要なシェーダキーワードは削除
+            foreach (var key in DELETE_KEYWORD)
+            {
+                if (mat.IsKeywordEnabled(key))
                 {
-                    continue;
-                }
-                foreach (var key in DELETE_KEYWORD)
-                {
-                    if (mat.IsKeywordEnabled(key))
-                    {
-                        mat.DisableKeyword(key);
-                    }
+                    mat.DisableKeyword(key);
                 }
             }
             // Enableキーワードを整理する
-            foreach (var mat in mats)
+            bool changed = false;
+            foreach (var prop_name in WFAccessor.GetAllPropertyNames(mat.shader))
             {
-                if (!IsSupportedShader(mat))
+                // 対応するキーワードが指定されているならばそれを設定する
+                var kwd = WFShaderDictionary.SpecialPropNameToKeywordMap.GetValueOrNull(prop_name);
+                if (kwd != null)
                 {
+                    changed |= kwd.SetKeywordTo(mat);
                     continue;
                 }
-                bool changed = false;
-                foreach (var prop_name in WFAccessor.GetAllPropertyNames(mat.shader))
-                {
-                    // 対応するキーワードが指定されているならばそれを設定する
-                    var kwd = WFShaderDictionary.SpecialPropNameToKeywordMap.GetValueOrNull(prop_name);
-                    if (kwd != null)
-                    {
-                        changed |= kwd.SetKeywordTo(mat);
-                        continue;
-                    }
 
-                    // Enableプロパティならば、それに対応するキーワードを設定する
-                    if (IsEnableToggleFromPropName(prop_name))
-                    {
-                        changed |= new WFCustomKeywordSettingBool(prop_name, prop_name.ToUpper()).SetKeywordTo(mat);
-                        continue;
-                    }
-                }
-                if (changed)
+                // Enableプロパティならば、それに対応するキーワードを設定する
+                if (IsEnableToggleFromPropName(prop_name))
                 {
-#if WF_COMMON_LOG_KEYWORD
-                    Debug.LogFormat("[WF] {0} has {1} keywords {2}", mat, mat.shaderKeywords.Length, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
-#endif
-                }
-                // _ES_ENABLE に連動して MaterialGlobalIlluminationFlags を設定する
-                if (mat.HasProperty("_ES_Enable"))
-                {
-                    var flag = mat.GetInt("_ES_Enable") != 0 ? MaterialGlobalIlluminationFlags.BakedEmissive : MaterialGlobalIlluminationFlags.None;
-                    if (mat.globalIlluminationFlags != flag)
-                    {
-                        mat.globalIlluminationFlags = flag;
-                    }
+                    changed |= new WFCustomKeywordSettingBool(prop_name, prop_name.ToUpper()).SetKeywordTo(mat);
+                    continue;
                 }
             }
+            if (changed)
+            {
+#if WF_COMMON_LOG_KEYWORD
+                Debug.LogFormat("[WF] {0} has {1} keywords {2}", mat, mat.shaderKeywords.Length, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
+#endif
+            }
+            // _ES_ENABLE に連動して MaterialGlobalIlluminationFlags を設定する
+            if (mat.HasProperty("_ES_Enable"))
+            {
+                var flag = mat.GetInt("_ES_Enable") != 0 ? MaterialGlobalIlluminationFlags.BakedEmissive : MaterialGlobalIlluminationFlags.None;
+                if (mat.globalIlluminationFlags != flag)
+                {
+                    mat.globalIlluminationFlags = flag;
+                    changed = true;
+                }
+            }
+            return changed;
         }
 
         #endregion
