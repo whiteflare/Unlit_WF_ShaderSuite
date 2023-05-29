@@ -9,7 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_Day_Bath (TransparentRefracted)
   m_Shader: {fileID: 4800000, guid: 1332d868874e61e44b48c1f59bf4bd11, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE
+  m_ShaderKeywords: _AO_ENABLE _CRF_ENABLE _GL_AUTO_ENABLE _WAM_ENABLE _WAV_ENABLE_1
+    _WAV_ENABLE_2
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1

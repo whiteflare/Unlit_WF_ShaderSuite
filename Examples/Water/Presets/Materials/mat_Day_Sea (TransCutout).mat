@@ -9,7 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_Day_Sea (TransCutout)
   m_Shader: {fileID: 4800000, guid: 92675e22926880147a67c25086c3bb70, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE
+  m_ShaderKeywords: _AO_ENABLE _GL_AUTO_ENABLE _WAD_ENABLE _WAM_ENABLE _WAM_ONLY2ND_ENABLE
+    _WAS_ENABLE _WAV_ENABLE_1 _WAV_ENABLE_2
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1
