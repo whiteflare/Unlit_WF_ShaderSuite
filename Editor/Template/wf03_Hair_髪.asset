@@ -244,6 +244,7 @@ Material:
     - _OVL_CustomParam1: 0
     - _OVL_Enable: 0
     - _OVL_InvMaskVal: 0
+    - _OVL_OutUVType: 0
     - _OVL_Power: 1
     - _OVL_UVType: 0
     - _OVL_VertColToDecal: 0

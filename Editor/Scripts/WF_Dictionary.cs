@@ -18,6 +18,7 @@
 #if UNITY_EDITOR
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace UnlitWF
@@ -270,40 +271,61 @@ namespace UnlitWF
         /// <summary>
         /// ENABLEキーワードに対応していない特殊なプロパティ名 → キーワードの変換マップ。
         /// </summary>
-        public static readonly Dictionary<string, WFCustomKeywordSetting> SpecialPropNameToKeywordMap = new Dictionary<string, WFCustomKeywordSetting>() {
-            { "_UseVertexColor", new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE")
-            },
-            { "_GL_LightMode", new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE") 
-            },
-            { "_TL_LineType", new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
+        public static readonly List<WFCustomKeywordSetting> SpecialPropNameToKeywordList = new List<WFCustomKeywordSetting>() {
+            // 基本機能
+            new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE"),
+            new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE"),
+            new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
-            } },
-            { "_MT_CubemapType", new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_", "_MT_ONLY2ND_ENABLE") {
+            },
+            new WFCustomKeywordSettingCustom("_SpecGlossMap",
+                mat => WFAccessor.GetTexture(mat, "_SpecGlossMap") == null && WFAccessor.GetInt(mat, "_MT_InvRoughnessMaskVal", 0) == 0 , "_MT_NORHMAP_ENABLE") {
                 enablePropName = "_MT_Enable",
-            } },
-            { "_TS_Steps", new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
+            },
+            new WFCustomKeywordSettingCustom("_MT_InvRoughnessMaskVal",
+                mat => WFAccessor.GetTexture(mat, "_SpecGlossMap") == null && WFAccessor.GetInt(mat, "_MT_InvRoughnessMaskVal", 0) == 0 , "_MT_NORHMAP_ENABLE") {
+                enablePropName = "_MT_Enable",
+            },
+            new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_", "_MT_ONLY2ND_ENABLE") {
+                enablePropName = "_MT_Enable",
+            },
+            new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
                 enablePropName = "_TS_Enable",
-            } },
-            { "_ES_ScrollEnable", new WFCustomKeywordSettingBool("_ES_ScrollEnable", "_ES_SCROLL_ENABLE") {
+            },
+            new WFCustomKeywordSettingBool("_ES_ScrollEnable", "_ES_SCROLL_ENABLE") {
                 enablePropName = "_ES_Enable",
-            } },
-            { "_ES_AuLinkEnable", new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
+            },
+            new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
                 enablePropName = "_ES_Enable",
-            } },
-            { "_TS_FixContrast", new WFCustomKeywordSettingEnum("_TS_FixContrast", "_", "_TS_FIXC_ENABLE") {
+            },
+            new WFCustomKeywordSettingEnum("_TS_FixContrast", "_", "_TS_FIXC_ENABLE") {
                 enablePropName = "_TS_Enable",
-            } },
-            { "_CGL_BlurMode", new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
+            },
+            // 特殊シェーダ用
+            new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
                 enablePropName = "_CGL_Enable",
-            } },
-            { "_GRS_HeightType", new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_") 
             },
-            { "_GRS_EraseSide", new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE") 
-            },
-            { "_WAM_CubemapType", new WFCustomKeywordSettingEnum("_WAM_CubemapType", "_", "_", "_WAM_ONLY2ND_ENABLE") {
+            new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_"),
+            new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE"),
+            new WFCustomKeywordSettingEnum("_WAM_CubemapType", "_", "_", "_WAM_ONLY2ND_ENABLE") {
                 enablePropName = "_WAM_Enable",
-            } },
+            },
         };
+
+        /// <summary>
+        /// ENABLEキーワードに対応していない特殊なプロパティ名 → キーワードの変換マップ。
+        /// </summary>
+        public static readonly Dictionary<string, WFCustomKeywordSetting> SpecialPropNameToKeywordMap = ToWFCustomKeywordSettingMap(SpecialPropNameToKeywordList);
+
+        private static Dictionary<string, WFCustomKeywordSetting> ToWFCustomKeywordSettingMap(IEnumerable<WFCustomKeywordSetting> list)
+        {
+            var result = new Dictionary<string, WFCustomKeywordSetting>();
+            foreach(var c in list)
+            {
+                result[c.propertyName] = c;
+            }
+            return result;
+        }
 
         /// <summary>
         /// ラベル名などの物理名 → 日本語訳の変換マップ。
@@ -673,6 +695,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PlzFixQueue, "半透明マテリアルのQueueが2500未満です。\nRenderQueueを修正しますか？"),
             new WFI18NTranslation(WFMessageText.PlzFixDoubleSidedGI, "マテリアルの DoubleSidedGI がチェックされていません。\nこのマテリアルは片面としてライトベイクされます。\nDoubleSidedGI を修正しますか？"),
             new WFI18NTranslation(WFMessageText.PlzQuestSupport, "このマテリアルは Quest 非対応シェーダを使用しています。"),
+            new WFI18NTranslation(WFMessageText.PlzDeprecatedFeature, "今後削除される予定の機能がマテリアルから使用されています。"),
 
             new WFI18NTranslation(WFMessageText.PsAntiShadowMask, "アンチシャドウマスクにはアバターの顔を白く塗ったマスクテクスチャを指定してください。マスク反転をチェックすることでマテリアル全体を顔とみなすこともできます。"),
             new WFI18NTranslation(WFMessageText.PsCapTypeMedian, "MEDIAN_CAPは灰色を基準とした加算＆減算合成を行うmatcapです"),
@@ -926,6 +949,7 @@ namespace UnlitWF
         public static readonly string PlzFixQueue = "The Queue for the transparency material is less than 2500, do you want to fix the RenderQueue?";
         public static readonly string PlzFixDoubleSidedGI = "The material's DoubleSidedGI is unchecked.\nThis material will be lightbaked as single sided.\nDo you want to fix DoubleSidedGI?";
         public static readonly string PlzQuestSupport = "This material uses a shader that does not support Quest.";
+        public static readonly string PlzDeprecatedFeature = "Features that will be removed in the future are used from this material.";
         public static readonly string PsAntiShadowMask = "In the Anti-Shadow Mask field, specify a mask texture with the avatar face painted white. You can also check the InvertMask checkbox to make the entire material a face.";
         public static readonly string PsCapTypeMedian = "MEDIAN_CAP is a matcap that performs gray-based additive and subtractive blending.";
         public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";

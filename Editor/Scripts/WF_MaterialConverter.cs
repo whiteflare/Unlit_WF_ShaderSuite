@@ -82,6 +82,7 @@ namespace UnlitWF.Converter
                 }
                 if (!Validate(mat))
                 {
+                    OnSkipConvert(mat);
                     continue;
                 }
 
@@ -111,6 +112,11 @@ namespace UnlitWF.Converter
             {
                 Debug.LogFormat("[WF] {0}: total {1} material converted", GetShortName(), total);
             }
+        }
+
+        protected virtual void OnSkipConvert(Material mat)
+        {
+
         }
 
         /// <summary>
@@ -736,7 +742,7 @@ namespace UnlitWF.Converter
 
     static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 5;
+        public const int VERSION = 6;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         /// <summary>
@@ -997,12 +1003,22 @@ namespace UnlitWF.Converter
 
         protected override void OnAfterConvert(ConvertContext ctx)
         {
+            // シェーダキーワードを整理
+            WFCommonUtility.SetupShaderKeyword(ctx.target);
+            EditorUtility.SetDirty(ctx.target);
             // 大量に変換すると大量にログが出るので出さない
         }
 
         protected override void OnAfterExecute(Material[] mats, int total)
         {
             // 大量に変換すると大量にログが出るので出さない
+        }
+
+        protected override void OnSkipConvert(Material mat)
+        {
+            // スキップした場合でもシェーダキーワードは整理する
+            WFCommonUtility.SetupShaderKeyword(mat);
+            EditorUtility.SetDirty(mat);
         }
 
         protected static List<Action<ConvertContext>> CreateConverterList()
@@ -1063,11 +1079,6 @@ namespace UnlitWF.Converter
                             ctx.target.SetInt("_ES_SC_UVType", 1);
                         }
                     }
-                },
-                ctx => {
-                    // シェーダキーワードを整理
-                    WFCommonUtility.SetupShaderKeyword(ctx.target);
-                    EditorUtility.SetDirty(ctx.target);
                 },
             };
         }
