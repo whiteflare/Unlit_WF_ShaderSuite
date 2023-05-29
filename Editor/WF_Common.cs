@@ -863,6 +863,15 @@ namespace UnlitWF
             }
             return _default;
         }
+
+        public static Texture GetTexture(Material mat, string name)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetTexture(name);
+            }
+            return null;
+        }
     }
 
     abstract class WFCustomKeywordSetting
@@ -972,6 +981,23 @@ namespace UnlitWF
             int value = mat.GetInt(propertyName);
             value = 0 <= value && value < index.Length ? index[value] : -1;
             return ApplyKeyword(mat, keywords, value);
+        }
+    }
+
+    class WFCustomKeywordSettingCustom : WFCustomKeywordSetting
+    {
+        public readonly string keyword;
+        private readonly Func<Material, bool> cond;
+
+        public WFCustomKeywordSettingCustom(string propertyName, Func<Material, bool> cond, string keyword) : base(propertyName)
+        {
+            this.keyword = keyword;
+            this.cond = cond;
+        }
+
+        public override bool SetKeywordTo(Material mat)
+        {
+            return ApplyKeywordByBool(mat, keyword, cond(mat));
         }
     }
 

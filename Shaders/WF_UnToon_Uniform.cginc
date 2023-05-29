@@ -34,6 +34,7 @@
     DECL_SUB_TEX2D      (_AL_MaskTex);
     DECL_SUB_TEX2D      (_EmissionMap);
     DECL_SUB_TEX2D      (_MetallicGlossMap);
+    DECL_SUB_TEX2D      (_SpecGlossMap);
     DECL_SUB_TEX2D      (_TS_MaskTex);
     DECL_SUB_TEX2D      (_TR_MaskTex);
     DECL_SUB_TEX2D      (_OVL_MaskTex);
@@ -44,7 +45,6 @@
 #endif
 #ifndef _WF_MOBILE
     DECL_SUB_TEX2D      (_NS_2ndMaskTex);
-    DECL_SUB_TEX2D      (_SpecGlossMap);
     DECL_SUB_TEX2D      (_TS_BaseTex);
     DECL_SUB_TEX2D      (_TS_1stTex);
     DECL_SUB_TEX2D      (_TS_2ndTex);
@@ -196,9 +196,7 @@
     float           _MT_Specular;
     float           _MT_SpecSmooth;
     float           _MT_InvMaskVal;
-#ifndef _WF_MOBILE
     float           _MT_InvRoughnessMaskVal;
-#endif
     uint            _MT_CubemapType;
     float4          _MT_Cubemap_HDR;
     float           _MT_CubemapPower;
