@@ -236,6 +236,7 @@ Material:
     - _OVL_CustomParam1: 0
     - _OVL_Enable: 0
     - _OVL_InvMaskVal: 0
+    - _OVL_OutUVType: 0
     - _OVL_Power: 1
     - _OVL_UVType: 0
     - _OVL_VertColToDecal: 0
@@ -273,7 +274,7 @@ Material:
     - _CHM_ColorG: {r: 1, g: 1, b: 1, a: 1}
     - _CHM_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
+    - _DFD_Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}
     - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
     - _ES_SC_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
@@ -303,8 +304,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e2b056a1e7bff1489e0ce6676d2ac92, type: 3}
   m_Name: "wf00_Basic_\u6A19\u6E96"
   m_EditorClassIdentifier: 
+  material: {fileID: -5904725250093424410}
   displayName: 
   memo: "\u9670\u3068\u30EA\u30E0\u30E9\u30A4\u30C8\u3092\u4ED8\u3051\u305F\u3001\u6A19\u6E96\u7684\u306A\u30DE\u30C6\u30EA\u30A2\u30EB\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3067\u3059\u3002"
-  material: {fileID: -5904725250093424410}
   copyMaterialColor: 0
   forceChangeShader: 0
