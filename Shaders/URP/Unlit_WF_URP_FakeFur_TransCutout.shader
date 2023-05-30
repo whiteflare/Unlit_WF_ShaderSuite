@@ -171,7 +171,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/05/06 (1.0.0)", Float) = 0
+            _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
     }
 
     SubShader {
