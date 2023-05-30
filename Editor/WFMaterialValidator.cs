@@ -193,13 +193,13 @@ namespace UnlitWF
 
             // 今後削除される予定の機能を使っている場合に警告
             new WFMaterialValidator(
-                targets => targets.Where(mat => mat.HasProperty("_CHM_Enable") && mat.GetInt("_CHM_Enable") != 0).ToArray(),
+                targets => targets.Where(mat => WFAccessor.GetInt(mat, "_CHM_Enable", 0) != 0).ToArray(),
                 MessageType.Warning,
                 targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + WFI18N.Translate("3ch Color Mask"),
                 null // アクションなし
             ),
             new WFMaterialValidator(
-                targets => targets.Where(mat => mat.HasProperty("_MT_MetallicMapType") && mat.GetInt("_MT_MetallicMapType") != 0).ToArray(),
+                targets => targets.Where(mat => WFAccessor.GetInt(mat, "_MT_Enable", 0) != 0 && WFAccessor.GetInt(mat, "_MT_MetallicMapType", 0) != 0).ToArray(),
                 MessageType.Warning,
                 targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + WFI18N.Translate("MT", "MetallicMap Type"),
                 null // アクションなし
