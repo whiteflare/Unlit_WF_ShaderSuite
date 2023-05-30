@@ -128,17 +128,23 @@ namespace UnlitWF
 
         #region Convert UnlitWF material
 
-        [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
-        private static void Menu_AutoConvertMaterial()
-        {
-            var mats = new MaterialSeeker().GetAllMaterialsInSelection(MatSelectMode.FromAssetDeep);
-            new Converter.WFMaterialFromOtherShaderConverter().ExecAutoConvert(mats.ToArray());
-        }
-
         [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
         private static void ContextMenu_AutoConvertMaterial(MenuCommand cmd)
         {
             new Converter.WFMaterialFromOtherShaderConverter().ExecAutoConvert(cmd.context as Material);
+        }
+
+        [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
+        private static void Menu_AutoConvertMaterial()
+        {
+            var converter = new Converter.WFMaterialFromOtherShaderConverter();
+            Undo.SetCurrentGroupName("WF " + converter.GetShortName());
+
+            var seeker = new MaterialSeeker();
+            seeker.progressBarTitle = WFCommonUtility.DialogTitle;
+            seeker.progressBarText = "Convert Materials...";
+            seeker.progressBarSpan = 2;
+            seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, mat => converter.ExecAutoConvert(mat) != 0);
         }
 
         #endregion
@@ -177,22 +183,28 @@ namespace UnlitWF
         [MenuItem(WFMenu.MATERIAL_CNGMOBILE, priority = WFMenu.PRI_MATERIAL_CNGMOBILE)]
         private static void ContextMenu_ChangeMobileShader(MenuCommand cmd)
         {
-            ChangeMobileShader(cmd.context as Material);
+            if (!EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel"))
+            {
+                return;
+            }
+            new Converter.WFMaterialToMobileShaderConverter().ExecAutoConvert(cmd.context as Material);
         }
 
         [MenuItem(WFMenu.ASSETS_CNGMOBILE, priority = WFMenu.PRI_ASSETS_CNGMOBILE)]
         private static void Menu_ChangeMobileShader()
         {
-            var mats = new MaterialSeeker().GetAllMaterialsInSelection(MatSelectMode.FromAssetDeep);
-            ChangeMobileShader(mats.ToArray());
-        }
-
-        private static void ChangeMobileShader(params Material[] mats)
-        {
-            if (0 < mats.Length && EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel"))
+            if (!EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, WFI18N.Translate(WFMessageText.DgChangeMobile), "OK", "Cancel"))
             {
-                new Converter.WFMaterialToMobileShaderConverter().ExecAutoConvert(mats);
+                return;
             }
+            var converter = new Converter.WFMaterialToMobileShaderConverter();
+            Undo.SetCurrentGroupName("WF " + converter.GetShortName());
+
+            var seeker = new MaterialSeeker();
+            seeker.progressBarTitle = WFCommonUtility.DialogTitle;
+            seeker.progressBarText = "Convert Materials...";
+            seeker.progressBarSpan = 2;
+            seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, mat => converter.ExecAutoConvert(mat) != 0);
         }
 
         #endregion
