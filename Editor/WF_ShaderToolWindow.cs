@@ -49,6 +49,7 @@ namespace UnlitWF
         public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "シェーダ切替/DebugView シェーダに切り替える";
         public const string ASSETS_CNGMOBILE = PATH_ASSETS + "シェーダ切替/モバイル向けシェーダに変換する";
 
+        public const string TOOLS_REIMPORT = PATH_TOOLS + "Reimport UnlitWF Shaders";
         public const string ASSETS_CREANUP = PATH_ASSETS + "マテリアルのクリンナップ";
         public const string ASSETS_COPY = PATH_ASSETS + "マテリアル設定値のコピー";
         public const string ASSETS_RESET = PATH_ASSETS + "マテリアル設定値のリセット";
@@ -81,6 +82,7 @@ namespace UnlitWF
         public const string ASSETS_MIGRATION = PATH_ASSETS + "Migration Material";
         public const string ASSETS_DLSET = PATH_ASSETS + "Bake DL into Material";
 
+        public const string TOOLS_REIMPORT = PATH_TOOLS + "Reimport UnlitWF Shaders";
         public const string TOOLS_CREANUP = PATH_TOOLS + "CleanUp Material Property";
         public const string TOOLS_COPY = PATH_TOOLS + "Copy Material Property";
         public const string TOOLS_RESET = PATH_TOOLS + "Reset Material Property";
@@ -109,14 +111,15 @@ namespace UnlitWF
         public const int PRI_ASSETS_MIGRATION = 2307;
         public const int PRI_ASSETS_DLSET = 2308;
 
-        public const int PRI_TOOLS_CREANUP = 101;
-        public const int PRI_TOOLS_COPY = 102;
-        public const int PRI_TOOLS_RESET = 103;
-        public const int PRI_TOOLS_MIGRATION = 104;
-        public const int PRI_TOOLS_VALIDATE = 105;
-        public const int PRI_TOOLS_DLSET = 106;
-        public const int PRI_TOOLS_HIDELMAP = 201;
-        public const int PRI_TOOLS_MIGALL = 301;
+        public const int PRI_TOOLS_REIMPORT = 101;
+        public const int PRI_TOOLS_CREANUP = 201;
+        public const int PRI_TOOLS_COPY = 202;
+        public const int PRI_TOOLS_RESET = 203;
+        public const int PRI_TOOLS_MIGRATION = 204;
+        public const int PRI_TOOLS_VALIDATE = 205;
+        public const int PRI_TOOLS_DLSET = 206;
+        public const int PRI_TOOLS_HIDELMAP = 301;
+        public const int PRI_TOOLS_MIGALL = 401;
         public const int PRI_TOOLS_CNGLANG = 501;
 
         public const int PRI_MATERIAL_AUTOCNV = 1654;
@@ -128,7 +131,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
         private static void Menu_AutoConvertMaterial()
         {
-            var mats = new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
+            var mats = new MaterialSeeker().GetAllMaterialsInSelection(MatSelectMode.FromAssetDeep);
             new Converter.WFMaterialFromOtherShaderConverter().ExecAutoConvert(mats.ToArray());
         }
 
@@ -161,7 +164,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_DEBUGVIEW, priority = WFMenu.PRI_ASSETS_DEBUGVIEW)]
         private static void Menu_DebugView()
         {
-            foreach (var mat in new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAsset))
+            foreach (var mat in new MaterialSeeker().GetAllMaterialsInSelection(MatSelectMode.FromAsset))
             {
                 WFCommonUtility.ChangeShader(WF_DebugViewEditor.SHADER_NAME_DEBUGVIEW, mat);
             }
@@ -180,7 +183,7 @@ namespace UnlitWF
         [MenuItem(WFMenu.ASSETS_CNGMOBILE, priority = WFMenu.PRI_ASSETS_CNGMOBILE)]
         private static void Menu_ChangeMobileShader()
         {
-            var mats = new MaterialSeeker().GetSelectionAllMaterial(MatSelectMode.FromAssetDeep);
+            var mats = new MaterialSeeker().GetAllMaterialsInSelection(MatSelectMode.FromAssetDeep);
             ChangeMobileShader(mats.ToArray());
         }
 
@@ -251,6 +254,39 @@ namespace UnlitWF
         {
             return Selection.GetFiltered<Material>(SelectionMode.Assets).Length != 0;
         }
+
+        #region Reimport Shaders
+
+        [MenuItem(TOOLS_REIMPORT, priority = PRI_TOOLS_REIMPORT)]
+        private static void Menu_ReloadShaders()
+        {
+            var folders = GetWFPackageFolders();
+            if (folders.Length == 0)
+            {
+                return;
+            }
+            AssetDatabase.StartAssetEditing();
+            try
+            {
+                foreach (var path in AssetDatabase.FindAssets("t:Shader", folders).Select(AssetDatabase.GUIDToAssetPath).Where(path => !string.IsNullOrWhiteSpace(path)))
+                {
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.DontDownloadFromCacheServer);
+                }
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+            }
+        }
+
+        private static string[] GetWFPackageFolders()
+        {
+            var folders = new List<string>();
+            folders.AddRange(AssetDatabase.FindAssets("Unlit_WF_ShaderSuite").Select(AssetDatabase.GUIDToAssetPath).Where(path => !string.IsNullOrWhiteSpace(path)));
+            return folders.ToArray();
+        }
+
+        #endregion
     }
 
     static class ToolCommon
@@ -345,7 +381,7 @@ namespace UnlitWF
         public static void SetSelectedMaterials(MatSelectMode mode)
         {
             arguments.Clear();
-            arguments.AddRange(new MaterialSeeker().GetSelectionAllMaterial(mode));
+            arguments.AddRange(new MaterialSeeker().GetAllMaterialsInSelection(mode));
         }
 
         public static void SetMaterials(Material[] mats)
@@ -440,7 +476,7 @@ namespace UnlitWF
         {
             if (Selection.GetFiltered<GameObject>(SelectionMode.Unfiltered).Length == 0)
             {
-                ToolCommon.SetMaterials(new MaterialSeeker().GetAllSceneAllMaterial().ToArray());
+                ToolCommon.SetMaterials(new MaterialSeeker().GetAllMaterialsInScene().ToArray());
             }
             else
             {
@@ -896,7 +932,7 @@ namespace UnlitWF
 
             rootObject = EditorGUILayout.ObjectField("Root GameObject", rootObject, typeof(GameObject), true) as GameObject;
 
-            var materials = rootObject != null ? new MaterialSeeker().GetAllMaterials(rootObject).Distinct().ToArray() : new MaterialSeeker().GetAllSceneAllMaterial().Distinct().ToArray();
+            var materials = rootObject != null ? new MaterialSeeker().GetAllMaterials(rootObject).Distinct().ToArray() : new MaterialSeeker().GetAllMaterialsInScene().Distinct().ToArray();
             var advices = WFMaterialValidators.ValidateAll(materials);
 
             if (advices.Count == 0)

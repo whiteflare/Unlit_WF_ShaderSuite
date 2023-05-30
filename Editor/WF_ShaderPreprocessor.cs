@@ -457,7 +457,7 @@ namespace UnlitWF
                 }
                 else
                 {
-                    materials.AddRange(materialSeeker.GetAllSceneAllMaterial());
+                    materials.AddRange(materialSeeker.GetAllMaterialsInScene());
                 }
                 materials = materials.Distinct()
                     .Where(mat => mat != null && IsStripTargetShader(mat.shader))
