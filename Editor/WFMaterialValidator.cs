@@ -191,6 +191,20 @@ namespace UnlitWF
                 }
             ),
 
+            // 今後削除される予定の機能を使っている場合に警告
+            new WFMaterialValidator(
+                targets => targets.Where(mat => mat.HasProperty("_CHM_Enable") && mat.GetInt("_CHM_Enable") != 0).ToArray(),
+                MessageType.Warning,
+                targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + WFI18N.Translate("3ch Color Mask"),
+                null // アクションなし
+            ),
+            new WFMaterialValidator(
+                targets => targets.Where(mat => mat.HasProperty("_MT_MetallicMapType") && mat.GetInt("_MT_MetallicMapType") != 0).ToArray(),
+                MessageType.Warning,
+                targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + WFI18N.Translate("MT", "MetallicMap Type"),
+                null // アクションなし
+            ),
+
             // モバイル向けではないシェーダを使用している場合にメッセージ
             new WFMaterialValidator(
                 // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
@@ -199,6 +213,7 @@ namespace UnlitWF
                 targets => WFI18N.Translate(WFMessageText.PlzQuestSupport),
                 null // アクションなし、変えると戻すのが大変なので
             ),
+
         };
 
         public static List<WFMaterialValidator.Advice> ValidateAll(params Material[] mats)

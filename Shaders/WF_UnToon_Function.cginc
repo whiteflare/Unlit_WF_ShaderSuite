@@ -53,7 +53,7 @@
     #endif
 
     #ifndef WF_TEX2D_METAL_GLOSS
-        #ifndef _WF_MOBILE
+        #if !defined(_MT_NORHMAP_ENABLE)
             #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba * float4(1, 1, 1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
         #else
             #define WF_TEX2D_METAL_GLOSS(uv)    SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba
@@ -667,12 +667,12 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
 
             // Metallic描画
             if (0.01 < metallic) {
-            float3 ws_metal_normal = ws_normal;
+                float3 ws_metal_normal = ws_normal;
 #ifdef _NM_ENABLE
-            ws_metal_normal = lerpNormals(ws_metal_normal, ws_bump_normal, _MT_BlendNormal);
+                ws_metal_normal = lerpNormals(ws_metal_normal, ws_bump_normal, _MT_BlendNormal);
 #endif
 #ifdef _NS_ENABLE
-            ws_metal_normal = lerpNormals(ws_metal_normal, ws_detail_normal, _MT_BlendNormal2);
+                ws_metal_normal = lerpNormals(ws_metal_normal, ws_detail_normal, _MT_BlendNormal2);
 #endif
                 float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
                 float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
