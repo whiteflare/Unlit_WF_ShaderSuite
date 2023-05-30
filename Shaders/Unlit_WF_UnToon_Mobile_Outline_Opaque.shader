@@ -68,6 +68,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [ToggleUI]
             _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
+        [ToggleUI]
+            _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
 
         [Header(Metallic Specular)]
             _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
@@ -186,6 +190,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
+        [ToggleUI]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
@@ -235,9 +241,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
 
             #define _WF_MOBILE
 
-
-            #define _TL_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -267,19 +273,20 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
-
-
-
-
-
-            #define _AO_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _NM_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _ _MT_NORHMAP_ENABLE
+            #pragma shader_feature_local _ _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -295,6 +302,26 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
         }
 
         Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
+
+            CGPROGRAM
+
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
+
+            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #include "WF_UnToon_ShadowCaster.cginc"
+
+            ENDCG
+        }
+
+        Pass {
             Name "META"
             Tags { "LightMode" = "Meta" }
 
@@ -305,8 +332,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #define _ES_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

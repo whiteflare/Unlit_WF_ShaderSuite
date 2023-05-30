@@ -197,14 +197,15 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
 
             #define _WF_FORCE_USE_SAMPLER
 
-
-            #define _AO_ENABLE
-            #define _NM_ENABLE
-            #define _NS_ENABLE
-
-            #define _HL_ENABLE
-            #define _HL_ENABLE_1
-            #define _MT_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _NM_ENABLE
+            #pragma shader_feature_local _NS_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE
+            #pragma shader_feature_local_fragment _HL_ENABLE_1
+            #pragma shader_feature_local_fragment _MT_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
