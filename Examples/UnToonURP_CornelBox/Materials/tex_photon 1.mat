@@ -2,14 +2,18 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_photon 1
   m_Shader: {fileID: 4800000, guid: 4985065d0e1d0424f8734ca60206aeec, type: 3}
-  m_ShaderKeywords: _ES_ENABLE _ES_SCROLL_ENABLE _GL_AUTO_ENABLE
+  m_ValidKeywords:
+  - _ES_ENABLE
+  - _ES_SCROLL_ENABLE
+  - _GL_AUTO_ENABLE
+  m_InvalidKeywords: []
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -123,6 +127,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _AL_Fresnel: 0.5
     - _AL_InvMaskVal: 0
@@ -226,6 +231,7 @@ Material:
     - _OVL_CustomParam1: 0
     - _OVL_Enable: 0
     - _OVL_InvMaskVal: 0
+    - _OVL_OutUVType: 0
     - _OVL_Power: 1
     - _OVL_UVType: 0
     - _OVL_VertColToDecal: 0
@@ -279,3 +285,4 @@ Material:
     - _TS_2ndColor: {r: 0.68, g: 0.68, b: 0.8, a: 1}
     - _TS_3rdColor: {r: 0.595, g: 0.595, b: 0.7, a: 1}
     - _TS_BaseColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []

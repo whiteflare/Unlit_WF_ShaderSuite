@@ -2,14 +2,18 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &-6123224880499273341
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_Gem_Transparent
   m_Shader: {fileID: 4800000, guid: eee9c1659f8a0434aac4790f35a6cc7c, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE _GMF_ENABLE _GMR_ENABLE
+  m_ValidKeywords:
+  - _GL_AUTO_ENABLE
+  m_InvalidKeywords:
+  - _GMF_ENABLE
+  - _GMR_ENABLE
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -35,6 +39,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _AL_Fresnel: 1
     - _AL_InvMaskVal: 0
@@ -73,6 +78,7 @@ Material:
     m_Colors:
     - _Color: {r: 0.6952468, g: 0.64161134, b: 1, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
+  m_BuildTextureStacks: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
