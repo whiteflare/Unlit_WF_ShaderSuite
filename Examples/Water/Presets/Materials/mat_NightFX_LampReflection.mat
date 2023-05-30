@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_NightFX_LampReflection
   m_Shader: {fileID: 4800000, guid: c6e2e8e77eaf9bb4b82f757fe9b823f0, type: 3}
-  m_ShaderKeywords: _WAR_ENABLE _WAV_ENABLE_1 _WAV_ENABLE_2 _WAV_ENABLE_3
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1

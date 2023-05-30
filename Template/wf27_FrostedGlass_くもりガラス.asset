@@ -26,7 +26,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass
   m_Shader: {fileID: 4800000, guid: 28e73745c5d1e464a876038f875501b4, type: 3}
-  m_ShaderKeywords: _CGL_ENABLE _GL_AUTO_ENABLE
+  m_ShaderKeywords: 
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0

@@ -9,8 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_body
   m_Shader: {fileID: 4800000, guid: dd3a683002b3a6f43bdb6c97bd0985c1, type: 3}
-  m_ShaderKeywords: _CLC_ENABLE _GL_AUTO_ENABLE _HL_ENABLE _TR_ENABLE _TS_ENABLE
-    _TS_STEP2_ENABLE
+  m_ShaderKeywords: 
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -150,7 +149,7 @@ Material:
     - _CLC_DeltaH: 0
     - _CLC_DeltaS: 0
     - _CLC_DeltaV: 0
-    - _CLC_Enable: 1
+    - _CLC_Enable: 0
     - _CLC_Monochrome: 0
     - _CullMode: 0
     - _CurrentVersion: 0
@@ -302,7 +301,7 @@ Material:
     - _CHM_ColorG: {r: 1, g: 1, b: 1, a: 1}
     - _CHM_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DFD_Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
     - _ES_SC_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
@@ -318,7 +317,7 @@ Material:
     - _TFG_BaseOffset: {r: 0, g: 0, b: 0, a: 0}
     - _TFG_Color: {r: 0.5, g: 0.5, b: 0.6, a: 1}
     - _TFG_Scale: {r: 1, g: 1, b: 1, a: 0}
-    - _TL_LineColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    - _TL_LineColor: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 1, a: 1}
     - _TS_1stColor: {r: 1, g: 1, b: 1, a: 1}
     - _TS_2ndColor: {r: 1, g: 1, b: 1, a: 1}

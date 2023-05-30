@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Transparent
   m_Shader: {fileID: 4800000, guid: 15212414cba0c7a4aac92d94a4ae8750, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE
+  m_ShaderKeywords: 
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -288,7 +288,7 @@ Material:
     - _CHM_ColorG: {r: 1, g: 1, b: 1, a: 1}
     - _CHM_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 0, g: 0, b: 0, a: 1}
-    - _DFD_Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
     - _ES_SC_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}

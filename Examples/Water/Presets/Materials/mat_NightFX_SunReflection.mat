@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_NightFX_SunReflection
   m_Shader: {fileID: 4800000, guid: 17124f35e2c0c5244a712e8654a994f9, type: 3}
-  m_ShaderKeywords: _WAR_ENABLE _WAV_ENABLE_1 _WAV_ENABLE_2 _WAV_ENABLE_3
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1

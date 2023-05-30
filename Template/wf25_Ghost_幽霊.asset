@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent
   m_Shader: {fileID: 4800000, guid: 4ba701b07ccc81e4aae7f053bf332eab, type: 3}
-  m_ShaderKeywords: _CGO_ENABLE _GL_AUTO_ENABLE _TR_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
+  m_ShaderKeywords: 
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0

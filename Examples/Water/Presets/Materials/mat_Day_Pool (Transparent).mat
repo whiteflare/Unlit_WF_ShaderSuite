@@ -9,8 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_Day_Pool (Transparent)
   m_Shader: {fileID: 4800000, guid: a3641cf3b665bec468ac868660864d64, type: 3}
-  m_ShaderKeywords: _AO_ENABLE _GL_AUTO_ENABLE _WAD_ENABLE _WAM_ENABLE _WAM_ONLY2ND_ENABLE
-    _WAS_ENABLE _WAV_ENABLE_1 _WAV_ENABLE_2 _WAV_ENABLE_3
+  m_ShaderKeywords: 
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1

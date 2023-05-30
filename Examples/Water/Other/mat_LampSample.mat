@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_LampSample
   m_Shader: {fileID: 4800000, guid: 4bd76f6599a5b8e4d88d81300fb74c37, type: 3}
-  m_ShaderKeywords: _ES_ENABLE _GL_AUTO_ENABLE
+  m_ShaderKeywords: 
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0

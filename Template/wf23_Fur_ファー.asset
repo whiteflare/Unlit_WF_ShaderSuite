@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_FakeFur_Mix
   m_Shader: {fileID: 4800000, guid: f19f31eb9bfd5154ba2c1a41c54a908b, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -149,7 +149,7 @@ Material:
     - _TS_Steps: 2
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DFD_Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
     - _FUR_TintColorBase: {r: 1, g: 1, b: 1, a: 1}
     - _FUR_TintColorTip: {r: 1, g: 1, b: 1, a: 1}

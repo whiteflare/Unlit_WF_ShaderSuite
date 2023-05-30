@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: PurpleGem
   m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE _GMB_ENABLE _GMF_ENABLE _GMR_ENABLE
+  m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
