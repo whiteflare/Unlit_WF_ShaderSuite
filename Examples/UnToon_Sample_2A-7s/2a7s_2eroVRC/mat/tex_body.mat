@@ -9,8 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_body
   m_Shader: {fileID: 4800000, guid: dd3a683002b3a6f43bdb6c97bd0985c1, type: 3}
-  m_ShaderKeywords: _CLC_ENABLE _GL_AUTO_ENABLE _HL_ENABLE _TR_ENABLE _TS_ENABLE
-    _TS_STEP2_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _HL_ENABLE _TR_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -150,7 +149,7 @@ Material:
     - _CLC_DeltaH: 0
     - _CLC_DeltaS: 0
     - _CLC_DeltaV: 0
-    - _CLC_Enable: 1
+    - _CLC_Enable: 0
     - _CLC_Monochrome: 0
     - _CullMode: 0
     - _CurrentVersion: 0
