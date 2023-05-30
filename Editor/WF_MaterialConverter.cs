@@ -859,8 +859,8 @@ namespace UnlitWF.Converter
             // Go Ahead
             var seeker = new MaterialSeeker();
             seeker.progressBarTitle = WFCommonUtility.DialogTitle;
-            seeker.progressBarText = "migration materials";
-            var done = seeker.VisitAllMaterialsFromProject(Migration);
+            seeker.progressBarText = "Convert Materials...";
+            var done = seeker.VisitAllMaterialsInProject(Migration);
             if (0 < done)
             {
                 AssetDatabase.SaveAssets();
