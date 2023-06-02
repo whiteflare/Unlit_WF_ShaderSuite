@@ -82,6 +82,7 @@ namespace UnlitWF.Converter
                 }
                 if (!Validate(mat))
                 {
+                    OnSkipConvert(mat);
                     continue;
                 }
 
@@ -111,6 +112,11 @@ namespace UnlitWF.Converter
             {
                 Debug.LogFormat("[WF] {0}: total {1} material converted", GetShortName(), total);
             }
+        }
+
+        protected virtual void OnSkipConvert(Material mat)
+        {
+
         }
 
         /// <summary>
@@ -736,7 +742,7 @@ namespace UnlitWF.Converter
 
     static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 5;
+        public const int VERSION = 6;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         /// <summary>
@@ -847,8 +853,14 @@ namespace UnlitWF.Converter
 
         private static void ScanAndMigration()
         {
+            // 先に未保存分は全て書き出す
+            AssetDatabase.SaveAssets();
+
             // Go Ahead
-            var done = new MaterialSeeker().SeekProjectAllMaterial("migration materials", Migration);
+            var seeker = new MaterialSeeker();
+            seeker.progressBarTitle = WFCommonUtility.DialogTitle;
+            seeker.progressBarText = "Convert Materials...";
+            var done = seeker.VisitAllMaterialsInProject(Migration);
             if (0 < done)
             {
                 AssetDatabase.SaveAssets();
@@ -872,7 +884,15 @@ namespace UnlitWF.Converter
             {
                 return false;
             }
-            return new WFMaterialMigrationConverter().ExecAutoConvert(mat) != 0;
+            // 変換
+            bool done = new WFMaterialMigrationConverter().ExecAutoConvert(mat) != 0;
+            // 変換要否にかかわらずシェーダキーワードを整理する
+            done |= WFCommonUtility.SetupShaderKeyword(mat);
+            if (done)
+            {
+                EditorUtility.SetDirty(mat);
+            }
+            return done;
         }
     }
 
@@ -1002,6 +1022,10 @@ namespace UnlitWF.Converter
             // 大量に変換すると大量にログが出るので出さない
         }
 
+        protected override void OnSkipConvert(Material mat)
+        {
+        }
+
         protected static List<Action<ConvertContext>> CreateConverterList()
         {
             return new List<Action<ConvertContext>>()
@@ -1060,11 +1084,6 @@ namespace UnlitWF.Converter
                             ctx.target.SetInt("_ES_SC_UVType", 1);
                         }
                     }
-                },
-                ctx => {
-                    // シェーダキーワードを整理
-                    WFCommonUtility.SetupShaderKeyword(ctx.target);
-                    EditorUtility.SetDirty(ctx.target);
                 },
             };
         }
