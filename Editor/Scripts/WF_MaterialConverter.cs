@@ -456,7 +456,7 @@ namespace UnlitWF.Converter
                         }
                         if (queue < 2450) {
                             ctx.renderType = ShaderType.Opaque;
-                        } else if (queue < 2500) {
+                        } else if (queue <= 2500) {
                             ctx.renderType = ShaderType.Cutout;
                         } else {
                             ctx.renderType = ShaderType.Transparent;

@@ -178,8 +178,8 @@ namespace UnlitWF
 
             // 不透明レンダーキューを使用している半透明マテリアルに対する警告
             new WFMaterialValidator(
-                // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
-                targets => targets.Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent") && mat.renderQueue < 2500).ToArray(),
+                // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 以下で描画しているもの
+                targets => targets.Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent") && mat.renderQueue <= 2500).ToArray(),
                 MessageType.Warning,
                 targets => WFI18N.Translate(WFMessageText.PlzFixQueue),
                 targets => {
@@ -207,7 +207,6 @@ namespace UnlitWF
 
             // モバイル向けではないシェーダを使用している場合にメッセージ
             new WFMaterialValidator(
-                // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 未満で描画しているもの
                 targets => WFCommonUtility.IsQuestPlatform() ? targets.Where(tgt => !WFCommonUtility.IsMobileSupportedShader(tgt)).ToArray() : new Material[0],
                 MessageType.Info,
                 targets => WFI18N.Translate(WFMessageText.PlzQuestSupport),
