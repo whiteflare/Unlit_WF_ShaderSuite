@@ -929,6 +929,12 @@ namespace UnlitWF
             {
                 return false;
             }
+#if UNITY_2021_2_OR_NEWER
+            if (!mat.shader.keywordSpace.keywordNames.Contains(kwd))
+            {
+                return false;
+            }
+#endif
             if (value)
             {
                 mat.EnableKeyword(kwd);
