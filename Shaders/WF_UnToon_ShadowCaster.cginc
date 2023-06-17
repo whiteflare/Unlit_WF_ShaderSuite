@@ -50,6 +50,7 @@
 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
+        UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
@@ -59,7 +60,6 @@
         }
         o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 
-        UNITY_TRANSFER_INSTANCE_ID(v, o);
         return o;
     }
 
