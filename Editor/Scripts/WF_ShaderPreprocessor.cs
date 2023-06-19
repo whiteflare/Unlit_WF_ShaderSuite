@@ -146,7 +146,7 @@ namespace UnlitWF
 
         protected int DoStripForwardBasePass(Shader shader, ShaderSnippetData snippet, IList<ShaderCompilerData> data, List<UsedShaderVariant> usedShaderVariantList)
         {
-            if (snippet.passType != PassType.ForwardBase && snippet.passType != PassType.ShadowCaster)
+            if (snippet.passType != PassType.ForwardBase && snippet.passType != PassType.ShadowCaster && snippet.passName != "CLR_BG")
             {
                 // ここで stripping するのは ForwardBase と ShadowCaster だけ
                 return 0;

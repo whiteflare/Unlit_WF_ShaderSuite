@@ -298,6 +298,10 @@ namespace UnlitWF
             {
                 folders.Add("Packages/jp.whiteflare.unlitwf");
             }
+            else
+            {
+                folders.AddRange(AssetDatabase.FindAssets("Unlit_WF_ShaderSuite").Select(AssetDatabase.GUIDToAssetPath).Where(path => !string.IsNullOrWhiteSpace(path)));
+            }
             return folders.ToArray();
         }
 

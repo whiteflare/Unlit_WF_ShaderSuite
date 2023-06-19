@@ -427,7 +427,7 @@ namespace UnlitWF
                 if (CopyProperties(src_props, dst_props, param.onlyOverrideBuiltinTextures))
                 {
                     // キーワードを整理する
-                    WFCommonUtility.SetupShaderKeyword(dst);
+                    WFCommonUtility.SetupMaterial(dst);
                     // ダーティフラグを付ける
                     EditorUtility.SetDirty(dst);
                 }
@@ -572,7 +572,7 @@ namespace UnlitWF
             }
 
             // キーワードを整理する
-            WFCommonUtility.SetupShaderKeyword(material);
+            WFCommonUtility.SetupMaterial(material);
             // 反映
             EditorUtility.SetDirty(material);
         }
@@ -667,7 +667,7 @@ namespace UnlitWF
             }
 
             // キーワードを整理する
-            WFCommonUtility.SetupShaderKeyword(material);
+            WFCommonUtility.SetupMaterial(material);
             // Default割り当てTextureを再設定する
             ResetDefaultTextures(material, del_names);
             // 反映

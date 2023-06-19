@@ -80,6 +80,7 @@
 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f, o);
+        UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
@@ -108,7 +109,6 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
-        UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
     }
