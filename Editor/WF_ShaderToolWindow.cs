@@ -294,7 +294,14 @@ namespace UnlitWF
         private static string[] GetWFPackageFolders()
         {
             var folders = new List<string>();
-            folders.AddRange(AssetDatabase.FindAssets("Unlit_WF_ShaderSuite").Select(AssetDatabase.GUIDToAssetPath).Where(path => !string.IsNullOrWhiteSpace(path)));
+            if (AssetDatabase.LoadAssetAtPath<DefaultAsset>("Packages/jp.whiteflare.unlitwf") != null)
+            {
+                folders.Add("Packages/jp.whiteflare.unlitwf");
+            }
+            else
+            {
+                folders.AddRange(AssetDatabase.FindAssets("Unlit_WF_ShaderSuite").Select(AssetDatabase.GUIDToAssetPath).Where(path => !string.IsNullOrWhiteSpace(path)));
+            }
             return folders.ToArray();
         }
 
