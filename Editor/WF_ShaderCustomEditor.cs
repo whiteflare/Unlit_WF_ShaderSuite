@@ -271,7 +271,7 @@ namespace UnlitWF
                 // DebugViewの保存に使っているタグはクリア
                 WF_DebugViewEditor.ClearDebugOverrideTag(newMat);
                 // シェーダキーワードを整理する
-                WFCommonUtility.SetupShaderKeyword(newMat);
+                WFCommonUtility.SetupMaterial(newMat);
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
@@ -411,7 +411,7 @@ namespace UnlitWF
             OnGUISub_Utilities(materialEditor);
 
             // シェーダキーワードを整理する
-            WFCommonUtility.SetupShaderKeyword(WFCommonUtility.AsMaterials(materialEditor.targets));
+            WFCommonUtility.SetupMaterials(WFCommonUtility.AsMaterials(materialEditor.targets));
         }
 
         private void OnGuiSub_ShaderProperty(PropertyGUIContext context)

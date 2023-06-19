@@ -335,7 +335,7 @@ namespace UnlitWF.Converter
                         cnv = true;
                     }
                     if (cnv) {
-                        WFCommonUtility.SetupShaderKeyword(ctx.target);
+                        WFCommonUtility.SetupMaterial(ctx.target);
                         EditorUtility.SetDirty(ctx.target);
                     }
                 },
@@ -887,7 +887,7 @@ namespace UnlitWF.Converter
             // 変換
             bool done = new WFMaterialMigrationConverter().ExecAutoConvert(mat) != 0;
             // 変換要否にかかわらずシェーダキーワードを整理する
-            done |= WFCommonUtility.SetupShaderKeyword(mat);
+            done |= WFCommonUtility.SetupMaterial(mat);
             if (done)
             {
                 EditorUtility.SetDirty(mat);

@@ -395,6 +395,9 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
+            _ClearBgSupported       ("True", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
     }
 
@@ -403,6 +406,31 @@ Shader "UnlitWF/WF_UnToon_Transparent_Mask" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "VRCFallback" = "UnlitCutout"
+        }
+
+        Pass {
+            Name "CLR_BG"
+            Tags { "LightMode" = "Always" }
+
+            Cull OFF
+            ZWrite ON
+
+            CGPROGRAM
+
+            #pragma vertex vert_clrbg
+            #pragma fragment frag_clrbg
+
+            #pragma target 4.5
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
+
+            #include "WF_UnToon_ClearBackground.cginc"
+
+            ENDCG
         }
 
         Pass {

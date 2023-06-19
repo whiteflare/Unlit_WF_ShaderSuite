@@ -180,12 +180,12 @@ namespace UnlitWF
         /// 各マテリアルのEnableキーワードを設定する
         /// </summary>
         /// <param name="mats"></param>
-        public static bool SetupShaderKeyword(params Material[] mats)
+        public static bool SetupMaterials(params Material[] mats)
         {
             bool changed = false;
             foreach(var mat in mats)
             {
-                changed |= SetupShaderKeyword(mat);
+                changed |= SetupMaterial(mat);
             }
             return changed;
         }
@@ -194,20 +194,36 @@ namespace UnlitWF
         /// 各マテリアルのEnableキーワードを設定する
         /// </summary>
         /// <param name="mats"></param>
-        public static bool SetupShaderKeyword(Material mat)
+        public static bool SetupMaterial(Material mat)
         {
-            if (!IsSupportedShader(mat))
+            var changed = false;
+            if (IsSupportedShader(mat))
             {
-                return false;
+                changed |= SetupMaterial_DeleteKeyword(mat);
+                changed |= SetupMaterial_SetupKeyword(mat);
+                changed |= SetupMaterial_GIFrags(mat);
+                changed |= SetupMaterial_ClearBgPass(mat);
             }
+            return changed;
+        }
+
+        private static bool SetupMaterial_DeleteKeyword(Material mat)
+        {
             // 不要なシェーダキーワードは削除
+            bool changed = false;
             foreach (var key in DELETE_KEYWORD)
             {
                 if (mat.IsKeywordEnabled(key))
                 {
                     mat.DisableKeyword(key);
+                    changed = true;
                 }
             }
+            return changed;
+        }
+
+        private static bool SetupMaterial_SetupKeyword(Material mat)
+        {
             // Enableキーワードを整理する
             bool changed = false;
             foreach (var prop_name in WFAccessor.GetAllPropertyNames(mat.shader))
@@ -233,7 +249,14 @@ namespace UnlitWF
                 Debug.LogFormat("[WF] {0} has {1} keywords {2}", mat, mat.shaderKeywords.Length, string.Join(" ", mat.shaderKeywords.OrderBy(k => k)));
 #endif
             }
+
+            return changed;
+        }
+
+        private static bool SetupMaterial_GIFrags(Material mat)
+        {
             // _ES_ENABLE に連動して MaterialGlobalIlluminationFlags を設定する
+            bool changed = false;
             if (mat.HasProperty("_ES_Enable"))
             {
                 var flag = mat.GetInt("_ES_Enable") != 0 ? MaterialGlobalIlluminationFlags.BakedEmissive : MaterialGlobalIlluminationFlags.None;
@@ -242,6 +265,22 @@ namespace UnlitWF
                     mat.globalIlluminationFlags = flag;
                     changed = true;
                 }
+            }
+            return changed;
+        }
+
+        private static bool SetupMaterial_ClearBgPass(Material mat)
+        {
+            // 半透明描画のときはAlwaysパス(CLR_BG)を無効化し、それ以外は有効化する
+            bool changed = false;
+            var isOpaque = mat.renderQueue <= 2500
+                || IsURP()
+                || !WFAccessor.GetShaderClearBgSupported(mat.shader)
+                ;
+            if (mat.GetShaderPassEnabled("Always") != isOpaque)
+            {
+                mat.SetShaderPassEnabled("Always", isOpaque);
+                changed = true;
             }
             return changed;
         }
@@ -808,6 +847,15 @@ namespace UnlitWF
             return GetPropertyDescription(shader, "_QuestSupported", "false").ToLower() == "true";
         }
 
+        /// <summary>
+        /// Shader から QuestSupported の値を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static bool GetShaderClearBgSupported(Shader shader)
+        {
+            return GetPropertyDescription(shader, "_ClearBgSupported", "false").ToLower() == "true";
+        }
 
         /// <summary>
         /// Material から _CurrentVersion の値を取得する。

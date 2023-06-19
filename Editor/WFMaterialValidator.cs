@@ -72,7 +72,7 @@ namespace UnlitWF
     static class WFMaterialValidators
     {
         public static WFMaterialValidator[] Validators = {
-            // マイグレーション
+            // マイグレーションが必要な時に警告
             new WFMaterialValidator(
                 targets => WFMaterialCache.instance.FilterOldMaterial(targets),
                 MessageType.Warning,
@@ -82,7 +82,7 @@ namespace UnlitWF
                 }
             ),
 
-            // BatchingStatic 向け設定がされていないマテリアルに対するアドバイス
+            // BatchingStatic 向け設定がされていないマテリアルに対する警告
             new WFMaterialValidator(
                 targets => {
                     targets = targets.Where(target => {
@@ -121,7 +121,7 @@ namespace UnlitWF
                 }
             ),
 
-            // LightmapStatic 向け設定がされていないマテリアルに対するアドバイス
+            // LightmapStatic 向け設定がされていないマテリアルに対する警告
             new WFMaterialValidator(
                 targets => {
                     targets = targets.Where(target => {
@@ -154,32 +154,12 @@ namespace UnlitWF
                 }
             ),
 
-            new WFMaterialValidator(
-                targets => {
-                    targets = targets.Where(target => {
-                        // DoubleSidedGI が付いていない、かつ Transparent か TransparentCutout なマテリアル
-                        return !target.doubleSidedGI && WFAccessor.IsMaterialRenderType(target, "Transparent", "TransparentCutout");
-                    }).ToArray();
-
-                    // LightmapStatic 付きのマテリアルを返却
-                    return FilterLightmapStaticMaterials(targets);
-                },
-                MessageType.Info,
-                targets => WFI18N.Translate(WFMessageText.PlzFixDoubleSidedGI),
-                targets => {
-                    Undo.RecordObjects(targets, "Fix DoubleSidedGI");
-                    // DoubleSidedGI をオンにする
-                    foreach (var mat in targets)
-                    {
-                        mat.doubleSidedGI = true;
-                    }
-                }
-            ),
-
             // 不透明レンダーキューを使用している半透明マテリアルに対する警告
             new WFMaterialValidator(
-                // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 以下で描画しているもの
-                targets => targets.Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent") && mat.renderQueue <= 2500).ToArray(),
+                // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 以下で描画しているもの(かつCLR_BG非対応のもの)
+                targets => targets.Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent")
+                    && mat.renderQueue <= 2500
+                    && !WFAccessor.GetShaderClearBgSupported(mat.shader)).ToArray(),
                 MessageType.Warning,
                 targets => WFI18N.Translate(WFMessageText.PlzFixQueue),
                 targets => {
@@ -202,6 +182,40 @@ namespace UnlitWF
                 targets => targets.Where(mat => WFAccessor.GetInt(mat, "_MT_Enable", 0) != 0 && WFAccessor.GetInt(mat, "_MT_MetallicMapType", 0) != 0).ToArray(),
                 MessageType.Warning,
                 targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + WFI18N.Translate("MT", "MetallicMap Type"),
+                null // アクションなし
+            ),
+
+            // DoubleSidedGI が付いていない両面マテリアルに対する情報
+            new WFMaterialValidator(
+                targets => {
+                    targets = targets.Where(target => {
+                        // DoubleSidedGI が付いていない、かつ Transparent か TransparentCutout なマテリアル
+                        return !target.doubleSidedGI && WFAccessor.IsMaterialRenderType(target, "Transparent", "TransparentCutout");
+                    }).ToArray();
+
+                    // LightmapStatic 付きのマテリアルを返却
+                    return FilterLightmapStaticMaterials(targets);
+                },
+                MessageType.Info,
+                targets => WFI18N.Translate(WFMessageText.PlzFixDoubleSidedGI),
+                targets => {
+                    Undo.RecordObjects(targets, "Fix DoubleSidedGI");
+                    // DoubleSidedGI をオンにする
+                    foreach (var mat in targets)
+                    {
+                        mat.doubleSidedGI = true;
+                    }
+                }
+            ),
+
+            // 不透明レンダーキューを使用している半透明マテリアルに対する情報
+            new WFMaterialValidator(
+                // 現在編集中のマテリアルの配列のうち、RenderType が Transparent なのに 2500 以下で描画しているもの(かつCLR_BG対応のもの)
+                targets => targets.Where(mat => WFAccessor.IsMaterialRenderType(mat, "Transparent")
+                    && mat.renderQueue <= 2500
+                    && WFAccessor.GetShaderClearBgSupported(mat.shader)).ToArray(),
+                MessageType.Info,
+                targets => WFI18N.Translate(WFMessageText.PlzFixQueueWithClearBg),
                 null // アクションなし
             ),
 
