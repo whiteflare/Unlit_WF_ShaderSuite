@@ -15,7 +15,8 @@ Material:
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - ALWAYS
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -149,6 +150,7 @@ Material:
     - _CLC_DeltaV: 0
     - _CLC_Enable: 0
     - _CLC_Monochrome: 0
+    - _ClearBgSupported: 0
     - _CurrentVersion: 0
     - _DFD_BackShadow: 1
     - _DFD_Enable: 0

@@ -15,8 +15,8 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef INC_UNLIT_WF_UNTOON_SHADOWCASTER
-#define INC_UNLIT_WF_UNTOON_SHADOWCASTER
+#ifndef INC_UNLIT_WF_UNTOON_CLEARBACK
+#define INC_UNLIT_WF_UNTOON_CLEARBACK
 
     ////////////////////////////
     // uniform variable
@@ -28,9 +28,15 @@
     // main structure
     ////////////////////////////
 
-    struct v2f_shadow {
-        V2F_SHADOW_CASTER;
-        float2 uv : TEXCOORD1;
+    struct appdata_clrbg {
+        float4 vertex           : POSITION;
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+    };
+
+    struct v2f_clrbg {
+        float4 vs_vertex        : SV_POSITION;
+        float3 ws_vertex        : TEXCOORD0;
+        float2 depth            : TEXCOORD1;
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -45,65 +51,49 @@
     // vertex&fragment shader
     ////////////////////////////
 
-    v2f_shadow vert_shadow(appdata_base v) {
-        v2f_shadow o;
+    v2f_clrbg vert_clrbg(appdata_clrbg v) {
+        v2f_clrbg o;
 
         UNITY_SETUP_INSTANCE_ID(v);
-        UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
+        UNITY_INITIALIZE_OUTPUT(v2f_clrbg, o);
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-        if (TGL_OFF(_GL_CastShadow)) {
-            // 無効化
-            o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
-        }
-        o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
+        o.depth = o.vs_vertex.zw;
+
+#if defined(UNITY_REVERSED_Z)
+        o.vs_vertex.z = o.vs_vertex.w * 1e-5;
+#else
+        o.vs_vertex.z = o.vs_vertex.w * (1 - 1e-5);
+#endif
 
         return o;
     }
 
-    float4 frag_shadow_caster(v2f_shadow i) {
-        SHADOW_CASTER_FRAGMENT(i)
-    }
-
-    float4 frag_shadow(v2f_shadow i) : SV_Target {
+    fixed4 frag_clrbg(v2f_clrbg i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        UNITY_APPLY_DITHER_CROSSFADE(i.pos);
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex.xy);
 
-        if (TGL_OFF(_GL_CastShadow)) {
+        float depth = i.depth.x / i.depth.y;
+#if defined(UNITY_REVERSED_Z)
+        if (depth <= 0 || 1 <= depth) {
             discard;
-            return float4(0, 0, 0, 0);
         }
-
-        // アルファ計算
-        #ifdef _AL_ENABLE
-            float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
-            affectAlphaMask(i.uv, color);
-            if (color.a < 0.5) {
-                discard;
-                return float4(0, 0, 0, 0);
-            }
-        #endif
-
-        // ディゾルブの考慮
-        if (TGL_ON(_DSV_Enable) && _DSV_Dissolve < 1 - 0.05) {
+#else
+        if (depth <= -1 || 1 <= depth) {
             discard;
-            return float4(0, 0, 0, 0);
         }
+#endif
 
-        return frag_shadow_caster(i);
+        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
+        float4 color = PICK_MAIN_TEXCUBE_LOD(unity_SpecCube0, -ws_camera_dir, 0);
+        color.rgb = DecodeHDR(color, float4(1, unity_SpecCube0_HDR.yzw));
+
+        return fixed4(color.rgb, 1);
     }
-
-    float4 frag_shadow_hidden(v2f_shadow i) : SV_Target {
-        UNITY_SETUP_INSTANCE_ID(i);
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-
-        discard;
-        return float4(0, 0, 0, 0);
-    }
-
 
 #endif
