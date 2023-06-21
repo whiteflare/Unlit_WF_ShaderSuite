@@ -113,6 +113,7 @@
     // -------------------------
 
     float           _GL_CastShadow;
+    float           _GL_ShadowCutoff;
     float           _GL_LevelMin;
     float           _GL_LevelMax;
     float           _GL_BlendPower;
