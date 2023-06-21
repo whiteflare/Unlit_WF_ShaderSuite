@@ -423,6 +423,7 @@ namespace UnlitWF
             new WFI18NTranslation("Saturate Intensity", "Saturate Intensity (飽和明度)"),
             new WFI18NTranslation("Chroma Reaction", "Chroma Reaction (彩度)"),
             new WFI18NTranslation("Cast Shadows", "他の物体に影を落とす"),
+            new WFI18NTranslation("Shadow Cutoff Threshold", "影のカットアウトしきい値"),
             // Alpha
             new WFI18NTranslation("AL", "Alpha Source", "アルファソース"),
             new WFI18NTranslation("AL", "Alpha Mask Texture", "アルファマスク"),

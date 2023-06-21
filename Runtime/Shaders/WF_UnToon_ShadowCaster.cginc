@@ -82,7 +82,7 @@
         #ifdef _AL_ENABLE
             float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
             affectAlphaMask(i.uv, color);
-            if (color.a < 0.5) {
+            if (color.a < _GL_ShadowCutoff) {
                 discard;
                 return float4(0, 0, 0, 0);
             }
