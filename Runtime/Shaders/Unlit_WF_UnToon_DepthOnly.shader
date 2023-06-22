@@ -17,6 +17,9 @@
 Shader "UnlitWF/WF_UnToon_DepthOnly" {
 
     Properties {
+        [WFHeader(Depth Only)]
+            _GL_DepthOnlyWidth      ("Buffer Width", Range(0, 1)) = 0
+
         [HideInInspector]
         [WF_FixFloat(1.0)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
@@ -93,7 +96,7 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
 
             CGPROGRAM
 
-            #pragma vertex vert_shadow
+            #pragma vertex vert_depthonly
             #pragma fragment frag_shadow
 
             #pragma multi_compile_shadowcaster
@@ -101,6 +104,27 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
             #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_UnToon_ShadowCaster.cginc"
+
+            float _GL_DepthOnlyWidth;
+
+            v2f_shadow vert_depthonly(appdata_base v) {
+                v2f_shadow o;
+
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
+                UNITY_TRANSFER_INSTANCE_ID(v, o);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+                v.vertex.xyz += normalize(v.normal) * max(0, _GL_DepthOnlyWidth);
+
+                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+                if (TGL_OFF(_GL_CastShadow)) {
+                    o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
+                }
+                o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+
+                return o;
+            }
 
             ENDCG
         }
