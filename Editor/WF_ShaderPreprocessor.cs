@@ -393,7 +393,7 @@ namespace UnlitWF
                     // 作成する
                     usedShaderVariantList = new UsedShaderVariantSeeker().CreateUsedShaderVariantList(out materialCount, rootObject, scene);
                     // その他の変数も一緒に初期化
-                    existLodGroupInScene = ExistsLodGroupInScene(scene);
+                    existLodGroupInScene = rootObject == null && ExistsLodGroupInScene(scene);
 #if WF_STRIP_LOG_SCAN_RESULT
                     Debug.LogFormat("[WF][Preprocess] InitUsedShaderVariantList, this = {0}, currentPlatform = {1}", base.GetHashCode(), this.currentPlatform);
 #endif
