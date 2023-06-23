@@ -393,7 +393,7 @@ namespace UnlitWF
                     // 作成する
                     usedShaderVariantList = new UsedShaderVariantSeeker().CreateUsedShaderVariantList(out materialCount, rootObject, scene);
                     // その他の変数も一緒に初期化
-                    existLodGroupInScene = ExistsLodGroupInScene(scene);
+                    existLodGroupInScene = rootObject == null && ExistsLodGroupInScene(scene);
 #if WF_STRIP_LOG_SCAN_RESULT
                     Debug.LogFormat("[WF][Preprocess] InitUsedShaderVariantList, this = {0}, currentPlatform = {1}", base.GetHashCode(), this.currentPlatform);
 #endif
@@ -408,9 +408,9 @@ namespace UnlitWF
                 }
                 else
                 {
-                    for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCount; i++)
+                    for (int i = 0; i < SceneManager.sceneCount; i++)
                     {
-                        if (ExistsLodGroupInScene(UnityEditor.SceneManagement.EditorSceneManager.GetSceneAt(i)))
+                        if (ExistsLodGroupInScene(SceneManager.GetSceneAt(i)))
                         {
                             return true;
                         }
@@ -421,10 +421,9 @@ namespace UnlitWF
 
             private bool ExistsLodGroupInScene(Scene scene)
             {
-                if (scene != null)
+                if (scene != null && scene.isLoaded)
                 {
-                    var sc = (Scene)scene;
-                    if (sc.GetRootGameObjects().SelectMany(rt => rt.GetComponentsInChildren<LODGroup>(true)).Any(lod => lod != null))
+                    if (scene.GetRootGameObjects().SelectMany(rt => rt.GetComponentsInChildren<LODGroup>(true)).Any(lod => lod != null))
                     {
                         return true;
                     }
