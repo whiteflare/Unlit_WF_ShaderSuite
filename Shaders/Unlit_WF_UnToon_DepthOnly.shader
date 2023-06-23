@@ -19,6 +19,8 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
     Properties {
         [WFHeader(Depth Only)]
             _GL_DepthOnlyWidth      ("Buffer Width", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_DepthOnlyVRCCam     ("VRC Camera Only", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(1.0)]
@@ -106,6 +108,8 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
             #include "WF_UnToon_ShadowCaster.cginc"
 
             float _GL_DepthOnlyWidth;
+            float _GL_DepthOnlyVRCCam;
+            float _VRChatCameraMode;
 
             v2f_shadow vert_depthonly(appdata_base v) {
                 v2f_shadow o;
@@ -118,9 +122,10 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
                 v.vertex.xyz += normalize(v.normal) * max(0, _GL_DepthOnlyWidth);
 
                 TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-                if (TGL_OFF(_GL_CastShadow)) {
+                if (TGL_ON(_GL_DepthOnlyVRCCam) && _VRChatCameraMode == 0) {
                     o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
                 }
+                // オリジナルは _GL_CastShadow の判定を行っているが省略。frag には判定が残っているのでプロパティは削除しない。
                 o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 
                 return o;
