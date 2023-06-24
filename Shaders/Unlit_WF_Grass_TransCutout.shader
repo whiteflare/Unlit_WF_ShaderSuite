@@ -78,7 +78,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
+            _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
