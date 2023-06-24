@@ -99,6 +99,7 @@
 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
+        UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.pos = GetShadowPositionHClip(v);
@@ -111,7 +112,6 @@
         o.vertex_color = v.vertex_color;
 #endif
 
-        UNITY_TRANSFER_INSTANCE_ID(v, o);
         return o;
     }
 
@@ -131,7 +131,7 @@
             color *= i.vertex_color;
 #endif
             affectAlphaMask(i.uv, color);
-            if (color.a < 0.5) {
+            if (color.a < _GL_ShadowCutoff) {
                 discard;
                 return float4(0, 0, 0, 0);
             }

@@ -17,8 +17,6 @@
 
 #if UNITY_EDITOR
 
-//#define WF_EDIT_LOG_VERBOSE
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -429,7 +427,7 @@ namespace UnlitWF
                 if (CopyProperties(src_props, dst_props, param.onlyOverrideBuiltinTextures))
                 {
                     // キーワードを整理する
-                    WFCommonUtility.SetupShaderKeyword(dst);
+                    WFCommonUtility.SetupMaterial(dst);
                     // ダーティフラグを付ける
                     EditorUtility.SetDirty(dst);
                 }
@@ -574,7 +572,7 @@ namespace UnlitWF
             }
 
             // キーワードを整理する
-            WFCommonUtility.SetupShaderKeyword(material);
+            WFCommonUtility.SetupMaterial(material);
             // 反映
             EditorUtility.SetDirty(material);
         }
@@ -665,14 +663,11 @@ namespace UnlitWF
             // キーワードクリア
             if (param.resetKeywords)
             {
-                foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
-                {
-                    DeleteShaderKeyword(so, material);
-                }
+                DeleteShaderKeyword(material, props);
             }
 
             // キーワードを整理する
-            WFCommonUtility.SetupShaderKeyword(material);
+            WFCommonUtility.SetupMaterial(material);
             // Default割り当てTextureを再設定する
             ResetDefaultTextures(material, del_names);
             // 反映
@@ -748,44 +743,51 @@ namespace UnlitWF
                 }
             }
 
-            // 削除する内容のログを出す
-#if WF_EDIT_LOG_VERBOSE
-            if (0 < del_names.Count)
-            {
-                var names = new List<string>(del_names);
-                names.Sort();
-                UnityEngine.Debug.LogFormat(material, "[WF][Tool] Deleted {0} Property: {1}", material, string.Join(", ", names.ToArray()));
-            }
-#endif
-
             ShaderSerializedProperty.AllApplyPropertyChange(props);
 
             return del_names;
         }
 
-        internal static void DeleteShaderKeyword(SerializedObject so, Material logTarget)
+        internal static void DeleteShaderKeyword(Material material, List<ShaderSerializedProperty> props)
         {
-            var prop = so.FindProperty("m_ShaderKeywords");
-            if (prop == null || string.IsNullOrEmpty(prop.stringValue))
+            foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
             {
-                return;
+                DeleteShaderKeyword(so, material);
             }
-
-            // 削除する内容のログを出す
-#if WF_EDIT_LOG_VERBOSE
-            var keywords = prop.stringValue;
-            keywords = string.Join(" ", keywords.Split(' ').Where(kwd => !WFCommonUtility.IsEnableKeyword(kwd)).OrderBy(kwd => kwd));
-            if (!string.IsNullOrWhiteSpace(keywords))
-            {
-                UnityEngine.Debug.LogFormat(logTarget, "[WF][Tool] Deleted {0} Shaderkeyword: {1}", logTarget, keywords);
-            }
-#endif
-
-            prop.stringValue = "";
-            so.ApplyModifiedProperties();
         }
 
-#endregion
+        internal static void DeleteShaderKeyword(SerializedObject so, Material logTarget)
+        {
+            var changed = false;
+
+            var prop = so.FindProperty("m_ShaderKeywords");
+            if (prop != null && !string.IsNullOrEmpty(prop.stringValue))
+            {
+                prop.stringValue = "";
+                changed = true;
+            }
+
+#if UNITY_2021_2_OR_NEWER
+            prop = so.FindProperty("m_ValidKeywords");
+            if (prop != null && 0 < prop.arraySize)
+            {
+                prop.ClearArray();
+                changed = true;
+            }
+            prop = so.FindProperty("m_InvalidKeywords");
+            if (prop != null && 0 < prop.arraySize)
+            {
+                prop.ClearArray();
+                changed = true;
+            }
+#endif
+            if (changed)
+            {
+                so.ApplyModifiedProperties();
+            }
+        }
+
+        #endregion
     }
 
     /// <summary>

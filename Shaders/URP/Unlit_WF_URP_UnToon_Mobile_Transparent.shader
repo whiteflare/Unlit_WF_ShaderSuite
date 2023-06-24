@@ -180,6 +180,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
+            _GL_ShadowCutoff        ("Shadow Cutoff Threshold", Range(0, 1)) = 0.1
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
