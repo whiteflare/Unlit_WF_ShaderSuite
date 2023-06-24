@@ -172,6 +172,7 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
+    - _GL_ShadowCutoff: 0.1
     - _HL_BlendNormal: 0.1
     - _HL_BlendNormal2: 0.1
     - _HL_BlendNormal2_1: 0.1
