@@ -136,7 +136,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
+            _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
     }
 
     SubShader {
