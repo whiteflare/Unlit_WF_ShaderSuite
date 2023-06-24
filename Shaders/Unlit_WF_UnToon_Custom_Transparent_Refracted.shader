@@ -360,6 +360,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
+            _GL_ShadowCutoff        ("Shadow Cutoff Threshold", Range(0, 1)) = 0.1
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
@@ -381,7 +382,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
+            _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -447,6 +448,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #include "WF_UnToon.cginc"
 

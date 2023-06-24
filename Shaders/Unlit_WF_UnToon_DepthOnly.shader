@@ -14,15 +14,27 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
+Shader "UnlitWF/WF_UnToon_DepthOnly" {
 
     Properties {
+        [WFHeader(Depth Only)]
+            _GL_DepthOnlyWidth      ("Buffer Width", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_DepthOnlyVRCCam     ("VRC Camera Only", Range(0, 1)) = 0
+
+        [HideInInspector]
+        [WF_FixFloat(1.0)]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
+
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _Category               ("BRP|UnToon|Custom/DepthOnly|DepthOnly", Float) = 0
     }
 
     SubShader {
@@ -66,12 +78,57 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+                v.vertex.xyz = 0;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 return o;
             }
 
             fixed4 frag (v2f i) : COLOR {
                 return fixed4(0, 0, 0, 1);
+            }
+
+            ENDCG
+        }
+
+        Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            Cull OFF
+
+            CGPROGRAM
+
+            #pragma vertex vert_depthonly
+            #pragma fragment frag_shadow
+
+            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #include "WF_UnToon_ShadowCaster.cginc"
+
+            float _GL_DepthOnlyWidth;
+            float _GL_DepthOnlyVRCCam;
+            float _VRChatCameraMode;
+
+            v2f_shadow vert_depthonly(appdata_base v) {
+                v2f_shadow o;
+
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
+                UNITY_TRANSFER_INSTANCE_ID(v, o);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+                v.vertex.xyz += normalize(v.normal) * max(0, _GL_DepthOnlyWidth);
+
+                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+                if (TGL_ON(_GL_DepthOnlyVRCCam) && _VRChatCameraMode == 0) {
+                    o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
+                }
+                // オリジナルは _GL_CastShadow の判定を行っているが省略。frag には判定が残っているのでプロパティは削除しない。
+                o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+
+                return o;
             }
 
             ENDCG

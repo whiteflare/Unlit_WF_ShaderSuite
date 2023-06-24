@@ -85,7 +85,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
+            _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _ClearBgSupported       ("True", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -97,6 +100,33 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             "Queue" = "Overlay"
             "IgnoreProjector" = "True"
             "VRCFallback" = "UnlitTransparent"
+        }
+
+        Pass {
+            Name "CLR_BG"
+            Tags { "LightMode" = "Always" }
+
+            Cull [_CullMode]
+            ZWrite ON
+
+            CGPROGRAM
+
+            #pragma vertex vert_clrbg
+            #pragma fragment frag_clrbg
+
+            #pragma target 4.5
+
+            #define _WF_MOBILE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
+
+            #include "WF_UnToon_ClearBackground.cginc"
+
+            ENDCG
         }
 
         Pass {

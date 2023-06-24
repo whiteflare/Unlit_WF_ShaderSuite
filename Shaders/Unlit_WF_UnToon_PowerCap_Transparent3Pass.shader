@@ -400,6 +400,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
+            _GL_ShadowCutoff        ("Shadow Cutoff Threshold", Range(0, 1)) = 0.1
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
@@ -421,7 +422,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
+            _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0

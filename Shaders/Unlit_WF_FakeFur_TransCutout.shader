@@ -190,7 +190,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
+            _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
@@ -267,7 +267,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
     }
 
     FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"

@@ -63,6 +63,7 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_ES_SC_.*", ctx => IsAnyIntValue(ctx, "_ES_ScrollEnable", p => p != 0)),
             new ConditionVisiblePropertyHook("_ES_SC_UVType", ctx => IsAnyIntValue(ctx, "_ES_SC_DirType", p => p == 2)),
             new ConditionVisiblePropertyHook("_ES_AU_.*", ctx => IsAnyIntValue(ctx, "_ES_AuLinkEnable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_GL_ShadowCutoff", ctx => IsAnyIntValue(ctx, "_GL_CastShadow", p => 1 <= p)),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
             // 条件付きHide(Grass系列)
@@ -271,7 +272,7 @@ namespace UnlitWF
                 // DebugViewの保存に使っているタグはクリア
                 WF_DebugViewEditor.ClearDebugOverrideTag(newMat);
                 // シェーダキーワードを整理する
-                WFCommonUtility.SetupShaderKeyword(newMat);
+                WFCommonUtility.SetupMaterial(newMat);
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
@@ -411,7 +412,7 @@ namespace UnlitWF
             OnGUISub_Utilities(materialEditor);
 
             // シェーダキーワードを整理する
-            WFCommonUtility.SetupShaderKeyword(WFCommonUtility.AsMaterials(materialEditor.targets));
+            WFCommonUtility.SetupMaterials(WFCommonUtility.AsMaterials(materialEditor.targets));
         }
 
         private void OnGuiSub_ShaderProperty(PropertyGUIContext context)
