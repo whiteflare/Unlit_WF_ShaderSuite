@@ -267,7 +267,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
     }
 
     FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"

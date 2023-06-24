@@ -241,7 +241,7 @@ namespace UnlitWF
         public IEnumerable<Material> GetAllMaterials(Scene scene, List<Material> result = null)
         {
             InitList(ref result);
-            if (scene == null)
+            if (scene == null || !scene.isLoaded)
             {
                 return result;
             }

@@ -360,6 +360,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
+            _GL_ShadowCutoff        ("Shadow Cutoff Threshold", Range(0, 1)) = 0.1
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
@@ -384,6 +385,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _CurrentVersion         ("2023/06/03 (1.1.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
+            _ClearBgSupported       ("True", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
@@ -392,9 +396,34 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
+            "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "VRCFallback" = "UnlitTransparent"
+        }
+
+        Pass {
+            Name "CLR_BG"
+            Tags { "LightMode" = "Always" }
+
+            Cull [_CullMode]
+            ZWrite ON
+
+            CGPROGRAM
+
+            #pragma vertex vert_clrbg
+            #pragma fragment frag_clrbg
+
+            #pragma target 4.5
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
+
+            #include "WF_UnToon_ClearBackground.cginc"
+
+            ENDCG
         }
 
         GrabPass { "_UnToonRefractionBack" }
@@ -447,6 +476,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #pragma multi_compile _ _WF_EDITOR_HIDE_LMAP
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
 
             #include "WF_UnToon.cginc"
 
