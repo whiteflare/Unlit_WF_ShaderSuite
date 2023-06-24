@@ -203,6 +203,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _ClearBgSupported       ("True", Float) = 0
     }
 
     SubShader {
@@ -210,6 +213,33 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             "RenderType" = "Transparent"
             "Queue" = "Transparent"
             "VRCFallback" = "UnlitTransparent"
+        }
+
+        Pass {
+            Name "CLR_BG"
+            Tags { "LightMode" = "Always" }
+
+            Cull [_CullMode]
+            ZWrite ON
+
+            CGPROGRAM
+
+            #pragma vertex vert_clrbg
+            #pragma fragment frag_clrbg
+
+            #pragma target 3.0
+
+            #define _WF_MOBILE
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
+
+            #include "WF_UnToon_ClearBackground.cginc"
+
+            ENDCG
         }
 
         Pass {
@@ -226,7 +256,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             #pragma fragment frag
 
             #pragma target 3.0
-
 
             #define _WF_ALPHA_FRESNEL
             #define _WF_AO_ONLY_LMAP

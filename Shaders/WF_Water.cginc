@@ -488,6 +488,7 @@ FEATURE_TGL_END
 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f_surface, o);
+        UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
@@ -499,7 +500,6 @@ FEATURE_TGL_END
 
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex).xyz;
 
-        UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
     }

@@ -15,7 +15,8 @@ Material:
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - ALWAYS
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -69,6 +70,7 @@ Material:
     - _AO_Contrast: 1
     - _AO_Enable: 0
     - _AO_UseLightMap: 1
+    - _ClearBgSupported: 0
     - _CullMode: 0
     - _CurrentVersion: 0
     - _ES_BlendType: 0
