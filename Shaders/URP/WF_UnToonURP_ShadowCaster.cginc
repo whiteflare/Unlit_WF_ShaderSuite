@@ -105,7 +105,7 @@
         o.pos = GetShadowPositionHClip(v);
         if (TGL_OFF(_GL_CastShadow)) {
             // 無効化
-            o.pos = UnityObjectToClipPos( ZERO_VEC3 );
+            o.pos = DISCARD_VS_VERTEX_ZERO;
         }
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 #ifdef _V2F_HAS_VERTEXCOLOR

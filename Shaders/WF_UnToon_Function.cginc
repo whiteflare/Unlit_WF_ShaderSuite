@@ -385,6 +385,24 @@ FEATURE_TGL_END
         return angle_light_camera;
     }
 
+#ifdef _GL_NCC_ENABLE
+    void affectNearClipCancel(inout float4 vs_vertex) {
+FEATURE_TGL_ON_BEGIN(_GL_NCC_Enable)
+        if(vs_vertex.w < _ProjectionParams.y * 1.01 && 0 < vs_vertex.w && _ProjectionParams.y < 0.1 && !isInMirror()) {
+            #if defined(UNITY_REVERSED_Z)
+                vs_vertex.z = vs_vertex.z * 0.0001 + vs_vertex.w * 0.999;
+            #else
+                vs_vertex.z = vs_vertex.z * 0.0001 - vs_vertex.w * 0.999;
+            #endif
+        }
+FEATURE_TGL_END
+    }
+#else
+    // Dummy
+    #define affectNearClipCancel(vs_vertex)
+#endif
+
+
     ////////////////////////////
     // Color Change
     ////////////////////////////
@@ -1270,14 +1288,16 @@ FEATURE_TGL_END
         if (TGL_ON(_TL_Enable)) {
 #endif
             // Normal方向にシフトとCamera方向にZ-Shiftを行う
-            return shiftNormalAndDepthVertex(ws_vertex, ws_normal, width, shift);
+            float4 vs_vertex = shiftNormalAndDepthVertex(ws_vertex, ws_normal, width, shift);
+            affectNearClipCancel(vs_vertex);
+            return vs_vertex;
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         } else {
-            return UnityObjectToClipPos( ZERO_VEC3 );
+            return DISCARD_VS_VERTEX_ZERO;
         }
 #endif
         #else
-            return UnityObjectToClipPos( ZERO_VEC3 );
+            return DISCARD_VS_VERTEX_ZERO;
         #endif
     }
 

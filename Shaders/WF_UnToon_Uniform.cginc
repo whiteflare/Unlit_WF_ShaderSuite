@@ -123,6 +123,7 @@
     float3          _GL_CustomLitPos;
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
+    FEATURE_TGL    (_GL_NCC_Enable);
 
     // -------------------------
 

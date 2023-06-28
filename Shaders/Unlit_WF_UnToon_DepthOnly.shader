@@ -123,7 +123,7 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
 
                 TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
                 if (TGL_ON(_GL_DepthOnlyVRCCam) && _VRChatCameraMode == 0) {
-                    o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
+                    o.pos = DISCARD_VS_VERTEX_ZERO;
                 }
                 // オリジナルは _GL_CastShadow の判定を行っているが省略。frag には判定が残っているのでプロパティは削除しない。
                 o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);

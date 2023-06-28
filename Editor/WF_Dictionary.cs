@@ -275,6 +275,7 @@ namespace UnlitWF
             // 基本機能
             new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE"),
             new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE"),
+            new WFCustomKeywordSettingBool("_GL_NCC_Enable", "_GL_NCC_ENABLE"),
             new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             },

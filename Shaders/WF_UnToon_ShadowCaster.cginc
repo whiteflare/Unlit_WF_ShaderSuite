@@ -56,7 +56,7 @@
         TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
         if (TGL_OFF(_GL_CastShadow)) {
             // 無効化
-            o.pos = UnityObjectToClipPos( float3(0, 0, 0) );
+            o.pos = DISCARD_VS_VERTEX_ZERO;
         }
         o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 
