@@ -557,6 +557,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma fragment frag_shadow
 
             #define _WF_ALPHA_BLEND
+            #define _GL_NCC_ENABLE
+            #define _DSV_ENABLE
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing

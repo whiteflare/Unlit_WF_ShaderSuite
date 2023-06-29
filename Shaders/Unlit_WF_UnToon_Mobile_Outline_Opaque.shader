@@ -316,6 +316,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
+            #define _GL_NCC_ENABLE
+
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE

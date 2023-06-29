@@ -54,11 +54,16 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+        o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+
         if (TGL_OFF(_GL_CastShadow)) {
-            // 無効化
             o.pos = DISCARD_VS_VERTEX_ZERO;
         }
-        o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+#ifdef _GL_NCC_ENABLE
+        else if (TGL_ON(_GL_NCC_Enable)) {
+            affectNearClipCancel(o.pos);
+        }
+#endif
 
         return o;
     }
@@ -89,10 +94,12 @@
         #endif
 
         // ディゾルブの考慮
-        if (TGL_ON(_DSV_Enable) && _DSV_Dissolve < 1 - 0.05) {
-            discard;
-            return float4(0, 0, 0, 0);
-        }
+        #ifdef _DSV_ENABLE
+            if (TGL_ON(_DSV_Enable) && (TGL_OFF(_DSV_Invert) ? _DSV_Dissolve < 1 - 0.05 : 0.05 < _DSV_Dissolve)) {
+                discard;
+                return float4(0, 0, 0, 0);
+            }
+        #endif
 
         return frag_shadow_caster(i);
     }

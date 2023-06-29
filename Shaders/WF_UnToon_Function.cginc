@@ -388,7 +388,7 @@ FEATURE_TGL_END
 #ifdef _GL_NCC_ENABLE
     void affectNearClipCancel(inout float4 vs_vertex) {
 FEATURE_TGL_ON_BEGIN(_GL_NCC_Enable)
-        if(vs_vertex.w < _ProjectionParams.y * 1.01 && 0 < vs_vertex.w && _ProjectionParams.y < 0.1 && !isInMirror()) {
+        if(vs_vertex.w < _ProjectionParams.y * 1.01 && 0 < vs_vertex.w && !isInMirror()) {
             #if defined(UNITY_REVERSED_Z)
                 vs_vertex.z = vs_vertex.z * 0.0001 + vs_vertex.w * 0.999;
             #else

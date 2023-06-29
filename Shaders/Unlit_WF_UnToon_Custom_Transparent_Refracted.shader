@@ -471,6 +471,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #pragma fragment frag_shadow
 
             #define _WF_ALPHA_BLEND
+            #define _GL_NCC_ENABLE
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing

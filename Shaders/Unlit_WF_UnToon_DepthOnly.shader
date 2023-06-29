@@ -22,6 +22,17 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
         [ToggleUI]
             _GL_DepthOnlyVRCCam     ("VRC Camera Only", Range(0, 1)) = 0
 
+        // Dissolve
+        [WFHeaderToggle(Dissolve)]
+            _DSV_Enable             ("[DSV] Enable", Float) = 0
+            _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
+        [ToggleUI]
+            _DSV_Invert             ("[DSV] Invert", Range(0, 1)) = 0
+
+        [WFHeader(Lit Advance)]
+        [ToggleUI]
+            _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
+
         [HideInInspector]
         [WF_FixFloat(1.0)]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
@@ -100,6 +111,9 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
 
             #pragma vertex vert_depthonly
             #pragma fragment frag_shadow
+
+            #define _DSV_ENABLE
+            #define _GL_NCC_ENABLE
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing

@@ -123,7 +123,7 @@
     float3          _GL_CustomLitPos;
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
-    FEATURE_TGL    (_GL_NCC_Enable);
+    float           _GL_NCC_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
 
     // -------------------------
 

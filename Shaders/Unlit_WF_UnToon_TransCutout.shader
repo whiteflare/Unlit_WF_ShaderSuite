@@ -461,6 +461,8 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             #pragma fragment frag_shadow
 
             #define _WF_ALPHA_CUTOUT
+            #define _GL_NCC_ENABLE
+            #define _DSV_ENABLE
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
