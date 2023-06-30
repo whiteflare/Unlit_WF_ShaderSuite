@@ -95,7 +95,7 @@
 
         // ディゾルブの考慮
         #ifdef _DSV_ENABLE
-            if (TGL_ON(_DSV_Enable) && (TGL_OFF(_DSV_Invert) ? _DSV_Dissolve < 1 - 0.05 : 0.05 < _DSV_Dissolve)) {
+            if (TGL_ON(_DSV_Enable) && _DSV_Dissolve < 1 - 0.05) {
                 discard;
                 return float4(0, 0, 0, 0);
             }

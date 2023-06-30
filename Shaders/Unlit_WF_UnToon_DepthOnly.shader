@@ -26,8 +26,6 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
             _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
-        [ToggleUI]
-            _DSV_Invert             ("[DSV] Invert", Range(0, 1)) = 0
 
         [WFHeader(Lit Advance)]
         [ToggleUI]
