@@ -107,9 +107,10 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
 
             CGPROGRAM
 
-            #pragma vertex vert_depthonly
+            #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
+            #define _WF_DEPTHONLY_BRP
             #define _DSV_ENABLE
             #define _GL_NCC_ENABLE
 
@@ -118,30 +119,6 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
             #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "WF_UnToon_ShadowCaster.cginc"
-
-            float _GL_DepthOnlyWidth;
-            float _GL_DepthOnlyVRCCam;
-            float _VRChatCameraMode;
-
-            v2f_shadow vert_depthonly(appdata_base v) {
-                v2f_shadow o;
-
-                UNITY_SETUP_INSTANCE_ID(v);
-                UNITY_INITIALIZE_OUTPUT(v2f_shadow, o);
-                UNITY_TRANSFER_INSTANCE_ID(v, o);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-
-                v.vertex.xyz += normalize(v.normal) * max(0, _GL_DepthOnlyWidth);
-
-                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-                if (TGL_ON(_GL_DepthOnlyVRCCam) && _VRChatCameraMode == 0) {
-                    o.pos = DISCARD_VS_VERTEX_ZERO;
-                }
-                // オリジナルは _GL_CastShadow の判定を行っているが省略。frag には判定が残っているのでプロパティは削除しない。
-                o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
-
-                return o;
-            }
 
             ENDCG
         }

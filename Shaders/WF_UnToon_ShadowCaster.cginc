@@ -41,6 +41,12 @@
 
     #include "WF_UnToon_Function.cginc"
 
+    #ifdef _WF_DEPTHONLY_BRP
+        float _GL_DepthOnlyWidth;
+        float _GL_DepthOnlyVRCCam;
+        float _VRChatCameraMode;
+    #endif
+
     ////////////////////////////
     // vertex&fragment shader
     ////////////////////////////
@@ -53,18 +59,41 @@
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-        TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
         o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 
-        if (TGL_OFF(_GL_CastShadow)) {
-            o.pos = DISCARD_VS_VERTEX_ZERO;
+#ifdef _TL_ENABLE
+        if (TGL_ON(_TL_Enable)) {
+            float3 ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
+            ws_vertex = shiftNormalVertex(ws_vertex, normalize(v.normal), getOutlineShiftWidth(o.uv));
+            v.vertex.xyz = UnityWorldToObjectPos(ws_vertex);
         }
-#ifdef _GL_NCC_ENABLE
-        else if (TGL_ON(_GL_NCC_Enable)) {
-            affectNearClipCancel(o.pos);
+#endif
+#ifdef _WF_DEPTHONLY_BRP
+        if (0 < _GL_DepthOnlyWidth) {
+            float3 ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
+            ws_vertex = shiftNormalVertex(ws_vertex, normalize(v.normal), _GL_DepthOnlyWidth);
+            v.vertex.xyz = UnityWorldToObjectPos(ws_vertex);
         }
 #endif
 
+        TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+
+#ifndef _WF_DEPTHONLY_BRP
+        if (TGL_OFF(_GL_CastShadow)) {
+            o.pos = DISCARD_VS_VERTEX_ZERO;
+            return o;
+        }
+#else
+        if (TGL_ON(_GL_DepthOnlyVRCCam) && _VRChatCameraMode == 0) {
+            o.pos = DISCARD_VS_VERTEX_ZERO;
+            return o;
+        }
+#endif
+#ifdef _GL_NCC_ENABLE
+        if (TGL_ON(_GL_NCC_Enable)) {
+            affectNearClipCancel(o.pos);
+        }
+#endif
         return o;
     }
 

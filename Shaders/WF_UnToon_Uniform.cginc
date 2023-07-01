@@ -309,7 +309,7 @@
 
     // -------------------------
 
-    FEATURE_TGL    (_TL_Enable);
+    float           _TL_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
     float           _TL_LineWidth;
     uint            _TL_LineType;
     float           _TL_Z_Shift;
