@@ -66,6 +66,7 @@
 #else
         o.vs_vertex     = shiftDepthVertex(o.ws_vertex, _WF_MAIN_Z_SHIFT);     // Zシフトした値を使う
 #endif
+        affectNearClipCancel(o.vs_vertex);
         o.uv_grab       = ComputeGrabScreenPos(o.vs_vertex);
 
         return o;
