@@ -52,9 +52,6 @@
     DECL_SUB_TEX2D      (_LME_Texture);
     DECL_SUB_TEX2D      (_LME_MaskTex);
 #endif
-#ifdef _WF_LEGACY_TL_MASK    // マスクをfragmentでアルファに反映する場合
-    DECL_SUB_TEX2D      (_TL_MaskTex);
-#endif
 
     // 独自の Sampler で参照するサブテクスチャ =================
 
@@ -67,9 +64,7 @@
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
 
-#ifndef _WF_LEGACY_TL_MASK   // マスクをシフト時に太さに反映する場合
     DECL_VERT_TEX2D     (_TL_MaskTex);
-#endif
 #ifdef _WF_UNTOON_TESS
     DECL_VERT_TEX2D     (_TE_SmoothPowerTex);
 #endif
