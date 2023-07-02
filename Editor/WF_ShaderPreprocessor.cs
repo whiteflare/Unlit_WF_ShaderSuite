@@ -64,18 +64,32 @@ namespace UnlitWF
 
             private void CleanupMaterialsBeforeAvatarBuild(GameObject avatarGameObject)
             {
-                if (WFEditorSetting.GetOneOfSettings().cleanupMaterialsBeforeAvatarBuild)
+                var cleanupMaterials = new List<Material>();
+                var setupMaterials = new List<Material>();
+                foreach (var mat in new MaterialSeeker().GetAllMaterials(avatarGameObject).Distinct())
+                {
+                    if (WFEditorSetting.GetOneOfSettings().cleanupMaterialsBeforeAvatarBuild && !Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat))
+                    {
+                        cleanupMaterials.Add(mat);
+                    }
+                    else
+                    {
+                        setupMaterials.Add(mat);
+                    }
+                }
+                if (0 < cleanupMaterials.Count)
                 {
                     var param = CleanUpParameter.Create();
-                    param.materials = new MaterialSeeker().GetAllMaterials(avatarGameObject).Distinct()
-                        // 古いプロパティを含んでいるマテリアルはクリンナップしない
-                        .Where(mat => !Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat))
-                        .ToArray();
+                    param.materials = cleanupMaterials.ToArray();
                     param.execNonWFMaterials = false; // ビルド時は NonWF マテリアルのクリンナップを行わない
                     if (WFMaterialEditUtility.CleanUpProperties(param))
                     {
                         AssetDatabase.SaveAssets(); // 未保存のマテリアルを保存
                     }
+                }
+                if (0 < setupMaterials.Count)
+                {
+                    WFCommonUtility.SetupMaterials(setupMaterials.ToArray());
                 }
             }
         }
