@@ -903,7 +903,7 @@ namespace UnlitWF
             DrawAdditionalColorCodeField(propColor);
 
             // もしテクスチャが新たに設定されたならば、カラーを白にリセットする
-            if (EditorGUI.EndChangeCheck() && oldTexture == null && propTexture.textureValue != null)
+            if (EditorGUI.EndChangeCheck() && oldTexture == null && propTexture.textureValue != null && propColor.colorValue.maxColorComponent < 0.05f)
             {
                 propColor.colorValue = Color.white;
             }
