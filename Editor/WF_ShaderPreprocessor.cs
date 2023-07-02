@@ -89,7 +89,10 @@ namespace UnlitWF
                 }
                 if (0 < setupMaterials.Count)
                 {
-                    WFCommonUtility.SetupMaterials(setupMaterials.ToArray());
+                    if (WFCommonUtility.SetupMaterials(setupMaterials.ToArray()))
+                    {
+                        AssetDatabase.SaveAssets(); // 未保存のマテリアルを保存
+                    }
                 }
             }
         }
@@ -100,7 +103,20 @@ namespace UnlitWF
 
             public void OnProcessScene(Scene scene, UnityEditor.Build.Reporting.BuildReport report)
             {
+                // マテリアルのセットアップ
+                CleanupMaterialsBeforeWorldBuild();
+
+                // avatarGameObject からマテリアルを回収
                 Core.InitUsedShaderVariantListForVRCSDK3World(scene);
+            }
+
+            private static void CleanupMaterialsBeforeWorldBuild()
+            {
+                var mats = new MaterialSeeker().GetAllMaterialsInScene().Distinct();
+                if (WFCommonUtility.SetupMaterials(mats.ToArray()))
+                {
+                    AssetDatabase.SaveAssets(); // 未保存のマテリアルを保存
+                }
             }
         }
 #else

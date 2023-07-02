@@ -210,10 +210,11 @@ namespace UnlitWF
             var changed = false;
             if (IsSupportedShader(mat))
             {
-                changed |= SetupMaterial_DeleteKeyword(mat);
-                changed |= SetupMaterial_SetupKeyword(mat);
                 changed |= SetupMaterial_GIFrags(mat);
                 changed |= SetupMaterial_ClearBgPass(mat);
+                changed |= SetupMaterial_NearClipCancel(mat);
+                changed |= SetupMaterial_SetupKeyword(mat);
+                changed |= SetupMaterial_DeleteKeyword(mat);
             }
             return changed;
         }
@@ -293,6 +294,28 @@ namespace UnlitWF
                 mat.SetShaderPassEnabled("Always", isOpaque);
                 changed = true;
             }
+            return changed;
+        }
+
+        private static bool SetupMaterial_NearClipCancel(Material mat)
+        {
+            bool changed = false;
+#if ENV_VRCSDK3_AVATAR || ENV_VRCSDK3_WORLD
+            if (mat.HasProperty("_GL_NCC_Enable"))
+            {
+                var oldVal = mat.GetInt("_GL_NCC_Enable");
+#if ENV_VRCSDK3_AVATAR
+                var newVal = (int)WFEditorSetting.GetOneOfSettings().enableNccInVRC3Avatar;
+#elif ENV_VRCSDK3_WORLD
+                var newVal = (int)WFEditorSetting.GetOneOfSettings().enableNccInVRC3World;
+#endif
+                if (0 <= newVal && oldVal != newVal)
+                {
+                    mat.SetInt("_GL_NCC_Enable", newVal);
+                    changed = true;
+                }
+            }
+#endif
             return changed;
         }
 

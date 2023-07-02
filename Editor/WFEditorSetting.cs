@@ -91,21 +91,39 @@ namespace UnlitWF
         [Tooltip("Quest向けシーンビルド時にMobile非対応シェーダを対応シェーダに置換する")]
         public bool autoSwitchQuestShader = true;
 
-        public static WFEditorSetting GetOneOfSettings()
+        [Tooltip("Nearクリップキャンセルを設定 (VRCSDK3 Avatar)")]
+        public NearClipCancelMode enableNccInVRC3Avatar = NearClipCancelMode.ForceON;
+
+        [Tooltip("Nearクリップキャンセルを設定 (VRCSDK3 Avatar)")]
+        public NearClipCancelMode enableNccInVRC3World = NearClipCancelMode.ForceOFF;
+
+        private static WFEditorSetting currentSettings = null;
+        private static int currentPriority = 0;
+
+        public static WFEditorSetting GetOneOfSettings(bool forceReload = false)
         {
+            if (forceReload)
+            {
+                currentSettings = null;
+            }
+            if (currentSettings != null && currentSettings.settingPriority == currentPriority)
+            {
+                return currentSettings;
+            }
+
             var settings = LoadAllSettingsFromAssetDatabase();
             if (settings.Length == 0)
             {
                 // 見つからないなら一時オブジェクトを作成して返却
-                return ScriptableObject.CreateInstance<WFEditorSetting>();
+                currentSettings = CreateInstance<WFEditorSetting>();
             }
-            // Debug.LogFormat("[WF][Settings] Load Settings: {0}", AssetDatabase.GetAssetPath(settings[0]));
-            return settings[0];
-        }
-
-        public static WFEditorSetting[] GetAllSettings()
-        {
-            return LoadAllSettingsFromAssetDatabase();
+            else
+            {
+                // Debug.LogFormat("[WF][Settings] Load Settings: {0}", AssetDatabase.GetAssetPath(settings[0]));
+                currentSettings = settings[0];
+            }
+            currentPriority = currentSettings.settingPriority;
+            return currentSettings;
         }
 
         private static WFEditorSetting[] LoadAllSettingsFromAssetDatabase()
@@ -119,6 +137,28 @@ namespace UnlitWF
                 .Select(path => AssetDatabase.LoadAssetAtPath<WFEditorSetting>(path))
                 .Where(s => s != null)
                 .OrderBy(s => s.settingPriority).ToArray();
+        }
+    }
+
+    public enum NearClipCancelMode
+    {
+        PerMaterial = -1,
+        ForceOFF = 0,
+        ForceON = 1,
+    }
+
+    class WFEditorSettingReloader : AssetPostprocessor
+    {
+        public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
+        {
+            foreach (var path in importedAssets)
+            {
+                if (string.IsNullOrWhiteSpace(path))
+                    continue;
+                if (AssetDatabase.LoadAssetAtPath<WFEditorSetting>(path) == null)
+                    continue;
+                WFEditorSetting.GetOneOfSettings(true);
+            }
         }
     }
 
@@ -136,6 +176,8 @@ namespace UnlitWF
         SerializedProperty p_cleanupMaterialsBeforeAvatarBuild;
         SerializedProperty p_enableMigrationWhenImport;
         SerializedProperty p_autoSwitchQuestShader;
+        SerializedProperty p_enableNccInVRC3Avatar;
+        SerializedProperty p_enableNccInVRC3World;
 
         private void OnEnable()
         {
@@ -157,10 +199,24 @@ namespace UnlitWF
 
             // Quest Build Support
             this.p_autoSwitchQuestShader = serializedObject.FindProperty(nameof(WFEditorSetting.autoSwitchQuestShader));
+
+            // EnableNCC
+            this.p_enableNccInVRC3Avatar = serializedObject.FindProperty(nameof(WFEditorSetting.enableNccInVRC3Avatar));
+            this.p_enableNccInVRC3World = serializedObject.FindProperty(nameof(WFEditorSetting.enableNccInVRC3World));
         }
 
         public override void OnInspectorGUI()
         {
+            if (target == WFEditorSetting.GetOneOfSettings())
+            {
+                EditorGUILayout.HelpBox("This is the current setting used.", MessageType.Info);
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("This is not the setting used now.", MessageType.Warning);
+            }
+            EditorGUILayout.Space();
+
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
 
@@ -191,15 +247,22 @@ namespace UnlitWF
 
             EditorGUILayout.PropertyField(p_autoSwitchQuestShader);
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-            }
-
             // Common Material Settings
 
             EditorGUILayout.Space();
             GUI.Label(EditorGUILayout.GetControlRect(), "Common Material Settings", EditorStyles.boldLabel);
+
+            EditorGUILayout.LabelField(WFI18N.Translate("Cancel Near Clipping"));
+            using (new EditorGUI.IndentLevelScope())
+            {
+                EditorGUILayout.PropertyField(p_enableNccInVRC3Avatar, new GUIContent("For VRCSDK3 Avatar"));
+                EditorGUILayout.PropertyField(p_enableNccInVRC3World, new GUIContent("For VRCSDK3 World"));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
 
             WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
         }
