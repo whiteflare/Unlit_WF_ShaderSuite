@@ -579,6 +579,7 @@ namespace UnlitWF
             new WFI18NTranslation("Custom Light Pos", "カスタムライトの位置"),
             new WFI18NTranslation("Disable BackLit", "逆光補正しない"),
             new WFI18NTranslation("Disable ObjectBasePos", "メッシュ原点を取得しない"),
+            new WFI18NTranslation("Cancel Near Clipping", "カメラのニアクリップを無視"),
             // Light Bake Effects
             new WFI18NTranslation("LBE", "Indirect Multiplier", "間接光の倍率"),
             new WFI18NTranslation("LBE", "Emission Multiplier", "Emissionの倍率"),

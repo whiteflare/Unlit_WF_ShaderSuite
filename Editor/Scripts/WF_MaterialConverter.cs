@@ -732,6 +732,7 @@ namespace UnlitWF.Converter
                     var resetParam = ResetParameter.Create();
                     resetParam.materials = new Material[]{ ctx.target };
                     resetParam.resetColorAlpha = true;
+                    resetParam.resetLit = true;
                     // resetParam.resetUnused = true;
                     resetParam.resetKeywords = true;
                     WFMaterialEditUtility.ResetPropertiesWithoutUndo(resetParam);
