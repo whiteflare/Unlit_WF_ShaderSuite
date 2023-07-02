@@ -17,6 +17,17 @@
 
 #if UNITY_EDITOR
 
+// VRCSDK有無の判定ここから //////
+#if VRC_SDK_VRCSDK3
+#define ENV_VRCSDK3
+#if UDON
+#define ENV_VRCSDK3_WORLD
+#else
+#define ENV_VRCSDK3_AVATAR
+#endif
+#endif
+// VRCSDK有無の判定ここまで //////
+
 // #define _WF_LEGACY_FEATURE_SWITCH
 // #define WF_COMMON_LOG_KEYWORD // キーワード変更時のログを出力する
 
@@ -673,6 +684,17 @@ namespace UnlitWF
             return AssetDatabase.IsValidFolder("Packages/jp.whiteflare.unlitwf");
         }
 
+        public static CurrentEntironment GetCurrentEntironment()
+        {
+#if ENV_VRCSDK3_AVATAR
+            return CurrentEntironment.VRCSDK3_Avatar;
+#elif ENV_VRCSDK3_WORLD
+            return CurrentEntironment.VRCSDK3_World;
+#else
+            return CurrentEntironment.Other;
+#endif
+        }
+
         public const string KWD_EDITOR_HIDE_LMAP = "_WF_EDITOR_HIDE_LMAP";
 
         public static bool IsKwdEnableHideLmap()
@@ -720,6 +742,13 @@ namespace UnlitWF
         }
 
         #endregion
+    }
+
+    enum CurrentEntironment
+    {
+        VRCSDK3_Avatar,
+        VRCSDK3_World,
+        Other,
     }
 
     static class WFAccessor
