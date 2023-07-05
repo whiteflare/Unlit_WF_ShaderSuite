@@ -690,6 +690,20 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_LOCAL_DIR", "カスタム(ローカル方向)"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_POS", "カスタム(ワールド座標)"),
 
+            // WFEditorSetting
+            new WFI18NTranslation("WFEditorSetting", "This is the current setting used.", "これは現在有効な設定です。"),
+            new WFI18NTranslation("WFEditorSetting", "This is not the setting used now.", "これは現在有効の設定ではなく、他に有効な設定があります。"),
+            new WFI18NTranslation("WFEditorSetting", "Enable Stripping", "不要コードを除去する"),
+            new WFI18NTranslation("WFEditorSetting", "Strip Unused Variant", "未使用のバリアントを除去する"),
+            new WFI18NTranslation("WFEditorSetting", "Strip Unused Lod Fade", "未使用のLODクロスフェードを除去"),
+            new WFI18NTranslation("WFEditorSetting", "Strip Fallback", "Fallbackを除去"),
+            new WFI18NTranslation("WFEditorSetting", "Strip Meta Pass", "Metaパスを除去"),
+            new WFI18NTranslation("WFEditorSetting", "Validate Scene Materials", "ビルド時に古いマテリアルが含まれていないか検査する"),
+            new WFI18NTranslation("WFEditorSetting", "Cleanup Materials Before Avatar Build", "アバタービルド前にマテリアルをクリンナップする"),
+            new WFI18NTranslation("WFEditorSetting", "Enable Scan Projects", "Shaderインポート時にプロジェクトをスキャン"),
+            new WFI18NTranslation("WFEditorSetting", "Enable Migration When Import", "マテリアルインポート時にマテリアルを最新化"),
+            new WFI18NTranslation("WFEditorSetting", "Auto Switch Quest Shader", "Quest向けシェーダに自動で切り替える"),
+
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
             new WFI18NTranslation(WFMessageText.PlzMigration, "このマテリアルは古いバージョンで作成されたようです。\n最新版に変換しますか？"),
