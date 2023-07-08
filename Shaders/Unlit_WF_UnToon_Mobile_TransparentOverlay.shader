@@ -76,6 +76,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
             _LBE_Enable             ("[LBE] Enable", Float) = 0
@@ -150,9 +152,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _WF_MAIN_Z_SHIFT    (_AL_Z_Offset)
             #define _WF_MOBILE
 
-
-            #define _AO_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

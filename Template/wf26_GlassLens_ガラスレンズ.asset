@@ -32,8 +32,7 @@ Material:
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3200
   stringTagMap: {}
-  disabledShaderPasses:
-  - ALWAYS
+  disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -166,7 +165,6 @@ Material:
     - _CRF_Enable: 1
     - _CRF_RefractiveIndex: 1.53
     - _Category: 0
-    - _ClearBgSupported: 0
     - _CullMode: 0
     - _CurrentVersion: 0
     - _DFD_BackShadow: 1
@@ -205,6 +203,7 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
+    - _GL_NCC_Enable: 0
     - _GL_ShadowCutoff: 0.1
     - _HL_BlendNormal: 0.1
     - _HL_BlendNormal2: 0.1

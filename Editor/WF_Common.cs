@@ -18,6 +18,17 @@
 #if UNITY_EDITOR
 
 #define _WF_LEGACY_FEATURE_SWITCH
+// VRCSDK有無の判定ここから //////
+#if VRC_SDK_VRCSDK3
+#define ENV_VRCSDK3
+#if UDON
+#define ENV_VRCSDK3_WORLD
+#else
+#define ENV_VRCSDK3_AVATAR
+#endif
+#endif
+// VRCSDK有無の判定ここまで //////
+
 // #define WF_COMMON_LOG_KEYWORD // キーワード変更時のログを出力する
 
 using System;
@@ -199,10 +210,11 @@ namespace UnlitWF
             var changed = false;
             if (IsSupportedShader(mat))
             {
-                changed |= SetupMaterial_DeleteKeyword(mat);
-                changed |= SetupMaterial_SetupKeyword(mat);
                 changed |= SetupMaterial_GIFrags(mat);
                 changed |= SetupMaterial_ClearBgPass(mat);
+                changed |= SetupMaterial_NearClipCancel(mat);
+                changed |= SetupMaterial_SetupKeyword(mat);
+                changed |= SetupMaterial_DeleteKeyword(mat);
             }
             return changed;
         }
@@ -282,6 +294,28 @@ namespace UnlitWF
                 mat.SetShaderPassEnabled("Always", isOpaque);
                 changed = true;
             }
+            return changed;
+        }
+
+        private static bool SetupMaterial_NearClipCancel(Material mat)
+        {
+            bool changed = false;
+#if ENV_VRCSDK3_AVATAR || ENV_VRCSDK3_WORLD
+            if (mat.HasProperty("_GL_NCC_Enable"))
+            {
+                var oldVal = mat.GetInt("_GL_NCC_Enable");
+#if ENV_VRCSDK3_AVATAR
+                var newVal = (int)WFEditorSetting.GetOneOfSettings().enableNccInVRC3Avatar;
+#elif ENV_VRCSDK3_WORLD
+                var newVal = (int)WFEditorSetting.GetOneOfSettings().enableNccInVRC3World;
+#endif
+                if (0 <= newVal && oldVal != newVal)
+                {
+                    mat.SetInt("_GL_NCC_Enable", newVal);
+                    changed = true;
+                }
+            }
+#endif
             return changed;
         }
 
@@ -673,6 +707,17 @@ namespace UnlitWF
             return AssetDatabase.IsValidFolder("Packages/jp.whiteflare.unlitwf");
         }
 
+        public static CurrentEntironment GetCurrentEntironment()
+        {
+#if ENV_VRCSDK3_AVATAR
+            return CurrentEntironment.VRCSDK3_Avatar;
+#elif ENV_VRCSDK3_WORLD
+            return CurrentEntironment.VRCSDK3_World;
+#else
+            return CurrentEntironment.Other;
+#endif
+        }
+
         public const string KWD_EDITOR_HIDE_LMAP = "_WF_EDITOR_HIDE_LMAP";
 
         public static bool IsKwdEnableHideLmap()
@@ -720,6 +765,13 @@ namespace UnlitWF
         }
 
         #endregion
+    }
+
+    enum CurrentEntironment
+    {
+        VRCSDK3_Avatar,
+        VRCSDK3_World,
+        Other,
     }
 
     static class WFAccessor

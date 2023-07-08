@@ -97,6 +97,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
@@ -133,12 +135,13 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
             #define _WF_ALPHA_BLEND
 
-
-
-            #define _TL_ENABLE
-            #define _VC_ENABLE
-            #define _DSV_ENABLE
-            #define _TFG_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _ _TL_EDGE_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _DSV_ENABLE
+            #pragma shader_feature_local_fragment _TFG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -165,6 +168,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             #pragma fragment frag_outline_canceller
 
             #pragma target 4.5
+
+            #pragma shader_feature_local _GL_NCC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

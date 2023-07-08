@@ -116,6 +116,7 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
+    - _GL_NCC_Enable: 0
     - _HL_CapType: 0
     - _HL_CapType_1: 0
     - _HL_Enable: 0

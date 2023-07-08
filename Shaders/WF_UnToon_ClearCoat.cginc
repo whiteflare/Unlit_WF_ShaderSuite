@@ -33,6 +33,7 @@
         v2f o = vert(v);
         // SV_POSITION を上書き
         o.vs_vertex = shiftNormalAndDepthVertex(o.ws_vertex, o.normal, _CCT_Width * 0.001, -_CCT_Z_Shift);
+        affectNearClipCancel(o.vs_vertex);
 
         return o;
     }

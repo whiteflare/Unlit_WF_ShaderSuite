@@ -181,6 +181,19 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
+        [Header(Emissive AudioLink)]
+        [ToggleUI]
+            _ES_AuLinkEnable        ("[ES] Enable AudioLink", Float) = 0
+            _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
+            _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
+        [ToggleUI]
+            _ES_AU_BlackOut         ("[ES] Dont Emit when AudioLink is disabled", Range(0, 1)) = 0
+        [Enum(TREBLE,3,HIGH_MIDS,2,LOW_MIDS,1,BASS,0)]
+            _ES_AU_Band             ("[ES] Band", Float) = 0
+            _ES_AU_Slope            ("[ES] Slope", Range(0, 1)) = 0.2
+            _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
+            _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
+
         // Lit
         [WFHeader(Lit)]
         [Gamma]
@@ -202,6 +215,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
             _LBE_Enable             ("[LBE] Enable", Float) = 0
@@ -242,9 +257,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             #define _WF_ALPHA_CUTFADE
             #define _WF_MOBILE
 
-
-            #define _TL_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
+            #pragma shader_feature_local _TL_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -277,19 +293,21 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
-
-
-
-
-
-
-            #define _AO_ENABLE
-            #define _ES_ENABLE
-            #define _HL_ENABLE
-            #define _MT_ENABLE
-            #define _TR_ENABLE
-            #define _TS_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _ _MT_NORHMAP_ENABLE
+            #pragma shader_feature_local _ _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
+            #pragma shader_feature_local _HL_ENABLE
+            #pragma shader_feature_local _MT_ENABLE
+            #pragma shader_feature_local _TR_ENABLE
+            #pragma shader_feature_local _TS_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -316,6 +334,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             #pragma fragment frag_shadow
 
             #define _WF_ALPHA_CUTOUT
+            #define _GL_NCC_ENABLE
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
@@ -340,8 +359,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             #define _WF_ALPHA_CUTOUT
             #define _WF_MOBILE
 
-            #define _ES_ENABLE
-            #define _VC_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

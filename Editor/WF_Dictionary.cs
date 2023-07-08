@@ -275,6 +275,7 @@ namespace UnlitWF
             // 基本機能
             new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE"),
             new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE"),
+            new WFCustomKeywordSettingBool("_GL_NCC_Enable", "_GL_NCC_ENABLE"),
             new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             },
@@ -578,6 +579,7 @@ namespace UnlitWF
             new WFI18NTranslation("Custom Light Pos", "カスタムライトの位置"),
             new WFI18NTranslation("Disable BackLit", "逆光補正しない"),
             new WFI18NTranslation("Disable ObjectBasePos", "メッシュ原点を取得しない"),
+            new WFI18NTranslation("Cancel Near Clipping", "カメラのニアクリップを無視"),
             // Light Bake Effects
             new WFI18NTranslation("LBE", "Indirect Multiplier", "間接光の倍率"),
             new WFI18NTranslation("LBE", "Emission Multiplier", "Emissionの倍率"),
@@ -687,6 +689,20 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_DIR", "カスタム(ワールド方向)"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_LOCAL_DIR", "カスタム(ローカル方向)"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_POS", "カスタム(ワールド座標)"),
+
+            // WFEditorSetting
+            new WFI18NTranslation("WFEditorSetting", "This is the current setting used.", "これは現在有効な設定です。"),
+            new WFI18NTranslation("WFEditorSetting", "This is not the setting used now.", "これは現在有効の設定ではなく、他に有効な設定があります。"),
+            new WFI18NTranslation("WFEditorSetting", "Enable Stripping", "不要コードを除去する"),
+            new WFI18NTranslation("WFEditorSetting", "Strip Unused Variant", "未使用のバリアントを除去する"),
+            new WFI18NTranslation("WFEditorSetting", "Strip Unused Lod Fade", "未使用のLODクロスフェードを除去"),
+            new WFI18NTranslation("WFEditorSetting", "Strip Fallback", "Fallbackを除去"),
+            new WFI18NTranslation("WFEditorSetting", "Strip Meta Pass", "Metaパスを除去"),
+            new WFI18NTranslation("WFEditorSetting", "Validate Scene Materials", "ビルド時に古いマテリアルが含まれていないか検査する"),
+            new WFI18NTranslation("WFEditorSetting", "Cleanup Materials Before Avatar Build", "アバタービルド前にマテリアルをクリンナップする"),
+            new WFI18NTranslation("WFEditorSetting", "Enable Scan Projects", "Shaderインポート時にプロジェクトをスキャン"),
+            new WFI18NTranslation("WFEditorSetting", "Enable Migration When Import", "マテリアルインポート時にマテリアルを最新化"),
+            new WFI18NTranslation("WFEditorSetting", "Auto Switch Quest Shader", "Quest向けシェーダに自動で切り替える"),
 
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
