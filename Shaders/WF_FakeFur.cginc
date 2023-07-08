@@ -107,6 +107,7 @@
     void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
         o.ws_vertex = lerp(vb, vu, height);
         o.vs_vertex = UnityWorldToClipPos( o.ws_vertex );
+        affectNearClipCancel(o.vs_vertex);
         o.height = height;
     }
 

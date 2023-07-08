@@ -52,9 +52,6 @@
     DECL_SUB_TEX2D      (_LME_Texture);
     DECL_SUB_TEX2D      (_LME_MaskTex);
 #endif
-#ifdef _WF_LEGACY_TL_MASK    // マスクをfragmentでアルファに反映する場合
-    DECL_SUB_TEX2D      (_TL_MaskTex);
-#endif
 
     // 独自の Sampler で参照するサブテクスチャ =================
 
@@ -67,9 +64,7 @@
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
 
-#ifndef _WF_LEGACY_TL_MASK   // マスクをシフト時に太さに反映する場合
     DECL_VERT_TEX2D     (_TL_MaskTex);
-#endif
 #ifdef _WF_UNTOON_TESS
     DECL_VERT_TEX2D     (_TE_SmoothPowerTex);
 #endif
@@ -123,6 +118,7 @@
     float3          _GL_CustomLitPos;
     float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
+    float           _GL_NCC_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
 
     // -------------------------
 
@@ -313,7 +309,7 @@
 
     // -------------------------
 
-    FEATURE_TGL    (_TL_Enable);
+    float           _TL_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
     float           _TL_LineWidth;
     uint            _TL_LineType;
     float           _TL_Z_Shift;

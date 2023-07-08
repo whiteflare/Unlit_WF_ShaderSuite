@@ -112,11 +112,7 @@
     #endif
 
     #ifndef WF_TEX2D_OUTLINE_MASK
-        #ifndef _WF_LEGACY_TL_MASK
-            #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv, _TL_InvMaskVal).r
-        #else
-            #define WF_TEX2D_OUTLINE_MASK(uv)   SAMPLE_MASK_VALUE(_TL_MaskTex, uv, _TL_InvMaskVal).r
-        #endif
+        #define WF_TEX2D_OUTLINE_MASK(uv)       SAMPLE_MASK_VALUE_LOD(_TL_MaskTex, uv, _TL_InvMaskVal).r
     #endif
 
     #ifndef WF_TEX2D_OCCLUSION
@@ -384,6 +380,24 @@ FEATURE_TGL_END
             * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         return angle_light_camera;
     }
+
+#ifdef _GL_NCC_ENABLE
+    void affectNearClipCancel(inout float4 vs_vertex) {
+FEATURE_TGL_ON_BEGIN(_GL_NCC_Enable)
+        if(vs_vertex.w < _ProjectionParams.y * 1.01 && 0 < vs_vertex.w && !isInMirror()) {
+            #if defined(UNITY_REVERSED_Z)
+                vs_vertex.z = vs_vertex.z * 0.0001 + vs_vertex.w * 0.999;
+            #else
+                vs_vertex.z = vs_vertex.z * 0.0001 - vs_vertex.w * 0.999;
+            #endif
+        }
+FEATURE_TGL_END
+    }
+#else
+    // Dummy
+    #define affectNearClipCancel(vs_vertex)
+#endif
+
 
     ////////////////////////////
     // Color Change
@@ -1224,13 +1238,8 @@ FEATURE_TGL_END
     #ifdef _TL_ENABLE
 
         float getOutlineShiftWidth(float2 uv_main) {
-            #ifndef _WF_LEGACY_TL_MASK
-                // マスクをシフト時に太さに反映する場合
-                float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
-            #else
-                // マスクをfragmentでアルファに反映する場合
-                float mask = 1;
-            #endif
+            // マスクをシフト時に太さに反映する
+            float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
             return _TL_LineWidth * 0.01 * mask;
         }
 
@@ -1243,19 +1252,7 @@ FEATURE_TGL_ON_BEGIN(_TL_Enable)
 
             // アウトラインアルファを反映
             #ifdef _WF_ALPHA_BLEND
-                #ifndef _WF_LEGACY_TL_MASK
-                    // マスクをシフト時に太さに反映する場合
-                    color.a = _TL_LineColor.a;
-                #else
-                    // マスクをfragmentでアルファに反映する場合
-                    float mask = WF_TEX2D_OUTLINE_MASK(uv_main);
-                    if (mask < 0.1) {
-                        color.a = 0;
-                        discard;
-                    } else {
-                        color.a = _TL_LineColor.a * mask;
-                    }
-                #endif
+                color.a = _TL_LineColor.a;
             #endif
 FEATURE_TGL_END
         }
@@ -1270,14 +1267,16 @@ FEATURE_TGL_END
         if (TGL_ON(_TL_Enable)) {
 #endif
             // Normal方向にシフトとCamera方向にZ-Shiftを行う
-            return shiftNormalAndDepthVertex(ws_vertex, ws_normal, width, shift);
+            float4 vs_vertex = shiftNormalAndDepthVertex(ws_vertex, ws_normal, width, shift);
+            affectNearClipCancel(vs_vertex);
+            return vs_vertex;
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         } else {
-            return UnityObjectToClipPos( ZERO_VEC3 );
+            return DISCARD_VS_VERTEX_ZERO;
         }
 #endif
         #else
-            return UnityObjectToClipPos( ZERO_VEC3 );
+            return DISCARD_VS_VERTEX_ZERO;
         #endif
     }
 

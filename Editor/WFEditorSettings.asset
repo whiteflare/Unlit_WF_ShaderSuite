@@ -23,3 +23,5 @@ MonoBehaviour:
   enableScanProjects: 1
   enableMigrationWhenImport: 1
   autoSwitchQuestShader: 1
+  enableNccInVRC3Avatar: 1
+  enableNccInVRC3World: 0

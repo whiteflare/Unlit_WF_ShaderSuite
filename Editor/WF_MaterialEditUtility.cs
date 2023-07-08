@@ -666,10 +666,11 @@ namespace UnlitWF
                 DeleteShaderKeyword(material, props);
             }
 
-            // キーワードを整理する
-            WFCommonUtility.SetupMaterial(material);
             // Default割り当てTextureを再設定する
             ResetDefaultTextures(material, del_names);
+
+            // キーワードを整理する
+            WFCommonUtility.SetupMaterial(material);
             // 反映
             EditorUtility.SetDirty(material);
         }
@@ -698,7 +699,7 @@ namespace UnlitWF
             EditorUtility.SetDirty(material);
         }
 
-        private static void ResetDefaultTextures(Material material, HashSet<string> del_names)
+        private static void ResetDefaultTextures(Material material, IEnumerable<string> del_names)
         {
             var shader = material.shader;
             var path = AssetDatabase.GetAssetPath(shader);

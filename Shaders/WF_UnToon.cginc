@@ -110,6 +110,8 @@
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
+        affectNearClipCancel(o.vs_vertex);
+
         return o;
     }
 
@@ -209,14 +211,14 @@
     ////////////////////////////
 
     float4 shiftOutlineVertex(inout v2f o, float width, float shift) {
-        return shiftOutlineVertex(o.ws_vertex, o.normal, width, shift);
+        return shiftOutlineVertex(o.ws_vertex, o.normal, width, shift); // NCC済み
     }
 
     float4 shiftOutlineVertex(inout v2f o) {
         #ifdef _TL_ENABLE
-            return shiftOutlineVertex(o, getOutlineShiftWidth(TRANSFORM_TEX(o.uv, _MainTex)), -_TL_Z_Shift);
+            return shiftOutlineVertex(o, getOutlineShiftWidth(TRANSFORM_TEX(o.uv, _MainTex)), -_TL_Z_Shift); // NCC済み
         #else
-            return UnityObjectToClipPos( ZERO_VEC3 );
+            return DISCARD_VS_VERTEX_ZERO;
         #endif
     }
 
@@ -225,7 +227,7 @@
         // 通常の vert を使う
         v2f o = vert(v);
         // SV_POSITION を上書き
-        o.vs_vertex = shiftOutlineVertex(o);
+        o.vs_vertex = shiftOutlineVertex(o); // NCC済み
 
         return o;
     }
@@ -250,9 +252,9 @@ FEATURE_TGL_ON_BEGIN(_TL_Enable)
         v2f p0 = v[0];
         v2f p1 = v[1];
         v2f p2 = v[2];
-        p0.vs_vertex = shiftOutlineVertex(p0, width0, shift0);
-        p1.vs_vertex = shiftOutlineVertex(p1, width1, shift1);
-        p2.vs_vertex = shiftOutlineVertex(p2, width2, shift2);
+        p0.vs_vertex = shiftOutlineVertex(p0, width0, shift0); // NCC済み
+        p1.vs_vertex = shiftOutlineVertex(p1, width1, shift1); // NCC済み
+        p2.vs_vertex = shiftOutlineVertex(p2, width2, shift2); // NCC済み
 
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_OFF(_TL_LineType)) {
@@ -274,9 +276,9 @@ FEATURE_TGL_ON_BEGIN(_TL_Enable)
         v2f n0 = v[0];
         v2f n1 = v[1];
         v2f n2 = v[2];
-        n0.vs_vertex = shiftOutlineVertex(n0, -width0, shift0);
-        n1.vs_vertex = shiftOutlineVertex(n1, -width1, shift1);
-        n2.vs_vertex = shiftOutlineVertex(n2, -width2, shift2);
+        n0.vs_vertex = shiftOutlineVertex(n0, -width0, shift0); // NCC済み
+        n1.vs_vertex = shiftOutlineVertex(n1, -width1, shift1); // NCC済み
+        n2.vs_vertex = shiftOutlineVertex(n2, -width2, shift2); // NCC済み
         triStream.Append(p2);
         triStream.Append(n2);
         triStream.Append(p0);
