@@ -388,29 +388,29 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_MirrorControl_Opaque" {
 
             #pragma target 4.5
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _GL_NCC_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _NS_ENABLE
-            #pragma shader_feature_local _OVL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CHM_ENABLE
-            #pragma shader_feature_local_fragment _CLC_ENABLE
-            #pragma shader_feature_local_fragment _DFD_ENABLE
-            #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _LME_ENABLE
-            #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
+
+
+            #define_AO_ENABLE
+            #define_GL_NCC_ENABLE
+            #define_NM_ENABLE
+            #define_NS_ENABLE
+            #define_OVL_ENABLE
+            #define_TS_ENABLE
+            #define_VC_ENABLE
+
+
+
+
+
+            #define_BKT_ENABLE
+            #define_CHM_ENABLE
+            #define_CLC_ENABLE
+            #define_DFD_ENABLE
+            #define_ES_ENABLE
+            #define_HL_ENABLE
+            #define_LME_ENABLE
+            #define_MT_ENABLE
+            #define_TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -476,8 +476,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_MirrorControl_Opaque" {
             #pragma vertex vert_meta
             #pragma fragment frag_meta
 
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define_ES_ENABLE
+            #define_VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

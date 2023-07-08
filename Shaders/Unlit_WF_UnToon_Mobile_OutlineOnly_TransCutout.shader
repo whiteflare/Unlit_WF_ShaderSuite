@@ -107,10 +107,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
 
             #define _WF_ALPHA_CUTFADE
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _GL_NCC_ENABLE
-            #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+
+            #define_GL_NCC_ENABLE
+            #define_TL_ENABLE
+            #define_VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

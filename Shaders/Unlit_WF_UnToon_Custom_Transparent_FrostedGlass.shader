@@ -388,28 +388,28 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _AO_ENABLE
-            #pragma shader_feature_local _GL_NCC_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _NS_ENABLE
-            #pragma shader_feature_local _OVL_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _CGL_BLURFAST_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
-            #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CGL_ENABLE
-            #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE_1
-            #pragma shader_feature_local_fragment _LME_ENABLE
-            #pragma shader_feature_local_fragment _MT_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
+
+            #define_AO_ENABLE
+            #define_GL_NCC_ENABLE
+            #define_NM_ENABLE
+            #define_NS_ENABLE
+            #define_OVL_ENABLE
+            #define_TS_ENABLE
+            #define_VC_ENABLE
+
+
+
+
+
+
+            #define_BKT_ENABLE
+            #define_CGL_ENABLE
+            #define_ES_ENABLE
+            #define_HL_ENABLE
+            #define_HL_ENABLE_1
+            #define_LME_ENABLE
+            #define_MT_ENABLE
+            #define_TR_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonFrostedGlass
 
@@ -462,8 +462,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
             #define _WF_ALPHA_BLEND
 
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+            #define_ES_ENABLE
+            #define_VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

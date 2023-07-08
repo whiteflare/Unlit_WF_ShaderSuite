@@ -360,11 +360,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             #pragma target 4.5
             #pragma require geometry
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _ _TL_EDGE_ENABLE
-            #pragma shader_feature_local _GL_NCC_ENABLE
-            #pragma shader_feature_local _TL_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
+
+
+            #define_GL_NCC_ENABLE
+            #define_TL_ENABLE
+            #define_VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -393,26 +393,26 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
 
             #define _WF_UNTOON_POWERCAP
 
-            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
-            #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _GL_NCC_ENABLE
-            #pragma shader_feature_local _NM_ENABLE
-            #pragma shader_feature_local _NS_ENABLE
-            #pragma shader_feature_local _TS_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
-            #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CHM_ENABLE
-            #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
 
-            #pragma shader_feature_local_fragment _HL_ENABLE_1
-            #pragma shader_feature_local_fragment _HL_ENABLE_2
-            #pragma shader_feature_local_fragment _HL_ENABLE_3
-            #pragma shader_feature_local_fragment _HL_ENABLE_4
-            #pragma shader_feature_local_fragment _HL_ENABLE_5
-            #pragma shader_feature_local_fragment _HL_ENABLE_6
-            #pragma shader_feature_local_fragment _HL_ENABLE_7
+
+            #define_GL_NCC_ENABLE
+            #define_NM_ENABLE
+            #define_NS_ENABLE
+            #define_TS_ENABLE
+            #define_VC_ENABLE
+
+            #define_BKT_ENABLE
+            #define_CHM_ENABLE
+            #define_HL_ENABLE
+            #define_TR_ENABLE
+
+            #define_HL_ENABLE_1
+            #define_HL_ENABLE_2
+            #define_HL_ENABLE_3
+            #define_HL_ENABLE_4
+            #define_HL_ENABLE_5
+            #define_HL_ENABLE_6
+            #define_HL_ENABLE_7
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
