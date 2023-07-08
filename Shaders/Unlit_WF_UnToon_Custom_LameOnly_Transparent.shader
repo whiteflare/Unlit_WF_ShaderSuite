@@ -70,6 +70,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
@@ -107,6 +109,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             #define _WF_MAIN_Z_SHIFT    (-_Z_Shift)
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local_fragment _LME_ENABLE
 
             #pragma multi_compile_fwdbase

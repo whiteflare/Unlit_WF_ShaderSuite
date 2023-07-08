@@ -412,6 +412,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
             _LBE_Enable             ("[LBE] Enable", Float) = 0
@@ -422,6 +424,9 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _ClearBgSupported       ("True", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -435,7 +440,35 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             "VRCFallback" = "UnlitCutout"
         }
 
-        GrabPass { "_UnToonOutlineCancel" }
+        Pass {
+            Name "CLR_BG"
+            Tags { "LightMode" = "Always" }
+
+            Cull OFF
+            ZWrite ON
+
+            CGPROGRAM
+
+            #pragma vertex vert_clrbg
+            #pragma fragment frag_clrbg
+
+            #pragma target 4.5
+
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #pragma skip_variants SHADOWS_SCREEN SHADOWS_CUBE
+
+            #include "WF_UnToon_ClearBackground.cginc"
+
+            ENDCG
+        }
+
+        GrabPass {
+            "_UnToonOutlineCancel"
+            Tags { "LightMode" = "ForwardBase" }
+        }
 
         Pass {
             Name "OUTLINE"
@@ -458,6 +491,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TL_EDGE_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE
@@ -488,6 +522,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma fragment frag_outline_canceller
 
             #pragma target 4.5
+
+            #pragma shader_feature_local _GL_NCC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -523,6 +559,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _OVL_ENABLE
@@ -581,6 +618,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _OVL_ENABLE
@@ -638,6 +676,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _OVL_ENABLE

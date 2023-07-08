@@ -356,6 +356,8 @@ Shader "UnlitWF/WF_UnToon_Opaque" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
             _LBE_Enable             ("[LBE] Enable", Float) = 0
@@ -394,6 +396,7 @@ Shader "UnlitWF/WF_UnToon_Opaque" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _OVL_ENABLE
@@ -439,6 +442,9 @@ Shader "UnlitWF/WF_UnToon_Opaque" {
 
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
+
+            #define _GL_NCC_ENABLE
+            #define _DSV_ENABLE
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
