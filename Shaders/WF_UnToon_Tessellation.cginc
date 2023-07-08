@@ -104,6 +104,7 @@
     v2f domain(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
         v2f o = domainCore(hsConst, i, bary);
         o.vs_vertex = UnityWorldToClipPos(o.ws_vertex.xyz);
+        affectNearClipCancel(o.vs_vertex);
         return o;
     }
 
@@ -111,7 +112,7 @@
     v2f domain_outline(HsConstantOutput hsConst, const OutputPatch<v2f, 3> i, float3 bary : SV_DomainLocation) {
         v2f o = domainCore(hsConst, i, bary);
         // SV_POSITION を上書き
-        o.vs_vertex = shiftOutlineVertex(o);
+        o.vs_vertex = shiftOutlineVertex(o); // NCC済み
 
         return o;
     }
