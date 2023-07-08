@@ -116,10 +116,12 @@
         #ifdef _AL_ENABLE
             float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
             affectAlphaMask(i.uv, color);
+            #if defined(_WF_ALPHA_BLEND)
             if (color.a < _GL_ShadowCutoff) {
                 discard;
                 return float4(0, 0, 0, 0);
             }
+            #endif
         #endif
 
         // ディゾルブの考慮
