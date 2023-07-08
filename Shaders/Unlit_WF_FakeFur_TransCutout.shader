@@ -220,15 +220,15 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma target 4.5
 
 
-            #define_GL_NCC_ENABLE
-            #define_TS_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _TS_ENABLE
 
-            #define_CLC_ENABLE
-            #define_HL_ENABLE
-            #define_HL_ENABLE_1
-            #define_TR_ENABLE
-            #define_DFD_ENABLE
-            #define_DSV_ENABLE
+            #define _CLC_ENABLE
+            #define _HL_ENABLE
+            #define _HL_ENABLE_1
+            #define _TR_ENABLE
+            #define _DFD_ENABLE
+            #define _DSV_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
@@ -254,12 +254,12 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma fragment frag_fakefur_cutoff
 
 
-            #define_GL_NCC_ENABLE
-            #define_TS_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _TS_ENABLE
 
-            #define_CLC_ENABLE
-            #define_DFD_ENABLE
-            #define_DSV_ENABLE
+            #define _CLC_ENABLE
+            #define _DFD_ENABLE
+            #define _DSV_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase

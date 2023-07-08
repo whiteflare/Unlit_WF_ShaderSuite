@@ -137,11 +137,11 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
 
 
-            #define_GL_NCC_ENABLE
-            #define_TL_ENABLE
-            #define_VC_ENABLE
-            #define_DSV_ENABLE
-            #define_TFG_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _TL_ENABLE
+            #define _VC_ENABLE
+            #define _DSV_ENABLE
+            #define _TFG_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -169,7 +169,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
             #pragma target 4.5
 
-            #define_GL_NCC_ENABLE
+            #define _GL_NCC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

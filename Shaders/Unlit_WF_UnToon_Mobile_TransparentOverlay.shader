@@ -153,9 +153,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _WF_MOBILE
 
 
-            #define_AO_ENABLE
-            #define_GL_NCC_ENABLE
-            #define_VC_ENABLE
+            #define _AO_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

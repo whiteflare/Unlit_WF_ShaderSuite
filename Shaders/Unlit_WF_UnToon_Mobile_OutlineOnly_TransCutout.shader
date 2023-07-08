@@ -108,9 +108,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             #define _WF_ALPHA_CUTFADE
 
 
-            #define_GL_NCC_ENABLE
-            #define_TL_ENABLE
-            #define_VC_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _TL_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

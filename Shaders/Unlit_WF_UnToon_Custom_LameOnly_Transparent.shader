@@ -109,8 +109,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
             #define _WF_MAIN_Z_SHIFT    (-_Z_Shift)
 
 
-            #define_GL_NCC_ENABLE
-            #define_LME_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _LME_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

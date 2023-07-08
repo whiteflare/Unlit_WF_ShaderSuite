@@ -420,29 +420,29 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #define _WF_ALPHA_FRESNEL
 
 
-            #define_AO_ENABLE
-            #define_GL_NCC_ENABLE
-            #define_NM_ENABLE
-            #define_NS_ENABLE
-            #define_OVL_ENABLE
-            #define_TS_ENABLE
-            #define_VC_ENABLE
+            #define _AO_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _NM_ENABLE
+            #define _NS_ENABLE
+            #define _OVL_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
 
 
 
 
-            #define_BKT_ENABLE
-            #define_CHM_ENABLE
-            #define_CLC_ENABLE
-            #define_CRF_ENABLE
-            #define_DFD_ENABLE
-            #define_ES_ENABLE
-            #define_HL_ENABLE
-            #define_HL_ENABLE_1
-            #define_LME_ENABLE
-            #define_MT_ENABLE
-            #define_TR_ENABLE
+            #define _BKT_ENABLE
+            #define _CHM_ENABLE
+            #define _CLC_ENABLE
+            #define _CRF_ENABLE
+            #define _DFD_ENABLE
+            #define _ES_ENABLE
+            #define _HL_ENABLE
+            #define _HL_ENABLE_1
+            #define _LME_ENABLE
+            #define _MT_ENABLE
+            #define _TR_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonRefractionBack
 
@@ -495,8 +495,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
             #define _WF_ALPHA_BLEND
 
-            #define_ES_ENABLE
-            #define_VC_ENABLE
+            #define _ES_ENABLE
+            #define _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

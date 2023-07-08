@@ -249,15 +249,15 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
 
 
-            #define_AO_ENABLE
-            #define_ES_ENABLE
-            #define_GL_NCC_ENABLE
-            #define_HL_ENABLE
-            #define_MT_ENABLE
-            #define_NM_ENABLE
-            #define_TR_ENABLE
-            #define_TS_ENABLE
-            #define_VC_ENABLE
+            #define _AO_ENABLE
+            #define _ES_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _HL_ENABLE
+            #define _MT_ENABLE
+            #define _NM_ENABLE
+            #define _TR_ENABLE
+            #define _TS_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -307,8 +307,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
 
             #define _WF_MOBILE
 
-            #define_ES_ENABLE
-            #define_VC_ENABLE
+            #define _ES_ENABLE
+            #define _VC_ENABLE
 
             #pragma shader_feature EDITOR_VISUALIZATION
 

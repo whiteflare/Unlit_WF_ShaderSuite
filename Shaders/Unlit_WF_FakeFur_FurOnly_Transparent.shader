@@ -165,12 +165,12 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
             #pragma fragment frag_fakefur
 
 
-            #define_GL_NCC_ENABLE
-            #define_TS_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _TS_ENABLE
 
-            #define_CLC_ENABLE
-            #define_DFD_ENABLE
-            #define_DSV_ENABLE
+            #define _CLC_ENABLE
+            #define _DFD_ENABLE
+            #define _DSV_ENABLE
 
             #pragma target 5.0
             #pragma multi_compile_fwdbase

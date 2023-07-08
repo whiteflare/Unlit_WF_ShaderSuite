@@ -198,15 +198,15 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             #define _WF_FORCE_USE_SAMPLER
 
 
-            #define_AO_ENABLE
-            #define_GL_NCC_ENABLE
-            #define_NM_ENABLE
-            #define_NS_ENABLE
+            #define _AO_ENABLE
+            #define _GL_NCC_ENABLE
+            #define _NM_ENABLE
+            #define _NS_ENABLE
 
 
-            #define_HL_ENABLE
-            #define_HL_ENABLE_1
-            #define_MT_ENABLE
+            #define _HL_ENABLE
+            #define _HL_ENABLE_1
+            #define _MT_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
