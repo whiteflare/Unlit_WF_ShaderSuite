@@ -70,6 +70,8 @@
     #define ONE_VEC3                                float3(1, 1, 1)
     #define ONE_VEC4                                float4(1, 1, 1, 1)
 
+    #define DISCARD_VS_VERTEX_ZERO                  UnityObjectToClipPos( float3(0, 0, 0) )
+
     #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
         #define _LMAP_ENABLE
     #endif

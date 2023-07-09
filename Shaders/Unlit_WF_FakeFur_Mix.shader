@@ -191,10 +191,12 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
+            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
@@ -222,6 +224,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             #pragma target 4.5
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
@@ -255,6 +258,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             #pragma fragment frag_fakefur_cutoff
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
@@ -286,6 +290,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
             #pragma fragment frag_fakefur
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE

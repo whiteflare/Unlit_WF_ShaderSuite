@@ -66,6 +66,17 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_GL_ShadowCutoff", ctx => IsAnyIntValue(ctx, "_GL_CastShadow", p => 1 <= p)),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
+            new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx => {
+                switch(WFCommonUtility.GetCurrentEntironment())
+                {
+                    case CurrentEntironment.VRCSDK3_Avatar:
+                        return WFEditorSetting.GetOneOfSettings().enableNccInVRC3Avatar == NearClipCancelMode.PerMaterial;
+                    case CurrentEntironment.VRCSDK3_World:
+                        return WFEditorSetting.GetOneOfSettings().enableNccInVRC3World == NearClipCancelMode.PerMaterial;
+                    default:
+                        return true;
+                }
+            }),
             // 条件付きHide(Grass系列)
             new ConditionVisiblePropertyHook("_GRS_WorldYBase|_GRS_WorldYScale", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 0)),
             new ConditionVisiblePropertyHook("_GRS_HeightUVType", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1 || p == 2)),
@@ -271,77 +282,90 @@ namespace UnlitWF
             {
                 // DebugViewの保存に使っているタグはクリア
                 WF_DebugViewEditor.ClearDebugOverrideTag(newMat);
-                // シェーダキーワードを整理する
-                WFCommonUtility.SetupMaterial(newMat);
                 // 他シェーダからの切替時に動作
                 if (!WFCommonUtility.IsSupportedShader(oldShader))
                 {
-                    // OverrideTag を掃除する
-                    newMat.SetOverrideTag("RenderType", "");
-                    newMat.SetOverrideTag("VRCFallback", "");
-                    newMat.SetOverrideTag("DisableBatching", ""); // DisableBatching は OverrideTag にしても動かないが
-                    newMat.SetOverrideTag("IgnoreProjector", "");
-                    // Color を sRGB -> Linear 変換して再設定する
-                    if (newMat.HasProperty("_Color"))
-                    {
-#if UNITY_2019_1_OR_NEWER
-                        var idx = oldShader.FindPropertyIndex("_Color");
-                        if (0 <= idx)
-                        {
-                            var flags = oldShader.GetPropertyFlags(idx);
-                            if (!flags.HasFlag(UnityEngine.Rendering.ShaderPropertyFlags.HDR))
-                            {
-                                var val = newMat.GetColor("_Color");
-                                newMat.SetColor("_Color", val.linear);
-                            }
-                        }
-#else
-                        var val = oldMat.GetColor("_Color");
-                        newMat.SetColor("_Color", val.linear);
-#endif
-                    }
-                    // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
-                    if (newMat.HasProperty("_EmissionColor"))
-                    {
-                        var val = newMat.GetColor("_EmissionColor");
-                        if (val.a < 1e-4)
-                        {
-                            val.a = 1.0f;
-                            newMat.SetColor("_EmissionColor", val);
-                        }
-                    }
-                    // もし FakeFur への切り替えかつ _Cutoff が 0.5 だったら 0.2 を設定しちゃう
-                    if (newShader.name.Contains("FakeFur") && newMat.HasProperty("_Cutoff"))
-                    {
-                        var val = newMat.GetFloat("_Cutoff");
-                        if (Mathf.Abs(val - 0.5f) < Mathf.Epsilon)
-                        {
-                            val = 0.2f;
-                            newMat.SetFloat("_Cutoff", val);
-                        }
-                    }
+                    PostChangeShader_OtherToWF(oldMat, newMat, oldShader, newShader);
                 }
                 else
                 {
-                    // UnlitWFからの切替時に動作
-                    if (oldShader.name.Contains("FakeFur") && newShader.name.Contains("FakeFur"))
+                    PostChangeShader_WFToWF(oldMat, newMat, oldShader, newShader);
+                }
+                // シェーダキーワードを整理する
+                WFCommonUtility.SetupMaterial(newMat);
+            }
+        }
+
+        public static void PostChangeShader_OtherToWF(Material oldMat, Material newMat, Shader oldShader, Shader newShader)
+        {
+            // OverrideTag を掃除する
+            newMat.SetOverrideTag("RenderType", "");
+            newMat.SetOverrideTag("VRCFallback", "");
+            newMat.SetOverrideTag("DisableBatching", ""); // DisableBatching は OverrideTag にしても動かないが
+            newMat.SetOverrideTag("IgnoreProjector", "");
+
+            // Color を sRGB -> Linear 変換して再設定する
+            if (newMat.HasProperty("_Color"))
+            {
+#if UNITY_2019_1_OR_NEWER
+                var idx = oldShader.FindPropertyIndex("_Color");
+                if (0 <= idx)
+                {
+                    var flags = oldShader.GetPropertyFlags(idx);
+                    if (!flags.HasFlag(UnityEngine.Rendering.ShaderPropertyFlags.HDR))
                     {
-                        // FakeFurどうしの切り替えで、
-                        if (!oldShader.name.Contains("_Mix") && newShader.name.Contains("_Mix"))
-                        {
-                            // Mixへの切り替えならば、FR_Height2とFR_Repeat2を設定する
-                            var height = newMat.GetFloat("_FUR_Height");
-                            newMat.SetFloat("_FUR_Height2", height * 1.25f);
-                            var repeat = newMat.GetInt("_FUR_Repeat");
-                            newMat.SetInt("_FUR_Repeat2", Math.Max(1, repeat - 1));
-                        }
-                    }
-                    // 同種シェーダの切替時には RenderQueue をコピーする
-                    if (oldShader.renderQueue == newShader.renderQueue && oldMat.renderQueue != oldShader.renderQueue)
-                    {
-                        newMat.renderQueue = oldMat.renderQueue;
+                        var val = newMat.GetColor("_Color");
+                        newMat.SetColor("_Color", val.linear);
                     }
                 }
+#else
+                var val = oldMat.GetColor("_Color");
+                newMat.SetColor("_Color", val.linear);
+#endif
+            }
+
+            // もし EmissionColor の Alpha が 0 になっていたら 1 にしちゃう
+            if (newMat.HasProperty("_EmissionColor"))
+            {
+                var val = newMat.GetColor("_EmissionColor");
+                if (val.a < 1e-4)
+                {
+                    val.a = 1.0f;
+                    newMat.SetColor("_EmissionColor", val);
+                }
+            }
+
+            // もし FakeFur への切り替えかつ _Cutoff が 0.5 だったら 0.2 を設定しちゃう
+            if (newShader.name.Contains("FakeFur") && newMat.HasProperty("_Cutoff"))
+            {
+                var val = newMat.GetFloat("_Cutoff");
+                if (Mathf.Abs(val - 0.5f) < Mathf.Epsilon)
+                {
+                    val = 0.2f;
+                    newMat.SetFloat("_Cutoff", val);
+                }
+            }
+        }
+
+        public static void PostChangeShader_WFToWF(Material oldMat, Material newMat, Shader oldShader, Shader newShader)
+        {
+            // UnlitWFからの切替時に動作
+            if (oldShader.name.Contains("FakeFur") && newShader.name.Contains("FakeFur"))
+            {
+                // FakeFurどうしの切り替えで、
+                if (!oldShader.name.Contains("_Mix") && newShader.name.Contains("_Mix"))
+                {
+                    // Mixへの切り替えならば、FR_Height2とFR_Repeat2を設定する
+                    var height = newMat.GetFloat("_FUR_Height");
+                    newMat.SetFloat("_FUR_Height2", height * 1.25f);
+                    var repeat = newMat.GetInt("_FUR_Repeat");
+                    newMat.SetInt("_FUR_Repeat2", Math.Max(1, repeat - 1));
+                }
+            }
+            // 同種シェーダの切替時には RenderQueue をコピーする
+            if (oldShader.renderQueue == newShader.renderQueue && oldMat.renderQueue != oldShader.renderQueue)
+            {
+                newMat.renderQueue = oldMat.renderQueue;
             }
         }
 
@@ -903,7 +927,7 @@ namespace UnlitWF
             DrawAdditionalColorCodeField(propColor);
 
             // もしテクスチャが新たに設定されたならば、カラーを白にリセットする
-            if (EditorGUI.EndChangeCheck() && oldTexture == null && propTexture.textureValue != null)
+            if (EditorGUI.EndChangeCheck() && oldTexture == null && propTexture.textureValue != null && propColor.colorValue.maxColorComponent < 0.05f)
             {
                 propColor.colorValue = Color.white;
             }

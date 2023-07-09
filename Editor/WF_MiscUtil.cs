@@ -232,7 +232,11 @@ namespace UnlitWF
             InitList(ref result);
             for (int i = 0; i < SceneManager.sceneCount; i++)
             {
-                GetAllMaterials(SceneManager.GetSceneAt(i), result);
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (scene.isLoaded) // SceneManagerで取るときはisLoadedを確認する
+                {
+                    GetAllMaterials(scene, result);
+                }
             }
 
             return result;
@@ -241,7 +245,7 @@ namespace UnlitWF
         public IEnumerable<Material> GetAllMaterials(Scene scene, List<Material> result = null)
         {
             InitList(ref result);
-            if (scene == null || !scene.isLoaded)
+            if (scene == null) // IProcessSceneWithReport.OnProcessSceneの実装クラスから呼び出されるここではisLoadedは確認しない
             {
                 return result;
             }

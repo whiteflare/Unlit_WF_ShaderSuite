@@ -119,7 +119,7 @@ Shader "UnlitWF/WF_Water_Surface_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/06/25 (1.2.0)", Float) = 0
+            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
