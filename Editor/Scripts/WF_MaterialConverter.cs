@@ -108,10 +108,7 @@ namespace UnlitWF.Converter
 
         protected virtual void OnAfterExecute(Material[] mats, int total)
         {
-            if (0 < total)
-            {
-                Debug.LogFormat("[WF] {0}: total {1} material converted", GetShortName(), total);
-            }
+            // インクリメンタルに変換する処理があるのでここではログを出さず、呼び出し元でログを出す
         }
 
         protected virtual void OnSkipConvert(Material mat)
@@ -1016,15 +1013,6 @@ namespace UnlitWF.Converter
         protected override void OnAfterConvert(ConvertContext ctx)
         {
             // 大量に変換すると大量にログが出るので出さない
-        }
-
-        protected override void OnAfterExecute(Material[] mats, int total)
-        {
-            // 大量に変換すると大量にログが出るので出さない
-        }
-
-        protected override void OnSkipConvert(Material mat)
-        {
         }
 
         protected static List<Action<ConvertContext>> CreateConverterList()
