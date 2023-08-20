@@ -776,6 +776,8 @@ namespace UnlitWF
 
     static class WFAccessor
     {
+        #region シェーダプロパティの取得
+
         /// <summary>
         /// Shader に指定のプロパティが存在するかどうか返す。
         /// </summary>
@@ -909,6 +911,10 @@ namespace UnlitWF
             return GetPropertyDescription(shader, "_ClearBgSupported", "false").ToLower() == "true";
         }
 
+        #endregion
+
+        #region マテリアルプロパティの取得
+
         /// <summary>
         /// Material から _CurrentVersion の値を取得する。
         /// </summary>
@@ -952,6 +958,19 @@ namespace UnlitWF
             return tags.Contains(GetMaterialRenderType(mat));
         }
 
+        #endregion
+
+        #region マテリアル値の取得
+
+        public static bool GetBool(Material mat, string name, bool _default)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetInt(name) != 0;
+            }
+            return _default;
+        }
+
         public static int GetInt(Material mat, string name, int _default)
         {
             if (mat.HasProperty(name))
@@ -978,6 +997,8 @@ namespace UnlitWF
             }
             return null;
         }
+
+        #endregion
     }
 
     abstract class WFCustomKeywordSetting

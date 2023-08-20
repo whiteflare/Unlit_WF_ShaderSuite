@@ -91,18 +91,31 @@ namespace UnlitWF
                         {
                             return false;
                         }
-                        // ターゲットが設定用プロパティをどちらも持っていないならば何もしない
-                        if (!target.HasProperty("_GL_DisableBackLit") && !target.HasProperty("_GL_DisableBasePos"))
+                        // 設定用プロパティが設定されていない場合に設定する
+                        if (!WFAccessor.GetBool(target, "_GL_DisableBasePos", true))
                         {
-                            return false;
+                            return true;
                         }
-                        // 設定用プロパティがどちらも設定されているならば何もしない
-                        if (target.GetInt("_GL_DisableBackLit") != 0 && target.GetInt("_GL_DisableBasePos") != 0)
+                        if (target.HasProperty("_GL_DisableBackLit"))
                         {
-                            return false;
+                            if (!WFAccessor.GetBool(target, "_GL_DisableBackLit", true))
+                            {
+                                return true;
+                            }
                         }
-                        // それ以外は設定対象
-                        return true;
+                        else
+                        {
+                            if (WFAccessor.GetBool(target, "_TS_Enable", false) && !WFAccessor.GetBool(target, "_TS_DisableBackLit", true))
+                            {
+                                return true;
+                            }
+                            if (WFAccessor.GetBool(target, "_TR_Enable", false) && !WFAccessor.GetBool(target, "_TR_DisableBackLit", true))
+                            {
+                                return true;
+                            }
+                        }
+                        // それ以外は設定不要
+                        return false;
                     }).ToArray();
 
                     // BatchingStatic 付きのマテリアルを返却
@@ -115,8 +128,22 @@ namespace UnlitWF
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
                     foreach (var mat in targets)
                     {
-                        mat.SetInt("_GL_DisableBackLit", 1);
-                        mat.SetInt("_GL_DisableBasePos", 1);
+                        if (mat.HasProperty("_GL_DisableBackLit"))
+                        {
+                            mat.SetInt("_GL_DisableBackLit", 1);
+                        }
+                        if (mat.HasProperty("_TS_DisableBackLit") && WFAccessor.GetBool(mat, "_TS_Enable", false))
+                        {
+                            mat.SetInt("_TS_DisableBackLit", 1);
+                        }
+                        if (mat.HasProperty("_TR_DisableBackLit") && WFAccessor.GetBool(mat, "_TR_Enable", false))
+                        {
+                            mat.SetInt("_TR_DisableBackLit", 1);
+                        }
+                        if (mat.HasProperty("_GL_DisableBasePos"))
+                        {
+                            mat.SetInt("_GL_DisableBasePos", 1);
+                        }
                     }
                 }
             ),

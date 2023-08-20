@@ -740,7 +740,7 @@ namespace UnlitWF.Converter
 
     static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 7;
+        public const int VERSION = 8;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         /// <summary>
@@ -985,6 +985,9 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Match("_ES_Sharpness", "_ES_SC_Sharpness"),
             PropertyNameReplacement.Match("_ES_Speed", "_ES_SC_Speed"),
             PropertyNameReplacement.Match("_ES_AlphaScroll", "_ES_SC_AlphaScroll"),
+
+            // PropertyNameReplacement.Group("2023/08/27"),
+            PropertyNameReplacement.Match("_GL_DisableBackLit", "_TS_DisableBackLit"), // 後でTRにもコピーする
         };
 
         public static bool ExistsNeedsMigration(Material mat)
@@ -1007,6 +1010,14 @@ namespace UnlitWF.Converter
             if (mat.HasProperty(from) && mat.HasProperty(to))
             {
                 mat.SetFloat(to, mat.GetFloat(from));
+            }
+        }
+
+        protected static void CopyIntValue(Material mat, string from, string to)
+        {
+            if (mat.HasProperty(from) && mat.HasProperty(to))
+            {
+                mat.SetInt(to, mat.GetInt(from));
             }
         }
 
@@ -1072,6 +1083,13 @@ namespace UnlitWF.Converter
                             ctx.target.SetInt("_ES_SC_DirType", 2);
                             ctx.target.SetInt("_ES_SC_UVType", 1);
                         }
+                    }
+                },
+                ctx => {
+                    // _GL_DisableBackLitありの状態からなしの状態に変更されたならば
+                    if (HasOldProperty(ctx, "_GL_DisableBackLit") && HasNewProperty(ctx, "_TS_DisableBackLit"))
+                    {
+                        CopyIntValue(ctx.target, "_TS_DisableBackLit", "_TR_DisableBackLit");
                     }
                 },
             };

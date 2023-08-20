@@ -125,6 +125,8 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
             _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+        [ToggleUI]
+            _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
         // リムライト
         [WFHeaderToggle(RimLight)]
@@ -143,6 +145,8 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
             _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
             _TR_PowerSide           ("[TR] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[TR] Power Bottom", Range(0, 0.5)) = 0.1
+        [ToggleUI]
+            _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
         // Lit
         [WFHeader(Lit)]
@@ -161,8 +165,6 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
-        [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
         [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
