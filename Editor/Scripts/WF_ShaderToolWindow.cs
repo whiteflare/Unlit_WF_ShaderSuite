@@ -983,9 +983,9 @@ namespace UnlitWF
                 {
                     continue;
                 }
-                mat.SetInt("_GL_LightMode", 3); // CUSTOM_WORLD_DIR
-                mat.SetFloat("_GL_CustomAzimuth", azm);
-                mat.SetFloat("_GL_CustomAltitude", alt);
+                WFAccessor.SetInt(mat, "_GL_LightMode", 3); // CUSTOM_WORLD_DIR
+                WFAccessor.SetFloat(mat, "_GL_CustomAzimuth", azm);
+                WFAccessor.SetFloat(mat, "_GL_CustomAltitude", alt);
                 EditorUtility.SetDirty(mat);
             }
         }
