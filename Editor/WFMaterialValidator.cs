@@ -128,21 +128,15 @@ namespace UnlitWF
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
                     foreach (var mat in targets)
                     {
-                        if (mat.HasProperty("_GL_DisableBackLit"))
+                        WFAccessor.SetBool(mat, "_GL_DisableBackLit", true);
+                        WFAccessor.SetBool(mat, "_GL_DisableBasePos", true);
+                        if (WFAccessor.GetBool(mat, "_TS_Enable", false))
                         {
-                            mat.SetInt("_GL_DisableBackLit", 1);
+                            WFAccessor.SetBool(mat, "_TS_DisableBackLit", true);
                         }
-                        if (mat.HasProperty("_TS_DisableBackLit") && WFAccessor.GetBool(mat, "_TS_Enable", false))
+                        if (WFAccessor.GetBool(mat, "_TR_Enable", false))
                         {
-                            mat.SetInt("_TS_DisableBackLit", 1);
-                        }
-                        if (mat.HasProperty("_TR_DisableBackLit") && WFAccessor.GetBool(mat, "_TR_Enable", false))
-                        {
-                            mat.SetInt("_TR_DisableBackLit", 1);
-                        }
-                        if (mat.HasProperty("_GL_DisableBasePos"))
-                        {
-                            mat.SetInt("_GL_DisableBasePos", 1);
+                            WFAccessor.SetBool(mat, "_TR_DisableBackLit", true);
                         }
                     }
                 }
@@ -152,17 +146,16 @@ namespace UnlitWF
             new WFMaterialValidator(
                 targets => {
                     targets = targets.Where(target => {
-                        // ターゲットが設定用プロパティを持っていないならば何もしない
-                        if (!target.HasProperty("_AO_Enable") || !target.HasProperty("_AO_UseLightMap"))
+                        // ターゲットが設定用プロパティを両方とも持っていないならば何もしない
+                        if (target.HasProperty("_AO_Enable") && target.HasProperty("_AO_UseLightMap"))
                         {
-                            return false;
+                            // Lightmap Static のときにオンにしたほうがいい設定がオンになっているならば何もしない
+                            if (!WFAccessor.GetBool(target, "_AO_Enable", true) || !WFAccessor.GetBool(target, "_AO_UseLightMap", true))
+                            {
+                                return true;
+                            }
                         }
-                        // Lightmap Static のときにオンにしたほうがいい設定がオンになっているならば何もしない
-                        if (target.GetInt("_AO_Enable") != 0 && target.GetInt("_AO_UseLightMap") != 0)
-                        {
-                            return false;
-                        }
-                        return true;
+                        return false;
                     }).ToArray();
 
                     // LightmapStatic 付きのマテリアルを返却
@@ -175,8 +168,8 @@ namespace UnlitWF
                     // _AO_Enable と _AO_UseLightMap をオンにする
                     foreach (var mat in targets)
                     {
-                        mat.SetInt("_AO_Enable", 1);
-                        mat.SetInt("_AO_UseLightMap", 1);
+                        WFAccessor.SetBool(mat, "_AO_Enable", true);
+                        WFAccessor.SetBool(mat, "_AO_UseLightMap", true);
                     }
                 }
             ),
