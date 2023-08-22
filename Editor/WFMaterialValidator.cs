@@ -91,18 +91,31 @@ namespace UnlitWF
                         {
                             return false;
                         }
-                        // ターゲットが設定用プロパティをどちらも持っていないならば何もしない
-                        if (!target.HasProperty("_GL_DisableBackLit") && !target.HasProperty("_GL_DisableBasePos"))
+                        // 設定用プロパティが設定されていない場合に設定する
+                        if (!WFAccessor.GetBool(target, "_GL_DisableBasePos", true))
                         {
-                            return false;
+                            return true;
                         }
-                        // 設定用プロパティがどちらも設定されているならば何もしない
-                        if (target.GetInt("_GL_DisableBackLit") != 0 && target.GetInt("_GL_DisableBasePos") != 0)
+                        if (target.HasProperty("_GL_DisableBackLit"))
                         {
-                            return false;
+                            if (!WFAccessor.GetBool(target, "_GL_DisableBackLit", true))
+                            {
+                                return true;
+                            }
                         }
-                        // それ以外は設定対象
-                        return true;
+                        else
+                        {
+                            if (WFAccessor.GetBool(target, "_TS_Enable", false) && !WFAccessor.GetBool(target, "_TS_DisableBackLit", true))
+                            {
+                                return true;
+                            }
+                            if (WFAccessor.GetBool(target, "_TR_Enable", false) && !WFAccessor.GetBool(target, "_TR_DisableBackLit", true))
+                            {
+                                return true;
+                            }
+                        }
+                        // それ以外は設定不要
+                        return false;
                     }).ToArray();
 
                     // BatchingStatic 付きのマテリアルを返却
@@ -115,8 +128,16 @@ namespace UnlitWF
                     // _GL_DisableBackLit と _GL_DisableBasePos をオンにする
                     foreach (var mat in targets)
                     {
-                        mat.SetInt("_GL_DisableBackLit", 1);
-                        mat.SetInt("_GL_DisableBasePos", 1);
+                        WFAccessor.SetBool(mat, "_GL_DisableBackLit", true);
+                        WFAccessor.SetBool(mat, "_GL_DisableBasePos", true);
+                        if (WFAccessor.GetBool(mat, "_TS_Enable", false))
+                        {
+                            WFAccessor.SetBool(mat, "_TS_DisableBackLit", true);
+                        }
+                        if (WFAccessor.GetBool(mat, "_TR_Enable", false))
+                        {
+                            WFAccessor.SetBool(mat, "_TR_DisableBackLit", true);
+                        }
                     }
                 }
             ),
@@ -125,17 +146,16 @@ namespace UnlitWF
             new WFMaterialValidator(
                 targets => {
                     targets = targets.Where(target => {
-                        // ターゲットが設定用プロパティを持っていないならば何もしない
-                        if (!target.HasProperty("_AO_Enable") || !target.HasProperty("_AO_UseLightMap"))
+                        // ターゲットが設定用プロパティを両方とも持っていないならば何もしない
+                        if (target.HasProperty("_AO_Enable") && target.HasProperty("_AO_UseLightMap"))
                         {
-                            return false;
+                            // Lightmap Static のときにオンにしたほうがいい設定がオンになっているならば何もしない
+                            if (!WFAccessor.GetBool(target, "_AO_Enable", true) || !WFAccessor.GetBool(target, "_AO_UseLightMap", true))
+                            {
+                                return true;
+                            }
                         }
-                        // Lightmap Static のときにオンにしたほうがいい設定がオンになっているならば何もしない
-                        if (target.GetInt("_AO_Enable") != 0 && target.GetInt("_AO_UseLightMap") != 0)
-                        {
-                            return false;
-                        }
-                        return true;
+                        return false;
                     }).ToArray();
 
                     // LightmapStatic 付きのマテリアルを返却
@@ -148,8 +168,8 @@ namespace UnlitWF
                     // _AO_Enable と _AO_UseLightMap をオンにする
                     foreach (var mat in targets)
                     {
-                        mat.SetInt("_AO_Enable", 1);
-                        mat.SetInt("_AO_UseLightMap", 1);
+                        WFAccessor.SetBool(mat, "_AO_Enable", true);
+                        WFAccessor.SetBool(mat, "_AO_UseLightMap", true);
                     }
                 }
             ),
