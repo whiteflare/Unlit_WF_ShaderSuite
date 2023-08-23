@@ -106,7 +106,6 @@ Material:
     - _GMR_Power: 1
     - _NM_Enable: 0
     - _QuestSupported: 0
-    - _TS_DisableBackLit: 0
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 0.045542486, g: 0.04282353, b: 0.050980393, a: 1}

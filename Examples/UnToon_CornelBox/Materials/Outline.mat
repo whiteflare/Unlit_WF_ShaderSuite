@@ -62,7 +62,6 @@ Material:
     - _TL_LineType: 1
     - _TL_LineWidth: 0.3
     - _TL_Z_Shift: 0
-    - _TS_DisableBackLit: 1
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
