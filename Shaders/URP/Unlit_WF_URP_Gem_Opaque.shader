@@ -17,7 +17,6 @@
 Shader "UnlitWF_URP/WF_Gem_Opaque" {
 
     Properties {
-        // 基本
         [WFHeader(Gem Surface)]
         [HDR]
             _Color                  ("Color", Color) = (0.8, 0.4, 0.4, 1)
@@ -27,7 +26,6 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
         [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // Flake
         [WFHeaderToggle(Gem Flake)]
             _GMF_Enable             ("[GMF] Enable", Float) = 1
         [PowerSlider(2.0)]
@@ -38,7 +36,6 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
             _GMF_Twinkle            ("[GMF] Twinkle", Range(0, 4)) = 2
             _GMF_BlendNormal        ("[GMF] Blend Normal", Range(0, 1)) = 0.1
 
-        // Reflection
         [WFHeaderToggle(Gem Reflection)]
             _GMR_Enable             ("[GMR] Enable", Float) = 1
             _GMR_Power              ("[GMR] Blend Power", Range(0, 1)) = 1
@@ -50,7 +47,6 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
             _GMR_CubemapHighCut     ("[GMR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
             _GMR_BlendNormal        ("[GMR] Blend Normal", Range(0, 1)) = 0.1
 
-        // 法線マップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
@@ -59,7 +55,6 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -75,13 +70,11 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
     }
 
     SubShader {

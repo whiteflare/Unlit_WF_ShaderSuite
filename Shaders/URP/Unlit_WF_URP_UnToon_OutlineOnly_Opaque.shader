@@ -17,7 +17,6 @@
 Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
@@ -27,7 +26,6 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
         [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // アウトライン
         [WFHeaderAlwaysOn(Outline)]
             _TL_Enable              ("[TL] Enable", Float) = 1
             _TL_LineColor           ("[TL] Line Color", Color) = (0.1, 0.1, 0.1, 1)
@@ -44,7 +42,6 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
             _TL_InvMaskVal          ("[TL] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[TL] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -60,13 +57,11 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
     }
 
     SubShader {

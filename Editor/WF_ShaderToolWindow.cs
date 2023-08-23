@@ -44,7 +44,9 @@ namespace UnlitWF
         public const string PATH_GAMEOBJECT = "GameObject/";
 
 #if WF_ML_JP
-        public const string ASSETS_AUTOCNV = PATH_ASSETS + "UnlitWF のマテリアルに変換する";
+        public const string ASSETS_AUTOCNV_01 = PATH_ASSETS + "UnlitWF のマテリアルに変換する/InternalErrorShaderのみ";
+        public const string ASSETS_AUTOCNV_02 = PATH_ASSETS + "UnlitWF のマテリアルに変換する/ビルトインシェーダ以外";
+        public const string ASSETS_AUTOCNV_03 = PATH_ASSETS + "UnlitWF のマテリアルに変換する/全てのマテリアル";
 
         public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "シェーダ切替/DebugView シェーダに切り替える";
         public const string ASSETS_CNGMOBILE = PATH_ASSETS + "シェーダ切替/モバイル向けシェーダに変換する";
@@ -71,7 +73,9 @@ namespace UnlitWF
 
         public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "UnlitWFマテリアルのクリンナップ";
 #else
-        public const string ASSETS_AUTOCNV = PATH_ASSETS + "Convert UnlitWF Material";
+        public const string ASSETS_AUTOCNV_01 = PATH_ASSETS + "Convert UnlitWF Material/Only InternalErrorShader";
+        public const string ASSETS_AUTOCNV_02 = PATH_ASSETS + "Convert UnlitWF Material/Exclude Unity-builtin Shaders";
+        public const string ASSETS_AUTOCNV_03 = PATH_ASSETS + "Convert UnlitWF Material/All Materials";
 
         public const string ASSETS_DEBUGVIEW = PATH_ASSETS + "SwitchShader/Switch DebugView Shader";
         public const string ASSETS_CNGMOBILE = PATH_ASSETS + "SwitchShader/Change Mobile Shader";
@@ -102,7 +106,9 @@ namespace UnlitWF
         public const string TOOLS_LNG_EN = PATH_TOOLS + "Menu Language Change To English";
         public const string TOOLS_LNG_JP = PATH_TOOLS + "メニューの言語を日本語にする";
 
-        public const int PRI_ASSETS_AUTOCNV = 2101;
+        public const int PRI_ASSETS_AUTOCNV_01 = 2101;
+        public const int PRI_ASSETS_AUTOCNV_02 = 2102;
+        public const int PRI_ASSETS_AUTOCNV_03 = 2103;
         public const int PRI_ASSETS_DEBUGVIEW = 2202;
         public const int PRI_ASSETS_CNGMOBILE = 2203;
         public const int PRI_ASSETS_CREANUP = 2304;
@@ -131,20 +137,70 @@ namespace UnlitWF
         [MenuItem(WFMenu.MATERIAL_AUTOCNV, priority = WFMenu.PRI_MATERIAL_AUTOCNV)]
         private static void ContextMenu_AutoConvertMaterial(MenuCommand cmd)
         {
-            new Converter.WFMaterialFromOtherShaderConverter().ExecAutoConvert(cmd.context as Material);
+            ExecuteAutoConvert(cmd.context as Material);
         }
 
-        [MenuItem(WFMenu.ASSETS_AUTOCNV, priority = WFMenu.PRI_ASSETS_AUTOCNV)]
-        private static void Menu_AutoConvertMaterial()
+        [MenuItem(WFMenu.ASSETS_AUTOCNV_01, priority = WFMenu.PRI_ASSETS_AUTOCNV_01)]
+        private static void Menu_AutoConvertMaterial_01()
+        {
+            // InternalErrorShaderのみ
+            ExecuteAutoConvert(filter: mat => mat.shader.name == "Hidden/InternalErrorShader");
+        }
+
+        [MenuItem(WFMenu.ASSETS_AUTOCNV_02, priority = WFMenu.PRI_ASSETS_AUTOCNV_02)]
+        private static void Menu_AutoConvertMaterial_02()
+        {
+            // ビルトインシェーダ以外
+            ExecuteAutoConvert(filter: mat =>
+            {
+                if (mat.shader.name == "Hidden/InternalErrorShader")
+                {
+                    return true; // ビルトインシェーダの中でもInternalErrorShaderだけは変換対象にする
+                }
+                var path = AssetDatabase.GetAssetPath(mat.shader);
+                return path != null && !path.Contains("unity_builtin_extra");
+            });
+        }
+
+        [MenuItem(WFMenu.ASSETS_AUTOCNV_03, priority = WFMenu.PRI_ASSETS_AUTOCNV_03)]
+        private static void Menu_AutoConvertMaterial_03()
+        {
+            // 全てのマテリアル
+            ExecuteAutoConvert();
+        }
+
+        private static void ExecuteAutoConvert(Material mat = null, Predicate<Material> filter = null)
         {
             var converter = new Converter.WFMaterialFromOtherShaderConverter();
             Undo.SetCurrentGroupName("WF " + converter.GetShortName());
 
-            var seeker = new MaterialSeeker();
-            seeker.progressBarTitle = WFCommonUtility.DialogTitle;
-            seeker.progressBarText = "Convert Materials...";
-            seeker.progressBarSpan = 2;
-            seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, mat => converter.ExecAutoConvert(mat) != 0);
+            bool ExecuteAutoConvertOneMaterial(Material m)
+            {
+                if (filter != null && !filter(m))
+                {
+                    return false; // 条件に合致しないならば変換しない
+                }
+                return converter.ExecAutoConvert(m) != 0;
+            }
+
+            var total = 0;
+            if (mat != null)
+            {
+                total += ExecuteAutoConvertOneMaterial(mat) ? 1 : 0;
+            }
+            else
+            {
+                var seeker = new MaterialSeeker();
+                seeker.progressBarTitle = WFCommonUtility.DialogTitle;
+                seeker.progressBarText = "Convert Materials...";
+                seeker.progressBarSpan = 2;
+                total += seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, ExecuteAutoConvertOneMaterial);
+            }
+
+            if (0 < total)
+            {
+                Debug.LogFormat("[WF] {0}: total {1} material converted", converter.GetShortName(), total);
+            }
         }
 
         #endregion
@@ -187,7 +243,14 @@ namespace UnlitWF
             {
                 return;
             }
-            new Converter.WFMaterialToMobileShaderConverter().ExecAutoConvert(cmd.context as Material);
+            var converter = new Converter.WFMaterialToMobileShaderConverter();
+            Undo.SetCurrentGroupName("WF " + converter.GetShortName());
+
+            var total = converter.ExecAutoConvert(cmd.context as Material);
+            if (0 < total)
+            {
+                Debug.LogFormat("[WF] {0}: total {1} material converted", converter.GetShortName(), total);
+            }
         }
 
         [MenuItem(WFMenu.ASSETS_CNGMOBILE, priority = WFMenu.PRI_ASSETS_CNGMOBILE)]
@@ -204,7 +267,11 @@ namespace UnlitWF
             seeker.progressBarTitle = WFCommonUtility.DialogTitle;
             seeker.progressBarText = "Convert Materials...";
             seeker.progressBarSpan = 2;
-            seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, mat => converter.ExecAutoConvert(mat) != 0);
+            var total = seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, mat => converter.ExecAutoConvert(mat) != 0);
+            if (0 < total)
+            {
+                Debug.LogFormat("[WF] {0}: total {1} material converted", converter.GetShortName(), total);
+            }
         }
 
         #endregion
@@ -916,9 +983,9 @@ namespace UnlitWF
                 {
                     continue;
                 }
-                mat.SetInt("_GL_LightMode", 3); // CUSTOM_WORLD_DIR
-                mat.SetFloat("_GL_CustomAzimuth", azm);
-                mat.SetFloat("_GL_CustomAltitude", alt);
+                WFAccessor.SetInt(mat, "_GL_LightMode", 3); // CUSTOM_WORLD_DIR
+                WFAccessor.SetFloat(mat, "_GL_CustomAzimuth", azm);
+                WFAccessor.SetFloat(mat, "_GL_CustomAltitude", alt);
                 EditorUtility.SetDirty(mat);
             }
         }

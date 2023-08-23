@@ -17,7 +17,6 @@
 Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
@@ -27,7 +26,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
             _AL_Source              ("[AL] Alpha Source", Float) = 0
@@ -39,7 +37,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         [ToggleUI]
             _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
-        // メタリックマップ
         [WFHeaderToggle(Metallic)]
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
@@ -71,7 +68,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
             _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
 
-        // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [WF_Enum(UnlitWF.BlendModeHL)]
@@ -89,7 +85,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _HL_MatcapMonochrome    ("[HL] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor         ("[HL] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
-        // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
         [IntRange]
@@ -114,8 +109,9 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+        [ToggleUI]
+            _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
-        // リムライト
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -132,8 +128,9 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
             _TR_PowerSide           ("[TR] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[TR] Power Bottom", Range(0, 0.5)) = 0.1
+        [ToggleUI]
+            _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
-        // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
         [WF_FixUIToggle(1.0)]
@@ -141,7 +138,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
-        // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
@@ -166,7 +162,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -184,8 +179,6 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
@@ -196,7 +189,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
     }
 
     SubShader {
