@@ -485,7 +485,7 @@ FEATURE_TGL_END
         #define calcEmissiveWaving(i, uv_main)   (1)
     #endif
 
-    #if defined(_ES_AULINK_ENABLE) || (defined(_WF_LEGACY_FEATURE_SWITCH) && !defined(_WF_MOBILE))
+    #if defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         #include "WF_UnToon_AudioLink.cginc"
 
         float   _ES_AuLinkEnable;
