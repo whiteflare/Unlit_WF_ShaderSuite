@@ -986,7 +986,7 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Match("_ES_Speed", "_ES_SC_Speed"),
             PropertyNameReplacement.Match("_ES_AlphaScroll", "_ES_SC_AlphaScroll"),
 
-            // PropertyNameReplacement.Group("2023/08/27"),
+            PropertyNameReplacement.Group("2023/08/27"),
             PropertyNameReplacement.Match("_GL_DisableBackLit", "_TS_DisableBackLit"), // 後でTRにもコピーする
         };
 
