@@ -71,7 +71,6 @@ Material:
     - _LBE_Enable: 0
     - _LBE_IndirectChroma: 1
     - _LBE_IndirectMultiplier: 1
-    - _TS_DisableBackLit: 0
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
