@@ -63,7 +63,6 @@ Material:
     - _GL_BlendPower: 0.8
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
-    - _GL_DisableBackLit: 0
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
@@ -72,6 +71,7 @@ Material:
     - _LBE_Enable: 0
     - _LBE_IndirectChroma: 1
     - _LBE_IndirectMultiplier: 1
+    - _TS_DisableBackLit: 0
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
