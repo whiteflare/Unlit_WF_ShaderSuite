@@ -17,13 +17,11 @@
 Shader "UnlitWF/WF_FakeFur_Transparent" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
 
-        // ファー設定
         [WFHeader(Fake Fur)]
             _FUR_Height             ("[FUR] Fur Height", Range(0, 0.2)) = 0.02
         [IntRange]
@@ -48,7 +46,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [ToggleUI]
             _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 
-        // 色変換
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -57,7 +54,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
 
-        // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [WF_Enum(UnlitWF.BlendModeHL)]
@@ -88,7 +84,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _HL_InvMaskVal_1        ("[HA] Invert Mask Value", Range(0, 1)) = 0
             _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
-        // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
         [IntRange]
@@ -121,8 +116,9 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+        [ToggleUI]
+            _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
-        // リムライト
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -139,8 +135,9 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
             _TR_PowerSide           ("[TR] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[TR] Power Bottom", Range(0, 0.5)) = 0.1
+        [ToggleUI]
+            _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
-        // Distance Fade
         [WFHeaderToggle(Distance Fade)]
             _DFD_Enable             ("[DFD] Enable", Float) = 0
             _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
@@ -150,7 +147,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [ToggleUI]
             _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
 
-        // Dissolve
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
             _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
@@ -163,7 +159,6 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
             _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -181,15 +176,13 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
         [ToggleUI]
             _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0

@@ -371,9 +371,6 @@ FEATURE_TGL_END
     }
 
     float calcAngleLightCamera(float3 ws_vertex, float3 ws_light_dir) {
-        if (TGL_ON(_GL_DisableBackLit)) {
-            return 0;
-        }
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float2 xz_camera_pos = worldSpaceViewPointPos().xz - calcWorldSpaceBasePos(ws_vertex).xz;
         float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
@@ -542,7 +539,7 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
                 color.a = max(color.a, waving * es_power);
             }
         #endif
-        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || (defined(_WF_LEGACY_FEATURE_SWITCH) && !defined(_WF_MOBILE)))
+        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
             if (TGL_ON(_ES_AU_AlphaLink) && 0 < au_status) {
                 color.a = max(color.a, waving * es_power);
             }
@@ -1033,7 +1030,7 @@ FEATURE_TGL_END
 
         void affectToonShade(IN_FRAG i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, float angle_light_camera, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_TS_Enable)
-            if (isInMirror()) {
+            if (isInMirror() || TGL_ON(_TS_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
 
@@ -1123,7 +1120,7 @@ FEATURE_TGL_END
 
         void affectRimLight(IN_FRAG i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_TR_Enable)
-            if (isInMirror()) {
+            if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
             // 順光の場合はリムライトを暗くする

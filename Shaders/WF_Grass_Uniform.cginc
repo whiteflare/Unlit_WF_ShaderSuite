@@ -46,7 +46,6 @@
     #define _GL_CustomAzimuth   0
     #define _GL_CustomAltitude  0
     #define _GL_CustomLitPos    0
-    #define _GL_DisableBackLit  0
     #define _GL_DisableBasePos  0
 
     // -------------------------

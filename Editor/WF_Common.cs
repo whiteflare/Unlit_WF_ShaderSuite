@@ -776,6 +776,8 @@ namespace UnlitWF
 
     static class WFAccessor
     {
+        #region シェーダプロパティの取得
+
         /// <summary>
         /// Shader に指定のプロパティが存在するかどうか返す。
         /// </summary>
@@ -909,6 +911,10 @@ namespace UnlitWF
             return GetPropertyDescription(shader, "_ClearBgSupported", "false").ToLower() == "true";
         }
 
+        #endregion
+
+        #region マテリアルプロパティの取得
+
         /// <summary>
         /// Material から _CurrentVersion の値を取得する。
         /// </summary>
@@ -952,6 +958,19 @@ namespace UnlitWF
             return tags.Contains(GetMaterialRenderType(mat));
         }
 
+        #endregion
+
+        #region マテリアル値の取得
+
+        public static bool GetBool(Material mat, string name, bool _default)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetInt(name) != 0;
+            }
+            return _default;
+        }
+
         public static int GetInt(Material mat, string name, int _default)
         {
             if (mat.HasProperty(name))
@@ -970,6 +989,24 @@ namespace UnlitWF
             return _default;
         }
 
+        public static Color GetColor(Material mat, string name, Color _default)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetColor(name);
+            }
+            return _default;
+        }
+
+        public static Vector4 GetVector(Material mat, string name, Vector4 _default)
+        {
+            if (mat.HasProperty(name))
+            {
+                return mat.GetVector(name);
+            }
+            return _default;
+        }
+
         public static Texture GetTexture(Material mat, string name)
         {
             if (mat.HasProperty(name))
@@ -978,6 +1015,102 @@ namespace UnlitWF
             }
             return null;
         }
+
+        #endregion
+
+        #region マテリアル値の設定
+
+        public static bool SetBool(Material mat, string name, bool value)
+        {
+            if (mat.HasProperty(name))
+            {
+                mat.SetInt(name, value ? 1 : 0);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool SetInt(Material mat, string name, int value)
+        {
+            if (mat.HasProperty(name))
+            {
+                mat.SetInt(name, value);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool SetFloat(Material mat, string name, float value)
+        {
+            if (mat.HasProperty(name))
+            {
+                mat.SetFloat(name, value);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool SetColor(Material mat, string name, Color value)
+        {
+            if (mat.HasProperty(name))
+            {
+                mat.SetColor(name, value);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool SetVector(Material mat, string name, Vector4 value)
+        {
+            if (mat.HasProperty(name))
+            {
+                mat.SetVector(name, value);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool SetTexture(Material mat, string name, Texture value)
+        {
+            if (mat.HasProperty(name))
+            {
+                mat.SetTexture(name, value);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool CopyFloatValue(Material mat, string from, string to)
+        {
+            if (mat.HasProperty(from) && mat.HasProperty(to))
+            {
+                mat.SetFloat(to, mat.GetFloat(from));
+                return true;
+            }
+            return false;
+        }
+
+        public static bool CopyIntValue(Material mat, string from, string to)
+        {
+            if (mat.HasProperty(from) && mat.HasProperty(to))
+            {
+                mat.SetInt(to, mat.GetInt(from));
+                return true;
+            }
+            return false;
+        }
+
+        public static bool CopyTextureValue(Material mat, string from, string to)
+        {
+            if (mat.HasProperty(from) && mat.HasProperty(to))
+            {
+                mat.SetTexture(to, mat.GetTexture(from));
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
     }
 
     abstract class WFCustomKeywordSetting
