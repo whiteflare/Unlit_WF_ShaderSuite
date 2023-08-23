@@ -17,7 +17,6 @@
 Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
@@ -27,7 +26,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
         [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
             _AL_Source              ("[AL] Alpha Source", Float) = 0
@@ -49,7 +47,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             _AL_DstAlpha            ("[AL] Blend Dst Alpha", Float) = 10
             _AL_Z_Offset            ("[AL] Z Offset", Range(-2, 2)) = 0
 
-        // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
         [WF_FixUIToggle(1.0)]
@@ -57,7 +54,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -85,7 +81,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _ClearBgSupported       ("True", Float) = 0
