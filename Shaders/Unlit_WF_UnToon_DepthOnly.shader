@@ -22,7 +22,6 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
         [ToggleUI]
             _GL_DepthOnlyVRCCam     ("VRC Camera Only", Range(0, 1)) = 0
 
-        // Dissolve
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
             _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0

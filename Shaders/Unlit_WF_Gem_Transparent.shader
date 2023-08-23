@@ -17,7 +17,6 @@
 Shader "UnlitWF/WF_Gem_Transparent" {
 
     Properties {
-        // 基本
         [WFHeader(Gem Surface)]
         [HDR]
             _Color                  ("Color", Color) = (0.8, 0.4, 0.4, 1)
@@ -34,7 +33,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _GMB_BackCulllMode      ("[GMB] Background CullMode", Float) = 1
 
-        // Flake
         [WFHeaderToggle(Gem Flake)]
             _GMF_Enable             ("[GMF] Enable", Float) = 1
         [PowerSlider(2.0)]
@@ -47,7 +45,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GMF_Twinkle            ("[GMF] Twinkle", Range(0, 4)) = 2
             _GMF_BlendNormal        ("[GMF] Blend Normal", Range(0, 1)) = 0.1
 
-        // Reflection
         [WFHeaderToggle(Gem Reflection)]
             _GMR_Enable             ("[GMR] Enable", Float) = 1
             _GMR_Power              ("[GMR] Blend Power", Range(0, 1)) = 1
@@ -59,7 +56,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GMR_CubemapHighCut     ("[GMR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
             _GMR_BlendNormal        ("[GMR] Blend Normal", Range(0, 1)) = 0.1
 
-        // Alpha
         [WFHeader(Transparent Alpha)]
         [WF_FixNoTexture]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
@@ -76,7 +72,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [Enum(OFF,0,ON,1)]
             _AL_ZWriteBack          ("[AL] ZWrite (Back)", int) = 0
 
-        // 法線マップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
@@ -85,7 +80,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
-        // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
@@ -127,7 +121,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
             _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
 
-        // Dissolve
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
             _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
@@ -140,7 +133,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
             _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125

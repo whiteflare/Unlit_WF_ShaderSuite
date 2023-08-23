@@ -17,13 +17,11 @@
 Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
             _Z_Shift                ("Z-shift (tweak)", Range(-0.5, 0.5)) = 0
 
-        // ラメ
         [WFHeaderAlwaysOn(Lame)]
             _LME_Enable             ("[LME] Enable", Float) = 1
         [Enum(UV1,0,UV2,1)]
@@ -51,7 +49,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
         [ToggleUI]
             _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125

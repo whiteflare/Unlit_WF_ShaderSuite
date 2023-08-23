@@ -17,7 +17,6 @@
 Shader "UnlitWF_URP/WF_UnToon_Opaque" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
@@ -27,7 +26,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -36,7 +34,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [HDR]
             _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
-        // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
             _CHM_Enable             ("[CHM] Enable", Float) = 0
         [NoScaleOffset]
@@ -48,7 +45,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [HDR]
             _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
 
-        // 色変換
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -57,7 +53,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
 
-        // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
@@ -67,7 +62,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
-        // Detailノーマルマップ
         [WFHeaderToggle(Detail NormalMap)]
             _NS_Enable              ("[NS] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -79,7 +73,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [ToggleUI]
             _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
-        // メタリックマップ
         [WFHeaderToggle(Metallic)]
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
@@ -113,7 +106,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
             _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
 
-        // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [WF_Enum(UnlitWF.BlendModeHL)]
@@ -152,7 +144,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             _HL_MatcapMonochrome_1  ("[HA] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
-        // ラメ
         [WFHeaderToggle(Lame)]
             _LME_Enable             ("[LME] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -178,7 +169,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [ToggleUI]
             _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
-        // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
         [IntRange]
@@ -216,7 +206,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
-        // リムライト
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -238,7 +227,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
-        // Overlay Texture
         [WFHeaderToggle(Overlay Texture)]
             _OVL_Enable             ("[OVL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
@@ -263,7 +251,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
         [ToggleUI]
             _OVL_InvMaskVal         ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
-        // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -278,7 +265,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
-        // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
@@ -303,7 +289,6 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125

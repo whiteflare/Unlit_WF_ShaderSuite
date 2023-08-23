@@ -17,7 +17,6 @@
 Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
@@ -27,7 +26,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // アウトライン
         [WFHeaderAlwaysOn(Outline)]
             _TL_Enable              ("[TL] Enable", Float) = 1
             _TL_LineColor           ("[TL] Line Color", Color) = (0.1, 0.1, 0.1, 1)
@@ -44,7 +42,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _TL_InvMaskVal          ("[TL] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[TL] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
-        // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -53,7 +50,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [HDR]
             _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
-        // 3chカラーマスク
         [WFHeaderToggle(3ch Color Mask)]
             _CHM_Enable             ("[CHM] Enable", Float) = 0
         [NoScaleOffset]
@@ -65,7 +61,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [HDR]
             _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
 
-        // 色変換
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -74,7 +69,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
 
-        // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
@@ -84,7 +78,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
-        // Detailノーマルマップ
         [WFHeaderToggle(Detail NormalMap)]
             _NS_Enable              ("[NS] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -96,7 +89,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [ToggleUI]
             _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
-        // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [WF_Enum(UnlitWF.BlendModeHL)]
@@ -249,7 +241,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _HL_MatcapMonochrome_7  ("[HG] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor_7       ("[HG] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
-        // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
         [IntRange]
@@ -287,7 +278,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
-        // リムライト
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -309,7 +299,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
-        // Distance Fade
         [WFHeaderToggle(Distance Fade)]
             _DFD_Enable             ("[DFD] Enable", Float) = 0
             _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
@@ -319,7 +308,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [ToggleUI]
             _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
 
-        // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -334,7 +322,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
-        // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
@@ -372,7 +359,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
             _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
 
-        // Dissolve
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
             _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
@@ -385,7 +371,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
             _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
 
-        // Fog
         [WFHeaderToggle(Fog)]
             _TFG_Enable              ("[TFG] Enable", Float) = 0
             _TFG_Color               ("[TFG] Color", Color) = (0.5, 0.5, 0.6, 1)
@@ -397,7 +382,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [WF_Vector3]
             _TFG_Scale               ("[TFG] Scale", Vector) = (1, 1, 1, 0)
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125

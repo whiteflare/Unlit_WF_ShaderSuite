@@ -17,13 +17,11 @@
 Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
 
-        // ファー設定
         [WFHeader(Fake Fur)]
             _FUR_Height             ("[FUR] Fur Height", Range(0, 0.2)) = 0.02
         [IntRange]
@@ -48,7 +46,6 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
         [ToggleUI]
             _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 
-        // 色変換
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -57,7 +54,6 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
 
-        // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [WF_Enum(UnlitWF.BlendModeHL)]
@@ -92,7 +88,6 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
             _HL_MatcapMonochrome_1  ("[HA] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
-        // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
         [IntRange]
@@ -128,7 +123,6 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
-        // リムライト
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -148,7 +142,6 @@ Shader "UnlitWF_URP/WF_FakeFur_Transparent" {
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
