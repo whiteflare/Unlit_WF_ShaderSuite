@@ -17,7 +17,6 @@
 Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
@@ -26,7 +25,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
             _Z_Shift                ("Z-shift (tweak)", Range(-0.5, 0.5)) = 0
 
-        // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
             _AL_Source              ("[AL] Alpha Source", Float) = 0
@@ -36,7 +34,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
 
-        // アウトライン
         [WFHeaderAlwaysOn(Outline)]
             _TL_Enable              ("[TL] Enable", Float) = 1
             _TL_LineColor           ("[TL] Line Color", Color) = (0.1, 0.1, 0.1, 1)
@@ -53,7 +50,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             _TL_InvMaskVal          ("[TL] Invert Mask Value", Float) = 0
             _TL_Z_Shift             ("[TL] Z-shift (tweak)", Range(-0.1, 0.5)) = 0
 
-        // Dissolve
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
             _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
@@ -66,7 +62,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
             _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
             _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
 
-        // Fog
         [WFHeaderToggle(Fog)]
             _TFG_Enable              ("[TFG] Enable", Float) = 0
             _TFG_Color               ("[TFG] Color", Color) = (0.5, 0.5, 0.6, 1)
@@ -78,7 +73,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
         [WF_Vector3]
             _TFG_Scale               ("[TFG] Scale", Vector) = (1, 1, 1, 0)
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -100,7 +94,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
     }
 
     SubShader {
