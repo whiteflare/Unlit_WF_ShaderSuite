@@ -9,8 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_Gem_Transparent
   m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 5
+  m_ShaderKeywords: _GL_AUTO_ENABLE _GMB_ENABLE _GMF_ENABLE _GMR_ENABLE
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -106,7 +106,6 @@ Material:
     - _GMR_Power: 1
     - _NM_Enable: 0
     - _QuestSupported: 0
-    - _TS_DisableBackLit: 0
     - _UseVertexColor: 0
     m_Colors:
     - _Color: {r: 0.6952468, g: 0.64161134, b: 1, a: 1}

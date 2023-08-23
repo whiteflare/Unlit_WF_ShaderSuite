@@ -261,7 +261,7 @@ Material:
     - _TR_BlendNormal: 0
     - _TR_BlendNormal2: 0
     - _TR_BlendType: 0
-    - _TR_DisableBackLit: 1
+    - _TR_DisableBackLit: 0
     - _TR_Enable: 0
     - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
@@ -277,7 +277,7 @@ Material:
     - _TS_3rdFeather: 0.05
     - _TS_BlendNormal: 0.1
     - _TS_BlendNormal2: 0.1
-    - _TS_DisableBackLit: 1
+    - _TS_DisableBackLit: 0
     - _TS_Enable: 0
     - _TS_FixContrast: 0
     - _TS_InvMaskVal: 0
