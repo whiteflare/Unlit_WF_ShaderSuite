@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
+Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_TransCutout" {
 
     Properties {
         // 基本
@@ -23,9 +23,21 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [HDR]
             _Color                  ("Color", Color) = (1, 1, 1, 1)
         [Enum(OFF,0,FRONT,1,BACK,2)]
-            _CullMode               ("Cull Mode", int) = 2
+            _CullMode               ("Cull Mode", int) = 0
         [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
+
+        // Alpha
+        [WFHeader(Transparent Alpha)]
+        [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
+            _AL_Source              ("[AL] Alpha Source", Float) = 0
+        [NoScaleOffset]
+            _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
+        [ToggleUI]
+            _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
+            _Cutoff                 ("[AL] Cutoff Threshold", Range(0, 1)) = 0.5
+        [ToggleUI]
+            _AL_AlphaToMask         ("[AL] Alpha-To-Coverage (use MSAA)", Float) = 0
 
         // アウトライン
         [WFHeaderAlwaysOn(Outline)]
@@ -430,18 +442,18 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque", Float) = 0
+            _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _Category               ("BRP|UnToon|Custom/PowerCap_Outline|Opaque", Float) = 0
+            _Category               ("BRP|UnToon|Custom/PowerCap_Outline|TransCutout", Float) = 0
     }
 
     SubShader {
         Tags {
-            "RenderType" = "Opaque"
-            "Queue" = "Geometry"
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest"
             "DisableBatching" = "True"
-            "VRCFallback" = "Unlit"
+            "VRCFallback" = "UnlitCutout"
         }
 
         Pass {
@@ -449,6 +461,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull FRONT
+            Blend One Zero, One OneMinusSrcAlpha
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 
@@ -458,6 +472,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
 
             #pragma target 4.5
             #pragma require geometry
+
+            #define _WF_ALPHA_CUTFADE
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TL_EDGE_ENABLE
@@ -484,6 +500,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             Tags { "LightMode" = "ForwardBase" }
 
             Cull [_CullMode]
+            Blend One Zero, One OneMinusSrcAlpha
+            AlphaToMask [_AL_AlphaToMask]
 
             CGPROGRAM
 
@@ -492,7 +510,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
 
             #pragma target 4.5
 
-            #define _WF_UNTOON_POWERCAP
+            #define _WF_ALPHA_CUTFADE
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
@@ -536,11 +554,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
-        UsePass "UnlitWF/WF_UnToon_Opaque/META"
+        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_TransCutout/META"
     }
 
-    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"
+    FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout"
 
     CustomEditor "UnlitWF.ShaderCustomEditor"
 }

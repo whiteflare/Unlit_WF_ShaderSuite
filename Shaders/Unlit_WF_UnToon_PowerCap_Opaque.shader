@@ -48,6 +48,15 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
         [HDR]
             _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
 
+        // 色変換
+        [WFHeaderToggle(Color Change)]
+            _CLC_Enable             ("[CLC] Enable", Float) = 0
+        [ToggleUI]
+            _CLC_Monochrome         ("[CLC] monochrome", Range(0, 1)) = 0
+            _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
+            _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
+            _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
+
         // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
@@ -283,6 +292,16 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
+        // Distance Fade
+        [WFHeaderToggle(Distance Fade)]
+            _DFD_Enable             ("[DFD] Enable", Float) = 0
+            _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DFD_Power              ("[DFD] Power", Range(0, 1)) = 1
+        [ToggleUI]
+            _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
+
         // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
@@ -433,6 +452,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CHM_ENABLE
+            #pragma shader_feature_local_fragment _CLC_ENABLE
+            #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _TFG_ENABLE
