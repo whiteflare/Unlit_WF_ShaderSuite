@@ -116,7 +116,6 @@
     float           _GL_CustomAzimuth;
     float           _GL_CustomAltitude;
     float3          _GL_CustomLitPos;
-    float           _GL_DisableBackLit;
     float           _GL_DisableBasePos;
     float           _GL_NCC_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
 
@@ -275,6 +274,7 @@
     float           _TS_FixContrast;
     float           _TS_MinDist;
     float           _TS_MaxDist;
+    float           _TS_DisableBackLit;
 
     // -------------------------
 
@@ -289,6 +289,7 @@
     float           _TR_PowerTop;
     float           _TR_PowerSide;
     float           _TR_PowerBottom;
+    float           _TR_DisableBackLit;
 
     // -------------------------
 

@@ -17,7 +17,6 @@
 Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
@@ -26,7 +25,6 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
         [ToggleUI]
             _AL_AlphaToMask         ("Alpha-To-Coverage (use MSAA)", Float) = 0
 
-        // ファー設定
         [WFHeader(Fake Fur)]
             _FUR_Height             ("[FUR] Fur Height", Range(0, 0.2)) = 0.02
         [IntRange]
@@ -51,7 +49,6 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
         [ToggleUI]
             _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 
-        // 色変換
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -60,7 +57,6 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
 
-        // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
         [IntRange]
@@ -93,8 +89,9 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
             _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+        [ToggleUI]
+            _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -110,13 +107,11 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout" {
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
     }
 
     SubShader {
