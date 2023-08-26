@@ -113,6 +113,9 @@
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
 
+        // EmissiveScroll
+        affectEmissiveScroll(i, uv_main, color);
+
         // フレネル
         affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
         // ディゾルブ
@@ -172,6 +175,9 @@
 
         // Anti-Glare とライト色ブレンドを同時に計算
         color.rgb *= i.light_color;
+
+        // EmissiveScroll
+        affectEmissiveScroll(i, uv_main, color);
 
         // フレネル
         affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);

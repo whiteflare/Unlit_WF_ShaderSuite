@@ -10,7 +10,7 @@ Material:
   m_Name: PurpleGem
   m_Shader: {fileID: 4800000, guid: 21f6eaa1dd1f25c4cb29a42c4ff5d98f, type: 3}
   m_ShaderKeywords: _GL_AUTO_ENABLE _GMB_ENABLE _GMF_ENABLE _GMR_ENABLE
-  m_LightmapFlags: 5
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -28,6 +28,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DSV_CtrlTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -55,12 +59,30 @@ Material:
     - _DSV_Invert: 0
     - _DSV_SparkWidth: 0
     - _DSV_TexIsSRGB: 1
+    - _ES_AU_AlphaLink: 0
+    - _ES_AU_Band: 0
+    - _ES_AU_BlackOut: 0
+    - _ES_AU_MaxThreshold: 0.5
+    - _ES_AU_MaxValue: 2
+    - _ES_AU_MinThreshold: 0.1
+    - _ES_AU_MinValue: 0
+    - _ES_AU_Slope: 0.2
+    - _ES_AuLinkEnable: 0
+    - _ES_BlendType: 0
+    - _ES_Enable: 0
+    - _ES_SC_AlphaScroll: 0
+    - _ES_SC_DirType: 0
+    - _ES_SC_LevelOffset: 0
+    - _ES_SC_Shape: 0
+    - _ES_SC_Sharpness: 1
+    - _ES_SC_Speed: 2
+    - _ES_SC_UVType: 0
+    - _ES_ScrollEnable: 0
     - _FallBack: 0
     - _FlipMirror: 0
     - _GL_BlendPower: 0.8
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
-    - _GL_DisableBackLit: 0
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
@@ -88,6 +110,8 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 0.419708, b: 0.52527535, a: 1}
     - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ES_SC_Direction: {r: 0, g: -10, b: 0, a: 0}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _GMB_ColorBack: {r: 0.73073506, g: 0.18900001, b: 1, a: 1}
 --- !u!1002 &2100001

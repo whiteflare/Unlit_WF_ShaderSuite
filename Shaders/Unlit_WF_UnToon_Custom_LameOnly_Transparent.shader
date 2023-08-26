@@ -17,13 +17,11 @@
 Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CullMode               ("Cull Mode", int) = 2
             _Z_Shift                ("Z-shift (tweak)", Range(-0.5, 0.5)) = 0
 
-        // ラメ
         [WFHeaderAlwaysOn(Lame)]
             _LME_Enable             ("[LME] Enable", Float) = 1
         [Enum(UV1,0,UV2,1)]
@@ -51,7 +49,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
         [ToggleUI]
             _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -67,15 +64,13 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
         [ToggleUI]
             _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/LameOnly|Transparent", Float) = 0

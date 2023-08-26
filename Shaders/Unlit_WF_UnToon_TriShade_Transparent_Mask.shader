@@ -17,7 +17,6 @@
 Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
 
     Properties {
-        // 基本
         [WFHeader(Base)]
             _MainTex                ("Main Texture", 2D) = "white" {}
         [HDR]
@@ -25,12 +24,10 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [ToggleUI]
             _UseVertexColor         ("Use Vertex Color", Range(0, 1)) = 0
 
-        // StencilMask
         [WFHeader(Stencil Mask)]
         [Enum(A_1000,8,B_1001,9,C_1010,10,D_1100,11)]
             _StencilMaskID          ("ID", int) = 8
 
-        // Alpha
         [WFHeader(Transparent Alpha)]
         [Enum(MAIN_TEX_ALPHA,0,MASK_TEX_RED,1,MASK_TEX_ALPHA,2)]
             _AL_Source              ("[AL] Alpha Source", Float) = 0
@@ -44,7 +41,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [Enum(OFF,0,ON,1)]
             _AL_ZWriteBack          ("[AL] ZWrite (Back)", int) = 0
 
-        // 裏面テクスチャ
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -53,7 +49,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [HDR]
             _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
-        // ノーマルマップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
@@ -63,7 +58,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
-        // Detailノーマルマップ
         [WFHeaderToggle(Detail NormalMap)]
             _NS_Enable              ("[NS] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -75,7 +69,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [ToggleUI]
             _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
-        // メタリックマップ
         [WFHeaderToggle(Metallic)]
             _MT_Enable              ("[MT] Enable", Float) = 0
             _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
@@ -109,7 +102,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
             _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
 
-        // Matcapハイライト
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [WF_Enum(UnlitWF.BlendModeHL)]
@@ -152,7 +144,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _HL_MatcapMonochrome_1  ("[HA] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor_1       ("[HA] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
-        // 階調影
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
         [WF_FixFloat(3.0)]
@@ -187,8 +178,9 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+        [ToggleUI]
+            _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
-        // リムライト
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -207,8 +199,9 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
             _TR_PowerSide           ("[TR] Power Side", Range(0, 0.5)) = 0.1
             _TR_PowerBottom         ("[TR] Power Bottom", Range(0, 0.5)) = 0.1
+        [ToggleUI]
+            _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
-        // Overlay Texture
         [WFHeaderToggle(Overlay Texture)]
             _OVL_Enable             ("[OVL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
@@ -233,7 +226,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [ToggleUI]
             _OVL_InvMaskVal         ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
-        // Ambient Occlusion
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -248,7 +240,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
-        // Emission
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
@@ -275,7 +266,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
-        // Fog
         [WFHeaderToggle(Fog)]
             _TFG_Enable              ("[TFG] Enable", Float) = 0
             _TFG_Color               ("[TFG] Color", Color) = (0.5, 0.5, 0.6, 1)
@@ -287,7 +277,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [WF_Vector3]
             _TFG_Scale               ("[TFG] Scale", Vector) = (1, 1, 1, 0)
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -306,8 +295,6 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
@@ -318,7 +305,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0

@@ -184,8 +184,8 @@ namespace UnlitWF
                     ctx.editor.RegisterPropertyChangeUndo("Assign MainTex to MaskTexture");
                     foreach(var mat in WFCommonUtility.AsMaterials(ctx.editor.targets))
                     {
-                        mat.SetTexture("_TR_MaskTex", mat.GetTexture("_MainTex"));
-                        mat.SetFloat("_TR_InvMaskVal", 0);
+                        WFAccessor.SetTexture(mat, "_TR_MaskTex", mat.GetTexture("_MainTex"));
+                        WFAccessor.SetFloat(mat, "_TR_InvMaskVal", 0);
                     }
                 }
             }),
@@ -342,7 +342,7 @@ namespace UnlitWF
                 if (Mathf.Abs(val - 0.5f) < Mathf.Epsilon)
                 {
                     val = 0.2f;
-                    newMat.SetFloat("_Cutoff", val);
+                    WFAccessor.SetFloat(newMat, "_Cutoff", val);
                 }
             }
         }
@@ -357,9 +357,9 @@ namespace UnlitWF
                 {
                     // Mixへの切り替えならば、FR_Height2とFR_Repeat2を設定する
                     var height = newMat.GetFloat("_FUR_Height");
-                    newMat.SetFloat("_FUR_Height2", height * 1.25f);
                     var repeat = newMat.GetInt("_FUR_Repeat");
-                    newMat.SetInt("_FUR_Repeat2", Math.Max(1, repeat - 1));
+                    WFAccessor.SetFloat(newMat, "_FUR_Height2", height * 1.25f);
+                    WFAccessor.SetInt(newMat, "_FUR_Repeat2", Math.Max(1, repeat - 1));
                 }
             }
             // 同種シェーダの切替時には RenderQueue をコピーする
@@ -741,12 +741,12 @@ namespace UnlitWF
                 // 2影
                 if (2 <= steps && m.HasProperty("_TS_2ndBorder"))
                 {
-                    m.SetFloat("_TS_2ndBorder", pos1 * (steps - 1.0f) / steps);
+                    WFAccessor.SetFloat(m, "_TS_2ndBorder", pos1 * (steps - 1.0f) / steps);
                 }
                 // 3影
                 if (2 <= steps && m.HasProperty("_TS_3rdBorder"))
                 {
-                    m.SetFloat("_TS_3rdBorder", pos1 * (steps - 2.0f) / steps);
+                    WFAccessor.SetFloat(m, "_TS_3rdBorder", pos1 * (steps - 2.0f) / steps);
                 }
             }
         }

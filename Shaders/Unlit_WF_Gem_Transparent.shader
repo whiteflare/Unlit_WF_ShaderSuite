@@ -17,7 +17,6 @@
 Shader "UnlitWF/WF_Gem_Transparent" {
 
     Properties {
-        // 基本
         [WFHeader(Gem Surface)]
         [HDR]
             _Color                  ("Color", Color) = (0.8, 0.4, 0.4, 1)
@@ -34,7 +33,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _GMB_BackCulllMode      ("[GMB] Background CullMode", Float) = 1
 
-        // Flake
         [WFHeaderToggle(Gem Flake)]
             _GMF_Enable             ("[GMF] Enable", Float) = 1
         [PowerSlider(2.0)]
@@ -47,7 +45,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GMF_Twinkle            ("[GMF] Twinkle", Range(0, 4)) = 2
             _GMF_BlendNormal        ("[GMF] Blend Normal", Range(0, 1)) = 0.1
 
-        // Reflection
         [WFHeaderToggle(Gem Reflection)]
             _GMR_Enable             ("[GMR] Enable", Float) = 1
             _GMR_Power              ("[GMR] Blend Power", Range(0, 1)) = 1
@@ -59,7 +56,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _GMR_CubemapHighCut     ("[GMR] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
             _GMR_BlendNormal        ("[GMR] Blend Normal", Range(0, 1)) = 0.1
 
-        // Alpha
         [WFHeader(Transparent Alpha)]
         [WF_FixNoTexture]
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
@@ -76,7 +72,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [Enum(OFF,0,ON,1)]
             _AL_ZWriteBack          ("[AL] ZWrite (Back)", int) = 0
 
-        // 法線マップ
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
@@ -85,7 +80,47 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
-        // Dissolve
+        [WFHeaderToggle(Emission)]
+            _ES_Enable              ("[ES] Enable", Float) = 0
+        [HDR]
+            _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
+        [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
+            _ES_BlendType           ("[ES] Blend Type", Float) = 0
+
+        [Header(Emissive Scroll)]
+        [ToggleUI]
+            _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
+        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
+            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
+        [ToggleUI]
+            _ES_SC_AlphaScroll      ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
+            _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _ES_SC_UVType           ("[ES] UV Type", Float) = 0
+        [WF_Vector3]
+            _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
+            _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
+            _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
+
+        [Header(Emissive AudioLink)]
+        [ToggleUI]
+            _ES_AuLinkEnable        ("[ES] Enable AudioLink", Float) = 0
+            _ES_AU_MinValue         ("[ES] Emission Multiplier (Min)", Range(0, 1)) = 0
+            _ES_AU_MaxValue         ("[ES] Emission Multiplier (Max)", Range(0, 8)) = 2
+        [ToggleUI]
+            _ES_AU_AlphaLink        ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
+        [ToggleUI]
+            _ES_AU_BlackOut         ("[ES] Dont Emit when AudioLink is disabled", Range(0, 1)) = 0
+        [Enum(TREBLE,3,HIGH_MIDS,2,LOW_MIDS,1,BASS,0)]
+            _ES_AU_Band             ("[ES] Band", Float) = 0
+            _ES_AU_Slope            ("[ES] Slope", Range(0, 1)) = 0.2
+            _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
+            _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
+
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
             _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
@@ -98,7 +133,6 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
             _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
 
-        // Lit
         [WFHeader(Lit)]
         [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
@@ -114,13 +148,11 @@ Shader "UnlitWF/WF_Gem_Transparent" {
         [WF_Vector3]
             _GL_CustomLitPos        ("Custom Light Pos", Vector) = (0, 3, 0)
         [ToggleUI]
-            _GL_DisableBackLit      ("Disable BackLit", Range(0, 1)) = 0
-        [ToggleUI]
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/07/10 (1.3.0)", Float) = 0
+            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -155,10 +187,13 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #define _WF_FACE_BACK
             #define _WF_MOBILE
 
+            #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _DSV_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local _DSV_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -190,10 +225,13 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
 
+            #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
+            #pragma shader_feature_local _DSV_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local _DSV_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
