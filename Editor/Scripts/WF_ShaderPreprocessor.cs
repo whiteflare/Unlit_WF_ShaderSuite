@@ -20,17 +20,6 @@
 // #define WF_STRIP_LOG_RESULT // Strippingの結果をログ出力する
 // #define WF_STRIP_LOG_VERBOSE // Strip中の挙動をログ出力する
 
-// VRCSDK有無の判定ここから //////
-#if VRC_SDK_VRCSDK3
-#define ENV_VRCSDK3
-#if UDON
-#define ENV_VRCSDK3_WORLD
-#else
-#define ENV_VRCSDK3_AVATAR
-#endif
-#endif
-// VRCSDK有無の判定ここまで //////
-
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
