@@ -947,6 +947,42 @@ namespace UnlitWF
             return tags.Contains(GetMaterialRenderType(mat));
         }
 
+        public static bool IsVariant(Material mat)
+        {
+#if UNITY_2022_1_OR_NEWER
+            return mat.isVariant;
+#else
+            return false;
+#endif
+        }
+
+        public static bool IsVariant(UnityEngine.Object[] mats)
+        {
+#if UNITY_2022_1_OR_NEWER
+            return WFCommonUtility.AsMaterials(mats).Any(IsVariant);
+#else
+            return false;
+#endif
+        }
+
+        public static bool IsPropertyLockedByAncestor(Material mat, string name)
+        {
+#if UNITY_2022_1_OR_NEWER
+            return mat.IsPropertyLockedByAncestor(name);
+#else
+            return false;
+#endif
+        }
+
+        public static bool IsPropertyLockedByAncestor(UnityEngine.Object[] mats, string name)
+        {
+#if UNITY_2022_1_OR_NEWER
+            return WFCommonUtility.AsMaterials(mats).Any(mat => IsPropertyLockedByAncestor(mat, name));
+#else
+            return false;
+#endif
+        }
+
         #endregion
 
         #region マテリアル値の取得
@@ -1005,13 +1041,18 @@ namespace UnlitWF
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region マテリアル値の設定
+#region マテリアル値の設定
+
+        private static bool CanWrite(Material mat, string name)
+        {
+            return mat.HasProperty(name) && !IsPropertyLockedByAncestor(mat, name);
+        }
 
         public static bool SetBool(Material mat, string name, bool value)
         {
-            if (mat.HasProperty(name))
+            if (CanWrite(mat, name))
             {
                 mat.SetInt(name, value ? 1 : 0);
                 return true;
@@ -1021,7 +1062,7 @@ namespace UnlitWF
 
         public static bool SetInt(Material mat, string name, int value)
         {
-            if (mat.HasProperty(name))
+            if (CanWrite(mat, name))
             {
                 mat.SetInt(name, value);
                 return true;
@@ -1031,7 +1072,7 @@ namespace UnlitWF
 
         public static bool SetFloat(Material mat, string name, float value)
         {
-            if (mat.HasProperty(name))
+            if (CanWrite(mat, name))
             {
                 mat.SetFloat(name, value);
                 return true;
@@ -1041,7 +1082,7 @@ namespace UnlitWF
 
         public static bool SetColor(Material mat, string name, Color value)
         {
-            if (mat.HasProperty(name))
+            if (CanWrite(mat, name))
             {
                 mat.SetColor(name, value);
                 return true;
@@ -1051,7 +1092,7 @@ namespace UnlitWF
 
         public static bool SetVector(Material mat, string name, Vector4 value)
         {
-            if (mat.HasProperty(name))
+            if (CanWrite(mat, name))
             {
                 mat.SetVector(name, value);
                 return true;
@@ -1061,7 +1102,7 @@ namespace UnlitWF
 
         public static bool SetTexture(Material mat, string name, Texture value)
         {
-            if (mat.HasProperty(name))
+            if (CanWrite(mat, name))
             {
                 mat.SetTexture(name, value);
                 return true;
@@ -1071,7 +1112,7 @@ namespace UnlitWF
 
         public static bool CopyFloatValue(Material mat, string from, string to)
         {
-            if (mat.HasProperty(from) && mat.HasProperty(to))
+            if (mat.HasProperty(from) && CanWrite(mat, to))
             {
                 mat.SetFloat(to, mat.GetFloat(from));
                 return true;
@@ -1081,7 +1122,7 @@ namespace UnlitWF
 
         public static bool CopyIntValue(Material mat, string from, string to)
         {
-            if (mat.HasProperty(from) && mat.HasProperty(to))
+            if (mat.HasProperty(from) && CanWrite(mat, to))
             {
                 mat.SetInt(to, mat.GetInt(from));
                 return true;
@@ -1091,7 +1132,7 @@ namespace UnlitWF
 
         public static bool CopyTextureValue(Material mat, string from, string to)
         {
-            if (mat.HasProperty(from) && mat.HasProperty(to))
+            if (mat.HasProperty(from) && CanWrite(mat, to))
             {
                 mat.SetTexture(to, mat.GetTexture(from));
                 return true;
@@ -1099,7 +1140,7 @@ namespace UnlitWF
             return false;
         }
 
-        #endregion
+#endregion
     }
 
     abstract class WFCustomKeywordSetting
