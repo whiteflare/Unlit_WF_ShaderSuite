@@ -173,7 +173,7 @@
         // Overlay Texture
         affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 1, 0.5), color);
         // Distance Fade
-        affectDistanceFade(i, facing, color);
+        affectDistanceFade(i, uv_main, facing, color);
         // Outline
         affectOutline(uv_main, color);
 
