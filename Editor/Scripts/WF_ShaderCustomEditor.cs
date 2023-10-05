@@ -97,6 +97,7 @@ namespace UnlitWF
             new SingleLineTexPropertyHook( "_LME_Color", "_LME_Texture" ),
             new SingleLineTexPropertyHook( "_TL_LineColor", "_TL_CustomColorTex" ),
             new SingleLineTexPropertyHook( "_OVL_Color", "_OVL_OverlayTex" ),
+            new SingleLineTexPropertyHook( "_DFD_Color", "_DFD_ColorTex" ),
 
             // MinMaxSlider
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist", "[TE] FadeOut Distance"),
