@@ -91,6 +91,8 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Transparent" {
 
         [WFHeaderToggle(Distance Fade)]
             _DFD_Enable             ("[DFD] Enable", Float) = 0
+        [NoScaleOffset]
+            _DFD_ColorTex           ("[DFD] Color Texture", 2D) = "white" {}
             _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
             _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
             _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
