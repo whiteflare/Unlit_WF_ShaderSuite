@@ -97,6 +97,7 @@ namespace UnlitWF
             new SingleLineTexPropertyHook( "_LME_Color", "_LME_Texture" ),
             new SingleLineTexPropertyHook( "_TL_LineColor", "_TL_CustomColorTex" ),
             new SingleLineTexPropertyHook( "_OVL_Color", "_OVL_OverlayTex" ),
+            new SingleLineTexPropertyHook( "_DFD_Color", "_DFD_ColorTex" ),
 
             // MinMaxSlider
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist", "[TE] FadeOut Distance"),
@@ -315,12 +316,12 @@ namespace UnlitWF
                     if (!flags.HasFlag(UnityEngine.Rendering.ShaderPropertyFlags.HDR))
                     {
                         var val = newMat.GetColor("_Color");
-                        newMat.SetColor("_Color", val.linear);
+                        WFAccessor.SetColor(newMat, "_Color", val.linear);
                     }
                 }
 #else
                 var val = oldMat.GetColor("_Color");
-                newMat.SetColor("_Color", val.linear);
+                WFAccessor.SetColor(newMat, "_Color", val.linear);
 #endif
             }
 
@@ -331,7 +332,7 @@ namespace UnlitWF
                 if (val.a < 1e-4)
                 {
                     val.a = 1.0f;
-                    newMat.SetColor("_EmissionColor", val);
+                    WFAccessor.SetColor(newMat, "_EmissionColor", val);
                 }
             }
 
@@ -540,7 +541,7 @@ namespace UnlitWF
 
                 // バリアントリストを作成
                 WFVariantList lists = WFShaderNameDictionary.CreateVariantList(snm);
-
+                EditorGUI.BeginDisabledGroup(WFAccessor.IsVariant(targets));
                 // ファミリー
                 {
                     EditorGUI.BeginChangeCheck();
@@ -568,7 +569,7 @@ namespace UnlitWF
                         WFCommonUtility.ChangeShader(lists.renderTypeList[idxRenderType].Name, targets);
                     }
                 }
-
+                EditorGUI.EndDisabledGroup();
                 // フィールド幅を戻す
                 materialEditor.SetDefaultGUIWidths();
             }
@@ -590,7 +591,7 @@ namespace UnlitWF
                     .Select(path => AssetDatabase.LoadAssetAtPath<WFMaterialTemplate>(path))
                     .Where(WFMaterialTemplate.IsAvailable)
                     .OrderBy(temp => temp.GetDisplayString());
-                
+
                 // メニュー作成
                 var menu = new GenericMenu();
                 foreach (var temp in temps)
@@ -679,15 +680,15 @@ namespace UnlitWF
             foreach (var m in mats)
             {
                 // ベース色を取得
-                Color baseColor = m.GetColor("_TS_BaseColor");
                 float hur, sat, val;
-                Color.RGBToHSV(baseColor, out hur, out sat, out val);
+                Color.RGBToHSV(m.GetColor("_TS_BaseColor"), out hur, out sat, out val);
 
                 // もし val が 0.7 未満ならばベース色を明るめに再設定する
                 if (val < 0.7f)
                 {
                     val = 0.7f;
-                    m.SetColor("_TS_BaseColor", Color.HSVToRGB(hur, sat, val));
+                    WFAccessor.SetColor(m, "_TS_BaseColor", Color.HSVToRGB(hur, sat, val));
+                    Color.RGBToHSV(m.GetColor("_TS_BaseColor"), out hur, out sat, out val);
                 }
 
                 // 段数を取得
@@ -697,31 +698,31 @@ namespace UnlitWF
                     case 1:
                         if (m.HasProperty("_TS_1stColor"))
                         {
-                            m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
+                            WFAccessor.SetColor(m, "_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
                         }
                         break;
                     default:
                         if (m.HasProperty("_TS_1stColor"))
                         {
-                            m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
+                            WFAccessor.SetColor(m, "_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
                         }
                         if (m.HasProperty("_TS_2ndColor"))
                         {
-                            m.SetColor("_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
+                            WFAccessor.SetColor(m, "_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
                         }
                         break;
                     case 3:
                         if (m.HasProperty("_TS_1stColor"))
                         {
-                            m.SetColor("_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
+                            WFAccessor.SetColor(m, "_TS_1stColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.6f), sat + 0.1f, val * 0.9f));
                         }
                         if (m.HasProperty("_TS_2ndColor"))
                         {
-                            m.SetColor("_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
+                            WFAccessor.SetColor(m, "_TS_2ndColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.8f));
                         }
                         if (m.HasProperty("_TS_3rdColor"))
                         {
-                            m.SetColor("_TS_3rdColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.7f));
+                            WFAccessor.SetColor(m, "_TS_3rdColor", Color.HSVToRGB(ShiftHur(hur, sat, 0.4f), sat + 0.15f, val * 0.7f));
                         }
                         break;
                 }
@@ -834,7 +835,8 @@ namespace UnlitWF
             GUI.Box(position, content, style);
 
             // ヘルプテキスト
-            if (WFI18N.TryTranslate(text, out var helpText)) {
+            if (WFI18N.TryTranslate(text, out var helpText))
+            {
                 var titleSize = style.CalcSize(content);
                 var rect = new Rect(position.x + titleSize.x + 24, position.y, position.width - titleSize.x - 24, 16f);
                 var style2 = new GUIStyle(EditorStyles.label);
@@ -888,7 +890,11 @@ namespace UnlitWF
 
                     EditorGUI.showMixedValue = prop.hasMixedValue;
                     EditorGUI.BeginChangeCheck();
+                    var lockPos = position;
+                    lockPos.y -= 6;
+                    CustomEditorMiscUtility.BeginProperty(lockPos, prop);
                     value = EditorGUI.Toggle(rect, " ", value);
+                    CustomEditorMiscUtility.EndProperty();
                     if (EditorGUI.EndChangeCheck())
                     {
                         prop.floatValue = value ? 1.0f : 0.0f;
@@ -964,6 +970,9 @@ namespace UnlitWF
             float maxLimit = Mathf.Max(propMinLimit.y, propMaxLimit.y, minValue, maxValue);
 
             var rect = EditorGUILayout.GetControlRect();
+            CustomEditorMiscUtility.BeginProperty(rect, propMin);
+            CustomEditorMiscUtility.BeginProperty(rect, propMax);
+
             float oldLabelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 0f;
 
@@ -1008,6 +1017,9 @@ namespace UnlitWF
                     propMax.floatValue = maxValue;
                 }
             }
+
+            CustomEditorMiscUtility.EndProperty();
+            CustomEditorMiscUtility.EndProperty();
         }
 
         public static void DrawZWriteProperty(MaterialEditor materialEditor, GUIContent label, MaterialProperty front, MaterialProperty back)
@@ -1017,7 +1029,13 @@ namespace UnlitWF
             EditorGUI.BeginChangeCheck();
             EditorGUI.showMixedValue = front.hasMixedValue || back.hasMixedValue;
 
-            value = EditorGUILayout.Popup(label, value, new string[] { "OFF", "ON", "TwoSided" });
+            var rect = EditorGUILayout.GetControlRect();
+            CustomEditorMiscUtility.BeginProperty(rect, front);
+            CustomEditorMiscUtility.BeginProperty(rect, back);
+            rect = EditorGUI.PrefixLabel(rect, label);
+            value = EditorGUI.Popup(rect, value, new string[] { "OFF", "ON", "TwoSided" });
+            CustomEditorMiscUtility.EndProperty();
+            CustomEditorMiscUtility.EndProperty();
 
             EditorGUI.showMixedValue = false;
             if (EditorGUI.EndChangeCheck())
@@ -1068,11 +1086,12 @@ namespace UnlitWF
 
             var style = new GUIStyle(EditorStyles.miniTextField);
             SetStyleFont(style, null, s => s - 1, FontStyle.Normal);
-
             // 表示
             EditorGUI.BeginChangeCheck();
             EditorGUI.showMixedValue = propColor.hasMixedValue;
+            EditorGUI.BeginDisabledGroup(WFAccessor.IsPropertyLockedByAncestor(propColor.targets, propColor.name));
             code = EditorGUI.DelayedTextField(rect2, code, style);
+            EditorGUI.EndDisabledGroup();
             EditorGUI.showMixedValue = false;
             if (EditorGUI.EndChangeCheck())
             {
@@ -1411,10 +1430,27 @@ namespace UnlitWF
             }
         }
 
-#endregion
+        #endregion
     }
 
-#region MaterialPropertyDrawer
+    #region MaterialPropertyDrawer
+
+    static class CustomEditorMiscUtility
+    {
+        internal static void BeginProperty(Rect rect, MaterialProperty prop)
+        {
+#if UNITY_2022_1_OR_NEWER
+            MaterialEditor.BeginProperty(rect, prop);
+#endif
+        }
+
+        internal static void EndProperty()
+        {
+#if UNITY_2022_1_OR_NEWER
+            MaterialEditor.EndProperty();
+#endif
+        }
+    }
 
     static class WFHeaderMenuController
     {
@@ -1626,7 +1662,9 @@ namespace UnlitWF
 
             Vector2 value = prop.vectorValue;
             EditorGUI.BeginChangeCheck();
+            CustomEditorMiscUtility.BeginProperty(position, prop);
             value = EditorGUI.Vector2Field(position, label, value);
+            CustomEditorMiscUtility.EndProperty();
             if (EditorGUI.EndChangeCheck())
             {
                 prop.vectorValue = new Vector4(value.x, value.y, 0, 0);
@@ -1655,7 +1693,9 @@ namespace UnlitWF
 
             Vector3 value = prop.vectorValue;
             EditorGUI.BeginChangeCheck();
+            CustomEditorMiscUtility.BeginProperty(position, prop);
             value = EditorGUI.Vector3Field(position, label, value);
+            CustomEditorMiscUtility.EndProperty();
             if (EditorGUI.EndChangeCheck())
             {
                 prop.vectorValue = new Vector4(value.x, value.y, value.z, 0);
@@ -1695,7 +1735,9 @@ namespace UnlitWF
 
             EditorGUI.showMixedValue = prop.hasMixedValue;
             EditorGUI.BeginChangeCheck();
+            CustomEditorMiscUtility.BeginProperty(position, prop);
             value.x = EditorGUI.Slider(position, label, value.x, min, max);
+            CustomEditorMiscUtility.EndProperty();
             if (EditorGUI.EndChangeCheck())
             {
                 value.y = Mathf.Sin(Mathf.Deg2Rad * value.x);
@@ -1855,7 +1897,7 @@ namespace UnlitWF
         {
             var names2 = new List<string>();
             var values2 = new List<int>();
-            foreach(var nm in actual)
+            foreach (var nm in actual)
             {
                 var idx = ArrayUtility.IndexOf(names, nm);
                 if (0 <= idx)
@@ -1885,7 +1927,10 @@ namespace UnlitWF
             }
 
             var names = Translate(this.names);
+
+            CustomEditorMiscUtility.BeginProperty(position, prop);
             var selIndex = EditorGUI.Popup(position, label, selectedIndex, names);
+            CustomEditorMiscUtility.EndProperty();
 
             EditorGUI.showMixedValue = false;
             if (EditorGUI.EndChangeCheck())
@@ -1897,7 +1942,7 @@ namespace UnlitWF
         private GUIContent[] Translate(string[] names)
         {
             var result = new GUIContent[names.Length];
-            for(int i = 0; i < result.Length; i++)
+            for (int i = 0; i < result.Length; i++)
             {
                 var key = enumName + "." + names[i];
                 if (WFI18N.TryTranslate(key, out var after))
@@ -1921,7 +1966,7 @@ namespace UnlitWF
         ADD = 1,
         MUL = 2,
         ADD_AND_SUB = 3,
-        SCREEN = 4, 
+        SCREEN = 4,
         OVERLAY = 5,
         HARD_LIGHT = 6
     }
@@ -1932,7 +1977,7 @@ namespace UnlitWF
         ADD = 1,
         MUL = 2,
     }
-    
+
     public enum BlendModeES
     {
         ADD = 0,
@@ -1949,7 +1994,7 @@ namespace UnlitWF
 
     public enum SunSourceMode
     {
-        AUTO = 0, 
+        AUTO = 0,
         ONLY_DIRECTIONAL_LIT = 1,
         ONLY_POINT_LIT = 2,
         CUSTOM_WORLD_DIR = 3,

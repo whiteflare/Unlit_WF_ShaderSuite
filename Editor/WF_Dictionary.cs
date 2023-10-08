@@ -551,6 +551,7 @@ namespace UnlitWF
             new WFI18NTranslation("AO", "Contrast", "コントラスト"),
             // Distance Fade
             new WFI18NTranslation("DFD", "Color", "色"),
+            new WFI18NTranslation("DFD", "Color Texture", "色テクスチャ"),
             new WFI18NTranslation("DFD", "Fade Distance", "フェード距離"),
             new WFI18NTranslation("DFD", "Fade Distance (Near)", "フェード距離 (Near)"),
             new WFI18NTranslation("DFD", "Fade Distance (Far)", "フェード距離 (Far)"),
