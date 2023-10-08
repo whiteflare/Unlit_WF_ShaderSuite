@@ -107,6 +107,10 @@
         #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OVL_MaskTex, uv, _OVL_InvMaskVal).r
     #endif
 
+    #ifndef WF_TEX2D_DFD_COLOR
+        #define WF_TEX2D_DFD_COLOR(uv)          PICK_SUB_TEX2D(_DFD_ColorTex, _MainTex, uv).rgb
+    #endif
+
     #ifndef WF_TEX2D_OUTLINE_COLOR
         #define WF_TEX2D_OUTLINE_COLOR(uv)      PICK_SUB_TEX2D(_TL_CustomColorTex, _MainTex, uv).rgb
     #endif
@@ -1362,17 +1366,17 @@ FEATURE_TGL_END
             #endif
         }
 
-        void affectDistanceFade(IN_FRAG i, uint facing, inout float4 color) {
+        void affectDistanceFade(IN_FRAG i, float2 uv_main, uint facing, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_DFD_Enable)
             float dist = sqrt(calcDistanceFadeDistanceSq(i.ws_vertex.xyz));
             if (!facing && TGL_ON(_DFD_BackShadow)) {
                 dist = 0;
             }
-            color.rgb = lerp(color.rgb, _DFD_Color.rgb, _DFD_Power * (1 - smoothstep(_DFD_MinDist, max(_DFD_MinDist + NZF, _DFD_MaxDist), dist)));
+            color.rgb = lerp(color.rgb, _DFD_Color.rgb * WF_TEX2D_DFD_COLOR(uv_main), _DFD_Power * (1 - smoothstep(_DFD_MinDist, max(_DFD_MinDist + NZF, _DFD_MaxDist), dist)));
 FEATURE_TGL_END
         }
     #else
-        #define affectDistanceFade(i, facing, color)
+        #define affectDistanceFade(i, uv_main, facing, color)
     #endif
 
     ////////////////////////////
