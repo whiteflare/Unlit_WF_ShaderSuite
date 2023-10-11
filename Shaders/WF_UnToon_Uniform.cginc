@@ -51,6 +51,7 @@
     DECL_SUB_TEX2D      (_TS_3rdTex);
     DECL_SUB_TEX2D      (_LME_Texture);
     DECL_SUB_TEX2D      (_LME_MaskTex);
+    DECL_SUB_TEX2D      (_DFD_ColorTex);
 #endif
 
     // 独自の Sampler で参照するサブテクスチャ =================

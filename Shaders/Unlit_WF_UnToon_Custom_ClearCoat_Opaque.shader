@@ -261,6 +261,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
 
         [WFHeaderToggle(Distance Fade)]
             _DFD_Enable             ("[DFD] Enable", Float) = 0
+        [NoScaleOffset]
+            _DFD_ColorTex           ("[DFD] Color Texture", 2D) = "white" {}
             _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
             _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
             _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
@@ -348,7 +350,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/08/27 (1.4.0)", Float) = 0
+            _CurrentVersion         ("2023/10/11 (1.5.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
