@@ -233,6 +233,9 @@ FEATURE_TGL_END
                 float fa = 1 - abs( dot( ws_normal, ws_viewdir ) );
                 color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
             #endif
+            if (color.a <= 0) {
+                discard;
+            }
         }
     #else
         #define affectAlphaMask(uv, color)                              color.a = 1.0
