@@ -51,6 +51,8 @@ Shader "UnlitWF_URP/WF_Gem_Opaque" {
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
+        [ToggleUI]
+            _NM_InvConvex           ("[NM] Invert Convexity / Use DirectX NormalMap", Float) = 0
             _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
