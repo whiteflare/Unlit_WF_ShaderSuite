@@ -440,6 +440,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
             #pragma target 4.5
 
+            #define _WF_ALPHA_FRESNEL
+
+            #pragma shader_feature_local _VC_ENABLE
+
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
             #pragma multi_compile _ LOD_FADE_CROSSFADE
