@@ -76,7 +76,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
         [NoScaleOffset]
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
         [ToggleUI]
-            _NM_InvConvex           ("[NM] Invert Convexity / Use DirectX NormalMap", Float) = 0
+            _NM_InvConvex           ("[NM] Use DirectX NormalMap", Float) = 0
             _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Enum(NONE,0,X,1,Y,2,XY,3)]
