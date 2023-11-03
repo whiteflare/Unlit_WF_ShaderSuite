@@ -168,6 +168,7 @@
     FEATURE_TGL    (_NM_Enable);
     float           _BumpScale;
     float           _NM_Power;
+    float           _NM_InvConvex;
 
     // -------------------------
 

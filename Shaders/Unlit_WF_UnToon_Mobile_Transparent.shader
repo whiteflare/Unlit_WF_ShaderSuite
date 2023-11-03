@@ -239,7 +239,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
             #pragma target 3.0
 
+            #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
+
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing

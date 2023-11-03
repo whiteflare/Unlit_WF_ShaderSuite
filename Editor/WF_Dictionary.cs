@@ -443,6 +443,7 @@ namespace UnlitWF
             new WFI18NTranslation("NM", "NormalMap Texture", "ノーマルマップ").AddTag("FUR"),
             new WFI18NTranslation("NM", "Bump Scale", "凹凸スケール"),
             new WFI18NTranslation("NM", "Flip Mirror", "ミラーXY反転").AddTag("NS", "FUR"),
+            new WFI18NTranslation("NM", "Use DirectX NormalMap", "DirectXのノーマルマップを使用"),
             // Normal 2nd
             new WFI18NTranslation("NS", "2nd Normal Blend", "2ndマップの混合タイプ"),
             new WFI18NTranslation("NS", "2nd Normal UV Type", "2ndマップのUVタイプ"),
