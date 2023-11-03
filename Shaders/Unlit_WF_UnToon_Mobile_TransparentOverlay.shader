@@ -115,7 +115,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing

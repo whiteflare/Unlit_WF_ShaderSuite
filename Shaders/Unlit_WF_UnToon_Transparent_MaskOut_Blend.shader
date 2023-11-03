@@ -415,7 +415,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing

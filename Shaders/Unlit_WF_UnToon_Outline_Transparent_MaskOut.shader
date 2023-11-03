@@ -442,7 +442,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
 
             #define _WF_ALPHA_FRESNEL
 
-            #pragma shader_feature_local _VC_ENABLE
+            #define _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
