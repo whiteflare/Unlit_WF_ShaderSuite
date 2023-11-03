@@ -1034,7 +1034,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1973605983, guid: c4e26fbda77a59649b7dd72bc276672e, type: 3}
       propertyPath: blueprintId
-      value: avtr_9d78f810-9aa5-4ace-b37e-22b3a04b9432
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5336665284677885226, guid: c4e26fbda77a59649b7dd72bc276672e,
         type: 3}
