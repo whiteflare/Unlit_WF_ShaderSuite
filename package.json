@@ -1,7 +1,7 @@
 {
   "name": "jp.whiteflare.unlitwf",
   "displayName": "UnlitWF Shader",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "General Shader Pack for VRChat, Unity.",
   "gitDependencies": {},
   "vpmDependencies" : {
