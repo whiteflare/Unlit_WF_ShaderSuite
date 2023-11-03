@@ -2,18 +2,14 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 8
+  serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_face 1
-  m_Shader: {fileID: 4800000, guid: f009b607188be344fac9370b2d7176c1, type: 3}
-  m_ValidKeywords:
-  - _GL_AUTO_ENABLE
-  - _TS_ENABLE
-  - _TS_STEP2_ENABLE
-  m_InvalidKeywords: []
+  m_Shader: {fileID: 4800000, guid: a1eb6533474a7e3409770e712b1414ad, type: 3}
+  m_ShaderKeywords: _GL_AUTO_ENABLE _TL_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -99,6 +95,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TL_CustomColorTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TL_MaskTex:
+        m_Texture: {fileID: 2800000, guid: 20a9fbbfd4974d041bfb8f61361c7493, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TR_MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -123,7 +127,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Ints: []
     m_Floats:
     - _AO_Brightness: 0
     - _AO_Contrast: 1
@@ -209,6 +212,7 @@ Material:
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_Enable: 0
+    - _NM_InvConvex: 0
     - _NM_Power: 0.25
     - _NS_Enable: 0
     - _NS_InvMaskVal: 0
@@ -222,6 +226,13 @@ Material:
     - _OVL_UVType: 0
     - _OVL_VertColToDecal: 0
     - _OVL_VertColToMask: 0
+    - _TL_BlendBase: 0
+    - _TL_BlendCustom: 0
+    - _TL_Enable: 1
+    - _TL_InvMaskVal: 0
+    - _TL_LineType: 0
+    - _TL_LineWidth: 0.07
+    - _TL_Z_Shift: 0
     - _TR_BlendNormal: 0
     - _TR_BlendNormal2: 0
     - _TR_BlendType: 0
@@ -268,9 +279,9 @@ Material:
     - _LME_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OVL_Color: {r: 1, g: 1, b: 1, a: 1}
     - _OVL_UVScroll: {r: 0, g: 0, b: 0, a: 0}
+    - _TL_LineColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.7529412, g: 0.5921569, b: 0.46666667, a: 1}
     - _TS_2ndColor: {r: 0.6431373, g: 0.47843137, b: 0.34901962, a: 1}
     - _TS_3rdColor: {r: 0.5, g: 0.5, b: 0.7, a: 1}
     - _TS_BaseColor: {r: 0.8745098, g: 0.74509805, b: 0.5764706, a: 1}
-  m_BuildTextureStacks: []
