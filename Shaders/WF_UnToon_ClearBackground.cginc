@@ -30,13 +30,25 @@
 
     struct appdata_clrbg {
         float4 vertex           : POSITION;
+#ifdef _V2F_HAS_VERTEXCOLOR
+        float4 vertex_color     : COLOR0;
+#endif
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 normal           : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_clrbg {
         float4 vs_vertex        : SV_POSITION;
-        float3 ws_vertex        : TEXCOORD0;
-        float2 depth            : TEXCOORD1;
+#ifdef _V2F_HAS_VERTEXCOLOR
+        float4 vertex_color     : COLOR0;
+#endif
+        float2 uv               : TEXCOORD0;
+        float2 uv_lmap          : TEXCOORD1;
+        float3 ws_vertex        : TEXCOORD2;
+        float2 depth            : TEXCOORD3;
+        float3 normal           : TEXCOORD4;
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -61,7 +73,14 @@
 
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
         o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
+#ifdef _V2F_HAS_VERTEXCOLOR
+        o.vertex_color = v.vertex_color;
+#endif
+        o.uv = v.uv;
+        o.uv_lmap = v.uv_lmap;
         o.depth = o.vs_vertex.zw;
+
+        localNormalToWorldTangentSpace(v.normal, o.normal);
 
 #if defined(UNITY_REVERSED_Z)
         o.vs_vertex.z = o.vs_vertex.w * 1e-5;
@@ -72,7 +91,7 @@
         return o;
     }
 
-    fixed4 frag_clrbg(v2f_clrbg i) : SV_Target {
+    fixed4 frag_clrbg(v2f_clrbg i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
@@ -82,16 +101,42 @@
 #if defined(UNITY_REVERSED_Z)
         if (depth <= 0 || 1 <= depth) {
             discard;
+            return fixed4(0, 0, 0, 0);
         }
 #else
         if (depth <= -1 || 1 <= depth) {
             discard;
+            return fixed4(0, 0, 0, 0);
         }
 #endif
 
+        float4 color;
+        float2 uv_main;
+
+        i.normal = normalize(i.normal);
+
+        // メイン
+        affectBaseColor(i.uv, i.uv_lmap, facing, uv_main, color);
+        // 頂点カラー
+        affectVertexColor(i.vertex_color, color);
+
+        // アルファマスク適用
+        affectAlphaMask(uv_main, color);
+
+        // BumpMap
+        float3 ws_normal = i.normal;
+
+        // ビューポイントへの方向
+        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
+        // カメラへの方向
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
-        float4 color = PICK_MAIN_TEXCUBE_LOD(unity_SpecCube0, -ws_camera_dir, 0);
-        color.rgb = DecodeHDR(color, float4(1, unity_SpecCube0_HDR.yzw));
+
+		// 背景消去
+        float4 cube_color = PICK_MAIN_TEXCUBE_LOD(unity_SpecCube0, -ws_camera_dir, 0);
+        color.rgb = DecodeHDR(cube_color, float4(1, unity_SpecCube0_HDR.yzw));
+
+        // フレネル
+        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
 
         return fixed4(color.rgb, 1);
     }
