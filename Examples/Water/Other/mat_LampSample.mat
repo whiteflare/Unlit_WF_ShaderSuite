@@ -121,6 +121,7 @@ Material:
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_Enable: 0
+    - _NM_InvConvex: 0
     - _NM_Power: 0.25
     - _QuestSupported: 0
     - _TR_BlendNormal: 0

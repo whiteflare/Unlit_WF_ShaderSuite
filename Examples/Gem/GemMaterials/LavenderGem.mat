@@ -105,6 +105,7 @@ Material:
     - _GMR_Monochrome: 1
     - _GMR_Power: 1
     - _NM_Enable: 0
+    - _NM_InvConvex: 0
     - _QuestSupported: 0
     - _UseVertexColor: 0
     m_Colors:

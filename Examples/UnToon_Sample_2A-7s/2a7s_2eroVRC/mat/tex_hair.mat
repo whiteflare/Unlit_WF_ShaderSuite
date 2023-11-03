@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_hair
   m_Shader: {fileID: 4800000, guid: a3678756e883b9349ac22fce33313139, type: 3}
-  m_ShaderKeywords: _GL_AUTO_ENABLE _GL_NCC_ENABLE _TR_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
+  m_ShaderKeywords: _GL_AUTO_ENABLE _TR_ENABLE _TS_ENABLE _TS_STEP2_ENABLE
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -183,7 +183,7 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
-    - _GL_NCC_Enable: 1
+    - _GL_NCC_Enable: 0
     - _HL_BlendNormal: 0.1
     - _HL_BlendNormal2: 0.1
     - _HL_BlendNormal2_1: 0.1
@@ -232,6 +232,7 @@ Material:
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_Enable: 0
+    - _NM_InvConvex: 0
     - _NM_Power: 0.25
     - _NS_Enable: 0
     - _NS_InvMaskVal: 0

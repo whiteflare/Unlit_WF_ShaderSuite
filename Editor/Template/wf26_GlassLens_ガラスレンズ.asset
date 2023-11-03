@@ -52,6 +52,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DFD_ColorTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailNormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -255,6 +259,7 @@ Material:
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_Enable: 0
+    - _NM_InvConvex: 0
     - _NM_Power: 0.25
     - _NS_Enable: 0
     - _NS_InvMaskVal: 0
@@ -304,7 +309,7 @@ Material:
     - _CHM_ColorR: {r: 1, g: 1, b: 1, a: 1}
     - _CRF_Tint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DFD_Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    - _DFD_Color: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
     - _ES_SC_Direction: {r: 0, g: -10, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
