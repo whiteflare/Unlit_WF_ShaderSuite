@@ -572,7 +572,7 @@ FEATURE_TGL_END
                 // 1st NormalMap
                 float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
                 if (TGL_ON(_NM_InvConvex)) {
-                    normalTangent.x = -normalTangent.x;
+                    normalTangent.y = -normalTangent.y;
                 }
                 // 法線計算
                 return transformTangentToWorldNormal(normalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
