@@ -584,12 +584,6 @@ namespace UnlitWF.Converter
                         PropertyNameReplacement.Match("_NormalMap", "_BumpMap"));
                     if (HasNewPropertyValue(ctx, "_BumpMap")) {
                         WFAccessor.SetBool(ctx.target, "_NM_Enable", true);
-                        var _BumpScale = WFAccessor.GetFloat(ctx.target, "_BumpScale", 1);
-                        if (_BumpScale < 0)
-                        {
-                            WFAccessor.SetFloat(ctx.target, "_BumpScale", Mathf.Abs(_BumpScale));
-                            WFAccessor.SetInt(ctx.target, "_NM_InvConvex", 1);
-                        }
                     }
                 },
                 ctx => {
