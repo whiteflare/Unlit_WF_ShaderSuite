@@ -46,7 +46,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
         [ToggleUI]
             _NM_InvConvex           ("[NM] Use DirectX NormalMap", Float) = 0
-            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
+            _BumpScale              ("[NM] Bump Scale", Range(-1, 2)) = 1.0
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
