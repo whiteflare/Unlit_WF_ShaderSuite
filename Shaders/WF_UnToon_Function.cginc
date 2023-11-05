@@ -233,6 +233,9 @@ FEATURE_TGL_END
                 float fa = 1 - abs( dot( ws_normal, ws_viewdir ) );
                 color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
             #endif
+            if (color.a <= 0) {
+                discard;
+            }
         }
     #else
         #define affectAlphaMask(uv, color)                              color.a = 1.0
@@ -568,6 +571,9 @@ FEATURE_TGL_END
 #endif
                 // 1st NormalMap
                 float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
+                if (TGL_ON(_NM_InvConvex)) {
+                    normalTangent.x = -normalTangent.x;
+                }
                 // 法線計算
                 return transformTangentToWorldNormal(normalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
 

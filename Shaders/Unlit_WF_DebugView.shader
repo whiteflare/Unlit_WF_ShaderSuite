@@ -59,7 +59,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/10/11 (1.5.0)", Float) = 0
+            _CurrentVersion         ("2023/11/05 (1.6.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -180,35 +180,38 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
                 float4 color = float4(0, 0, 0, 1);
-                float2 grid_uv;
+                float2 grid_uv = float2(0, 0);
 
                 // 基本色
                 switch(_ModeColor) {
                     case 1:
+                        grid_uv = i.uv;
                         color.rgb = 1;
                         break;
                     case 3:
+                        grid_uv = i.uv;
                         color.rb = 1;
                         break;
                     case 4:
                         discard;
                         break;
                     case 5:
+                        grid_uv = i.uv;
                         color.rgb = i.vcolor;
                         break;
                     case 6:
+                        grid_uv = i.uv;
                         color.rgb = facing ? float4(0, 1, 0, 1) : float4(1, 0, 0, 1);
                         break;
                     case 7:
 #ifdef LIGHTMAP_ON
-                        color.rgb = facing ? float4(0, 1, 0, 1) : float4(1, 0, 0, 1);
                         grid_uv = saturate(i.uv2 * unity_LightmapST.xy + unity_LightmapST.zw);
-                        color.b = 0;
-#else
-                        grid_uv.xy = 0;
-                        discard;
-#endif
+                        color.rgb = facing ? float4(0, 1, 0, 1) : float4(1, 0, 0, 1);
                         break;
+#else
+                        discard;
+                        break;
+#endif
                     default:
                         break;
                 }
@@ -239,49 +242,55 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 #ifdef LIGHTMAP_ON
                         color.rg = grid_uv = saturate(i.uv2 * unity_LightmapST.xy + unity_LightmapST.zw);
                         color.b = 0;
-#else
-                        grid_uv.xy = 0;
-                        discard;
-#endif
                         break;
+#else
+                        discard;
+                        break;
+#endif
                     case 6:
 #ifdef DYNAMICLIGHTMAP_ON
                         color.rg = grid_uv = saturate(i.uv2 * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw);
                         color.b = 0;
-#else
-                        grid_uv.xy = 0;
-                        discard;
-#endif
                         break;
+#else
+                        discard;
+                        break;
+#endif
                     default:
-                        grid_uv = saturate(i.uv);
                         break;
                 }
 
                 // 法線
                 switch(_ModeNormal) {
                     case 1:
+                        grid_uv = i.uv;
                         color.rgb = saturate(normalize(i.normal.xyz) + 0.5);
                         break;
                     case 2:
+                        grid_uv = i.uv;
                         color.rgb = saturate(normalize(i.tangent.xyz) + 0.5);
                         break;
                     case 3:
+                        grid_uv = i.uv;
                         color.rgb = saturate(normalize(i.bitangent.xyz) + 0.5);
                         break;
                     case 4:
+                        grid_uv = i.uv;
                         color.rgb = saturate(UnityObjectToWorldNormal(i.normal.xyz) + 0.5);
                         break;
                     case 5:
+                        grid_uv = i.uv;
                         color.rgb = saturate(UnityObjectToWorldNormal(i.tangent.xyz) + 0.5);
                         break;
                     case 6:
+                        grid_uv = i.uv;
                         color.rgb = saturate(UnityObjectToWorldNormal(i.bitangent.xyz) + 0.5);
                         break;
                     default:
                         break;
                 }
 
+                // テクスチャ表示
                 switch(_ModeTexture) {
                     case 1:
                         grid_uv     = TRANSFORM_TEX(i.uv, _MainTex);

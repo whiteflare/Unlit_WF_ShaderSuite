@@ -81,7 +81,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/10/11 (1.5.0)", Float) = 0
+            _CurrentVersion         ("2023/11/05 (1.6.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _ClearBgSupported       ("True", Float) = 0
@@ -112,7 +112,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
             #pragma target 4.5
 
+            #define _WF_ALPHA_FRESNEL
             #define _WF_MOBILE
+
+            #pragma shader_feature_local _VC_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing

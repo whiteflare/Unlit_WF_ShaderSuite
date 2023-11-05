@@ -9,7 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: tex_photon
   m_Shader: {fileID: 4800000, guid: 0a7a6cdca16a38548a5d81aca8d4e3ba, type: 3}
-  m_ShaderKeywords: _ES_ENABLE _ES_SCROLL_ENABLE _GL_AUTO_ENABLE
+  m_ShaderKeywords: _ES_AULINK_ENABLE _ES_ENABLE _ES_SCROLL_ENABLE _GL_AUTO_ENABLE
+    _GL_NCC_ENABLE
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -73,15 +74,15 @@ Material:
     - _ClearBgSupported: 0
     - _CullMode: 0
     - _CurrentVersion: 0
-    - _ES_AU_AlphaLink: 0
+    - _ES_AU_AlphaLink: 1
     - _ES_AU_Band: 0
     - _ES_AU_BlackOut: 0
     - _ES_AU_MaxThreshold: 0.5
-    - _ES_AU_MaxValue: 2
+    - _ES_AU_MaxValue: 3
     - _ES_AU_MinThreshold: 0.1
-    - _ES_AU_MinValue: 0
+    - _ES_AU_MinValue: 0.3
     - _ES_AU_Slope: 0.2
-    - _ES_AuLinkEnable: 0
+    - _ES_AuLinkEnable: 1
     - _ES_BlendType: 0
     - _ES_Enable: 1
     - _ES_SC_AlphaScroll: 1
@@ -99,7 +100,7 @@ Material:
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
     - _GL_LightMode: 0
-    - _GL_NCC_Enable: 0
+    - _GL_NCC_Enable: 1
     - _HL_CapType: 0
     - _HL_ChangeAlpha: 0
     - _HL_Enable: 0

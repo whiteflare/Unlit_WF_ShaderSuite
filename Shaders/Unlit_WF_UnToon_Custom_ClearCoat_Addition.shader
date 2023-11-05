@@ -33,6 +33,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
+        [ToggleUI]
+            _NM_InvConvex           ("[NM] Use DirectX NormalMap", Float) = 0
             _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Enum(NONE,0,X,1,Y,2,XY,3)]
@@ -156,7 +158,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/10/11 (1.5.0)", Float) = 0
+            _CurrentVersion         ("2023/11/05 (1.6.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/ClearCoat|Addition", Float) = 0
