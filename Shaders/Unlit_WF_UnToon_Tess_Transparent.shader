@@ -82,7 +82,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
         [ToggleUI]
             _NM_InvConvex           ("[NM] Use DirectX NormalMap", Float) = 0
-            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
+            _BumpScale              ("[NM] Bump Scale", Range(-1, 2)) = 1.0
             _NM_Power               ("[NM] Shadow Power", Range(0, 1)) = 0.25
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
@@ -92,7 +92,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
         [Enum(UV1,0,UV2,1)]
             _NS_UVType              ("[NS] 2nd Normal UV Type", Float) = 0
             _DetailNormalMap        ("[NS] 2nd NormalMap Texture", 2D) = "bump" {}
-            _DetailNormalMapScale   ("[NS] 2nd Bump Scale", Range(0, 2)) = 0.4
+            _DetailNormalMapScale   ("[NS] 2nd Bump Scale", Range(-1, 2)) = 0.4
         [NoScaleOffset]
             _NS_2ndMaskTex          ("[NS] 2nd NormalMap Mask Texture (R)", 2D) = "white" {}
         [ToggleUI]
@@ -401,7 +401,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/11/05 (1.6.0)", Float) = 0
+            _CurrentVersion         ("2023/11/06 (1.6.1)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", Float) = 0

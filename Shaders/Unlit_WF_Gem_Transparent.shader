@@ -78,7 +78,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _BumpMap                ("[NM] NormalMap Texture", 2D) = "bump" {}
         [ToggleUI]
             _NM_InvConvex           ("[NM] Use DirectX NormalMap", Float) = 0
-            _BumpScale              ("[NM] Bump Scale", Range(0, 2)) = 1.0
+            _BumpScale              ("[NM] Bump Scale", Range(-1, 2)) = 1.0
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[NM] Flip Mirror", Float) = 0
 
@@ -154,7 +154,7 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/11/05 (1.6.0)", Float) = 0
+            _CurrentVersion         ("2023/11/06 (1.6.1)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
