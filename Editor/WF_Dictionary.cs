@@ -234,6 +234,7 @@ namespace UnlitWF
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
                 new WFShaderFunction("CHM", "CHM", "3ch Color Mask"),
+                new WFShaderFunction("CGR", "CGR", "Gradient Map"),
                 new WFShaderFunction("CLC", "CLC", "Color Change"),
                 new WFShaderFunction("LME", "LME", "Lame"),
                 new WFShaderFunction("OVL", "OVL", "Overlay Texture"),
@@ -338,6 +339,7 @@ namespace UnlitWF
             new WFI18NTranslation("BackFace Texture", "裏面テクスチャ"),
             new WFI18NTranslation("Base", "基本設定"),
             new WFI18NTranslation("ClearCoat", "クリアコート"),
+            new WFI18NTranslation("Gradient Map", "グラデーションマップ"),
             new WFI18NTranslation("Color Change", "色変更"),
             new WFI18NTranslation("Detail NormalMap", "ディテールノーマルマップ"),
             new WFI18NTranslation("Distance Fade", "距離フェード"),
@@ -419,6 +421,9 @@ namespace UnlitWF
             new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離 (Near)"),
             new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離 (Far)"),
             new WFI18NTranslation("Shadow Power", "影の濃さ"),
+            new WFI18NTranslation("Preview", "プレビュー"),
+            new WFI18NTranslation("Save", "保存"),
+            new WFI18NTranslation("Create GradationMap Texture", "グラデーションマップ用テクスチャを作成"),
             // Lit
             new WFI18NTranslation("Unlit Intensity", "Unlit Intensity (最小明度)"),
             new WFI18NTranslation("Saturate Intensity", "Saturate Intensity (飽和明度)"),
