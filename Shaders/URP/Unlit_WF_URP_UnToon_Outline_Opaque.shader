@@ -427,6 +427,7 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _BKT_ENABLE
             #pragma shader_feature_local _CHM_ENABLE
+            #pragma shader_feature_local _CGR_ENABLE
             #pragma shader_feature_local _CLC_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _HL_ENABLE

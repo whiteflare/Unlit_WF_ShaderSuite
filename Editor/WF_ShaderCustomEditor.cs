@@ -199,6 +199,19 @@ namespace UnlitWF
                 }
                 EditorGUILayout.Space(4);
             }),
+            // _CGR_InvMaskValの後に、プレビューテクスチャが設定されているならば警告を出す
+            new CustomPropertyHook("_CGR_InvMaskVal", null, (ctx, changed) => {
+                var hasPreviewTex = ctx.editor.targets.Any(mat => {
+                    var tex = WFAccessor.GetTexture(mat as Material, "_CGR_GradMapTex");
+                    return tex != null && string.IsNullOrWhiteSpace(AssetDatabase.GetAssetPath(tex));
+                });
+                if (hasPreviewTex)
+                {
+                    EditorGUILayout.Space(4);
+                    var msg = WFI18N.Translate(WFMessageText.PsPreviewTexture);
+                    EditorGUILayout.HelpBox(msg, MessageType.Warning);
+                }
+            }),
 
             // _NS_InvMaskVal の直後に FlipMirror を再表示
             new CustomPropertyHook("_NS_InvMaskVal", null, (ctx, changed) => {
@@ -2035,6 +2048,7 @@ namespace UnlitWF
             var tex = GenerateTexture(preview);
             if (tex != null)
             {
+                Undo.RecordObjects(targets, "Set Material GradientMap");
                 foreach (var mat in targets)
                 {
                     WFAccessor.SetTexture(mat, "_CGR_GradMapTex", tex);
@@ -2044,6 +2058,7 @@ namespace UnlitWF
 
         private const int TEX_WIDTH = 128;
         private const int TEX_HEIGHT = 4;
+        private const TextureImporterCompression TEX_COMPRESS = TextureImporterCompression.CompressedHQ;
 
         private Texture2D GenerateTexture(bool preview)
         {
@@ -2083,7 +2098,7 @@ namespace UnlitWF
                     return null;
                 }
 
-                importer.textureCompression = TextureImporterCompression.Compressed;
+                importer.textureCompression = TEX_COMPRESS;
                 importer.wrapMode = TextureWrapMode.Clamp;
                 importer.filterMode = FilterMode.Bilinear;
                 importer.mipmapEnabled = false;

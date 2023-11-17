@@ -397,6 +397,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _BKT_ENABLE
             #pragma shader_feature_local _CHM_ENABLE
+            #pragma shader_feature_local _CGR_ENABLE
             #pragma shader_feature_local _CLC_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _HL_ENABLE

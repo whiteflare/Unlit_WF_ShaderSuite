@@ -38,6 +38,13 @@
         #define WF_TEX2D_3CH_MASK(uv)           PICK_SUB_TEX2D(_CHM_3chMaskTex, _MainTex, uv).rgb
     #endif
 
+    #ifndef WF_TEX2D_GRADMAP
+        #define WF_TEX2D_GRADMAP(uv)            PICK_MAIN_TEX2D(_CGR_GradMapTex, uv)
+    #endif
+    #ifndef WF_TEX2D_GRADMAP_MASK
+        #define WF_TEX2D_GRADMAP_MASK(uv)       SAMPLE_MASK_VALUE(_CGR_MaskTex, uv, _CGR_InvMaskVal).r
+    #endif
+
     #ifndef WF_TEX2D_EMISSION
         #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgba
     #endif
@@ -402,6 +409,24 @@ FEATURE_TGL_END
     #define affectNearClipCancel(vs_vertex)
 #endif
 
+
+    ////////////////////////////
+    // Gradient Map
+    ////////////////////////////
+
+    #ifdef _CGR_ENABLE
+        void affectGradientMap(float2 uv_main, inout float4 color) {
+FEATURE_TGL_ON_BEGIN(_CGR_ENABLE)
+            float x = saturate(calcBrightness(color.rgb));
+            float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0)).rgb;
+            color.rgb = lerp(color.rgb, cgr, WF_TEX2D_GRADMAP_MASK(uv_main));
+FEATURE_TGL_END
+        }
+
+    #else
+        // Dummy
+        #define affectGradientMap(uv_main, color)
+    #endif
 
     ////////////////////////////
     // Color Change

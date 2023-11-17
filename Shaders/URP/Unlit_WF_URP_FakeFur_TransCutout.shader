@@ -205,6 +205,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local _CGR_ENABLE
             #pragma shader_feature_local _CLC_ENABLE
             #pragma shader_feature_local _HL_ENABLE
             #pragma shader_feature_local _HL_ENABLE_1
@@ -257,6 +258,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local _CGR_ENABLE
             #pragma shader_feature_local _CLC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
 
