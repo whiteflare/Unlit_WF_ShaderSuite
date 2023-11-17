@@ -46,6 +46,15 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
         [ToggleUI]
             _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Gradient Map)]
+            _CGR_Enable             ("[CGR] Enable", Float) = 0
+        [NoScaleOffset]
+            _CGR_GradMapTex         ("[CGR] Gradient Map", 2D) = "white" {}
+        [NoScaleOffset]
+            _CGR_MaskTex            ("[CGR] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CGR_InvMaskVal         ("[CGR] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -215,6 +224,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
@@ -249,6 +259,7 @@ Shader "UnlitWF/WF_FakeFur_Transparent" {
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE

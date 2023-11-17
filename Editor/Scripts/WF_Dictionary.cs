@@ -234,6 +234,7 @@ namespace UnlitWF
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
                 new WFShaderFunction("CHM", "CHM", "3ch Color Mask"),
+                new WFShaderFunction("CGR", "CGR", "Gradient Map"),
                 new WFShaderFunction("CLC", "CLC", "Color Change"),
                 new WFShaderFunction("LME", "LME", "Lame"),
                 new WFShaderFunction("OVL", "OVL", "Overlay Texture"),
@@ -338,6 +339,7 @@ namespace UnlitWF
             new WFI18NTranslation("BackFace Texture", "裏面テクスチャ"),
             new WFI18NTranslation("Base", "基本設定"),
             new WFI18NTranslation("ClearCoat", "クリアコート"),
+            new WFI18NTranslation("Gradient Map", "グラデーションマップ"),
             new WFI18NTranslation("Color Change", "色変更"),
             new WFI18NTranslation("Detail NormalMap", "ディテールノーマルマップ"),
             new WFI18NTranslation("Distance Fade", "距離フェード"),
@@ -419,6 +421,9 @@ namespace UnlitWF
             new WFI18NTranslation("FadeOut Distance (Near)", "フェードアウト距離 (Near)"),
             new WFI18NTranslation("FadeOut Distance (Far)", "フェードアウト距離 (Far)"),
             new WFI18NTranslation("Shadow Power", "影の濃さ"),
+            new WFI18NTranslation("Preview", "プレビュー"),
+            new WFI18NTranslation("Save", "保存"),
+            new WFI18NTranslation("Create GradationMap Texture", "グラデーションマップ用テクスチャを作成"),
             // Lit
             new WFI18NTranslation("Unlit Intensity", "Unlit Intensity (最小明度)"),
             new WFI18NTranslation("Saturate Intensity", "Saturate Intensity (飽和明度)"),
@@ -721,6 +726,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PsCapTypeMedian, "MEDIAN_CAPは灰色を基準とした加算＆減算合成を行うmatcapです"),
             new WFI18NTranslation(WFMessageText.PsCapTypeLight, "LIGHT_CAPは黒色を基準とした加算合成を行うmatcapです"),
             new WFI18NTranslation(WFMessageText.PsCapTypeShade, "SHADE_CAPは白色を基準とした乗算合成を行うmatcapです"),
+            new WFI18NTranslation(WFMessageText.PsPreviewTexture, "プレビューテクスチャが設定されています。\nプレビューテクスチャは保存されません。"),
 
             new WFI18NTranslation(WFMessageText.DgChangeMobile, "シェーダをMobile向けに切り替えますか？\n\nこの操作はUndoできますが、バックアップを取ることをお勧めします。"),
             new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダがインポートされました。\nプロジェクト内に古いマテリアルが残っていないかスキャンしますか？"),
@@ -975,6 +981,7 @@ namespace UnlitWF
         public static readonly string PsCapTypeMedian = "MEDIAN_CAP is a matcap that performs gray-based additive and subtractive blending.";
         public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";
         public static readonly string PsCapTypeShade = "SHADE_CAP is a matcap that performs white-based multiply blending.";
+        public static readonly string PsPreviewTexture = "A preview texture is set that cannot be saved.";
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
         public static readonly string DgMigrationAuto = "UnlitWF shaders have been imported.\nDo you want to scan for old materials still in the project?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";

@@ -191,6 +191,28 @@ namespace UnlitWF
                 }
             }),
 
+            // _CGR_GradMapTexの後にグラデーションマップ作成ボタンを追加する
+            new CustomPropertyHook("_CGR_GradMapTex", null, (ctx, changed) => {
+                var rect = EditorGUILayout.GetControlRect();
+                if (GUI.Button(rect, WFI18N.GetGUIContent("Create GradationMap Texture"))) {
+                    GradientMakerWindow.Show(rect, WFCommonUtility.AsMaterials(ctx.editor.targets));
+                }
+                EditorGUILayout.Space(4);
+            }),
+            // _CGR_InvMaskValの後に、プレビューテクスチャが設定されているならば警告を出す
+            new CustomPropertyHook("_CGR_InvMaskVal", null, (ctx, changed) => {
+                var hasPreviewTex = ctx.editor.targets.Any(mat => {
+                    var tex = WFAccessor.GetTexture(mat as Material, "_CGR_GradMapTex");
+                    return tex != null && string.IsNullOrWhiteSpace(AssetDatabase.GetAssetPath(tex));
+                });
+                if (hasPreviewTex)
+                {
+                    EditorGUILayout.Space(4);
+                    var msg = WFI18N.Translate(WFMessageText.PsPreviewTexture);
+                    EditorGUILayout.HelpBox(msg, MessageType.Warning);
+                }
+            }),
+
             // _NS_InvMaskVal の直後に FlipMirror を再表示
             new CustomPropertyHook("_NS_InvMaskVal", null, (ctx, changed) => {
                 var prop = ctx.all.Where(p => p.name == "_FlipMirror").FirstOrDefault();
@@ -1955,6 +1977,136 @@ namespace UnlitWF
                 }
             }
             return result;
+        }
+    }
+
+    #endregion
+
+    #region PopupWindowContent
+
+    public class GradientMakerWindow : PopupWindowContent
+    {
+        public static void Show(Rect ownerRect, params Material[] targets)
+        {
+            if (targets.Length == 0)
+            {
+                return;
+            }
+            var contents = new GradientMakerWindow();
+            contents.targets = targets;
+            contents.ownerRect = ownerRect;
+            PopupWindow.Show(ownerRect, contents);
+        }
+
+        private static Gradient grad = null;
+        private Material[] targets;
+        private Rect ownerRect;
+
+        public override Vector2 GetWindowSize()
+        {
+            return new Vector2(ownerRect.width * 0.75f, ownerRect.height * 3f);
+        }
+
+        public override void OnGUI(Rect rect)
+        {
+            if (grad == null)
+            {
+                grad = CreateEmptyGradient();
+            }
+
+            EditorGUILayout.Space(3f);
+
+            grad = EditorGUILayout.GradientField(grad);
+
+            var rectBtn = EditorGUILayout.GetControlRect();
+            rectBtn.width /= 2;
+            rectBtn.width--;
+            if (GUI.Button(rectBtn, WFI18N.Translate("Preview")))
+            {
+                Execute(true);
+            }
+
+            rectBtn.x += rectBtn.width + 2;
+            if (ToolCommon.ExecuteButton(rectBtn, WFI18N.Translate("Save")))
+            {
+                Execute(false);
+            }
+        }
+
+        private static Gradient CreateEmptyGradient()
+        {
+            var grad = new Gradient();
+            grad.colorKeys = new GradientColorKey[]{
+                new GradientColorKey(Color.black, 0),
+                new GradientColorKey(Color.white, 1),
+            };
+            return grad;
+        }
+
+        private void Execute(bool preview)
+        {
+            var tex = GenerateTexture(preview);
+            if (tex != null)
+            {
+                Undo.RecordObjects(targets, "Set Material GradientMap");
+                foreach (var mat in targets)
+                {
+                    WFAccessor.SetTexture(mat, "_CGR_GradMapTex", tex);
+                }
+            }
+        }
+
+        private const int TEX_WIDTH = 128;
+        private const int TEX_HEIGHT = 4;
+        private const TextureImporterCompression TEX_COMPRESS = TextureImporterCompression.CompressedHQ;
+
+        private Texture2D GenerateTexture(bool preview)
+        {
+            Texture2D tex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
+            tex.wrapMode = TextureWrapMode.Clamp;
+
+            Color[] c = new Color[TEX_WIDTH];
+            for (int i = 0; i < TEX_WIDTH; i++)
+            {
+                c[i] = grad.Evaluate(i / (float)TEX_WIDTH);
+            }
+
+            for (int y = 0; y < TEX_HEIGHT; y++)
+            {
+                tex.SetPixels(0, y, TEX_WIDTH, 1, c);
+            }
+            tex.Apply();
+
+            if (preview)
+            {
+                return tex;
+            }
+            else
+            {
+                var path = EditorUtility.SaveFilePanelInProject("Save Texture", "", "png", "Save Texture");
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    return null;
+                }
+
+                System.IO.File.WriteAllBytes(path, tex.EncodeToPNG());
+
+                AssetDatabase.ImportAsset(path);
+                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer == null)
+                {
+                    return null;
+                }
+
+                importer.textureCompression = TEX_COMPRESS;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.mipmapEnabled = false;
+                importer.streamingMipmaps = false;
+                importer.SaveAndReimport();
+
+                return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            }
         }
     }
 

@@ -214,6 +214,8 @@
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
 
+        // グラデーションマップ
+        affectGradientMap(uv_main, color);
         // 色変換
         affectColorChange(color);
 
