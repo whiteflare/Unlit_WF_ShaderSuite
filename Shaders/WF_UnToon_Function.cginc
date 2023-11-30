@@ -45,6 +45,10 @@
         #define WF_TEX2D_GRADMAP_MASK(uv)       SAMPLE_MASK_VALUE(_CGR_MaskTex, uv, _CGR_InvMaskVal).r
     #endif
 
+    #ifndef WF_TEX2D_CLC_MASK
+        #define WF_TEX2D_CLC_MASK(uv)           SAMPLE_MASK_VALUE(_CLC_MaskTex, uv, _CLC_InvMaskVal).r
+    #endif
+
     #ifndef WF_TEX2D_EMISSION
         #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgba
     #endif
@@ -433,7 +437,7 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _CLC_ENABLE
-        void affectColorChange(inout float4 color) {
+        void affectColorChange(float2 uv_main, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_CLC_Enable)
             if (TGL_ON(_CLC_Monochrome)) {
                 color.r += color.g + color.b;
@@ -443,13 +447,14 @@ FEATURE_TGL_ON_BEGIN(_CLC_Enable)
             float3 hsv = rgb2hsv( saturate(color.rgb) );
             hsv += float3( _CLC_DeltaH, _CLC_DeltaS, _CLC_DeltaV);
             hsv.r = frac(hsv.r);
-            color.rgb = saturate( hsv2rgb( saturate(hsv) ) );
+            float3 clc = saturate( hsv2rgb( saturate(hsv) ) );
+            color.rgb = lerp(color.rgb, clc, WF_TEX2D_CLC_MASK(uv_main));
 FEATURE_TGL_END
         }
 
     #else
         // Dummy
-        #define affectColorChange(color)
+        #define affectColorChange(uv_main, color)
     #endif
 
     ////////////////////////////

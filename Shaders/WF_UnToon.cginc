@@ -143,7 +143,7 @@
         // グラデーションマップ
         affectGradientMap(uv_main, color);
         // 色変換
-        affectColorChange(color);
+        affectColorChange(uv_main, color);
 
         // BumpMap
         float3 ws_normal = i.normal;

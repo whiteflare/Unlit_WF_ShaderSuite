@@ -53,6 +53,7 @@
     DECL_SUB_TEX2D      (_LME_MaskTex);
     DECL_SUB_TEX2D      (_DFD_ColorTex);
     DECL_SUB_TEX2D      (_CGR_MaskTex);
+    DECL_SUB_TEX2D      (_CLC_MaskTex);
 #endif
 
     // 独自の Sampler で参照するサブテクスチャ =================
@@ -154,6 +155,7 @@
     float           _CLC_DeltaS;
     float           _CLC_DeltaV;
     float           _CLC_Monochrome;
+    float           _CLC_InvMaskVal;
 #endif
 
     // -------------------------

@@ -72,6 +72,10 @@ Shader "UnlitWF/WF_UnToon_TransCutout" {
             _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
+        [NoScaleOffset]
+            _CLC_MaskTex            ("[CLC] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CLC_InvMaskVal         ("[CLC] Invert Mask Value", Range(0, 1)) = 0
 
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
