@@ -721,6 +721,42 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    // 色変換
+                    var p = ctx.oldProps.GetValueOrNull("_MainTexHSVG");
+                    if (p != null && (p.Type == ShaderUtil.ShaderPropertyType.Vector || p.Type == ShaderUtil.ShaderPropertyType.Color)) {
+                        var hsv = p.ColorValue;
+                        if (hsv.r != 0 || hsv.g != 1 || hsv.b != 1)
+                        {
+                            WFAccessor.SetBool(ctx.target, "_CLC_Enable", true);
+                            WFAccessor.SetFloat(ctx.target, "_CLC_DeltaH", 0 <= hsv.r ? hsv.r : (hsv.r + 1));
+                            WFAccessor.SetFloat(ctx.target, "_CLC_DeltaS", hsv.g - 1);
+                            WFAccessor.SetFloat(ctx.target, "_CLC_DeltaV", hsv.b - 1);
+                        }
+                        var t = ctx.oldProps.GetValueOrNull("_MainColorAdjustMask");
+                        if (t != null && t.Type == ShaderUtil.ShaderPropertyType.TexEnv)
+                        {
+                            var tex = t.TextureValue;
+                            WFAccessor.SetTexture(ctx.target, "_CLC_MaskTex", tex);
+                        }
+                    }
+                },
+                ctx => {
+                    // グラデーションマップ
+                    if (HasOldPropertyValue(ctx, "_MainGradationTex"))
+                    {
+                        WFAccessor.SetBool(ctx.target, "_CGR_Enable", true);
+                        WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                            PropertyNameReplacement.MatchIgnoreCase("_MainGradationTex", "_CGR_GradMapTex")
+                        );
+                        var t = ctx.oldProps.GetValueOrNull("_MainColorAdjustMask");
+                        if (t != null && t.Type == ShaderUtil.ShaderPropertyType.TexEnv)
+                        {
+                            var tex = t.TextureValue;
+                            WFAccessor.SetTexture(ctx.target, "_CGR_MaskTex", tex);
+                        }
+                    }
+                },
+                ctx => {
                     // プロパティ名変更終了
                     WFMaterialEditUtility.EndReplacePropertyNames(ctx.target);
                 },

@@ -239,6 +239,7 @@ namespace UnlitWF
                 new WFShaderFunction("LME", "LME", "Lame"),
                 new WFShaderFunction("OVL", "OVL", "Overlay Texture"),
                 new WFShaderFunction("DFD", "DFD", "Distance Fade"),
+                new WFShaderFunction("DSV", "DSV", "Dissolve"),
                 new WFShaderFunction("LBE", "LBE", "Light Bake Effects"),
 
                 // カスタムシェーダ系
