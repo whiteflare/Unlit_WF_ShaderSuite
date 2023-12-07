@@ -725,12 +725,13 @@ namespace UnlitWF.Converter
                     var p = ctx.oldProps.GetValueOrNull("_MainTexHSVG");
                     if (p != null && (p.Type == ShaderUtil.ShaderPropertyType.Vector || p.Type == ShaderUtil.ShaderPropertyType.Color)) {
                         var hsv = p.ColorValue;
-                        if (hsv.r != 0 || hsv.g != 1 || hsv.b != 1)
+                        if (hsv.r != 0 || hsv.g != 1 || hsv.b != 1 || hsv.a != 1)
                         {
                             WFAccessor.SetBool(ctx.target, "_CLC_Enable", true);
                             WFAccessor.SetFloat(ctx.target, "_CLC_DeltaH", 0 <= hsv.r ? hsv.r : (hsv.r + 1));
                             WFAccessor.SetFloat(ctx.target, "_CLC_DeltaS", hsv.g - 1);
                             WFAccessor.SetFloat(ctx.target, "_CLC_DeltaV", hsv.b - 1);
+                            WFAccessor.SetFloat(ctx.target, "_CLC_Gamma", hsv.a);
                         }
                         var t = ctx.oldProps.GetValueOrNull("_MainColorAdjustMask");
                         if (t != null && t.Type == ShaderUtil.ShaderPropertyType.TexEnv)
