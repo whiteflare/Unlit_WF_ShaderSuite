@@ -439,15 +439,20 @@ FEATURE_TGL_END
     #ifdef _CLC_ENABLE
         void affectColorChange(float2 uv_main, inout float4 color) {
 FEATURE_TGL_ON_BEGIN(_CLC_Enable)
+            float3 clc = color.rgb;
+            // モノクロ化
             if (TGL_ON(_CLC_Monochrome)) {
-                color.r += color.g + color.b;
-                color.g = (color.r - 1) / 2;
-                color.b = (color.r - 1) / 2;
+                clc.r += clc.g + clc.b;
+                clc.gb = (clc.r - 1) / 2;
             }
-            float3 hsv = rgb2hsv( saturate(color.rgb) );
+            // HSVで調整
+            float3 hsv = rgb2hsv( saturate(clc.rgb) );
             hsv += float3( _CLC_DeltaH, _CLC_DeltaS, _CLC_DeltaV);
             hsv.r = frac(hsv.r);
-            float3 clc = saturate( hsv2rgb( saturate(hsv) ) );
+            clc = saturate( hsv2rgb( saturate(hsv) ) );
+            // ガンマ調整
+            clc = pow(clc, NON_ZERO_FLOAT(_CLC_Gamma));
+            // 合成
             color.rgb = lerp(color.rgb, clc, WF_TEX2D_CLC_MASK(uv_main));
 FEATURE_TGL_END
         }

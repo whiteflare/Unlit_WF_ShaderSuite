@@ -154,6 +154,7 @@
     float           _CLC_DeltaH;
     float           _CLC_DeltaS;
     float           _CLC_DeltaV;
+    float           _CLC_Gamma;
     float           _CLC_Monochrome;
     float           _CLC_InvMaskVal;
 #endif

@@ -424,6 +424,7 @@ namespace UnlitWF
             new WFI18NTranslation("Shadow Power", "影の濃さ"),
             new WFI18NTranslation("Preview", "プレビュー"),
             new WFI18NTranslation("Save", "保存"),
+            new WFI18NTranslation("Gamma", "ガンマ"),
             new WFI18NTranslation("Create GradationMap Texture", "グラデーションマップ用テクスチャを作成"),
             // Lit
             new WFI18NTranslation("Unlit Intensity", "Unlit Intensity (最小明度)"),

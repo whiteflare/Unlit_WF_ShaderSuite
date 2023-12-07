@@ -68,6 +68,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Opaque" {
             _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
+        [PowerSlider(2.0)]
+            _CLC_Gamma              ("[CLC] Gamma", Range(0, 4)) = 1
         [NoScaleOffset]
             _CLC_MaskTex            ("[CLC] Mask Texture (R)", 2D) = "white" {}
         [ToggleUI]
