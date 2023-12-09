@@ -58,6 +58,15 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         [HDR]
             _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
 
+        [WFHeaderToggle(Gradient Map)]
+            _CGR_Enable             ("[CGR] Enable", Float) = 0
+        [NoScaleOffset]
+            _CGR_GradMapTex         ("[CGR] Gradient Map", 2D) = "white" {}
+        [NoScaleOffset]
+            _CGR_MaskTex            ("[CGR] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CGR_InvMaskVal         ("[CGR] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -65,6 +74,12 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
+        [PowerSlider(2.0)]
+            _CLC_Gamma              ("[CLC] Gamma", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _CLC_MaskTex            ("[CLC] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CLC_InvMaskVal         ("[CLC] Invert Mask Value", Range(0, 1)) = 0
 
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
@@ -380,7 +395,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/11/06 (1.6.1)", Float) = 0
+            _CurrentVersion         ("2023/12/10 (1.7.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _ClearBgSupported       ("True", Float) = 0
@@ -458,6 +473,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CHM_ENABLE
+            #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE
@@ -516,6 +532,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CHM_ENABLE
+            #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE
@@ -573,6 +590,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CHM_ENABLE
+            #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE
