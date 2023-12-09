@@ -65,7 +65,7 @@ Shader "UnlitWF/WF_Water_Caustics_Addition" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/11/06 (1.6.1)", Float) = 0
+            _CurrentVersion         ("2023/12/10 (1.7.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
