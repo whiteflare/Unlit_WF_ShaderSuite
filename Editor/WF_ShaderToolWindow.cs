@@ -452,11 +452,17 @@ namespace UnlitWF
 
         public static bool ExecuteButton(string label, bool disable = false)
         {
+            var rect = EditorGUILayout.GetControlRect();
+            return ExecuteButton(rect, label, disable);
+        }
+
+        public static bool ExecuteButton(Rect rect, string label, bool disable = false)
+        {
             using (new EditorGUI.DisabledGroupScope(disable))
             {
                 var oldColor = GUI.color;
                 GUI.color = new Color(0.75f, 0.75f, 1f);
-                bool exec = GUILayout.Button(label);
+                bool exec = GUI.Button(rect, label);
                 GUI.color = oldColor;
                 return exec;
             }
