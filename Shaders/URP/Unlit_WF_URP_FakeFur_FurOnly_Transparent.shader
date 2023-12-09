@@ -46,6 +46,15 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent" {
         [ToggleUI]
             _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Gradient Map)]
+            _CGR_Enable             ("[CGR] Enable", Float) = 0
+        [NoScaleOffset]
+            _CGR_GradMapTex         ("[CGR] Gradient Map", 2D) = "white" {}
+        [NoScaleOffset]
+            _CGR_MaskTex            ("[CGR] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CGR_InvMaskVal         ("[CGR] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -53,6 +62,12 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent" {
             _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
+        [PowerSlider(2.0)]
+            _CLC_Gamma              ("[CLC] Gamma", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _CLC_MaskTex            ("[CLC] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CLC_InvMaskVal         ("[CLC] Invert Mask Value", Range(0, 1)) = 0
 
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
@@ -142,6 +157,7 @@ Shader "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent" {
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
+            #pragma shader_feature_local _CGR_ENABLE
             #pragma shader_feature_local _CLC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
 
