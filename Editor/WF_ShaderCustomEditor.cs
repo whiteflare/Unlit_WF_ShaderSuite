@@ -197,7 +197,9 @@ namespace UnlitWF
                 if (GUI.Button(rect, WFI18N.GetGUIContent("Create GradationMap Texture"))) {
                     GradientMakerWindow.Show(rect, WFCommonUtility.AsMaterials(ctx.editor.targets));
                 }
+#if UNITY_2019_1_OR_NEWER
                 EditorGUILayout.Space(4);
+#endif
             }, isRegex:false),
             // _CGR_InvMaskValの後に、プレビューテクスチャが設定されているならば警告を出す
             new CustomPropertyHook("_CGR_InvMaskVal", null, (ctx, changed) => {
@@ -207,7 +209,9 @@ namespace UnlitWF
                 });
                 if (hasPreviewTex)
                 {
+#if UNITY_2019_1_OR_NEWER
                     EditorGUILayout.Space(4);
+#endif
                     var msg = WFI18N.Translate(WFMessageText.PsPreviewTexture);
                     EditorGUILayout.HelpBox(msg, MessageType.Warning);
                 }
@@ -813,7 +817,7 @@ namespace UnlitWF
             return hur;
         }
 
-        #region GUI部品
+#region GUI部品
 
         private static void SetStyleFont(GUIStyle style, Font font, System.Func<int, int> fontSize, FontStyle fontStyle)
         {
@@ -1160,9 +1164,9 @@ namespace UnlitWF
             });
         }
 
-        #endregion
+#endregion
 
-        #region PropertyHook
+#region PropertyHook
 
         /// <summary>
         /// PropertyHookで使用する表示コンテキスト
@@ -1459,10 +1463,10 @@ namespace UnlitWF
             }
         }
 
-        #endregion
+#endregion
     }
 
-    #region MaterialPropertyDrawer
+#region MaterialPropertyDrawer
 
     static class CustomEditorMiscUtility
     {
@@ -1987,9 +1991,9 @@ namespace UnlitWF
         }
     }
 
-    #endregion
+#endregion
 
-    #region PopupWindowContent
+#region PopupWindowContent
 
     public class GradientMakerWindow : PopupWindowContent
     {
@@ -2021,7 +2025,9 @@ namespace UnlitWF
                 grad = CreateEmptyGradient();
             }
 
+#if UNITY_2019_1_OR_NEWER
             EditorGUILayout.Space(3f);
+#endif
 
             grad = EditorGUILayout.GradientField(grad);
 
@@ -2117,7 +2123,7 @@ namespace UnlitWF
         }
     }
 
-    #endregion
+#endregion
 
     public enum BlendModeOVL
     {
