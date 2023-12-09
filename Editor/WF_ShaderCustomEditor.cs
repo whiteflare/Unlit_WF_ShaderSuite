@@ -39,7 +39,7 @@ namespace UnlitWF
                     ctx.editor.RegisterPropertyChangeUndo("Shade Color Suggest");
                     SuggestShadowColor(WFCommonUtility.AsMaterials(ctx.editor.targets));
                 }
-            } , null),
+            } , null, isRegex:false),
             // _TS_Feather の直前に設定ボタンを追加する
             new CustomPropertyHook("_TS_Feather|_TS_1stFeather", ctx => {
                 if (GetShadowStepsFromMaterial(WFCommonUtility.AsMaterials(ctx.editor.targets)) < 2) {
@@ -55,17 +55,17 @@ namespace UnlitWF
             // 条件付きHide
             new ConditionVisiblePropertyHook("_TS_2ndColor|_TS_2ndBorder|_TS_2ndFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => p == 0 || 2 <= p)),
             new ConditionVisiblePropertyHook("_TS_3rdColor|_TS_3rdBorder|_TS_3rdFeather", ctx => IsAnyIntValue(ctx, "_TS_Steps", p => 3 <= p)),
-            new ConditionVisiblePropertyHook("_OVL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)), // ANGEL_RING
-            new ConditionVisiblePropertyHook("_OVL_UVScroll", ctx => IsAnyIntValue(ctx, "_OVL_OutUVType", p => p != 1)), // Clip
+            new ConditionVisiblePropertyHook("_OVL_CustomParam1", ctx => IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3), isRegex:false), // ANGEL_RING
+            new ConditionVisiblePropertyHook("_OVL_UVScroll", ctx => IsAnyIntValue(ctx, "_OVL_OutUVType", p => p != 1), isRegex:false), // Clip
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_ES_SC_.*", ctx => IsAnyIntValue(ctx, "_ES_ScrollEnable", p => p != 0)),
-            new ConditionVisiblePropertyHook("_ES_SC_UVType", ctx => IsAnyIntValue(ctx, "_ES_SC_DirType", p => p == 2)),
+            new ConditionVisiblePropertyHook("_ES_SC_UVType", ctx => IsAnyIntValue(ctx, "_ES_SC_DirType", p => p == 2), isRegex:false),
             new ConditionVisiblePropertyHook("_ES_AU_.*", ctx => IsAnyIntValue(ctx, "_ES_AuLinkEnable", p => p != 0)),
-            new ConditionVisiblePropertyHook("_GL_ShadowCutoff", ctx => IsAnyIntValue(ctx, "_GL_CastShadow", p => 1 <= p)),
+            new ConditionVisiblePropertyHook("_GL_ShadowCutoff", ctx => IsAnyIntValue(ctx, "_GL_CastShadow", p => 1 <= p), isRegex:false),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
-            new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5)),
+            new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5), isRegex:false),
             new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx => {
                 switch(WFCommonUtility.GetCurrentEntironment())
                 {
@@ -76,16 +76,16 @@ namespace UnlitWF
                     default:
                         return true;
                 }
-            }),
+            }, isRegex:false),
             // 条件付きHide(Grass系列)
             new ConditionVisiblePropertyHook("_GRS_WorldYBase|_GRS_WorldYScale", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 0)),
-            new ConditionVisiblePropertyHook("_GRS_HeightUVType", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1 || p == 2)),
+            new ConditionVisiblePropertyHook("_GRS_HeightUVType", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1 || p == 2), isRegex:false),
             new ConditionVisiblePropertyHook("_GRS_HeightMaskTex|_GRS_InvMaskVal", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 2)),
-            new ConditionVisiblePropertyHook("_GRS_UVFactor", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1)),
-            new ConditionVisiblePropertyHook("_GRS_ColorFactor", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 2 || p == 3)),
+            new ConditionVisiblePropertyHook("_GRS_UVFactor", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1), isRegex:false),
+            new ConditionVisiblePropertyHook("_GRS_ColorFactor", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 2 || p == 3), isRegex:false),
             // 条件付きHide(Water系列)
-            new ConditionVisiblePropertyHook("_WAM_Cubemap", ctx => IsAnyIntValue(ctx, "_WAM_CubemapType", p => p != 0)),
-            new ConditionVisiblePropertyHook("_WAM_CubemapHighCut", ctx => IsAnyIntValue(ctx, "_WAM_CubemapType", p => p != 0)),
+            new ConditionVisiblePropertyHook("_WAM_Cubemap", ctx => IsAnyIntValue(ctx, "_WAM_CubemapType", p => p != 0), isRegex:false),
+            new ConditionVisiblePropertyHook("_WAM_CubemapHighCut", ctx => IsAnyIntValue(ctx, "_WAM_CubemapType", p => p != 0), isRegex:false),
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
@@ -118,24 +118,24 @@ namespace UnlitWF
                 if (IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)) {
                     ctx.guiContent = WFI18N.GetGUIContent("OL", "UV2.y <-> Normal.y");
                 }
-            }, null),
+            }, null, isRegex:false),
 
             // 値を設定したら他プロパティの値を自動で設定する
             new DefValueSetPropertyHook("_MT_Cubemap", ctx => {
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_MT_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP
                 }
-            }),
+            }, isRegex:false),
             new DefValueSetPropertyHook("_WAM_Cubemap", ctx => {
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_WRL_CubemapType", 0, 2); // OFF -> ONLY_SECOND_MAP
                 }
-            }),
+            }, isRegex:false),
             new DefValueSetPropertyHook("_AL_MaskTex", ctx => {
                 if (ctx.current.textureValue != null) {
                     CompareAndSet(ctx.all, "_AL_Source", 0, 1); // MAIN_TEX_ALPHA -> MASK_TEX_RED
                 }
-            }),
+            }, isRegex:false),
             new DefValueSetPropertyHook("_HL_MatcapTex(_[0-9]+)?", ctx => {
                 if (ctx.current.textureValue != null) {
                     var name = ctx.current.textureValue.name;
@@ -189,7 +189,29 @@ namespace UnlitWF
                         WFAccessor.SetFloat(mat, "_TR_InvMaskVal", 0);
                     }
                 }
-            }),
+            }, isRegex:false),
+
+            // _CGR_GradMapTexの後にグラデーションマップ作成ボタンを追加する
+            new CustomPropertyHook("_CGR_GradMapTex", null, (ctx, changed) => {
+                var rect = EditorGUILayout.GetControlRect();
+                if (GUI.Button(rect, WFI18N.GetGUIContent("Create GradationMap Texture"))) {
+                    GradientMakerWindow.Show(rect, WFCommonUtility.AsMaterials(ctx.editor.targets));
+                }
+                EditorGUILayout.Space(4);
+            }, isRegex:false),
+            // _CGR_InvMaskValの後に、プレビューテクスチャが設定されているならば警告を出す
+            new CustomPropertyHook("_CGR_InvMaskVal", null, (ctx, changed) => {
+                var hasPreviewTex = ctx.editor.targets.Any(mat => {
+                    var tex = WFAccessor.GetTexture(mat as Material, "_CGR_GradMapTex");
+                    return tex != null && string.IsNullOrWhiteSpace(AssetDatabase.GetAssetPath(tex));
+                });
+                if (hasPreviewTex)
+                {
+                    EditorGUILayout.Space(4);
+                    var msg = WFI18N.Translate(WFMessageText.PsPreviewTexture);
+                    EditorGUILayout.HelpBox(msg, MessageType.Warning);
+                }
+            }, isRegex:false),
 
             // _NS_InvMaskVal の直後に FlipMirror を再表示
             new CustomPropertyHook("_NS_InvMaskVal", null, (ctx, changed) => {
@@ -198,12 +220,12 @@ namespace UnlitWF
                 {
                     ctx.editor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName.Replace("[NM]", "[NS]")));
                 }
-            }),
+            }, isRegex:false),
 
             // _TS_InvMaskVal の後に説明文を追加する
             new CustomPropertyHook("_TS_InvMaskVal", null, (ctx, changed) => {
                 EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info);
-            }),
+            }, isRegex:false),
             // _HL_MatcapColor の後に説明文を追加する
             new CustomPropertyHook("_HL_MatcapColor(_[0-9]+)?", null, (ctx, changed) => {
                 var name = ctx.current.name.Replace("_MatcapColor", "_CapType");
@@ -1193,16 +1215,18 @@ namespace UnlitWF
 
         internal abstract class AbstractPropertyHook : IPropertyHook
         {
+            protected readonly string pattern;
             protected readonly Regex matcher;
 
-            protected AbstractPropertyHook(string pattern)
+            protected AbstractPropertyHook(string pattern, bool isRegex)
             {
-                this.matcher = new Regex(@"^(" + pattern + @")$", RegexOptions.Compiled);
+                this.pattern = pattern;
+                this.matcher = isRegex ? new Regex(@"^(" + pattern + @")$", RegexOptions.Compiled) : null;
             }
 
             public void OnBefore(PropertyGUIContext context)
             {
-                if (matcher.IsMatch(context.current.name))
+                if (IsMatch(context.current.name))
                 {
                     OnBeforeProp(context);
                 }
@@ -1210,10 +1234,15 @@ namespace UnlitWF
 
             public void OnAfter(PropertyGUIContext context, bool changed)
             {
-                if (matcher.IsMatch(context.current.name))
+                if (IsMatch(context.current.name))
                 {
                     OnAfterProp(context, changed);
                 }
+            }
+
+            protected bool IsMatch(string name)
+            {
+                return matcher != null ? matcher.IsMatch(name) : pattern == name;
             }
 
             protected virtual void OnBeforeProp(PropertyGUIContext context)
@@ -1235,7 +1264,7 @@ namespace UnlitWF
             private readonly string colName;
             private readonly string texName;
 
-            public SingleLineTexPropertyHook(string colName, string texName) : base(colName + "|" + texName)
+            public SingleLineTexPropertyHook(string colName, string texName) : base(colName + "|" + texName, isRegex:true)
             {
                 this.colName = colName;
                 this.texName = texName;
@@ -1279,7 +1308,7 @@ namespace UnlitWF
             private readonly string maxName;
             private readonly string displayName;
 
-            public MinMaxSliderPropertyHook(string minName, string maxName, string displayName = null) : base(minName + "|" + maxName)
+            public MinMaxSliderPropertyHook(string minName, string maxName, string displayName = null) : base(minName + "|" + maxName, isRegex: true)
             {
                 this.minName = minName;
                 this.maxName = maxName;
@@ -1316,7 +1345,7 @@ namespace UnlitWF
             private readonly string backName;
             private readonly string displayName;
 
-            public ZWriteFrontBackPropertyHook(string frontName, string backName, string displayName = null) : base(frontName + "|" + backName)
+            public ZWriteFrontBackPropertyHook(string frontName, string backName, string displayName = null) : base(frontName + "|" + backName, isRegex: true)
             {
                 this.frontName = frontName;
                 this.backName = backName;
@@ -1361,7 +1390,7 @@ namespace UnlitWF
 
             private readonly DefValueSetDelegate setter;
 
-            public DefValueSetPropertyHook(string name, DefValueSetDelegate setter) : base(name)
+            public DefValueSetPropertyHook(string name, DefValueSetDelegate setter, bool isRegex = true) : base(name, isRegex)
             {
                 this.setter = setter;
             }
@@ -1382,7 +1411,7 @@ namespace UnlitWF
         {
             private readonly Predicate<PropertyGUIContext> pred;
 
-            public ConditionVisiblePropertyHook(string pattern, Predicate<PropertyGUIContext> pred) : base(pattern)
+            public ConditionVisiblePropertyHook(string pattern, Predicate<PropertyGUIContext> pred, bool isRegex = true) : base(pattern, isRegex)
             {
                 this.pred = pred;
             }
@@ -1407,7 +1436,7 @@ namespace UnlitWF
             private readonly OnBeforeDelegate before;
             private readonly OnAfterDelegate after;
 
-            public CustomPropertyHook(string pattern, OnBeforeDelegate before, OnAfterDelegate after) : base(pattern)
+            public CustomPropertyHook(string pattern, OnBeforeDelegate before, OnAfterDelegate after, bool isRegex = true) : base(pattern, isRegex)
             {
                 this.before = before;
                 this.after = after;
@@ -1955,6 +1984,136 @@ namespace UnlitWF
                 }
             }
             return result;
+        }
+    }
+
+    #endregion
+
+    #region PopupWindowContent
+
+    public class GradientMakerWindow : PopupWindowContent
+    {
+        public static void Show(Rect ownerRect, params Material[] targets)
+        {
+            if (targets.Length == 0)
+            {
+                return;
+            }
+            var contents = new GradientMakerWindow();
+            contents.targets = targets;
+            contents.ownerRect = ownerRect;
+            PopupWindow.Show(ownerRect, contents);
+        }
+
+        private static Gradient grad = null;
+        private Material[] targets;
+        private Rect ownerRect;
+
+        public override Vector2 GetWindowSize()
+        {
+            return new Vector2(ownerRect.width * 0.75f, ownerRect.height * 3f);
+        }
+
+        public override void OnGUI(Rect rect)
+        {
+            if (grad == null)
+            {
+                grad = CreateEmptyGradient();
+            }
+
+            EditorGUILayout.Space(3f);
+
+            grad = EditorGUILayout.GradientField(grad);
+
+            var rectBtn = EditorGUILayout.GetControlRect();
+            rectBtn.width /= 2;
+            rectBtn.width--;
+            if (GUI.Button(rectBtn, WFI18N.Translate("Preview")))
+            {
+                Execute(true);
+            }
+
+            rectBtn.x += rectBtn.width + 2;
+            if (ToolCommon.ExecuteButton(rectBtn, WFI18N.Translate("Save")))
+            {
+                Execute(false);
+            }
+        }
+
+        private static Gradient CreateEmptyGradient()
+        {
+            var grad = new Gradient();
+            grad.colorKeys = new GradientColorKey[]{
+                new GradientColorKey(Color.black, 0),
+                new GradientColorKey(Color.white, 1),
+            };
+            return grad;
+        }
+
+        private void Execute(bool preview)
+        {
+            var tex = GenerateTexture(preview);
+            if (tex != null)
+            {
+                Undo.RecordObjects(targets, "Set Material GradientMap");
+                foreach (var mat in targets)
+                {
+                    WFAccessor.SetTexture(mat, "_CGR_GradMapTex", tex);
+                }
+            }
+        }
+
+        private const int TEX_WIDTH = 128;
+        private const int TEX_HEIGHT = 4;
+        private const TextureImporterCompression TEX_COMPRESS = TextureImporterCompression.CompressedHQ;
+
+        private Texture2D GenerateTexture(bool preview)
+        {
+            Texture2D tex = new Texture2D(TEX_WIDTH, TEX_HEIGHT, TextureFormat.RGBA32, false);
+            tex.wrapMode = TextureWrapMode.Clamp;
+
+            Color[] c = new Color[TEX_WIDTH];
+            for (int i = 0; i < TEX_WIDTH; i++)
+            {
+                c[i] = grad.Evaluate(i / (float)TEX_WIDTH);
+            }
+
+            for (int y = 0; y < TEX_HEIGHT; y++)
+            {
+                tex.SetPixels(0, y, TEX_WIDTH, 1, c);
+            }
+            tex.Apply();
+
+            if (preview)
+            {
+                return tex;
+            }
+            else
+            {
+                var path = EditorUtility.SaveFilePanelInProject("Save Texture", "", "png", "Save Texture");
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    return null;
+                }
+
+                System.IO.File.WriteAllBytes(path, tex.EncodeToPNG());
+
+                AssetDatabase.ImportAsset(path);
+                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer == null)
+                {
+                    return null;
+                }
+
+                importer.textureCompression = TEX_COMPRESS;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.mipmapEnabled = false;
+                importer.streamingMipmaps = false;
+                importer.SaveAndReimport();
+
+                return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            }
         }
     }
 

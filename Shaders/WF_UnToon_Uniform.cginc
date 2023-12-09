@@ -52,6 +52,8 @@
     DECL_SUB_TEX2D      (_LME_Texture);
     DECL_SUB_TEX2D      (_LME_MaskTex);
     DECL_SUB_TEX2D      (_DFD_ColorTex);
+    DECL_SUB_TEX2D      (_CGR_MaskTex);
+    DECL_SUB_TEX2D      (_CLC_MaskTex);
 #endif
 
     // 独自の Sampler で参照するサブテクスチャ =================
@@ -62,6 +64,7 @@
 #endif
     DECL_MAIN_TEXCUBE   (_MT_Cubemap);
     DECL_MAIN_TEX2D     (_OVL_OverlayTex);
+    DECL_MAIN_TEX2D     (_CGR_GradMapTex);
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
 
@@ -140,11 +143,20 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
+    FEATURE_TGL    (_CGR_Enable);
+    float           _CGR_InvMaskVal;
+#endif
+
+    // -------------------------
+
+#ifndef _WF_MOBILE
     FEATURE_TGL    (_CLC_Enable);
     float           _CLC_DeltaH;
     float           _CLC_DeltaS;
     float           _CLC_DeltaV;
+    float           _CLC_Gamma;
     float           _CLC_Monochrome;
+    float           _CLC_InvMaskVal;
 #endif
 
     // -------------------------

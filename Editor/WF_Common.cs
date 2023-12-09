@@ -998,9 +998,14 @@ namespace UnlitWF
 
         #region マテリアル値の取得
 
+        private static bool CanRead(Material mat, string name)
+        {
+            return mat != null && mat.HasProperty(name);
+        }
+
         public static bool GetBool(Material mat, string name, bool _default)
         {
-            if (mat.HasProperty(name))
+            if (CanRead(mat, name))
             {
                 return mat.GetInt(name) != 0;
             }
@@ -1009,7 +1014,7 @@ namespace UnlitWF
 
         public static int GetInt(Material mat, string name, int _default)
         {
-            if (mat.HasProperty(name))
+            if (CanRead(mat, name))
             {
                 return mat.GetInt(name);
             }
@@ -1018,7 +1023,7 @@ namespace UnlitWF
 
         public static float GetFloat(Material mat, string name, float _default)
         {
-            if (mat.HasProperty(name))
+            if (CanRead(mat, name))
             {
                 return mat.GetFloat(name);
             }
@@ -1027,7 +1032,7 @@ namespace UnlitWF
 
         public static Color GetColor(Material mat, string name, Color _default)
         {
-            if (mat.HasProperty(name))
+            if (CanRead(mat, name))
             {
                 return mat.GetColor(name);
             }
@@ -1036,7 +1041,7 @@ namespace UnlitWF
 
         public static Vector4 GetVector(Material mat, string name, Vector4 _default)
         {
-            if (mat.HasProperty(name))
+            if (CanRead(mat, name))
             {
                 return mat.GetVector(name);
             }
@@ -1045,7 +1050,7 @@ namespace UnlitWF
 
         public static Texture GetTexture(Material mat, string name)
         {
-            if (mat.HasProperty(name))
+            if (CanRead(mat, name))
             {
                 return mat.GetTexture(name);
             }
@@ -1058,7 +1063,7 @@ namespace UnlitWF
 
         private static bool CanWrite(Material mat, string name)
         {
-            return mat.HasProperty(name) && !IsPropertyLockedByAncestor(mat, name);
+            return mat != null && mat.HasProperty(name) && !IsPropertyLockedByAncestor(mat, name);
         }
 
         public static bool SetBool(Material mat, string name, bool value)
@@ -1123,7 +1128,7 @@ namespace UnlitWF
 
         public static bool CopyFloatValue(Material mat, string from, string to)
         {
-            if (mat.HasProperty(from) && CanWrite(mat, to))
+            if (CanRead(mat, from) && CanWrite(mat, to))
             {
                 mat.SetFloat(to, mat.GetFloat(from));
                 return true;
@@ -1133,7 +1138,7 @@ namespace UnlitWF
 
         public static bool CopyIntValue(Material mat, string from, string to)
         {
-            if (mat.HasProperty(from) && CanWrite(mat, to))
+            if (CanRead(mat, from) && CanWrite(mat, to))
             {
                 mat.SetInt(to, mat.GetInt(from));
                 return true;
@@ -1143,7 +1148,7 @@ namespace UnlitWF
 
         public static bool CopyTextureValue(Material mat, string from, string to)
         {
-            if (mat.HasProperty(from) && CanWrite(mat, to))
+            if (CanRead(mat, from) && CanWrite(mat, to))
             {
                 mat.SetTexture(to, mat.GetTexture(from));
                 return true;

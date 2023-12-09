@@ -53,6 +53,15 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
         [ToggleUI]
             _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Gradient Map)]
+            _CGR_Enable             ("[CGR] Enable", Float) = 0
+        [NoScaleOffset]
+            _CGR_GradMapTex         ("[CGR] Gradient Map", 2D) = "white" {}
+        [NoScaleOffset]
+            _CGR_MaskTex            ("[CGR] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CGR_InvMaskVal         ("[CGR] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(Color Change)]
             _CLC_Enable             ("[CLC] Enable", Float) = 0
         [ToggleUI]
@@ -60,6 +69,12 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
             _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
             _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
+        [PowerSlider(2.0)]
+            _CLC_Gamma              ("[CLC] Gamma", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _CLC_MaskTex            ("[CLC] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CLC_InvMaskVal         ("[CLC] Invert Mask Value", Range(0, 1)) = 0
 
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
@@ -170,6 +185,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #define _GL_NCC_ENABLE
             #define _TS_ENABLE
 
+            #define _CGR_ENABLE
             #define _CLC_ENABLE
             #define _DFD_ENABLE
             #define _DSV_ENABLE
@@ -202,6 +218,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #define _GL_NCC_ENABLE
             #define _TS_ENABLE
 
+            #define _CGR_ENABLE
             #define _CLC_ENABLE
             #define _DFD_ENABLE
             #define _DSV_ENABLE

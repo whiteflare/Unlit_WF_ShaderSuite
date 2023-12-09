@@ -131,7 +131,7 @@
         // カメラへの方向
         float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
 
-		// 背景消去
+        // 背景消去
         float4 cube_color = PICK_MAIN_TEXCUBE_LOD(unity_SpecCube0, -ws_camera_dir, 0);
         color.rgb = DecodeHDR(cube_color, float4(1, unity_SpecCube0_HDR.yzw));
 
