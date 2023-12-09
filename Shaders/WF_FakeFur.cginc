@@ -214,8 +214,10 @@
         // アルファマスク適用
         affectAlphaMask(uv_main, color);
 
+        // グラデーションマップ
+        affectGradientMap(uv_main, color);
         // 色変換
-        affectColorChange(color);
+        affectColorChange(uv_main, color);
 
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
