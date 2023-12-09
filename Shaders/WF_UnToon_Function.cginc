@@ -420,7 +420,7 @@ FEATURE_TGL_END
 
     #ifdef _CGR_ENABLE
         void affectGradientMap(float2 uv_main, inout float4 color) {
-FEATURE_TGL_ON_BEGIN(_CGR_ENABLE)
+FEATURE_TGL_ON_BEGIN(_CGR_Enable)
             float x = saturate(calcBrightness(color.rgb));
             float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0)).rgb;
             color.rgb = lerp(color.rgb, cgr, WF_TEX2D_GRADMAP_MASK(uv_main));
