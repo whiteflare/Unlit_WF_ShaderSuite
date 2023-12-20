@@ -55,6 +55,44 @@
 
     #define IN_FRAG v2f_surface
 
+    struct drawing {
+        float4  color;
+        float2  uv1;
+        float2  uv2;
+        float2  uv_main;
+        float2  uv_lmap;
+        float3  ws_vertex;
+        float3  ws_normal;
+        float3  ws_bump_normal;
+        float3  ws_view_dir;
+        float3  ws_camera_dir;
+        float3  ws_light_dir;
+        float3  ws_tangent;
+        float3  ws_bitangent;
+        uint    facing;
+        float   height;
+    };
+
+    drawing prepareDrawing(IN_FRAG i, uint facing) {
+        drawing d = (drawing) 0;
+
+        d.color         = float4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv2           = i.uv_lmap;
+        d.uv_main       = i.uv;
+        d.uv_lmap       = i.uv_lmap;
+        d.ws_vertex     = i.ws_vertex;
+        d.facing        = facing;
+        d.ws_light_dir  = i.ws_light_dir;
+        d.ws_normal     = normalize(i.ws_normal);
+        d.ws_tangent    = normalize(i.ws_tangent);
+        d.ws_bitangent  = normalize(i.ws_bitangent);
+        d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
+        d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
+
+        return d;
+    }
+
 #endif
 
 #ifdef _WF_WATER_CAUSTICS
@@ -78,24 +116,65 @@
 
     #define IN_FRAG v2f_caustics
 
+    struct drawing {
+        float4  color;
+        float2  uv1;
+        float2  uv2;
+        float2  uv_main;
+        float2  uv_lmap;
+        float3  ws_vertex;
+    };
+
+    drawing prepareDrawing(IN_FRAG i) {
+        drawing d = (drawing) 0;
+
+        d.color         = float4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv2           = i.uv_lmap;
+        d.uv_main       = i.uv;
+        d.uv_lmap       = i.uv_lmap;
+        d.ws_vertex     = i.ws_vertex;
+
+        return d;
+    }
+
 #endif
 
 #ifdef _WF_WATER_DEPTHFOG
 
     struct appdata_depthfog {
         float4 vertex           : POSITION;
+        float2 uv               : TEXCOORD0;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_depthfog {
         float4 vs_vertex        : SV_POSITION;
-        float3 ws_vertex        : TEXCOORD0;
+        float2 uv               : TEXCOORD0;
+        float3 ws_vertex        : TEXCOORD1;
         UNITY_FOG_COORDS(1)
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
     #define IN_FRAG v2f_depthfog
 
+    struct drawing {
+        float4  color;
+        float2  uv1;
+        float2  uv_main;
+        float3  ws_vertex;
+    };
+
+    drawing prepareDrawing(IN_FRAG i) {
+        drawing d = (drawing) 0;
+
+        d.color         = float4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv_main       = i.uv;
+        d.ws_vertex     = i.ws_vertex;
+
+        return d;
+    }
 #endif
 
 #if defined(_WF_WATER_LAMP_DIR) || defined(_WF_WATER_LAMP_POINT)
@@ -126,6 +205,40 @@
 
     #define IN_FRAG v2f_lamp
 
+    struct drawing {
+        float4  color;
+        float2  uv1;
+        float2  uv2;
+        float2  uv_main;
+        float2  uv_lmap;
+        float3  ws_vertex;
+        float3  ws_normal;
+        float3  ws_tangent;
+        float3  ws_bitangent;
+        float3  ws_bump_normal;
+#ifdef _WF_WATER_LAMP_POINT
+        float3  ws_base_pos;
+#endif
+    };
+
+    drawing prepareDrawing(IN_FRAG i) {
+        drawing d = (drawing) 0;
+
+        d.color         = float4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv2           = i.uv_lmap;
+        d.uv_main       = i.uv;
+        d.uv_lmap       = i.uv_lmap;
+        d.ws_vertex     = i.ws_vertex;
+        d.ws_normal     = normalize(i.ws_normal);
+        d.ws_tangent    = normalize(i.ws_tangent);
+        d.ws_bitangent  = normalize(i.ws_bitangent);
+#ifdef _WF_WATER_LAMP_POINT
+        d.ws_base_pos   = i.ws_base_pos;
+#endif
+
+        return d;
+    }
 #endif
 
     ////////////////////////////
@@ -168,8 +281,8 @@
         }
 
     #define WF_DEF_WAVE_CAUSTICS(id)                                                                            \
-        float3 calcWavingCaustics##id(IN_FRAG i, inout uint cnt) {                                              \
-            float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
+        float3 calcWavingCaustics##id(inout drawing d, inout uint cnt) {                                        \
+            float2 uv = calcWavingUV(d.uv_main, d.uv_lmap, d.ws_vertex,                                         \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);                \
             cnt++;                                                                                              \
             return PICK_MAIN_TEX2D(_WAV_CausticsTex##id, uv);                                                   \
@@ -204,9 +317,9 @@
         }
 
     #define WF_DEF_WAVE_CAUSTICS(id)                                                                            \
-        float3 calcWavingCaustics##id(IN_FRAG i, inout uint cnt) {                                              \
+        float3 calcWavingCaustics##id(inout drawing d, inout uint cnt) {                                        \
             if (_WAV_Enable##id) {                                                                              \
-                float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
+                float2 uv = calcWavingUV(d.uv_main, d.uv_lmap, d.ws_vertex,                                     \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);            \
                 cnt++;                                                                                          \
                 return PICK_MAIN_TEX2D(_WAV_CausticsTex##id, uv);                                               \
@@ -241,22 +354,22 @@
         #define calcWavingHeight_3(i, cnt)      0
     #endif
 
-    float calcWavingHeight(v2f_surface i) {
+    void prepareWaveHeight(IN_FRAG i, inout drawing d) {
         uint cnt = 0;
         float height = 0;
         height += calcWavingHeight_1(i, cnt);
         height += calcWavingHeight_2(i, cnt);
         height += calcWavingHeight_3(i, cnt);
-        return cnt == 0 ? 1 : saturate( height / max(1, cnt) / 0.5 + 0.5 );
+        d.height = cnt == 0 ? 1 : saturate( height / max(1, cnt) / 0.5 + 0.5 );
     }
 
-    float3 calcWavingNormal(v2f_surface i) {
+    void prepareWaveNormal(IN_FRAG i, inout drawing d) {
         uint cnt = 0;
         float3 ws_bump_normal = ZERO_VEC3;
         ws_bump_normal += calcWavingNormal_1(i, cnt);
         ws_bump_normal += calcWavingNormal_2(i, cnt);
         ws_bump_normal += calcWavingNormal_3(i, cnt);
-        return cnt == 0 ? i.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
+        d.ws_bump_normal = cnt == 0 ? d.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
     }
 
 #endif
@@ -279,13 +392,12 @@
         #define calcWavingCaustics_3(i, cnt)    ZERO_VEC3
     #endif
 
-    float3 calcWavingCaustics(v2f_caustics i) {
+    void drawWavingCaustics(inout drawing d) {
         uint cnt = 0;
-        float3 color = ZERO_VEC3;
-        color += calcWavingCaustics_1(i, cnt);
-        color += calcWavingCaustics_2(i, cnt);
-        color += calcWavingCaustics_3(i, cnt);
-        return color;
+        d.color.rgb = ZERO_VEC3;
+        d.color.rgb += calcWavingCaustics_1(d, cnt);
+        d.color.rgb += calcWavingCaustics_2(d, cnt);
+        d.color.rgb += calcWavingCaustics_3(d, cnt);
     }
 
 #endif
@@ -308,13 +420,13 @@
         #define calcWavingNormal_3(i, cnt)      ZERO_VEC3
     #endif
 
-    float3 calcWavingNormal(v2f_lamp i) {
+    void prepareWaveNormal(IN_FRAG i, inout drawing d) {
         uint cnt = 0;
         float3 ws_bump_normal = ZERO_VEC3;
         ws_bump_normal += calcWavingNormal_1(i, cnt);
         ws_bump_normal += calcWavingNormal_2(i, cnt);
         ws_bump_normal += calcWavingNormal_3(i, cnt);
-        return cnt == 0 ? i.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
+        d.ws_bump_normal = cnt == 0 ? d.ws_normal : SafeNormalizeVec3(ws_bump_normal / max(1, cnt));
     }
 
 #endif
@@ -329,19 +441,16 @@
         return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
     }
 
-    void affectWaterSurfaceSpecular(IN_FRAG i, float3 ws_bump_normal, inout float4 color) {
+    void drawWaterSurfaceSpecular(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_WAS_Enable)
-        // カメラへの方向
-        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
-
         // GGX Specular
-        color.rgb += pickSpecular(ws_camera_dir, ws_bump_normal, i.ws_light_dir, _WAS_Color.rgb, _WAS_Smooth) * _WAS_Power;
-        color.rgb += pickSpecular(ws_camera_dir, ws_bump_normal, i.ws_light_dir, _WAS_Color2.rgb, _WAS_Smooth2) * _WAS_Power2;
+        d.color.rgb += pickSpecular(d.ws_camera_dir, d.ws_bump_normal, d.ws_light_dir, _WAS_Color.rgb, _WAS_Smooth) * _WAS_Power;
+        d.color.rgb += pickSpecular(d.ws_camera_dir, d.ws_bump_normal, d.ws_light_dir, _WAS_Color2.rgb, _WAS_Smooth2) * _WAS_Power2;
 FEATURE_TGL_END
     }
 
 #else
-    #define affectWaterSurfaceSpecular(i, ws_bump_normal, color)
+    #define drawWaterSurfaceSpecular(d)
 #endif
 
     ////////////////////////////
@@ -376,16 +485,16 @@ FEATURE_TGL_END
         return color;
     }
 
-    void affectWaterSurfaceReflection(IN_FRAG i, float3 ws_bump_normal, inout float4 color) {
+    void drawWaterSurfaceReflection(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_WAM_Enable)
-        float3 reflection = pickReflection(i.ws_vertex, ws_bump_normal, _WAM_Smooth);
-        reflection = lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _WAM_Bright);
-        color.rgb = lerp(color.rgb, reflection.rgb, _WAM_Power);
+        float3 reflection = pickReflection(d.ws_vertex, d.ws_bump_normal, _WAM_Smooth);
+        reflection = lerp(d.color.rgb * reflection.rgb, d.color.rgb + reflection.rgb, _WAM_Bright);
+        d.color.rgb = lerp(d.color.rgb, reflection.rgb, _WAM_Power);
 FEATURE_TGL_END
     }
 
 #else
-    #define affectWaterSurfaceReflection(i, ws_bump_normal, color)
+    #define drawWaterSurfaceReflection(d)
 #endif
 
     ////////////////////////////
@@ -399,14 +508,14 @@ FEATURE_TGL_END
             return dot(cam_vec1, cam_vec1);
         }
 
-        void affectWaterDistanceFade(IN_FRAG i, inout float4 color) {
+        void drawWaterDistanceFade(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_WAD_Enable)
-            float dist = sqrt(calcDistanceFadeDistanceSq(i.ws_vertex.xyz));
-            color.rgb *= lerp(ONE_VEC3, _WAD_Color.rgb * unity_ColorSpaceDouble.rgb, _WAD_Power * smoothstep(_WAD_MinDist, max(_WAD_MinDist + NZF, _WAD_MaxDist), dist));
+            float dist = sqrt(calcDistanceFadeDistanceSq(d.ws_vertex.xyz));
+            d.color.rgb *= lerp(ONE_VEC3, _WAD_Color.rgb * unity_ColorSpaceDouble.rgb, _WAD_Power * smoothstep(_WAD_MinDist, max(_WAD_MinDist + NZF, _WAD_MaxDist), dist));
 FEATURE_TGL_END
         }
     #else
-        #define affectWaterDistanceFade(i, color)
+        #define drawWaterDistanceFade(d)
     #endif
 
     ////////////////////////////
@@ -422,19 +531,19 @@ FEATURE_TGL_END
         float           _WMI_Power;
         float           _WMI_BlendNormal;
 
-        void affectVRCMirrorReflection(IN_FRAG i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+        void drawVRCMirrorReflection(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_WMI_Enable)
-            if (facing) {
-                float4 mirror_scr_pos = mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz + (ws_bump_normal - ws_normal * dot(ws_normal, ws_bump_normal)) * _WMI_BlendNormal, 1));
+            if (d.facing) {
+                float4 mirror_scr_pos = mul(UNITY_MATRIX_VP, float4(d.ws_vertex.xyz + (d.ws_bump_normal - d.ws_normal * dot(d.ws_normal, d.ws_bump_normal)) * _WMI_BlendNormal, 1));
                 float4 refl_pos = ComputeNonStereoScreenPos(mirror_scr_pos);
                 float4 refl = unity_StereoEyeIndex == 0 ? tex2Dproj(_ReflectionTex0, UNITY_PROJ_COORD(refl_pos)) : tex2Dproj(_ReflectionTex1, UNITY_PROJ_COORD(refl_pos));
                 refl.rgb *= _WMI_Color.rgb * unity_ColorSpaceDouble.rgb;
-                color.rgb = lerp(color.rgb, refl.rgb, _WMI_Power * refl.a);
+                d.color.rgb = lerp(d.color.rgb, refl.rgb, _WMI_Power * refl.a);
             }
 FEATURE_TGL_END
         }
     #else
-        #define affectVRCMirrorReflection(i, facing, ws_normal, ws_bump_normal, color)
+        #define drawVRCMirrorReflection(d)
     #endif
 
     ////////////////////////////
@@ -443,38 +552,38 @@ FEATURE_TGL_END
 
     #ifdef _WAR_ENABLE
 
-        void affectLampReflection(IN_FRAG i, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+        void drawLampReflection(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_WAR_Enable)
-            float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
-            float3 refl_dir = normalize(reflect(view_dir, lerpNormals(ws_normal, ws_bump_normal, _WAR_BlendNormal))) / NON_ZERO_FLOAT(_WAR_Size);
+            float3 view_dir = normalize(d.ws_vertex - _WorldSpaceCameraPos.xyz);
+            float3 refl_dir = normalize(reflect(view_dir, lerpNormals(d.ws_normal, d.ws_bump_normal, _WAR_BlendNormal))) / NON_ZERO_FLOAT(_WAR_Size);
 
 #ifdef _WF_WATER_LAMP_DIR
             float3 base_dir = calcHorizontalCoordSystem(_WAR_Azimuth, _WAR_Altitude);
             float power = _WAR_Power;
 #endif
 #ifdef _WF_WATER_LAMP_POINT
-            float3 base_dir = SafeNormalizeVec3(i.ws_base_pos.xyz - i.ws_vertex.xyz);
+            float3 base_dir = SafeNormalizeVec3(d.ws_base_pos.xyz - d.ws_vertex.xyz);
             if (TGL_ON(_WAR_CullBack) && dot(view_dir, base_dir) < 0) {
                 discard;
                 return;
             }
-            float power = _WAR_Power * (1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_MaxDist - _WAR_MinDist), length(i.ws_base_pos.xyz - i.ws_vertex.xyz) - _WAR_MinDist));
+            float power = _WAR_Power * (1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_MaxDist - _WAR_MinDist), length(d.ws_base_pos.xyz - d.ws_vertex.xyz) - _WAR_MinDist));
 #endif
 
             // リフレクション空間の三軸を計算(うち一軸はbase_dir)
-            float3 rs_tangent = SafeNormalizeVec3(cross(ws_normal, base_dir));
+            float3 rs_tangent = SafeNormalizeVec3(cross(d.ws_normal, base_dir));
             float3 rs_bitangent = SafeNormalizeVec3(cross(base_dir, rs_tangent));
             float2 uv_refl = float2(dot(rs_tangent, refl_dir), dot(rs_bitangent, refl_dir));
             if (uv_refl.x < -1 || 1 < uv_refl.x || uv_refl.y < -1 || 1 < uv_refl.y) {
                 discard;
                 return;
             }
-            color.rgb *= power * PICK_MAIN_TEX2D(_WAR_CookieTex, uv_refl / 2 + 0.5).rgb;
+            d.color.rgb *= power * PICK_MAIN_TEX2D(_WAR_CookieTex, uv_refl / 2 + 0.5).rgb;
 
 FEATURE_TGL_END
         }
     #else
-        #define affectLampReflection(i, ws_normal, ws_bump_normal, color)
+        #define drawLampReflection(d)
     #endif
 
     ////////////////////////////
@@ -508,55 +617,41 @@ FEATURE_TGL_END
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        i.ws_normal        = normalize(i.ws_normal);
-        i.ws_tangent       = normalize(i.ws_tangent);
-        i.ws_bitangent     = normalize(i.ws_bitangent);
+        drawing d = prepareDrawing(i, facing);
 
-        // ハイトマップ
-        float height = calcWavingHeight(i);
-        // ノーマルマップ
-        float3 ws_bump_normal = calcWavingNormal(i);
+        prepareMainTex(i, d);
+        prepareWaveHeight(i, d);
+        prepareWaveNormal(i, d);
 
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-        half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * lerp(_Color2, _Color, height);
+        d.color = PICK_MAIN_TEX2D(_MainTex, d.uv_main) * lerp(_Color2, _Color, d.height);
 
-        // VRC Mirror Reflection
-        affectVRCMirrorReflection(i, facing, i.ws_normal, ws_bump_normal, color);
-
-        // 距離フェード
-        affectWaterDistanceFade(i, color);
-        // アルファマスク適用
-        affectAlphaMask(uv_main, color);
+        drawVRCMirrorReflection(d);     // VRCミラー
+        drawWaterDistanceFade(d);       // 距離フェード
+        drawAlphaMask(d);               // アルファマスク
 
         #ifdef _WF_WATER_CUTOUT
-            if (color.a < _Cutoff) {
+            if (d.color.a < _Cutoff) {
                 discard;
-                return half4(color.rgb, 0);
+                return half4(d.color.rgb, 0);
             }
         #endif
 
-        // リフレクション
-        affectWaterSurfaceReflection(i, ws_bump_normal, color);
-        // スペキュラ
-        affectWaterSurfaceSpecular(i, ws_bump_normal, color);
+        drawWaterSurfaceReflection(d);  // リフレクション
+        drawWaterSurfaceSpecular(d);    // スペキュラ
 
         // Half Lambert
-        color.rgb *= saturate(dot(ws_bump_normal, i.ws_light_dir) * _ShadowPower + (1 - _ShadowPower));
+        d.color.rgb *= saturate(dot(d.ws_bump_normal, i.ws_light_dir) * _ShadowPower + (1 - _ShadowPower));
 
-        // Ambient Occlusion
-        affectOcclusion(i, uv_main, color);
+        drawOcclusion(d);               // オクルージョン
+        drawFresnelAlpha(d);            // フレネル
+        drawRefraction(d);              // リフラクション
 
-        // フレネル
-        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
-        affectFresnelAlpha(uv_main, ws_bump_normal, ws_view_dir, color);
+        // fog
+        UNITY_APPLY_FOG(i.fogCoord, d.color);
         // Alpha は 0-1 にクランプ
-        color.a = saturate(color.a);
-        // リフラクション
-        affectRefraction(i, facing, i.ws_normal, ws_bump_normal, color);
+        d.color.a = saturate(d.color.a);
 
-        UNITY_APPLY_FOG(i.fogCoord, color);
-
-        return color;
+        return d.color;
     }
 
 #endif
@@ -582,20 +677,23 @@ FEATURE_TGL_END
     half4 frag_caustics(v2f_caustics i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        float3 caustics = calcWavingCaustics(i);
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-        half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color * float4(caustics, 1);
+        drawing d = prepareDrawing(i);
 
-        if (TGL_ON(_HideCausticsAbove) && _WaterLevel < i.ws_vertex.y) {
+        prepareMainTex(i, d);
+
+        drawWavingCaustics(d);
+        d.color = PICK_MAIN_TEX2D(_MainTex, d.uv_main) * _Color * float4(d.color.rgb, 1);
+
+        if (TGL_ON(_HideCausticsAbove) && _WaterLevel < d.ws_vertex.y) {
             discard;
         }
 
-        // Ambient Occlusion
-        affectOcclusion(i, uv_main, color);
+        drawOcclusion(d);               // オクルージョン
 
-        UNITY_APPLY_FOG_COLOR(i.fogCoord, color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
+        // fog
+        UNITY_APPLY_FOG_COLOR(i.fogCoord, d.color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
 
-        return color;
+        return d.color;
     }
 
 #endif
@@ -610,6 +708,7 @@ FEATURE_TGL_END
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
+        o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
 
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
@@ -619,9 +718,12 @@ FEATURE_TGL_END
     half4 frag_depthfog(v2f_depthfog i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        half4 color = _Color;
+        drawing d = prepareDrawing(i);
+        d.color = _Color;
 
-        float y = _WaterLevel - i.ws_vertex.y;
+        prepareMainTex(i, d);
+
+        float y = _WaterLevel - d.ws_vertex.y;
         if (y <= NZF) {
             // メッシュが水上のときは描画しない
             return half4(1, 1, 1, 0);
@@ -629,14 +731,14 @@ FEATURE_TGL_END
         else {
             float3 ws_viewpos = worldSpaceViewPointPos();
             float ey = ws_viewpos.y - _WaterLevel;
-            float dist = length(i.ws_vertex - ws_viewpos);
+            float dist = length(d.ws_vertex - ws_viewpos);
 
             dist *= ey <= NZF ? 1   // 視点が水面下のときは dist をそのまま採用する
                 : y / (y + ey);     // そうではないときは水中の距離を計算する
-            color.a *= saturate(dist / NON_ZERO_FLOAT(_WaterTransparency));
+            d.color.a *= saturate(dist / NON_ZERO_FLOAT(_WaterTransparency));
 
-            // UNITY_APPLY_FOG(i.fogCoord, color); // DepthFog は Fog には対応しない
-            return color;
+            // UNITY_APPLY_FOG(i.fogCoord, d.color); // DepthFog は Fog には対応しない
+            return d.color;
         }
     }
 
@@ -668,25 +770,21 @@ FEATURE_TGL_END
     half4 frag_lamp(v2f_lamp i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        i.ws_normal        = normalize(i.ws_normal);
-        i.ws_tangent       = normalize(i.ws_tangent);
-        i.ws_bitangent     = normalize(i.ws_bitangent);
+        drawing d = prepareDrawing(i);
 
-        // ノーマルマップ
-        float3 ws_bump_normal = calcWavingNormal(i);
+        prepareMainTex(i, d);
+        prepareWaveNormal(i, d);
 
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-        half4 color = float4(PICK_MAIN_TEX2D(_MainTex, uv_main).rgb * _Color.rgb, 1);
+        d.color = float4(PICK_MAIN_TEX2D(_MainTex, d.uv_main).rgb * _Color.rgb, 1);
 
-        // Lamp&Sun リフレクション
-        affectLampReflection(i, i.ws_normal, ws_bump_normal, color);
+        drawLampReflection(d);          // Lamp&Sun リフレクション
 
+        // fog
+        UNITY_APPLY_FOG_COLOR(i.fogCoord, d.color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
         // Alpha は 0-1 にクランプ
-        color.a = saturate(color.a);
+        d.color.a = saturate(d.color.a);
 
-        UNITY_APPLY_FOG_COLOR(i.fogCoord, color, fixed4(0, 0, 0, 0));   // 加算合成なので ForwardAdd と同じく FogColor を黒にして適用する
-
-        return color;
+        return d.color;
     }
 
 #endif

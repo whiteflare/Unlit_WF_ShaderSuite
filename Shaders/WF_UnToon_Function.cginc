@@ -142,40 +142,31 @@
     // Base Color
     ////////////////////////////
 
-    void affectMainTex(float2 uv, out float2 uv_main, inout float4 color) {
-        uv_main = TRANSFORM_TEX(uv, _MainTex);
-        color *= PICK_MAIN_TEX2D(_MainTex, uv_main);
+    void prepareMainTex(IN_FRAG i, inout drawing d) {
+        d.uv_main = TRANSFORM_TEX(i.uv, _MainTex);
     }
 
-    #ifdef _BKT_ENABLE
-        void affectBackTex(float2 uv, float2 uv2, uint facing, inout float4 color) {
+    void drawMainTex(inout drawing d) {
+        d.color *= PICK_MAIN_TEX2D(_MainTex, d.uv_main);
+    }
+
+    void drawBackTex(inout drawing d) {
+#ifdef _BKT_ENABLE
 FEATURE_TGL_ON_BEGIN(_BKT_Enable)
-            if (!facing) {
-                float2 uv_back = _BKT_UVType == 1 ? uv2 : uv;
-                uv_back = TRANSFORM_TEX(uv_back, _BKT_BackTex);
-                color = PICK_MAIN_TEX2D(_BKT_BackTex, uv_back) * _BKT_BackColor;
-            }
-FEATURE_TGL_END
+        if (!d.facing) {
+            float2 uv_back = _BKT_UVType == 1 ? d.uv2 : d.uv1;
+            uv_back = TRANSFORM_TEX(uv_back, _BKT_BackTex);
+            d.color = PICK_MAIN_TEX2D(_BKT_BackTex, uv_back) * _BKT_BackColor;
         }
-    #else
-        #define affectBackTex(uv, uv2, facing, color)
-    #endif
-
-    void affectBaseColor(float2 uv, float2 uv2, uint facing, out float2 uv_main, out float4 color) {    // ShadowCasterがv2f_shadowを使うので、ここではv2fを引数にしない
-        color = _Color;
-        // メイン
-        affectMainTex(uv, uv_main, color);
-        // バック
-        affectBackTex(uv, uv2, facing, color);
+FEATURE_TGL_END
+#endif
     }
 
-    #ifdef _VC_ENABLE
-        void affectVertexColor(float4 vertex_color, inout float4 color) {
-            color *= lerp(ONE_VEC4, vertex_color, _UseVertexColor);
-        }
-    #else
-        #define affectVertexColor(vertex_color, color)
-    #endif
+    void drawVertexColor(inout drawing d) {
+#ifdef _VC_ENABLE
+        d.color *= lerp(ONE_VEC4, d.vertex_color, _UseVertexColor);
+#endif
+    }
 
     ////////////////////////////
     // Alpha Transparent
@@ -204,8 +195,8 @@ FEATURE_TGL_END
                  : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        void affectAlphaMask(float2 uv, inout float4 color) {
-            float alpha = pickAlpha(uv, color.a) * _AL_CustomValue;
+        void drawAlphaMask(inout drawing d) {
+            float alpha = pickAlpha(d.uv_main, d.color.a) * _AL_CustomValue;
 
             /*
              * カットアウト処理
@@ -234,23 +225,23 @@ FEATURE_TGL_END
                 alpha *= _AL_Power;
             #endif
 
-            color.a = alpha;
+            d.color.a = alpha;
         }
 
-        void affectFresnelAlpha(float2 uv, float3 ws_normal, float3 ws_viewdir, inout float4 color) {
+        void drawFresnelAlpha(inout drawing d) {
             #ifdef _WF_ALPHA_FRESNEL
                 // フレネルアルファ
-                float maxValue = max(color.a, _AL_Fresnel * _AL_CustomValue);
-                float fa = 1 - abs( dot( ws_normal, ws_viewdir ) );
-                color.a = lerp( color.a, maxValue, fa * fa * fa * fa );
+                float maxValue = max(d.color.a, _AL_Fresnel * _AL_CustomValue);
+                float fa = 1 - abs( dot( d.ws_normal, d.ws_view_dir ) );
+                d.color.a = lerp( d.color.a, maxValue, fa * fa * fa * fa );
             #endif
-            if (color.a <= 0) {
+            if (d.color.a <= 0) {
                 discard;
             }
         }
     #else
-        #define affectAlphaMask(uv, color)                              color.a = 1.0
-        #define affectFresnelAlpha(uv, ws_normal, ws_viewdir, color)
+        #define drawAlphaMask(d) d.color.a = 1.0
+        #define drawFresnelAlpha(d)
     #endif
 
     ////////////////////////////
@@ -396,40 +387,40 @@ FEATURE_TGL_END
         return angle_light_camera;
     }
 
-#ifdef _GL_NCC_ENABLE
-    void affectNearClipCancel(inout float4 vs_vertex) {
-FEATURE_TGL_ON_BEGIN(_GL_NCC_Enable)
-        if(vs_vertex.w < _ProjectionParams.y * 1.01 && 0 < vs_vertex.w && !isInMirror()) {
-            #if defined(UNITY_REVERSED_Z)
-                vs_vertex.z = vs_vertex.z * 0.0001 + vs_vertex.w * 0.999;
-            #else
-                vs_vertex.z = vs_vertex.z * 0.0001 - vs_vertex.w * 0.999;
-            #endif
-        }
-FEATURE_TGL_END
-    }
-#else
-    // Dummy
-    #define affectNearClipCancel(vs_vertex)
-#endif
+    #ifdef _GL_NCC_ENABLE
 
+        void affectNearClipCancel(inout float4 vs_vertex) {
+FEATURE_TGL_ON_BEGIN(_GL_NCC_Enable)
+            if(vs_vertex.w < _ProjectionParams.y * 1.01 && 0 < vs_vertex.w && !isInMirror()) {
+                #if defined(UNITY_REVERSED_Z)
+                    vs_vertex.z = vs_vertex.z * 0.0001 + vs_vertex.w * 0.999;
+                #else
+                    vs_vertex.z = vs_vertex.z * 0.0001 - vs_vertex.w * 0.999;
+                #endif
+            }
+FEATURE_TGL_END
+        }
+
+    #else
+        #define affectNearClipCancel(vs_vertex)
+    #endif
 
     ////////////////////////////
     // Gradient Map
     ////////////////////////////
 
     #ifdef _CGR_ENABLE
-        void affectGradientMap(float2 uv_main, inout float4 color) {
+
+        void drawGradientMap(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CGR_Enable)
-            float x = saturate(calcBrightness(color.rgb));
+            float x = saturate(calcBrightness(d.color.rgb));
             float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0)).rgb;
-            color.rgb = lerp(color.rgb, cgr, WF_TEX2D_GRADMAP_MASK(uv_main));
+            d.color.rgb = lerp(d.color.rgb, cgr, WF_TEX2D_GRADMAP_MASK(d.uv_main));
 FEATURE_TGL_END
         }
 
     #else
-        // Dummy
-        #define affectGradientMap(uv_main, color)
+        #define drawGradientMap(d)
     #endif
 
     ////////////////////////////
@@ -437,9 +428,10 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _CLC_ENABLE
-        void affectColorChange(float2 uv_main, inout float4 color) {
+
+        void drawColorChange(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CLC_Enable)
-            float3 clc = color.rgb;
+            float3 clc = d.color.rgb;
             // モノクロ化
             if (TGL_ON(_CLC_Monochrome)) {
                 clc.r += clc.g + clc.b;
@@ -453,13 +445,12 @@ FEATURE_TGL_ON_BEGIN(_CLC_Enable)
             // ガンマ調整
             clc = pow(clc, NON_ZERO_FLOAT(_CLC_Gamma));
             // 合成
-            color.rgb = lerp(color.rgb, clc, WF_TEX2D_CLC_MASK(uv_main));
+            d.color.rgb = lerp(d.color.rgb, clc, WF_TEX2D_CLC_MASK(d.uv_main));
 FEATURE_TGL_END
         }
 
     #else
-        // Dummy
-        #define affectColorChange(uv_main, color)
+        #define drawColorChange(d)
     #endif
 
     ////////////////////////////
@@ -468,21 +459,20 @@ FEATURE_TGL_END
 
     #ifdef _CHM_ENABLE
 
-        void affect3chColorMask(float2 mask_uv, inout float4 color) {
+        void draw3chColorMask(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CHM_Enable)
-            float3 mask  = WF_TEX2D_3CH_MASK(mask_uv);
-            float4 c1 = color * _CHM_ColorR;
-            float4 c2 = color * _CHM_ColorG;
-            float4 c3 = color * _CHM_ColorB;
-            color = lerp(color, c1, mask.r);
-            color = lerp(color, c2, mask.g);
-            color = lerp(color, c3, mask.b);
+            float3 mask  = WF_TEX2D_3CH_MASK(d.uv_main);
+            float4 c1 = d.color * _CHM_ColorR;
+            float4 c2 = d.color * _CHM_ColorG;
+            float4 c3 = d.color * _CHM_ColorB;
+            d.color = lerp(d.color, c1, mask.r);
+            d.color = lerp(d.color, c2, mask.g);
+            d.color = lerp(d.color, c3, mask.b);
 FEATURE_TGL_END
         }
 
     #else
-        // Dummy
-        #define affect3chColorMask(mask_uv, color)
+        #define draw3chColorMask(d)
     #endif
 
     ////////////////////////////
@@ -492,16 +482,17 @@ FEATURE_TGL_END
     #ifdef _ES_ENABLE
 
     #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-        float calcEmissiveWaving(IN_FRAG i, float2 uv_main) {
+
+        float calcEmissiveWaving(inout drawing d) {
             if (TGL_OFF(_ES_ScrollEnable)) {
                 return 1;
             }
             float3 uv =
-                    _ES_SC_DirType == 1 ? UnityWorldToObjectPos(i.ws_vertex)    // ローカル座標
+                    _ES_SC_DirType == 1 ? UnityWorldToObjectPos(d.ws_vertex)    // ローカル座標
                     : _ES_SC_DirType == 2 ? (                                   // UV
-                        _ES_SC_UVType == 1 ? float3(i.uv_lmap, 0) : float3(uv_main, 0)
+                        _ES_SC_UVType == 1 ? float3(d.uv_lmap, 0) : float3(d.uv_main, 0)
                     )
-                    : i.ws_vertex                                               // ワールド座標
+                    : d.ws_vertex                                               // ワールド座標
                     ;
 
             // 0 -> 1 への時間関数
@@ -523,8 +514,9 @@ FEATURE_TGL_END
 
             return saturate(waving + _ES_SC_LevelOffset);
         }
+
     #else
-        #define calcEmissiveWaving(i, uv_main)   (1)
+        #define calcEmissiveWaving(d)       (1)
     #endif
 
     #if defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
@@ -540,58 +532,58 @@ FEATURE_TGL_END
         float   _ES_AU_BlackOut;
         float   _ES_AU_AlphaLink;
 
-        float calcEmissiveAudioLink(IN_FRAG i, float2 uv_main) {
+        float calcEmissiveAudioLink(inout drawing d) {
             float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( 0, _ES_AU_Band ) ).r);
             au = lerp(au * _ES_AU_Slope, lerp(1, au, _ES_AU_Slope), smoothstep(_ES_AU_MinThreshold, _ES_AU_MaxThreshold, au));
             return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, au);
         }
 
-        float enableEmissiveAudioLink(IN_FRAG i) {
+        float enableEmissiveAudioLink(inout drawing d) {
             return TGL_ON(_ES_AuLinkEnable) ? ( AudioLinkIsAvailable() ? 1 : ( TGL_ON(_ES_AU_BlackOut) ? -1 : 0 ) ) : 0;
         }
+
     #else
-        #define calcEmissiveAudioLink(i, uv_main)   (1)
-        #define enableEmissiveAudioLink(i)          (0)
+        #define calcEmissiveAudioLink(d)    (1)
+        #define enableEmissiveAudioLink(d)  (0)
     #endif
 
-        void affectEmissiveScroll(IN_FRAG i, float2 uv_main, inout float4 color) {
+        void drawEmissiveScroll(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
-            float au_status = enableEmissiveAudioLink(i);
+            float au_status = enableEmissiveAudioLink(d);
             if (au_status < 0) {
                 return; // Emission自体を無効にする
             }
-            float waving    = 0 < au_status ? calcEmissiveAudioLink(i, uv_main) : calcEmissiveWaving(i, uv_main);
+            float waving    = 0 < au_status ? calcEmissiveAudioLink(d) : calcEmissiveWaving(d);
 
-            float4 es_mask  = WF_TEX2D_EMISSION(uv_main);
+            float4 es_mask  = WF_TEX2D_EMISSION(d.uv_main);
             float4 es_color = _EmissionColor * es_mask;
             float es_power  = MAX_RGB(es_mask.rgb);
 
             // RGB側の合成
-            color.rgb =
+            d.color.rgb =
                 // 加算合成
-                _ES_BlendType == 0 ? color.rgb + es_color.rgb * waving :
+                _ES_BlendType == 0 ? d.color.rgb + es_color.rgb * waving :
                 // 旧形式のブレンド
-                _ES_BlendType == 1 ? lerp(color.rgb, es_color.rgb, waving * es_power) :
+                _ES_BlendType == 1 ? lerp(d.color.rgb, es_color.rgb, waving * es_power) :
                 // ブレンド
-                lerp(color.rgb, es_color.rgb, waving);
+                lerp(d.color.rgb, es_color.rgb, waving);
 
             // Alpha側の合成
         #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
             if (TGL_ON(_ES_SC_AlphaScroll)) {
-                color.a = max(color.a, waving * es_power);
+                d.color.a = max(d.color.a, waving * es_power);
             }
         #endif
         #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
             if (TGL_ON(_ES_AU_AlphaLink) && 0 < au_status) {
-                color.a = max(color.a, waving * es_power);
+                d.color.a = max(d.color.a, waving * es_power);
             }
         #endif
 FEATURE_TGL_END
         }
 
     #else
-        // Dummy
-        #define affectEmissiveScroll(i, uv_main, color)
+        #define drawEmissiveScroll(d)
     #endif
 
     ////////////////////////////
@@ -600,40 +592,33 @@ FEATURE_TGL_END
 
     #ifdef _NM_ENABLE
 
-        float3 calcBumpNormal(IN_FRAG i, float2 uv_main) {
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-            if (TGL_ON(_NM_Enable)) {
-#endif
-                // 1st NormalMap
-                float3 normalTangent = WF_TEX2D_NORMAL(uv_main);
-                if (TGL_ON(_NM_InvConvex)) {
-                    normalTangent.y = -normalTangent.y;
-                }
-                // 法線計算
-                return transformTangentToWorldNormal(normalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
+        void prepareBumpNormal(IN_FRAG i, inout drawing d) {
+        	d.ws_bump_normal = d.ws_normal;
 
-#ifdef _WF_LEGACY_FEATURE_SWITCH
+FEATURE_TGL_ON_BEGIN(_NM_Enable)
+            float3 normalTangent = WF_TEX2D_NORMAL(d.uv_main);
+            if (TGL_ON(_NM_InvConvex)) {
+                normalTangent.y = -normalTangent.y;
             }
-            else {
-                return i.normal;
-            }
-#endif
+
+            // 法線計算
+            d.ws_bump_normal = transformTangentToWorldNormal(normalTangent, d.ws_normal, d.ws_tangent, d.ws_bitangent);
+
+FEATURE_TGL_END
         }
 
-        void affectBumpNormal(IN_FRAG i, float2 uv_main, out float3 ws_bump_normal, inout float4 color) {
-            // bump_normal 計算
-            ws_bump_normal = calcBumpNormal(i, uv_main);
-
+        void drawBumpNormal(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_NM_Enable)
             // NormalMap は陰影として描画する
             // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を乗算することで明暗を付ける
-            color.rgb *= max(0.0, 1.0 + (dot(ws_bump_normal, i.ws_light_dir.xyz) - dot(i.normal, i.ws_light_dir.xyz)) * _NM_Power * 2);
+            d.color.rgb *= max(0.0, 1.0 + (dot(d.ws_bump_normal, d.ws_light_dir.xyz) - dot(d.ws_normal, d.ws_light_dir.xyz)) * _NM_Power * 2);
 FEATURE_TGL_END
         }
 
     #else
-        #define calcBumpNormal(i, uv_main) i.normal
-        #define affectBumpNormal(i, uv_main, ws_bump_normal, color)  ws_bump_normal = i.normal
+        #define prepareBumpNormal(i, d)     d.ws_bump_normal = d.ws_normal
+        #define drawBumpNormal(d)
+        #define calcBumpNormal(d)  d.ws_normal
     #endif
 
     ////////////////////////////
@@ -642,8 +627,8 @@ FEATURE_TGL_END
 
     #ifdef _NS_ENABLE
 
-        void affectDetailNormal(IN_FRAG i, float2 uv_main, out float3 ws_detail_normal, inout float4 color) {
-            ws_detail_normal = i.normal;
+        void prepareDetailNormal(IN_FRAG i, inout drawing d) {
+            d.ws_detail_normal = d.ws_normal;
 
 FEATURE_TGL_ON_BEGIN(_NS_Enable)
             // 2nd NormalMap
@@ -651,15 +636,15 @@ FEATURE_TGL_ON_BEGIN(_NS_Enable)
             float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
 
             // 法線計算
-            ws_detail_normal = transformTangentToWorldNormal(dtlNormalTangent, i.normal, i.tangent, i.bitangent); // vertex周辺のworld法線空間
+            d.ws_detail_normal = transformTangentToWorldNormal(dtlNormalTangent, d.ws_normal, d.ws_tangent, d.ws_bitangent);
 
-            float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(uv_main);
-            ws_detail_normal = lerpNormals(i.normal, ws_detail_normal, dtlPower);
+            float dtlPower = WF_TEX2D_NORMAL_DTL_MASK(d.uv_main);
+            d.ws_detail_normal = lerpNormals(d.ws_normal, d.ws_detail_normal, dtlPower);
 FEATURE_TGL_END
         }
 
     #else
-        #define affectDetailNormal(i, uv_main, ws_detail_normal, color)  ws_detail_normal = i.normal
+        #define prepareDetailNormal(i, d)  d.ws_detail_normal = d.ws_bump_normal
     #endif
 
     ////////////////////////////
@@ -705,11 +690,11 @@ FEATURE_TGL_END
             return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
         }
 
-        void affectMetallic(IN_FRAG i, float3 ws_camera_dir, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, inout float4 color) {
+        void drawMetallic(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_MT_Enable)
             float metallic = _MT_Metallic;
             float monochrome = _MT_Monochrome;
-            float4 metalGlossMap = WF_TEX2D_METAL_GLOSS(uv_main);
+            float4 metalGlossMap = WF_TEX2D_METAL_GLOSS(d.uv_main);
 
             // MetallicSmoothness をパラメータに反映
             if (_MT_MetallicMapType == 0) {
@@ -723,12 +708,12 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
 
             // Metallic描画
             if (0.01 < metallic) {
-                float3 ws_metal_normal = ws_normal;
+                float3 ws_metal_normal = d.ws_normal;
 #ifdef _NM_ENABLE
-                ws_metal_normal = lerpNormals(ws_metal_normal, ws_bump_normal, _MT_BlendNormal);
+                ws_metal_normal = lerpNormals(ws_metal_normal, d.ws_bump_normal, _MT_BlendNormal);
 #endif
 #ifdef _NS_ENABLE
-                ws_metal_normal = lerpNormals(ws_metal_normal, ws_detail_normal, _MT_BlendNormal2);
+                ws_metal_normal = lerpNormals(ws_metal_normal, d.ws_detail_normal, _MT_BlendNormal2);
 #endif
                 float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
                 float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
@@ -742,54 +727,33 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
                 }
 
                 // リフレクション
-                float3 reflection = pickReflection(i.ws_vertex, ws_metal_normal, reflSmooth);
+                float3 reflection = pickReflection(d.ws_vertex, ws_metal_normal, reflSmooth);
                 reflection = lerp(reflection, calcBrightness(reflection).xxx, monochrome);
 
                 // スペキュラ
                 float3 specular = ZERO_VEC3;
                 if (0.01 < _MT_Specular) {
-                    specular = pickSpecular(ws_camera_dir, ws_metal_normal, i.ws_light_dir.xyz, i.light_color.rgb * color.rgb, specSmooth);
+                    specular = pickSpecular(d.ws_camera_dir, ws_metal_normal, d.ws_light_dir.xyz, d.light_color.rgb * d.color.rgb, specSmooth);
                 }
 
                 // 合成
-                color.rgb = lerp(
-                    color.rgb,
-                    lerp(color.rgb * reflection.rgb, color.rgb + reflection.rgb, _MT_Brightness) + specular.rgb * _MT_Specular,
+                d.color.rgb = lerp(
+                    d.color.rgb,
+                    lerp(d.color.rgb * reflection.rgb, d.color.rgb + reflection.rgb, _MT_Brightness) + specular.rgb * _MT_Specular,
                     metallic);
             }
 FEATURE_TGL_END
         }
+
     #else
-        #define affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, color)
+        #define drawMetallic(d)
     #endif
 
     ////////////////////////////
     // Light Matcap
     ////////////////////////////
 
-    #if defined(USING_STEREO_MATRICES)
-        #define _MV_HAS_PARALLAX
-    #endif
-    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
-        #define _MV_HAS_NML
-    #endif
-    #if defined(_NS_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
-        #define _MV_HAS_NML2
-    #endif
-
-    struct MatcapVector {
-        float3 vs_normal_center;
-#ifdef _MV_HAS_PARALLAX
-        float3 diff_parallax;
-#endif
-#ifdef _MV_HAS_NML
-        float3 diff_normal;
-#endif
-#ifdef _MV_HAS_NML2
-        float3 diff_normal2;
-#endif
-    };
-    #define WF_TYP_MATVEC   MatcapVector
+#ifdef WF_TYP_MATVEC
 
     WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal, in float3 ws_detail_normal) {
         // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
@@ -861,6 +825,8 @@ FEATURE_TGL_END
         return calcMatcapVector(matcapVector, normal, normal, parallax);
     }
 
+#endif // WF_TYP_MATVEC
+
     void calcMatcapColor(
             float4  matcap_color,
             float3  matcap_mask,
@@ -909,12 +875,12 @@ FEATURE_TGL_END
         FEATURE_TGL_ON_BEGIN(_HL_Enable##id)                                                                                                                \
                     calcMatcapColor(                                                                                                                        \
                         PICK_MAIN_TEX2D(_HL_MatcapTex##id,                                                                                                  \
-                        saturate(calcMatcapVector(matcapVector, _HL_BlendNormal##id, _HL_BlendNormal2##id, _HL_Parallax##id).xy * 0.5 + 0.5)),              \
-                        SAMPLE_MASK_VALUE(_HL_MaskTex##id, uv_main, _HL_InvMaskVal##id).rgb,                                                                \
-                        _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, color);    \
+                        saturate(calcMatcapVector(d.matcapVector, _HL_BlendNormal##id, _HL_BlendNormal2##id, _HL_Parallax##id).xy * 0.5 + 0.5)),            \
+                        SAMPLE_MASK_VALUE(_HL_MaskTex##id, d.uv_main, _HL_InvMaskVal##id).rgb,                                                              \
+                        _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, d.color);  \
         FEATURE_TGL_END
 
-    void affectMatcapColor(WF_TYP_MATVEC matcapVector, float2 uv_main, inout float4 color) {
+    void drawMatcapColor(inout drawing d) {
 #ifdef _HL_ENABLE
     #ifdef UNITY_OLD_PREPROCESSOR
         WF_CALC_MATCAP_COLOR(##)
@@ -959,11 +925,11 @@ FEATURE_TGL_END
 
     #ifdef _LME_ENABLE
 
-        void affectLame(IN_FRAG i, float2 uv_main, float3 ws_normal, inout float4 color) {
+        void drawLame(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_LME_Enable)
-            float power = WF_TEX2D_LAME_MASK(uv_main);
+            float power = WF_TEX2D_LAME_MASK(d.uv_main);
             if (0 < power) {
-                float2 uv_lame = _LME_UVType == 1 ? i.uv_lmap : i.uv;
+                float2 uv_lame = _LME_UVType == 1 ? d.uv2 : d.uv1;
                 uv_lame = TRANSFORM_TEX(uv_lame, _LME_Texture);
 
                 float   scale = NON_ZERO_FLOAT(_LME_Scale) / 100;
@@ -983,7 +949,7 @@ FEATURE_TGL_ON_BEGIN(_LME_Enable)
                     }
                 }
 
-                float3 ws_camera_vec = worldSpaceCameraVector(i.ws_vertex);
+                float3 ws_camera_vec = worldSpaceCameraVector(d.ws_vertex);
 
                 // アニメーション項
                 power *= _LME_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LME_AnimSpeed + random2to1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
@@ -996,22 +962,23 @@ FEATURE_TGL_ON_BEGIN(_LME_Enable)
                 // 距離フェード項
                 power *= 1 - smoothstep(_LME_MinDist, max(_LME_MinDist + NZF, _LME_MaxDist), length(ws_camera_vec));
                 // NdotV起因の強度項
-                power *= pow(abs(dot(normalize(ws_camera_vec), ws_normal)), NON_ZERO_FLOAT(_LME_Spot));
+                power *= pow(abs(dot(normalize(ws_camera_vec), d.ws_normal)), NON_ZERO_FLOAT(_LME_Spot));
                 // 形状
                 power *= _LME_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
 
                 float4 lame_color = _LME_Color * WF_TEX2D_LAME_TEX(uv_lame);
                 lame_color.rgb += _LME_RandColor * (random2to3(min_pos.xy) * 2 - 1);
 
-                color.rgb += max(ZERO_VEC3, lame_color.rgb) * power;
+                d.color.rgb += max(ZERO_VEC3, lame_color.rgb) * power;
                 #ifdef _WF_ALPHA_BLEND
-                    color.a = max(color.a, lerp(color.a, lame_color.a, saturate(power * _LME_ChangeAlpha)));
+                    d.color.a = max(d.color.a, lerp(d.color.a, lame_color.a, saturate(power * _LME_ChangeAlpha)));
                 #endif
             }
 FEATURE_TGL_END
         }
+
     #else
-        #define affectLame(i, uv_main, ws_normal, color)
+        #define drawLame(d)
     #endif
 
     ////////////////////////////
@@ -1073,64 +1040,66 @@ FEATURE_TGL_END
                 smoothstep(border, border + max(feather, 0.001), brightness) );
         }
 
-        void affectToonShade(IN_FRAG i, float2 uv_main, float3 ws_normal, float3 ws_bump_normal, float3 ws_detail_normal, float angle_light_camera, inout float4 color) {
+        void drawToonShade(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TS_Enable)
+            float angle_light_camera = d.angle_light_camera;
             if (isInMirror() || TGL_ON(_TS_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
 
             // 陰用法線とライト方向から Harf-Lambert
-            float3 ws_shade_normal = ws_normal;
+            float3 ws_shade_normal = d.ws_normal;
 #ifdef _NM_ENABLE
-            ws_shade_normal = lerpNormals(ws_shade_normal, ws_bump_normal, _TS_BlendNormal);
+            ws_shade_normal = lerpNormals(ws_shade_normal, d.ws_bump_normal, _TS_BlendNormal);
 #endif
 #ifdef _NS_ENABLE
-            ws_shade_normal = lerpNormals(ws_shade_normal, ws_detail_normal, _TS_BlendNormal2);
+            ws_shade_normal = lerpNormals(ws_shade_normal, d.ws_detail_normal, _TS_BlendNormal2);
 #endif
-            float brightness = lerp(dot(ws_shade_normal, i.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
+            float brightness = lerp(dot(ws_shade_normal, d.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
 
             // アンチシャドウマスク加算
-            float anti_shade = WF_TEX2D_SHADE_MASK(uv_main);
+            float anti_shade = WF_TEX2D_SHADE_MASK(d.uv_main);
             brightness = lerp(brightness, lerp(brightness, 1, 0.5), anti_shade);
             // ビュー相対位置シフト
             brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
 
             // 影色計算
-            float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(uv_main) );
+            float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(d.uv_main) );
             float3 shadow_color = ONE_VEC3;
 
 #ifndef _WF_LEGACY_FEATURE_SWITCH
 
             // 1影
-            calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, _TS_1stFeather, brightness, shadow_color);
+            calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(d.uv_main), base_color, d.shadow_power, _TS_1stBorder, _TS_1stFeather, brightness, shadow_color);
 
 #if !defined(_TS_STEP1_ENABLE) || defined(_TS_STEP3_ENABLE)
             // 2影
-            calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, _TS_2ndFeather, brightness, shadow_color);
+            calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(d.uv_main), base_color, d.shadow_power, _TS_2ndBorder, _TS_2ndFeather, brightness, shadow_color);
 #endif
 #if defined(_TS_STEP3_ENABLE)
             // 3影
-            calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, _TS_3rdFeather, brightness, shadow_color);
+            calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(d.uv_main), base_color, d.shadow_power, _TS_3rdBorder, _TS_3rdFeather, brightness, shadow_color);
 #endif
 
 #else
             // 1影まで
-            calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(uv_main), base_color, i.shadow_power, _TS_1stBorder, _TS_1stFeather, brightness, shadow_color);
+            calcShadowColor(_TS_1stColor, WF_TEX2D_SHADE_1ST(d.uv_main), base_color, d.shadow_power, _TS_1stBorder, _TS_1stFeather, brightness, shadow_color);
             if (_TS_Steps == 2 || _TS_Steps == 3) {
-                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(uv_main), base_color, i.shadow_power, _TS_2ndBorder, _TS_2ndFeather, brightness, shadow_color);
+                calcShadowColor(_TS_2ndColor, WF_TEX2D_SHADE_2ND(d.uv_main), base_color, d.shadow_power, _TS_2ndBorder, _TS_2ndFeather, brightness, shadow_color);
             }
             if (_TS_Steps == 3) {
-                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(uv_main), base_color, i.shadow_power, _TS_3rdBorder, _TS_3rdFeather, brightness, shadow_color);
+                calcShadowColor(_TS_3rdColor, WF_TEX2D_SHADE_3RD(d.uv_main), base_color, d.shadow_power, _TS_3rdBorder, _TS_3rdFeather, brightness, shadow_color);
             }
 #endif
 
             // 乗算
-            color.rgb *= shadow_color;
+            d.color.rgb *= shadow_color;
 FEATURE_TGL_END
         }
+
     #else
         #define calcToonShadeContrast(ws_vertex, ws_light_dir, ambientColor, shadow_power)
-        #define affectToonShade(i, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, angle_light_camera, color)
+        #define drawToonShade(d)
     #endif
 
     ////////////////////////////
@@ -1163,21 +1132,23 @@ FEATURE_TGL_END
             return rimColor;
         }
 
-        void affectRimLight(IN_FRAG i, float2 uv_main, float3 vs_normal, float angle_light_camera, inout float4 color) {
+        void drawRimLight(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TR_Enable)
+            float angle_light_camera = d.angle_light_camera;
             if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
             // 順光の場合はリムライトを暗くする
-            float3 rimPower = saturate(0.8 - angle_light_camera) * WF_TEX2D_RIM_MASK(uv_main);
+            float3 rimPower = saturate(0.8 - angle_light_camera) * WF_TEX2D_RIM_MASK(d.uv_main);
             // 色計算
-            float3 rimColor = calcRimLightColor(color.rgb);
+            float3 rimColor = calcRimLightColor(d.color.rgb);
             // 合成
-            color.rgb = lerp(color.rgb, color.rgb + rimColor * rimPower, calcRimLightPower(vs_normal));
+            d.color.rgb = lerp(d.color.rgb, d.color.rgb + rimColor * rimPower, calcRimLightPower(calcMatcapVector(d.matcapVector, _TR_BlendNormal, _TR_BlendNormal2, 0)));
 FEATURE_TGL_END
         }
+
     #else
-        #define affectRimLight(i, uv_main, vs_normal, angle_light_camera, color)
+        #define drawRimLight(d)
     #endif
 
     ////////////////////////////
@@ -1214,14 +1185,14 @@ FEATURE_TGL_END
                 ;
         }
 
-        void affectOverlayTexture(IN_FRAG i, float2 uv_main, float3 vs_normal, inout float4 color) {
+        void drawOverlayTexture(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_OVL_Enable)
             float2 uv_overlay =
-                _OVL_UVType == 1 ? i.uv_lmap                                                 // UV2
-                : _OVL_UVType == 2 ? computeOverlayTex(i.ws_vertex)                          // SKYBOX
-                : _OVL_UVType == 3 ? computeAngelRingUV(vs_normal, i.uv_lmap)                // ANGELRING
-                : _OVL_UVType == 4 ? vs_normal.xy / 2 + 0.5                                  // MATCAP
-                : i.uv                                                                      // UV1
+                _OVL_UVType == 1 ? d.uv2                                                 // UV2
+                : _OVL_UVType == 2 ? computeOverlayTex(d.ws_vertex)                          // SKYBOX
+                : _OVL_UVType == 3 ? computeAngelRingUV(calcMatcapVector(d.matcapVector, 1, 1, 0.5), d.uv2)                // ANGELRING
+                : _OVL_UVType == 4 ? calcMatcapVector(d.matcapVector, 1, 1, 0.5).xy / 2 + 0.5                                  // MATCAP
+                : d.uv1                                                                      // UV1
                 ;
             uv_overlay = TRANSFORM_TEX(uv_overlay, _OVL_OverlayTex);
             if (_OVL_OutUVType == 1) {  // Clip
@@ -1233,17 +1204,18 @@ FEATURE_TGL_ON_BEGIN(_OVL_Enable)
                 uv_overlay += frac(_OVL_UVScroll * _Time.xx);
             }
             float4 ov_color = PICK_MAIN_TEX2D(_OVL_OverlayTex, uv_overlay) * _OVL_Color;
-            float ov_power = _OVL_Power * WF_TEX2D_SCREEN_MASK(uv_main);
+            float ov_power = _OVL_Power * WF_TEX2D_SCREEN_MASK(d.uv_main);
 
             // 頂点カラーを加味
-            ov_color *= lerp(ONE_VEC4, i.vertex_color, _OVL_VertColToDecal);
-            ov_power *= lerp(1, saturate(TGL_OFF(_OVL_InvMaskVal) ? i.vertex_color.r : 1 - i.vertex_color.r), _OVL_VertColToMask);
+            ov_color *= lerp(ONE_VEC4, d.vertex_color, _OVL_VertColToDecal);
+            ov_power *= lerp(1, saturate(TGL_OFF(_OVL_InvMaskVal) ? d.vertex_color.r : 1 - d.vertex_color.r), _OVL_VertColToMask);
 
-            color.rgb = blendOverlayColor(color.rgb, ov_color, ov_power);
+            d.color.rgb = blendOverlayColor(d.color.rgb, ov_color, ov_power);
 FEATURE_TGL_END
         }
+
     #else
-        #define affectOverlayTexture(i, uv_main, vs_normal, color)
+        #define drawOverlayTexture(d)
     #endif
 
     ////////////////////////////
@@ -1285,22 +1257,22 @@ FEATURE_TGL_END
             return _TL_LineWidth * 0.01 * mask;
         }
 
-        void affectOutline(float2 uv_main, inout float4 color) {
+        void drawOutline(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TL_Enable)
             // アウトライン色をカスタムカラーと合成
-            float3 line_color = lerp(_TL_LineColor.rgb, WF_TEX2D_OUTLINE_COLOR(uv_main), _TL_BlendCustom);
+            float3 line_color = lerp(_TL_LineColor.rgb, WF_TEX2D_OUTLINE_COLOR(d.uv_main), _TL_BlendCustom);
             // アウトライン色をベースと合成
-            color.rgb = lerp(line_color, color.rgb, _TL_BlendBase);
+            d.color.rgb = lerp(line_color, d.color.rgb, _TL_BlendBase);
 
             // アウトラインアルファを反映
             #ifdef _WF_ALPHA_BLEND
-                color.a = _TL_LineColor.a;
+                d.color.a = _TL_LineColor.a;
             #endif
 FEATURE_TGL_END
         }
 
     #else
-        #define affectOutline(uv_main, color)
+        #define drawOutline(d)
     #endif
 
     float4 shiftOutlineVertex(inout float3 ws_vertex, float3 ws_normal, float width, float shift) { // 4
@@ -1338,11 +1310,11 @@ FEATURE_TGL_END
 
     #ifdef _AO_ENABLE
 
-        void affectOcclusion(IN_FRAG i, float2 uv_main, inout float4 color) {
+        void drawOcclusion(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_AO_Enable)
             float3 occlusion = ONE_VEC3;
 #ifndef _WF_AO_ONLY_LMAP
-            float2 uv_aomap = _AO_UVType == 1 ? i.uv_lmap : uv_main;
+            float2 uv_aomap = _AO_UVType == 1 ? d.uv_lmap : d.uv_main;
             float3 aomap_var = WF_TEX2D_OCCLUSION(uv_aomap);
             occlusion *= TGL_OFF(_AO_UseGreenMap) ? aomap_var.rgb : aomap_var.ggg;
             occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
@@ -1351,18 +1323,19 @@ FEATURE_TGL_ON_BEGIN(_AO_Enable)
     #ifndef _WF_AO_ONLY_LMAP
             if (TGL_ON(_AO_UseLightMap)) {
     #endif
-                occlusion *= _AO_PICK_LMAP(i.uv_lmap);
+                occlusion *= _AO_PICK_LMAP(d.uv_lmap);
     #ifndef _WF_AO_ONLY_LMAP
             }
     #endif
 #endif
             occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BlendPower); // 色の混合
             occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
-            color.rgb *= max(ZERO_VEC3, occlusion.rgb);
+            d.color.rgb *= max(ZERO_VEC3, occlusion.rgb);
 FEATURE_TGL_END
         }
+
     #else
-        #define affectOcclusion(i, uv_main, color)
+        #define drawOcclusion(d)
     #endif
 
     float3 calcAmbientColorVertex(float2 uv_lmap) {
@@ -1407,17 +1380,18 @@ FEATURE_TGL_END
             #endif
         }
 
-        void affectDistanceFade(IN_FRAG i, float2 uv_main, uint facing, inout float4 color) {
+        void drawDistanceFade(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_DFD_Enable)
-            float dist = sqrt(calcDistanceFadeDistanceSq(i.ws_vertex.xyz));
-            if (!facing && TGL_ON(_DFD_BackShadow)) {
+            float dist = sqrt(calcDistanceFadeDistanceSq(d.ws_vertex.xyz));
+            if (!d.facing && TGL_ON(_DFD_BackShadow)) {
                 dist = 0;
             }
-            color.rgb = lerp(color.rgb, _DFD_Color.rgb * WF_TEX2D_DFD_COLOR(uv_main), _DFD_Power * (1 - smoothstep(_DFD_MinDist, max(_DFD_MinDist + NZF, _DFD_MaxDist), dist)));
+            d.color.rgb = lerp(d.color.rgb, _DFD_Color.rgb * WF_TEX2D_DFD_COLOR(d.uv_main), _DFD_Power * (1 - smoothstep(_DFD_MinDist, max(_DFD_MinDist + NZF, _DFD_MaxDist), dist)));
 FEATURE_TGL_END
         }
+
     #else
-        #define affectDistanceFade(i, uv_main, facing, color)
+        #define drawDistanceFade(d)
     #endif
 
     ////////////////////////////
@@ -1426,32 +1400,31 @@ FEATURE_TGL_END
 
     #ifdef _DSV_ENABLE
 
-        void affectDissolve(float2 uv1, inout float4 color) {
+        void drawDissolve(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_DSV_Enable)
-
-        if (1 - NZF < _DSV_Dissolve) {
-            // nop
-        }
-        else if (_DSV_Dissolve < NZF) {
-            discard;
-        }
-        else {
-            float2 uv   = TRANSFORM_TEX(uv1, _DSV_CtrlTex);
-            float3 tex  = PICK_MAIN_TEX2D(_DSV_CtrlTex, uv);
-            tex = TGL_OFF(_DSV_TexIsSRGB) ? tex : LinearToGammaSpace(tex);
-
-            float pos = _DSV_Dissolve / (1 - _DSV_SparkWidth) - (TGL_OFF(_DSV_Invert) ? tex.r : 1 - tex.r);
-            if (pos < 0) {
+            if (1 - NZF < _DSV_Dissolve) {
+                // nop
+            }
+            else if (_DSV_Dissolve < NZF) {
                 discard;
             }
+            else {
+                float2 uv   = TRANSFORM_TEX(d.uv1, _DSV_CtrlTex);
+                float3 tex  = PICK_MAIN_TEX2D(_DSV_CtrlTex, uv);
+                tex = TGL_OFF(_DSV_TexIsSRGB) ? tex : LinearToGammaSpace(tex);
 
-            color.rgb += _DSV_SparkColor * (1 - smoothstep(0, NON_ZERO_FLOAT(_DSV_SparkWidth), pos));
-        }
+                float pos = _DSV_Dissolve / (1 - _DSV_SparkWidth) - (TGL_OFF(_DSV_Invert) ? tex.r : 1 - tex.r);
+                if (pos < 0) {
+                    discard;
+                }
 
+                d.color.rgb += _DSV_SparkColor * (1 - smoothstep(0, NON_ZERO_FLOAT(_DSV_SparkWidth), pos));
+            }
 FEATURE_TGL_END
         }
+
     #else
-        #define affectDissolve(uv1, color)
+        #define drawDissolve(d)
     #endif
 
     ////////////////////////////
@@ -1460,22 +1433,23 @@ FEATURE_TGL_END
 
     #ifdef _TFG_ENABLE
 
-        void affectToonFog(IN_FRAG i, float3 ws_view_dir, inout float4 color) {
+        void drawToonFog(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TFG_Enable)
             float3 ws_base_position = UnityObjectToWorldPos(_TFG_BaseOffset);
-            float3 ws_offset_vertex = (i.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _TFG_Scale);
+            float3 ws_offset_vertex = (d.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _TFG_Scale);
             float power =
                 // 原点からの距離の判定
                 smoothstep(_TFG_MinDist, max(_TFG_MinDist + NZF, _TFG_MaxDist), length( ws_offset_vertex ))
                 // 前後の判定
-                * smoothstep(0, 0.2, -dot(ws_view_dir.xz, ws_offset_vertex.xz))
+                * smoothstep(0, 0.2, -dot(d.ws_view_dir.xz, ws_offset_vertex.xz))
                 // カメラと原点の水平距離の判定
                 * smoothstep(_TFG_MinDist, max(_TFG_MinDist + NZF, _TFG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
-            color.rgb = lerp(color.rgb, _TFG_Color.rgb * i.light_color, _TFG_Color.a * pow(power, _TFG_Exponential));
+            d.color.rgb = lerp(d.color.rgb, _TFG_Color.rgb * d.light_color, _TFG_Color.a * pow(power, _TFG_Exponential));
 FEATURE_TGL_END
         }
+
     #else
-        #define affectToonFog(i, ws_view_dir, color)
+        #define drawToonFog(d)
     #endif
 
     ////////////////////////////
@@ -1484,21 +1458,21 @@ FEATURE_TGL_END
 
     #ifdef _CGO_ENABLE
 
-        void affectGhostTransparent(IN_FRAG i, inout float4 color) {
+        void drawGhostTransparent(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CGO_Enable)
             // GrabScreenPos 計算
-            float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
+            float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(d.ws_vertex.xyz, 1)));
             grab_uv.xy /= grab_uv.w;
 
             float3 back_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv).rgb;
 
-            color.rgb = lerp(back_color.rgb, color.rgb, saturate(color.a * _CGO_Power));
-            color.a = 1;
+            d.color.rgb = lerp(back_color.rgb, d.color.rgb, saturate(d.color.a * _CGO_Power));
+            d.color.a = 1;
 FEATURE_TGL_END
         }
 
     #else
-        #define affectGhostTransparent(i, color)
+        #define drawGhostTransparent(d)
     #endif
 
     ////////////////////////////
@@ -1507,13 +1481,13 @@ FEATURE_TGL_END
 
     #ifdef _CRF_ENABLE
 
-        void affectRefraction(IN_FRAG i, uint facing, float3 ws_normal, float3 ws_bump_normal, inout float4 color) {
+        void drawRefraction(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CRF_Enable)
-            float3 view_dir = normalize(i.ws_vertex - _WorldSpaceCameraPos.xyz);
+            float3 view_dir = normalize(d.ws_vertex - _WorldSpaceCameraPos.xyz);
 
-            float3 refract_normal = lerpNormals(ws_normal, ws_bump_normal, _CRF_BlendNormal);
-            float3 refract_dir = refract(view_dir, facing ? refract_normal : -refract_normal, 1.0 / _CRF_RefractiveIndex);
-            float3 refract_pos = i.ws_vertex + refract_dir * _CRF_Distance;
+            float3 refract_normal = lerpNormals(d.ws_normal, d.ws_bump_normal, _CRF_BlendNormal);
+            float3 refract_dir = refract(view_dir, d.facing ? refract_normal : -refract_normal, 1.0 / _CRF_RefractiveIndex);
+            float3 refract_pos = d.ws_vertex + refract_dir * _CRF_Distance;
 
             float4 refract_scr_pos = mul(UNITY_MATRIX_VP, float4(refract_pos, 1));
             refract_scr_pos.xy = clamp(refract_scr_pos.xy, -refract_scr_pos.w, refract_scr_pos.w);
@@ -1523,13 +1497,13 @@ FEATURE_TGL_ON_BEGIN(_CRF_Enable)
             float4 grab_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv.xy);
             float3 back_color = grab_color.rgb * (_CRF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
-            color.rgb = lerp(lerp(color.rgb, back_color.rgb, grab_color.a), color.rgb, color.a);
-            color.a = lerp(color.a, 1, grab_color.a);
+            d.color.rgb = lerp(lerp(d.color.rgb, back_color.rgb, grab_color.a), d.color.rgb, d.color.a);
+            d.color.a = lerp(d.color.a, 1, grab_color.a);
 FEATURE_TGL_END
         }
 
     #else
-        #define affectRefraction(i, facing, ws_normal, ws_bump_normal, color)
+        #define drawRefraction(d)
     #endif
 
     ////////////////////////////
@@ -1575,14 +1549,14 @@ FEATURE_TGL_END
             return color;
         }
 
-        void affectFrostedGlass(IN_FRAG i, inout float4 color) {
+        void drawFrostedGlass(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             // GrabScreenPos 計算
-            float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(i.ws_vertex.xyz, 1)));
+            float4 grab_uv = ComputeGrabScreenPos(mul(UNITY_MATRIX_VP, float4(d.ws_vertex.xyz, 1)));
             grab_uv.xy /= grab_uv.w;
 
             // Scale 計算
-            float2 scale = max(_CGL_BlurMin.xx, _CGL_Blur.xx / max(1, length( i.ws_vertex.xyz - worldSpaceViewPointPos() )));
+            float2 scale = max(_CGL_BlurMin.xx, _CGL_Blur.xx / max(1, length( d.ws_vertex.xyz - worldSpaceViewPointPos() )));
             scale *= UNITY_MATRIX_P._m11 / 100;
             scale.y *= _ScreenParams.x / _ScreenParams.y
 #ifdef UNITY_SINGLE_PASS_STEREO
@@ -1601,13 +1575,13 @@ FEATURE_TGL_ON_BEGIN(_CGL_Enable)
     #endif
 #endif
 
-            color.rgb = lerp(back_color.rgb, color.rgb, color.a);
-            color.a = 1;
+            d.color.rgb = lerp(back_color.rgb, d.color.rgb, d.color.a);
+            d.color.a = 1;
 FEATURE_TGL_END
         }
 
     #else
-        #define affectFrostedGlass(i, color)
+        #define drawFrostedGlass(d)
     #endif
 
 #endif
