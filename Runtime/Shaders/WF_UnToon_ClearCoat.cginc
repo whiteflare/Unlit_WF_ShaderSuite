@@ -27,12 +27,11 @@
     float _CCT_Width;
     float _CCT_Z_Shift;
 
-    // vertex シェーダでアウトラインメッシュを張るタイプ。NORMALのみサポートする。
     v2f vert_clearcoat(appdata v) {
         // 通常の vert を使う
         v2f o = vert(v);
         // SV_POSITION を上書き
-        o.vs_vertex = shiftNormalAndDepthVertex(o.ws_vertex, o.normal, _CCT_Width * 0.001, -_CCT_Z_Shift);
+        o.vs_vertex = shiftNormalAndDepthVertex(o.ws_vertex, o.ws_normal, _CCT_Width * 0.001, -_CCT_Z_Shift);
         affectNearClipCancel(o.vs_vertex);
 
         return o;
@@ -44,43 +43,25 @@
 
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        drawing d = prepareDrawing(i, 1);
+        d.color = float4(0, 0, 0, 1);
 
-        i.normal = normalize(i.normal);
-#ifdef _V2F_HAS_TANGENT
-        i.tangent = normalize(i.tangent);
-        i.bitangent = normalize(i.bitangent);
-#endif
+        prepareMainTex(i, d);
+        prepareBumpNormal(i, d);
+        prepareDetailNormal(i, d);
+        d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
 
-        // メイン
-        float4 color = float4(0, 0, 0, 1);
+        drawBumpNormal(d);          // ノーマルマップ
+        drawMetallic(d);            // メタリック
 
-        // BumpMap
-        float3 ws_normal = i.normal;
-        float3 ws_bump_normal;
-        float3 ws_detail_normal;
-        affectBumpNormal(i, uv_main, ws_bump_normal, color);
-        affectDetailNormal(i, uv_main, ws_detail_normal, color);
-
-        // ビューポイントへの方向
-        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
-        // カメラへの方向
-        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
-
-        // matcapベクトルの配列
-        WF_TYP_MATVEC matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal, ws_detail_normal);
-
-        // メタリック
-        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, color);
-        // Highlight
-        affectMatcapColor(matcapVector, uv_main, color);
+        drawMatcapColor(d);         // マットキャップ
 
         // Anti-Glare とライト色ブレンドを同時に計算
-        color.rgb *= i.light_color;
-        // Ambient Occlusion
-        affectOcclusion(i, uv_main, color);
+        d.color.rgb *= d.light_color;
 
-        return color;
+        drawOcclusion(d);           // オクルージョンとライトマップ
+
+        return d.color;
     }
 
 #endif
