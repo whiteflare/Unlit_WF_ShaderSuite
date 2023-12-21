@@ -221,7 +221,6 @@ FEATURE_TGL_END
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
         drawing d = prepareDrawing(i);
-        d.color = _Color;
 
         prepareMainTex(i, d);
 
