@@ -34,7 +34,7 @@
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 normal           : NORMAL;
 #ifdef _V2F_HAS_TANGENT
         float4 tangent          : TANGENT;
@@ -52,7 +52,7 @@
         float shadow_power      : COLOR2;
 #endif
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 ws_vertex        : TEXCOORD2;
         float4 ws_light_dir     : TEXCOORD3;
         float3 ws_normal        : TEXCOORD4;
@@ -96,7 +96,6 @@
         float2  uv1;
         float2  uv2;
         float2  uv_main;
-        float2  uv_lmap;
         float3  ws_vertex;
         float3  ws_normal;
 #ifdef _V2F_HAS_TANGENT
@@ -125,9 +124,8 @@
 
         d.color         = float4(1, 1, 1, 1);
         d.uv1           = i.uv;
-        d.uv2           = i.uv_lmap;
         d.uv_main       = i.uv;
-        d.uv_lmap       = i.uv_lmap;
+        d.uv2           = i.uv2;
         d.facing        = facing;
         d.ws_vertex     = i.ws_vertex;
         d.light_color   = i.light_color;
@@ -177,7 +175,7 @@
         o.vertex_color = v.vertex_color;
 #endif
         o.uv = v.uv;
-        o.uv_lmap = v.uv_lmap;
+        o.uv2 = v.uv2;
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
 #ifdef _V2F_HAS_TANGENT
@@ -187,7 +185,7 @@
 #endif
 
         // 環境光取得
-        float3 ambientColor = calcAmbientColorVertex(v.uv_lmap);
+        float3 ambientColor = calcAmbientColorVertex(v.uv2);
         // 影コントラスト
         calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算

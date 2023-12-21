@@ -76,7 +76,7 @@
         o.shadow_power  = MUL_BARY(i, shadow_power);
 #endif
         o.uv            = MUL_BARY(i, uv);
-        o.uv_lmap       = MUL_BARY(i, uv_lmap);
+        o.uv2           = MUL_BARY(i, uv2);
         o.ws_vertex     = MUL_BARY(i, ws_vertex);
         o.ws_light_dir  = MUL_BARY(i, ws_light_dir);
         o.ws_normal     = MUL_BARY(i, ws_normal);  // frag で normalize するので、ここでは normalize しない

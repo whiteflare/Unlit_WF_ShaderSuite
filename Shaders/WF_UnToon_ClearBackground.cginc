@@ -34,7 +34,7 @@
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 normal           : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
@@ -45,7 +45,7 @@
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 ws_vertex        : TEXCOORD2;
         float2 depth            : TEXCOORD3;
         float3 ws_normal        : TEXCOORD4;
@@ -60,7 +60,6 @@
         float2  uv1;
         float2  uv2;
         float2  uv_main;
-        float2  uv_lmap;
         float3  ws_vertex;
         float3  ws_normal;
         float3  ws_bump_normal;
@@ -77,9 +76,8 @@
 
         d.color         = float4(1, 1, 1, 1);
         d.uv1           = i.uv;
-        d.uv2           = i.uv_lmap;
         d.uv_main       = i.uv;
-        d.uv_lmap       = i.uv_lmap;
+        d.uv2           = i.uv2;
         d.ws_vertex     = i.ws_vertex;
         d.ws_normal     = normalize(i.ws_normal);
 #ifdef _V2F_HAS_VERTEXCOLOR
@@ -115,7 +113,7 @@
         o.vertex_color = v.vertex_color;
 #endif
         o.uv = v.uv;
-        o.uv_lmap = v.uv_lmap;
+        o.uv2 = v.uv2;
         o.depth = o.vs_vertex.zw;
 
         localNormalToWorldTangentSpace(v.normal, o.ws_normal);

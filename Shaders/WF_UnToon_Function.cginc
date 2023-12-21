@@ -490,7 +490,7 @@ FEATURE_TGL_END
             float3 uv =
                     _ES_SC_DirType == 1 ? UnityWorldToObjectPos(d.ws_vertex)    // ローカル座標
                     : _ES_SC_DirType == 2 ? (                                   // UV
-                        _ES_SC_UVType == 1 ? float3(d.uv_lmap, 0) : float3(d.uv_main, 0)
+                        _ES_SC_UVType == 1 ? float3(d.uv2, 0) : float3(d.uv_main, 0)
                     )
                     : d.ws_vertex                                               // ワールド座標
                     ;
@@ -632,7 +632,7 @@ FEATURE_TGL_END
 
 FEATURE_TGL_ON_BEGIN(_NS_Enable)
             // 2nd NormalMap
-            float2 uv_dtl = _NS_UVType == 1 ? i.uv_lmap : i.uv;
+            float2 uv_dtl = _NS_UVType == 1 ? i.uv2 : i.uv;
             float3 dtlNormalTangent = WF_TEX2D_NORMAL_DTL( TRANSFORM_TEX(uv_dtl, _DetailNormalMap) );
 
             // 法線計算
@@ -1314,7 +1314,7 @@ FEATURE_TGL_END
 FEATURE_TGL_ON_BEGIN(_AO_Enable)
             float3 occlusion = ONE_VEC3;
 #ifndef _WF_AO_ONLY_LMAP
-            float2 uv_aomap = _AO_UVType == 1 ? d.uv_lmap : d.uv_main;
+            float2 uv_aomap = _AO_UVType == 1 ? d.uv2 : d.uv_main;
             float3 aomap_var = WF_TEX2D_OCCLUSION(uv_aomap);
             occlusion *= TGL_OFF(_AO_UseGreenMap) ? aomap_var.rgb : aomap_var.ggg;
             occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
@@ -1323,7 +1323,7 @@ FEATURE_TGL_ON_BEGIN(_AO_Enable)
     #ifndef _WF_AO_ONLY_LMAP
             if (TGL_ON(_AO_UseLightMap)) {
     #endif
-                occlusion *= _AO_PICK_LMAP(d.uv_lmap);
+                occlusion *= _AO_PICK_LMAP(d.uv2);
     #ifndef _WF_AO_ONLY_LMAP
             }
     #endif

@@ -43,7 +43,7 @@
 #endif
         float2 uv               : TEXCOORD0;
 #ifdef _V2F_HAS_UV_LMAP
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
 #endif
 #ifdef _GRS_ERSSIDE_ENABLE
         float3 ws_normal        : TEXCOORD2;
@@ -161,7 +161,7 @@ FEATURE_TGL_END
         o.vertex_color = v.vertex_color;
 #endif
 #ifdef _V2F_HAS_UV_LMAP
-        o.uv_lmap = v.uv2;
+        o.uv2 = v.uv2;
 #endif
 
         UNITY_TRANSFER_FOG(o, o.vs_vertex);

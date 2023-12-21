@@ -34,7 +34,7 @@
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 normal           : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };

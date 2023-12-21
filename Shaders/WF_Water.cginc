@@ -42,7 +42,7 @@
     struct v2f_surface {
         float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
         float3 ws_vertex        : TEXCOORD3;
         float3 ws_tangent       : TEXCOORD4;
@@ -60,7 +60,6 @@
         float2  uv1;
         float2  uv2;
         float2  uv_main;
-        float2  uv_lmap;
         float3  ws_vertex;
         float3  ws_normal;
         float3  ws_bump_normal;
@@ -78,9 +77,8 @@
 
         d.color         = float4(1, 1, 1, 1);
         d.uv1           = i.uv;
-        d.uv2           = i.uv_lmap;
         d.uv_main       = i.uv;
-        d.uv_lmap       = i.uv_lmap;
+        d.uv2           = i.uv2;
         d.ws_vertex     = i.ws_vertex;
         d.facing        = facing;
         d.ws_light_dir  = i.ws_light_dir;
@@ -108,7 +106,7 @@
     struct v2f_caustics {
         float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 ws_vertex        : TEXCOORD2;
         UNITY_FOG_COORDS(3)
         UNITY_VERTEX_OUTPUT_STEREO
@@ -121,7 +119,6 @@
         float2  uv1;
         float2  uv2;
         float2  uv_main;
-        float2  uv_lmap;
         float3  ws_vertex;
     };
 
@@ -130,9 +127,8 @@
 
         d.color         = float4(1, 1, 1, 1);
         d.uv1           = i.uv;
-        d.uv2           = i.uv_lmap;
         d.uv_main       = i.uv;
-        d.uv_lmap       = i.uv_lmap;
+        d.uv2           = i.uv2;
         d.ws_vertex     = i.ws_vertex;
 
         return d;
@@ -191,7 +187,7 @@
     struct v2f_lamp {
         float4 vs_vertex        : SV_POSITION;
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 ws_normal        : TEXCOORD2;
         float3 ws_vertex        : TEXCOORD3;
         float3 ws_tangent       : TEXCOORD4;
@@ -210,7 +206,6 @@
         float2  uv1;
         float2  uv2;
         float2  uv_main;
-        float2  uv_lmap;
         float3  ws_vertex;
         float3  ws_normal;
         float3  ws_tangent;
@@ -226,9 +221,8 @@
 
         d.color         = float4(1, 1, 1, 1);
         d.uv1           = i.uv;
-        d.uv2           = i.uv_lmap;
         d.uv_main       = i.uv;
-        d.uv_lmap       = i.uv_lmap;
+        d.uv2           = i.uv2;
         d.ws_vertex     = i.ws_vertex;
         d.ws_normal     = normalize(i.ws_normal);
         d.ws_tangent    = normalize(i.ws_tangent);
@@ -264,7 +258,7 @@
 
     #define WF_DEF_WAVE_NORMAL(id)                                                                              \
         float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                \
-            float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
+            float2 uv = calcWavingUV(i.uv, i.uv2, i.ws_vertex,                                                  \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);                  \
             float4 tex = PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv);                                               \
             float3 normalTangent = UnpackScaleNormal( tex, _WAV_NormalScale##id ).xyz;                          \
@@ -274,7 +268,7 @@
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
         float calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                 \
-            float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                              \
+            float2 uv = calcWavingUV(i.uv, i.uv2, i.ws_vertex,                                                  \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);                  \
             cnt++;                                                                                              \
             return PICK_MAIN_TEX2D(_WAV_HeightMap##id, uv).r * 2 - 0.5;                                         \
@@ -282,7 +276,7 @@
 
     #define WF_DEF_WAVE_CAUSTICS(id)                                                                            \
         float3 calcWavingCaustics##id(inout drawing d, inout uint cnt) {                                        \
-            float2 uv = calcWavingUV(d.uv_main, d.uv_lmap, d.ws_vertex,                                         \
+            float2 uv = calcWavingUV(d.uv_main, d.uv2, d.ws_vertex,                                             \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);                \
             cnt++;                                                                                              \
             return PICK_MAIN_TEX2D(_WAV_CausticsTex##id, uv);                                                   \
@@ -293,7 +287,7 @@
     #define WF_DEF_WAVE_NORMAL(id)                                                                              \
         float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                \
             if (_WAV_Enable##id) {                                                                              \
-                float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
+                float2 uv = calcWavingUV(i.uv, i.uv2, i.ws_vertex,                                              \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);              \
                 float4 tex = PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv);                                           \
                 float3 normalTangent = UnpackScaleNormal( tex, _WAV_NormalScale##id ).xyz;                      \
@@ -307,7 +301,7 @@
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
         float calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                 \
             if (_WAV_Enable##id) {                                                                              \
-                float2 uv = calcWavingUV(i.uv, i.uv_lmap, i.ws_vertex,                                          \
+                float2 uv = calcWavingUV(i.uv, i.uv2, i.ws_vertex,                                              \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);              \
                 cnt++;                                                                                          \
                 return PICK_MAIN_TEX2D(_WAV_HeightMap##id, uv).r * 2 - 0.5;                                     \
@@ -319,7 +313,7 @@
     #define WF_DEF_WAVE_CAUSTICS(id)                                                                            \
         float3 calcWavingCaustics##id(inout drawing d, inout uint cnt) {                                        \
             if (_WAV_Enable##id) {                                                                              \
-                float2 uv = calcWavingUV(d.uv_main, d.uv_lmap, d.ws_vertex,                                     \
+                float2 uv = calcWavingUV(d.uv_main, d.uv2, d.ws_vertex,                                         \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_CausticsTex##id##_ST);            \
                 cnt++;                                                                                          \
                 return PICK_MAIN_TEX2D(_WAV_CausticsTex##id, uv);                                               \
@@ -603,7 +597,7 @@ FEATURE_TGL_END
         o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
         o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-        o.uv_lmap = v.uv2;
+        o.uv2 = v.uv2;
 
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, 0);
 
@@ -668,7 +662,7 @@ FEATURE_TGL_END
         o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
         o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-        o.uv_lmap = v.uv2;
+        o.uv2 = v.uv2;
 
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
         return o;
@@ -756,7 +750,7 @@ FEATURE_TGL_END
         o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
         o.uv = v.uv;
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-        o.uv_lmap = v.uv2;
+        o.uv2 = v.uv2;
 #ifdef _WF_WATER_LAMP_POINT
         o.ws_base_pos = UnityObjectToWorldPos(_WAR_BasePosOffset);
 #endif
