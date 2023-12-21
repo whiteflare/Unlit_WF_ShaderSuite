@@ -53,6 +53,53 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
+    #define IN_FRAG v2f
+
+    struct drawing {
+        float4  color;
+        float2  uv1;
+#ifdef _V2F_HAS_UV_LMAP
+        float2  uv2;
+#endif
+        float2  uv_main;
+#ifdef _GRS_ERSSIDE_ENABLE
+        float3  ws_vertex;
+        float3  ws_normal;
+#endif
+        float3  ws_view_dir;
+        float3  ws_camera_dir;
+        float3  ws_light_dir;
+        float3  light_color;
+        float   height;
+#ifdef _V2F_HAS_VERTEXCOLOR
+        float4  vertex_color;
+#endif
+    };
+
+    drawing prepareDrawing(IN_FRAG i) {
+        drawing d = (drawing) 0;
+
+        d.color         = float4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv_main       = i.uv;
+        d.light_color   = i.light_color;
+        d.height        = i.height;
+#ifdef _V2F_HAS_UV_LMAP
+        d.uv2           = i.uv2;
+#endif
+#ifdef _GRS_ERSSIDE_ENABLE
+        d.ws_vertex     = i.ws_vertex;
+        d.ws_normal     = normalize(i.ws_normal);
+        d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
+        d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
+#endif
+#ifdef _V2F_HAS_VERTEXCOLOR
+        d.vertex_color  = i.vertex_color;
+#endif
+
+        return d;
+    }
+
     ////////////////////////////
     // UnToon function
     ////////////////////////////
@@ -173,27 +220,30 @@ FEATURE_TGL_END
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
-        half2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-        half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main);
-        affectVertexColor(i.vertex_color, color);
+        drawing d = prepareDrawing(i);
+        d.color = _Color;
 
-        color.rgb *= lerp(_GRS_ColorBottom.rgb, _GRS_ColorTop.rgb, saturate(i.height));
+        prepareMainTex(i, d);
 
-        color.rgb *= i.light_color;
-        // Ambient Occlusion
-        affectOcclusion(i, uv_main, color);
+        drawMainTex(d);             // メインテクスチャ
+        drawVertexColor(d);         // 頂点カラー
 
-        clip(color.a - _Cutoff);
+        d.color.rgb *= lerp(_GRS_ColorBottom.rgb, _GRS_ColorTop.rgb, saturate(d.height));
+        d.color.rgb *= d.light_color;
+
+        drawOcclusion(d);           // オクルージョンとライトマップ
+
+        clip(d.color.a - _Cutoff);
 
 #ifdef _GRS_ERSSIDE_ENABLE
-        if (abs(dot(normalize(i.ws_normal), worldSpaceViewPointDir(i.ws_vertex))) < _GRS_EraseSide) {
+        if (abs(dot(d.ws_normal, worldSpaceViewPointDir(d.ws_vertex))) < _GRS_EraseSide) {
             discard;
         }
 #endif
 
-        UNITY_APPLY_FOG(i.fogCoord, color);
+        UNITY_APPLY_FOG(i.fogCoord, d.color);
 
-        return color;
+        return d.color;
     }
 
     ////////////////////////////
@@ -254,7 +304,10 @@ FEATURE_TGL_END
 
         half2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
         half4 color = PICK_MAIN_TEX2D(_MainTex, uv_main);
-        affectVertexColor(i.vertex_color, color);
+
+#ifdef _VC_ENABLE
+        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
+#endif
 
         clip(color.a - _Cutoff);
 
