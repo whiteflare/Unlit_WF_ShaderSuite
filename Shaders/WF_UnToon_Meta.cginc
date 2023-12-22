@@ -50,11 +50,35 @@
 #endif
     };
 
+    #define IN_FRAG v2f_meta
+
+    struct drawing {
+        float4  color;
+        float2  uv1;
+        float2  uv_main;
+    };
+
+    drawing prepareDrawing(IN_FRAG i) {
+        drawing d = (drawing) 0;
+
+        d.color         = float4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv_main       = i.uv;
+
+        return d;
+    }
+
     ////////////////////////////
     // Unity Meta function
     ////////////////////////////
 
     #include "UnityMetaPass.cginc"
+
+    ////////////////////////////
+    // UnToon function
+    ////////////////////////////
+
+    #include "WF_UnToon_Function.cginc"
 
     ////////////////////////////
     // vertex&fragment shader
@@ -87,24 +111,25 @@
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        drawing d = prepareDrawing(i);
+        d.color = _Color;
 
-        float4 color    = _Color * PICK_MAIN_TEX2D(_MainTex, uv_main);
-#ifdef _VC_ENABLE
-        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
-#endif
+        prepareMainTex(i, d);
+
+        drawMainTex(d);             // メインテクスチャ
+        drawVertexColor(d);         // 頂点カラー
 
         // 単色化
-        color.rgb = max(ZERO_VEC3, lerp(AVE_RGB(color.rgb).xxx, color.rgb, lerp(1, _LBE_IndirectChroma, _LBE_Enable)));
+        d.color.rgb = max(ZERO_VEC3, lerp(AVE_RGB(d.color.rgb).xxx, d.color.rgb, lerp(1, _LBE_IndirectChroma, _LBE_Enable)));
 
-        o.Albedo        = color.rgb * lerp(1, _LBE_IndirectMultiplier, _LBE_Enable);
+        o.Albedo        = d.color.rgb * lerp(1, _LBE_IndirectMultiplier, _LBE_Enable);
         o.SpecularColor = o.Albedo;
         o.Emission      = ZERO_VEC3;    // 初期化
 
 #ifdef _ES_ENABLE
 
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
-        float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv_main).rgba;
+        float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, d.uv_main).rgba;
         float4 es_color = _EmissionColor * es_mask;
         o.Emission  = es_color.rgb * lerp(1, _LBE_EmissionMultiplier, _LBE_Enable);
 FEATURE_TGL_END

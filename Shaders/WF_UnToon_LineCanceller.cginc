@@ -41,6 +41,16 @@
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
+    struct v2f {    // dummy
+        float4 vs_vertex        : SV_POSITION;
+        float2 uv               : TEXCOORD0;
+    };
+
+    struct drawing {    // dummy
+        float4  color;
+        float2  uv_main;
+    };
+
     ////////////////////////////
     // UnToon function
     ////////////////////////////

@@ -32,4 +32,10 @@
 
     #endif
 
+    #ifndef _V2F_HAS_SHADOWPOWER
+        #if defined(_TS_ENABLE)
+            #define _V2F_HAS_SHADOWPOWER
+        #endif
+    #endif
+
 #endif

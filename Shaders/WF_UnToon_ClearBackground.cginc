@@ -34,7 +34,7 @@
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 normal           : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
@@ -45,13 +45,49 @@
         float4 vertex_color     : COLOR0;
 #endif
         float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
+        float2 uv2              : TEXCOORD1;
         float3 ws_vertex        : TEXCOORD2;
         float2 depth            : TEXCOORD3;
-        float3 normal           : TEXCOORD4;
+        float3 ws_normal        : TEXCOORD4;
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
+
+    #define IN_FRAG v2f_clrbg
+
+    struct drawing {
+        float4  color;
+        float2  uv1;
+        float2  uv2;
+        float2  uv_main;
+        float3  ws_vertex;
+        float3  ws_normal;
+        float3  ws_bump_normal;
+        float3  ws_detail_normal;
+        float3  ws_view_dir;
+        float3  ws_camera_dir;
+#ifdef _V2F_HAS_VERTEXCOLOR
+        float4  vertex_color;
+#endif
+    };
+
+    drawing prepareDrawing(IN_FRAG i, uint facing) {
+        drawing d = (drawing) 0;
+
+        d.color         = float4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv_main       = i.uv;
+        d.uv2           = i.uv2;
+        d.ws_vertex     = i.ws_vertex;
+        d.ws_normal     = normalize(i.ws_normal);
+#ifdef _V2F_HAS_VERTEXCOLOR
+        d.vertex_color  = i.vertex_color;
+#endif
+        d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
+        d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
+
+        return d;
+    }
 
     ////////////////////////////
     // UnToon function
@@ -77,10 +113,10 @@
         o.vertex_color = v.vertex_color;
 #endif
         o.uv = v.uv;
-        o.uv_lmap = v.uv_lmap;
+        o.uv2 = v.uv2;
         o.depth = o.vs_vertex.zw;
 
-        localNormalToWorldTangentSpace(v.normal, o.normal);
+        localNormalToWorldTangentSpace(v.normal, o.ws_normal);
 
 #if defined(UNITY_REVERSED_Z)
         o.vs_vertex.z = o.vs_vertex.w * 1e-5;
@@ -110,35 +146,24 @@
         }
 #endif
 
-        float4 color;
-        float2 uv_main;
+        drawing d = prepareDrawing(i, facing);
+        d.color = _Color;
 
-        i.normal = normalize(i.normal);
+        prepareMainTex(i, d);
+        prepareBumpNormal(i, d);
 
-        // メイン
-        affectBaseColor(i.uv, i.uv_lmap, facing, uv_main, color);
-        // 頂点カラー
-        affectVertexColor(i.vertex_color, color);
+        drawMainTex(d);             // メインテクスチャ
+        drawVertexColor(d);         // 頂点カラー
 
-        // アルファマスク適用
-        affectAlphaMask(uv_main, color);
-
-        // BumpMap
-        float3 ws_normal = i.normal;
-
-        // ビューポイントへの方向
-        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
-        // カメラへの方向
-        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
+        drawAlphaMask(d);           // アルファ
 
         // 背景消去
-        float4 cube_color = PICK_MAIN_TEXCUBE_LOD(unity_SpecCube0, -ws_camera_dir, 0);
-        color.rgb = DecodeHDR(cube_color, float4(1, unity_SpecCube0_HDR.yzw));
+        float4 cube_color = PICK_MAIN_TEXCUBE_LOD(unity_SpecCube0, -d.ws_camera_dir, 0);
+        d.color.rgb = DecodeHDR(cube_color, float4(1, unity_SpecCube0_HDR.yzw));
 
-        // フレネル
-        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
+        drawFresnelAlpha(d);        // フレネル
 
-        return fixed4(color.rgb, 1);
+        return fixed4(d.color.rgb, 1);
     }
 
 #endif
