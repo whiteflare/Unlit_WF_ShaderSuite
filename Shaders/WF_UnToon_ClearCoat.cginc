@@ -49,7 +49,7 @@
         prepareMainTex(i, d);
         prepareBumpNormal(i, d);
         prepareDetailNormal(i, d);
-        d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
+        prepareMatcapVector(i, d);
 
         drawBumpNormal(d);          // ノーマルマップ
         drawMetallic(d);            // メタリック

@@ -387,6 +387,12 @@ FEATURE_TGL_END
         return angle_light_camera;
     }
 
+    void prepareAngleLightCamera(IN_FRAG i, inout drawing d) {
+#if defined(_TS_ENABLE) || defined(_TR_ENABLE)
+        d.angle_light_camera = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
+#endif
+    }
+
     #ifdef _GL_NCC_ENABLE
 
         void affectNearClipCancel(inout float4 vs_vertex) {
@@ -824,6 +830,14 @@ FEATURE_TGL_END
     float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
         return calcMatcapVector(matcapVector, normal, normal, parallax);
     }
+
+	void prepareMatcapVector(IN_FRAG i, inout drawing d) {
+        d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
+	}
+
+#else
+
+	#define prepareMatcapVector(i, d)
 
 #endif // WF_TYP_MATVEC
 

@@ -235,7 +235,7 @@ FEATURE_TGL_END
         clip(d.color.a - _Cutoff);
 
 #ifdef _GRS_ERSSIDE_ENABLE
-        if (abs(dot(d.ws_normal, worldSpaceViewPointDir(d.ws_vertex))) < _GRS_EraseSide) {
+        if (abs(dot(d.ws_normal, d.ws_view_dir)) < _GRS_EraseSide) {
             discard;
         }
 #endif

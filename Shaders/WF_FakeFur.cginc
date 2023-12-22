@@ -75,10 +75,6 @@
         float2  uv_main;
         float3  ws_vertex;
         float3  ws_normal;
-        float3  ws_bump_normal;
-        float3  ws_detail_normal;
-        float3  ws_view_dir;
-        float3  ws_camera_dir;
         float3  ws_light_dir;
         float   angle_light_camera;
         float3  light_color;
@@ -100,8 +96,6 @@
 #ifdef _V2F_HAS_SHADOWPOWER
         d.shadow_power  = i.shadow_power;
 #endif
-        d.ws_view_dir           = worldSpaceViewPointDir(d.ws_vertex);
-        d.ws_camera_dir         = worldSpaceCameraDir(d.ws_vertex);
 
         return d;
     }
@@ -253,8 +247,7 @@
         d.color = _Color;
 
         prepareMainTex(i, d);
-        prepareBumpNormal(i, d);
-        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
+        prepareAngleLightCamera(i, d);
 
         drawMainTex(d);             // メインテクスチャ
         drawAlphaMask(d);           // アルファ

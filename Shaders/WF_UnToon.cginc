@@ -209,8 +209,8 @@
         prepareMainTex(i, d);
         prepareBumpNormal(i, d);
         prepareDetailNormal(i, d);
-        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
-        d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
+        prepareAngleLightCamera(i, d);
+        prepareMatcapVector(i, d);
 
         drawMainTex(d);             // メインテクスチャ
         drawBackTex(d);             // 裏面テクスチャ
