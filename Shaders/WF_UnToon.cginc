@@ -54,7 +54,7 @@
         float2 uv               : TEXCOORD0;
         float2 uv2              : TEXCOORD1;
         float3 ws_vertex        : TEXCOORD2;
-        float4 ws_light_dir     : TEXCOORD3;
+        float3 ws_light_dir     : TEXCOORD3;    // ws_light_dir.w は frag では使わないので削減
         float3 ws_normal        : TEXCOORD4;
 #ifdef _V2F_HAS_TANGENT
         float3 ws_tangent       : TEXCOORD5;
@@ -106,7 +106,7 @@
         float3  ws_detail_normal;
         float3  ws_view_dir;
         float3  ws_camera_dir;
-        float3  ws_light_dir;
+        float3  ws_light_dir;    // ws_light_dir.w は frag では使わないので削減
         float   angle_light_camera;
         float3  light_color;
         uint    facing;

@@ -593,7 +593,7 @@ FEATURE_TGL_END
     #ifdef _NM_ENABLE
 
         void prepareBumpNormal(IN_FRAG i, inout drawing d) {
-        	d.ws_bump_normal = d.ws_normal;
+            d.ws_bump_normal = d.ws_normal;
 
 FEATURE_TGL_ON_BEGIN(_NM_Enable)
             float3 normalTangent = WF_TEX2D_NORMAL(d.uv_main);
@@ -1410,7 +1410,7 @@ FEATURE_TGL_ON_BEGIN(_DSV_Enable)
             }
             else {
                 float2 uv   = TRANSFORM_TEX(d.uv1, _DSV_CtrlTex);
-                float3 tex  = PICK_MAIN_TEX2D(_DSV_CtrlTex, uv);
+                float3 tex  = PICK_MAIN_TEX2D(_DSV_CtrlTex, uv).rgb;
                 tex = TGL_OFF(_DSV_TexIsSRGB) ? tex : LinearToGammaSpace(tex);
 
                 float pos = _DSV_Dissolve / (1 - _DSV_SparkWidth) - (TGL_OFF(_DSV_Invert) ? tex.r : 1 - tex.r);
@@ -1418,7 +1418,7 @@ FEATURE_TGL_ON_BEGIN(_DSV_Enable)
                     discard;
                 }
 
-                d.color.rgb += _DSV_SparkColor * (1 - smoothstep(0, NON_ZERO_FLOAT(_DSV_SparkWidth), pos));
+                d.color.rgb += _DSV_SparkColor.rgb * (1 - smoothstep(0, NON_ZERO_FLOAT(_DSV_SparkWidth), pos));
             }
 FEATURE_TGL_END
         }
