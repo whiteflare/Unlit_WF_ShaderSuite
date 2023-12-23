@@ -431,7 +431,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_MirrorControl_Opaque" {
             float   _MR_Enable;
             uint    _MR_Visibility;
 
-            float4 frag_mirrorcontrol(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+            half4 frag_mirrorcontrol(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
                 float4 color = frag(i, facing);
 
                 if (TGL_ON(_MR_Enable)) {

@@ -24,7 +24,7 @@
     // vertex&fragment shader
     ////////////////////////////
 
-    float4 frag_powercap(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+    half4 frag_powercap(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
         // deprecated
         return frag(i, facing);
     }

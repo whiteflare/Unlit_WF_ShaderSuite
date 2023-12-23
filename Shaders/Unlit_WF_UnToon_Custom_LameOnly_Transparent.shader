@@ -116,14 +116,14 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
             #include "WF_UnToon.cginc"
 
-            float4 frag_lameonly(v2f i) : SV_Target {
+            half4 frag_lameonly(v2f i) : SV_Target {
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
                 UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
                 drawing d = prepareDrawing(i, 1);
-                d.color = float4(0, 0, 0, 0);
+                d.color = half4(0, 0, 0, 0);
 
                 prepareMainTex(i, d);
                 prepareBumpNormal(i, d);

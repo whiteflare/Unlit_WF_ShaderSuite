@@ -29,36 +29,36 @@
     ////////////////////////////
 
     struct appdata {
-        float4 vertex           : POSITION;
+        float4  vertex              : POSITION;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 normal           : NORMAL;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   normal              : NORMAL;
 #ifdef _V2F_HAS_TANGENT
-        float4 tangent          : TANGENT;
+        half4   tangent             : TANGENT;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f {
-        float4 vs_vertex        : SV_POSITION;
+        float4  vs_vertex           : SV_POSITION;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
-        float3 light_color      : COLOR1;
+        half3   light_color         : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
-        float shadow_power      : COLOR2;
+        half    shadow_power        : COLOR2;
 #endif
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 ws_vertex        : TEXCOORD2;
-        float3 ws_light_dir     : TEXCOORD3;    // ws_light_dir.w は frag では使わないので削減
-        float3 ws_normal        : TEXCOORD4;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        float3  ws_vertex           : TEXCOORD2;
+        half4   ws_light_dir        : TEXCOORD3;
+        half3   ws_normal           : TEXCOORD4;
 #ifdef _V2F_HAS_TANGENT
-        float3 ws_tangent       : TEXCOORD5;
-        float3 ws_bitangent     : TEXCOORD6;
+        half3   ws_tangent          : TEXCOORD5;
+        half3   ws_bitangent        : TEXCOORD6;
 #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -78,51 +78,51 @@
     #endif
 
     struct MatcapVector {
-        float3 vs_normal_center;
+        float3  vs_normal_center;
 #ifdef _MV_HAS_PARALLAX
-        float3 diff_parallax;
+        float3  diff_parallax;
 #endif
 #ifdef _MV_HAS_NML
-        float3 diff_normal;
+        float3  diff_normal;
 #endif
 #ifdef _MV_HAS_NML2
-        float3 diff_normal2;
+        float3  diff_normal2;
 #endif
     };
     #define WF_TYP_MATVEC   MatcapVector
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv2;
         float2  uv_main;
         float3  ws_vertex;
-        float3  ws_normal;
+        half3   ws_normal;
 #ifdef _V2F_HAS_TANGENT
-        float3 ws_tangent;
-        float3 ws_bitangent;
+        half3   ws_tangent;
+        half3   ws_bitangent;
 #endif
-        float3  ws_bump_normal;
-        float3  ws_detail_normal;
-        float3  ws_view_dir;
-        float3  ws_camera_dir;
-        float3  ws_light_dir;    // ws_light_dir.w は frag では使わないので削減
-        float   angle_light_camera;
-        float3  light_color;
+        half3   ws_bump_normal;
+        half3   ws_detail_normal;
+        half3   ws_view_dir;
+        half3   ws_camera_dir;
+        half3   ws_light_dir;
+        half    angle_light_camera;
+        half3   light_color;
         uint    facing;
         WF_TYP_MATVEC matcapVector;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4  vertex_color;
+        half4   vertex_color;
 #endif
 #ifdef _V2F_HAS_SHADOWPOWER
-        float   shadow_power;
+        half    shadow_power;
 #endif
     };
 
     drawing prepareDrawing(IN_FRAG i, uint facing) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.uv2           = i.uv2;
@@ -197,7 +197,7 @@
         return o;
     }
 
-    float4 frag(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+    half4 frag(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
@@ -209,8 +209,8 @@
         prepareMainTex(i, d);
         prepareBumpNormal(i, d);
         prepareDetailNormal(i, d);
-        prepareAngleLightCamera(i, d);
-        prepareMatcapVector(i, d);
+        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
+        d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
 
         drawMainTex(d);             // メインテクスチャ
         drawBackTex(d);             // 裏面テクスチャ
@@ -363,7 +363,7 @@ FEATURE_TGL_END
     // Depth&Normal のみ描く fragment shader
     ////////////////////////////
 
-    float4 frag_depth(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+    half4 frag_depth(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
@@ -388,7 +388,7 @@ FEATURE_TGL_END
             }
         #endif
 
-        return float4(d.ws_bump_normal, 0);
+        return half4(d.ws_bump_normal, 0);
     }
 
 #endif

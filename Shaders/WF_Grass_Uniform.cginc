@@ -29,17 +29,17 @@
     // Other uniform variable
     ////////////////////////////
 
-    half4           _MainTex_ST;
-    half            _Color;
-    half            _Cutoff;
-    half            _UseVertexColor;
+    float4              _MainTex_ST;
+    half                _Color;
+    half                _Cutoff;
+    half                _UseVertexColor;
 
     // -------------------------
 
-    float           _GL_CastShadow;
-    float           _GL_LevelMin;
-    float           _GL_LevelMax;
-    float           _GL_BlendPower;
+    half                _GL_CastShadow;
+    half                _GL_LevelMin;
+    half                _GL_LevelMax;
+    half                _GL_BlendPower;
 
     // 使わない変数は define で固定値を設定
     #define _GL_LightMode       0
@@ -50,39 +50,39 @@
 
     // -------------------------
 
-    uint            _GRS_HeightType;
-    uint            _GRS_HeightUVType;
-    half4           _GRS_HeightMaskTex_ST;
-    float           _GRS_InvMaskVal;
-    float           _GRS_WorldYBase;
-    half            _GRS_WorldYScale;
-    half4           _GRS_UVFactor;
-    half3           _GRS_ColorFactor;
-    half4           _GRS_ColorBottom;
-    half4           _GRS_ColorTop;
-    half            _GRS_EraseSide;
+    uint                _GRS_HeightType;
+    uint                _GRS_HeightUVType;
+    float4              _GRS_HeightMaskTex_ST;
+    half                _GRS_InvMaskVal;
+    half                _GRS_WorldYBase;
+    half                _GRS_WorldYScale;
+    half4               _GRS_UVFactor;
+    half3               _GRS_ColorFactor;
+    half4               _GRS_ColorBottom;
+    half4               _GRS_ColorTop;
+    half                _GRS_EraseSide;
 
     // -------------------------
 
-    float           _LBE_Enable;
-    float           _LBE_IndirectChroma;
-    float           _LBE_IndirectMultiplier;
-    float           _LBE_EmissionMultiplier;
+    half                _LBE_Enable;
+    half                _LBE_IndirectChroma;
+    half                _LBE_IndirectMultiplier;
+    half                _LBE_EmissionMultiplier;
 
     // -------------------------
 
-    FEATURE_TGL    (_GRW_Enable);
-    half            _GRW_WaveSpeed;
-    half4           _GRW_WaveWidth;
-    half            _GRW_WaveExponent;
-    half            _GRW_WaveOffset;
-    half4           _GRW_WindVector;
+    FEATURE_TGL        (_GRW_Enable);
+    half                _GRW_WaveSpeed;
+    half4               _GRW_WaveWidth;
+    half                _GRW_WaveExponent;
+    half                _GRW_WaveOffset;
+    half4               _GRW_WindVector;
 
     // -------------------------
 
-    FEATURE_TGL    (_AO_Enable);
-    float           _AO_UseLightMap;
-    float           _AO_Contrast;
-    float           _AO_Brightness;
+    FEATURE_TGL        (_AO_Enable);
+    half                _AO_UseLightMap;
+    half                _AO_Contrast;
+    half                _AO_Brightness;
 
 #endif

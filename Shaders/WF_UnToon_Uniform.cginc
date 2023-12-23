@@ -85,10 +85,10 @@
     ////////////////////////////
 
     float4          _MainTex_ST;
-    float4          _Color;
-    float           _Cutoff;
-    float           _UseVertexColor;
-    float           _Z_Shift;
+    half4           _Color;
+    half            _Cutoff;
+    half            _UseVertexColor;
+    half            _Z_Shift;
     uint            _FlipMirror;
 
     // -------------------------
@@ -96,91 +96,91 @@
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_BKT_Enable);
     float4          _BKT_BackTex_ST;
-    float4          _BKT_BackColor;
+    half4           _BKT_BackColor;
     uint            _BKT_UVType;
 #endif
 
     // -------------------------
 
     uint            _AL_Source;
-    float           _AL_Power;
-    float           _AL_Fresnel;
-    float           _AL_AlphaToMask;
-    float           _AL_Z_Offset;
-    float           _AL_InvMaskVal;
+    half            _AL_Power;
+    half            _AL_Fresnel;
+    half            _AL_AlphaToMask;
+    half            _AL_Z_Offset;
+    half            _AL_InvMaskVal;
 
     // -------------------------
 
-    float           _GL_CastShadow;
-    float           _GL_ShadowCutoff;
-    float           _GL_LevelMin;
-    float           _GL_LevelMax;
-    float           _GL_BlendPower;
+    half            _GL_CastShadow;
+    half            _GL_ShadowCutoff;
+    half            _GL_LevelMin;
+    half            _GL_LevelMax;
+    half            _GL_BlendPower;
     uint            _GL_LightMode;
-    float           _GL_CustomAzimuth;
-    float           _GL_CustomAltitude;
-    float3          _GL_CustomLitPos;
-    float           _GL_DisableBasePos;
-    float           _GL_NCC_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
+    half            _GL_CustomAzimuth;
+    half            _GL_CustomAltitude;
+    half3           _GL_CustomLitPos;
+    half            _GL_DisableBasePos;
+    half            _GL_NCC_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく half で定義
 
     // -------------------------
 
     #define _WF_DEFINED_LBE
-    float           _LBE_Enable;
-    float           _LBE_IndirectChroma;
-    float           _LBE_IndirectMultiplier;
-    float           _LBE_EmissionMultiplier;
+    half            _LBE_Enable;
+    half            _LBE_IndirectChroma;
+    half            _LBE_IndirectMultiplier;
+    half            _LBE_EmissionMultiplier;
 
     // -------------------------
 
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_CHM_Enable);
-    float4          _CHM_ColorR;
-    float4          _CHM_ColorG;
-    float4          _CHM_ColorB;
+    half4           _CHM_ColorR;
+    half4           _CHM_ColorG;
+    half4           _CHM_ColorB;
 #endif
 
     // -------------------------
 
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_CGR_Enable);
-    float           _CGR_InvMaskVal;
+    half            _CGR_InvMaskVal;
 #endif
 
     // -------------------------
 
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_CLC_Enable);
-    float           _CLC_DeltaH;
-    float           _CLC_DeltaS;
-    float           _CLC_DeltaV;
-    float           _CLC_Gamma;
-    float           _CLC_Monochrome;
-    float           _CLC_InvMaskVal;
+    half            _CLC_DeltaH;
+    half            _CLC_DeltaS;
+    half            _CLC_DeltaV;
+    half            _CLC_Gamma;
+    half            _CLC_Monochrome;
+    half            _CLC_InvMaskVal;
 #endif
 
     // -------------------------
 
     FEATURE_TGL    (_ES_Enable);
-    float4          _EmissionColor;
+    half4           _EmissionColor;
     uint            _ES_BlendType;
 
-    float           _ES_ScrollEnable;
+    half            _ES_ScrollEnable;
     uint            _ES_SC_Shape;
     uint            _ES_SC_DirType;
     uint            _ES_SC_UVType;
-    float4          _ES_SC_Direction;
-    float           _ES_SC_LevelOffset;
-    float           _ES_SC_Sharpness;
-    float           _ES_SC_Speed;
-    float           _ES_SC_AlphaScroll;
+    half4           _ES_SC_Direction;
+    half            _ES_SC_LevelOffset;
+    half            _ES_SC_Sharpness;
+    half            _ES_SC_Speed;
+    half            _ES_SC_AlphaScroll;
 
     // -------------------------
 
     FEATURE_TGL    (_NM_Enable);
-    float           _BumpScale;
-    float           _NM_Power;
-    float           _NM_InvConvex;
+    half            _BumpScale;
+    half            _NM_Power;
+    half            _NM_InvConvex;
 
     // -------------------------
 
@@ -188,29 +188,29 @@
     FEATURE_TGL    (_NS_Enable);
     uint            _NS_UVType;
     float4          _DetailNormalMap_ST;
-    float           _DetailNormalMapScale;
-    float           _NS_InvMaskVal;
+    half            _DetailNormalMapScale;
+    half            _NS_InvMaskVal;
 #endif
 
     // -------------------------
 
     FEATURE_TGL    (_MT_Enable);
-    float           _MT_Metallic;
-    float           _MT_ReflSmooth;
-    float           _MT_BlendNormal;
-    float           _MT_BlendNormal2;
-    float           _MT_Brightness;
-    float           _MT_Monochrome;
-    float           _MT_GeomSpecAA;
+    half            _MT_Metallic;
+    half            _MT_ReflSmooth;
+    half            _MT_BlendNormal;
+    half            _MT_BlendNormal2;
+    half            _MT_Brightness;
+    half            _MT_Monochrome;
+    half            _MT_GeomSpecAA;
     uint            _MT_MetallicMapType;
-    float           _MT_Specular;
-    float           _MT_SpecSmooth;
-    float           _MT_InvMaskVal;
-    float           _MT_InvRoughnessMaskVal;
+    half            _MT_Specular;
+    half            _MT_SpecSmooth;
+    half            _MT_InvMaskVal;
+    half            _MT_InvRoughnessMaskVal;
     uint            _MT_CubemapType;
-    float4          _MT_Cubemap_HDR;
-    float           _MT_CubemapPower;
-    float           _MT_CubemapHighCut;
+    half4           _MT_Cubemap_HDR;
+    half            _MT_CubemapPower;
+    half            _MT_CubemapHighCut;
 
     // -------------------------
 
@@ -219,15 +219,15 @@
     DECL_SUB_TEX2D(_HL_MaskTex##id);        \
     FEATURE_TGL(_HL_Enable##id);            \
     uint        _HL_CapType##id;            \
-    float3      _HL_MedianColor##id;        \
-    float3      _HL_MatcapColor##id;        \
-    float       _HL_Power##id;              \
-    float       _HL_BlendNormal##id;        \
-    float       _HL_BlendNormal2##id;       \
-    float       _HL_Parallax##id;           \
-    float       _HL_InvMaskVal##id;         \
-    float       _HL_ChangeAlpha##id;        \
-    float       _HL_MatcapMonochrome##id;
+    half3       _HL_MedianColor##id;        \
+    half3       _HL_MatcapColor##id;        \
+    half        _HL_Power##id;              \
+    half        _HL_BlendNormal##id;        \
+    half        _HL_BlendNormal2##id;       \
+    half        _HL_Parallax##id;           \
+    half        _HL_InvMaskVal##id;         \
+    half        _HL_ChangeAlpha##id;        \
+    half        _HL_MatcapMonochrome##id;
 
 #ifdef UNITY_OLD_PREPROCESSOR
     WF_DECL_MATCAP(##)
@@ -252,58 +252,58 @@
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_LME_Enable);
     float4          _LME_Texture_ST;
-    float4          _LME_Color;
-    float3          _LME_RandColor;
+    half4           _LME_Color;
+    half3           _LME_RandColor;
     uint            _LME_UVType;
     uint            _LME_Shape;
-    float           _LME_Scale;
-    float           _LME_Dencity;
-    float           _LME_Glitter;
-    float           _LME_MinDist;
-    float           _LME_MaxDist;
-    float           _LME_Spot;
-    float           _LME_AnimSpeed;
-    float           _LME_ChangeAlpha;
-    float           _LME_InvMaskVal;
+    half            _LME_Scale;
+    half            _LME_Dencity;
+    half            _LME_Glitter;
+    half            _LME_MinDist;
+    half            _LME_MaxDist;
+    half            _LME_Spot;
+    half            _LME_AnimSpeed;
+    half            _LME_ChangeAlpha;
+    half            _LME_InvMaskVal;
 #endif
 
     // -------------------------
 
     FEATURE_TGL    (_TS_Enable);
     uint            _TS_Steps;
-    float3          _TS_BaseColor;
-    float3          _TS_1stColor;
-    float3          _TS_2ndColor;
-    float3          _TS_3rdColor;
-    float           _TS_Power;
-    float           _TS_1stBorder;
-    float           _TS_2ndBorder;
-    float           _TS_3rdBorder;
-    float           _TS_1stFeather;
-    float           _TS_2ndFeather;
-    float           _TS_3rdFeather;
-    float           _TS_BlendNormal;
-    float           _TS_BlendNormal2;
-    float           _TS_InvMaskVal;
-    float           _TS_FixContrast;
-    float           _TS_MinDist;
-    float           _TS_MaxDist;
-    float           _TS_DisableBackLit;
+    half3           _TS_BaseColor;
+    half3           _TS_1stColor;
+    half3           _TS_2ndColor;
+    half3           _TS_3rdColor;
+    half            _TS_Power;
+    half            _TS_1stBorder;
+    half            _TS_2ndBorder;
+    half            _TS_3rdBorder;
+    half            _TS_1stFeather;
+    half            _TS_2ndFeather;
+    half            _TS_3rdFeather;
+    half            _TS_BlendNormal;
+    half            _TS_BlendNormal2;
+    half            _TS_InvMaskVal;
+    half            _TS_FixContrast;
+    half            _TS_MinDist;
+    half            _TS_MaxDist;
+    half            _TS_DisableBackLit;
 
     // -------------------------
 
     FEATURE_TGL    (_TR_Enable);
-    float3          _TR_Color;
+    half3           _TR_Color;
     uint            _TR_BlendType;
-    float           _TR_Power;
-    float           _TR_Feather;
-    float           _TR_InvMaskVal;
-    float           _TR_BlendNormal;
-    float           _TR_BlendNormal2;
-    float           _TR_PowerTop;
-    float           _TR_PowerSide;
-    float           _TR_PowerBottom;
-    float           _TR_DisableBackLit;
+    half            _TR_Power;
+    half            _TR_Feather;
+    half            _TR_InvMaskVal;
+    half            _TR_BlendNormal;
+    half            _TR_BlendNormal2;
+    half            _TR_PowerTop;
+    half            _TR_PowerSide;
+    half            _TR_PowerBottom;
+    half            _TR_DisableBackLit;
 
     // -------------------------
 
@@ -311,105 +311,105 @@
     FEATURE_TGL    (_OVL_Enable);
     uint            _OVL_UVType;
     uint            _OVL_OutUVType;
-    float4          _OVL_Color;
+    half4           _OVL_Color;
     float4          _OVL_OverlayTex_ST;
-    float2          _OVL_UVScroll;
+    half2           _OVL_UVScroll;
     uint            _OVL_BlendType;
-    float           _OVL_Power;
-    float           _OVL_CustomParam1;
-    float           _OVL_InvMaskVal;
-    float           _OVL_VertColToDecal;
-    float           _OVL_VertColToMask;
+    half            _OVL_Power;
+    half            _OVL_CustomParam1;
+    half            _OVL_InvMaskVal;
+    half            _OVL_VertColToDecal;
+    half            _OVL_VertColToMask;
 #endif
 
     // -------------------------
 
-    float           _TL_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
-    float           _TL_LineWidth;
+    half            _TL_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく half で定義
+    half            _TL_LineWidth;
     uint            _TL_LineType;
-    float           _TL_Z_Shift;
-    float4          _TL_LineColor;
-    float           _TL_BlendBase;
-    float           _TL_BlendCustom;
-    float           _TL_InvMaskVal;
-    float           _TL_UseCutout;
+    half            _TL_Z_Shift;
+    half4           _TL_LineColor;
+    half            _TL_BlendBase;
+    half            _TL_BlendCustom;
+    half            _TL_InvMaskVal;
+    half            _TL_UseCutout;
 
     // -------------------------
 
     FEATURE_TGL    (_AO_Enable);
     uint            _AO_UVType;
-    float           _AO_UseLightMap;
-    float           _AO_UseGreenMap;
-    float           _AO_Contrast;
-    float           _AO_Brightness;
-    float4          _AO_TintColor;
+    half            _AO_UseLightMap;
+    half            _AO_UseGreenMap;
+    half            _AO_Contrast;
+    half            _AO_Brightness;
+    half4           _AO_TintColor;
 
     // -------------------------
 
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_DFD_Enable);
-    float4          _DFD_Color;
-    float           _DFD_MinDist;
-    float           _DFD_MaxDist;
-    float           _DFD_Power;
-    float           _DFD_BackShadow;
+    half4           _DFD_Color;
+    half            _DFD_MinDist;
+    half            _DFD_MaxDist;
+    half            _DFD_Power;
+    half            _DFD_BackShadow;
 #endif
 
     // -------------------------
 
-    float           _DSV_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく float で定義
-    float           _DSV_Dissolve;
-    float           _DSV_Invert;
-    float4          _DSV_SparkColor;
-    float           _DSV_SparkWidth;
+    half            _DSV_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく half で定義
+    half            _DSV_Dissolve;
+    half            _DSV_Invert;
+    half4           _DSV_SparkColor;
+    half            _DSV_SparkWidth;
     DECL_MAIN_TEX2D(_DSV_CtrlTex);
     float4          _DSV_CtrlTex_ST;
-    float           _DSV_TexIsSRGB;
+    half            _DSV_TexIsSRGB;
 
     // -------------------------
 
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_TFG_Enable);
-    float4          _TFG_Color;
-    float           _TFG_MinDist;
-    float           _TFG_MaxDist;
-    float           _TFG_Exponential;
-    float3          _TFG_BaseOffset;
-    float3          _TFG_Scale;
+    half4           _TFG_Color;
+    half            _TFG_MinDist;
+    half            _TFG_MaxDist;
+    half            _TFG_Exponential;
+    half3           _TFG_BaseOffset;
+    half3           _TFG_Scale;
 #endif
 
     // -------------------------
 
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_CRF_Enable);
-    float           _CRF_RefractiveIndex;
-    float           _CRF_Distance;
-    float3          _CRF_Tint;
-    float           _CRF_BlendNormal;
+    half            _CRF_RefractiveIndex;
+    half            _CRF_Distance;
+    half3           _CRF_Tint;
+    half            _CRF_BlendNormal;
 #endif
 
     // -------------------------
 
     FEATURE_TGL    (_CGO_Enable);
-    float           _CGO_Power;
+    half            _CGO_Power;
 
     // -------------------------
 
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_CGL_Enable);
-    float           _CGL_Blur;
-    float           _CGL_BlurMin;
+    half            _CGL_Blur;
+    half            _CGL_BlurMin;
     uint            _CGL_BlurMode;
 #endif
 
     // -------------------------
 
 #ifdef _WF_UNTOON_TESS
-    float           _TE_Factor;
-    float           _TE_MinDist;
-    float           _TE_MaxDist;
-    float           _TE_SmoothPower;
-    float           _TE_InvMaskVal;
+    half            _TE_Factor;
+    half            _TE_MinDist;
+    half            _TE_MaxDist;
+    half            _TE_SmoothPower;
+    half            _TE_InvMaskVal;
 #endif
 
 #endif

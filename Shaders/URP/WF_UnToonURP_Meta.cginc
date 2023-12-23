@@ -29,27 +29,27 @@
     ////////////////////////////
 
     struct appdata {
-        float4 vertex           : POSITION;
-        float2 uv0              : TEXCOORD0;
-        float2 uv1              : TEXCOORD1;
-        float2 uv2              : TEXCOORD2;
+        float4  vertex              : POSITION;
+        float2  uv0                 : TEXCOORD0;
+        float2  uv1                 : TEXCOORD1;
+        float2  uv2                 : TEXCOORD2;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
     };
 
     struct v2f_meta {
-        float4 pos              : SV_POSITION;
-        float2 uv               : TEXCOORD0;
+        float4  pos                 : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
     };
 
     #define IN_FRAG v2f_meta
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv_main;
     };
@@ -57,7 +57,7 @@
     drawing prepareDrawing(IN_FRAG i) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
 
@@ -94,7 +94,7 @@
         return o;
     }
 
-    float4 frag_meta(v2f_meta i) : SV_Target {
+    half4 frag_meta(v2f_meta i) : SV_Target {
         MetaInput o;
         UNITY_INITIALIZE_OUTPUT(MetaInput, o);
 
@@ -136,7 +136,7 @@ FEATURE_TGL_END
         return MetaFragment(o);
     }
 
-    float4 frag_meta_black(v2f_meta i) : SV_Target {
+    half4 frag_meta_black(v2f_meta i) : SV_Target {
         MetaInput o;
         UNITY_INITIALIZE_OUTPUT(MetaInput, o);
 

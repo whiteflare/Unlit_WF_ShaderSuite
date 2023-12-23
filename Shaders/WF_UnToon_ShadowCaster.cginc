@@ -30,7 +30,7 @@
 
     struct v2f_shadow {
         V2F_SHADOW_CASTER;
-        float2 uv : TEXCOORD1;
+        float2  uv : TEXCOORD1;
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -38,7 +38,7 @@
     #define IN_FRAG v2f_shadow
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv_main;
     };
@@ -46,7 +46,7 @@
     drawing prepareDrawing(IN_FRAG i) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
 
@@ -115,11 +115,11 @@
         return o;
     }
 
-    float4 frag_shadow_caster(v2f_shadow i) {
+    half4 frag_shadow_caster(v2f_shadow i) {
         SHADOW_CASTER_FRAGMENT(i)
     }
 
-    float4 frag_shadow(v2f_shadow i) : SV_Target {
+    half4 frag_shadow(v2f_shadow i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
@@ -127,7 +127,7 @@
 
         if (TGL_OFF(_GL_CastShadow)) {
             discard;
-            return float4(0, 0, 0, 0);
+            return half4(0, 0, 0, 0);
         }
 
         drawing d = prepareDrawing(i);
@@ -144,7 +144,7 @@
             #if defined(_WF_ALPHA_BLEND)
             if (d.color.a < _GL_ShadowCutoff) {
                 discard;
-                return float4(0, 0, 0, 0);
+                return half4(0, 0, 0, 0);
             }
             #endif
         #endif
@@ -153,19 +153,20 @@
         #ifdef _DSV_ENABLE
             if (TGL_ON(_DSV_Enable) && _DSV_Dissolve < 1 - 0.05) {
                 discard;
-                return float4(0, 0, 0, 0);
+                return half4(0, 0, 0, 0);
             }
         #endif
 
         return frag_shadow_caster(i);
     }
 
-    float4 frag_shadow_hidden(v2f_shadow i) : SV_Target {
+    half4 frag_shadow_hidden(v2f_shadow i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         discard;
-        return float4(0, 0, 0, 0);
+        return half4(0, 0, 0, 0);
     }
+
 
 #endif

@@ -65,7 +65,7 @@
 
     #ifndef WF_TEX2D_METAL_GLOSS
         #if !defined(_MT_NORHMAP_ENABLE)
-            #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba * float4(1, 1, 1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
+            #define WF_TEX2D_METAL_GLOSS(uv)    (SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba * half4(1, 1, 1, 1 - SAMPLE_MASK_VALUE(_SpecGlossMap, uv, _MT_InvRoughnessMaskVal).r))
         #else
             #define WF_TEX2D_METAL_GLOSS(uv)    SAMPLE_MASK_VALUE(_MetallicGlossMap, uv, _MT_InvMaskVal).rgba
         #endif
@@ -379,18 +379,12 @@ FEATURE_TGL_END
         return color;
     }
 
-    float calcAngleLightCamera(float3 ws_vertex, float3 ws_light_dir) {
+    float calcAngleLightCamera(float3 ws_vertex, half3 ws_light_dir) {
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float2 xz_camera_pos = worldSpaceViewPointPos().xz - calcWorldSpaceBasePos(ws_vertex).xz;
-        float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
+        half angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(xz_camera_pos) )
             * (1 - smoothstep(0.9, 1, abs(ws_light_dir.y))) * smoothstep(0, 1, length(xz_camera_pos) * 3);
         return angle_light_camera;
-    }
-
-    void prepareAngleLightCamera(IN_FRAG i, inout drawing d) {
-#if defined(_TS_ENABLE) || defined(_TR_ENABLE)
-        d.angle_light_camera = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
-#endif
     }
 
     #ifdef _GL_NCC_ENABLE
@@ -602,7 +596,7 @@ FEATURE_TGL_END
             d.ws_bump_normal = d.ws_normal;
 
 FEATURE_TGL_ON_BEGIN(_NM_Enable)
-            float3 normalTangent = WF_TEX2D_NORMAL(d.uv_main);
+            half3 normalTangent = WF_TEX2D_NORMAL(d.uv_main);
             if (TGL_ON(_NM_InvConvex)) {
                 normalTangent.y = -normalTangent.y;
             }
@@ -657,7 +651,7 @@ FEATURE_TGL_END
     // Metallic
     ////////////////////////////
 
-    float smoothnessToSpecularPower(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float smoothness) {
+    float smoothnessToSpecularPower(half3 ws_camera_dir, half3 ws_normal, half3 ws_light_dir, float smoothness) {
         float roughness     = (1 - smoothness) * (1 - smoothness);
         float3 halfVL       = normalize(ws_camera_dir + ws_light_dir);
         float NdotH         = max(0, dot( ws_normal, halfVL ));
@@ -666,7 +660,7 @@ FEATURE_TGL_END
 
     #ifdef _MT_ENABLE
 
-        float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
+        float3 pickReflection(float3 ws_vertex, half3 ws_normal, float smoothness) {
             float metal_lod = (1 - smoothness) * 10;
             float3 color = ZERO_VEC3;
 
@@ -692,7 +686,7 @@ FEATURE_TGL_END
             return color;
         }
 
-        float3 pickSpecular(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
+        float3 pickSpecular(half3 ws_camera_dir, half3 ws_normal, half3 ws_light_dir, float3 spec_color, float smoothness) {
             return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
         }
 
@@ -725,8 +719,8 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
                 float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
 
                 if (TGL_ON(_MT_GeomSpecAA)) {
-                    float3 normal_ddx = ddx(ws_metal_normal);
-                    float3 normal_ddy = ddy(ws_metal_normal);
+                    half3 normal_ddx = ddx(ws_metal_normal);
+                    half3 normal_ddy = ddy(ws_metal_normal);
                     float geom_roughness = pow(saturate(max(dot(normal_ddx, normal_ddx), dot(normal_ddy, normal_ddy))), 0.333);
                     reflSmooth = min(reflSmooth, 1.0 - geom_roughness);
                     specSmooth = min(specSmooth, 1.0 - geom_roughness);
@@ -761,7 +755,7 @@ FEATURE_TGL_END
 
 #ifdef WF_TYP_MATVEC
 
-    WF_TYP_MATVEC calcMatcapVectorArray(in float3 ws_view_dir, in float3 ws_camera_dir, in float3 ws_normal, in float3 ws_bump_normal, in float3 ws_detail_normal) {
+    WF_TYP_MATVEC calcMatcapVectorArray(in half3 ws_view_dir, in half3 ws_camera_dir, in half3 ws_normal, in half3 ws_bump_normal, in half3 ws_detail_normal) {
         // このメソッドは ws_bump_normal を考慮するバージョン。考慮しないバージョンは WF_Common.cginc にある。
 
         WF_TYP_MATVEC matcapVector;
@@ -830,14 +824,6 @@ FEATURE_TGL_END
     float3 calcMatcapVector(WF_TYP_MATVEC matcapVector, float normal, float parallax) {
         return calcMatcapVector(matcapVector, normal, normal, parallax);
     }
-
-	void prepareMatcapVector(IN_FRAG i, inout drawing d) {
-        d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
-	}
-
-#else
-
-	#define prepareMatcapVector(i, d)
 
 #endif // WF_TYP_MATVEC
 
@@ -1001,7 +987,7 @@ FEATURE_TGL_END
 
     #ifdef _TS_ENABLE
 
-        float calcShadowPower(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor) {
+        float calcShadowPower(float3 ws_vertex, half4 ws_light_dir, float3 ambientColor) {
             float3 lightColorMain = calcWorldSpaceLightColor(ws_vertex, ws_light_dir.w);
             float3 lightColorSub4 = 0 < ws_light_dir.w ? sampleAdditionalLightColor(ws_vertex) : sampleAdditionalLightColorExclude1(ws_vertex);
             float main = saturate(calcBrightness( lightColorMain ));
@@ -1009,7 +995,7 @@ FEATURE_TGL_END
             float ambient = saturate(calcBrightness( ambientColor ));
 
             // メインライトとそれ以外のライトの明るさの差が影の強さになる
-            float shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
+            half shadow_power = saturate( abs(main - sub4) / max(main + sub4, 0.0001) ) * 0.5 + 0.5;
 
             // メインライトが真上または真下から当たっている場合は影を弱める
             shadow_power = min( shadow_power, 1 - smoothstep(0.8, 1, abs(ws_light_dir.y)) * 0.5 );
@@ -1020,14 +1006,14 @@ FEATURE_TGL_END
             // 距離が離れているときは影を弱める
             if (TGL_OFF(_GL_DisableBasePos)) {  // BatchingStatic のときには DisableBasePos が ON になるのでそのときは影を弱めない
                 float3 cam_vec = worldSpaceViewPointPos() - calcWorldSpaceBasePos(ws_vertex);
-                float angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(cam_vec.xz) );
+                half angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(cam_vec.xz) );
                 shadow_power = min( shadow_power, 1 - smoothstep(_TS_MinDist, max(_TS_MinDist + NZF, _TS_MaxDist), length(cam_vec)) * saturate(-angle_light_camera) );
             }
 
             return shadow_power;
         }
 
-        void calcToonShadeContrast(float3 ws_vertex, float4 ws_light_dir, float3 ambientColor, out float shadow_power) {
+        void calcToonShadeContrast(float3 ws_vertex, half4 ws_light_dir, float3 ambientColor, out half shadow_power) {
 #ifndef _WF_LEGACY_FEATURE_SWITCH
     #if !defined(_TS_FIXC_ENABLE)
             shadow_power = calcShadowPower(ws_vertex, ws_light_dir, ambientColor);
@@ -1056,7 +1042,7 @@ FEATURE_TGL_END
 
         void drawToonShade(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TS_Enable)
-            float angle_light_camera = d.angle_light_camera;
+            half angle_light_camera = d.angle_light_camera;
             if (isInMirror() || TGL_ON(_TS_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
@@ -1127,7 +1113,7 @@ FEATURE_TGL_END
             float top       = _TR_Power * _TR_PowerTop;
             float bottom    = _TR_Power * _TR_PowerBottom;
 
-            float3x3 mat = 0;
+            half3x3 mat = 0;
             mat[0][0] = side + 1;
             mat[1][1] = (top + bottom) / 2 + 1;
             mat[1][2] = (top - bottom) / 2;
@@ -1148,7 +1134,7 @@ FEATURE_TGL_END
 
         void drawRimLight(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TR_Enable)
-            float angle_light_camera = d.angle_light_camera;
+            half angle_light_camera = d.angle_light_camera;
             if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
@@ -1172,7 +1158,7 @@ FEATURE_TGL_END
     #ifdef _OVL_ENABLE
 
         float2 computeOverlayTex(float3 ws_vertex) {
-            float3 ws_view_dir = normalize( ws_vertex - _WorldSpaceCameraPos.xyz );
+            half3 ws_view_dir = normalize( ws_vertex - _WorldSpaceCameraPos.xyz );
 
             float lon = atan2( ws_view_dir.z, ws_view_dir.x );  // -PI ~ +PI
             float lat = acos( ws_view_dir.y );                  // -PI ~ +PI
@@ -1236,14 +1222,14 @@ FEATURE_TGL_END
     // Outline
     ////////////////////////////
 
-    float3 shiftNormalVertex(inout float3 ws_vertex, float3 ws_normal, float width) {
+    float3 shiftNormalVertex(inout float3 ws_vertex, half3 ws_normal, float width) {
         // 外側にシフトする
         return ws_vertex.xyz + ws_normal * width; // ws_normal は normalizeされている前提
     }
 
     float4 shiftDepthVertex(float3 ws_vertex, float width) {
         // ワールド座標でのカメラ方向と距離を計算
-        float3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
+        half3 ws_camera_dir = _WorldSpaceCameraPos - ws_vertex; // ワールド座標で計算する。理由は width をモデルスケール非依存とするため。
         // カメラ方向の z シフト量を加算
         float3 zShiftVec = SafeNormalizeVec3(ws_camera_dir) * min(width, length(ws_camera_dir) * 0.5);
 
@@ -1259,7 +1245,7 @@ FEATURE_TGL_END
         return vertex;
     }
 
-    float4 shiftNormalAndDepthVertex(float3 ws_vertex, float3 ws_normal, float width, float shift) {
+    float4 shiftNormalAndDepthVertex(float3 ws_vertex, half3 ws_normal, float width, float shift) {
         return shiftDepthVertex(shiftNormalVertex(ws_vertex, ws_normal, width), shift);
     }
 
@@ -1289,7 +1275,7 @@ FEATURE_TGL_END
         #define drawOutline(d)
     #endif
 
-    float4 shiftOutlineVertex(inout float3 ws_vertex, float3 ws_normal, float width, float shift) { // 4
+    float4 shiftOutlineVertex(inout float3 ws_vertex, half3 ws_normal, float width, float shift) { // 4
         #ifdef _TL_ENABLE
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         if (TGL_ON(_TL_Enable)) {
@@ -1424,7 +1410,7 @@ FEATURE_TGL_ON_BEGIN(_DSV_Enable)
             }
             else {
                 float2 uv   = TRANSFORM_TEX(d.uv1, _DSV_CtrlTex);
-                float3 tex  = PICK_MAIN_TEX2D(_DSV_CtrlTex, uv).rgb;
+                float3 tex  = PICK_MAIN_TEX2D(_DSV_CtrlTex, uv);
                 tex = TGL_OFF(_DSV_TexIsSRGB) ? tex : LinearToGammaSpace(tex);
 
                 float pos = _DSV_Dissolve / (1 - _DSV_SparkWidth) - (TGL_OFF(_DSV_Invert) ? tex.r : 1 - tex.r);
@@ -1432,7 +1418,7 @@ FEATURE_TGL_ON_BEGIN(_DSV_Enable)
                     discard;
                 }
 
-                d.color.rgb += _DSV_SparkColor.rgb * (1 - smoothstep(0, NON_ZERO_FLOAT(_DSV_SparkWidth), pos));
+                d.color.rgb += _DSV_SparkColor * (1 - smoothstep(0, NON_ZERO_FLOAT(_DSV_SparkWidth), pos));
             }
 FEATURE_TGL_END
         }

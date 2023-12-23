@@ -29,22 +29,22 @@
     ////////////////////////////
 
     struct appdata {
-        float4 vertex           : POSITION;
+        float4  vertex              : POSITION;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 normal           : NORMAL;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   normal              : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
     struct v2f_shadow {
-        float4 pos          : SV_POSITION;
-        float2 uv           : TEXCOORD1;
+        float4  pos                 : SV_POSITION;
+        float2  uv                  : TEXCOORD1;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
@@ -53,7 +53,7 @@
     #define IN_FRAG v2f_shadow
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv_main;
     };
@@ -61,7 +61,7 @@
     drawing prepareDrawing(IN_FRAG i) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
 
@@ -134,13 +134,13 @@
         return o;
     }
 
-    float4 frag_shadow(v2f_shadow i) : SV_Target {
+    half4 frag_shadow(v2f_shadow i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         if (TGL_OFF(_GL_CastShadow)) {
             discard;
-            return float4(0, 0, 0, 0);
+            return half4(0, 0, 0, 0);
         }
 
         drawing d = prepareDrawing(i);
@@ -157,12 +157,12 @@
             #if defined(_WF_ALPHA_BLEND)
             if (d.color.a < _GL_ShadowCutoff) {
                 discard;
-                return float4(0, 0, 0, 0);
+                return half4(0, 0, 0, 0);
             }
             #endif
         #endif
 
-        return float4(0, 0, 0, 0);
+        return half4(0, 0, 0, 0);
     }
 
 #endif

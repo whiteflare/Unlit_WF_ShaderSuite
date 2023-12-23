@@ -29,39 +29,39 @@
     ////////////////////////////
 
     struct appdata_fur {
-        float4 vertex           : POSITION;
-        float2 uv               : TEXCOORD0;
-        float3 normal           : NORMAL;
-        float4 tangent          : TANGENT;
-        uint vid                : SV_VertexID;
+        float4  vertex              : POSITION;
+        float2  uv                  : TEXCOORD0;
+        half3   normal              : NORMAL;
+        half4   tangent             : TANGENT;
+        uint vid                    : SV_VertexID;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2g {
-        float2 uv               : TEXCOORD0;
-        float3 ws_vertex        : TEXCOORD1;
-        float3 ws_normal        : TEXCOORD2;
-        float3 ws_tangent       : TEXCOORD3;
-        float3 ws_bitangent     : TEXCOORD4;
-        float3 ws_light_dir     : TEXCOORD5;    // ws_light_dir.w は frag では使わないので削減
-        float vid               : TEXCOORD6;
-        float3 light_color      : COLOR1;
+        float2  uv                  : TEXCOORD0;
+        float3  ws_vertex           : TEXCOORD1;
+        half3   ws_normal           : TEXCOORD2;
+        half3   ws_tangent          : TEXCOORD3;
+        half3   ws_bitangent        : TEXCOORD4;
+        half3   ws_light_dir        : TEXCOORD5;    // ws_light_dir.w は frag では使わないので削減
+        float   vid                 : TEXCOORD6;
+        half3   light_color         : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
-        float shadow_power      : COLOR2;
+        half    shadow_power        : COLOR2;
 #endif
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
     struct g2f {
-        float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        float3 ws_vertex        : TEXCOORD1;
-        float3 ws_normal        : TEXCOORD2;
-        float3 ws_light_dir     : TEXCOORD3;    // ws_light_dir.w は frag では使わないので削減
-        float  height           : COLOR0;
-        float3 light_color      : COLOR1;
+        float4  vs_vertex           : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
+        float3  ws_vertex           : TEXCOORD1;
+        half3   ws_normal           : TEXCOORD2;
+        half3   ws_light_dir        : TEXCOORD3;    // ws_light_dir.w は frag では使わないので削減
+        half    height              : COLOR0;
+        half3   light_color         : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
-        float shadow_power      : COLOR2;
+        half    shadow_power        : COLOR2;
 #endif
         UNITY_VERTEX_OUTPUT_STEREO
         // フルセット 21 value なので、geometry シェーダの制限 1024 value 内では 48 vertex = 6枚のファーまで使用できる
@@ -70,23 +70,27 @@
     #define IN_FRAG g2f
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv_main;
         float3  ws_vertex;
-        float3  ws_normal;
-        float3  ws_light_dir;
-        float   angle_light_camera;
-        float3  light_color;
+        half3   ws_normal;
+        half3   ws_bump_normal;
+        half3   ws_detail_normal;
+        half3   ws_view_dir;
+        half3   ws_camera_dir;
+        half3   ws_light_dir;
+        half    angle_light_camera;
+        half3   light_color;
 #ifdef _V2F_HAS_SHADOWPOWER
-        float   shadow_power;
+        half    shadow_power;
 #endif
     };
 
     drawing prepareDrawing(IN_FRAG i) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.ws_vertex     = i.ws_vertex;
@@ -96,6 +100,8 @@
 #ifdef _V2F_HAS_SHADOWPOWER
         d.shadow_power  = i.shadow_power;
 #endif
+        d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
+        d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
 
         return d;
     }
@@ -123,7 +129,7 @@
 
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FlipMirror & 1, _FlipMirror & 2);
 
-        float4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+        half4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
         o.ws_light_dir = ws_light_dir.xyz;
         // 環境光取得
         float3 ambientColor = sampleSHLightColor();
@@ -150,7 +156,7 @@
         return o;
     }
 
-    void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
+    void transferGeomVertex(inout g2f o, float3 vb, float3 vu, half height) {
         o.ws_vertex = lerp(vb, vu, height);
         o.vs_vertex = UnityWorldToClipPos( o.ws_vertex );
         affectNearClipCancel(o.vs_vertex);
@@ -175,7 +181,7 @@
         return o;
     }
 
-    float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
+    float3 calcFurVector(half3 ws_tangent, half3 ws_bitangent, half3 ws_normal, float2 uv) {
         // Static Fur Vector 計算
         float3 vec_fur = SafeNormalizeVec3Normal(_FUR_Vector.xyz);
 
@@ -238,7 +244,7 @@
         }}
     }
 
-    float4 frag_fakefur(g2f i) : SV_Target {
+    half4 frag_fakefur(g2f i) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
@@ -247,7 +253,8 @@
         d.color = _Color;
 
         prepareMainTex(i, d);
-        prepareAngleLightCamera(i, d);
+        prepareBumpNormal(i, d);
+        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
 
         drawMainTex(d);             // メインテクスチャ
         drawAlphaMask(d);           // アルファ
@@ -280,7 +287,7 @@
         return d.color;
     }
 
-    float4 frag_fakefur_cutoff(g2f i) : SV_Target {
+    half4 frag_fakefur_cutoff(g2f i) : SV_Target {
         float4 color = frag_fakefur(i);
 
         color.a = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, color.a);
