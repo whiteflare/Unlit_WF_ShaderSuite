@@ -92,13 +92,13 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
 
             #include "UnityStandardMeta.cginc"
 
-            float4 frag_meta_black(v2f_meta i) : SV_Target {
+            half4 frag_meta_black(v2f_meta i) : SV_Target {
                 UnityMetaInput o;
                 UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
-                o.Albedo        = float3(0, 0, 0);
-                o.SpecularColor = float3(0, 0, 0);
-                o.Emission      = float3(0, 0, 0);
+                o.Albedo        = half3(0, 0, 0);
+                o.SpecularColor = half3(0, 0, 0);
+                o.Emission      = half3(0, 0, 0);
 
                 #ifdef EDITOR_VISUALIZATION
                     o.VizUV         = i.vizUV;

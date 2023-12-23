@@ -29,26 +29,26 @@
     ////////////////////////////
 
     struct appdata_clrbg {
-        float4 vertex           : POSITION;
+        float4  vertex              : POSITION;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 normal           : NORMAL;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   normal              : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_clrbg {
-        float4 vs_vertex        : SV_POSITION;
+        float4  vs_vertex           : SV_POSITION;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 ws_vertex        : TEXCOORD2;
-        float2 depth            : TEXCOORD3;
-        float3 ws_normal        : TEXCOORD4;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        float3  ws_vertex           : TEXCOORD2;
+        float2  depth               : TEXCOORD3;
+        half3   ws_normal           : TEXCOORD4;
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -56,25 +56,25 @@
     #define IN_FRAG v2f_clrbg
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv2;
         float2  uv_main;
         float3  ws_vertex;
-        float3  ws_normal;
-        float3  ws_bump_normal;
-        float3  ws_detail_normal;
-        float3  ws_view_dir;
-        float3  ws_camera_dir;
+        half3   ws_normal;
+        half3   ws_bump_normal;
+        half3   ws_detail_normal;
+        half3   ws_view_dir;
+        half3   ws_camera_dir;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4  vertex_color;
+        half4   vertex_color;
 #endif
     };
 
     drawing prepareDrawing(IN_FRAG i, uint facing) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.uv2           = i.uv2;

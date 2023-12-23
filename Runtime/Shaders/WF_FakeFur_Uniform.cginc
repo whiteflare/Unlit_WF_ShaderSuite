@@ -40,14 +40,14 @@
 #endif
 
     float4          _FUR_NoiseTex_ST;
-    float           _FUR_HEIGHT_PARAM;
-    float4          _FUR_Vector;
+    half            _FUR_HEIGHT_PARAM;
+    half4           _FUR_Vector;
 
     uint            _FUR_REPEAT_PARAM;
-    float           _FUR_ShadowPower;
-    float4          _FUR_TintColorBase;
-    float4          _FUR_TintColorTip;
-    float           _FUR_InvMaskVal;
-    float           _FUR_Random;
+    half            _FUR_ShadowPower;
+    half4           _FUR_TintColorBase;
+    half4           _FUR_TintColorTip;
+    half            _FUR_InvMaskVal;
+    half            _FUR_Random;
 
 #endif

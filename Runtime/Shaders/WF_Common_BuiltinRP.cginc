@@ -68,13 +68,13 @@
 
     float3 sampleSHLightColor() {
         float3 col = float3(0, 0, 0);
-        col += ShadeSH9( float4(+1, 0, 0, 1) );
-        col += ShadeSH9( float4(-1, 0, 0, 1) );
-        col += ShadeSH9( float4(0, 0, +1, 1) );
-        col += ShadeSH9( float4(0, 0, -1, 1) );
+        col += ShadeSH9( half4(+1, 0, 0, 1) );
+        col += ShadeSH9( half4(-1, 0, 0, 1) );
+        col += ShadeSH9( half4(0, 0, +1, 1) );
+        col += ShadeSH9( half4(0, 0, -1, 1) );
         col /= 4;
-        col += ShadeSH9( float4(0, +1, 0, 1) );
-        col += ShadeSH9( float4(0, -1, 0, 1) );
+        col += ShadeSH9( half4(0, +1, 0, 1) );
+        col += ShadeSH9( half4(0, -1, 0, 1) );
         return col / 3;
     }
 
@@ -235,8 +235,8 @@
     // ReflectionProbe Sampler
     ////////////////////////////
 
-    float4 pickReflectionProbe(float3 ws_vertex, float3 ws_normal, float lod) {
-        float3 ws_camera_dir = normalize(_WorldSpaceCameraPos - ws_vertex);
+    float4 pickReflectionProbe(float3 ws_vertex, half3 ws_normal, float lod) {
+        half3 ws_camera_dir = normalize(_WorldSpaceCameraPos - ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float3 dir0 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);

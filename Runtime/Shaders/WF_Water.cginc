@@ -31,23 +31,23 @@
 #ifdef _WF_WATER_SURFACE
 
     struct appdata_surface {
-        float4 vertex           : POSITION;
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 normal           : NORMAL;
-        float4 tangent          : TANGENT;
+        float4  vertex              : POSITION;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   normal              : NORMAL;
+        half4   tangent             : TANGENT;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_surface {
-        float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 ws_normal        : TEXCOORD2;
-        float3 ws_vertex        : TEXCOORD3;
-        float3 ws_tangent       : TEXCOORD4;
-        float3 ws_bitangent     : TEXCOORD5;
-        float3 ws_light_dir     : TEXCOORD6;
+        float4  vs_vertex           : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   ws_normal           : TEXCOORD2;
+        float3  ws_vertex           : TEXCOORD3;
+        half3   ws_tangent          : TEXCOORD4;
+        half3   ws_bitangent        : TEXCOORD5;
+        half3   ws_light_dir        : TEXCOORD6;
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
@@ -56,26 +56,26 @@
     #define IN_FRAG v2f_surface
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv2;
         float2  uv_main;
         float3  ws_vertex;
-        float3  ws_normal;
-        float3  ws_bump_normal;
-        float3  ws_view_dir;
-        float3  ws_camera_dir;
-        float3  ws_light_dir;
+        half3   ws_normal;
+        half3   ws_bump_normal;
+        half3   ws_view_dir;
+        half3   ws_camera_dir;
+        half3   ws_light_dir;
         float3  ws_tangent;
         float3  ws_bitangent;
         uint    facing;
-        float   height;
+        half    height;
     };
 
     drawing prepareDrawing(IN_FRAG i, uint facing) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.uv2           = i.uv2;
@@ -96,18 +96,18 @@
 #ifdef _WF_WATER_CAUSTICS
 
     struct appdata_caustics {
-        float4 vertex           : POSITION;
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 normal           : NORMAL;
+        float4  vertex              : POSITION;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   normal              : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_caustics {
-        float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 ws_vertex        : TEXCOORD2;
+        float4  vs_vertex           : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        float3  ws_vertex           : TEXCOORD2;
         UNITY_FOG_COORDS(3)
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -115,7 +115,7 @@
     #define IN_FRAG v2f_caustics
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv2;
         float2  uv_main;
@@ -125,7 +125,7 @@
     drawing prepareDrawing(IN_FRAG i) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.uv2           = i.uv2;
@@ -139,15 +139,15 @@
 #ifdef _WF_WATER_DEPTHFOG
 
     struct appdata_depthfog {
-        float4 vertex           : POSITION;
-        float2 uv               : TEXCOORD0;
+        float4  vertex              : POSITION;
+        float2  uv                  : TEXCOORD0;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_depthfog {
-        float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        float3 ws_vertex        : TEXCOORD1;
+        float4  vs_vertex           : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
+        float3  ws_vertex           : TEXCOORD1;
         UNITY_FOG_COORDS(1)
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -155,7 +155,7 @@
     #define IN_FRAG v2f_depthfog
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv_main;
         float3  ws_vertex;
@@ -164,7 +164,7 @@
     drawing prepareDrawing(IN_FRAG i) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.ws_vertex     = i.ws_vertex;
@@ -176,24 +176,24 @@
 #if defined(_WF_WATER_LAMP_DIR) || defined(_WF_WATER_LAMP_POINT)
 
     struct appdata_lamp {
-        float4 vertex           : POSITION;
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 normal           : NORMAL;
-        float4 tangent          : TANGENT;
+        float4  vertex              : POSITION;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   normal              : NORMAL;
+        half4   tangent             : TANGENT;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_lamp {
-        float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float3 ws_normal        : TEXCOORD2;
-        float3 ws_vertex        : TEXCOORD3;
-        float3 ws_tangent       : TEXCOORD4;
-        float3 ws_bitangent     : TEXCOORD5;
+        float4  vs_vertex           : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   ws_normal           : TEXCOORD2;
+        float3  ws_vertex           : TEXCOORD3;
+        half3   ws_tangent          : TEXCOORD4;
+        half3   ws_bitangent        : TEXCOORD5;
 #ifdef _WF_WATER_LAMP_POINT
-        float3 ws_base_pos      : TEXCOORD6;
+        float3  ws_base_pos         : TEXCOORD6;
 #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
@@ -202,15 +202,15 @@
     #define IN_FRAG v2f_lamp
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
         float2  uv2;
         float2  uv_main;
         float3  ws_vertex;
-        float3  ws_normal;
+        half3   ws_normal;
         float3  ws_tangent;
         float3  ws_bitangent;
-        float3  ws_bump_normal;
+        half3   ws_bump_normal;
 #ifdef _WF_WATER_LAMP_POINT
         float3  ws_base_pos;
 #endif
@@ -219,7 +219,7 @@
     drawing prepareDrawing(IN_FRAG i) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.uv2           = i.uv2;
@@ -257,17 +257,17 @@
 #ifndef _WF_LEGACY_FEATURE_SWITCH
 
     #define WF_DEF_WAVE_NORMAL(id)                                                                              \
-        float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                \
+        half3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                 \
             float2 uv = calcWavingUV(i.uv, i.uv2, i.ws_vertex,                                                  \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);                  \
             float4 tex = PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv);                                               \
-            float3 normalTangent = UnpackScaleNormal( tex, _WAV_NormalScale##id ).xyz;                          \
+            half3 normalTangent = UnpackScaleNormal( tex, _WAV_NormalScale##id ).xyz;                           \
             cnt++;                                                                                              \
             return transformTangentToWorldNormal(normalTangent, i.ws_normal, i.ws_tangent, i.ws_bitangent);     \
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
-        float calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                 \
+        half calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                  \
             float2 uv = calcWavingUV(i.uv, i.uv2, i.ws_vertex,                                                  \
                 _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);                  \
             cnt++;                                                                                              \
@@ -285,12 +285,12 @@
 #else
 
     #define WF_DEF_WAVE_NORMAL(id)                                                                              \
-        float3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                \
+        half3 calcWavingNormal##id(IN_FRAG i, inout uint cnt) {                                                 \
             if (_WAV_Enable##id) {                                                                              \
                 float2 uv = calcWavingUV(i.uv, i.uv2, i.ws_vertex,                                              \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_NormalMap##id##_ST);              \
                 float4 tex = PICK_MAIN_TEX2D(_WAV_NormalMap##id, uv);                                           \
-                float3 normalTangent = UnpackScaleNormal( tex, _WAV_NormalScale##id ).xyz;                      \
+                half3 normalTangent = UnpackScaleNormal( tex, _WAV_NormalScale##id ).xyz;                       \
                 cnt++;                                                                                          \
                 return transformTangentToWorldNormal(normalTangent, i.ws_normal, i.ws_tangent, i.ws_bitangent); \
             } else {                                                                                            \
@@ -299,7 +299,7 @@
         }
 
     #define WF_DEF_WAVE_HEIGHT(id)                                                                              \
-        float calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                 \
+        half calcWavingHeight##id(IN_FRAG i, inout uint cnt) {                                                  \
             if (_WAV_Enable##id) {                                                                              \
                 float2 uv = calcWavingUV(i.uv, i.uv2, i.ws_vertex,                                              \
                     _WAV_UVType##id, _WAV_Direction##id, _WAV_Speed##id, _WAV_HeightMap##id##_ST);              \
@@ -350,7 +350,7 @@
 
     void prepareWaveHeight(IN_FRAG i, inout drawing d) {
         uint cnt = 0;
-        float height = 0;
+        half height = 0;
         height += calcWavingHeight_1(i, cnt);
         height += calcWavingHeight_2(i, cnt);
         height += calcWavingHeight_3(i, cnt);
@@ -359,7 +359,7 @@
 
     void prepareWaveNormal(IN_FRAG i, inout drawing d) {
         uint cnt = 0;
-        float3 ws_bump_normal = ZERO_VEC3;
+        half3 ws_bump_normal = ZERO_VEC3;
         ws_bump_normal += calcWavingNormal_1(i, cnt);
         ws_bump_normal += calcWavingNormal_2(i, cnt);
         ws_bump_normal += calcWavingNormal_3(i, cnt);
@@ -416,7 +416,7 @@
 
     void prepareWaveNormal(IN_FRAG i, inout drawing d) {
         uint cnt = 0;
-        float3 ws_bump_normal = ZERO_VEC3;
+        half3 ws_bump_normal = ZERO_VEC3;
         ws_bump_normal += calcWavingNormal_1(i, cnt);
         ws_bump_normal += calcWavingNormal_2(i, cnt);
         ws_bump_normal += calcWavingNormal_3(i, cnt);
@@ -431,7 +431,7 @@
 
 #ifdef _WAS_ENABLE
 
-    float3 pickSpecular(float3 ws_camera_dir, float3 ws_normal, float3 ws_light_dir, float3 spec_color, float smoothness) {
+    float3 pickSpecular(half3 ws_camera_dir, half3 ws_normal, half3 ws_light_dir, float3 spec_color, float smoothness) {
         return spec_color * smoothnessToSpecularPower(ws_camera_dir, ws_normal, ws_light_dir, smoothness);
     }
 
@@ -453,7 +453,7 @@ FEATURE_TGL_END
 
 #ifdef _WAM_ENABLE
 
-    float3 pickReflection(float3 ws_vertex, float3 ws_normal, float smoothness) {
+    float3 pickReflection(float3 ws_vertex, half3 ws_normal, float smoothness) {
         float metal_lod = (1 - smoothness) * 10;
         float3 color = ZERO_VEC3;
 
@@ -676,7 +676,7 @@ FEATURE_TGL_END
         prepareMainTex(i, d);
 
         drawWavingCaustics(d);
-        d.color = PICK_MAIN_TEX2D(_MainTex, d.uv_main) * _Color * float4(d.color.rgb, 1);
+        d.color = PICK_MAIN_TEX2D(_MainTex, d.uv_main) * _Color * half4(d.color.rgb, 1);
 
         if (TGL_ON(_HideCausticsAbove) && _WaterLevel < d.ws_vertex.y) {
             discard;
@@ -769,7 +769,7 @@ FEATURE_TGL_END
         prepareMainTex(i, d);
         prepareWaveNormal(i, d);
 
-        d.color = float4(PICK_MAIN_TEX2D(_MainTex, d.uv_main).rgb * _Color.rgb, 1);
+        d.color = half4(PICK_MAIN_TEX2D(_MainTex, d.uv_main).rgb * _Color.rgb, 1);
 
         drawLampReflection(d);          // Lamp&Sun リフレクション
 

@@ -24,8 +24,8 @@
     // vertex&fragment shader
     ////////////////////////////
 
-    float _CCT_Width;
-    float _CCT_Z_Shift;
+    half    _CCT_Width;
+    half    _CCT_Z_Shift;
 
     v2f vert_clearcoat(appdata v) {
         // 通常の vert を使う
@@ -37,14 +37,14 @@
         return o;
     }
 
-    float4 frag_clearcoat(v2f i) : SV_Target {
+    half4 frag_clearcoat(v2f i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
         drawing d = prepareDrawing(i, 1);
-        d.color = float4(0, 0, 0, 1);
+        d.color = half4(0, 0, 0, 1);
 
         prepareMainTex(i, d);
         prepareBumpNormal(i, d);
