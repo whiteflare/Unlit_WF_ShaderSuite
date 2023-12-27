@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -25,29 +25,29 @@
     ////////////////////////////
 
     struct appdata {
-        float4 vertex           : POSITION;
-        float4 vertex_color     : COLOR0;
-        float2 uv               : TEXCOORD0;
-        float2 uv2              : TEXCOORD1;
-        float2 uv3              : TEXCOORD2;
-        float4 normal           : NORMAL; // ShadowCasterから使用される
+        float4  vertex              : POSITION;
+        half4   vertex_color        : COLOR0;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        float2  uv3                 : TEXCOORD2;
+        float4  normal              : NORMAL; // ShadowCasterから使用される
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f {
-        float4 vs_vertex        : SV_POSITION;
-        float  height           : COLOR0;
-        float3 light_color      : COLOR1;
+        float4  vs_vertex           : SV_POSITION;
+        half    height              : COLOR0;
+        half3   light_color         : COLOR1;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR2;
+        half4   vertex_color        : COLOR2;
 #endif
-        float2 uv               : TEXCOORD0;
+        float2  uv                  : TEXCOORD0;
 #ifdef _V2F_HAS_UV_LMAP
-        float2 uv2              : TEXCOORD1;
+        float2  uv2                 : TEXCOORD1;
 #endif
 #ifdef _GRS_ERSSIDE_ENABLE
-        float3 ws_normal        : TEXCOORD2;
-        float3 ws_vertex        : TEXCOORD3;
+        half3   ws_normal           : TEXCOORD2;
+        float3  ws_vertex           : TEXCOORD3;
 #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
@@ -56,7 +56,7 @@
     #define IN_FRAG v2f
 
     struct drawing {
-        float4  color;
+        half4   color;
         float2  uv1;
 #ifdef _V2F_HAS_UV_LMAP
         float2  uv2;
@@ -64,22 +64,22 @@
         float2  uv_main;
 #ifdef _GRS_ERSSIDE_ENABLE
         float3  ws_vertex;
-        float3  ws_normal;
+        half3   ws_normal;
 #endif
-        float3  ws_view_dir;
-        float3  ws_camera_dir;
-        float3  ws_light_dir;
-        float3  light_color;
-        float   height;
+        half3   ws_view_dir;
+        half3   ws_camera_dir;
+        half3   ws_light_dir;
+        half3   light_color;
+        half    height;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4  vertex_color;
+        half4   vertex_color;
 #endif
     };
 
     drawing prepareDrawing(IN_FRAG i) {
         drawing d = (drawing) 0;
 
-        d.color         = float4(1, 1, 1, 1);
+        d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.light_color   = i.light_color;
@@ -110,8 +110,8 @@
     // Grass
     ////////////////////////////
 
-    float calcGrassHeightVertex(appdata v, float3 ws_vertex) {
-        float result = 0;
+    half calcGrassHeightVertex(appdata v, float3 ws_vertex) {
+        half result = 0;
 
         // ベース高の算出
 #if defined(_GRS_MASKTEX_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
@@ -122,7 +122,7 @@
                 v.uv;
             uv = TRANSFORM_TEX(uv, _GRS_HeightMaskTex);
             half4 color = SAMPLE_MASK_VALUE_LOD(_GRS_HeightMaskTex, uv, _GRS_InvMaskVal);
-            float3 height = color.rgb * _GRS_ColorFactor.rgb;
+            half3 height = color.rgb * _GRS_ColorFactor.rgb;
             result = MAX_RGB(height);
         }
 #endif
@@ -135,12 +135,12 @@
                 _GRS_HeightUVType == 1 ? v.uv2 :
                 _GRS_HeightUVType == 2 ? v.uv3 :
                 v.uv;
-            float2 height = uv * _GRS_UVFactor.xy + _GRS_UVFactor.zw;
+            half2 height = uv * _GRS_UVFactor.xy + _GRS_UVFactor.zw;
             result = height.x + height.y;
         }
         else if (_GRS_HeightType == 3) {    // VERTEX_COLOR
             half4 color = v.vertex_color;
-            float3 height = color.rgb * _GRS_ColorFactor.rgb;
+            half3 height = color.rgb * _GRS_ColorFactor.rgb;
             result = MAX_RGB(height);
         }
         else { // WORLD_Y
@@ -157,7 +157,7 @@
 
     #ifdef _GRW_ENABLE
 
-        void calcGrassWaveVertex(float height, inout float3 ws_vertex) {
+        void calcGrassWaveVertex(half height, inout float3 ws_vertex) {
 FEATURE_TGL_ON_BEGIN(_GRW_Enable)
             // ウェーブ生成
             float3 phase = SafeDivVec3(ws_vertex, _GRW_WindVector, 0.01);
@@ -253,11 +253,11 @@ FEATURE_TGL_END
         V2F_SHADOW_CASTER;  // TEXCOORD0
         float2 uv : TEXCOORD1;
 #ifdef _GRS_ERSSIDE_ENABLE
-        float3 ws_normal        : TEXCOORD2;
+        half3 ws_normal        : TEXCOORD2;
         float3 ws_vertex        : TEXCOORD3;
 #endif
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR1;
+        half4 vertex_color     : COLOR1;
 #endif
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -270,7 +270,7 @@ FEATURE_TGL_END
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         float3 ws_vertex = UnityObjectToWorldPos(v.vertex);
-        float height;
+        half height;
 
         // ベース高の算出
         height = calcGrassHeightVertex(v, ws_vertex);
@@ -293,11 +293,11 @@ FEATURE_TGL_END
         return o;
     }
 
-    float4 frag_shadow_caster(v2f_shadow i) {
+    half4 frag_shadow_caster(v2f_shadow i) {
         SHADOW_CASTER_FRAGMENT(i)
     }
 
-    float4 frag_shadow(v2f_shadow i) : SV_Target {
+    half4 frag_shadow(v2f_shadow i) : SV_Target {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
         UNITY_APPLY_DITHER_CROSSFADE(i.pos);
 
@@ -327,9 +327,9 @@ FEATURE_TGL_END
     struct v2f_meta {
         float4 pos              : SV_POSITION;
         float2 uv               : TEXCOORD0;
-        float  height           : COLOR0;
+        half height           : COLOR0;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR1;
+        half4 vertex_color     : COLOR1;
 #endif
 #ifdef EDITOR_VISUALIZATION
         float2 vizUV            : TEXCOORD1;
@@ -375,7 +375,7 @@ FEATURE_TGL_END
         return o;
     }
 
-    float4 frag_meta(v2f_meta i) : SV_Target {
+    half4 frag_meta(v2f_meta i) : SV_Target {
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 

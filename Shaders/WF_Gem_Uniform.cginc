@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -30,28 +30,28 @@
     // Other uniform variable
     ////////////////////////////
 
-    float           _GMF_Enable;
-    float           _GMF_FlakeSizeFront;
-    float           _GMF_FlakeSizeBack;
-    float           _GMF_FlakeShear;
-    float           _GMF_FlakeBrighten;
-    float           _GMF_FlakeDarken;
-    float           _GMF_Twinkle;
-    float           _GMF_BlendNormal;
+    half            _GMF_Enable;
+    half            _GMF_FlakeSizeFront;
+    half            _GMF_FlakeSizeBack;
+    half            _GMF_FlakeShear;
+    half            _GMF_FlakeBrighten;
+    half            _GMF_FlakeDarken;
+    half            _GMF_Twinkle;
+    half            _GMF_BlendNormal;
 
-    float           _GMR_Enable;
-    float           _GMR_Power;
-    float           _GMR_Brightness;
-    float           _GMR_Monochrome;
-    float4          _GMR_Cubemap_HDR;
-    float           _GMR_CubemapPower;
-    float           _GMR_CubemapHighCut;
-    float           _GMR_BlendNormal;
+    half            _GMR_Enable;
+    half            _GMR_Power;
+    half            _GMR_Brightness;
+    half            _GMR_Monochrome;
+    half4           _GMR_Cubemap_HDR;
+    half            _GMR_CubemapPower;
+    half            _GMR_CubemapHighCut;
+    half            _GMR_BlendNormal;
 
-    float           _AlphaFront;
-    float           _AlphaBack;
+    half            _AlphaFront;
+    half            _AlphaBack;
 
-    float           _GMB_Enable;
-    float4          _GMB_ColorBack;
+    half            _GMB_Enable;
+    half4           _GMB_ColorBack;
 
 #endif

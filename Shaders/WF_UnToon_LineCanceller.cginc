@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -29,25 +29,25 @@
     ////////////////////////////
 
     struct appdata {
-        float4 vertex           : POSITION;
+        float4  vertex              : POSITION;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f_canceller {
-        float4      vs_vertex   : SV_POSITION;
-        float4      uv_grab     : TEXCOORD0;
-        float3      ws_vertex   : TEXCOORD1;
+        float4  vs_vertex           : SV_POSITION;
+        float4  uv_grab             : TEXCOORD0;
+        float3  ws_vertex           : TEXCOORD1;
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
     struct v2f {    // dummy
-        float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
+        float4  vs_vertex           : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
     };
 
     struct drawing {    // dummy
-        float4  color;
+        half4   color;
         float2  uv_main;
     };
 
@@ -82,7 +82,7 @@
         return o;
     }
 
-    float4 frag_outline_canceller(v2f_canceller i) : SV_Target {
+    half4 frag_outline_canceller(v2f_canceller i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 

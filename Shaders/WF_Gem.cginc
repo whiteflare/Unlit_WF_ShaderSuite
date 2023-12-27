@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -28,7 +28,7 @@
     void drawGemFlake(inout drawing d) {
         if (TGL_ON(_GMF_Enable)) {
             float size = 1 / NON_ZERO_FLOAT(d.facing ? _GMF_FlakeSizeFront : _GMF_FlakeSizeBack);
-            float3 ws_normal = lerpNormals(d.ws_normal, d.ws_bump_normal, _GMF_BlendNormal);
+            half3 ws_normal = lerpNormals(d.ws_normal, d.ws_bump_normal, _GMF_BlendNormal);
             float2 matcapVector = calcMatcapVector(d.ws_camera_dir, ws_normal).xy * size;
             float3 ls_camera_dir = SafeNormalizeVec3(worldSpaceViewPointPos() - calcWorldSpaceBasePos(d.ws_vertex));
 
@@ -52,7 +52,7 @@
 
     void drawGemReflection(inout drawing d) {
         if (TGL_ON(_GMR_Enable)) {
-            float3 ws_normal = lerpNormals(d.ws_normal, d.ws_bump_normal, _GMR_BlendNormal);
+            half3 ws_normal = lerpNormals(d.ws_normal, d.ws_bump_normal, _GMR_BlendNormal);
             float3 cubemap = pickReflectionCubemap(_GMR_Cubemap, _GMR_Cubemap_HDR, d.ws_vertex, ws_normal, 0); // smoothnessは1固定
             float3 reflection = lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _GMR_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _GMR_CubemapPower;
             reflection = lerp(reflection, calcBrightness(reflection), _GMR_Monochrome);
@@ -69,7 +69,7 @@
     // fragment shader
     ////////////////////////////
 
-    float4 frag_gem_back(v2f i) : SV_Target {
+    half4 frag_gem_back(v2f i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
@@ -112,7 +112,7 @@
         return d.color;
     }
 
-    float4 frag_gem_front(v2f i) : SV_Target {
+    half4 frag_gem_front(v2f i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
