@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -29,41 +29,123 @@
     ////////////////////////////
 
     struct appdata {
-        float4 vertex           : POSITION;
+        float4  vertex              : POSITION;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
-        float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
-        float3 normal           : NORMAL;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   normal              : NORMAL;
 #ifdef _V2F_HAS_TANGENT
-        float4 tangent          : TANGENT;
+        half4   tangent             : TANGENT;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2f {
-        float4 vs_vertex        : SV_POSITION;
+        float4  vs_vertex           : SV_POSITION;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
-        float3 light_color      : COLOR1;
+        half3   light_color         : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
-        float shadow_power      : COLOR2;
+        half    shadow_power        : COLOR2;
 #endif
-        float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
-        float3 ws_vertex        : TEXCOORD2;
-        float4 ws_light_dir     : TEXCOORD3;
-        float3 normal           : TEXCOORD4;    // world space
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        float3  ws_vertex           : TEXCOORD2;
+        half4   ws_light_dir        : TEXCOORD3;
+        half3   ws_normal           : TEXCOORD4;
 #ifdef _V2F_HAS_TANGENT
-        float3 tangent          : TEXCOORD5;    // world space
-        float3 bitangent        : TEXCOORD6;    // world space
+        half3   ws_tangent          : TEXCOORD5;
+        half3   ws_bitangent        : TEXCOORD6;
 #endif
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
+
+    #define IN_FRAG v2f
+
+    #if defined(USING_STEREO_MATRICES)
+        #define _MV_HAS_PARALLAX
+    #endif
+    #if defined(_NM_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        #define _MV_HAS_NML
+    #endif
+    #if defined(_NS_ENABLE) && !defined(_WF_LEGACY_FEATURE_SWITCH)
+        #define _MV_HAS_NML2
+    #endif
+
+    struct MatcapVector {
+        float3  vs_normal_center;
+#ifdef _MV_HAS_PARALLAX
+        float3  diff_parallax;
+#endif
+#ifdef _MV_HAS_NML
+        float3  diff_normal;
+#endif
+#ifdef _MV_HAS_NML2
+        float3  diff_normal2;
+#endif
+    };
+    #define WF_TYP_MATVEC   MatcapVector
+
+    struct drawing {
+        half4   color;
+        float2  uv1;
+        float2  uv2;
+        float2  uv_main;
+        float3  ws_vertex;
+        half3   ws_normal;
+#ifdef _V2F_HAS_TANGENT
+        half3   ws_tangent;
+        half3   ws_bitangent;
+#endif
+        half3   ws_bump_normal;
+        half3   ws_detail_normal;
+        half3   ws_view_dir;
+        half3   ws_camera_dir;
+        half3   ws_light_dir;
+        half    angle_light_camera;
+        half3   light_color;
+        uint    facing;
+        WF_TYP_MATVEC matcapVector;
+#ifdef _V2F_HAS_VERTEXCOLOR
+        half4   vertex_color;
+#endif
+#ifdef _V2F_HAS_SHADOWPOWER
+        half    shadow_power;
+#endif
+    };
+
+    drawing prepareDrawing(IN_FRAG i, uint facing) {
+        drawing d = (drawing) 0;
+
+        d.color         = half4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv_main       = i.uv;
+        d.uv2           = i.uv2;
+        d.facing        = facing;
+        d.ws_vertex     = i.ws_vertex;
+        d.light_color   = i.light_color;
+        d.ws_light_dir  = i.ws_light_dir;
+        d.ws_normal     = normalize(i.ws_normal);
+#ifdef _V2F_HAS_TANGENT
+        d.ws_tangent    = normalize(i.ws_tangent);
+        d.ws_bitangent  = normalize(i.ws_bitangent);
+#endif
+#ifdef _V2F_HAS_VERTEXCOLOR
+        d.vertex_color  = i.vertex_color;
+#endif
+#ifdef _V2F_HAS_SHADOWPOWER
+        d.shadow_power  = i.shadow_power;
+#endif
+        d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
+        d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
+
+        return d;
+    }
 
     ////////////////////////////
     // UnToon function
@@ -93,17 +175,17 @@
         o.vertex_color = v.vertex_color;
 #endif
         o.uv = v.uv;
-        o.uv_lmap = v.uv_lmap;
+        o.uv2 = v.uv2;
         o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
 
 #ifdef _V2F_HAS_TANGENT
-        localNormalToWorldTangentSpace(v.normal, v.tangent, o.normal, o.tangent, o.bitangent, _FlipMirror & 1, _FlipMirror & 2);
+        localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FlipMirror & 1, _FlipMirror & 2);
 #else
-        localNormalToWorldTangentSpace(v.normal, o.normal);
+        localNormalToWorldTangentSpace(v.normal, o.ws_normal);
 #endif
 
         // 環境光取得
-        float3 ambientColor = calcAmbientColorVertex(v.uv_lmap);
+        float3 ambientColor = calcAmbientColorVertex(v.uv2);
         // 影コントラスト
         calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
@@ -115,97 +197,65 @@
         return o;
     }
 
-    float4 frag(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+    half4 frag(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
-        float4 color;
-        float2 uv_main;
+        drawing d = prepareDrawing(i, facing);
+        d.color = _Color;
 
-        i.normal = normalize(i.normal);
-#ifdef _V2F_HAS_TANGENT
-        i.tangent = normalize(i.tangent);
-        i.bitangent = normalize(i.bitangent);
-#endif
+        prepareMainTex(i, d);
+        prepareBumpNormal(i, d);
+        prepareDetailNormal(i, d);
+        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
+        d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
 
-        // メイン
-        affectBaseColor(i.uv, i.uv_lmap, facing, uv_main, color);
-        // 頂点カラー
-        affectVertexColor(i.vertex_color, color);
+        drawMainTex(d);             // メインテクスチャ
+        drawBackTex(d);             // 裏面テクスチャ
+        drawVertexColor(d);         // 頂点カラー
 
-        // カラーマスク
-        affect3chColorMask(uv_main, color);
-        // アルファマスク適用
-        affectAlphaMask(uv_main, color);
+        draw3chColorMask(d);        // カラーマスク
+        drawAlphaMask(d);           // アルファ
 
-        // グラデーションマップ
-        affectGradientMap(uv_main, color);
-        // 色変換
-        affectColorChange(uv_main, color);
+        drawGradientMap(d);         // グラデーションマップ
+        drawColorChange(d);         // 色変換
 
-        // BumpMap
-        float3 ws_normal = i.normal;
-        float3 ws_bump_normal;
-        float3 ws_detail_normal;
-        affectBumpNormal(i, uv_main, ws_bump_normal, color);
-        affectDetailNormal(i, uv_main, ws_detail_normal, color);
+        drawBumpNormal(d);          // ノーマルマップ
+        drawMetallic(d);            // メタリック
 
-        // ビューポイントへの方向
-        float3 ws_view_dir = worldSpaceViewPointDir(i.ws_vertex);
-        // カメラへの方向
-        float3 ws_camera_dir = worldSpaceCameraDir(i.ws_vertex);
-        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
+        drawMatcapColor(d);         // マットキャップ
+        drawLame(d);                // ラメ
 
-        // matcapベクトルの配列
-        WF_TYP_MATVEC matcapVector = calcMatcapVectorArray(ws_view_dir, ws_camera_dir, ws_normal, ws_bump_normal, ws_detail_normal);
+        drawToonShade(d);           // 階調影
+        drawRimLight(d);            // リムライト
 
-        // メタリック
-        affectMetallic(i, ws_camera_dir, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, color);
-        // Highlight
-        affectMatcapColor(matcapVector, uv_main, color);
-        // ラメ
-        affectLame(i, uv_main, ws_normal, color);
-        // 階調影
-        affectToonShade(i, uv_main, ws_normal, ws_bump_normal, ws_detail_normal, angle_light_camera, color);
-        // リムライト
-        affectRimLight(i, uv_main, calcMatcapVector(matcapVector, _TR_BlendNormal, _TR_BlendNormal2, 0), angle_light_camera, color);
-        // Overlay Texture
-        affectOverlayTexture(i, uv_main, calcMatcapVector(matcapVector, 1, 1, 0.5), color);
-        // Distance Fade
-        affectDistanceFade(i, uv_main, facing, color);
-        // Outline
-        affectOutline(uv_main, color);
+        drawOverlayTexture(d);      // オーバーレイ
+        drawDistanceFade(d);        // 距離フェード
+        drawOutline(d);             // アウトライン
 
         // Anti-Glare とライト色ブレンドを同時に計算
-        color.rgb *= i.light_color;
-        // Ambient Occlusion
-        affectOcclusion(i, uv_main, color);
+        d.color.rgb *= d.light_color;
 
-        // EmissiveScroll
-        affectEmissiveScroll(i, uv_main, color);
-        // ToonFog
-        affectToonFog(i, ws_view_dir, color);
+        drawOcclusion(d);           // オクルージョンとライトマップ
+        drawEmissiveScroll(d);      // エミッション
 
-        // フレネル
-        affectFresnelAlpha(uv_main, ws_normal, ws_view_dir, color);
-        // ディゾルブ
-        affectDissolve(i.uv, color);
-        // Alpha は 0-1 にクランプ
-        color.a = saturate(color.a);
-        // リフラクション
-        affectRefraction(i, facing, ws_normal, ws_bump_normal, color);
-        // すりガラス
-        affectFrostedGlass(i, color);
-        // GhostTransparent
-        affectGhostTransparent(i, color);
+        drawToonFog(d);             // トゥーンフォグ
+        drawFresnelAlpha(d);        // フレネル
+
+        drawDissolve(d);            // ディゾルブ
+
+        drawRefraction(d);          // リフラクション
+        drawFrostedGlass(d);        // すりガラス
+        drawGhostTransparent(d);    // ゴースト
 
         // fog
-        UNITY_APPLY_FOG(i.fogCoord, color);
+        UNITY_APPLY_FOG(i.fogCoord, d.color);
+        // Alpha は 0-1 にクランプ
+        d.color.a = saturate(d.color.a);
 
-        return color;
+        return d.color;
     }
 
     ////////////////////////////
@@ -213,7 +263,7 @@
     ////////////////////////////
 
     float4 shiftOutlineVertex(inout v2f o, float width, float shift) {
-        return shiftOutlineVertex(o.ws_vertex, o.normal, width, shift); // NCC済み
+        return shiftOutlineVertex(o.ws_vertex, o.ws_normal, width, shift); // NCC済み
     }
 
     float4 shiftOutlineVertex(inout v2f o) {
@@ -313,47 +363,32 @@ FEATURE_TGL_END
     // Depth&Normal のみ描く fragment shader
     ////////////////////////////
 
-    float4 frag_depth(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+    half4 frag_depth(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
-        float4 color;
-        float2 uv_main;
+        drawing d = prepareDrawing(i, facing);
+        d.color = _Color;
 
-        // メイン
-        affectBaseColor(i.uv, i.uv_lmap, facing, uv_main, color);
-        // 頂点カラー
-        affectVertexColor(i.vertex_color, color);
+        prepareMainTex(i, d);
+        prepareBumpNormal(i, d);
+
+        drawMainTex(d);             // メインテクスチャ
+        drawVertexColor(d);         // 頂点カラー
 
         // アルファ計算
         #ifdef _AL_ENABLE
-            // アルファマスク
-            affectAlphaMask(uv_main, color);
+            drawAlphaMask(d);       // アルファ
 
-            if (color.a < 0.5) {
+            if (d.color.a < 0.5) {
                 discard;
                 return ZERO_VEC4;
             }
         #endif
 
-        i.normal = normalize(i.normal);
-        float3 ws_normal = i.normal;
-
-#ifdef _V2F_HAS_TANGENT
-        i.tangent = normalize(i.tangent);
-        i.bitangent = normalize(i.bitangent);
-#endif
-
-#ifdef _NM_ENABLE
-        float3 ws_bump_normal;
-        affectBumpNormal(i, uv_main, ws_bump_normal, color);
-        ws_normal = ws_bump_normal;
-#endif
-
-        return float4(ws_normal, 0);
+        return half4(d.ws_bump_normal, 0);
     }
-
 
 #endif
