@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -76,19 +76,19 @@
         o.shadow_power  = MUL_BARY(i, shadow_power);
 #endif
         o.uv            = MUL_BARY(i, uv);
-        o.uv_lmap       = MUL_BARY(i, uv_lmap);
+        o.uv2           = MUL_BARY(i, uv2);
         o.ws_vertex     = MUL_BARY(i, ws_vertex);
         o.ws_light_dir  = MUL_BARY(i, ws_light_dir);
-        o.normal        = MUL_BARY(i, normal);  // frag で normalize するので、ここでは normalize しない
+        o.ws_normal     = MUL_BARY(i, ws_normal);  // frag で normalize するので、ここでは normalize しない
 #ifdef _V2F_HAS_TANGENT
-        o.tangent       = MUL_BARY(i, tangent);
-        o.bitangent     = MUL_BARY(i, bitangent);
+        o.ws_tangent    = MUL_BARY(i, ws_tangent);
+        o.ws_bitangent  = MUL_BARY(i, ws_bitangent);
 #endif
 
         // Phong Tessellation
         float3 phg[3];
         for (int a = 0; a < 3; a++) {
-            float3 nml = normalize(i[a].normal);
+            float3 nml = normalize(i[a].ws_normal);
             phg[a] = nml * (dot( i[a].ws_vertex.xyz, nml ) - dot(o.ws_vertex.xyz, nml));
         }
         float2 uv_main = TRANSFORM_TEX(o.uv, _MainTex);

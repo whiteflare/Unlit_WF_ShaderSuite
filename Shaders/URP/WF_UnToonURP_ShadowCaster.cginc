@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -29,25 +29,44 @@
     ////////////////////////////
 
     struct appdata {
-        float4 vertex           : POSITION;
+        float4  vertex              : POSITION;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
-        float2 uv               : TEXCOORD0;
-        float2 uv_lmap          : TEXCOORD1;
-        float3 normal           : NORMAL;
+        float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        half3   normal              : NORMAL;
         UNITY_VERTEX_INPUT_INSTANCE_ID
+        UNITY_VERTEX_OUTPUT_STEREO
     };
 
     struct v2f_shadow {
-        float4 pos          : SV_POSITION;
-        float2 uv           : TEXCOORD1;
+        float4  pos                 : SV_POSITION;
+        float2  uv                  : TEXCOORD1;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
+
+    #define IN_FRAG v2f_shadow
+
+    struct drawing {
+        half4   color;
+        float2  uv1;
+        float2  uv_main;
+    };
+
+    drawing prepareDrawing(IN_FRAG i) {
+        drawing d = (drawing) 0;
+
+        d.color         = half4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv_main       = i.uv;
+
+        return d;
+    }
 
     ////////////////////////////
     // UnToon function
@@ -115,31 +134,35 @@
         return o;
     }
 
-    float4 frag_shadow(v2f_shadow i) : SV_Target {
+    half4 frag_shadow(v2f_shadow i) : SV_Target {
         UNITY_SETUP_INSTANCE_ID(i);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
         if (TGL_OFF(_GL_CastShadow)) {
             discard;
-            return ZERO_VEC4;
+            return half4(0, 0, 0, 0);
         }
+
+        drawing d = prepareDrawing(i);
+        d.color = _Color;
+
+        prepareMainTex(i, d);
+
+        drawMainTex(d);             // メインテクスチャ
+        drawVertexColor(d);         // 頂点カラー
 
         // アルファ計算
         #ifdef _AL_ENABLE
-            float4 color = PICK_MAIN_TEX2D(_MainTex, i.uv) * _Color;
-#ifdef _VC_ENABLE
-            color *= i.vertex_color;
-#endif
-            affectAlphaMask(i.uv, color);
+            drawAlphaMask(d);       // アルファ
             #if defined(_WF_ALPHA_BLEND)
-            if (color.a < _GL_ShadowCutoff) {
+            if (d.color.a < _GL_ShadowCutoff) {
                 discard;
-                return float4(0, 0, 0, 0);
+                return half4(0, 0, 0, 0);
             }
             #endif
         #endif
 
-        return ZERO_VEC4;
+        return half4(0, 0, 0, 0);
     }
 
 #endif

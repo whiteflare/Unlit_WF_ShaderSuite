@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -51,24 +51,24 @@
     #define TGL_OFF(value)  (value < 0.5)
     #define TGL_01(value)   step(0.5, value)
 
-    static const float3 MEDIAN_GRAY = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : GammaToLinearSpace( float3(0.5, 0.5, 0.5) );
+    static const float3 MEDIAN_GRAY = IsGammaSpace() ? half3(0.5, 0.5, 0.5) : GammaToLinearSpace( half3(0.5, 0.5, 0.5) );
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
     #define AVE3(r, g, b)   ((r + g + b) / 3)
     #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
     #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
 
-    #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : float4(1 - rgba.rgb, rgba.a) )
+    #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : half4(1 - rgba.rgb, rgba.a) )
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( PICK_VERT_TEX2D_LOD(tex, uv, 0), inv )
 
     #define NZF                                     0.000001
     #define NON_ZERO_FLOAT(v)                       max(v, NZF)
     #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
-    #define ZERO_VEC3                               float3(0, 0, 0)
-    #define ZERO_VEC4                               float4(0, 0, 0, 0)
-    #define ONE_VEC3                                float3(1, 1, 1)
-    #define ONE_VEC4                                float4(1, 1, 1, 1)
+    #define ZERO_VEC3                               half3(0, 0, 0)
+    #define ZERO_VEC4                               half4(0, 0, 0, 0)
+    #define ONE_VEC3                                half3(1, 1, 1)
+    #define ONE_VEC4                                half4(1, 1, 1, 1)
 
     #define DISCARD_VS_VERTEX_ZERO                  UnityObjectToClipPos( float3(0, 0, 0) )
 
@@ -77,7 +77,7 @@
     #endif
 
     #ifdef _WF_LEGACY_FEATURE_SWITCH
-        #define FEATURE_TGL(name)               float name
+        #define FEATURE_TGL(name)               half name
         #define FEATURE_TGL_ON_BEGIN(name)      if (TGL_ON(name)) {
         #define FEATURE_TGL_OFF_BEGIN(name)     if (TGL_OFF(name)) {
         #define FEATURE_TGL_END                 }
@@ -128,11 +128,11 @@
     // Normal
     ////////////////////////////
 
-    void localNormalToWorldTangentSpace(float3 normal, out float3 out_normal) {
+    void localNormalToWorldTangentSpace(half3 normal, out float3 out_normal) {
         out_normal = UnityObjectToWorldNormal(normal);
     }
 
-    void localNormalToWorldTangentSpace(float3 normal, float4 tangent, out float3 out_normal, out float3 out_tangent, out float3 out_bitangent, float flipMirrorX, float flipMirrorY) {
+    void localNormalToWorldTangentSpace(half3 normal, half4 tangent, out half3 out_normal, out half3 out_tangent, out half3 out_bitangent, float flipMirrorX, float flipMirrorY) {
         // Normalは普通に計算
         localNormalToWorldTangentSpace(normal, out_normal);
 
@@ -152,12 +152,12 @@
         }
     }
 
-    void localNormalToWorldTangentSpace(float3 normal, float4 tangent, out float3 out_normal, out float3 out_tangent, out float3 out_bitangent, float flipTangent) {
+    void localNormalToWorldTangentSpace(half3 normal, half4 tangent, out half3 out_normal, out half3 out_tangent, out half3 out_bitangent, float flipTangent) {
         localNormalToWorldTangentSpace(normal, tangent, out_normal, out_tangent, out_bitangent, flipTangent, flipTangent);
     }
 
-    float3 transformTangentToWorldNormal(float3 v, float3 ws_normal, float3 ws_tangent, float3 ws_bitangent) {
-        float3x3 tangentTransform = float3x3(ws_tangent, ws_bitangent, ws_normal);
+    float3 transformTangentToWorldNormal(float3 v, half3 ws_normal, half3 ws_tangent, half3 ws_bitangent) {
+        half3x3 tangentTransform = half3x3(ws_tangent, ws_bitangent, ws_normal);
         return mul(v, tangentTransform);
     }
 
@@ -287,7 +287,7 @@
     // Matcap
     ////////////////////////////
 
-    float3 matcapViewCorrect(float3 vs_normal, float3 ws_view_dir) {
+    float3 matcapViewCorrect(float3 vs_normal, half3 ws_view_dir) {
         float3 base = mul( (float3x3)UNITY_MATRIX_V, ws_view_dir ) * float3(-1, -1, 1) + float3(0, 0, 1);
         float3 detail = vs_normal.xyz * float3(-1, -1, 1);
         return base * dot(base, detail) / base.z - detail;
@@ -304,11 +304,11 @@
         return matrixRotate;
     }
 
-    float3 calcMatcapVector(in float3 ws_view_dir, in float3 ws_normal) {
+    float3 calcMatcapVector(in half3 ws_view_dir, in half3 ws_normal) {
         // このメソッドは ws_bump_normal を考慮しないバージョン。考慮するバージョンは WF_UnToon_Function.cginc にある。
 
         // ワールド法線をビュー法線に変換
-        float3 vs_normal = mul(float4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
+        float3 vs_normal = mul(half4(ws_normal, 1), UNITY_MATRIX_I_V).xyz;
 
         // カメラ位置にて補正する
         vs_normal = matcapViewCorrect(vs_normal, ws_view_dir);
@@ -347,8 +347,8 @@
         ( DecodeHDR( PICK_MAIN_TEXCUBE_LOD(cubemap, reflect(-worldSpaceCameraDir(ws_vertex), ws_normal), lod ), hdrInst) )
 
 /*
-    float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, float3 ws_normal, float lod) {
-        float3 ws_camera_dir = worldSpaceCameraDir(ws_vertex);
+    float3 pickReflectionCubemap(samplerCUBE cubemap, half4 cubemap_HDR, float3 ws_vertex, half3 ws_normal, float lod) {
+        half3 ws_camera_dir = worldSpaceCameraDir(ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float4 color = texCUBElod(cubemap, float4(reflect_dir, lod) );

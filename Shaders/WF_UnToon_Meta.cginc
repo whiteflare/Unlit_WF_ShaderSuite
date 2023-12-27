@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -29,32 +29,56 @@
     ////////////////////////////
 
     struct appdata {
-        float4 vertex           : POSITION;
-        float2 uv0              : TEXCOORD0;
-        float2 uv1              : TEXCOORD1;
-        float2 uv2              : TEXCOORD2;
+        float4  vertex              : POSITION;
+        float2  uv0                 : TEXCOORD0;
+        float2  uv1                 : TEXCOORD1;
+        float2  uv2                 : TEXCOORD2;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
     };
 
     struct v2f_meta {
-        float4 pos              : SV_POSITION;
-        float2 uv               : TEXCOORD0;
+        float4  pos                 : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        float4 vertex_color     : COLOR0;
+        half4   vertex_color        : COLOR0;
 #endif
 #ifdef EDITOR_VISUALIZATION
-        float2 vizUV            : TEXCOORD1;
-        float4 lightCoord       : TEXCOORD2;
+        float2  vizUV               : TEXCOORD1;
+        float4  lightCoord          : TEXCOORD2;
 #endif
     };
+
+    #define IN_FRAG v2f_meta
+
+    struct drawing {
+        half4   color;
+        float2  uv1;
+        float2  uv_main;
+    };
+
+    drawing prepareDrawing(IN_FRAG i) {
+        drawing d = (drawing) 0;
+
+        d.color         = half4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv_main       = i.uv;
+
+        return d;
+    }
 
     ////////////////////////////
     // Unity Meta function
     ////////////////////////////
 
     #include "UnityMetaPass.cginc"
+
+    ////////////////////////////
+    // UnToon function
+    ////////////////////////////
+
+    #include "WF_UnToon_Function.cginc"
 
     ////////////////////////////
     // vertex&fragment shader
@@ -83,28 +107,29 @@
         return o;
     }
 
-    float4 frag_meta(v2f_meta i) : SV_Target {
+    half4 frag_meta(v2f_meta i) : SV_Target {
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
+        drawing d = prepareDrawing(i);
+        d.color = _Color;
 
-        float4 color    = _Color * PICK_MAIN_TEX2D(_MainTex, uv_main);
-#ifdef _VC_ENABLE
-        color *= lerp(ONE_VEC4, i.vertex_color, _UseVertexColor);
-#endif
+        prepareMainTex(i, d);
+
+        drawMainTex(d);             // メインテクスチャ
+        drawVertexColor(d);         // 頂点カラー
 
         // 単色化
-        color.rgb = max(ZERO_VEC3, lerp(AVE_RGB(color.rgb).xxx, color.rgb, lerp(1, _LBE_IndirectChroma, _LBE_Enable)));
+        d.color.rgb = max(ZERO_VEC3, lerp(AVE_RGB(d.color.rgb).xxx, d.color.rgb, lerp(1, _LBE_IndirectChroma, _LBE_Enable)));
 
-        o.Albedo        = color.rgb * lerp(1, _LBE_IndirectMultiplier, _LBE_Enable);
+        o.Albedo        = d.color.rgb * lerp(1, _LBE_IndirectMultiplier, _LBE_Enable);
         o.SpecularColor = o.Albedo;
         o.Emission      = ZERO_VEC3;    // 初期化
 
 #ifdef _ES_ENABLE
 
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
-        float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv_main).rgba;
+        float4 es_mask  = PICK_SUB_TEX2D(_EmissionMap, _MainTex, d.uv_main).rgba;
         float4 es_color = _EmissionColor * es_mask;
         o.Emission  = es_color.rgb * lerp(1, _LBE_EmissionMultiplier, _LBE_Enable);
 FEATURE_TGL_END
@@ -119,7 +144,7 @@ FEATURE_TGL_END
         return UnityMetaFragment(o);
     }
 
-    float4 frag_meta_black(v2f_meta i) : SV_Target {
+    half4 frag_meta_black(v2f_meta i) : SV_Target {
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
