@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -116,29 +116,27 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
             #include "WF_UnToon.cginc"
 
-            float4 _LME_MaskTex_ST;
-
-            float4 frag_lameonly(v2f i) : SV_Target {
+            half4 frag_lameonly(v2f i) : SV_Target {
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-                float2 uv_main = TRANSFORM_TEX(i.uv, _LME_MaskTex);
+                UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
-                // メイン
-                float4 color = float4(0, 0, 0, 0);
+                drawing d = prepareDrawing(i, 1);
+                d.color = half4(0, 0, 0, 0);
 
-                float3 ws_normal = normalize(i.normal);
+                prepareMainTex(i, d);
+                prepareBumpNormal(i, d);
 
-                // ラメ
-                affectLame(i, uv_main, ws_normal, color);
+                drawLame(d);
 
                 // Anti-Glare とライト色ブレンドを同時に計算
-                color.rgb *= i.light_color;
+                d.color.rgb *= d.light_color;
 
                 // Alpha は 0-1 にクランプ
-                color.a = saturate(color.a);
+                d.color.a = saturate(d.color.a);
 
-                return color;
+                return d.color;
             }
 
             ENDCG

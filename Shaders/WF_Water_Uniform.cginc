@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -51,78 +51,78 @@
     ////////////////////////////
 
     float4          _MainTex_ST;
-    float4          _Color;
-    float4          _Color2;
-    float           _ShadowPower;
-    float           _Cutoff;
+    half4           _Color;
+    half4           _Color2;
+    half            _ShadowPower;
+    half            _Cutoff;
 
-    float           _WaterLevel;
-    float           _WaterTransparency;
-    float           _HideCausticsAbove;
+    half            _WaterLevel;
+    half            _WaterTransparency;
+    half            _HideCausticsAbove;
 
     // -------------------------
 
     FEATURE_TGL    (_WAV_Enable_1);
     uint            _WAV_UVType_1;
-    float4          _WAV_Direction_1;
-    float           _WAV_Speed_1;
+    half4           _WAV_Direction_1;
+    half            _WAV_Speed_1;
     float4          _WAV_NormalMap_1_ST;
-    float           _WAV_NormalScale_1;
+    half            _WAV_NormalScale_1;
     float4          _WAV_HeightMap_1_ST;
     float4          _WAV_CausticsTex_1_ST;
 
     FEATURE_TGL    (_WAV_Enable_2);
     uint            _WAV_UVType_2;
-    float4          _WAV_Direction_2;
-    float           _WAV_Speed_2;
+    half4           _WAV_Direction_2;
+    half            _WAV_Speed_2;
     float4          _WAV_NormalMap_2_ST;
-    float           _WAV_NormalScale_2;
+    half            _WAV_NormalScale_2;
     float4          _WAV_HeightMap_2_ST;
     float4          _WAV_CausticsTex_2_ST;
 
     FEATURE_TGL    (_WAV_Enable_3);
     uint            _WAV_UVType_3;
-    float4          _WAV_Direction_3;
-    float           _WAV_Speed_3;
+    half4           _WAV_Direction_3;
+    half            _WAV_Speed_3;
     float4          _WAV_NormalMap_3_ST;
-    float           _WAV_NormalScale_3;
+    half            _WAV_NormalScale_3;
     float4          _WAV_HeightMap_3_ST;
     float4          _WAV_CausticsTex_3_ST;
 
     // -------------------------
 
     uint            _AL_Source;
-    float           _AL_Power;
-    float           _AL_Fresnel;
-    float           _AL_Z_Offset;
-    float           _AL_InvMaskVal;
+    half            _AL_Power;
+    half            _AL_Fresnel;
+    half            _AL_Z_Offset;
+    half            _AL_InvMaskVal;
 
     // -------------------------
 
     FEATURE_TGL    (_WAS_Enable);
-    float           _WAS_Power;
-    float4          _WAS_Color;
-    float           _WAS_Smooth;
-    float           _WAS_Power2;
-    float4          _WAS_Color2;
-    float           _WAS_Smooth2;
+    half            _WAS_Power;
+    half4           _WAS_Color;
+    half            _WAS_Smooth;
+    half            _WAS_Power2;
+    half4           _WAS_Color2;
+    half            _WAS_Smooth2;
 
     // -------------------------
 
     FEATURE_TGL    (_WAM_Enable);
-    float4          _WAM_Cubemap_HDR;
-    float           _WAM_Power;
-    float           _WAM_Smooth;
-    float           _WAM_Bright;
-    float           _WAM_CubemapType;
-    float           _WAM_CubemapHighCut;
+    half4           _WAM_Cubemap_HDR;
+    half            _WAM_Power;
+    half            _WAM_Smooth;
+    half            _WAM_Bright;
+    half            _WAM_CubemapType;
+    half            _WAM_CubemapHighCut;
 
     // -------------------------
 
     uint            _GL_LightMode;
-    float           _GL_CustomAzimuth;
-    float           _GL_CustomAltitude;
-    float3          _GL_CustomLitPos;
+    half            _GL_CustomAzimuth;
+    half            _GL_CustomAltitude;
+    half3           _GL_CustomLitPos;
 
     // 使わない変数は define で固定値を設定
     #define _GL_CastShadow      0
@@ -135,43 +135,43 @@
 
     FEATURE_TGL    (_AO_Enable);
     uint            _AO_UVType;
-    float           _AO_UseLightMap;
-    float           _AO_UseGreenMap;
-    float           _AO_Contrast;
-    float           _AO_Brightness;
-    float4          _AO_TintColor;
+    half            _AO_UseLightMap;
+    half            _AO_UseGreenMap;
+    half            _AO_Contrast;
+    half            _AO_Brightness;
+    half4           _AO_TintColor;
 
     // -------------------------
 
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_CRF_Enable);
-    float           _CRF_RefractiveIndex;
-    float           _CRF_Distance;
-    float3          _CRF_Tint;
-    float           _CRF_BlendNormal;
+    half            _CRF_RefractiveIndex;
+    half            _CRF_Distance;
+    half3           _CRF_Tint;
+    half            _CRF_BlendNormal;
 #endif
 
     // -------------------------
 
     FEATURE_TGL    (_WAD_Enable);
-    float4          _WAD_Color;
-    float           _WAD_MinDist;
-    float           _WAD_MaxDist;
-    float           _WAD_Power;
-    float           _WAD_BackShadow;
+    half4           _WAD_Color;
+    half            _WAD_MinDist;
+    half            _WAD_MaxDist;
+    half            _WAD_Power;
+    half            _WAD_BackShadow;
 
     // -------------------------
 
     FEATURE_TGL    (_WAR_Enable);
-    float           _WAR_Power;
-    float           _WAR_Azimuth;
-    float           _WAR_Altitude;
-    float3          _WAR_BasePosOffset;
-    float           _WAR_CullBack;
-    float           _WAR_Size;
-    float           _WAR_Feather;
-    float           _WAR_BlendNormal;
-    float           _WAR_MinDist;
-    float           _WAR_MaxDist;
+    half            _WAR_Power;
+    half            _WAR_Azimuth;
+    half            _WAR_Altitude;
+    half3           _WAR_BasePosOffset;
+    half            _WAR_CullBack;
+    half            _WAR_Size;
+    half            _WAR_Feather;
+    half            _WAR_BlendNormal;
+    half            _WAR_MinDist;
+    half            _WAR_MaxDist;
 
 #endif
