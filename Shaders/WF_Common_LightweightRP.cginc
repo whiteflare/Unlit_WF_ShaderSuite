@@ -103,11 +103,11 @@
         return _MainLightPosition.xyz;
     }
 
-    float3 sampleMainLightColor() {
+    half3 sampleMainLightColor() {
         return _MainLightColor.rgb;
     }
 
-    float3 sampleSHLightColor() {
+    half3 sampleSHLightColor() {
         float3 col = float3(0, 0, 0);
         col += SampleSH( float3(+1, 0, 0) );
         col += SampleSH( float3(-1, 0, 0) );
@@ -139,7 +139,7 @@
         }
     }
 
-    float3 samplePoint1LightColor(float3 ws_vertex) {
+    half3 samplePoint1LightColor(float3 ws_vertex) {
         if (GetAdditionalLightsCount() < 1) {
             return float3(0, 0, 0);
         } else {
@@ -148,7 +148,7 @@
         }
     }
 
-    float3 sampleAdditionalLightColor(float3 ws_vertex) {
+    half3 sampleAdditionalLightColor(float3 ws_vertex) {
         float3 col = float3(0, 0, 0);
 
         int pixelLightCount = GetAdditionalLightsCount();
@@ -160,7 +160,7 @@
         return col;
     }
 
-    float3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
+    half3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
         float3 col = float3(0, 0, 0);
 
         int pixelLightCount = GetAdditionalLightsCount();
