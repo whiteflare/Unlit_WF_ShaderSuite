@@ -51,7 +51,7 @@
     #define TGL_OFF(value)  (value < 0.5)
     #define TGL_01(value)   step(0.5, value)
 
-    static const float3 MEDIAN_GRAY = IsGammaSpace() ? half3(0.5, 0.5, 0.5) : GammaToLinearSpace( half3(0.5, 0.5, 0.5) );
+    static const half3 MEDIAN_GRAY = IsGammaSpace() ? half3(0.5, 0.5, 0.5) : GammaToLinearSpace( half3(0.5, 0.5, 0.5) );
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
     #define AVE3(r, g, b)   ((r + g + b) / 3)
@@ -233,39 +233,39 @@
     // Color Utility
     ////////////////////////////
 
-    inline float3 blendColor_Alpha(float3 base, float3 over, float power) {
+    inline half3 blendColor_Alpha(half3 base, half3 over, float power) {
         // アルファブレンド
-        float3 c = over;
+        half3 c = over;
         return lerp(base, c, power);
     }
 
-    inline float3 blendColor_Add(float3 base, float3 over, float power) {
+    inline half3 blendColor_Add(half3 base, half3 over, float power) {
         // 加算
-        float3 c = base + over;
+        half3 c = base + over;
         return lerp(base, c, power);
     }
 
-    inline float3 blendColor_Mul(float3 base, float3 over, float power) {
+    inline half3 blendColor_Mul(half3 base, half3 over, float power) {
         // 乗算
-        float3 c = base * over;
+        half3 c = base * over;
         return lerp(base, c, power);
     }
 
-    inline float3 blendColor_AddAndSub(float3 base, float3 over, float power) {
+    inline half3 blendColor_AddAndSub(half3 base, half3 over, float power) {
         // 半加算
-        float3 c = base + over - MEDIAN_GRAY;
+        half3 c = base + over - MEDIAN_GRAY;
         return lerp(base, c, power);
     }
 
-    inline float3 blendColor_Screen(float3 base, float3 over, float power) {
+    inline half3 blendColor_Screen(half3 base, half3 over, float power) {
         // スクリーン
-        float3 c = 1 - (1 - base) * (1 - over);
+        half3 c = 1 - (1 - base) * (1 - over);
         return lerp(base, c, power);
     }
 
-    inline float3 blendColor_Overlay(float3 base, float3 over, float power) {
+    inline half3 blendColor_Overlay(half3 base, half3 over, float power) {
         // オーバーレイ
-        float3 c = lerp(
+        half3 c = lerp(
                 2 * base * over,
                 1 - 2 * (1 - base) * (1 - over.rgb),
                 step(AVE_RGB(base), 0.5)
@@ -273,9 +273,9 @@
         return lerp(base, c, power);
     }
 
-    inline float3 blendColor_HardLight(float3 base, float3 over, float power) {
+    inline half3 blendColor_HardLight(half3 base, half3 over, float power) {
         // ハードライト
-        float3 c = lerp(
+        half3 c = lerp(
                 2 * base * over,
                 1 - 2 * (1 - base) * (1 - over.rgb),
                 step(AVE_RGB(over), 0.5)
