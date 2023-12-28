@@ -62,11 +62,11 @@
         return _WorldSpaceLightPos0.xyz;
     }
 
-    float3 sampleMainLightColor() {
+    half3 sampleMainLightColor() {
         return _LightColor0.rgb;
     }
 
-    float3 sampleSHLightColor() {
+    half3 sampleSHLightColor() {
         float3 col = float3(0, 0, 0);
         col += ShadeSH9( half4(+1, 0, 0, 1) );
         col += ShadeSH9( half4(-1, 0, 0, 1) );
@@ -104,7 +104,7 @@
         return float3(0, 0, 0); // ポイントライトが無いときは 0, 0, 0 を返す
     }
 
-    float3 samplePoint1LightColor(float3 ws_vertex) {
+    half3 samplePoint1LightColor(float3 ws_vertex) {
 #ifdef VERTEXLIGHT_ON
         float3 ws_lightPos = getPoint1LightPos();
         if (any(ws_lightPos)) {
@@ -117,7 +117,7 @@
         return float3(0, 0, 0); // ポイントライトが無いときは 0, 0, 0 を返す
     }
 
-    float3 OmniDirectional_Shade4PointLights(
+    half3 OmniDirectional_Shade4PointLights(
         float4 lpX, float4 lpY, float4 lpZ,
         float3 col0, float3 col1, float3 col2, float3 col3,
         float4 lightAttenSq, float3 ws_vertex) {
@@ -149,7 +149,7 @@
     }
 
 
-    float3 sampleAdditionalLightColor(float3 ws_vertex) {
+    half3 sampleAdditionalLightColor(float3 ws_vertex) {
 #ifdef VERTEXLIGHT_ON
         return OmniDirectional_Shade4PointLights(
                 unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
@@ -165,7 +165,7 @@
 #endif
     }
 
-    float3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
+    half3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
 #ifdef VERTEXLIGHT_ON
         return OmniDirectional_Shade4PointLights(
                 unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
@@ -185,7 +185,7 @@
     // Lightmap Sampler
     ////////////////////////////
 
-    float3 pickLightmap(float2 uv_lmap) {
+    half3 pickLightmap(float2 uv_lmap) {
         float3 color = float3(0, 0, 0);
         #ifdef LIGHTMAP_ON
         {
@@ -206,7 +206,7 @@
         return color;
     }
 
-    float3 pickLightmapLod(float2 uv_lmap) {
+    half3 pickLightmapLod(float2 uv_lmap) {
 #ifdef SHADER_API_D3D11
         float3 color = float3(0, 0, 0);
         #ifdef LIGHTMAP_ON
@@ -235,7 +235,7 @@
     // ReflectionProbe Sampler
     ////////////////////////////
 
-    float4 pickReflectionProbe(float3 ws_vertex, half3 ws_normal, float lod) {
+    half4 pickReflectionProbe(float3 ws_vertex, half3 ws_normal, float lod) {
         half3 ws_camera_dir = normalize(_WorldSpaceCameraPos - ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
