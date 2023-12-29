@@ -208,7 +208,6 @@ namespace UnlitWF
             EditorGUILayout.Space();
 
             serializedObject.Update();
-            EditorGUI.BeginChangeCheck();
 
             // 優先度
 
@@ -249,10 +248,7 @@ namespace UnlitWF
                 EditorGUILayout.PropertyField(p_enableNccInVRC3World, new GUIContent("For VRCSDK3 World"));
             }
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-            }
+            serializedObject.ApplyModifiedProperties();
 
             WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
         }
