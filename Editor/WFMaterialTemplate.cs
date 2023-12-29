@@ -139,8 +139,6 @@ namespace UnlitWF
         {
             serializedObject.Update();
 
-            EditorGUI.BeginChangeCheck();
-
             using (new EditorGUI.DisabledGroupScope(true))
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(WFMaterialTemplate.material)));
@@ -157,10 +155,7 @@ namespace UnlitWF
             EditorGUILayout.PrefixLabel("memo");
             m_memo.stringValue = EditorGUILayout.TextArea(m_memo.stringValue, style, GUILayout.Height(80));
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-            }
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
