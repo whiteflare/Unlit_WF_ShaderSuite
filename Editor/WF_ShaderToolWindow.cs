@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -491,18 +491,14 @@ namespace UnlitWF
             }
         }
 
-        public static void MaterialProperty(UnityEngine.Object obj, string name)
+        public static void MaterialProperty(SerializedObject so, string name)
         {
-            var so = new SerializedObject(obj);
-            so.Update();
-
             SerializedProperty property = so.FindProperty(name);
             if (property == null)
             {
                 return;
             }
 
-            EditorGUI.BeginChangeCheck();
             if (property.isArray)
             {
                 // 複数行マテリアルフィールド
@@ -513,18 +509,10 @@ namespace UnlitWF
                 // 1行マテリアルフィールド
                 EditorGUILayout.PropertyField(property, new GUIContent("material"), true);
             }
-            if (EditorGUI.EndChangeCheck())
-            {
-                so.ApplyModifiedPropertiesWithoutUndo();
-                so.SetIsDifferentCacheDirty();
-            }
         }
 
-        public static void SetArrayPropertyExpanded(UnityEngine.Object obj, string name)
+        public static void SetArrayPropertyExpanded(SerializedObject so, string name)
         {
-            var so = new SerializedObject(obj);
-            so.Update();
-
             SerializedProperty property = so.FindProperty(name);
             if (property == null || !property.isArray)
             {
@@ -592,6 +580,7 @@ namespace UnlitWF
 
         Vector2 scroll = Vector2.zero;
         private CleanUpParameter param;
+        private SerializedObject serializedObject;
 
         private void OnEnable()
         {
@@ -599,11 +588,14 @@ namespace UnlitWF
             param = CleanUpParameter.Create();
             param.execNonWFMaterials = true; // ツール経由のときはNonWFマテリアルのクリンナップも行う
             ToolCommon.GetSelectedMaterials(ref param.materials);
-            ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materials));
+            serializedObject = new SerializedObject(param);
+            ToolCommon.SetArrayPropertyExpanded(serializedObject, nameof(param.materials));
         }
 
         private void OnGUI()
         {
+            serializedObject.Update();
+
             ToolCommon.WindowHeader("UnlitWF / CleanUp material property", "CleanUp disabled values", "materialsから無効化されている機能の設定値をクリアします。");
 
             // スクロール開始
@@ -611,7 +603,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("materials", EditorStyles.boldLabel);
-            ToolCommon.MaterialProperty(param, nameof(param.materials));
+            ToolCommon.MaterialProperty(serializedObject, nameof(param.materials));
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -640,6 +632,8 @@ namespace UnlitWF
 
             // スクロール終了
             EditorGUILayout.EndScrollView();
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
     }
 
@@ -665,17 +659,21 @@ namespace UnlitWF
 
         Vector2 scroll = Vector2.zero;
         private ResetParameter param;
+        private SerializedObject serializedObject;
 
         private void OnEnable()
         {
             ToolCommon.SetupSize(this);
             param = ResetParameter.Create();
             ToolCommon.GetSelectedMaterials(ref param.materials);
-            ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materials));
+            serializedObject = new SerializedObject(param);
+            ToolCommon.SetArrayPropertyExpanded(serializedObject, nameof(param.materials));
         }
 
         private void OnGUI()
         {
+            serializedObject.Update();
+
             ToolCommon.WindowHeader("UnlitWF / Reset material property", "Reset properties", "materialsの設定値を初期化します。");
 
             // スクロール開始
@@ -683,7 +681,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("materials", EditorStyles.boldLabel);
-            ToolCommon.MaterialProperty(param, nameof(param.materials));
+            ToolCommon.MaterialProperty(serializedObject, nameof(param.materials));
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -727,6 +725,8 @@ namespace UnlitWF
 
             // スクロール終了
             EditorGUILayout.EndScrollView();
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
     }
 
@@ -753,17 +753,21 @@ namespace UnlitWF
 
         Vector2 scroll = Vector2.zero;
         private CopyPropParameter param;
+        private SerializedObject serializedObject;
 
         private void OnEnable()
         {
             ToolCommon.SetupSize(this);
             param = CopyPropParameter.Create();
             ToolCommon.GetSelectedMaterials(ref param.materialDestination);
-            ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materialDestination));
+            serializedObject = new SerializedObject(param);
+            ToolCommon.SetArrayPropertyExpanded(serializedObject, nameof(param.materialDestination));
         }
 
         private void OnGUI()
         {
+            serializedObject.Update();
+
             ToolCommon.WindowHeader("UnlitWF / Copy material property", "Copy properties", "source material の設定値を destination materials にコピーします。");
 
             // スクロール開始
@@ -771,7 +775,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("destination materials", EditorStyles.boldLabel);
-            ToolCommon.MaterialProperty(param, nameof(param.materialDestination));
+            ToolCommon.MaterialProperty(serializedObject, nameof(param.materialDestination));
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -779,7 +783,7 @@ namespace UnlitWF
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("source materials", EditorStyles.boldLabel);
-            ToolCommon.MaterialProperty(param, nameof(param.materialSource));
+            ToolCommon.MaterialProperty(serializedObject, nameof(param.materialSource));
             EditorGUILayout.Space();
 
             ToolCommon.NoticeIfIllegalMaterials(new Material[] { param.materialSource }, false);
@@ -821,6 +825,8 @@ namespace UnlitWF
 
             // スクロール終了
             EditorGUILayout.EndScrollView();
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
     }
     #endregion
@@ -845,17 +851,21 @@ namespace UnlitWF
 
         Vector2 scroll = Vector2.zero;
         private MigrationParameter param;
+        private SerializedObject serializedObject;
 
         private void OnEnable()
         {
             ToolCommon.SetupSize(this);
             param = MigrationParameter.Create();
             ToolCommon.GetSelectedMaterials(ref param.materials);
-            ToolCommon.SetArrayPropertyExpanded(param, nameof(param.materials));
+            serializedObject = new SerializedObject(param);
+            ToolCommon.SetArrayPropertyExpanded(serializedObject, nameof(param.materials));
         }
 
         private void OnGUI()
         {
+            serializedObject.Update();
+
             ToolCommon.WindowHeader("UnlitWF / Migration material", "Migration materials", "古いバージョンのUnlitWFで設定されたmaterialsを最新版に変換します。");
 
             // スクロール開始
@@ -863,7 +873,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("materials", EditorStyles.boldLabel);
-            ToolCommon.MaterialProperty(param, nameof(param.materials));
+            ToolCommon.MaterialProperty(serializedObject, nameof(param.materials));
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -888,6 +898,8 @@ namespace UnlitWF
 
             // スクロール終了
             EditorGUILayout.EndScrollView();
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
     }
 
@@ -918,17 +930,21 @@ namespace UnlitWF
         private Light directionalLight;
         [SerializeField]
         private Material[] materials = { };
+        private SerializedObject serializedObject;
 
         private void OnEnable()
         {
             ToolCommon.SetupSize(this);
             directionalLight = RenderSettings.sun;
             ToolCommon.GetSelectedMaterials(ref materials);
-            ToolCommon.SetArrayPropertyExpanded(this, nameof(this.materials));
+            serializedObject = new SerializedObject(this);
+            ToolCommon.SetArrayPropertyExpanded(serializedObject, nameof(this.materials));
         }
 
         private void OnGUI()
         {
+            serializedObject.Update();
+
             ToolCommon.WindowHeader("UnlitWF / DirectionalLight Setting", "DirectionalLight Setting", "マテリアルにシーン DirectionalLight を焼き込みます。");
 
             // スクロール開始
@@ -944,7 +960,7 @@ namespace UnlitWF
 
             // マテリアルリスト
             EditorGUILayout.LabelField("materials", EditorStyles.boldLabel);
-            ToolCommon.MaterialProperty(this, nameof(this.materials));
+            ToolCommon.MaterialProperty(serializedObject, nameof(this.materials));
             EditorGUILayout.Space();
 
             // マテリアルに UnlitWF 以外のシェーダが紛れている場合には警告
@@ -969,6 +985,8 @@ namespace UnlitWF
 
             // スクロール終了
             EditorGUILayout.EndScrollView();
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private void ExecuteDLBake()

@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -103,11 +103,11 @@
         return _MainLightPosition.xyz;
     }
 
-    float3 sampleMainLightColor() {
+    half3 sampleMainLightColor() {
         return _MainLightColor.rgb;
     }
 
-    float3 sampleSHLightColor() {
+    half3 sampleSHLightColor() {
         float3 col = float3(0, 0, 0);
         col += SampleSH( float3(+1, 0, 0) );
         col += SampleSH( float3(-1, 0, 0) );
@@ -139,7 +139,7 @@
         }
     }
 
-    float3 samplePoint1LightColor(float3 ws_vertex) {
+    half3 samplePoint1LightColor(float3 ws_vertex) {
         if (GetAdditionalLightsCount() < 1) {
             return float3(0, 0, 0);
         } else {
@@ -148,7 +148,7 @@
         }
     }
 
-    float3 sampleAdditionalLightColor(float3 ws_vertex) {
+    half3 sampleAdditionalLightColor(float3 ws_vertex) {
         float3 col = float3(0, 0, 0);
 
         int pixelLightCount = GetAdditionalLightsCount();
@@ -160,7 +160,7 @@
         return col;
     }
 
-    float3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
+    half3 sampleAdditionalLightColorExclude1(float3 ws_vertex) {
         float3 col = float3(0, 0, 0);
 
         int pixelLightCount = GetAdditionalLightsCount();
@@ -176,8 +176,8 @@
     // Lightmap Sampler
     ////////////////////////////
 
-    float3 pickLightmap(float2 uv_lmap) {
-        float3 color = float3(0, 0, 0);
+    half3 pickLightmap(float2 uv_lmap) {
+        half3 color = half3(0, 0, 0);
         #ifdef LIGHTMAP_ON
         {
             float2 uv = uv_lmap.xy * unity_LightmapST.xy + unity_LightmapST.zw;
@@ -197,8 +197,8 @@
         return color;
     }
 
-    float3 pickLightmapLod(float2 uv_lmap) {
-        return float3(1, 1, 1);
+    half3 pickLightmapLod(float2 uv_lmap) {
+        return half3(1, 1, 1);
         // SRP Batcher を有効にするために、vertシェーダとfragシェーダの両方から読むことを諦め、fragシェーダの方を生かす。vertでは白色を返す。
     }
 
@@ -206,11 +206,11 @@
     // ReflectionProbe Sampler
     ////////////////////////////
 
-    float4 pickReflectionProbe(float3 ws_vertex, float3 ws_normal, float lod) {
-        float4 color0 = float4(0, 0, 0, 1);
+    half4 pickReflectionProbe(float3 ws_vertex, half3 ws_normal, float lod) {
+        half4 color0 = half4(0, 0, 0, 1);
 
 #if !defined(_ENVIRONMENTREFLECTIONS_OFF)
-        float3 ws_camera_dir = normalize(_WorldSpaceCameraPos - ws_vertex);
+        half3 ws_camera_dir = normalize(_WorldSpaceCameraPos - ws_vertex);
         float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
         float3 dir0 = reflect_dir;

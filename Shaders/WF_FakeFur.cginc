@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,47 +18,99 @@
 #ifndef INC_UNLIT_WF_FAKEFUR
 #define INC_UNLIT_WF_FAKEFUR
 
+    ////////////////////////////
+    // uniform variable
+    ////////////////////////////
+
     #include "WF_INPUT_FakeFur.cginc"
-    #include "WF_UnToon.cginc"
+
+    ////////////////////////////
+    // main structure
+    ////////////////////////////
 
     struct appdata_fur {
-        float4 vertex           : POSITION;
-        float2 uv               : TEXCOORD0;
-        float3 normal           : NORMAL;
-        float4 tangent          : TANGENT;
-        uint vid                : SV_VertexID;
+        float4  vertex              : POSITION;
+        float2  uv                  : TEXCOORD0;
+        half3   normal              : NORMAL;
+        half4   tangent             : TANGENT;
+        uint vid                    : SV_VertexID;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
     struct v2g {
-        float2 uv               : TEXCOORD0;
-        float3 ws_vertex        : TEXCOORD1;
-        float3 ws_normal        : TEXCOORD2;
-        float3 ws_tangent       : TEXCOORD3;
-        float3 ws_bitangent     : TEXCOORD4;
-        float3 ws_light_dir     : TEXCOORD5;    // ws_light_dir.w は frag では使わないので削減
-        float vid               : TEXCOORD6;
-        float3 light_color      : COLOR1;
+        float2  uv                  : TEXCOORD0;
+        float3  ws_vertex           : TEXCOORD1;
+        half3   ws_normal           : TEXCOORD2;
+        half3   ws_tangent          : TEXCOORD3;
+        half3   ws_bitangent        : TEXCOORD4;
+        half3   ws_light_dir        : TEXCOORD5;    // ws_light_dir.w は frag では使わないので削減
+        float   vid                 : TEXCOORD6;
+        half3   light_color         : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
-        float shadow_power      : COLOR2;
+        half    shadow_power        : COLOR2;
 #endif
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
     struct g2f {
-        float4 vs_vertex        : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        float3 ws_vertex        : TEXCOORD1;
-        float3 ws_normal        : TEXCOORD2;
-        float3 ws_light_dir     : TEXCOORD3;    // ws_light_dir.w は frag では使わないので削減
-        float  height           : COLOR0;
-        float3 light_color      : COLOR1;
+        float4  vs_vertex           : SV_POSITION;
+        float2  uv                  : TEXCOORD0;
+        float3  ws_vertex           : TEXCOORD1;
+        half3   ws_normal           : TEXCOORD2;
+        half3   ws_light_dir        : TEXCOORD3;    // ws_light_dir.w は frag では使わないので削減
+        half    height              : COLOR0;
+        half3   light_color         : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
-        float shadow_power      : COLOR2;
+        half    shadow_power        : COLOR2;
 #endif
         UNITY_VERTEX_OUTPUT_STEREO
         // フルセット 21 value なので、geometry シェーダの制限 1024 value 内では 48 vertex = 6枚のファーまで使用できる
     };
+
+    #define IN_FRAG g2f
+
+    struct drawing {
+        half4   color;
+        float2  uv1;
+        float2  uv_main;
+        float3  ws_vertex;
+        half3   ws_normal;
+        half3   ws_bump_normal;
+        half3   ws_detail_normal;
+        half3   ws_view_dir;
+        half3   ws_camera_dir;
+        half3   ws_light_dir;
+        half    angle_light_camera;
+        half3   light_color;
+#ifdef _V2F_HAS_SHADOWPOWER
+        half    shadow_power;
+#endif
+    };
+
+    drawing prepareDrawing(IN_FRAG i) {
+        drawing d = (drawing) 0;
+
+        d.color         = half4(1, 1, 1, 1);
+        d.uv1           = i.uv;
+        d.uv_main       = i.uv;
+        d.ws_vertex     = i.ws_vertex;
+        d.light_color   = i.light_color;
+        d.ws_light_dir  = i.ws_light_dir;
+        d.ws_normal     = normalize(i.ws_normal);
+#ifdef _V2F_HAS_SHADOWPOWER
+        d.shadow_power  = i.shadow_power;
+#endif
+        d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
+        d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
+
+        return d;
+    }
+
+    ////////////////////////////
+    // UnToon function
+    ////////////////////////////
+
+    #include "WF_UnToon_Function.cginc"
 
     ////////////////////////////
     // vertex & fragment shader
@@ -77,7 +129,7 @@
 
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FlipMirror & 1, _FlipMirror & 2);
 
-        float4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+        half4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
         o.ws_light_dir = ws_light_dir.xyz;
         // 環境光取得
         float3 ambientColor = sampleSHLightColor();
@@ -104,7 +156,7 @@
         return o;
     }
 
-    void transferGeomVertex(inout g2f o, float3 vb, float3 vu, float height) {
+    void transferGeomVertex(inout g2f o, float3 vb, float3 vu, half height) {
         o.ws_vertex = lerp(vb, vu, height);
         o.vs_vertex = UnityWorldToClipPos( o.ws_vertex );
         affectNearClipCancel(o.vs_vertex);
@@ -129,7 +181,7 @@
         return o;
     }
 
-    float3 calcFurVector(float3 ws_tangent, float3 ws_bitangent, float3 ws_normal, float2 uv) {
+    float3 calcFurVector(half3 ws_tangent, half3 ws_bitangent, half3 ws_normal, float2 uv) {
         // Static Fur Vector 計算
         float3 vec_fur = SafeNormalizeVec3Normal(_FUR_Vector.xyz);
 
@@ -192,62 +244,50 @@
         }}
     }
 
-    float4 frag_fakefur(g2f gi) : SV_Target {
-        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(gi);
+    half4 frag_fakefur(g2f i) : SV_Target {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-        UNITY_APPLY_DITHER_CROSSFADE(gi.vs_vertex);
+        UNITY_APPLY_DITHER_CROSSFADE(i.vs_vertex);
 
-        v2f i = (v2f) 0;
-        i.vs_vertex     = gi.vs_vertex;
-        i.uv            = gi.uv;
-        i.ws_vertex     = gi.ws_vertex;
-        i.normal        = normalize(gi.ws_normal);
-        i.light_color   = gi.light_color;
-#ifdef _V2F_HAS_SHADOWPOWER
-        i.shadow_power  = gi.shadow_power;
-#endif
-        i.ws_light_dir  = float4(gi.ws_light_dir, 0);
+        drawing d = prepareDrawing(i);
+        d.color = _Color;
 
-        // メイン
-        float2 uv_main = TRANSFORM_TEX(i.uv, _MainTex);
-        float4 color = PICK_MAIN_TEX2D(_MainTex, uv_main) * _Color;
-        // アルファマスク適用
-        affectAlphaMask(uv_main, color);
+        prepareMainTex(i, d);
+        prepareBumpNormal(i, d);
+        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
 
-        // グラデーションマップ
-        affectGradientMap(uv_main, color);
-        // 色変換
-        affectColorChange(uv_main, color);
+        drawMainTex(d);             // メインテクスチャ
+        drawAlphaMask(d);           // アルファ
 
-        // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
-        float angle_light_camera = calcAngleLightCamera(i.ws_vertex, i.ws_light_dir.xyz);
-        // 階調影
-        affectToonShade(i, uv_main, i.normal, i.normal, i.normal, angle_light_camera, color);
-        // Distance Fade
-        affectDistanceFade(i, uv_main, 1, color);
+        drawGradientMap(d);         // グラデーションマップ
+        drawColorChange(d);         // 色変換
+
+        drawToonShade(d);           // 階調影
+        drawDistanceFade(d);        // 距離フェード
 
         // Anti-Glare とライト色ブレンドを同時に計算
-        color.rgb *= i.light_color;
-        // ディゾルブ
-        affectDissolve(i.uv, color);
-        // Alpha は 0-1 にクランプ
-        color.a = saturate(color.a);
+        d.color.rgb *= d.light_color;
 
-        float4 maskTex = SAMPLE_MASK_VALUE(_FUR_MaskTex, uv_main, _FUR_InvMaskVal);
-        if (maskTex.r < 0.01 || maskTex.r <= gi.height) {
+        drawDissolve(d);            // ディゾルブ
+
+        // Alpha は 0-1 にクランプ
+        d.color.a = saturate(d.color.a);
+
+        float4 maskTex = SAMPLE_MASK_VALUE(_FUR_MaskTex, d.uv_main, _FUR_InvMaskVal);
+        if (maskTex.r < 0.01 || maskTex.r <= i.height) {
             discard;
         }
 
         // ファーノイズを追加
-        float noise = PICK_MAIN_TEX2D(_FUR_NoiseTex, TRANSFORM_TEX(i.uv, _FUR_NoiseTex)).r;
-        color.rgb   *= lerp(_FUR_TintColorBase.rgb, _FUR_TintColorTip.rgb, gi.height);
-        color.rgb   *= saturate(1 - (1 - noise) * _FUR_ShadowPower);
-        color.a     = saturate(noise - pow(gi.height, 4));
+        float noise = PICK_MAIN_TEX2D(_FUR_NoiseTex, TRANSFORM_TEX(d.uv1, _FUR_NoiseTex)).r;
+        d.color.rgb   *= lerp(_FUR_TintColorBase.rgb, _FUR_TintColorTip.rgb, i.height);
+        d.color.rgb   *= saturate(1 - (1 - noise) * _FUR_ShadowPower);
+        d.color.a     = saturate(noise - pow(i.height, 4));
 
-        return color;
+        return d.color;
     }
 
-    float4 frag_fakefur_cutoff(g2f i) : SV_Target {
+    half4 frag_fakefur_cutoff(g2f i) : SV_Target {
         float4 color = frag_fakefur(i);
 
         color.a = smoothstep(_Cutoff - 0.0625, _Cutoff + 0.0625, color.a);

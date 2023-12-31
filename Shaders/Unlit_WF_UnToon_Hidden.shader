@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -19,7 +19,7 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
     Properties {
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/12/10 (1.7.0)", Float) = 0
+            _CurrentVersion         ("2024/01/01 (1.8.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -92,13 +92,13 @@ Shader "Hidden/UnlitWF/WF_UnToon_Hidden" {
 
             #include "UnityStandardMeta.cginc"
 
-            float4 frag_meta_black(v2f_meta i) : SV_Target {
+            half4 frag_meta_black(v2f_meta i) : SV_Target {
                 UnityMetaInput o;
                 UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
 
-                o.Albedo        = float3(0, 0, 0);
-                o.SpecularColor = float3(0, 0, 0);
-                o.Emission      = float3(0, 0, 0);
+                o.Albedo        = half3(0, 0, 0);
+                o.SpecularColor = half3(0, 0, 0);
+                o.Emission      = half3(0, 0, 0);
 
                 #ifdef EDITOR_VISUALIZATION
                     o.VizUV         = i.vizUV;

@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -59,7 +59,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/12/10 (1.7.0)", Float) = 0
+            _CurrentVersion         ("2024/01/01 (1.8.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -97,8 +97,8 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 float2 uv2      : TEXCOORD1;
                 float2 uv3      : TEXCOORD2;
                 float2 uv4      : TEXCOORD3;
-                float3 normal   : NORMAL;
-                float4 tangent  : TANGENT;
+                half3 normal   : NORMAL;
+                half4 tangent  : TANGENT;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -112,7 +112,7 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 float2 uv2          : TEXCOORD3;
                 float2 uv3          : TEXCOORD4;
                 float2 uv4          : TEXCOORD5;
-                float3 normal       : TEXCOORD6;
+                half3 normal       : TEXCOORD6;
                 float3 tangent      : TEXCOORD7;
                 float3 bitangent    : TEXCOORD8;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -157,9 +157,9 @@ Shader "UnlitWF/Debug/WF_DebugView" {
             sampler2D _OcclusionMap;        float4  _OcclusionMap_ST;
             sampler2D _EmissionMap;         float4  _EmissionMap_ST;
 
-            float3 pickSpecCube(float3 ws_vertex, float3 ws_normal, float spec0, float spec1) {
+            float3 pickSpecCube(float3 ws_vertex, half3 ws_normal, float spec0, float spec1) {
                 float lod = 0;
-                float3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
+                half3 ws_camera_dir = normalize(_WorldSpaceCameraPos.xyz - ws_vertex );
                 float3 reflect_dir = reflect(-ws_camera_dir, ws_normal);
 
                 float3 dir0 = BoxProjectedCubemapDirection(reflect_dir, ws_vertex, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
@@ -174,12 +174,12 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                 return color0.rgb * spec0 + color1.rgb * spec1;
             }
 
-            float4 frag (v2f i, uint facing: SV_IsFrontFace) : SV_Target
+            half4 frag (v2f i, uint facing: SV_IsFrontFace) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-                float4 color = float4(0, 0, 0, 1);
+                half4 color = half4(0, 0, 0, 1);
                 float2 grid_uv = float2(0, 0);
 
                 // 基本色
@@ -201,12 +201,12 @@ Shader "UnlitWF/Debug/WF_DebugView" {
                         break;
                     case 6:
                         grid_uv = i.uv;
-                        color.rgb = facing ? float4(0, 1, 0, 1) : float4(1, 0, 0, 1);
+                        color.rgb = facing ? half4(0, 1, 0, 1) : half4(1, 0, 0, 1);
                         break;
                     case 7:
 #ifdef LIGHTMAP_ON
                         grid_uv = saturate(i.uv2 * unity_LightmapST.xy + unity_LightmapST.zw);
-                        color.rgb = facing ? float4(0, 1, 0, 1) : float4(1, 0, 0, 1);
+                        color.rgb = facing ? half4(0, 1, 0, 1) : half4(1, 0, 0, 1);
                         break;
 #else
                         discard;

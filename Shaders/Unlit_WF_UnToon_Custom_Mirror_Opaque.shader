@@ -1,7 +1,7 @@
 ﻿/*
  *  The MIT License
  *
- *  Copyright 2018-2023 whiteflare.
+ *  Copyright 2018-2024 whiteflare.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -364,7 +364,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_MirrorControl_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2023/12/10 (1.7.0)", Float) = 0
+            _CurrentVersion         ("2024/01/01 (1.8.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
@@ -431,7 +431,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_MirrorControl_Opaque" {
             float   _MR_Enable;
             uint    _MR_Visibility;
 
-            float4 frag_mirrorcontrol(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+            half4 frag_mirrorcontrol(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
                 float4 color = frag(i, facing);
 
                 if (TGL_ON(_MR_Enable)) {
