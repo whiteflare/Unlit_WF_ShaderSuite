@@ -2155,6 +2155,7 @@ namespace UnlitWF
         ADD = 2,
         ALPHA = 1,
         ADD_AND_SUB = 0,
+        MUL = 3,
     }
 
     public enum SunSourceMode
