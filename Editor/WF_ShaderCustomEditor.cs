@@ -454,8 +454,14 @@ namespace UnlitWF
 
             DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Material Options");
             materialEditor.RenderQueueField();
-            materialEditor.EnableInstancingField();
-            materialEditor.DoubleSidedGIField();
+            {
+                var mat = materialEditor.target as Material;
+                if (mat == null || !mat.shader.name.Contains("Particle"))
+                {
+                    materialEditor.EnableInstancingField();
+                    materialEditor.DoubleSidedGIField();
+                }
+            }
 
             // 情報(ボトム)
             OnGuiSub_ShowCurrentShaderName(materialEditor, true);
@@ -2156,6 +2162,13 @@ namespace UnlitWF
         ALPHA = 1,
         ADD_AND_SUB = 0,
         MUL = 3,
+    }
+
+    public enum BlendModeVC // パーティクル用
+    {
+        MUL = 0,
+        ADD = 1,
+        SUB = 2,
     }
 
     public enum SunSourceMode
