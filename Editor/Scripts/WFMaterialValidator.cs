@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace UnlitWF
 {
@@ -190,6 +191,8 @@ namespace UnlitWF
                     }
                 }
             ),
+
+            WFMaterialParticleValidator.Validator,
 
             // 今後削除される予定の機能を使っている場合に警告
             new WFMaterialValidator(
@@ -371,6 +374,168 @@ namespace UnlitWF
             var mats = values.Where(mat => mat != null).ToArray();
             oldMaterialVersionCache.RemoveAll(mats);
             newMaterialVersionCache.RemoveAll(mats);
+        }
+    }
+
+    class WFMaterialParticleValidator : ScriptableSingleton<WFMaterialParticleValidator>
+    {
+        public static readonly WFMaterialValidator Validator = new WFMaterialValidator(
+                targets => WFMaterialParticleValidator.instance.ValidateMaterials(targets),
+                MessageType.Warning,
+                targets => WFI18N.Translate(WFMessageText.PlzFixParticleVertexStreams),
+                targets => WFMaterialParticleValidator.instance.FixParticleSystems(targets)
+            );
+
+        public void OnEnable()
+        {
+            EditorApplication.hierarchyChanged += OnHierarchyChanged;
+        }
+
+        public void OnDestroy()
+        {
+            EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+        }
+
+        private void OnHierarchyChanged()
+        {
+            renderers = null;
+        }
+
+        private ParticleSystemRenderer[] renderers = null;
+
+        ParticleSystemRenderer[] GetSceneRenderers()
+        {
+            if (renderers != null)
+                return renderers;
+
+            var list = new List<ParticleSystemRenderer>();
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (scene.isLoaded) // SceneManagerで取るときはisLoadedを確認する
+                {
+                    foreach (var root in scene.GetRootGameObjects())
+                    {
+                        list.AddRange(root.GetComponentsInChildren<ParticleSystemRenderer>(true));
+                    }
+                }
+            }
+            return renderers = list.ToArray();
+        }
+
+        ParticleSystemRenderer[] GetRenderers(Material mat)
+        {
+            var all = GetSceneRenderers();
+            return all.Where(r => r != null && r.sharedMaterial == mat).ToArray();
+        }
+
+        public Material[] ValidateMaterials(params Material[] targets)
+        {
+            // パーティクル系シェーダを使っているマテリアルに対して
+            targets = targets.Where(mat => mat.shader.name.Contains("Particle")).ToArray();
+            if (targets.Length == 0)
+            {
+                // パーティクル系ではないときは何もしない
+                return new Material[0];
+            }
+
+            var renderers = GetSceneRenderers();
+            if (renderers.Length == 0)
+            {
+                return new Material[0];
+            }
+
+            return targets.Where(mat =>
+            {
+                GetRequiredStream(mat, out var streams, out var instancedStreams);
+                return GetRenderers(mat).Any(r =>
+                {
+                    var st = new List<ParticleSystemVertexStream>();
+                    r.GetActiveVertexStreams(st);
+                    if (IsUseMeshInstancing(r))
+                        return !st.SequenceEqual(instancedStreams);
+                    else
+                        return !st.SequenceEqual(streams);
+                });
+            }).ToArray();
+        }
+
+        public void FixParticleSystems(params Material[] targets)
+        {
+            var renderers = GetSceneRenderers();
+            if (renderers.Length == 0)
+            {
+                return;
+            }
+
+            Undo.RecordObjects(renderers.ToArray(), "Apply custom vertex streams from material");
+
+            foreach(var mat in targets)
+            {
+                GetRequiredStream(mat, out var streams, out var instancedStreams);
+                foreach(var r in GetRenderers(mat))
+                {
+                    if (IsUseMeshInstancing(r))
+                        r.SetActiveVertexStreams(instancedStreams);
+                    else
+                        r.SetActiveVertexStreams(streams);
+                }
+            }
+        }
+
+        private static bool IsUseMeshInstancing(ParticleSystemRenderer r)
+        {
+            return r.renderMode == ParticleSystemRenderMode.Mesh && r.supportsMeshInstancing;
+        }
+
+        void GetRequiredStream(Material mat, out List<ParticleSystemVertexStream> streams, out List<ParticleSystemVertexStream> instancedStreams)
+        {
+            streams = new List<ParticleSystemVertexStream>();
+            streams.Add(ParticleSystemVertexStream.Position);
+            streams.Add(ParticleSystemVertexStream.Color);
+            streams.Add(ParticleSystemVertexStream.UV);
+
+            instancedStreams = new List<ParticleSystemVertexStream>(streams);
+
+            if (WFAccessor.GetBool(mat, "_PA_UseFlipBook", false))
+            {
+                streams.Add(ParticleSystemVertexStream.UV2);
+                streams.Add(ParticleSystemVertexStream.AnimBlend);
+                instancedStreams.Add(ParticleSystemVertexStream.AnimFrame);
+            }
+        }
+
+        public IEnumerable<string> GetRequiredStreamText(Material[] mat)
+        {
+            var rs = mat.SelectMany(GetRenderers).ToArray();
+            var useGPUInstancing = rs.Any(IsUseMeshInstancing);
+            var useFlipBookBlending = mat.Any(m => WFAccessor.GetBool(m, "_PA_UseFlipBook", false));
+
+            var result = new List<string>();
+            
+            if (!useGPUInstancing)
+            {
+                result.Add("Position (POSITION.xyz)");
+                result.Add("Color(COLOR.xyzw)");
+                result.Add("UV (TEXCOORD0.xy)");
+                if (useFlipBookBlending)
+                {
+                    result.Add("UV2 (TEXCOORD0.zw)");
+                    result.Add("AnimBlend (TEXCOORD1.x)");
+                }
+            }
+            else
+            {
+                result.Add("Position (POSITION.xyz)");
+                result.Add("Color(INSTANCED0.xyzw)");
+                result.Add("UV (TEXCOORD0.xy)");
+                if (useFlipBookBlending)
+                {
+                    result.Add("AnimFrame (INSTANCED1.x)");
+                }
+            }
+
+            return result;
         }
     }
 }

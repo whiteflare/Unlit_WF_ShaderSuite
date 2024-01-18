@@ -243,6 +243,17 @@ namespace UnlitWF
                     EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeShade), MessageType.Info);
                 }
             }),
+
+            // _PA_Z_Offset の後に説明文を追加する
+            new CustomPropertyHook("_PA_Z_Offset", null, (ctx, changed) => {
+                EditorGUILayout.Space(16);
+                GUILayout.Label("Required Vertex Streams", EditorStyles.boldLabel);
+                foreach(var tex in WFMaterialParticleValidator.instance.GetRequiredStreamText(WFCommonUtility.AsMaterials(ctx.editor.targets)))
+                {
+                    GUILayout.Label(tex);
+                }
+                EditorGUILayout.Space(8);
+            }, isRegex:false),
         };
 
         private static bool IsAnyIntValue(PropertyGUIContext ctx, string name, Predicate<int> pred)

@@ -105,6 +105,8 @@ Shader "UnlitWF/WF_Particle_Multiply" {
 
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
+            #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
+            #define _WF_PREMUL_ALPHA
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
