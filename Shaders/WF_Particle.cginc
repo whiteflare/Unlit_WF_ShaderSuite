@@ -22,6 +22,10 @@
     // uniform variable
     ////////////////////////////
 
+#ifdef _PF_ENABLE
+    #define _FLIPBOOK_BLENDING
+#endif
+
     #include "WF_INPUT_UnToon.cginc"
     #include "UnityStandardParticleInstancing.cginc"
 
