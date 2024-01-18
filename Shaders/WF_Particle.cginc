@@ -167,7 +167,7 @@
         o.uv = v.uv.xy;
     #else
         o.uv = v.uv.xy;
-        o.uv2 = float3(v.uv.x, v.uv.y, v.uv2.x);
+        o.uv2 = float3(v.uv.z, v.uv.w, v.uv2.x);
     #endif
 #endif
 
@@ -189,12 +189,20 @@
         drawParticleFlipbookTex(d); // Particleテクスチャシートアニメーション
         drawParticleVertexColor(d); // 頂点カラー
 
+#ifdef _WF_PREMUL_ALPHA
+        d.color.rgb *= d.color.a;
+#endif
+
         drawAlphaMask(d);           // アルファ
         drawEmissiveScroll(d);      // エミッション
         drawFresnelAlpha(d);        // フレネル
 
         // fog
+#ifdef _WF_CUSTOM_FOG_COLOR
+        UNITY_APPLY_FOG_COLOR(i.fogCoord, d.color, _WF_CUSTOM_FOG_COLOR);
+#else
         UNITY_APPLY_FOG(i.fogCoord, d.color);
+#endif
         // Alpha は 0-1 にクランプ
         d.color.a = saturate(d.color.a);
 
