@@ -250,6 +250,8 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Transparent_Mask" {
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
         [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
+        [ToggleUI]
+            _ES_ChangeAlpha         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
 
         [Header(Emissive Scroll)]
         [ToggleUI]
