@@ -29,6 +29,7 @@ Shader "UnlitWF/WF_Particle_Addition" {
             _PA_VCBlendType         ("[PA] Vertex Color Blend Mode", Float) = 0
         [ToggleUI]
             _PA_UseFlipBook         ("[PA] Flip-Book Frame Blending", Float) = 0
+            _PA_Z_Offset            ("[PA] Z Offset", Range(-2, 2)) = 0
 
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
@@ -102,6 +103,7 @@ Shader "UnlitWF/WF_Particle_Addition" {
 
             #pragma target 3.0
 
+            #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE

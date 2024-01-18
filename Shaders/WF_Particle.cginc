@@ -104,7 +104,8 @@
 #endif
     }
 
-    uint _PA_VCBlendType;
+    uint            _PA_VCBlendType;
+    half            _PA_Z_Offset;
 
     void drawParticleVertexColor(inout drawing d) {
         switch(_PA_VCBlendType) {
@@ -143,7 +144,11 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
         o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);
+#ifndef _WF_MAIN_Z_SHIFT
+        o.vs_vertex = UnityObjectToClipPos(v.vertex.xyz);   // 通常の ToClipPos を使う
+#else
+        o.vs_vertex = shiftDepthVertex(o.ws_vertex, _WF_MAIN_Z_SHIFT);      // Zシフトした値を使う
+#endif
 
 #ifdef UNITY_PARTICLE_INSTANCING_ENABLED
         vertInstancingColor(o.vertex_color);
