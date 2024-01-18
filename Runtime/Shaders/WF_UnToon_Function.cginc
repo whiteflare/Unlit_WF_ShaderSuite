@@ -484,9 +484,6 @@ FEATURE_TGL_END
     #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
 
         float calcEmissiveWaving(inout drawing d) {
-            if (TGL_OFF(_ES_ScrollEnable)) {
-                return 1;
-            }
             float3 uv =
                     _ES_SC_DirType == 1 ? UnityWorldToObjectPos(d.ws_vertex)    // ローカル座標
                     : _ES_SC_DirType == 2 ? (                                   // UV
@@ -515,8 +512,13 @@ FEATURE_TGL_END
             return saturate(waving + _ES_SC_LevelOffset);
         }
 
+        half enableEmissiveScroll(inout drawing d) {
+            return TGL_ON(_ES_ScrollEnable);
+        }
+
     #else
         #define calcEmissiveWaving(d)       (1)
+        #define enableEmissiveScroll(d)     (0)
     #endif
 
     #if defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
@@ -538,7 +540,7 @@ FEATURE_TGL_END
             return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, au);
         }
 
-        float enableEmissiveAudioLink(inout drawing d) {
+        half enableEmissiveAudioLink(inout drawing d) {
             return TGL_ON(_ES_AuLinkEnable) ? ( AudioLinkIsAvailable() ? 1 : ( TGL_ON(_ES_AU_BlackOut) ? -1 : 0 ) ) : 0;
         }
 
@@ -549,11 +551,22 @@ FEATURE_TGL_END
 
         void drawEmissiveScroll(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_ES_Enable)
-            float au_status = enableEmissiveAudioLink(d);
+            half au_status = enableEmissiveAudioLink(d);
             if (au_status < 0) {
                 return; // Emission自体を無効にする
             }
-            float waving    = 0 < au_status ? calcEmissiveAudioLink(d) : calcEmissiveWaving(d);
+            half es_status = enableEmissiveScroll(d);
+
+            float waving;
+            if (0 < au_status) {
+                waving = calcEmissiveAudioLink(d);
+            }
+            else if(0 < es_status) {
+                waving = calcEmissiveWaving(d);
+            }
+            else {
+                waving = 1;
+            }
 
             float4 es_mask  = WF_TEX2D_EMISSION(d.uv_main);
             float4 es_color = _EmissionColor * es_mask;
@@ -569,16 +582,27 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
                 lerp(d.color.rgb, es_color.rgb, waving);
 
             // Alpha側の合成
-        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
-            if (TGL_ON(_ES_SC_AlphaScroll)) {
-                d.color.a = max(d.color.a, waving * es_power);
+#if defined(_WF_ALPHA_BLEND)
+            if (0 < au_status) {
+    #if defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+                if (0 < au_status && TGL_ON(_ES_AU_AlphaLink)) {
+                    d.color.a = max(d.color.a, waving * es_power);
+                }
+    #endif
             }
-        #endif
-        #if defined(_WF_ALPHA_BLEND) && (defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH))
-            if (TGL_ON(_ES_AU_AlphaLink) && 0 < au_status) {
-                d.color.a = max(d.color.a, waving * es_power);
+            else if(0 < es_status) {
+    #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+                if (0 < es_status && TGL_ON(_ES_SC_AlphaScroll)) {
+                    d.color.a = max(d.color.a, waving * es_power);
+                }
+    #endif
             }
-        #endif
+            else {
+                if (TGL_ON(_ES_ChangeAlpha)) {
+                    d.color.a = max(d.color.a, es_color.a * es_power);
+                }
+            }
+#endif
 FEATURE_TGL_END
         }
 
@@ -1124,18 +1148,22 @@ FEATURE_TGL_END
         }
 
         float3 calcRimLightColor(float3 color) {
-            float3 rimColor = _TR_Color.rgb - (
-                    _TR_BlendType == 0 ? MEDIAN_GRAY    // ADD_AND_SUB
-                    : _TR_BlendType == 1 ? color        // ALPHA
-                    : ZERO_VEC3                         // ADD
-                );
+            float3 rimColor =
+                    _TR_BlendType == 0 ? (_TR_Color.rgb - MEDIAN_GRAY)  // ADD_AND_SUB
+                    : _TR_BlendType == 1 ? (_TR_Color.rgb - color)      // ALPHA
+                    : _TR_BlendType == 3 ? (_TR_Color.rgb - ONE_VEC3) * color   // MUL
+                    : _TR_Color.rgb // ADD
+                ;
             return rimColor;
         }
 
         void drawRimLight(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TR_Enable)
             half angle_light_camera = d.angle_light_camera;
-            if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
+            if (_TR_BlendType == 3) {
+                angle_light_camera = -0.2; // 乗算のときは常に最大
+            }
+            else if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
             // 順光の場合はリムライトを暗くする

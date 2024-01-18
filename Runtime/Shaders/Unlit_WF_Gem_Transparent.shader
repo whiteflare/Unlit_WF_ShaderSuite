@@ -90,6 +90,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
         [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
+        [ToggleUI]
+            _ES_ChangeAlpha         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
 
         [Header(Emissive Scroll)]
         [ToggleUI]
