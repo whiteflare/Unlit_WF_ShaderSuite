@@ -741,6 +741,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PlzFixQueue, "半透明マテリアルのQueueが2500以下です。\nRenderQueueを修正しますか？"),
             new WFI18NTranslation(WFMessageText.PlzFixQueueWithClearBg, "半透明マテリアルのQueueが2500以下です。\n背景消去パスが有効化されます。"),
             new WFI18NTranslation(WFMessageText.PlzFixDoubleSidedGI, "マテリアルの DoubleSidedGI がチェックされていません。\nこのマテリアルは片面としてライトベイクされます。\nDoubleSidedGI を修正しますか？"),
+            new WFI18NTranslation(WFMessageText.PlzFixParticleVertexStreams, "ParticleSystem の VertexStreams が不一致です。\nParticleSystem の設定値を修正しますか？"),
             new WFI18NTranslation(WFMessageText.PlzQuestSupport, "このマテリアルは Quest 非対応シェーダを使用しています。"),
             new WFI18NTranslation(WFMessageText.PlzDeprecatedFeature, "今後削除される予定の機能がマテリアルから使用されています。"),
 
@@ -997,6 +998,7 @@ namespace UnlitWF
         public static readonly string PlzFixQueue = "The Queue for the transparency material is less or equal to 2500, do you want to fix the RenderQueue?";
         public static readonly string PlzFixQueueWithClearBg = "The Queue for the transparency material is less or equal to 2500.\nBackground Clear pass is activated.";
         public static readonly string PlzFixDoubleSidedGI = "The material's DoubleSidedGI is unchecked.\nThis material will be lightbaked as single sided.\nDo you want to fix DoubleSidedGI?";
+        public static readonly string PlzFixParticleVertexStreams = "Vertex Streams do not match the ParticleSystem settings.\nDo you want to fix ParticleSystem property?";
         public static readonly string PlzQuestSupport = "This material uses a shader that does not support Quest.";
         public static readonly string PlzDeprecatedFeature = "Features that will be removed in the future are used from this material.";
         public static readonly string PsAntiShadowMask = "In the Anti-Shadow Mask field, specify a mask texture with the avatar face painted white. You can also check the InvertMask checkbox to make the entire material a face.";
