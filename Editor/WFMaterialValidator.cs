@@ -380,10 +380,10 @@ namespace UnlitWF
     class WFMaterialParticleValidator : ScriptableSingleton<WFMaterialParticleValidator>
     {
         public static readonly WFMaterialValidator Validator = new WFMaterialValidator(
-                targets => WFMaterialParticleValidator.instance.ValidateMaterials(targets),
+                ValidateMaterials,
                 MessageType.Warning,
                 targets => WFI18N.Translate(WFMessageText.PlzFixParticleVertexStreams),
-                targets => WFMaterialParticleValidator.instance.FixParticleSystems(targets)
+                FixParticleSystems
             );
 
         public void OnEnable()
@@ -403,7 +403,7 @@ namespace UnlitWF
 
         private ParticleSystemRenderer[] renderers = null;
 
-        ParticleSystemRenderer[] GetSceneRenderers()
+        private ParticleSystemRenderer[] GetSceneRenderers()
         {
             if (renderers != null)
                 return renderers;
@@ -423,13 +423,13 @@ namespace UnlitWF
             return renderers = list.ToArray();
         }
 
-        ParticleSystemRenderer[] GetRenderers(Material mat)
+        private ParticleSystemRenderer[] GetRenderers(Material mat)
         {
             var all = GetSceneRenderers();
             return all.Where(r => r != null && r.sharedMaterial == mat).ToArray();
         }
 
-        public Material[] ValidateMaterials(params Material[] targets)
+        private static Material[] ValidateMaterials(params Material[] targets)
         {
             // パーティクル系シェーダを使っているマテリアルに対して
             targets = targets.Where(mat => mat.shader.name.Contains("Particle")).ToArray();
@@ -439,7 +439,7 @@ namespace UnlitWF
                 return new Material[0];
             }
 
-            var renderers = GetSceneRenderers();
+            var renderers = instance.GetSceneRenderers();
             if (renderers.Length == 0)
             {
                 return new Material[0];
@@ -448,7 +448,7 @@ namespace UnlitWF
             return targets.Where(mat =>
             {
                 GetRequiredStream(mat, out var streams, out var instancedStreams);
-                return GetRenderers(mat).Any(r =>
+                return instance.GetRenderers(mat).Any(r =>
                 {
                     var st = new List<ParticleSystemVertexStream>();
                     r.GetActiveVertexStreams(st);
@@ -460,9 +460,9 @@ namespace UnlitWF
             }).ToArray();
         }
 
-        public void FixParticleSystems(params Material[] targets)
+        private static void FixParticleSystems(params Material[] targets)
         {
-            var renderers = GetSceneRenderers();
+            var renderers = instance.GetSceneRenderers();
             if (renderers.Length == 0)
             {
                 return;
@@ -473,7 +473,7 @@ namespace UnlitWF
             foreach(var mat in targets)
             {
                 GetRequiredStream(mat, out var streams, out var instancedStreams);
-                foreach(var r in GetRenderers(mat))
+                foreach(var r in instance.GetRenderers(mat))
                 {
                     if (IsUseMeshInstancing(r))
                         r.SetActiveVertexStreams(instancedStreams);
@@ -488,7 +488,7 @@ namespace UnlitWF
             return r.renderMode == ParticleSystemRenderMode.Mesh && r.supportsMeshInstancing;
         }
 
-        void GetRequiredStream(Material mat, out List<ParticleSystemVertexStream> streams, out List<ParticleSystemVertexStream> instancedStreams)
+        private static void GetRequiredStream(Material mat, out List<ParticleSystemVertexStream> streams, out List<ParticleSystemVertexStream> instancedStreams)
         {
             streams = new List<ParticleSystemVertexStream>();
             streams.Add(ParticleSystemVertexStream.Position);
@@ -505,9 +505,14 @@ namespace UnlitWF
             }
         }
 
-        public IEnumerable<string> GetRequiredStreamText(Material[] mat)
+        public static WFMaterialValidator.Advice Validate(params Material[] targets)
         {
-            var rs = mat.SelectMany(GetRenderers).ToArray();
+            return Validator.Validate(targets);
+        }
+
+        public static IEnumerable<string> GetRequiredStreamText(Material[] mat)
+        {
+            var rs = mat.SelectMany(instance.GetRenderers).ToArray();
             var useGPUInstancing = rs.Any(IsUseMeshInstancing);
             var useFlipBookBlending = mat.Any(m => WFAccessor.GetBool(m, "_PA_UseFlipBook", false));
 

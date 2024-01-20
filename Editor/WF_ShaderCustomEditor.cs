@@ -250,13 +250,13 @@ namespace UnlitWF
 
                 EditorGUILayout.Space(8);
                 GUILayout.Label("Required Vertex Streams", EditorStyles.boldLabel);
-                foreach(var tex in WFMaterialParticleValidator.instance.GetRequiredStreamText(mats))
+                foreach(var tex in WFMaterialParticleValidator.GetRequiredStreamText(mats))
                 {
                     GUILayout.Label(tex);
                 }
                 EditorGUILayout.Space(8);
 
-                var advice = WFMaterialParticleValidator.Validator.Validate(mats);
+                var advice = WFMaterialParticleValidator.Validate(mats);
                 if (advice != null)
                 {
                     ValidatorHelpBox(ctx.editor, advice);
