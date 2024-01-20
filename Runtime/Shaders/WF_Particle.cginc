@@ -22,12 +22,7 @@
     // uniform variable
     ////////////////////////////
 
-#ifdef _PF_ENABLE
-    #define _FLIPBOOK_BLENDING
-#endif
-
-    #include "WF_INPUT_UnToon.cginc"
-    #include "UnityStandardParticleInstancing.cginc"
+    #include "WF_INPUT_Particle.cginc"
 
     ////////////////////////////
     // main structure
@@ -48,6 +43,9 @@
     struct v2f {
         float4  vs_vertex           : SV_POSITION;
         half4   vertex_color        : COLOR0;
+#ifndef _WF_FORCE_UNLIT
+        half3   light_color         : COLOR1;
+#endif
         float2  uv                  : TEXCOORD0;
 #ifdef _PF_ENABLE
         float3  uv2                 : TEXCOORD1;
@@ -69,8 +67,9 @@
         float3  uv_flip;
 #endif
         float3  ws_vertex;
-        half3   ws_view_dir;
-        half3   ws_camera_dir;
+#ifndef _WF_FORCE_UNLIT
+        half3   light_color;
+#endif
         uint    facing;
         half4   vertex_color;
     };
@@ -88,9 +87,9 @@
         d.facing        = facing;
         d.ws_vertex     = i.ws_vertex;
         d.vertex_color  = i.vertex_color;
-        d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
-        d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
-
+#ifndef _WF_FORCE_UNLIT
+        d.light_color   = i.light_color;
+#endif
         return d;
     }
 
@@ -107,9 +106,6 @@
         d.uv_main = TRANSFORM_TEX(i.uv, _MainTex);
 #endif
     }
-
-    uint            _PA_VCBlendType;
-    half            _PA_Z_Offset;
 
     void drawParticleVertexColor(inout drawing d) {
         switch(_PA_VCBlendType) {
@@ -128,12 +124,16 @@
         d.color = max(ZERO_VEC4, d.color);
     }
 
-    void drawParticleFlipbookTex(inout drawing d) {
-#ifdef _PF_ENABLE
-        half4 color2 = PICK_MAIN_TEX2D(_MainTex, d.uv_flip.xy);
-        d.color = lerp(d.color, color2, d.uv_flip.z);
-#endif
-    }
+    #ifdef _PF_ENABLE
+
+        void drawParticleFlipbookTex(inout drawing d) {
+            half4 color2 = PICK_MAIN_TEX2D(_MainTex, d.uv_flip.xy);
+            d.color = lerp(d.color, color2, d.uv_flip.z);
+        }
+
+    #else
+        #define drawParticleFlipbookTex(d)
+    #endif
 
     ////////////////////////////
     // vertex&fragment shader
@@ -171,6 +171,13 @@
     #endif
 #endif
 
+#ifndef _WF_FORCE_UNLIT
+        // 環境光取得
+        float3 ambientColor = sampleSHLightColor();
+        // Anti-Glare とライト色ブレンドを同時に計算
+        o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
+#endif
+
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
 
         return o;
@@ -194,6 +201,12 @@
 #endif
 
         drawAlphaMask(d);           // アルファ
+
+#ifndef _WF_FORCE_UNLIT
+        // Anti-Glare とライト色ブレンドを同時に計算
+        d.color.rgb *= d.light_color;
+#endif
+
         drawEmissiveScroll(d);      // エミッション
         drawFresnelAlpha(d);        // フレネル
 

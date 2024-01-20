@@ -69,6 +69,13 @@ Shader "UnlitWF/WF_Particle_Opaque" {
             _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
             _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
 
+        [WFHeader(Lit)]
+        [Gamma]
+            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
+        [Gamma]
+            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
+
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _CurrentVersion         ("2024/01/01 (1.8.0)", Float) = 0

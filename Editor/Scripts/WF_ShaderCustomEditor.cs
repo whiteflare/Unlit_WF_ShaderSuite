@@ -246,13 +246,22 @@ namespace UnlitWF
 
             // _PA_Z_Offset の後に説明文を追加する
             new CustomPropertyHook("_PA_Z_Offset", null, (ctx, changed) => {
-                EditorGUILayout.Space(16);
+                var mats = WFCommonUtility.AsMaterials(ctx.editor.targets);
+
+                EditorGUILayout.Space(8);
                 GUILayout.Label("Required Vertex Streams", EditorStyles.boldLabel);
-                foreach(var tex in WFMaterialParticleValidator.instance.GetRequiredStreamText(WFCommonUtility.AsMaterials(ctx.editor.targets)))
+                foreach(var tex in WFMaterialParticleValidator.GetRequiredStreamText(mats))
                 {
                     GUILayout.Label(tex);
                 }
                 EditorGUILayout.Space(8);
+
+                var advice = WFMaterialParticleValidator.Validate(mats);
+                if (advice != null)
+                {
+                    ValidatorHelpBox(ctx.editor, advice);
+                }
+
             }, isRegex:false),
         };
 
@@ -699,20 +708,25 @@ namespace UnlitWF
             var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
             foreach (var advice in WFMaterialValidators.ValidateAll(targets))
             {
-                if (advice.action != null)
+                ValidatorHelpBox(materialEditor, advice);
+            }
+        }
+
+        private static void ValidatorHelpBox(MaterialEditor materialEditor, WFMaterialValidator.Advice advice)
+        {
+            if (advice.action != null)
+            {
+                // 修正 action ありの場合はボタン付き
+                var messageContent = ToolCommon.GetMessageContent(advice.messageType, advice.message);
+                if (materialEditor.HelpBoxWithButton(messageContent, new GUIContent("Fix Now")))
                 {
-                    // 修正 action ありの場合はボタン付き
-                    var messageContent = ToolCommon.GetMessageContent(advice.messageType, advice.message);
-                    if (materialEditor.HelpBoxWithButton(messageContent, new GUIContent("Fix Now")))
-                    {
-                        advice.action();
-                    }
+                    advice.action();
                 }
-                else
-                {
-                    // 修正 action なしの場合はボタンなし
-                    EditorGUILayout.HelpBox(advice.message, advice.messageType, true);
-                }
+            }
+            else
+            {
+                // 修正 action なしの場合はボタンなし
+                EditorGUILayout.HelpBox(advice.message, advice.messageType, true);
             }
         }
 
