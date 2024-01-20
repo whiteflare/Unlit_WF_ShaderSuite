@@ -22,12 +22,7 @@
     // uniform variable
     ////////////////////////////
 
-#ifdef _PF_ENABLE
-    #define _FLIPBOOK_BLENDING
-#endif
-
-    #include "WF_INPUT_UnToon.cginc"
-    #include "UnityStandardParticleInstancing.cginc"
+    #include "WF_INPUT_Particle.cginc"
 
     ////////////////////////////
     // main structure
@@ -112,9 +107,6 @@
 #endif
     }
 
-    uint            _PA_VCBlendType;
-    half            _PA_Z_Offset;
-
     void drawParticleVertexColor(inout drawing d) {
         switch(_PA_VCBlendType) {
             case 0:
@@ -132,12 +124,16 @@
         d.color = max(ZERO_VEC4, d.color);
     }
 
-    void drawParticleFlipbookTex(inout drawing d) {
-#ifdef _PF_ENABLE
-        half4 color2 = PICK_MAIN_TEX2D(_MainTex, d.uv_flip.xy);
-        d.color = lerp(d.color, color2, d.uv_flip.z);
-#endif
-    }
+    #ifdef _PF_ENABLE
+
+        void drawParticleFlipbookTex(inout drawing d) {
+            half4 color2 = PICK_MAIN_TEX2D(_MainTex, d.uv_flip.xy);
+            d.color = lerp(d.color, color2, d.uv_flip.z);
+        }
+
+    #else
+        #define drawParticleFlipbookTex(d)
+    #endif
 
     ////////////////////////////
     // vertex&fragment shader
