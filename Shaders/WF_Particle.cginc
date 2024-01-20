@@ -48,6 +48,9 @@
     struct v2f {
         float4  vs_vertex           : SV_POSITION;
         half4   vertex_color        : COLOR0;
+#ifndef _WF_FORCE_UNLIT
+        half3   light_color         : COLOR1;
+#endif
         float2  uv                  : TEXCOORD0;
 #ifdef _PF_ENABLE
         float3  uv2                 : TEXCOORD1;
@@ -69,8 +72,9 @@
         float3  uv_flip;
 #endif
         float3  ws_vertex;
-        half3   ws_view_dir;
-        half3   ws_camera_dir;
+#ifndef _WF_FORCE_UNLIT
+        half3   light_color;
+#endif
         uint    facing;
         half4   vertex_color;
     };
@@ -88,9 +92,9 @@
         d.facing        = facing;
         d.ws_vertex     = i.ws_vertex;
         d.vertex_color  = i.vertex_color;
-        d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
-        d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
-
+#ifndef _WF_FORCE_UNLIT
+        d.light_color   = i.light_color;
+#endif
         return d;
     }
 
@@ -171,6 +175,13 @@
     #endif
 #endif
 
+#ifndef _WF_FORCE_UNLIT
+        // 環境光取得
+        float3 ambientColor = sampleSHLightColor();
+        // Anti-Glare とライト色ブレンドを同時に計算
+        o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
+#endif
+
         UNITY_TRANSFER_FOG(o, o.vs_vertex);
 
         return o;
@@ -194,6 +205,12 @@
 #endif
 
         drawAlphaMask(d);           // アルファ
+
+#ifndef _WF_FORCE_UNLIT
+        // Anti-Glare とライト色ブレンドを同時に計算
+        d.color.rgb *= d.light_color;
+#endif
+
         drawEmissiveScroll(d);      // エミッション
         drawFresnelAlpha(d);        // フレネル
 
