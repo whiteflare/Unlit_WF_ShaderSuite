@@ -222,4 +222,18 @@
         return d.color;
     }
 
+    float   _ObjectId;
+    float   _PassValue;
+    float4  _SelectionID;
+
+    half4 fragSceneHighlightPass(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+        frag(i, facing);
+        return float4(_ObjectId, _PassValue, 1, 1);
+    }
+
+    half4 fragScenePickingPass(v2f i, uint facing: SV_IsFrontFace) : SV_Target {
+        frag(i, facing);
+        return _SelectionID;
+    }
+
 #endif

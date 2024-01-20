@@ -24,6 +24,12 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+#if UNITY_2021_2_OR_NEWER
+using UnityEditor.SceneManagement;
+#else
+using UnityEditor.Experimental.SceneManagement;
+#endif
+
 namespace UnlitWF
 {
     class WFMaterialValidator
@@ -389,14 +395,21 @@ namespace UnlitWF
         public void OnEnable()
         {
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
+            PrefabStage.prefabStageOpened += OnPrefabStageOpened;
         }
 
         public void OnDestroy()
         {
             EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+            PrefabStage.prefabStageOpened -= OnPrefabStageOpened;
         }
 
         private void OnHierarchyChanged()
+        {
+            renderers = null;
+        }
+
+        private void OnPrefabStageOpened(PrefabStage obj)
         {
             renderers = null;
         }
@@ -409,17 +422,28 @@ namespace UnlitWF
                 return renderers;
 
             var list = new List<ParticleSystemRenderer>();
-            for (int i = 0; i < SceneManager.sceneCount; i++)
+
+            var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            if (prefabStage != null)
             {
-                Scene scene = SceneManager.GetSceneAt(i);
-                if (scene.isLoaded) // SceneManagerで取るときはisLoadedを確認する
+                var root = prefabStage.prefabContentsRoot;
+                list.AddRange(root.GetComponentsInChildren<ParticleSystemRenderer>(true));
+            }
+            else
+            {
+                for (int i = 0; i < SceneManager.sceneCount; i++)
                 {
-                    foreach (var root in scene.GetRootGameObjects())
+                    Scene scene = SceneManager.GetSceneAt(i);
+                    if (scene.isLoaded) // SceneManagerで取るときはisLoadedを確認する
                     {
-                        list.AddRange(root.GetComponentsInChildren<ParticleSystemRenderer>(true));
+                        foreach (var root in scene.GetRootGameObjects())
+                        {
+                            list.AddRange(root.GetComponentsInChildren<ParticleSystemRenderer>(true));
+                        }
                     }
                 }
             }
+
             return renderers = list.ToArray();
         }
 
@@ -501,8 +525,10 @@ namespace UnlitWF
             {
                 streams.Add(ParticleSystemVertexStream.UV2);
                 streams.Add(ParticleSystemVertexStream.AnimBlend);
-                instancedStreams.Add(ParticleSystemVertexStream.AnimFrame);
             }
+
+            // Instancing時はFlipBook使用しているか否かに関わらずAnimFrameを含める必要がある
+            instancedStreams.Add(ParticleSystemVertexStream.AnimFrame);
         }
 
         public static WFMaterialValidator.Advice Validate(params Material[] targets)
@@ -534,10 +560,7 @@ namespace UnlitWF
                 result.Add("Position (POSITION.xyz)");
                 result.Add("Color(INSTANCED0.xyzw)");
                 result.Add("UV (TEXCOORD0.xy)");
-                if (useFlipBookBlending)
-                {
-                    result.Add("AnimFrame (INSTANCED1.x)");
-                }
+                result.Add("AnimFrame (INSTANCED1.x)"); // Instancing時はFlipBook使用しているか否かに関わらずAnimFrameを含める必要がある
             }
 
             return result;

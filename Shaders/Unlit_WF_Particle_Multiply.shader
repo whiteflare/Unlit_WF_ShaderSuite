@@ -121,6 +121,80 @@ Shader "UnlitWF/WF_Particle_Multiply" {
 
             ENDCG
         }
+
+        Pass
+        {
+            Name "SceneSelectionPass"
+            Tags { "LightMode" = "SceneSelectionPass" }
+
+            BlendOp Add
+            Blend One Zero
+            ZWrite On
+            Cull Off
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment fragSceneHighlightPass
+            #pragma instancing_options procedural:vertInstancingSetup
+
+            #pragma target 3.0
+
+            #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
+            #define _WF_MOBILE
+            #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
+            #define _WF_PREMUL_ALPHA
+            #define _WF_FORCE_UNLIT
+
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _PF_ENABLE
+
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_Particle.cginc"
+
+            ENDCG
+        }
+
+        Pass
+        {
+            Name "ScenePickingPass"
+            Tags{ "LightMode" = "Picking" }
+
+            BlendOp Add
+            Blend One Zero
+            ZWrite On
+            Cull Off
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment fragScenePickingPass
+            #pragma instancing_options procedural:vertInstancingSetup
+
+            #pragma target 3.0
+
+            #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
+            #define _WF_MOBILE
+            #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
+            #define _WF_PREMUL_ALPHA
+            #define _WF_FORCE_UNLIT
+
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _PF_ENABLE
+
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #include "WF_Particle.cginc"
+
+            ENDCG
+        }
     }
 
     FallBack "Particles/Standard Unlit"
