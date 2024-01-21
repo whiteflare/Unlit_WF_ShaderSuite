@@ -396,6 +396,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/Refracted|Transparent", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("UnlitTransparent", Float) = 0
     }
 
     SubShader {

@@ -351,6 +351,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/FrostedGlass|Transparent", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("UnlitTransparent", Float) = 0
     }
 
     SubShader {

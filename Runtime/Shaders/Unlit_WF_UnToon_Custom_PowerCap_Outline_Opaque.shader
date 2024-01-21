@@ -437,6 +437,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/PowerCap_Outline|Opaque", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("Unlit", Float) = 0
     }
 
     SubShader {

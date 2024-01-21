@@ -881,6 +881,16 @@ namespace UnlitWF
         }
 
         /// <summary>
+        /// Shader から VRCFallback の値を取得する。
+        /// </summary>
+        /// <param name="shader"></param>
+        /// <returns></returns>
+        public static string GetVRCFallback(Shader shader)
+        {
+            return GetPropertyDescription(shader, "_VRCFallback");
+        }
+
+        /// <summary>
         /// Shader から QuestSupported の値を取得する。
         /// </summary>
         /// <param name="shader"></param>

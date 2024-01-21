@@ -82,6 +82,9 @@ Shader "UnlitWF/WF_Particle_Opaque" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("Unlit", Float) = 0
     }
 
     SubShader {

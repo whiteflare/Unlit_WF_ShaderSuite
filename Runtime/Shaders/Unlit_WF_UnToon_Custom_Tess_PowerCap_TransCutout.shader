@@ -457,6 +457,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_TransCutout" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/PowerCap_Tess|TransCutout", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("UnlitCutout", Float) = 0
     }
 
     SubShader {
