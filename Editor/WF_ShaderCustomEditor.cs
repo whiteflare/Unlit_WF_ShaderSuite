@@ -482,6 +482,7 @@ namespace UnlitWF
                     materialEditor.DoubleSidedGIField();
                 }
             }
+            VRCFallbackField(materialEditor);
 
             // 情報(ボトム)
             OnGuiSub_ShowCurrentShaderName(materialEditor, true);
@@ -1195,9 +1196,118 @@ namespace UnlitWF
             });
         }
 
-#endregion
+        private static readonly string[] vrcFallbackPopupLabel = { "From Shader", "Custom", "", 
+                // Unlit系列
+                "Unlit/Texture", "Unlit/Cutout", "Unlit/Transparent",
+                // Standard系列
+                "Standard/Opaque", "Standard/Cutout", "Standard/Fade", "Standard/Transparent",
+                // Unlit系列
+                "Unlit DoubleSided/Texture", "Unlit DoubleSided/Cutout", "Unlit DoubleSided/Transparent",
+                // Standard系列
+                "Standard DoubleSided/Opaque", "Standard DoubleSided/Cutout", "Standard DoubleSided/Fade", "Standard DoubleSided/Transparent",
+                // その他
+                "Hidden" };
+        private static readonly string[] vrcFallbackActualTag = { "", "", "",
+                // Unlit系列
+                "Unlit", "UnlitCutout", "UnlitTransparent",
+                // Standard系列
+                "Standard", "StandardCutout", "StandardFade", "StandardTransparent",
+                // Unlit系列
+                "UnlitDoubleSided", "UnlitCutoutDoubleSided", "UnlitTransparentDoubleSided",
+                // Standard系列
+                "StandardDoubleSided", "StandardCutoutDoubleSided", "StandardFadeDoubleSided", "StandardTransparentDoubleSided",
+                // その他
+                "Hidden" };
 
-#region PropertyHook
+        private static void VRCFallbackField(MaterialEditor materialEditor)
+        {
+            // シェーダ既定値とマテリアル現在値を取得
+            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
+            var materialTags = mats.Select(m => m.GetTag("VRCFallback", false)).Where(tag => !string.IsNullOrWhiteSpace(tag)).ToArray();
+            if (materialTags.Length == 0)
+            {
+                return;
+            }
+            var shaderTag = WFAccessor.GetVRCFallback(mats[0].shader);
+            if (shaderTag == null)
+            {
+                return; // シェーダから取得できない場合は設定もしない
+            }
+
+            // GUI用Rect算出
+            const float kQueuePopupWidth = 100f;
+            var oldLabelWidth = EditorGUIUtility.labelWidth;
+            var oldFieldWidth = EditorGUIUtility.fieldWidth;
+
+            var r = EditorGUILayout.GetControlRect();
+            EditorGUIUtility.labelWidth -= kQueuePopupWidth;
+            Rect popupRect = r;
+            popupRect.width -= EditorGUIUtility.fieldWidth + 2;
+            Rect textRect = r;
+            textRect.xMin = textRect.xMax - EditorGUIUtility.fieldWidth;
+
+            // index計算
+            int index = Array.IndexOf(vrcFallbackActualTag, materialTags[0]);
+            if (index < 0)
+            {
+                index = 1; // Custom
+            }
+            else if (shaderTag == materialTags[0])
+            {
+                index = 0; // From Shader
+            }
+
+            // GUI
+            EditorGUI.showMixedValue = 2 <= materialTags.Distinct().Count();
+            string editedTag;
+
+            EditorGUI.BeginChangeCheck();
+            index = EditorGUI.Popup(popupRect, "VRCFallback", index, vrcFallbackPopupLabel);
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (index != 1) // Customには反応しない
+                {
+                    editedTag = (index == 0 || vrcFallbackActualTag.Length <= index) ? "" // From Shader
+                        : vrcFallbackActualTag[index];
+                    if (editedTag == shaderTag)
+                    {
+                        editedTag = "";
+                    }
+                    Undo.RecordObjects(mats, "Set VRCFallback Tag");
+                    foreach (var mat in mats)
+                    {
+                        mat.SetOverrideTag("VRCFallback", editedTag);
+                        EditorUtility.SetDirty(mat);
+                    }
+                }
+            }
+
+            EditorGUI.BeginChangeCheck();
+            editedTag = EditorGUI.DelayedTextField(textRect, materialTags[0]);
+            if (EditorGUI.EndChangeCheck())
+            {
+                editedTag = editedTag.Trim();
+                if (editedTag == shaderTag)
+                {
+                    editedTag = "";
+                }
+                Undo.RecordObjects(mats, "Set VRCFallback Tag");
+                foreach (var mat in mats)
+                {
+                    mat.SetOverrideTag("VRCFallback", editedTag);
+                    EditorUtility.SetDirty(mat);
+                }
+            }
+
+            // 戻し
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+            EditorGUIUtility.fieldWidth = oldFieldWidth;
+        }
+
+        #endregion
+
+        #region PropertyHook
 
         /// <summary>
         /// PropertyHookで使用する表示コンテキスト

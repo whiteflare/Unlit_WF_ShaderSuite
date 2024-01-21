@@ -63,6 +63,9 @@ Shader "UnlitWF/Debug/WF_DebugView" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("Hidden", Float) = 0
     }
 
     SubShader

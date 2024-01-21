@@ -385,6 +385,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/ClearCoat|TransCutout", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("UnlitCutout", Float) = 0
     }
 
     SubShader {
