@@ -171,6 +171,10 @@ Shader "UnlitWF/WF_Particle_Addition" {
 
             CGPROGRAM
 
+            #pragma vertex vert
+            #pragma fragment fragScenePickingPass
+            #pragma instancing_options procedural:vertInstancingSetup
+
             #pragma target 3.0
 
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
