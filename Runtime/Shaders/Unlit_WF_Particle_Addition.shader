@@ -110,7 +110,6 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_MOBILE
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
             #define _WF_PREMUL_ALPHA
-            #define _WF_FORCE_UNLIT
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
@@ -147,7 +146,6 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_MOBILE
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
             #define _WF_PREMUL_ALPHA
-            #define _WF_FORCE_UNLIT
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
@@ -184,7 +182,6 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_MOBILE
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
             #define _WF_PREMUL_ALPHA
-            #define _WF_FORCE_UNLIT
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE

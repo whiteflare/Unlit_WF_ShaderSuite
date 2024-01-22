@@ -1262,7 +1262,7 @@ namespace UnlitWF
             string editedTag;
 
             EditorGUI.BeginChangeCheck();
-            index = EditorGUI.Popup(popupRect, "VRCFallback", index, vrcFallbackPopupLabel);
+            index = EditorGUI.Popup(popupRect, "VRC Fallback", index, vrcFallbackPopupLabel);
             if (EditorGUI.EndChangeCheck())
             {
                 if (index != 1) // Customには反応しない
