@@ -43,7 +43,7 @@
     struct v2f {
         float4  vs_vertex           : SV_POSITION;
         half4   vertex_color        : COLOR0;
-#ifndef _WF_FORCE_UNLIT
+#ifdef _GL_ENABLE
         half3   light_color         : COLOR1;
 #endif
         float2  uv                  : TEXCOORD0;
@@ -67,7 +67,7 @@
         float3  uv_flip;
 #endif
         float3  ws_vertex;
-#ifndef _WF_FORCE_UNLIT
+#ifdef _GL_ENABLE
         half3   light_color;
 #endif
         uint    facing;
@@ -87,7 +87,7 @@
         d.facing        = facing;
         d.ws_vertex     = i.ws_vertex;
         d.vertex_color  = i.vertex_color;
-#ifndef _WF_FORCE_UNLIT
+#ifdef _GL_ENABLE
         d.light_color   = i.light_color;
 #endif
         return d;
@@ -171,7 +171,7 @@
     #endif
 #endif
 
-#ifndef _WF_FORCE_UNLIT
+#ifdef _GL_ENABLE
         // 環境光取得
         float3 ambientColor = sampleSHLightColor();
         // Anti-Glare とライト色ブレンドを同時に計算
@@ -202,7 +202,7 @@
 
         drawAlphaMask(d);           // アルファ
 
-#ifndef _WF_FORCE_UNLIT
+#ifdef _GL_ENABLE
         // Anti-Glare とライト色ブレンドを同時に計算
         d.color.rgb *= d.light_color;
 #endif

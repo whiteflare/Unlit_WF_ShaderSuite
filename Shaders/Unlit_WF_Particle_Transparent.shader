@@ -86,12 +86,13 @@ Shader "UnlitWF/WF_Particle_Transparent" {
             _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
             _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
 
-        [WFHeader(Lit)]
+        [WFHeaderToggle(Lit)]
+            _GL_Enable              ("[GL] Enable", Float) = 0
         [Gamma]
-            _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
+            _GL_LevelMin            ("[GL] Unlit Intensity", Range(0, 1)) = 0.125
         [Gamma]
-            _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
-            _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
+            _GL_LevelMax            ("[GL] Saturate Intensity", Range(0, 1)) = 0.8
+            _GL_BlendPower          ("[GL] Chroma Reaction", Range(0, 1)) = 0.8
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
@@ -137,6 +138,7 @@ Shader "UnlitWF/WF_Particle_Transparent" {
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
             #pragma shader_feature_local _ES_ENABLE
+            #pragma shader_feature_local _GL_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
             #pragma multi_compile_fog
