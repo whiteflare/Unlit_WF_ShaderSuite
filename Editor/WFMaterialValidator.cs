@@ -509,7 +509,11 @@ namespace UnlitWF
 
         private static bool IsUseMeshInstancing(ParticleSystemRenderer r)
         {
+#if UNITY_2019_4_OR_NEWER
             return r.renderMode == ParticleSystemRenderMode.Mesh && r.supportsMeshInstancing;
+#else
+            return false;
+#endif
         }
 
         private static void GetRequiredStream(Material mat, out List<ParticleSystemVertexStream> streams, out List<ParticleSystemVertexStream> instancedStreams)
