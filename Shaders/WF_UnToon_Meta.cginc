@@ -41,12 +41,14 @@
     struct v2f_meta {
         float4  pos                 : SV_POSITION;
         float2  uv                  : TEXCOORD0;
+        float2  uv2                 : TEXCOORD1;
+        float3  ws_vertex           : TEXCOORD2;
 #ifdef _V2F_HAS_VERTEXCOLOR
         half4   vertex_color        : COLOR0;
 #endif
 #ifdef EDITOR_VISUALIZATION
-        float2  vizUV               : TEXCOORD1;
-        float4  lightCoord          : TEXCOORD2;
+        float2  vizUV               : TEXCOORD3;
+        float4  lightCoord          : TEXCOORD4;
 #endif
     };
 
@@ -55,7 +57,12 @@
     struct drawing {
         half4   color;
         float2  uv1;
+        float2  uv2;
         float2  uv_main;
+        float3  ws_vertex;
+#ifdef _V2F_HAS_VERTEXCOLOR
+        half4   vertex_color;
+#endif
     };
 
     drawing prepareDrawing(IN_FRAG i) {
@@ -64,6 +71,10 @@
         d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
+        d.ws_vertex     = i.ws_vertex;
+#ifdef _V2F_HAS_VERTEXCOLOR
+        d.vertex_color  = i.vertex_color;
+#endif
 
         return d;
     }
@@ -89,10 +100,12 @@
         UNITY_INITIALIZE_OUTPUT(v2f_meta, o);
 
         o.pos   = UnityMetaVertexPosition(v.vertex, v.uv1.xy, v.uv2.xy, unity_LightmapST, unity_DynamicLightmapST);
-        o.uv    = TRANSFORM_TEX(v.uv0, _MainTex);
+        o.uv = v.uv0;
+        o.uv2 = v.uv1;
 #ifdef _V2F_HAS_VERTEXCOLOR
         o.vertex_color = v.vertex_color;
 #endif
+        o.ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
 
 #ifdef EDITOR_VISUALIZATION
         if (unity_VisualizationMode == EDITORVIZ_TEXTURE) {
