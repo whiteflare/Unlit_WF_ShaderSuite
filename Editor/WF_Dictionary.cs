@@ -120,11 +120,13 @@ namespace UnlitWF
             // Particle 系列
             // ================
 
+#if UNITY_2019_1_OR_NEWER // Particle系は2018には入れないのでスキップする
             new WFShaderName("BRP", "Particle", "Basic", "Opaque",                     "UnlitWF/WF_Particle_Opaque"),
             new WFShaderName("BRP", "Particle", "Basic", "TransCutout",                "UnlitWF/WF_Particle_TransCutout"),
             new WFShaderName("BRP", "Particle", "Basic", "Transparent",                "UnlitWF/WF_Particle_Transparent"),
             new WFShaderName("BRP", "Particle", "Basic", "Addition",                   "UnlitWF/WF_Particle_Addition"),
             new WFShaderName("BRP", "Particle", "Basic", "Multiply",                   "UnlitWF/WF_Particle_Multiply"),
+#endif
 
             // ================
             // UnToon 系列(URP)
