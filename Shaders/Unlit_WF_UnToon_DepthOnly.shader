@@ -43,6 +43,9 @@ Shader "UnlitWF/WF_UnToon_DepthOnly" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/DepthOnly|DepthOnly", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("Hidden", Float) = 0
     }
 
     SubShader {

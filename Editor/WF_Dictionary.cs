@@ -117,6 +117,16 @@ namespace UnlitWF
             new WFShaderName("BRP", "Water", "FX_Lamp", "Addition",                    "UnlitWF/WF_Water_Lamp_Addition"),
 
             // ================
+            // Particle 系列
+            // ================
+
+            new WFShaderName("BRP", "Particle", "Basic", "Opaque",                     "UnlitWF/WF_Particle_Opaque"),
+            new WFShaderName("BRP", "Particle", "Basic", "TransCutout",                "UnlitWF/WF_Particle_TransCutout"),
+            new WFShaderName("BRP", "Particle", "Basic", "Transparent",                "UnlitWF/WF_Particle_Transparent"),
+            new WFShaderName("BRP", "Particle", "Basic", "Addition",                   "UnlitWF/WF_Particle_Addition"),
+            new WFShaderName("BRP", "Particle", "Basic", "Multiply",                   "UnlitWF/WF_Particle_Multiply"),
+
+            // ================
             // UnToon 系列(URP)
             // ================
 
@@ -231,6 +241,8 @@ namespace UnlitWF
                 new WFShaderFunction("WAR", "WAR", "Water Lamp&Sun Reflection"),
                 new WFShaderFunction("WMI", "WMI", "Water VRC Mirror Reflection"),
 
+                new WFShaderFunction("PA", "PA", "Particle System"),
+
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
                 new WFShaderFunction("CHM", "CHM", "3ch Color Mask"),
@@ -276,6 +288,7 @@ namespace UnlitWF
         public static readonly List<WFCustomKeywordSetting> SpecialPropNameToKeywordList = new List<WFCustomKeywordSetting>() {
             // 基本機能
             new WFCustomKeywordSettingBool("_UseVertexColor", "_VC_ENABLE"),
+            new WFCustomKeywordSettingBool("_PA_UseFlipBook", "_PF_ENABLE"),
             new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE"),
             new WFCustomKeywordSettingBool("_GL_NCC_Enable", "_GL_NCC_ENABLE"),
             new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
@@ -387,6 +400,7 @@ namespace UnlitWF
             new WFI18NTranslation("Waving 1", "波面の生成1"),
             new WFI18NTranslation("Waving 2", "波面の生成2"),
             new WFI18NTranslation("Waving 3", "波面の生成3"),
+            new WFI18NTranslation("Particle System", "パーティクル"),
             // Base
             new WFI18NTranslation("Main Texture", "メイン テクスチャ"),
             new WFI18NTranslation("Color", "マテリアルカラー"),
@@ -668,6 +682,8 @@ namespace UnlitWF
             new WFI18NTranslation("WAR", "Size", "サイズ"),
             new WFI18NTranslation("WAR", "Base Pos", "位置"),
             new WFI18NTranslation("WAR", "Hide Back", "後側を非表示"),
+            // Particle
+            new WFI18NTranslation("PA", "Vertex Color Blend Mode", "頂点カラーの混合モード"),
 
             // メニュー
             new WFI18NTranslation("Copy material", "コピー"),
@@ -692,6 +708,10 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.BlendModeTR.ADD", "加算"),
             new WFI18NTranslation("UnlitWF.BlendModeTR.ALPHA", "アルファ合成"),
             new WFI18NTranslation("UnlitWF.BlendModeTR.ADD_AND_SUB", "加算・減算"),
+            new WFI18NTranslation("UnlitWF.BlendModeTR.MUL", "乗算"),
+            new WFI18NTranslation("UnlitWF.BlendModeVC.MUL", "乗算"),
+            new WFI18NTranslation("UnlitWF.BlendModeVC.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeVC.SUB", "減算"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.AUTO", "自動"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_DIRECTIONAL_LIT", "DirectionalLightのみ"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_POINT_LIT", "PointLightのみ"),
@@ -721,6 +741,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PlzFixQueue, "半透明マテリアルのQueueが2500以下です。\nRenderQueueを修正しますか？"),
             new WFI18NTranslation(WFMessageText.PlzFixQueueWithClearBg, "半透明マテリアルのQueueが2500以下です。\n背景消去パスが有効化されます。"),
             new WFI18NTranslation(WFMessageText.PlzFixDoubleSidedGI, "マテリアルの DoubleSidedGI がチェックされていません。\nこのマテリアルは片面としてライトベイクされます。\nDoubleSidedGI を修正しますか？"),
+            new WFI18NTranslation(WFMessageText.PlzFixParticleVertexStreams, "ParticleSystem の VertexStreams が不一致です。\nParticleSystem の設定値を修正しますか？"),
             new WFI18NTranslation(WFMessageText.PlzQuestSupport, "このマテリアルは Quest 非対応シェーダを使用しています。"),
             new WFI18NTranslation(WFMessageText.PlzDeprecatedFeature, "今後削除される予定の機能がマテリアルから使用されています。"),
 
@@ -977,6 +998,7 @@ namespace UnlitWF
         public static readonly string PlzFixQueue = "The Queue for the transparency material is less or equal to 2500, do you want to fix the RenderQueue?";
         public static readonly string PlzFixQueueWithClearBg = "The Queue for the transparency material is less or equal to 2500.\nBackground Clear pass is activated.";
         public static readonly string PlzFixDoubleSidedGI = "The material's DoubleSidedGI is unchecked.\nThis material will be lightbaked as single sided.\nDo you want to fix DoubleSidedGI?";
+        public static readonly string PlzFixParticleVertexStreams = "Vertex Streams do not match the ParticleSystem settings.\nDo you want to fix ParticleSystem property?";
         public static readonly string PlzQuestSupport = "This material uses a shader that does not support Quest.";
         public static readonly string PlzDeprecatedFeature = "Features that will be removed in the future are used from this material.";
         public static readonly string PsAntiShadowMask = "In the Anti-Shadow Mask field, specify a mask texture with the avatar face painted white. You can also check the InvertMask checkbox to make the entire material a face.";

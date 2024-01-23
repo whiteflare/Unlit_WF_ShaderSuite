@@ -243,6 +243,26 @@ namespace UnlitWF
                     EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeShade), MessageType.Info);
                 }
             }),
+
+            // _PA_Z_Offset の後に説明文を追加する
+            new CustomPropertyHook("_PA_Z_Offset", null, (ctx, changed) => {
+                var mats = WFCommonUtility.AsMaterials(ctx.editor.targets);
+
+                EditorGUILayout.Space(8);
+                GUILayout.Label("Required Vertex Streams", EditorStyles.boldLabel);
+                foreach(var tex in WFMaterialParticleValidator.GetRequiredStreamText(mats))
+                {
+                    GUILayout.Label(tex);
+                }
+                EditorGUILayout.Space(8);
+
+                var advice = WFMaterialParticleValidator.Validate(mats);
+                if (advice != null)
+                {
+                    ValidatorHelpBox(ctx.editor, advice);
+                }
+
+            }, isRegex:false),
         };
 
         private static bool IsAnyIntValue(PropertyGUIContext ctx, string name, Predicate<int> pred)
@@ -454,8 +474,15 @@ namespace UnlitWF
 
             DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Material Options");
             materialEditor.RenderQueueField();
-            materialEditor.EnableInstancingField();
-            materialEditor.DoubleSidedGIField();
+            {
+                var mat = materialEditor.target as Material;
+                if (mat == null || !mat.shader.name.Contains("Particle"))
+                {
+                    materialEditor.EnableInstancingField();
+                    materialEditor.DoubleSidedGIField();
+                }
+            }
+            VRCFallbackField(materialEditor);
 
             // 情報(ボトム)
             OnGuiSub_ShowCurrentShaderName(materialEditor, true);
@@ -682,20 +709,25 @@ namespace UnlitWF
             var targets = WFCommonUtility.AsMaterials(materialEditor.targets);
             foreach (var advice in WFMaterialValidators.ValidateAll(targets))
             {
-                if (advice.action != null)
+                ValidatorHelpBox(materialEditor, advice);
+            }
+        }
+
+        private static void ValidatorHelpBox(MaterialEditor materialEditor, WFMaterialValidator.Advice advice)
+        {
+            if (advice.action != null)
+            {
+                // 修正 action ありの場合はボタン付き
+                var messageContent = ToolCommon.GetMessageContent(advice.messageType, advice.message);
+                if (materialEditor.HelpBoxWithButton(messageContent, new GUIContent("Fix Now")))
                 {
-                    // 修正 action ありの場合はボタン付き
-                    var messageContent = ToolCommon.GetMessageContent(advice.messageType, advice.message);
-                    if (materialEditor.HelpBoxWithButton(messageContent, new GUIContent("Fix Now")))
-                    {
-                        advice.action();
-                    }
+                    advice.action();
                 }
-                else
-                {
-                    // 修正 action なしの場合はボタンなし
-                    EditorGUILayout.HelpBox(advice.message, advice.messageType, true);
-                }
+            }
+            else
+            {
+                // 修正 action なしの場合はボタンなし
+                EditorGUILayout.HelpBox(advice.message, advice.messageType, true);
             }
         }
 
@@ -1164,9 +1196,118 @@ namespace UnlitWF
             });
         }
 
-#endregion
+        private static readonly string[] vrcFallbackPopupLabel = { "From Shader", "Custom", "", 
+                // Unlit系列
+                "Unlit/Texture", "Unlit/Cutout", "Unlit/Transparent",
+                // Standard系列
+                "Standard/Opaque", "Standard/Cutout", "Standard/Fade", "Standard/Transparent",
+                // Unlit系列
+                "Unlit DoubleSided/Texture", "Unlit DoubleSided/Cutout", "Unlit DoubleSided/Transparent",
+                // Standard系列
+                "Standard DoubleSided/Opaque", "Standard DoubleSided/Cutout", "Standard DoubleSided/Fade", "Standard DoubleSided/Transparent",
+                // その他
+                "Hidden" };
+        private static readonly string[] vrcFallbackActualTag = { "", "", "",
+                // Unlit系列
+                "Unlit", "UnlitCutout", "UnlitTransparent",
+                // Standard系列
+                "Standard", "StandardCutout", "StandardFade", "StandardTransparent",
+                // Unlit系列
+                "UnlitDoubleSided", "UnlitCutoutDoubleSided", "UnlitTransparentDoubleSided",
+                // Standard系列
+                "StandardDoubleSided", "StandardCutoutDoubleSided", "StandardFadeDoubleSided", "StandardTransparentDoubleSided",
+                // その他
+                "Hidden" };
 
-#region PropertyHook
+        private static void VRCFallbackField(MaterialEditor materialEditor)
+        {
+            // シェーダ既定値とマテリアル現在値を取得
+            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
+            var materialTags = mats.Select(m => m.GetTag("VRCFallback", false)).Where(tag => !string.IsNullOrWhiteSpace(tag)).ToArray();
+            if (materialTags.Length == 0)
+            {
+                return;
+            }
+            var shaderTag = WFAccessor.GetVRCFallback(mats[0].shader);
+            if (shaderTag == null)
+            {
+                return; // シェーダから取得できない場合は設定もしない
+            }
+
+            // GUI用Rect算出
+            const float kQueuePopupWidth = 100f;
+            var oldLabelWidth = EditorGUIUtility.labelWidth;
+            var oldFieldWidth = EditorGUIUtility.fieldWidth;
+
+            var r = EditorGUILayout.GetControlRect();
+            EditorGUIUtility.labelWidth -= kQueuePopupWidth;
+            Rect popupRect = r;
+            popupRect.width -= EditorGUIUtility.fieldWidth + 2;
+            Rect textRect = r;
+            textRect.xMin = textRect.xMax - EditorGUIUtility.fieldWidth;
+
+            // index計算
+            int index = Array.IndexOf(vrcFallbackActualTag, materialTags[0]);
+            if (index < 0)
+            {
+                index = 1; // Custom
+            }
+            else if (shaderTag == materialTags[0])
+            {
+                index = 0; // From Shader
+            }
+
+            // GUI
+            EditorGUI.showMixedValue = 2 <= materialTags.Distinct().Count();
+            string editedTag;
+
+            EditorGUI.BeginChangeCheck();
+            index = EditorGUI.Popup(popupRect, "VRC Fallback", index, vrcFallbackPopupLabel);
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (index != 1) // Customには反応しない
+                {
+                    editedTag = (index == 0 || vrcFallbackActualTag.Length <= index) ? "" // From Shader
+                        : vrcFallbackActualTag[index];
+                    if (editedTag == shaderTag)
+                    {
+                        editedTag = "";
+                    }
+                    Undo.RecordObjects(mats, "Set VRCFallback Tag");
+                    foreach (var mat in mats)
+                    {
+                        mat.SetOverrideTag("VRCFallback", editedTag);
+                        EditorUtility.SetDirty(mat);
+                    }
+                }
+            }
+
+            EditorGUI.BeginChangeCheck();
+            editedTag = EditorGUI.DelayedTextField(textRect, materialTags[0]);
+            if (EditorGUI.EndChangeCheck())
+            {
+                editedTag = editedTag.Trim();
+                if (editedTag == shaderTag)
+                {
+                    editedTag = "";
+                }
+                Undo.RecordObjects(mats, "Set VRCFallback Tag");
+                foreach (var mat in mats)
+                {
+                    mat.SetOverrideTag("VRCFallback", editedTag);
+                    EditorUtility.SetDirty(mat);
+                }
+            }
+
+            // 戻し
+            EditorGUI.showMixedValue = false;
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+            EditorGUIUtility.fieldWidth = oldFieldWidth;
+        }
+
+        #endregion
+
+        #region PropertyHook
 
         /// <summary>
         /// PropertyHookで使用する表示コンテキスト
@@ -2155,6 +2296,14 @@ namespace UnlitWF
         ADD = 2,
         ALPHA = 1,
         ADD_AND_SUB = 0,
+        MUL = 3,
+    }
+
+    public enum BlendModeVC // パーティクル用
+    {
+        MUL = 0,
+        ADD = 1,
+        SUB = 2,
     }
 
     public enum SunSourceMode
