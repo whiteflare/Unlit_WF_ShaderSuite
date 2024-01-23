@@ -52,6 +52,17 @@ namespace UnlitWF.Converter
         }
     }
 
+    [Serializable]
+    public class AbortAndResetConvertException : Exception
+    {
+        public AbortAndResetConvertException() { }
+        public AbortAndResetConvertException(string message) : base(message) { }
+        public AbortAndResetConvertException(string message, Exception inner) : base(message, inner) { }
+        protected AbortAndResetConvertException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
     abstract class AbstractMaterialConverter<CTX> where CTX : ConvertContext
     {
         private readonly List<Action<CTX>> converters;
@@ -87,12 +98,21 @@ namespace UnlitWF.Converter
                 }
 
                 var ctx = CreateContext(mat);
-                foreach (var cnv in converters)
+                try
                 {
-                    cnv(ctx);
+                    foreach (var cnv in converters)
+                    {
+                        cnv(ctx);
+                    }
+                    count++;
+                    OnAfterConvert(ctx);
                 }
-                count++;
-                OnAfterConvert(ctx);
+                catch (AbortAndResetConvertException ex)
+                {
+                    OnAbortConvert(ctx, ex);
+                    EditorUtility.CopySerializedIfDifferent(ctx.oldMaterial, ctx.target);
+                    EditorUtility.SetDirty(ctx.target);
+                }
             }
             OnAfterExecute(mats, count);
             return count;
@@ -114,6 +134,11 @@ namespace UnlitWF.Converter
         protected virtual void OnSkipConvert(Material mat)
         {
 
+        }
+
+        protected virtual void OnAbortConvert(CTX ctx, AbortAndResetConvertException ex)
+        {
+            Debug.LogWarningFormat("[WF] {0} {1}: Abort Convert", GetShortName(), ctx.target);
         }
 
         /// <summary>
@@ -513,63 +538,70 @@ namespace UnlitWF.Converter
                     // _GI_Intensity は UTS が保持しているが、UnToon でも過去に同名プロパティを持っていてマイグレーション対象にしているため削除する
                 },
                 ctx => {
+                    var changed = false;
                     if (WFCommonUtility.IsURP()) {
                         switch(ctx.renderType) {
                             case ShaderType.Transparent:
-                                WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Transparent", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Transparent", ctx.target);
                                 break;
                             case ShaderType.Cutout:
-                                WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_TransCutout", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_TransCutout", ctx.target);
                                 break;
                             default:
-                                WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Opaque", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF_URP/WF_UnToon_Opaque", ctx.target);
                                 break;
                         }
                     }
+#if UNITY_2019_1_OR_NEWER // Particle系は2018には入れないのでスキップする
                     else if (ctx.particle) {
                         switch(ctx.renderType) {
                             case ShaderType.Opaque:
-                                WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_Opaque", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_Opaque", ctx.target);
                                 break;
                             case ShaderType.Cutout:
-                                WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_TransCutout", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_TransCutout", ctx.target);
                                 break;
                             case ShaderType.Transparent:
-                                WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_Transparent", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_Transparent", ctx.target);
                                 break;
                             case ShaderType.Additive:
-                                WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_Addition", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_Addition", ctx.target);
                                 break;
                             default:
-                                WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_Transparent", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/WF_Particle_Transparent", ctx.target);
                                 break;
                         }
                     }
+#endif
                     else if (ctx.outline) {
                         switch(ctx.renderType) {
                             case ShaderType.Transparent:
-                                WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", ctx.target);
                                 break;
                             case ShaderType.Cutout:
-                                WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout", ctx.target);
                                 break;
                             default:
-                                WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", ctx.target);
                                 break;
                         }
                     }
                     else {
                         switch(ctx.renderType) {
                             case ShaderType.Transparent:
-                                WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Transparent", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Transparent", ctx.target);
                                 break;
                             case ShaderType.Cutout:
-                                WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_TransCutout", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_TransCutout", ctx.target);
                                 break;
                             default:
-                                WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Opaque", ctx.target);
+                                changed |= WFCommonUtility.ChangeShader("UnlitWF/WF_UnToon_Opaque", ctx.target);
                                 break;
                         }
+                    }
+                    // 変更に失敗した場合は変換を中止
+                    if (!changed) {
+                        throw new AbortAndResetConvertException();
                     }
                     // シェーダ切り替え後に RenderQueue をコピー
                     if (ctx.target.renderQueue != ctx.oldMaterial.renderQueue)
