@@ -317,50 +317,53 @@ namespace UnlitWF
         /// </summary>
         /// <param name="name"></param>
         /// <param name="mats"></param>
-        public static void ChangeShader(string name, params Material[] mats)
+        public static bool ChangeShader(string name, params Material[] mats)
         {
             if (string.IsNullOrWhiteSpace(name) || mats.Length == 0)
             {
-                return; // なにもしない
+                return false; // なにもしない
             }
-            var newShader = FindShader(name);
-            if (newShader != null)
-            {
-                Undo.RecordObjects(mats, "change shader");
-                foreach (var m in mats)
-                {
-                    if (m == null)
-                    {
-                        continue;
-                    }
-                    var oldM = new Material(m);
 
-                    // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
-                    if (WF_DebugViewEditor.IsSupportedShader(newShader))
-                    {
-                        WF_DebugViewEditor.PreChangeShader(m, oldM.shader, newShader);
-                    }
-                    else if (ShaderCustomEditor.IsSupportedShader(newShader))
-                    {
-                        ShaderCustomEditor.PreChangeShader(m, oldM.shader, newShader);
-                    }
-                    // マテリアルにシェーダ割り当て
-                    m.shader = newShader;
-                    // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
-                    if (WF_DebugViewEditor.IsSupportedShader(newShader))
-                    {
-                        WF_DebugViewEditor.PostChangeShader(oldM, m, oldM.shader, newShader);
-                    }
-                    else if (ShaderCustomEditor.IsSupportedShader(newShader))
-                    {
-                        ShaderCustomEditor.PostChangeShader(oldM, m, oldM.shader, newShader);
-                    }
-                }
-            }
-            else
+            var newShader = FindShader(name);
+            if (newShader == null)
             {
                 Debug.LogErrorFormat("[WF][Common] Shader Not Found in this projects: {0}", name);
+                return false;
             }
+
+            Undo.RecordObjects(mats, "change shader");
+            var changed = false;
+            foreach (var m in mats)
+            {
+                if (m == null)
+                {
+                    continue;
+                }
+                var oldM = new Material(m);
+
+                // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
+                if (WF_DebugViewEditor.IsSupportedShader(newShader))
+                {
+                    WF_DebugViewEditor.PreChangeShader(m, oldM.shader, newShader);
+                }
+                else if (ShaderCustomEditor.IsSupportedShader(newShader))
+                {
+                    ShaderCustomEditor.PreChangeShader(m, oldM.shader, newShader);
+                }
+                // マテリアルにシェーダ割り当て
+                m.shader = newShader;
+                // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
+                if (WF_DebugViewEditor.IsSupportedShader(newShader))
+                {
+                    WF_DebugViewEditor.PostChangeShader(oldM, m, oldM.shader, newShader);
+                }
+                else if (ShaderCustomEditor.IsSupportedShader(newShader))
+                {
+                    ShaderCustomEditor.PostChangeShader(oldM, m, oldM.shader, newShader);
+                }
+                changed |= true;
+            }
+            return changed;
         }
 
         /// <summary>
