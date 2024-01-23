@@ -248,13 +248,17 @@ namespace UnlitWF
             new CustomPropertyHook("_PA_Z_Offset", null, (ctx, changed) => {
                 var mats = WFCommonUtility.AsMaterials(ctx.editor.targets);
 
+#if UNITY_2019_1_OR_NEWER
                 EditorGUILayout.Space(8);
+#endif
                 GUILayout.Label("Required Vertex Streams", EditorStyles.boldLabel);
                 foreach(var tex in WFMaterialParticleValidator.GetRequiredStreamText(mats))
                 {
                     GUILayout.Label(tex);
                 }
+#if UNITY_2019_1_OR_NEWER
                 EditorGUILayout.Space(8);
+#endif
 
                 var advice = WFMaterialParticleValidator.Validate(mats);
                 if (advice != null)
@@ -1305,9 +1309,9 @@ namespace UnlitWF
             EditorGUIUtility.fieldWidth = oldFieldWidth;
         }
 
-        #endregion
+#endregion
 
-        #region PropertyHook
+#region PropertyHook
 
         /// <summary>
         /// PropertyHookで使用する表示コンテキスト
