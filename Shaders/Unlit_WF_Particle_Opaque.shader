@@ -25,7 +25,7 @@ Shader "UnlitWF/WF_Particle_Opaque" {
             _CullMode               ("Cull Mode", int) = 2
 
         [WFHeader(Particle System)]
-        [WF_Enum(UnlitWF.BlendModeVC,MUL,ADD,SUB,OVERLAY,COLOR,DIFFERENCE)]
+        [WF_Enum(UnlitWF.BlendModeVC,MUL,ADD,SUB)]
             _PA_VCBlendType         ("[PA] Vertex Color Blend Mode", Float) = 0
         [ToggleUI]
             _PA_UseFlipBook         ("[PA] Flip-Book Frame Blending", Float) = 0
