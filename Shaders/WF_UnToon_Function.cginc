@@ -635,7 +635,7 @@ FEATURE_TGL_END
 FEATURE_TGL_ON_BEGIN(_NM_Enable)
             // NormalMap は陰影として描画する
             // 影側を暗くしすぎないために、ws_normal と ws_bump_normal の差を乗算することで明暗を付ける
-            d.color.rgb *= max(0.0, 1.0 + (dot(d.ws_bump_normal, d.ws_light_dir.xyz) - dot(d.ws_normal, d.ws_light_dir.xyz)) * _NM_Power * 2);
+            d.color.rgb *= max(0.0, 1.0 + (dot(d.ws_bump_normal, d.ws_light_dir) - dot(d.ws_normal, d.ws_light_dir)) * _NM_Power * 2);
 FEATURE_TGL_END
         }
 
@@ -757,7 +757,7 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
                 // スペキュラ
                 float3 specular = ZERO_VEC3;
                 if (0.01 < _MT_Specular) {
-                    specular = pickSpecular(d.ws_camera_dir, ws_metal_normal, d.ws_light_dir.xyz, d.light_color.rgb * d.color.rgb, specSmooth);
+                    specular = pickSpecular(d.ws_camera_dir, ws_metal_normal, d.ws_light_dir, d.light_color.rgb * d.color.rgb, specSmooth);
                 }
 
                 // 合成
@@ -1079,7 +1079,7 @@ FEATURE_TGL_ON_BEGIN(_TS_Enable)
 #ifdef _NS_ENABLE
             ws_shade_normal = lerpNormals(ws_shade_normal, d.ws_detail_normal, _TS_BlendNormal2);
 #endif
-            float brightness = lerp(dot(ws_shade_normal, d.ws_light_dir.xyz), 1, 0.5);  // 0.0 ～ 1.0
+            float brightness = lerp(dot(ws_shade_normal, d.ws_light_dir), 1, 0.5);  // 0.0 ～ 1.0
 
             // アンチシャドウマスク加算
             float anti_shade = WF_TEX2D_SHADE_MASK(d.uv_main);
