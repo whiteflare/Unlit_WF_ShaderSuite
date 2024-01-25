@@ -227,7 +227,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB)]
+        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB,MUL)]
             _TR_BlendType           ("[TR] Blend Type", Float) = 0
             _TR_Power               ("[TR] Power", Range(0, 2)) = 1
             _TR_Feather             ("[TR] Feather", Range(0, 0.2)) = 0.05
@@ -333,7 +333,7 @@ Shader "UnlitWF_URP/WF_UnToon_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/01/01 (1.8.0)", Float) = 0
+            _CurrentVersion         ("2024/01/28 (1.9.0)", Float) = 0
     }
 
     SubShader {
