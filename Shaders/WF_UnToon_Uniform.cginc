@@ -164,6 +164,7 @@
     FEATURE_TGL    (_ES_Enable);
     half4           _EmissionColor;
     uint            _ES_BlendType;
+    half            _ES_ChangeAlpha;
 
     half            _ES_ScrollEnable;
     uint            _ES_SC_Shape;

@@ -54,7 +54,7 @@
         float2  uv                  : TEXCOORD0;
         float2  uv2                 : TEXCOORD1;
         float3  ws_vertex           : TEXCOORD2;
-        half4   ws_light_dir        : TEXCOORD3;
+        half3   ws_light_dir        : TEXCOORD3;
         half3   ws_normal           : TEXCOORD4;
 #ifdef _V2F_HAS_TANGENT
         half3   ws_tangent          : TEXCOORD5;
@@ -176,7 +176,8 @@
 #endif
         o.uv = v.uv;
         o.uv2 = v.uv2;
-        o.ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+        half4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
+        o.ws_light_dir = ws_light_dir.xyz;
 
 #ifdef _V2F_HAS_TANGENT
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FlipMirror & 1, _FlipMirror & 2);
@@ -187,7 +188,7 @@
         // 環境光取得
         float3 ambientColor = calcAmbientColorVertex(v.uv2);
         // 影コントラスト
-        calcToonShadeContrast(o.ws_vertex, o.ws_light_dir, ambientColor, o.shadow_power);
+        calcToonShadeContrast(o.ws_vertex, ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 
@@ -209,7 +210,7 @@
         prepareMainTex(i, d);
         prepareBumpNormal(i, d);
         prepareDetailNormal(i, d);
-        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
+        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir);
         d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
 
         drawMainTex(d);             // メインテクスチャ
