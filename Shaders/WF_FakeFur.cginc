@@ -254,7 +254,7 @@
 
         prepareMainTex(i, d);
         prepareBumpNormal(i, d);
-        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir.xyz);
+        d.angle_light_camera    = calcAngleLightCamera(d.ws_vertex, d.ws_light_dir);
 
         drawMainTex(d);             // メインテクスチャ
         drawAlphaMask(d);           // アルファ

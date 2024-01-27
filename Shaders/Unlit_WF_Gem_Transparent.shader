@@ -90,6 +90,8 @@ Shader "UnlitWF/WF_Gem_Transparent" {
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
         [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
+        [ToggleUI]
+            _ES_ChangeAlpha         ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
 
         [Header(Emissive Scroll)]
         [ToggleUI]
@@ -154,13 +156,16 @@ Shader "UnlitWF/WF_Gem_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/01/01 (1.8.0)", Float) = 0
+            _CurrentVersion         ("2024/01/28 (1.9.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
+        [HideInInspector]
+        [WF_FixFloat(0.0)]
+            _VRCFallback            ("UnlitTransparent", Float) = 0
     }
 
     SubShader {
