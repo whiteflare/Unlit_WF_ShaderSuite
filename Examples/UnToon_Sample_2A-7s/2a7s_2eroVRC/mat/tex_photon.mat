@@ -84,6 +84,7 @@ Material:
     - _ES_AU_Slope: 0.2
     - _ES_AuLinkEnable: 1
     - _ES_BlendType: 0
+    - _ES_ChangeAlpha: 0
     - _ES_Enable: 1
     - _ES_SC_AlphaScroll: 1
     - _ES_SC_DirType: 0
@@ -130,12 +131,13 @@ Material:
     - _TR_BlendType: 0
     - _TR_DisableBackLit: 0
     - _TR_Enable: 0
+    - _TR_Exponent: 1
     - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
-    - _TR_Power: 1
-    - _TR_PowerBottom: 0.1
-    - _TR_PowerSide: 0.1
-    - _TR_PowerTop: 0.05
+    - _TR_Width: 0.05
+    - _TR_WidthBottom: 1
+    - _TR_WidthSide: 1
+    - _TR_WidthTop: 0.5
     - _TS_1stBorder: 0.4
     - _TS_1stFeather: 0.05
     - _TS_2ndBorder: 0.2
@@ -151,6 +153,7 @@ Material:
     - _TS_Power: 1
     - _TS_Steps: 2
     - _UseVertexColor: 0
+    - _VRCFallback: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ES_SC_Direction: {r: 0, g: 10, b: 0, a: 0}
