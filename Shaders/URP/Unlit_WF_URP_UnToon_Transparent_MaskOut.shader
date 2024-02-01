@@ -250,8 +250,9 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
             _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
         [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB,MUL)]
             _TR_BlendType           ("[TR] Blend Type", Float) = 0
-            _TR_Power               ("[TR] Power", Range(0, 2)) = 1
-            _TR_Feather             ("[TR] Feather", Range(0, 0.2)) = 0.05
+            _TR_Width               ("[TR] Width", Range(0, 1)) = 0.05
+            _TR_Feather             ("[TR] Feather", Range(0, 1)) = 0.05
+            _TR_Exponent            ("[TR] Exponent", Range(1, 8)) = 1
             _TR_BlendNormal         ("[TR] Blend Normal", Range(0, 1)) = 0
             _TR_BlendNormal2        ("[TR] Blend Normal 2nd", Range(0, 1)) = 0
         [NoScaleOffset]
@@ -259,9 +260,9 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_MaskOut" {
         [ToggleUI]
             _TR_InvMaskVal          ("[TR] Invert Mask Value", Range(0, 1)) = 0
         [Header(RimLight Advance)]
-            _TR_PowerTop            ("[TR] Power Top", Range(0, 0.5)) = 0.05
-            _TR_PowerSide           ("[TR] Power Side", Range(0, 0.5)) = 0.1
-            _TR_PowerBottom         ("[TR] Power Bottom", Range(0, 0.5)) = 0.1
+            _TR_WidthTop            ("[TR] Width Top", Range(0, 1)) = 0.5
+            _TR_WidthSide           ("[TR] Width Side", Range(0, 1)) = 1
+            _TR_WidthBottom         ("[TR] Width Bottom", Range(0, 1)) = 1
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 

@@ -527,11 +527,12 @@ namespace UnlitWF
             new WFI18NTranslation("TS", "Dont Ajust Contrast", "影コントラストを調整しない"),
             // RimLight
             new WFI18NTranslation("TR", "Rim Color", "リムライト色"),
-            new WFI18NTranslation("TR", "Power", "強度(マスター)"),
-            new WFI18NTranslation("TR", "Feather", "境界のぼかし強度"),
-            new WFI18NTranslation("TR", "Power Top", "強度(上)"),
-            new WFI18NTranslation("TR", "Power Side", "強度(横)"),
-            new WFI18NTranslation("TR", "Power Bottom", "強度(下)"),
+            new WFI18NTranslation("TR", "Width", "幅"),
+            new WFI18NTranslation("TR", "Width Top", "幅(上)"),
+            new WFI18NTranslation("TR", "Width Side", "幅(横)"),
+            new WFI18NTranslation("TR", "Width Bottom", "幅(下)"),
+            new WFI18NTranslation("TR", "Feather", "ぼかし幅"),
+            new WFI18NTranslation("TR", "Exponent", "ぼかし指数"),
             new WFI18NTranslation("TR", "Assign MainTex to MaskTexture", "MainTexをマスクに設定する"),
             // Overlay Texture
             new WFI18NTranslation("OVL", "Overlay Color", "オーバーレイ テクスチャ"),
