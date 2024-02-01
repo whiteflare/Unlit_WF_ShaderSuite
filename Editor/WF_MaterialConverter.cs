@@ -891,7 +891,7 @@ namespace UnlitWF.Converter
 
     static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 8;
+        public const int VERSION = 9;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         /// <summary>
@@ -1140,7 +1140,7 @@ namespace UnlitWF.Converter
             PropertyNameReplacement.Group("2023/08/27"),
             PropertyNameReplacement.Match("_GL_DisableBackLit", "_TS_DisableBackLit"), // 後でTRにもコピーする
 
-            PropertyNameReplacement.Group("2024/01/28"),
+            PropertyNameReplacement.Group("2024/01/28"), // TODO 後で変更
             PropertyNameReplacement.Match("_TR_Power", "_TR_Width"),
             PropertyNameReplacement.Match("_TR_PowerTop", "_TR_WidthTop"),
             PropertyNameReplacement.Match("_TR_PowerSide", "_TR_WidthSide"),
