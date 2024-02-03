@@ -63,6 +63,7 @@ Material:
     - _TL_LineWidth: 0.3
     - _TL_Z_Shift: 0
     - _UseVertexColor: 0
+    - _VRCFallback: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
