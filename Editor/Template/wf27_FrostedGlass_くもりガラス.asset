@@ -263,7 +263,7 @@ Material:
     - _TR_Exponent: 1
     - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
-    - _TR_Width: 0.05
+    - _TR_Width: 0.1
     - _TR_WidthBottom: 1
     - _TR_WidthSide: 1
     - _TR_WidthTop: 0.5

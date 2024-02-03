@@ -1237,7 +1237,7 @@ namespace UnlitWF.Converter
                     // _TR_Powerありの状態から_TR_Widthに変更されたならば、
                     if (HasOldProperty(ctx, "_TR_Power") && HasNewProperty(ctx, "_TR_Width"))
                     {
-                        WFAccessor.SetFloat(ctx.target, "_TR_Width", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_Width", 1) * 0.05f, 0, 1));
+                        WFAccessor.SetFloat(ctx.target, "_TR_Width", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_Width", 1) * 0.1f, 0, 1));
                         WFAccessor.SetFloat(ctx.target, "_TR_WidthTop", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthTop", 1) * 10, 0, 1));
                         WFAccessor.SetFloat(ctx.target, "_TR_WidthSide", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthSide", 1) * 10, 0, 1));
                         WFAccessor.SetFloat(ctx.target, "_TR_WidthBottom", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthBottom", 1) * 10, 0, 1));
