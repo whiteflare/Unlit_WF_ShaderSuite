@@ -66,17 +66,8 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_GL_ShadowCutoff", ctx => IsAnyIntValue(ctx, "_GL_CastShadow", p => 1 <= p), isRegex:false),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5), isRegex:false),
-            new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx => {
-                switch(WFCommonUtility.GetCurrentEntironment())
-                {
-                    case CurrentEntironment.VRCSDK3_Avatar:
-                        return WFEditorSetting.GetOneOfSettings().enableNccInVRC3Avatar == NearClipCancelMode.PerMaterial;
-                    case CurrentEntironment.VRCSDK3_World:
-                        return WFEditorSetting.GetOneOfSettings().enableNccInVRC3World == NearClipCancelMode.PerMaterial;
-                    default:
-                        return true;
-                }
-            }, isRegex:false),
+            new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx => WFEditorSetting.GetOneOfSettings().GetEnableNccInCurrentEnvironment() == MatForceSettingMode.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_T[SR]_DisableBackLit", ctx => WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode.PerMaterial),
             // 条件付きHide(Grass系列)
             new ConditionVisiblePropertyHook("_GRS_WorldYBase|_GRS_WorldYScale", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 0)),
             new ConditionVisiblePropertyHook("_GRS_HeightUVType", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1 || p == 2), isRegex:false),
