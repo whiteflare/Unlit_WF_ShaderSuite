@@ -112,13 +112,16 @@ namespace UnlitWF
                         }
                         else
                         {
-                            if (WFAccessor.GetBool(target, "_TS_Enable", false) && !WFAccessor.GetBool(target, "_TS_DisableBackLit", true))
+                            if (WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode.PerMaterial)
                             {
-                                return true;
-                            }
-                            if (WFAccessor.GetBool(target, "_TR_Enable", false) && !WFAccessor.GetBool(target, "_TR_DisableBackLit", true))
-                            {
-                                return true;
+                                if (WFAccessor.GetBool(target, "_TS_Enable", false) && !WFAccessor.GetBool(target, "_TS_DisableBackLit", true))
+                                {
+                                    return true;
+                                }
+                                if (WFAccessor.GetBool(target, "_TR_Enable", false) && !WFAccessor.GetBool(target, "_TR_DisableBackLit", true))
+                                {
+                                    return true;
+                                }
                             }
                         }
                         // それ以外は設定不要
@@ -137,13 +140,16 @@ namespace UnlitWF
                     {
                         WFAccessor.SetBool(mat, "_GL_DisableBackLit", true);
                         WFAccessor.SetBool(mat, "_GL_DisableBasePos", true);
-                        if (WFAccessor.GetBool(mat, "_TS_Enable", false))
+                        if (WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode.PerMaterial)
                         {
-                            WFAccessor.SetBool(mat, "_TS_DisableBackLit", true);
-                        }
-                        if (WFAccessor.GetBool(mat, "_TR_Enable", false))
-                        {
-                            WFAccessor.SetBool(mat, "_TR_DisableBackLit", true);
+                            if (WFAccessor.GetBool(mat, "_TS_Enable", false))
+                            {
+                                WFAccessor.SetBool(mat, "_TS_DisableBackLit", true);
+                            }
+                            if (WFAccessor.GetBool(mat, "_TR_Enable", false))
+                            {
+                                WFAccessor.SetBool(mat, "_TR_DisableBackLit", true);
+                            }
                         }
                     }
                 }

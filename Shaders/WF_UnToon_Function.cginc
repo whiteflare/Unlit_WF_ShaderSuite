@@ -1133,18 +1133,23 @@ FEATURE_TGL_END
     #ifdef _TR_ENABLE
 
         float calcRimLightPower(float3 vs_normal) {
-            float side      = _TR_Power * _TR_PowerSide;
-            float top       = _TR_Power * _TR_PowerTop;
-            float bottom    = _TR_Power * _TR_PowerBottom;
+            float rimPower = length(vs_normal.xy);
+            if (rimPower < NZF) {
+                return 0;
+            }
+            else {
+                float2 dir_vec = vs_normal.xy / rimPower;
+                dir_vec.x *= _TR_WidthSide * 2;
+                dir_vec.y *= (_TR_WidthTop + _TR_WidthBottom);
+                dir_vec.y += (_TR_WidthTop - _TR_WidthBottom);
 
-            half3x3 mat = 0;
-            mat[0][0] = side + 1;
-            mat[1][1] = (top + bottom) / 2 + 1;
-            mat[1][2] = (top - bottom) / 2;
+                float dir_pwr = length(dir_vec);
+                float width = _TR_Width * 0.1;
+                float2 rim_max = 1 - width * dir_pwr;
+                float2 rim_min = 1 - (width + _TR_Feather) * dir_pwr;
 
-            float2 rim_uv = mul(mat, float3(vs_normal.xy, 1)).xy;
-
-            return smoothstep(-NZF, _TR_Feather, length(rim_uv) - 1);
+                return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TR_Exponent));
+            }
         }
 
         float3 calcRimLightColor(float3 color) {
