@@ -373,7 +373,10 @@ namespace UnlitWF
         {
             if (mm != null && mm.shader != null)
             {
-                return mm.shader.name.Contains("UnlitWF") && !mm.shader.name.Contains("Debug");
+                if (mm.shader.name.Contains("UnlitWF") && !mm.shader.name.Contains("Debug"))
+                {
+                    return mm.shader.name.Contains("URP") == WFCommonUtility.IsURP();
+                }
             }
             return false;
         }
