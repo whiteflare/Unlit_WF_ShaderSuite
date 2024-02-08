@@ -235,9 +235,11 @@ FEATURE_TGL_END
                 float fa = 1 - abs( dot( d.ws_normal, d.ws_view_dir ) );
                 d.color.a = lerp( d.color.a, maxValue, fa * fa * fa * fa );
             #endif
-            if (d.color.a <= 0) {
-                discard;
-            }
+            #ifndef _WF_PB_GRAB_TEXTURE
+                if (d.color.a <= 0) {
+                    discard;
+                }
+            #endif
         }
     #else
         #define drawAlphaMask(d) d.color.a = 1.0
