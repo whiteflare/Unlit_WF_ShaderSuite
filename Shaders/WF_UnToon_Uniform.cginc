@@ -296,14 +296,15 @@
     FEATURE_TGL    (_TR_Enable);
     half3           _TR_Color;
     uint            _TR_BlendType;
-    half            _TR_Power;
+    half            _TR_Width;
     half            _TR_Feather;
+    half            _TR_Exponent;
     half            _TR_InvMaskVal;
     half            _TR_BlendNormal;
     half            _TR_BlendNormal2;
-    half            _TR_PowerTop;
-    half            _TR_PowerSide;
-    half            _TR_PowerBottom;
+    half            _TR_WidthTop;
+    half            _TR_WidthSide;
+    half            _TR_WidthBottom;
     half            _TR_DisableBackLit;
 
     // -------------------------

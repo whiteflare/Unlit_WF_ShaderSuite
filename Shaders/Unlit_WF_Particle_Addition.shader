@@ -71,7 +71,7 @@ Shader "UnlitWF/WF_Particle_Addition" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/01/28 (1.9.0)", Float) = 0
+            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -109,7 +109,7 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
-            #define _WF_PREMUL_ALPHA
+            #define _WF_PREMUL_ALPHA d.color.rgb *= d.color.a; if (MAX_RGB(d.color.rgb) <= 0) { discard; }
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
@@ -145,7 +145,7 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
-            #define _WF_PREMUL_ALPHA
+            #define _WF_PREMUL_ALPHA d.color.rgb *= d.color.a; if (MAX_RGB(d.color.rgb) <= 0) { discard; }
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
@@ -181,7 +181,7 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
-            #define _WF_PREMUL_ALPHA
+            #define _WF_PREMUL_ALPHA d.color.rgb *= d.color.a; if (MAX_RGB(d.color.rgb) <= 0) { discard; }
 
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
