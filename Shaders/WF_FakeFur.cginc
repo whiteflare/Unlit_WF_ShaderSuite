@@ -82,6 +82,7 @@
         half3   ws_light_dir;
         half    angle_light_camera;
         half3   light_color;
+        uint    facing;
 #ifdef _V2F_HAS_SHADOWPOWER
         half    shadow_power;
 #endif
@@ -92,6 +93,7 @@
 
         d.color         = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
+        d.facing        = 1; // furは常にfacing=1
         d.uv_main       = i.uv;
         d.ws_vertex     = i.ws_vertex;
         d.light_color   = i.light_color;
