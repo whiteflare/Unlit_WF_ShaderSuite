@@ -69,6 +69,7 @@ Material:
     - _ES_AU_Slope: 0.2
     - _ES_AuLinkEnable: 0
     - _ES_BlendType: 0
+    - _ES_ChangeAlpha: 0
     - _ES_Enable: 0
     - _ES_SC_AlphaScroll: 0
     - _ES_SC_DirType: 0
@@ -105,8 +106,10 @@ Material:
     - _GMR_Monochrome: 1
     - _GMR_Power: 1
     - _NM_Enable: 0
+    - _NM_InvConvex: 0
     - _QuestSupported: 0
     - _UseVertexColor: 0
+    - _VRCFallback: 0
     m_Colors:
     - _Color: {r: 0.61931795, g: 0.9435569, b: 0.8464332, a: 1}
     - _DSV_SparkColor: {r: 1, g: 1, b: 1, a: 1}
