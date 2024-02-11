@@ -419,7 +419,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/01/28 (1.9.0)", Float) = 0
+            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", Float) = 0

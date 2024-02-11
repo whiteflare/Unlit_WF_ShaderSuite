@@ -38,7 +38,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
         [WFHeaderAlwaysOn(Refraction)]
             _CRF_Enable             ("[CRF] Enable", Float) = 1
-            _CRF_RefractiveIndex    ("[CRF] Refractive Index", Range(1.0, 3.0)) = 1.33
+            _CRF_RefractiveIndex    ("[CRF] Refractive Index", Range(0.8, 3.0)) = 1.33
             _CRF_Distance           ("[CRF] Distance", Range(0, 10)) = 10.0
             _CRF_Tint               ("[CRF] Tint Color", Color) = (0.5, 0.5, 0.5)
             _CRF_BlendNormal        ("[CRF] Blend Normal", Range(0, 1)) = 0.1
@@ -390,7 +390,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/01/28 (1.9.0)", Float) = 0
+            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
