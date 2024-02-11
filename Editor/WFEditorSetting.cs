@@ -81,12 +81,52 @@ namespace UnlitWF
         [Header("Quest Build Support")]
         public bool autoSwitchQuestShader = true;
 
-        public NearClipCancelMode enableNccInVRC3Avatar = NearClipCancelMode.ForceON;
+        /// <summary>
+        /// カメラのニアクリップを無視(for VRC3Avatar)
+        /// </summary>
+        public MatForceSettingMode enableNccInVRC3Avatar = MatForceSettingMode.ForceON;
+        /// <summary>
+        /// カメラのニアクリップを無視(for VRC3World)
+        /// </summary>
+        public MatForceSettingMode enableNccInVRC3World = MatForceSettingMode.ForceOFF;
 
-        public NearClipCancelMode enableNccInVRC3World = NearClipCancelMode.ForceOFF;
+        /// <summary>
+        /// 逆光補正しない(for VRC3Avatar)
+        /// </summary>
+        public MatForceSettingMode disableBackLitInVRC3Avatar = MatForceSettingMode.PerMaterial;
+        /// <summary>
+        /// 逆光補正しない(for VRC3World)
+        /// </summary>
+        public MatForceSettingMode disableBackLitInVRC3World = MatForceSettingMode.ForceON;
 
         private static WFEditorSetting currentSettings = null;
         private static int currentPriority = 0;
+
+        public MatForceSettingMode GetEnableNccInCurrentEnvironment()
+        {
+            switch (WFCommonUtility.GetCurrentEntironment())
+            {
+                case CurrentEntironment.VRCSDK3_Avatar:
+                    return enableNccInVRC3Avatar;
+                case CurrentEntironment.VRCSDK3_World:
+                    return enableNccInVRC3World;
+                default:
+                    return MatForceSettingMode.PerMaterial;
+            }
+        }
+
+        public MatForceSettingMode GetDisableBackLitInCurrentEnvironment()
+        {
+            switch (WFCommonUtility.GetCurrentEntironment())
+            {
+                case CurrentEntironment.VRCSDK3_Avatar:
+                    return disableBackLitInVRC3Avatar;
+                case CurrentEntironment.VRCSDK3_World:
+                    return disableBackLitInVRC3World;
+                default:
+                    return MatForceSettingMode.PerMaterial;
+            }
+        }
 
         public static WFEditorSetting GetOneOfSettings(bool forceReload = false)
         {
@@ -128,7 +168,7 @@ namespace UnlitWF
         }
     }
 
-    public enum NearClipCancelMode
+    public enum MatForceSettingMode
     {
         PerMaterial = -1,
         ForceOFF = 0,
@@ -166,6 +206,8 @@ namespace UnlitWF
         SerializedProperty p_autoSwitchQuestShader;
         SerializedProperty p_enableNccInVRC3Avatar;
         SerializedProperty p_enableNccInVRC3World;
+        SerializedProperty p_disableBackLitInVRC3Avatar;
+        SerializedProperty p_disableBackLitInVRC3World;
 
         private void OnEnable()
         {
@@ -191,6 +233,10 @@ namespace UnlitWF
             // EnableNCC
             this.p_enableNccInVRC3Avatar = serializedObject.FindProperty(nameof(WFEditorSetting.enableNccInVRC3Avatar));
             this.p_enableNccInVRC3World = serializedObject.FindProperty(nameof(WFEditorSetting.enableNccInVRC3World));
+
+            // DisableBackLit
+            this.p_disableBackLitInVRC3Avatar = serializedObject.FindProperty(nameof(WFEditorSetting.disableBackLitInVRC3Avatar));
+            this.p_disableBackLitInVRC3World = serializedObject.FindProperty(nameof(WFEditorSetting.disableBackLitInVRC3World));
         }
 
         public override void OnInspectorGUI()
@@ -248,9 +294,50 @@ namespace UnlitWF
                 EditorGUILayout.PropertyField(p_enableNccInVRC3World, new GUIContent("For VRCSDK3 World"));
             }
 
+            EditorGUILayout.LabelField(WFI18N.Translate("WFEditorSetting", "Disable BackLit"));
+            using (new EditorGUI.IndentLevelScope())
+            {
+                EditorGUILayout.PropertyField(p_disableBackLitInVRC3Avatar, new GUIContent("For VRCSDK3 Avatar"));
+                EditorGUILayout.PropertyField(p_disableBackLitInVRC3World, new GUIContent("For VRCSDK3 World"));
+            }
+
             serializedObject.ApplyModifiedProperties();
 
             WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
+
+            EditorGUILayout.Space();
+            GUI.Label(EditorGUILayout.GetControlRect(), "Other", EditorStyles.boldLabel);
+
+            if (GUI.Button(EditorGUILayout.GetControlRect(), WFI18N.Translate("WFEditorSetting", "Create New Settings asset")))
+            {
+                CreateNewSettingsAsset();
+            }
+        }
+
+        private void CreateNewSettingsAsset()
+        {
+            if (target == null)
+            {
+                return;
+            }
+            var path = EditorUtility.SaveFilePanelInProject("Create New Settings asset", "", "asset", "");
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+
+            // 現在の設定をコピーして新しいアセットとする
+            var newSettings = Instantiate((WFEditorSetting)target);
+            // 優先度は現在有効になっている設定より小さくする
+            newSettings.settingPriority = WFEditorSetting.GetOneOfSettings().settingPriority - 1;
+
+            // 新規作成
+            AssetDatabase.CreateAsset(newSettings, path);
+            // 選択する
+            Selection.activeObject = newSettings;
+
+            // リロード
+            WFEditorSetting.GetOneOfSettings(true);
         }
 
         private GUIContent toDisplay(SerializedProperty p)

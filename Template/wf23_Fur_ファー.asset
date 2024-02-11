@@ -19,6 +19,22 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _CGR_GradMapTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CGR_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CLC_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DFD_ColorTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DSV_CtrlTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -81,10 +97,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AL_AlphaToMask: 0
+    - _CGR_Enable: 0
+    - _CGR_InvMaskVal: 0
     - _CLC_DeltaH: 0
     - _CLC_DeltaS: 0
     - _CLC_DeltaV: 0
     - _CLC_Enable: 0
+    - _CLC_Gamma: 1
+    - _CLC_InvMaskVal: 0
     - _CLC_Monochrome: 0
     - _CurrentVersion: 0
     - _Cutoff: 0.2
@@ -129,12 +149,13 @@ Material:
     - _TR_BlendType: 0
     - _TR_DisableBackLit: 0
     - _TR_Enable: 0
+    - _TR_Exponent: 1
     - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
-    - _TR_Power: 1
-    - _TR_PowerBottom: 0.1
-    - _TR_PowerSide: 0.1
-    - _TR_PowerTop: 0.05
+    - _TR_Width: 0.1
+    - _TR_WidthBottom: 1
+    - _TR_WidthSide: 1
+    - _TR_WidthTop: 0.5
     - _TS_1stBorder: 0.4
     - _TS_1stFeather: 0.05
     - _TS_2ndBorder: 0.2
@@ -149,6 +170,7 @@ Material:
     - _TS_MinDist: 1
     - _TS_Power: 1
     - _TS_Steps: 2
+    - _VRCFallback: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DFD_Color: {r: 0.1, g: 0.1, b: 0.1, a: 1}

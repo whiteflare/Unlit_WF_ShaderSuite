@@ -76,6 +76,7 @@ Material:
     - _LBE_IndirectMultiplier: 1
     - _QuestSupported: 0
     - _UseVertexColor: 0
+    - _VRCFallback: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}

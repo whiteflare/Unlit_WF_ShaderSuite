@@ -891,7 +891,7 @@ namespace UnlitWF.Converter
 
     static class ScanAndMigrationExecutor
     {
-        public const int VERSION = 8;
+        public const int VERSION = 9;
         private static readonly string KEY_MIG_VERSION = "UnlitWF.ShaderEditor/autoMigrationVersion";
 
         /// <summary>
@@ -1139,6 +1139,12 @@ namespace UnlitWF.Converter
 
             PropertyNameReplacement.Group("2023/08/27"),
             PropertyNameReplacement.Match("_GL_DisableBackLit", "_TS_DisableBackLit"), // 後でTRにもコピーする
+
+            PropertyNameReplacement.Group("2024/01/28"), // TODO 後で変更
+            PropertyNameReplacement.Match("_TR_Power", "_TR_Width"),
+            PropertyNameReplacement.Match("_TR_PowerTop", "_TR_WidthTop"),
+            PropertyNameReplacement.Match("_TR_PowerSide", "_TR_WidthSide"),
+            PropertyNameReplacement.Match("_TR_PowerBottom", "_TR_WidthBottom"),
         };
 
         public static bool ExistsNeedsMigration(Material mat)
@@ -1225,6 +1231,16 @@ namespace UnlitWF.Converter
                     if (HasOldProperty(ctx, "_GL_DisableBackLit") && HasNewProperty(ctx, "_TS_DisableBackLit"))
                     {
                         WFAccessor.CopyIntValue(ctx.target, "_TS_DisableBackLit", "_TR_DisableBackLit");
+                    }
+                },
+                ctx => {
+                    // _TR_Powerありの状態から_TR_Widthに変更されたならば、
+                    if (HasOldProperty(ctx, "_TR_Power") && HasNewProperty(ctx, "_TR_Width"))
+                    {
+                        WFAccessor.SetFloat(ctx.target, "_TR_Width", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_Width", 1) * 0.1f, 0, 1));
+                        WFAccessor.SetFloat(ctx.target, "_TR_WidthTop", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthTop", 1) * 10, 0, 1));
+                        WFAccessor.SetFloat(ctx.target, "_TR_WidthSide", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthSide", 1) * 10, 0, 1));
+                        WFAccessor.SetFloat(ctx.target, "_TR_WidthBottom", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthBottom", 1) * 10, 0, 1));
                     }
                 },
             };
