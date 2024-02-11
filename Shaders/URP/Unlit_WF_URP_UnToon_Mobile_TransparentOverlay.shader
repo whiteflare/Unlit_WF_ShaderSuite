@@ -79,7 +79,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/01/28 (1.9.0)", Float) = 0
+            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
     }
 
     SubShader {
