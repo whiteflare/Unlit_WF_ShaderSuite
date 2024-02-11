@@ -442,7 +442,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/01/28 (1.9.0)", Float) = 0
+            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout", Float) = 0
