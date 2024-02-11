@@ -197,7 +197,7 @@
         drawParticleVertexColor(d); // 頂点カラー
 
 #ifdef _WF_PREMUL_ALPHA
-        d.color.rgb *= d.color.a;
+        _WF_PREMUL_ALPHA
 #endif
 
         drawAlphaMask(d);           // アルファ

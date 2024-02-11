@@ -304,6 +304,40 @@ namespace UnlitWF
             serializedObject.ApplyModifiedProperties();
 
             WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
+
+            EditorGUILayout.Space();
+            GUI.Label(EditorGUILayout.GetControlRect(), "Other", EditorStyles.boldLabel);
+
+            if (GUI.Button(EditorGUILayout.GetControlRect(), WFI18N.Translate("WFEditorSetting", "Create New Settings asset")))
+            {
+                CreateNewSettingsAsset();
+            }
+        }
+
+        private void CreateNewSettingsAsset()
+        {
+            if (target == null)
+            {
+                return;
+            }
+            var path = EditorUtility.SaveFilePanelInProject("Create New Settings asset", "", "asset", "");
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+
+            // 現在の設定をコピーして新しいアセットとする
+            var newSettings = Instantiate((WFEditorSetting)target);
+            // 優先度は現在有効になっている設定より小さくする
+            newSettings.settingPriority = WFEditorSetting.GetOneOfSettings().settingPriority - 1;
+
+            // 新規作成
+            AssetDatabase.CreateAsset(newSettings, path);
+            // 選択する
+            Selection.activeObject = newSettings;
+
+            // リロード
+            WFEditorSetting.GetOneOfSettings(true);
         }
 
         private GUIContent toDisplay(SerializedProperty p)

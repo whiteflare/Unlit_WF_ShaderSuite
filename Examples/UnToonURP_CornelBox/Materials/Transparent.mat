@@ -31,7 +31,19 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _CGR_GradMapTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CGR_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _CHM_3chMaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CLC_MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -138,16 +150,21 @@ Material:
     - _BKT_Enable: 0
     - _BKT_UVType: 0
     - _BumpScale: 1
+    - _CGR_Enable: 0
+    - _CGR_InvMaskVal: 0
     - _CHM_Enable: 0
     - _CLC_DeltaH: 0
     - _CLC_DeltaS: 0
     - _CLC_DeltaV: 0
     - _CLC_Enable: 0
+    - _CLC_Gamma: 1
+    - _CLC_InvMaskVal: 0
     - _CLC_Monochrome: 0
     - _CullMode: 2
     - _CurrentVersion: 0
     - _DetailNormalMapScale: 0.4
     - _ES_BlendType: 0
+    - _ES_ChangeAlpha: 0
     - _ES_Enable: 0
     - _ES_SC_AlphaScroll: 0
     - _ES_SC_DirType: 0
@@ -218,6 +235,7 @@ Material:
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _NM_Enable: 0
+    - _NM_InvConvex: 0
     - _NM_Power: 0.25
     - _NS_Enable: 0
     - _NS_InvMaskVal: 0
@@ -236,12 +254,13 @@ Material:
     - _TR_BlendType: 0
     - _TR_DisableBackLit: 0
     - _TR_Enable: 0
+    - _TR_Exponent: 1
     - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
-    - _TR_Power: 1
-    - _TR_PowerBottom: 0.1
-    - _TR_PowerSide: 0.1
-    - _TR_PowerTop: 0.05
+    - _TR_Width: 0.1
+    - _TR_WidthBottom: 1
+    - _TR_WidthSide: 1
+    - _TR_WidthTop: 0.5
     - _TS_1stBorder: 0.4
     - _TS_1stFeather: 0.05
     - _TS_2ndBorder: 0.2

@@ -56,6 +56,7 @@
     #define MAX3(r, g, b)   max(r, max(g, b) )
     #define AVE3(r, g, b)   ((r + g + b) / 3)
     #define MAX_RGB(v)      max(v.r, max(v.g, v.b))
+    #define MIN_RGB(v)      min(v.r, min(v.g, v.b))
     #define AVE_RGB(v)      ((v.r + v.g + v.b) / 3)
 
     #define INVERT_MASK_VALUE(rgba, inv)            saturate( TGL_OFF(inv) ? rgba : half4(1 - rgba.rgb, rgba.a) )
