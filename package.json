@@ -1,0 +1,17 @@
+{
+  "name": "jp.whiteflare.unlitwf.texpack",
+  "displayName": "UnlitWF TexturePack",
+  "version": "1.1.2",
+  "description": "Texture material pack for UnlitWF shaders.",
+  "author": {
+    "name": "whiteflare",
+    "url": "https://github.com/whiteflare/"
+  },
+  "gitDependencies": {},
+  "vpmDependencies": {},
+  "hideInEditor": false,
+  "legacyFolders": {
+    "Assets\\Unlit_WF_ShaderSuite\\Texture": "331497fcbc7fc8e459baa9751d01bf77"
+  },
+  "legacyFiles": {}
+}
