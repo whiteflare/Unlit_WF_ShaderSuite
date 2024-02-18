@@ -35,6 +35,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
+        [WF_Enum(UnlitWF.MaskModeAL)]
+            _AL_MaskMode            ("[AL] Mask Mode", int) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
         [Enum(OFF,0,ON,1)]
             _AL_ZWrite              ("[AL] ZWrite", int) = 1

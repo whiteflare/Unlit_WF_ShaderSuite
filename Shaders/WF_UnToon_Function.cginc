@@ -195,15 +195,37 @@ FEATURE_TGL_END
                  : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        void drawAlphaMask(inout drawing d) {
-            float alpha = pickAlpha(d.uv_main, d.color.a) * _AL_CustomValue;
+        void alphaCutoutOutline(inout float alpha) {
+#ifdef _TL_ENABLE
+            if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) {
+                discard;
+            }
+#endif
+            alpha = 1;
+        }
 
-            /*
-             * カットアウト処理
-             * cutoutに使うものは、pickAlpha と _AL_CustomValue の値。
-             * 一方、Fresnel は cutout には巻き込まない。
-             * _AL_CustomValue を使っている MaskOut_Blend は cutout を使わない。
-             */
+        void alpha3PassCutout(inout float alpha) {
+            if (alpha < _Cutoff) {
+                discard;
+                alpha = 0;
+            }
+            else {
+                alpha = 1;
+            }
+        }
+
+        void alpha3PassFade(inout float alpha) {
+            if (alpha < _Cutoff) {
+                alpha *= _AL_Power;
+            }
+            else {
+                discard;
+                alpha = 0;
+            }
+        }
+
+        void drawAlphaMask(inout drawing d) {
+            float alpha = pickAlpha(d.uv_main, d.color.a);
 
             #if defined(_WF_ALPHA_CUSTOM)
                 _WF_ALPHA_CUSTOM
@@ -223,6 +245,10 @@ FEATURE_TGL_END
                 #endif
             #else
                 alpha *= _AL_Power;
+                if (_AL_MaskMode == 1) {
+                    alpha = max(0, 1 - alpha);
+                }
+                alpha *= _AL_CustomValue;
             #endif
 
             d.color.a = alpha;

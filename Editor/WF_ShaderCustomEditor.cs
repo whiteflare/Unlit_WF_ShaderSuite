@@ -2301,6 +2301,12 @@ namespace UnlitWF
         SUB = 2,
     }
 
+    public enum MaskModeAL
+    {
+        NORMAL = 0,
+        SUB = 1,
+    }
+
     public enum SunSourceMode
     {
         AUTO = 0,
