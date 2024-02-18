@@ -643,6 +643,7 @@ namespace UnlitWF
             new WFI18NTranslation("CGL", "Blur", "ブラー"),
             new WFI18NTranslation("CGL", "Blur Min", "ブラー(下限)"),
             new WFI18NTranslation("CGL", "Blur Mode", "ブラーモード"),
+            new WFI18NTranslation("CGL", "Blur Random", "ブラーランダム化"),
             // Grass
             new WFI18NTranslation("GRS", "Height Type", "高さ指定タイプ"),
             new WFI18NTranslation("GRS", "Ground Y coordinate", "地面Y座標"),

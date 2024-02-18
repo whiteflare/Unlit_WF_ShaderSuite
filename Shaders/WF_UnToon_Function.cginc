@@ -1572,7 +1572,7 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _CGL_ENABLE
-
+half _CGL_BlurRandom;
         float3 sampleScreenTextureBlur1(float2 uv, float2 scale) {    // NORMAL
             static const int    BLUR_SAMPLE_COUNT = 7;
             static const float  BLUR_KERNEL[BLUR_SAMPLE_COUNT] = { -1, -2.0/3, -1.0/3, 0, 1.0/3, 2.0/3, 1 };
@@ -1581,7 +1581,7 @@ FEATURE_TGL_END
             float3 color = ZERO_VEC3;
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
                 for (int k = 0; k < BLUR_SAMPLE_COUNT; k++) {
-                    float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale;
+                    float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale * (1 - random2to1(uv + fixed2(j, k)) * _CGL_BlurRandom);
                     color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
                 }
             }
@@ -1604,7 +1604,7 @@ FEATURE_TGL_END
 
             float3 color = ZERO_VEC3;
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
-                float2 offset = BLUR_KERNEL[j] * scale;
+                float2 offset = BLUR_KERNEL[j] * scale * (1 - random2to1(uv + j.xx) * _CGL_BlurRandom);
                 color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHT;
             }
             return color;
