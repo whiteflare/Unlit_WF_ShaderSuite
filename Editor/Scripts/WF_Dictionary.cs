@@ -451,6 +451,7 @@ namespace UnlitWF
             // Alpha
             new WFI18NTranslation("AL", "Alpha Source", "アルファソース"),
             new WFI18NTranslation("AL", "Alpha Mask Texture", "アルファマスク"),
+            new WFI18NTranslation("AL", "Mask Mode", "マスクモード"),
             new WFI18NTranslation("AL", "Power", "アルファ強度"),
             new WFI18NTranslation("AL", "Fresnel Power", "フレネル強度"),
             new WFI18NTranslation("AL", "Cutoff Threshold", "カットアウトしきい値"),
@@ -642,6 +643,7 @@ namespace UnlitWF
             new WFI18NTranslation("CGL", "Blur", "ブラー"),
             new WFI18NTranslation("CGL", "Blur Min", "ブラー(下限)"),
             new WFI18NTranslation("CGL", "Blur Mode", "ブラーモード"),
+            new WFI18NTranslation("CGL", "Blur Random", "ブラーランダム化"),
             // Grass
             new WFI18NTranslation("GRS", "Height Type", "高さ指定タイプ"),
             new WFI18NTranslation("GRS", "Ground Y coordinate", "地面Y座標"),
@@ -715,6 +717,8 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.BlendModeVC.MUL", "乗算"),
             new WFI18NTranslation("UnlitWF.BlendModeVC.ADD", "加算"),
             new WFI18NTranslation("UnlitWF.BlendModeVC.SUB", "減算"),
+            new WFI18NTranslation("UnlitWF.MaskModeAL.NORMAL", "通常"),
+            new WFI18NTranslation("UnlitWF.MaskModeAL.SUB", "減算"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.AUTO", "自動"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_DIRECTIONAL_LIT", "DirectionalLightのみ"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_POINT_LIT", "PointLightのみ"),

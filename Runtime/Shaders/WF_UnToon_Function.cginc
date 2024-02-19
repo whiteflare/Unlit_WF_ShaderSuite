@@ -195,15 +195,37 @@ FEATURE_TGL_END
                  : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        void drawAlphaMask(inout drawing d) {
-            float alpha = pickAlpha(d.uv_main, d.color.a) * _AL_CustomValue;
+        void alphaCutoutOutline(inout float alpha) {
+#ifdef _TL_ENABLE
+            if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) {
+                discard;
+            }
+#endif
+            alpha = 1;
+        }
 
-            /*
-             * カットアウト処理
-             * cutoutに使うものは、pickAlpha と _AL_CustomValue の値。
-             * 一方、Fresnel は cutout には巻き込まない。
-             * _AL_CustomValue を使っている MaskOut_Blend は cutout を使わない。
-             */
+        void alpha3PassCutout(inout float alpha) {
+            if (alpha < _Cutoff) {
+                discard;
+                alpha = 0;
+            }
+            else {
+                alpha = 1;
+            }
+        }
+
+        void alpha3PassFade(inout float alpha) {
+            if (alpha < _Cutoff) {
+                alpha *= _AL_Power;
+            }
+            else {
+                discard;
+                alpha = 0;
+            }
+        }
+
+        void drawAlphaMask(inout drawing d) {
+            float alpha = pickAlpha(d.uv_main, d.color.a);
 
             #if defined(_WF_ALPHA_CUSTOM)
                 _WF_ALPHA_CUSTOM
@@ -223,6 +245,10 @@ FEATURE_TGL_END
                 #endif
             #else
                 alpha *= _AL_Power;
+                if (_AL_MaskMode == 1) {
+                    alpha = max(0, 1 - alpha);
+                }
+                alpha *= _AL_CustomValue;
             #endif
 
             d.color.a = alpha;
@@ -1546,7 +1572,7 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _CGL_ENABLE
-
+half _CGL_BlurRandom;
         float3 sampleScreenTextureBlur1(float2 uv, float2 scale) {    // NORMAL
             static const int    BLUR_SAMPLE_COUNT = 7;
             static const float  BLUR_KERNEL[BLUR_SAMPLE_COUNT] = { -1, -2.0/3, -1.0/3, 0, 1.0/3, 2.0/3, 1 };
@@ -1555,7 +1581,7 @@ FEATURE_TGL_END
             float3 color = ZERO_VEC3;
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
                 for (int k = 0; k < BLUR_SAMPLE_COUNT; k++) {
-                    float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale;
+                    float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale * (1 - random2to1(uv + fixed2(j, k)) * _CGL_BlurRandom);
                     color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
                 }
             }
@@ -1578,7 +1604,7 @@ FEATURE_TGL_END
 
             float3 color = ZERO_VEC3;
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
-                float2 offset = BLUR_KERNEL[j] * scale;
+                float2 offset = BLUR_KERNEL[j] * scale * (1 - random2to1(uv + j.xx) * _CGL_BlurRandom);
                 color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHT;
             }
             return color;

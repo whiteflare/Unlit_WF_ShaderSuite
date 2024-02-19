@@ -108,6 +108,7 @@
     half            _AL_AlphaToMask;
     half            _AL_Z_Offset;
     half            _AL_InvMaskVal;
+    uint            _AL_MaskMode;
 
     // -------------------------
 
