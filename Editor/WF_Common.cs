@@ -210,10 +210,9 @@ namespace UnlitWF
             var changed = false;
             if (IsSupportedShader(mat))
             {
+                changed |= SetupMaterial_CommonMaterialSettings(mat);
                 changed |= SetupMaterial_GIFrags(mat);
                 changed |= SetupMaterial_ClearBgPass(mat);
-                changed |= SetupMaterial_NearClipCancel(mat);
-                changed |= SetupMaterial_DisableBackLit(mat);
                 changed |= SetupMaterial_SetupKeyword(mat);
                 changed |= SetupMaterial_DeleteKeyword(mat);
             }
@@ -298,49 +297,30 @@ namespace UnlitWF
             return changed;
         }
 
-        private static bool SetupMaterial_NearClipCancel(Material mat)
+        private static bool SetupMaterial_CommonMaterialSettings(Material mat)
         {
-            bool changed = false;
-#if ENV_VRCSDK3_AVATAR || ENV_VRCSDK3_WORLD
-            if (mat.HasProperty("_GL_NCC_Enable"))
-            {
-                var oldVal = mat.GetInt("_GL_NCC_Enable");
-                var newVal = (int)WFEditorSetting.GetOneOfSettings().GetEnableNccInCurrentEnvironment();
-                if (0 <= newVal && oldVal != newVal)
-                {
-                    mat.SetInt("_GL_NCC_Enable", newVal);
-                    changed = true;
-                }
-            }
-#endif
+            var changed = false;
+            var settings = WFEditorSetting.GetOneOfSettings();
+            changed |= SetupMaterial_CommonMaterialSettings(mat, "_GL_NCC_Enable", settings.GetEnableNccInCurrentEnvironment());
+            changed |= SetupMaterial_CommonMaterialSettings(mat, "_GL_UseDepthTex", settings.GetUseDepthTexInCurrentEnvironment());
+            changed |= SetupMaterial_CommonMaterialSettings(mat, "_TS_DisableBackLit", settings.GetDisableBackLitInCurrentEnvironment());
+            changed |= SetupMaterial_CommonMaterialSettings(mat, "_TR_DisableBackLit", settings.GetDisableBackLitInCurrentEnvironment());
             return changed;
         }
 
-        private static bool SetupMaterial_DisableBackLit(Material mat)
+        private static bool SetupMaterial_CommonMaterialSettings(Material mat, string name, MatForceSettingMode value)
         {
+            var newVal = (int)value;
             bool changed = false;
-#if ENV_VRCSDK3_AVATAR || ENV_VRCSDK3_WORLD
-            if (mat.HasProperty("_TS_DisableBackLit"))
+            if (0 <= newVal && mat.HasProperty(name))
             {
-                var oldVal = mat.GetInt("_TS_DisableBackLit");
-                var newVal = (int)WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment();
-                if (0 <= newVal && oldVal != newVal)
+                var oldVal = mat.GetInt(name);
+                if (oldVal != newVal)
                 {
-                    mat.SetInt("_TS_DisableBackLit", newVal);
+                    mat.SetInt(name, newVal);
                     changed = true;
                 }
             }
-            if (mat.HasProperty("_TR_DisableBackLit"))
-            {
-                var oldVal = mat.GetInt("_TR_DisableBackLit");
-                var newVal = (int)WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment();
-                if (0 <= newVal && oldVal != newVal)
-                {
-                    mat.SetInt("_TR_DisableBackLit", newVal);
-                    changed = true;
-                }
-            }
-#endif
             return changed;
         }
 

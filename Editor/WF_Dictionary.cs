@@ -293,6 +293,7 @@ namespace UnlitWF
             new WFCustomKeywordSettingBool("_PA_UseFlipBook", "_PF_ENABLE"),
             new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE"),
             new WFCustomKeywordSettingBool("_GL_NCC_Enable", "_GL_NCC_ENABLE"),
+            new WFCustomKeywordSettingBool("_GL_UseDepthTex", "_GL_DEPTH_ENABLE"),
             new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             },
@@ -448,6 +449,7 @@ namespace UnlitWF
             new WFI18NTranslation("Chroma Reaction", "Chroma Reaction (彩度)"),
             new WFI18NTranslation("Cast Shadows", "他の物体に影を落とす"),
             new WFI18NTranslation("Shadow Cutoff Threshold", "影のカットアウトしきい値"),
+            new WFI18NTranslation("Use CameraDepthTexture", "CameraDepthTexture を使う"),
             // Alpha
             new WFI18NTranslation("AL", "Alpha Source", "アルファソース"),
             new WFI18NTranslation("AL", "Alpha Mask Texture", "アルファマスク"),
