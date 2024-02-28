@@ -22,13 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-#if UNITY_2021_2_OR_NEWER
 using UnityEditor.SceneManagement;
-#else
-using UnityEditor.Experimental.SceneManagement;
-#endif
 
 namespace UnlitWF
 {
@@ -151,6 +145,7 @@ namespace UnlitWF
                                 WFAccessor.SetBool(mat, "_TR_DisableBackLit", true);
                             }
                         }
+                        EditorUtility.SetDirty(mat);
                     }
                 }
             ),
@@ -183,6 +178,7 @@ namespace UnlitWF
                     {
                         WFAccessor.SetBool(mat, "_AO_Enable", true);
                         WFAccessor.SetBool(mat, "_AO_UseLightMap", true);
+                        EditorUtility.SetDirty(mat);
                     }
                 }
             ),
@@ -200,10 +196,12 @@ namespace UnlitWF
                     foreach (var mat in targets)
                     {
                         mat.renderQueue = -1;
+                        EditorUtility.SetDirty(mat);
                     }
                 }
             ),
 
+            WFMaterialDepthTexValidator.Validator,
             WFMaterialParticleValidator.Validator,
 
             // 今後削除される予定の機能を使っている場合に警告
@@ -239,6 +237,7 @@ namespace UnlitWF
                     foreach (var mat in targets)
                     {
                         mat.doubleSidedGI = true;
+                        EditorUtility.SetDirty(mat);
                     }
                 }
             ),
@@ -285,7 +284,7 @@ namespace UnlitWF
         /// <returns></returns>
         private static Material[] FilterBatchingStaticMaterials(Material[] mats)
         {
-            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            var scene = EditorSceneManager.GetActiveScene();
 
             // 現在のシーンにある BatchingStatic の付いた MeshRenderer が使っているマテリアルを整理
             var matsInScene = scene.GetRootGameObjects()
@@ -304,7 +303,7 @@ namespace UnlitWF
         /// <returns></returns>
         private static Material[] FilterLightmapStaticMaterials(Material[] mats)
         {
-            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            var scene = EditorSceneManager.GetActiveScene();
 
             // 現在のシーンにある LightmapStatic の付いた MeshRenderer が使っているマテリアルを整理
             var matsInScene = scene.GetRootGameObjects()
@@ -398,64 +397,21 @@ namespace UnlitWF
                 FixParticleSystems
             );
 
+        private readonly HierarchyComponentWatcher<ParticleSystemRenderer> watcher = new HierarchyComponentWatcher<ParticleSystemRenderer>(true);
+
         public void OnEnable()
         {
-            EditorApplication.hierarchyChanged += OnHierarchyChanged;
-            PrefabStage.prefabStageOpened += OnPrefabStageOpened;
+            watcher.OnEnable();
         }
 
         public void OnDestroy()
         {
-            EditorApplication.hierarchyChanged -= OnHierarchyChanged;
-            PrefabStage.prefabStageOpened -= OnPrefabStageOpened;
-        }
-
-        private void OnHierarchyChanged()
-        {
-            renderers = null;
-        }
-
-        private void OnPrefabStageOpened(PrefabStage obj)
-        {
-            renderers = null;
-        }
-
-        private ParticleSystemRenderer[] renderers = null;
-
-        private ParticleSystemRenderer[] GetSceneRenderers()
-        {
-            if (renderers != null)
-                return renderers;
-
-            var list = new List<ParticleSystemRenderer>();
-
-            var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-            if (prefabStage != null)
-            {
-                var root = prefabStage.prefabContentsRoot;
-                list.AddRange(root.GetComponentsInChildren<ParticleSystemRenderer>(true));
-            }
-            else
-            {
-                for (int i = 0; i < SceneManager.sceneCount; i++)
-                {
-                    Scene scene = SceneManager.GetSceneAt(i);
-                    if (scene.isLoaded) // SceneManagerで取るときはisLoadedを確認する
-                    {
-                        foreach (var root in scene.GetRootGameObjects())
-                        {
-                            list.AddRange(root.GetComponentsInChildren<ParticleSystemRenderer>(true));
-                        }
-                    }
-                }
-            }
-
-            return renderers = list.ToArray();
+            watcher.OnDestroy();
         }
 
         private ParticleSystemRenderer[] GetRenderers(Material mat)
         {
-            var all = GetSceneRenderers();
+            var all = watcher.GetComponents();
             return all.Where(r => r != null && r.sharedMaterial == mat).ToArray();
         }
 
@@ -466,10 +422,10 @@ namespace UnlitWF
             if (targets.Length == 0)
             {
                 // パーティクル系ではないときは何もしない
-                return new Material[0];
+                return targets;
             }
 
-            var renderers = instance.GetSceneRenderers();
+            var renderers = instance.watcher.GetComponents();
             if (renderers.Length == 0)
             {
                 return new Material[0];
@@ -492,7 +448,7 @@ namespace UnlitWF
 
         private static void FixParticleSystems(params Material[] targets)
         {
-            var renderers = instance.GetSceneRenderers();
+            var renderers = instance.watcher.GetComponents();
             if (renderers.Length == 0)
             {
                 return;
@@ -509,6 +465,7 @@ namespace UnlitWF
                         r.SetActiveVertexStreams(instancedStreams);
                     else
                         r.SetActiveVertexStreams(streams);
+                    EditorUtility.SetDirty(r);
                 }
             }
         }
@@ -574,6 +531,86 @@ namespace UnlitWF
             }
 
             return result;
+        }
+    }
+
+    class WFMaterialDepthTexValidator : ScriptableSingleton<WFMaterialDepthTexValidator>
+    {
+        public static readonly WFMaterialValidator Validator = new WFMaterialValidator(
+                ValidateMaterials,
+                MessageType.Warning,
+                targets => "CameraDepthTextureを使う設定ですがシーン内に影付きライトがありません。",
+                targets => {
+                    // メニュー作成
+                    var menu = new GenericMenu();
+                    menu.AddItem(new GUIContent("シーンに影生成ライトを追加する"), false, () => FixAddLightInScene(targets));
+                    if (WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode.PerMaterial)
+                    {
+                        menu.AddItem(new GUIContent("CameraDepthTextureを使わないマテリアル設定にする"), false, () => FixMaterialTakeDown(targets));
+                    }
+                    menu.ShowAsContext();
+                }
+            );
+
+        private readonly HierarchyComponentWatcher<Light> watcher = new HierarchyComponentWatcher<Light>(false);
+
+        public void OnEnable()
+        {
+            watcher.OnEnable();
+        }
+
+        public void OnDestroy()
+        {
+            watcher.OnDestroy();
+        }
+
+        private static Material[] ValidateMaterials(params Material[] targets)
+        {
+            if (WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode.ForceOFF)
+            {
+                return new Material[0];
+            }
+
+            targets = targets.Where(mat => WFAccessor.GetBool(mat, "_GL_UseDepthTex", false)).ToArray();
+            if (targets.Length == 0)
+            {
+                return targets;
+            }
+
+            var lights = instance.watcher.GetComponents();
+            if (lights.Where(lit => lit != null && lit.enabled && lit.lightmapBakeType != LightmapBakeType.Baked).Any(lit => lit.shadows != LightShadows.None))
+            {
+                return new Material[0];
+            }
+
+            return targets;
+        }
+
+        private static void FixAddLightInScene(Material[] targets)
+        {
+            var go = new GameObject("DepthGenLight");
+            var light = go.AddComponent<Light>();
+
+            light.type = LightType.Directional;
+            light.lightmapBakeType = LightmapBakeType.Realtime;
+            light.color = Color.black;
+            light.intensity = 0.2f;
+            light.bounceIntensity = 0;
+            light.renderMode = LightRenderMode.ForcePixel;
+            light.shadows = LightShadows.Hard;
+            light.cullingMask = LayerMask.GetMask("TransparentFX", "Ignore Raycast", "reserve2", "reserve3", "reserve4");
+
+            Undo.RegisterCreatedObjectUndo(go, "Create DepthGenLight");
+        }
+
+        private static void FixMaterialTakeDown(Material[] targets)
+        {
+            Undo.RecordObjects(targets, "Fix UseCameraDepthTex");
+            foreach(var mat in targets)
+            {
+                WFAccessor.SetBool(mat, "_GL_UseDepthTex", false);
+                EditorUtility.SetDirty(mat);
+            }
         }
     }
 }

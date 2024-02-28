@@ -1558,7 +1558,7 @@ FEATURE_TGL_ON_BEGIN(_CRF_Enable)
             float4 grab_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv.xy);
             float3 back_color = grab_color.rgb * (_CRF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
-            d.color.rgb = lerp(lerp(d.color.rgb, back_color.rgb, grab_color.a), d.color.rgb, d.color.a);
+            d.color.rgb = lerp(lerp(d.color.rgb, back_color.rgb, grab_color.a), d.color.rgb, saturate(d.color.a));
             d.color.a = lerp(d.color.a, 1, grab_color.a);
 FEATURE_TGL_END
         }
@@ -1572,8 +1572,20 @@ FEATURE_TGL_END
     ////////////////////////////
 
     #ifdef _CGL_ENABLE
-half _CGL_BlurRandom;
-        float3 sampleScreenTextureBlur1(float2 uv, float2 scale) {    // NORMAL
+
+        float isCancelEyeDepth(float2 grab_uv, float depth) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            return TGL_ON(_GL_UseDepthTex) && LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+#else
+    #if _GL_DEPTH_ENABLE
+            return LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+    #else
+            return 0;
+    #endif
+#endif
+        }
+
+        float3 sampleScreenTextureBlur1(float2 uv, float2 scale, float depth) {    // NORMAL
             static const int    BLUR_SAMPLE_COUNT = 7;
             static const float  BLUR_KERNEL[BLUR_SAMPLE_COUNT] = { -1, -2.0/3, -1.0/3, 0, 1.0/3, 2.0/3, 1 };
             static const half   BLUR_WEIGHTS[BLUR_SAMPLE_COUNT] = { 0.036, 0.113, 0.216, 0.269, 0.216, 0.113, 0.036 };
@@ -1582,13 +1594,17 @@ half _CGL_BlurRandom;
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
                 for (int k = 0; k < BLUR_SAMPLE_COUNT; k++) {
                     float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale * (1 - random2to1(uv + fixed2(j, k)) * _CGL_BlurRandom);
-                    color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
+                    float2 uv2 = uv + offset;
+                    if (isCancelEyeDepth(uv2, depth)) {
+                        uv2 = uv;
+                    }
+                    color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv2).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
                 }
             }
             return color;
         }
 
-        float3 sampleScreenTextureBlur2(float2 uv, float2 scale) {    // FAST
+        float3 sampleScreenTextureBlur2(float2 uv, float2 scale, float depth) {    // FAST
             static const int    BLUR_SAMPLE_COUNT = 8;
             static const float2 BLUR_KERNEL[BLUR_SAMPLE_COUNT] = {
                 float2(-1.0, -1.0),
@@ -1605,10 +1621,27 @@ half _CGL_BlurRandom;
             float3 color = ZERO_VEC3;
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
                 float2 offset = BLUR_KERNEL[j] * scale * (1 - random2to1(uv + j.xx) * _CGL_BlurRandom);
-                color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHT;
+                float2 uv2 = uv + offset;
+                if (isCancelEyeDepth(uv2, depth)) {
+                    uv2 = uv;
+                }
+                color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv2).rgb * BLUR_WEIGHT;
             }
             return color;
         }
+
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+        float3 sampleScreenTextureBlur(float2 uv, float2 scale, float depth) {
+            return _CGL_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale, depth).rgb : sampleScreenTextureBlur2(grab_uv, scale, depth).rgb;
+        }
+        #define SAMPLE_BLUR sampleScreenTextureBlur
+#else
+    #ifdef _CGL_BLURFAST_ENABLE
+        #define SAMPLE_BLUR sampleScreenTextureBlur2
+    #else
+        #define SAMPLE_BLUR sampleScreenTextureBlur1
+    #endif
+#endif
 
         void drawFrostedGlass(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CGL_Enable)
@@ -1619,24 +1652,15 @@ FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             // Scale 計算
             float2 scale = max(_CGL_BlurMin.xx, _CGL_Blur.xx / max(1, length( d.ws_vertex.xyz - worldSpaceViewPointPos() )));
             scale *= UNITY_MATRIX_P._m11 / 100;
-            scale.y *= _ScreenParams.x / _ScreenParams.y
-#ifdef UNITY_SINGLE_PASS_STEREO
-                / 2
+#ifdef USING_STEREO_MATRICES
+            scale.x *= 0.5;
 #endif
-            ;
+            scale.y *= _ScreenParams.x / _ScreenParams.y;
 
-            float3 back_color =
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-                _CGL_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale).rgb : sampleScreenTextureBlur2(grab_uv, scale).rgb;
-#else
-    #ifdef _CGL_BLURFAST_ENABLE
-                sampleScreenTextureBlur2(grab_uv, scale).rgb;
-    #else
-                sampleScreenTextureBlur1(grab_uv, scale).rgb;
-    #endif
-#endif
+            float depth = -mul(UNITY_MATRIX_V, float4(d.ws_vertex.xyz, 1.0)).z;
+            float3 back_color = SAMPLE_BLUR(grab_uv, scale, depth).rgb;
 
-            d.color.rgb = lerp(back_color.rgb, d.color.rgb, d.color.a);
+            d.color.rgb = lerp(back_color.rgb, d.color.rgb, saturate(d.color.a));
             d.color.a = 1;
 FEATURE_TGL_END
         }
