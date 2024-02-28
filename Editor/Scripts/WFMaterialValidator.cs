@@ -539,14 +539,14 @@ namespace UnlitWF
         public static readonly WFMaterialValidator Validator = new WFMaterialValidator(
                 ValidateMaterials,
                 MessageType.Warning,
-                targets => "CameraDepthTextureを使う設定ですがシーン内に影付きライトがありません。",
+                targets => WFI18N.Translate(WFMessageText.PlzFixCameraDepthTexture),
                 targets => {
                     // メニュー作成
                     var menu = new GenericMenu();
-                    menu.AddItem(new GUIContent("シーンに影生成ライトを追加する"), false, () => FixAddLightInScene(targets));
+                    menu.AddItem(WFI18N.GetGUIContent(WFMessageText.MenuCreateDepthLight), false, () => FixAddLightInScene(targets));
                     if (WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode.PerMaterial)
                     {
-                        menu.AddItem(new GUIContent("CameraDepthTextureを使わないマテリアル設定にする"), false, () => FixMaterialTakeDown(targets));
+                        menu.AddItem(WFI18N.GetGUIContent(WFMessageText.MenuWithoutDepthTex), false, () => FixMaterialTakeDown(targets));
                     }
                     menu.ShowAsContext();
                 }
@@ -598,7 +598,7 @@ namespace UnlitWF
             light.bounceIntensity = 0;
             light.renderMode = LightRenderMode.ForcePixel;
             light.shadows = LightShadows.Hard;
-            light.cullingMask = LayerMask.GetMask("TransparentFX", "Ignore Raycast", "reserve2", "reserve3", "reserve4");
+            light.cullingMask = LayerMask.GetMask("TransparentFX", "Ignore Raycast");
 
             Undo.RegisterCreatedObjectUndo(go, "Create DepthGenLight");
         }
