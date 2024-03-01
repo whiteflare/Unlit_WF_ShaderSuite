@@ -247,6 +247,23 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
+        [WFHeaderToggle(RimShadow)]
+            _TM_Enable              ("[TR] Enable", Float) = 0
+            _TM_Color               ("[TR] Rim Color", Color) = (0, 0, 0, 1)
+            _TM_Width               ("[TR] Width", Range(0, 1)) = 0
+            _TM_Feather             ("[TR] Feather", Range(0, 1)) = 0.1
+            _TM_Exponent            ("[TR] Exponent", Range(1, 8)) = 1
+            _TM_BlendNormal         ("[TR] Blend Normal", Range(0, 1)) = 0
+            _TM_BlendNormal2        ("[TR] Blend Normal 2nd", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TM_MaskTex             ("[TR] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _TM_InvMaskVal          ("[TR] Invert Mask Value", Range(0, 1)) = 0
+        [Header(RimShadow Advance)]
+            _TM_WidthTop            ("[TR] Width Top", Range(0, 1)) = 0.5
+            _TM_WidthSide           ("[TR] Width Side", Range(0, 1)) = 1
+            _TM_WidthBottom         ("[TR] Width Bottom", Range(0, 1)) = 1
+
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -500,6 +517,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -563,6 +581,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -627,6 +646,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -693,6 +713,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase

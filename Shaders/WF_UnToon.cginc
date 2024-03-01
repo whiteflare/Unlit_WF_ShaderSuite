@@ -230,6 +230,7 @@
         drawLame(d);                // ラメ
 
         drawToonShade(d);           // 階調影
+        drawRimShadow(d);           // リムシャドウ
         drawRimLight(d);            // リムライト
 
         drawOverlayTexture(d);      // オーバーレイ

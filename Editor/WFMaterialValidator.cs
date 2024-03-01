@@ -217,6 +217,12 @@ namespace UnlitWF
                 targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + WFI18N.Translate("MT", "MetallicMap Type"),
                 null // アクションなし
             ),
+            new WFMaterialValidator(
+                targets => targets.Where(mat => WFAccessor.GetInt(mat, "_TR_Enable", 0) != 0 && WFAccessor.GetInt(mat, "_TR_BlendType", 0) == 3).ToArray(),
+                MessageType.Warning,
+                targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + WFI18N.Translate("TR", "Blend Type"),
+                null // アクションなし
+            ),
 
             // DoubleSidedGI が付いていない両面マテリアルに対する情報
             new WFMaterialValidator(

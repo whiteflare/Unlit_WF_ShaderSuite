@@ -1241,6 +1241,7 @@ namespace UnlitWF.Converter
                         WFAccessor.SetFloat(ctx.target, "_TR_WidthTop", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthTop", 1) * 10, 0, 1));
                         WFAccessor.SetFloat(ctx.target, "_TR_WidthSide", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthSide", 1) * 10, 0, 1));
                         WFAccessor.SetFloat(ctx.target, "_TR_WidthBottom", Mathf.Clamp(WFAccessor.GetFloat(ctx.target, "_TR_WidthBottom", 1) * 10, 0, 1));
+                        WFAccessor.SetFloat(ctx.target, "_TR_Feather", 0.05f); // Featherはリセット
                     }
                 },
             };
