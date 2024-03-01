@@ -114,6 +114,10 @@
         #define WF_TEX2D_RIM_MASK(uv)           SAMPLE_MASK_VALUE(_TR_MaskTex, uv, _TR_InvMaskVal).rgb
     #endif
 
+    #ifndef WF_TEX2D_RIM_SHADOW_MASK
+        #define WF_TEX2D_RIM_SHADOW_MASK(uv)    SAMPLE_MASK_VALUE(_TM_MaskTex, uv, _TM_InvMaskVal).r
+    #endif
+
     #ifndef WF_TEX2D_SCREEN_MASK
         #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OVL_MaskTex, uv, _OVL_InvMaskVal).r
     #endif
@@ -1152,6 +1156,44 @@ FEATURE_TGL_END
     #else
         #define calcToonShadeContrast(ws_vertex, ws_light_dir, ambientColor, shadow_power)
         #define drawToonShade(d)
+    #endif
+
+    ////////////////////////////
+    // Rim Shadow
+    ////////////////////////////
+
+    #ifdef _TM_ENABLE
+
+        float calcRimShadowPower(float3 vs_normal) {
+            float rimPower = length(vs_normal.xy);
+            if (rimPower < NZF) {
+                return 0;
+            }
+            else {
+                float2 dir_vec = vs_normal.xy / rimPower;
+                dir_vec.x *= _TM_WidthSide * 2;
+                dir_vec.y *= (_TM_WidthTop + _TM_WidthBottom);
+                dir_vec.y += (_TM_WidthTop - _TM_WidthBottom);
+
+                float dir_pwr = length(dir_vec);
+                float width = _TM_Width * 0.1;
+                float2 rim_max = 1 - width * dir_pwr;
+                float2 rim_min = 1 - (width + _TM_Feather) * dir_pwr;
+
+                return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TM_Exponent));
+            }
+        }
+
+        void drawRimShadow(inout drawing d) {
+FEATURE_TGL_ON_BEGIN(_TM_Enable)
+            float rimPower = WF_TEX2D_RIM_SHADOW_MASK(d.uv_main);
+            // 合成
+            d.color.rgb = lerp(d.color.rgb, d.color.rgb * _TM_Color.rgb, rimPower * calcRimShadowPower(calcMatcapVector(d.matcapVector, _TM_BlendNormal, _TM_BlendNormal2, 0)));
+FEATURE_TGL_END
+        }
+
+    #else
+        #define drawRimShadow(d)
     #endif
 
     ////////////////////////////

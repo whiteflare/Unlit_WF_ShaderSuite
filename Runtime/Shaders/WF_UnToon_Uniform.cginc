@@ -37,6 +37,7 @@
     DECL_SUB_TEX2D      (_SpecGlossMap);
     DECL_SUB_TEX2D      (_TS_MaskTex);
     DECL_SUB_TEX2D      (_TR_MaskTex);
+    DECL_SUB_TEX2D      (_TM_MaskTex);
     DECL_SUB_TEX2D      (_OVL_MaskTex);
     DECL_SUB_TEX2D      (_TL_CustomColorTex);
     DECL_SUB_TEX2D      (_CHM_3chMaskTex);
@@ -313,6 +314,20 @@
     half            _TR_WidthSide;
     half            _TR_WidthBottom;
     half            _TR_DisableBackLit;
+
+    // -------------------------
+
+    FEATURE_TGL    (_TM_Enable);
+    half3           _TM_Color;
+    half            _TM_Width;
+    half            _TM_Feather;
+    half            _TM_Exponent;
+    half            _TM_InvMaskVal;
+    half            _TM_BlendNormal;
+    half            _TM_BlendNormal2;
+    half            _TM_WidthTop;
+    half            _TM_WidthSide;
+    half            _TM_WidthBottom;
 
     // -------------------------
 

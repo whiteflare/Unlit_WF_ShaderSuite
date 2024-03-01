@@ -213,6 +213,7 @@ namespace UnlitWF
                 // Toon系機能
                 new WFShaderFunction("TS", "TS", "ToonShade"),
                 new WFShaderFunction("TR", "TR", "RimLight"),
+                new WFShaderFunction("TM", "TM", "RimShadow"),
                 new WFShaderFunction("TL", "TL", "Outline"),
                 new WFShaderFunction("TFG", "TFG", "ToonFog"),
 
@@ -393,6 +394,7 @@ namespace UnlitWF
             new WFI18NTranslation("Reflection", "反射(リフレクション)"),
             new WFI18NTranslation("Refraction", "屈折"),
             new WFI18NTranslation("RimLight", "リムライト"),
+            new WFI18NTranslation("RimShadow", "リムシャドウ"),
             new WFI18NTranslation("Specular", "光沢(スペキュラ)"),
             new WFI18NTranslation("Stencil Mask", "ステンシル"),
             new WFI18NTranslation("Tessellation", "細分化"),
