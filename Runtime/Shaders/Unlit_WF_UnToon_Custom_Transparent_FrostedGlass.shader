@@ -46,7 +46,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _CGL_BlurMode           ("[CGL] Blur Mode", Float) = 0
             _CGL_BlurRandom         ("[CGL] Blur Random", Range(0, 1)) = 0
         [ToggleUI]
-            _GL_UseDepthTex         ("[CGL] Use CameraDepthTexture", Range(0, 1)) = 0
+            _CGL_UseDepthTex        ("[CGL] Correct Blur to exclude the foreground", Range(0, 1)) = 0
 
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
@@ -358,8 +358,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
         [ToggleUI]
             _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
-        [ToggleUI]
-            _GL_UseDepthTex         ("Use CameraDepthTexture", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
             _LBE_Enable             ("[LBE] Enable", Float) = 0
@@ -416,9 +414,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _CGL_BLURFAST_ENABLE
+            #pragma shader_feature_local_fragment _ _CGL_DEPTH_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
-            #pragma shader_feature_local_fragment _ _GL_DEPTH_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE

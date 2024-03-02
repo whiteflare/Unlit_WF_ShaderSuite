@@ -294,7 +294,6 @@ namespace UnlitWF
             new WFCustomKeywordSettingBool("_PA_UseFlipBook", "_PF_ENABLE"),
             new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE"),
             new WFCustomKeywordSettingBool("_GL_NCC_Enable", "_GL_NCC_ENABLE"),
-            new WFCustomKeywordSettingBool("_GL_UseDepthTex", "_GL_DEPTH_ENABLE"),
             new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             },
@@ -323,6 +322,9 @@ namespace UnlitWF
             },
             // 特殊シェーダ用
             new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
+                enablePropName = "_CGL_Enable",
+            },
+            new WFCustomKeywordSettingBool("_CGL_UseDepthTex", "_CGL_DEPTH_ENABLE") {
                 enablePropName = "_CGL_Enable",
             },
             new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_"),
@@ -648,6 +650,7 @@ namespace UnlitWF
             new WFI18NTranslation("CGL", "Blur Min", "ブラー(下限)"),
             new WFI18NTranslation("CGL", "Blur Mode", "ブラーモード"),
             new WFI18NTranslation("CGL", "Blur Random", "ブラーランダム化"),
+            new WFI18NTranslation("CGL", "Correct Blur to exclude the foreground", "ブラー補正(手前のメッシュを映さない)"),
             // Grass
             new WFI18NTranslation("GRS", "Height Type", "高さ指定タイプ"),
             new WFI18NTranslation("GRS", "Ground Y coordinate", "地面Y座標"),
@@ -765,6 +768,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PsCapTypeLight, "LIGHT_CAPは黒色を基準とした加算合成を行うmatcapです"),
             new WFI18NTranslation(WFMessageText.PsCapTypeShade, "SHADE_CAPは白色を基準とした乗算合成を行うmatcapです"),
             new WFI18NTranslation(WFMessageText.PsPreviewTexture, "プレビューテクスチャが設定されています。\nプレビューテクスチャは保存されません。"),
+            new WFI18NTranslation(WFMessageText.PsCameraDepthTex, "CameraDepthTexture を使用する設定です。"),
 
             new WFI18NTranslation(WFMessageText.DgChangeMobile, "シェーダをMobile向けに切り替えますか？\n\nこの操作はUndoできますが、バックアップを取ることをお勧めします。"),
             new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダがインポートされました。\nプロジェクト内に古いマテリアルが残っていないかスキャンしますか？"),
@@ -1024,6 +1028,7 @@ namespace UnlitWF
         public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";
         public static readonly string PsCapTypeShade = "SHADE_CAP is a matcap that performs white-based multiply blending.";
         public static readonly string PsPreviewTexture = "A preview texture is set that cannot be saved.";
+        public static readonly string PsCameraDepthTex = "CameraDepthTexture will be used.";
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
         public static readonly string DgMigrationAuto = "UnlitWF shaders have been imported.\nDo you want to scan for old materials still in the project?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";

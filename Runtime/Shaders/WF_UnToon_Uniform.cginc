@@ -82,7 +82,7 @@
 
     // CameraDepthTexture ======================================
 
-#if defined(_GL_DEPTH_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+#if defined(_CGL_DEPTH_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
 #endif
 
@@ -129,7 +129,6 @@
     half3           _GL_CustomLitPos;
     half            _GL_DisableBasePos;
     half            _GL_NCC_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく half で定義
-    half            _GL_UseDepthTex;
 
     // -------------------------
 
@@ -425,6 +424,7 @@
     half            _CGL_BlurMin;
     uint            _CGL_BlurMode;
     half            _CGL_BlurRandom;
+    half            _CGL_UseDepthTex;
 #endif
 
     // -------------------------

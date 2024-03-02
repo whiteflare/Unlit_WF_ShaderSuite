@@ -291,7 +291,7 @@ namespace UnlitWF
             var changed = false;
             var settings = WFEditorSetting.GetOneOfSettings();
             changed |= SetupMaterial_CommonMaterialSettings(mat, "_GL_NCC_Enable", settings.GetEnableNccInCurrentEnvironment());
-            changed |= SetupMaterial_CommonMaterialSettings(mat, "_GL_UseDepthTex", settings.GetUseDepthTexInCurrentEnvironment());
+            changed |= SetupMaterial_CommonMaterialSettingsForceOFF(mat, "_CGL_UseDepthTex", settings.GetUseDepthTexInCurrentEnvironment());
             changed |= SetupMaterial_CommonMaterialSettings(mat, "_TS_DisableBackLit", settings.GetDisableBackLitInCurrentEnvironment());
             changed |= SetupMaterial_CommonMaterialSettings(mat, "_TR_DisableBackLit", settings.GetDisableBackLitInCurrentEnvironment());
             return changed;
@@ -301,7 +301,23 @@ namespace UnlitWF
         {
             var newVal = (int)value;
             bool changed = false;
-            if (0 <= newVal && mat.HasProperty(name))
+            if (0 <= newVal && mat.HasProperty(name)) // ForceOFF または ForceON の場合に設定する
+            {
+                var oldVal = mat.GetInt(name);
+                if (oldVal != newVal)
+                {
+                    mat.SetInt(name, newVal);
+                    changed = true;
+                }
+            }
+            return changed;
+        }
+
+        private static bool SetupMaterial_CommonMaterialSettingsForceOFF(Material mat, string name, MatForceSettingMode value)
+        {
+            var newVal = (int)value;
+            bool changed = false;
+            if (0 == newVal && mat.HasProperty(name)) // ForceOFF の場合に設定する
             {
                 var oldVal = mat.GetInt(name);
                 if (oldVal != newVal)
