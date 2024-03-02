@@ -213,6 +213,7 @@ namespace UnlitWF
                 // Toon系機能
                 new WFShaderFunction("TS", "TS", "ToonShade"),
                 new WFShaderFunction("TR", "TR", "RimLight"),
+                new WFShaderFunction("TM", "TM", "RimShadow"),
                 new WFShaderFunction("TL", "TL", "Outline"),
                 new WFShaderFunction("TFG", "TFG", "ToonFog"),
 
@@ -323,6 +324,9 @@ namespace UnlitWF
             new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
                 enablePropName = "_CGL_Enable",
             },
+            new WFCustomKeywordSettingBool("_CGL_UseDepthTex", "_CGL_DEPTH_ENABLE") {
+                enablePropName = "_CGL_Enable",
+            },
             new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_"),
             new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE"),
             new WFCustomKeywordSettingEnum("_WAM_CubemapType", "_", "_", "_WAM_ONLY2ND_ENABLE") {
@@ -392,6 +396,7 @@ namespace UnlitWF
             new WFI18NTranslation("Reflection", "反射(リフレクション)"),
             new WFI18NTranslation("Refraction", "屈折"),
             new WFI18NTranslation("RimLight", "リムライト"),
+            new WFI18NTranslation("RimShadow", "リムシャドウ"),
             new WFI18NTranslation("Specular", "光沢(スペキュラ)"),
             new WFI18NTranslation("Stencil Mask", "ステンシル"),
             new WFI18NTranslation("Tessellation", "細分化"),
@@ -448,9 +453,11 @@ namespace UnlitWF
             new WFI18NTranslation("Chroma Reaction", "Chroma Reaction (彩度)"),
             new WFI18NTranslation("Cast Shadows", "他の物体に影を落とす"),
             new WFI18NTranslation("Shadow Cutoff Threshold", "影のカットアウトしきい値"),
+            new WFI18NTranslation("Use CameraDepthTexture", "CameraDepthTexture を使う"),
             // Alpha
             new WFI18NTranslation("AL", "Alpha Source", "アルファソース"),
             new WFI18NTranslation("AL", "Alpha Mask Texture", "アルファマスク"),
+            new WFI18NTranslation("AL", "Mask Mode", "マスクモード"),
             new WFI18NTranslation("AL", "Power", "アルファ強度"),
             new WFI18NTranslation("AL", "Fresnel Power", "フレネル強度"),
             new WFI18NTranslation("AL", "Cutoff Threshold", "カットアウトしきい値"),
@@ -642,6 +649,8 @@ namespace UnlitWF
             new WFI18NTranslation("CGL", "Blur", "ブラー"),
             new WFI18NTranslation("CGL", "Blur Min", "ブラー(下限)"),
             new WFI18NTranslation("CGL", "Blur Mode", "ブラーモード"),
+            new WFI18NTranslation("CGL", "Blur Random", "ブラーランダム化"),
+            new WFI18NTranslation("CGL", "Correct Blur to exclude the foreground", "ブラー補正(手前のメッシュを映さない)"),
             // Grass
             new WFI18NTranslation("GRS", "Height Type", "高さ指定タイプ"),
             new WFI18NTranslation("GRS", "Ground Y coordinate", "地面Y座標"),
@@ -715,6 +724,8 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.BlendModeVC.MUL", "乗算"),
             new WFI18NTranslation("UnlitWF.BlendModeVC.ADD", "加算"),
             new WFI18NTranslation("UnlitWF.BlendModeVC.SUB", "減算"),
+            new WFI18NTranslation("UnlitWF.MaskModeAL.NORMAL", "通常"),
+            new WFI18NTranslation("UnlitWF.MaskModeAL.SUB", "減算"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.AUTO", "自動"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_DIRECTIONAL_LIT", "DirectionalLightのみ"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_POINT_LIT", "PointLightのみ"),
@@ -746,6 +757,9 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PlzFixQueueWithClearBg, "半透明マテリアルのQueueが2500以下です。\n背景消去パスが有効化されます。"),
             new WFI18NTranslation(WFMessageText.PlzFixDoubleSidedGI, "マテリアルの DoubleSidedGI がチェックされていません。\nこのマテリアルは片面としてライトベイクされます。\nDoubleSidedGI を修正しますか？"),
             new WFI18NTranslation(WFMessageText.PlzFixParticleVertexStreams, "ParticleSystem の VertexStreams が不一致です。\nParticleSystem の設定値を修正しますか？"),
+            new WFI18NTranslation(WFMessageText.PlzFixCameraDepthTexture, "マテリアルは CameraDepthTexture を使う設定ですが シーンに影付きライトがありません。"),
+            new WFI18NTranslation(WFMessageText.MenuCreateDepthLight, "Depth生成ライトをシーンに追加する"),
+            new WFI18NTranslation(WFMessageText.MenuWithoutDepthTex, "CameraDepthTexを使わないようマテリアルを変更"),
             new WFI18NTranslation(WFMessageText.PlzQuestSupport, "このマテリアルは Quest 非対応シェーダを使用しています。"),
             new WFI18NTranslation(WFMessageText.PlzDeprecatedFeature, "今後削除される予定の機能がマテリアルから使用されています。"),
 
@@ -754,6 +768,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PsCapTypeLight, "LIGHT_CAPは黒色を基準とした加算合成を行うmatcapです"),
             new WFI18NTranslation(WFMessageText.PsCapTypeShade, "SHADE_CAPは白色を基準とした乗算合成を行うmatcapです"),
             new WFI18NTranslation(WFMessageText.PsPreviewTexture, "プレビューテクスチャが設定されています。\nプレビューテクスチャは保存されません。"),
+            new WFI18NTranslation(WFMessageText.PsCameraDepthTex, "CameraDepthTexture を使用する設定です。"),
 
             new WFI18NTranslation(WFMessageText.DgChangeMobile, "シェーダをMobile向けに切り替えますか？\n\nこの操作はUndoできますが、バックアップを取ることをお勧めします。"),
             new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダがインポートされました。\nプロジェクト内に古いマテリアルが残っていないかスキャンしますか？"),
@@ -1003,6 +1018,9 @@ namespace UnlitWF
         public static readonly string PlzFixQueueWithClearBg = "The Queue for the transparency material is less or equal to 2500.\nBackground Clear pass is activated.";
         public static readonly string PlzFixDoubleSidedGI = "The material's DoubleSidedGI is unchecked.\nThis material will be lightbaked as single sided.\nDo you want to fix DoubleSidedGI?";
         public static readonly string PlzFixParticleVertexStreams = "Vertex Streams do not match the ParticleSystem settings.\nDo you want to fix ParticleSystem property?";
+        public static readonly string PlzFixCameraDepthTexture = "The setting uses CameraDepthTexture but there is no shadowed light in the scene.";
+        public static readonly string MenuCreateDepthLight = "Add Depth-generated lights to the scene";
+        public static readonly string MenuWithoutDepthTex = "Set material without CameraDepthTexture";
         public static readonly string PlzQuestSupport = "This material uses a shader that does not support Quest.";
         public static readonly string PlzDeprecatedFeature = "Features that will be removed in the future are used from this material.";
         public static readonly string PsAntiShadowMask = "In the Anti-Shadow Mask field, specify a mask texture with the avatar face painted white. You can also check the InvertMask checkbox to make the entire material a face.";
@@ -1010,6 +1028,7 @@ namespace UnlitWF
         public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";
         public static readonly string PsCapTypeShade = "SHADE_CAP is a matcap that performs white-based multiply blending.";
         public static readonly string PsPreviewTexture = "A preview texture is set that cannot be saved.";
+        public static readonly string PsCameraDepthTex = "CameraDepthTexture will be used.";
         public static readonly string DgChangeMobile = "Do you want to change those shader for Mobile?\n\nYou can undo this operation, but we recommend that you make a backup.";
         public static readonly string DgMigrationAuto = "UnlitWF shaders have been imported.\nDo you want to scan for old materials still in the project?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
