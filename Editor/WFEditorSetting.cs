@@ -92,41 +92,41 @@ namespace UnlitWF
         /// <summary>
         /// カメラのニアクリップを無視(for VRC3Avatar)
         /// </summary>
-        public MatForceSettingMode enableNccInVRC3Avatar = MatForceSettingMode.ForceON;
+        public MatForceSettingMode3 enableNccInVRC3Avatar = MatForceSettingMode3.ForceON;
         /// <summary>
         /// カメラのニアクリップを無視(for VRC3World)
         /// </summary>
-        public MatForceSettingMode enableNccInVRC3World = MatForceSettingMode.ForceOFF;
+        public MatForceSettingMode3 enableNccInVRC3World = MatForceSettingMode3.ForceOFF;
         /// <summary>
         /// カメラのニアクリップを無視(for OtherEnv)
         /// </summary>
-        public MatForceSettingMode enableNccInOther= MatForceSettingMode.PerMaterial;
+        public MatForceSettingMode3 enableNccInOther= MatForceSettingMode3.PerMaterial;
 
         /// <summary>
         /// 逆光補正しない(for VRC3Avatar)
         /// </summary>
-        public MatForceSettingMode disableBackLitInVRC3Avatar = MatForceSettingMode.PerMaterial;
+        public MatForceSettingMode3 disableBackLitInVRC3Avatar = MatForceSettingMode3.PerMaterial;
         /// <summary>
         /// 逆光補正しない(for VRC3World)
         /// </summary>
-        public MatForceSettingMode disableBackLitInVRC3World = MatForceSettingMode.ForceON;
+        public MatForceSettingMode3 disableBackLitInVRC3World = MatForceSettingMode3.ForceON;
         /// <summary>
         /// 逆光補正しない(for OtherEnv)
         /// </summary>
-        public MatForceSettingMode disableBackLitInOther = MatForceSettingMode.PerMaterial;
+        public MatForceSettingMode3 disableBackLitInOther = MatForceSettingMode3.PerMaterial;
 
         /// <summary>
         /// CameraDepthTextureを使う(for VRC3Avatar)
         /// </summary>
-        public MatForceSettingMode useDepthTexInVRC3Avatar = MatForceSettingMode.ForceOFF;
+        public MatForceSettingMode2 useDepthTexInVRC3Avatar = MatForceSettingMode2.ForceOFF;
         /// <summary>
         /// CameraDepthTextureを使う(for VRC3World)
         /// </summary>
-        public MatForceSettingMode useDepthTexInVRC3World = MatForceSettingMode.PerMaterial;
+        public MatForceSettingMode2 useDepthTexInVRC3World = MatForceSettingMode2.PerMaterial;
         /// <summary>
         /// CameraDepthTextureを使う(for OtherEnv)
         /// </summary>
-        public MatForceSettingMode useDepthTexInOther = MatForceSettingMode.PerMaterial;
+        public MatForceSettingMode2 useDepthTexInOther = MatForceSettingMode2.PerMaterial;
 
         // ==================================================
 
@@ -135,7 +135,7 @@ namespace UnlitWF
 
         // ==================================================
 
-        public MatForceSettingMode GetEnableNccInCurrentEnvironment()
+        public MatForceSettingMode3 GetEnableNccInCurrentEnvironment()
         {
             switch (WFCommonUtility.GetCurrentEntironment())
             {
@@ -148,7 +148,7 @@ namespace UnlitWF
             }
         }
 
-        public MatForceSettingMode GetDisableBackLitInCurrentEnvironment()
+        public MatForceSettingMode3 GetDisableBackLitInCurrentEnvironment()
         {
             switch (WFCommonUtility.GetCurrentEntironment())
             {
@@ -161,7 +161,7 @@ namespace UnlitWF
             }
         }
 
-        public MatForceSettingMode GetUseDepthTexInCurrentEnvironment()
+        public MatForceSettingMode2 GetUseDepthTexInCurrentEnvironment()
         {
             switch (WFCommonUtility.GetCurrentEntironment())
             {
@@ -216,7 +216,13 @@ namespace UnlitWF
         }
     }
 
-    public enum MatForceSettingMode
+    public enum MatForceSettingMode2
+    {
+        PerMaterial = -1,
+        ForceOFF = 0,
+    }
+
+    public enum MatForceSettingMode3
     {
         PerMaterial = -1,
         ForceOFF = 0,

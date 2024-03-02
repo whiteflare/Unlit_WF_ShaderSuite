@@ -77,10 +77,10 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_WAM_CubemapHighCut", ctx => IsAnyIntValue(ctx, "_WAM_CubemapType", p => p != 0), isRegex:false),
 
             // 条件付きHide(Common Material Settings)
-            new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx =>  WFEditorSetting.GetOneOfSettings().GetEnableNccInCurrentEnvironment() == MatForceSettingMode.PerMaterial, isRegex:false),
-            new ConditionVisiblePropertyHook("_CGL_UseDepthTex", ctx =>  WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() != MatForceSettingMode.ForceOFF, isRegex:false),
-            new ConditionVisiblePropertyHook("_TS_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode.PerMaterial, isRegex:false),
-            new ConditionVisiblePropertyHook("_TR_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx =>  WFEditorSetting.GetOneOfSettings().GetEnableNccInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_CGL_UseDepthTex", ctx =>  WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_TS_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_TR_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
