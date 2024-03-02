@@ -1177,8 +1177,8 @@ FEATURE_TGL_END
 
                 float dir_pwr = length(dir_vec);
                 float width = _TM_Width * 0.1;
-                float2 rim_max = 1 - width * dir_pwr;
-                float2 rim_min = 1 - (width + _TM_Feather) * dir_pwr;
+                float rim_max = 1 - width * dir_pwr;
+                float rim_min = 1 - (width + _TM_Feather) * dir_pwr;
 
                 return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TM_Exponent));
             }
@@ -1215,8 +1215,8 @@ FEATURE_TGL_END
 
                 float dir_pwr = length(dir_vec);
                 float width = _TR_Width * 0.1;
-                float2 rim_max = 1 - width * dir_pwr;
-                float2 rim_min = 1 - (width + _TR_Feather) * dir_pwr;
+                float rim_max = 1 - width * dir_pwr;
+                float rim_min = 1 - (width + _TR_Feather) * dir_pwr;
 
                 return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TR_Exponent));
             }
