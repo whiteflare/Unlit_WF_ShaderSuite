@@ -106,7 +106,7 @@ namespace UnlitWF
                         }
                         else
                         {
-                            if (WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode.PerMaterial)
+                            if (WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial)
                             {
                                 if (WFAccessor.GetBool(target, "_TS_Enable", false) && !WFAccessor.GetBool(target, "_TS_DisableBackLit", true))
                                 {
@@ -134,7 +134,7 @@ namespace UnlitWF
                     {
                         WFAccessor.SetBool(mat, "_GL_DisableBackLit", true);
                         WFAccessor.SetBool(mat, "_GL_DisableBasePos", true);
-                        if (WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode.PerMaterial)
+                        if (WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial)
                         {
                             if (WFAccessor.GetBool(mat, "_TS_Enable", false))
                             {
@@ -550,7 +550,7 @@ namespace UnlitWF
                     // メニュー作成
                     var menu = new GenericMenu();
                     menu.AddItem(WFI18N.GetGUIContent(WFMessageText.MenuCreateDepthLight), false, () => FixAddLightInScene(targets));
-                    if (WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode.PerMaterial)
+                    if (WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.PerMaterial)
                     {
                         menu.AddItem(WFI18N.GetGUIContent(WFMessageText.MenuWithoutDepthTex), false, () => FixMaterialTakeDown(targets));
                     }
@@ -572,7 +572,7 @@ namespace UnlitWF
 
         private static Material[] ValidateMaterials(params Material[] targets)
         {
-            if (WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode.ForceOFF)
+            if (WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.ForceOFF)
             {
                 return new Material[0];
             }
