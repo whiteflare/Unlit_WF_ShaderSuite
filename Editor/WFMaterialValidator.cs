@@ -577,7 +577,7 @@ namespace UnlitWF
                 return new Material[0];
             }
 
-            targets = targets.Where(mat => WFAccessor.GetBool(mat, "_GL_UseDepthTex", false)).ToArray();
+            targets = targets.Where(mat => WFAccessor.GetBool(mat, "_CGL_UseDepthTex", false)).ToArray();
             if (targets.Length == 0)
             {
                 return targets;
@@ -614,7 +614,7 @@ namespace UnlitWF
             Undo.RecordObjects(targets, "Fix UseCameraDepthTex");
             foreach(var mat in targets)
             {
-                WFAccessor.SetBool(mat, "_GL_UseDepthTex", false);
+                WFAccessor.SetBool(mat, "_CGL_UseDepthTex", false);
                 EditorUtility.SetDirty(mat);
             }
         }

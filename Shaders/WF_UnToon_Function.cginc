@@ -1617,9 +1617,9 @@ FEATURE_TGL_END
 
         float isCancelEyeDepth(float2 grab_uv, float depth) {
 #ifdef _WF_LEGACY_FEATURE_SWITCH
-            return TGL_ON(_GL_UseDepthTex) && LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+            return TGL_ON(_CGL_UseDepthTex) && LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
 #else
-    #if _GL_DEPTH_ENABLE
+    #if _CGL_DEPTH_ENABLE
             return LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
     #else
             return 0;
