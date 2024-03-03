@@ -321,7 +321,7 @@ namespace UnlitWF
                 enablePropName = "_TS_Enable",
             },
             // 特殊シェーダ用
-            new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
+            new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE", "_CGL_BLUROCT_ENABLE", "_CGL_BLURHEX_ENABLE", "_CGL_BLURSQ_ENABLE") {
                 enablePropName = "_CGL_Enable",
             },
             new WFCustomKeywordSettingBool("_CGL_UseDepthTex", "_CGL_DEPTH_ENABLE") {
@@ -534,13 +534,14 @@ namespace UnlitWF
             new WFI18NTranslation("TS", "Dont Ajust Contrast", "影コントラストを調整しない"),
             // RimLight
             new WFI18NTranslation("TR", "Rim Color", "リムライト色"),
-            new WFI18NTranslation("TR", "Width", "幅"),
-            new WFI18NTranslation("TR", "Width Top", "幅(上)"),
-            new WFI18NTranslation("TR", "Width Side", "幅(横)"),
-            new WFI18NTranslation("TR", "Width Bottom", "幅(下)"),
-            new WFI18NTranslation("TR", "Feather", "ぼかし幅"),
-            new WFI18NTranslation("TR", "Exponent", "ぼかし指数"),
+            new WFI18NTranslation("TR", "Width", "幅").AddTag("TM"),
+            new WFI18NTranslation("TR", "Width Top", "幅(上)").AddTag("TM"),
+            new WFI18NTranslation("TR", "Width Side", "幅(横)").AddTag("TM"),
+            new WFI18NTranslation("TR", "Width Bottom", "幅(下)").AddTag("TM"),
+            new WFI18NTranslation("TR", "Feather", "ぼかし幅").AddTag("TM"),
+            new WFI18NTranslation("TR", "Exponent", "ぼかし指数").AddTag("TM"),
             new WFI18NTranslation("TR", "Assign MainTex to MaskTexture", "MainTexをマスクに設定する"),
+            new WFI18NTranslation("TM", "Rim Color", "リムシャドウ色"),
             // Overlay Texture
             new WFI18NTranslation("OVL", "Overlay Color", "オーバーレイ テクスチャ"),
             new WFI18NTranslation("OVL", "Overlay Texture", "オーバーレイ テクスチャ"),

@@ -220,7 +220,11 @@ namespace UnlitWF
             new WFMaterialValidator(
                 targets => targets.Where(mat => WFAccessor.GetInt(mat, "_TR_Enable", 0) != 0 && WFAccessor.GetInt(mat, "_TR_BlendType", 0) == 3).ToArray(),
                 MessageType.Warning,
-                targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + WFI18N.Translate("TR", "Blend Type"),
+                targets => WFI18N.Translate(WFMessageText.PlzDeprecatedFeature) + ": " + 
+                    string.Format("{0}.{1} == {2}", 
+                        WFI18N.Translate("RimLight"),
+                        WFI18N.Translate("TR", "Blend Type"), 
+                        WFI18N.TryTranslate("UnlitWF.BlendModeTR.MUL", out var after) ? after : "MUL"),
                 null // アクションなし
             ),
 
