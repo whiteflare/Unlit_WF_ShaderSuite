@@ -37,6 +37,7 @@
     DECL_SUB_TEX2D      (_SpecGlossMap);
     DECL_SUB_TEX2D      (_TS_MaskTex);
     DECL_SUB_TEX2D      (_TR_MaskTex);
+    DECL_SUB_TEX2D      (_TM_MaskTex);
     DECL_SUB_TEX2D      (_OVL_MaskTex);
     DECL_SUB_TEX2D      (_TL_CustomColorTex);
     DECL_SUB_TEX2D      (_CHM_3chMaskTex);
@@ -79,6 +80,11 @@
     DECL_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE);   // URPではGrabがサポートされていないのでここで宣言する
 #endif
 
+    // CameraDepthTexture ======================================
+
+#if defined(_CGL_DEPTH_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+        UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
+#endif
 
     ////////////////////////////
     // Other uniform variable
@@ -108,6 +114,7 @@
     half            _AL_AlphaToMask;
     half            _AL_Z_Offset;
     half            _AL_InvMaskVal;
+    uint            _AL_MaskMode;
 
     // -------------------------
 
@@ -309,6 +316,20 @@
 
     // -------------------------
 
+    FEATURE_TGL    (_TM_Enable);
+    half3           _TM_Color;
+    half            _TM_Width;
+    half            _TM_Feather;
+    half            _TM_Exponent;
+    half            _TM_InvMaskVal;
+    half            _TM_BlendNormal;
+    half            _TM_BlendNormal2;
+    half            _TM_WidthTop;
+    half            _TM_WidthSide;
+    half            _TM_WidthBottom;
+
+    // -------------------------
+
 #ifndef _WF_MOBILE
     FEATURE_TGL    (_OVL_Enable);
     uint            _OVL_UVType;
@@ -402,6 +423,8 @@
     half            _CGL_Blur;
     half            _CGL_BlurMin;
     uint            _CGL_BlurMode;
+    half            _CGL_BlurRandom;
+    half            _CGL_UseDepthTex;
 #endif
 
     // -------------------------

@@ -28,6 +28,8 @@ namespace UnlitWF
     {
         public int settingPriority = 0;
 
+        // ==================================================
+
         /// <summary>
         /// ShaderStripping を有効にする
         /// </summary>
@@ -64,6 +66,8 @@ namespace UnlitWF
         /// </summary>
         public bool cleanupMaterialsBeforeAvatarBuild = true;
 
+        // ==================================================
+
         /// <summary>
         /// shaderインポート時にプロジェクトをスキャンする
         /// </summary>
@@ -75,34 +79,63 @@ namespace UnlitWF
         /// </summary>
         public bool enableMigrationWhenImport = true;
 
+        // ==================================================
+
         /// <summary>
         /// Quest向けシーンビルド時にMobile非対応シェーダを対応シェーダに置換する
         /// </summary>
         [Header("Quest Build Support")]
         public bool autoSwitchQuestShader = true;
 
+        // ==================================================
+
         /// <summary>
         /// カメラのニアクリップを無視(for VRC3Avatar)
         /// </summary>
-        public MatForceSettingMode enableNccInVRC3Avatar = MatForceSettingMode.ForceON;
+        public MatForceSettingMode3 enableNccInVRC3Avatar = MatForceSettingMode3.ForceON;
         /// <summary>
         /// カメラのニアクリップを無視(for VRC3World)
         /// </summary>
-        public MatForceSettingMode enableNccInVRC3World = MatForceSettingMode.ForceOFF;
+        public MatForceSettingMode3 enableNccInVRC3World = MatForceSettingMode3.ForceOFF;
+        /// <summary>
+        /// カメラのニアクリップを無視(for OtherEnv)
+        /// </summary>
+        public MatForceSettingMode3 enableNccInOther= MatForceSettingMode3.PerMaterial;
 
         /// <summary>
         /// 逆光補正しない(for VRC3Avatar)
         /// </summary>
-        public MatForceSettingMode disableBackLitInVRC3Avatar = MatForceSettingMode.PerMaterial;
+        public MatForceSettingMode3 disableBackLitInVRC3Avatar = MatForceSettingMode3.PerMaterial;
         /// <summary>
         /// 逆光補正しない(for VRC3World)
         /// </summary>
-        public MatForceSettingMode disableBackLitInVRC3World = MatForceSettingMode.ForceON;
+        public MatForceSettingMode3 disableBackLitInVRC3World = MatForceSettingMode3.ForceON;
+        /// <summary>
+        /// 逆光補正しない(for OtherEnv)
+        /// </summary>
+        public MatForceSettingMode3 disableBackLitInOther = MatForceSettingMode3.PerMaterial;
+
+        /// <summary>
+        /// CameraDepthTextureを使う(for VRC3Avatar)
+        /// </summary>
+        public MatForceSettingMode2 useDepthTexInVRC3Avatar = MatForceSettingMode2.ForceOFF;
+        /// <summary>
+        /// CameraDepthTextureを使う(for VRC3World)
+        /// </summary>
+        public MatForceSettingMode2 useDepthTexInVRC3World = MatForceSettingMode2.PerMaterial;
+        /// <summary>
+        /// CameraDepthTextureを使う(for OtherEnv)
+        /// </summary>
+        public MatForceSettingMode2 useDepthTexInOther = MatForceSettingMode2.PerMaterial;
+
+        // ==================================================
 
         private static WFEditorSetting currentSettings = null;
         private static int currentPriority = 0;
 
-        public MatForceSettingMode GetEnableNccInCurrentEnvironment()
+        // ==================================================
+
+        public MatForceSettingMode3 GetEnableNccInCurrentEnvironment()
         {
             switch (WFCommonUtility.GetCurrentEntironment())
             {
@@ -111,11 +144,11 @@ namespace UnlitWF
                 case CurrentEntironment.VRCSDK3_World:
                     return enableNccInVRC3World;
                 default:
-                    return MatForceSettingMode.PerMaterial;
+                    return enableNccInOther;
             }
         }
 
-        public MatForceSettingMode GetDisableBackLitInCurrentEnvironment()
+        public MatForceSettingMode3 GetDisableBackLitInCurrentEnvironment()
         {
             switch (WFCommonUtility.GetCurrentEntironment())
             {
@@ -124,9 +157,24 @@ namespace UnlitWF
                 case CurrentEntironment.VRCSDK3_World:
                     return disableBackLitInVRC3World;
                 default:
-                    return MatForceSettingMode.PerMaterial;
+                    return disableBackLitInOther;
             }
         }
+
+        public MatForceSettingMode2 GetUseDepthTexInCurrentEnvironment()
+        {
+            switch (WFCommonUtility.GetCurrentEntironment())
+            {
+                case CurrentEntironment.VRCSDK3_Avatar:
+                    return useDepthTexInVRC3Avatar;
+                case CurrentEntironment.VRCSDK3_World:
+                    return useDepthTexInVRC3World;
+                default:
+                    return useDepthTexInOther;
+            }
+        }
+
+        // ==================================================
 
         public static WFEditorSetting GetOneOfSettings(bool forceReload = false)
         {
@@ -168,7 +216,13 @@ namespace UnlitWF
         }
     }
 
-    public enum MatForceSettingMode
+    public enum MatForceSettingMode2
+    {
+        PerMaterial = -1,
+        ForceOFF = 0,
+    }
+
+    public enum MatForceSettingMode3
     {
         PerMaterial = -1,
         ForceOFF = 0,
@@ -204,10 +258,16 @@ namespace UnlitWF
         SerializedProperty p_cleanupMaterialsBeforeAvatarBuild;
         SerializedProperty p_enableMigrationWhenImport;
         SerializedProperty p_autoSwitchQuestShader;
+
         SerializedProperty p_enableNccInVRC3Avatar;
         SerializedProperty p_enableNccInVRC3World;
+        SerializedProperty p_enableNccInOther;
         SerializedProperty p_disableBackLitInVRC3Avatar;
         SerializedProperty p_disableBackLitInVRC3World;
+        SerializedProperty p_disableBackLitInOther;
+        SerializedProperty p_useDepthTexInVRC3Avatar;
+        SerializedProperty p_useDepthTexInVRC3World;
+        SerializedProperty p_useDepthTexInOther;
 
         private void OnEnable()
         {
@@ -233,10 +293,17 @@ namespace UnlitWF
             // EnableNCC
             this.p_enableNccInVRC3Avatar = serializedObject.FindProperty(nameof(WFEditorSetting.enableNccInVRC3Avatar));
             this.p_enableNccInVRC3World = serializedObject.FindProperty(nameof(WFEditorSetting.enableNccInVRC3World));
+            this.p_enableNccInOther = serializedObject.FindProperty(nameof(WFEditorSetting.enableNccInOther));
 
             // DisableBackLit
             this.p_disableBackLitInVRC3Avatar = serializedObject.FindProperty(nameof(WFEditorSetting.disableBackLitInVRC3Avatar));
             this.p_disableBackLitInVRC3World = serializedObject.FindProperty(nameof(WFEditorSetting.disableBackLitInVRC3World));
+            this.p_disableBackLitInOther = serializedObject.FindProperty(nameof(WFEditorSetting.disableBackLitInOther));
+
+            // UseDepthTex
+            this.p_useDepthTexInVRC3Avatar = serializedObject.FindProperty(nameof(WFEditorSetting.useDepthTexInVRC3Avatar));
+            this.p_useDepthTexInVRC3World = serializedObject.FindProperty(nameof(WFEditorSetting.useDepthTexInVRC3World));
+            this.p_useDepthTexInOther = serializedObject.FindProperty(nameof(WFEditorSetting.useDepthTexInOther));
         }
 
         public override void OnInspectorGUI()
@@ -251,13 +318,57 @@ namespace UnlitWF
                 var msg = WFI18N.Translate("WFEditorSetting", "This is not the setting used now.");
                 EditorGUILayout.HelpBox(msg, MessageType.Warning);
             }
-            EditorGUILayout.Space();
+
+            var width = EditorGUIUtility.labelWidth + EditorGUIUtility.fieldWidth + 5;
+            var rect = GUILayoutUtility.GetRect(width, width, 0, 0, EditorStyles.layerMaskField);
+            EditorGUIUtility.fieldWidth = 50;
+            EditorGUIUtility.labelWidth = rect.width - EditorGUIUtility.fieldWidth - 25 - 15;
 
             serializedObject.Update();
 
             // 優先度
 
             EditorGUILayout.PropertyField(p_settingPriority, toDisplay(p_settingPriority));
+
+            // Common Material Settings
+
+            EditorGUILayout.Space();
+            GUI.Label(EditorGUILayout.GetControlRect(), "Common Material Settings", EditorStyles.boldLabel);
+
+            var currentEnv = WFCommonUtility.GetCurrentEntironment();
+
+            using (new EditorGUI.DisabledGroupScope(currentEnv != CurrentEntironment.VRCSDK3_Avatar))
+            {
+                EditorGUILayout.LabelField(WFI18N.Translate("WFEditorSetting", "For VRCSDK3 Avatar"));
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    EditorGUILayout.PropertyField(p_enableNccInVRC3Avatar, new GUIContent(WFI18N.Translate("WFEditorSetting", "Cancel Near Clipping")));
+                    EditorGUILayout.PropertyField(p_disableBackLitInVRC3Avatar, new GUIContent(WFI18N.Translate("WFEditorSetting", "Disable BackLit")));
+                    EditorGUILayout.PropertyField(p_useDepthTexInVRC3Avatar, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use CameraDepthTexture")));
+                }
+            }
+
+            using (new EditorGUI.DisabledGroupScope(currentEnv != CurrentEntironment.VRCSDK3_World))
+            {
+                EditorGUILayout.LabelField(WFI18N.Translate("WFEditorSetting", "For VRCSDK3 World"));
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    EditorGUILayout.PropertyField(p_enableNccInVRC3World, new GUIContent(WFI18N.Translate("WFEditorSetting", "Cancel Near Clipping")));
+                    EditorGUILayout.PropertyField(p_disableBackLitInVRC3World, new GUIContent(WFI18N.Translate("WFEditorSetting", "Disable BackLit")));
+                    EditorGUILayout.PropertyField(p_useDepthTexInVRC3World, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use CameraDepthTexture")));
+                }
+            }
+
+            using (new EditorGUI.DisabledGroupScope(currentEnv != CurrentEntironment.Other))
+            {
+                EditorGUILayout.LabelField(WFI18N.Translate("WFEditorSetting", "Other Environment"));
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    EditorGUILayout.PropertyField(p_enableNccInOther, new GUIContent(WFI18N.Translate("WFEditorSetting", "Cancel Near Clipping")));
+                    EditorGUILayout.PropertyField(p_disableBackLitInOther, new GUIContent(WFI18N.Translate("WFEditorSetting", "Disable BackLit")));
+                    EditorGUILayout.PropertyField(p_useDepthTexInOther, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use CameraDepthTexture")));
+                }
+            }
 
             // Shader Build Settings
 
@@ -273,33 +384,14 @@ namespace UnlitWF
             EditorGUILayout.PropertyField(p_validateSceneMaterials, toDisplay(p_validateSceneMaterials));
             EditorGUILayout.PropertyField(p_cleanupMaterialsBeforeAvatarBuild, toDisplay(p_cleanupMaterialsBeforeAvatarBuild));
 
-            // Editor Behaviour Settings
-
-            EditorGUILayout.PropertyField(p_enableScanProjects, toDisplay(p_enableScanProjects));
-            EditorGUILayout.PropertyField(p_enableMigrationWhenImport, toDisplay(p_enableMigrationWhenImport));
-
             // Quest Build Support
 
             EditorGUILayout.PropertyField(p_autoSwitchQuestShader, toDisplay(p_autoSwitchQuestShader));
 
-            // Common Material Settings
+            // Editor Behaviour Settings
 
-            EditorGUILayout.Space();
-            GUI.Label(EditorGUILayout.GetControlRect(), "Common Material Settings", EditorStyles.boldLabel);
-
-            EditorGUILayout.LabelField(WFI18N.Translate("WFEditorSetting", "Cancel Near Clipping"));
-            using (new EditorGUI.IndentLevelScope())
-            {
-                EditorGUILayout.PropertyField(p_enableNccInVRC3Avatar, new GUIContent("For VRCSDK3 Avatar"));
-                EditorGUILayout.PropertyField(p_enableNccInVRC3World, new GUIContent("For VRCSDK3 World"));
-            }
-
-            EditorGUILayout.LabelField(WFI18N.Translate("WFEditorSetting", "Disable BackLit"));
-            using (new EditorGUI.IndentLevelScope())
-            {
-                EditorGUILayout.PropertyField(p_disableBackLitInVRC3Avatar, new GUIContent("For VRCSDK3 Avatar"));
-                EditorGUILayout.PropertyField(p_disableBackLitInVRC3World, new GUIContent("For VRCSDK3 World"));
-            }
+            EditorGUILayout.PropertyField(p_enableScanProjects, toDisplay(p_enableScanProjects));
+            EditorGUILayout.PropertyField(p_enableMigrationWhenImport, toDisplay(p_enableMigrationWhenImport));
 
             serializedObject.ApplyModifiedProperties();
 

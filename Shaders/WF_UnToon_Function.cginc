@@ -114,6 +114,10 @@
         #define WF_TEX2D_RIM_MASK(uv)           SAMPLE_MASK_VALUE(_TR_MaskTex, uv, _TR_InvMaskVal).rgb
     #endif
 
+    #ifndef WF_TEX2D_RIM_SHADOW_MASK
+        #define WF_TEX2D_RIM_SHADOW_MASK(uv)    SAMPLE_MASK_VALUE(_TM_MaskTex, uv, _TM_InvMaskVal).r
+    #endif
+
     #ifndef WF_TEX2D_SCREEN_MASK
         #define WF_TEX2D_SCREEN_MASK(uv)        SAMPLE_MASK_VALUE(_OVL_MaskTex, uv, _OVL_InvMaskVal).r
     #endif
@@ -195,15 +199,37 @@ FEATURE_TGL_END
                  : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
-        void drawAlphaMask(inout drawing d) {
-            float alpha = pickAlpha(d.uv_main, d.color.a) * _AL_CustomValue;
+        void alphaCutoutOutline(inout float alpha) {
+#ifdef _TL_ENABLE
+            if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) {
+                discard;
+            }
+#endif
+            alpha = 1;
+        }
 
-            /*
-             * カットアウト処理
-             * cutoutに使うものは、pickAlpha と _AL_CustomValue の値。
-             * 一方、Fresnel は cutout には巻き込まない。
-             * _AL_CustomValue を使っている MaskOut_Blend は cutout を使わない。
-             */
+        void alpha3PassCutout(inout float alpha) {
+            if (alpha < _Cutoff) {
+                discard;
+                alpha = 0;
+            }
+            else {
+                alpha = 1;
+            }
+        }
+
+        void alpha3PassFade(inout float alpha) {
+            if (alpha < _Cutoff) {
+                alpha *= _AL_Power;
+            }
+            else {
+                discard;
+                alpha = 0;
+            }
+        }
+
+        void drawAlphaMask(inout drawing d) {
+            float alpha = pickAlpha(d.uv_main, d.color.a);
 
             #if defined(_WF_ALPHA_CUSTOM)
                 _WF_ALPHA_CUSTOM
@@ -223,6 +249,10 @@ FEATURE_TGL_END
                 #endif
             #else
                 alpha *= _AL_Power;
+                if (_AL_MaskMode == 1) {
+                    alpha = max(0, 1 - alpha);
+                }
+                alpha *= _AL_CustomValue;
             #endif
 
             d.color.a = alpha;
@@ -1129,6 +1159,44 @@ FEATURE_TGL_END
     #endif
 
     ////////////////////////////
+    // Rim Shadow
+    ////////////////////////////
+
+    #ifdef _TM_ENABLE
+
+        float calcRimShadowPower(float3 vs_normal) {
+            float rimPower = length(vs_normal.xy);
+            if (rimPower < NZF) {
+                return 0;
+            }
+            else {
+                float2 dir_vec = vs_normal.xy / rimPower;
+                dir_vec.x *= _TM_WidthSide * 2;
+                dir_vec.y *= (_TM_WidthTop + _TM_WidthBottom);
+                dir_vec.y += (_TM_WidthTop - _TM_WidthBottom);
+
+                float dir_pwr = length(dir_vec);
+                float width = _TM_Width * 0.1;
+                float rim_max = 1 - width * dir_pwr;
+                float rim_min = 1 - (width + _TM_Feather) * dir_pwr;
+
+                return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TM_Exponent));
+            }
+        }
+
+        void drawRimShadow(inout drawing d) {
+FEATURE_TGL_ON_BEGIN(_TM_Enable)
+            float rimPower = WF_TEX2D_RIM_SHADOW_MASK(d.uv_main);
+            // 合成
+            d.color.rgb = lerp(d.color.rgb, d.color.rgb * _TM_Color.rgb, rimPower * calcRimShadowPower(calcMatcapVector(d.matcapVector, _TM_BlendNormal, _TM_BlendNormal2, 0)));
+FEATURE_TGL_END
+        }
+
+    #else
+        #define drawRimShadow(d)
+    #endif
+
+    ////////////////////////////
     // Rim Light
     ////////////////////////////
 
@@ -1147,8 +1215,8 @@ FEATURE_TGL_END
 
                 float dir_pwr = length(dir_vec);
                 float width = _TR_Width * 0.1;
-                float2 rim_max = 1 - width * dir_pwr;
-                float2 rim_min = 1 - (width + _TR_Feather) * dir_pwr;
+                float rim_max = 1 - width * dir_pwr;
+                float rim_min = 1 - (width + _TR_Feather) * dir_pwr;
 
                 return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TR_Exponent));
             }
@@ -1532,7 +1600,7 @@ FEATURE_TGL_ON_BEGIN(_CRF_Enable)
             float4 grab_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv.xy);
             float3 back_color = grab_color.rgb * (_CRF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
-            d.color.rgb = lerp(lerp(d.color.rgb, back_color.rgb, grab_color.a), d.color.rgb, d.color.a);
+            d.color.rgb = lerp(lerp(d.color.rgb, back_color.rgb, grab_color.a), d.color.rgb, saturate(d.color.a));
             d.color.a = lerp(d.color.a, 1, grab_color.a);
 FEATURE_TGL_END
         }
@@ -1547,7 +1615,19 @@ FEATURE_TGL_END
 
     #ifdef _CGL_ENABLE
 
-        float3 sampleScreenTextureBlur1(float2 uv, float2 scale) {    // NORMAL
+        float isCancelEyeDepth(float2 grab_uv, float depth) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            return TGL_ON(_CGL_UseDepthTex) && LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+#else
+    #if _CGL_DEPTH_ENABLE
+            return LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+    #else
+            return 0;
+    #endif
+#endif
+        }
+
+        float3 sampleScreenTextureBlur1(float2 uv, float2 scale, float depth) {    // NORMAL
             static const int    BLUR_SAMPLE_COUNT = 7;
             static const float  BLUR_KERNEL[BLUR_SAMPLE_COUNT] = { -1, -2.0/3, -1.0/3, 0, 1.0/3, 2.0/3, 1 };
             static const half   BLUR_WEIGHTS[BLUR_SAMPLE_COUNT] = { 0.036, 0.113, 0.216, 0.269, 0.216, 0.113, 0.036 };
@@ -1555,14 +1635,18 @@ FEATURE_TGL_END
             float3 color = ZERO_VEC3;
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
                 for (int k = 0; k < BLUR_SAMPLE_COUNT; k++) {
-                    float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale;
-                    color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
+                    float2 offset = float2(BLUR_KERNEL[j], BLUR_KERNEL[k]) * scale * (1 - random2to1(uv + fixed2(j, k)) * _CGL_BlurRandom);
+                    float2 uv2 = uv + offset;
+                    if (isCancelEyeDepth(uv2, depth)) {
+                        uv2 = uv;
+                    }
+                    color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv2).rgb * BLUR_WEIGHTS[j] * BLUR_WEIGHTS[k];
                 }
             }
             return color;
         }
 
-        float3 sampleScreenTextureBlur2(float2 uv, float2 scale) {    // FAST
+        float3 sampleScreenTextureBlur2(float2 uv, float2 scale, float depth) {    // FAST
             static const int    BLUR_SAMPLE_COUNT = 8;
             static const float2 BLUR_KERNEL[BLUR_SAMPLE_COUNT] = {
                 float2(-1.0, -1.0),
@@ -1578,11 +1662,28 @@ FEATURE_TGL_END
 
             float3 color = ZERO_VEC3;
             for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
-                float2 offset = BLUR_KERNEL[j] * scale;
-                color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv + offset).rgb * BLUR_WEIGHT;
+                float2 offset = BLUR_KERNEL[j] * scale * (1 - random2to1(uv + j.xx) * _CGL_BlurRandom);
+                float2 uv2 = uv + offset;
+                if (isCancelEyeDepth(uv2, depth)) {
+                    uv2 = uv;
+                }
+                color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv2).rgb * BLUR_WEIGHT;
             }
             return color;
         }
+
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+        float3 sampleScreenTextureBlur(float2 uv, float2 scale, float depth) {
+            return _CGL_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale, depth).rgb : sampleScreenTextureBlur2(grab_uv, scale, depth).rgb;
+        }
+        #define SAMPLE_BLUR sampleScreenTextureBlur
+#else
+    #ifdef _CGL_BLURFAST_ENABLE
+        #define SAMPLE_BLUR sampleScreenTextureBlur2
+    #else
+        #define SAMPLE_BLUR sampleScreenTextureBlur1
+    #endif
+#endif
 
         void drawFrostedGlass(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CGL_Enable)
@@ -1593,24 +1694,15 @@ FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             // Scale 計算
             float2 scale = max(_CGL_BlurMin.xx, _CGL_Blur.xx / max(1, length( d.ws_vertex.xyz - worldSpaceViewPointPos() )));
             scale *= UNITY_MATRIX_P._m11 / 100;
-            scale.y *= _ScreenParams.x / _ScreenParams.y
-#ifdef UNITY_SINGLE_PASS_STEREO
-                / 2
+#ifdef USING_STEREO_MATRICES
+            scale.x *= 0.5;
 #endif
-            ;
+            scale.y *= _ScreenParams.x / _ScreenParams.y;
 
-            float3 back_color =
-#ifdef _WF_LEGACY_FEATURE_SWITCH
-                _CGL_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale).rgb : sampleScreenTextureBlur2(grab_uv, scale).rgb;
-#else
-    #ifdef _CGL_BLURFAST_ENABLE
-                sampleScreenTextureBlur2(grab_uv, scale).rgb;
-    #else
-                sampleScreenTextureBlur1(grab_uv, scale).rgb;
-    #endif
-#endif
+            float depth = -mul(UNITY_MATRIX_V, float4(d.ws_vertex.xyz, 1.0)).z;
+            float3 back_color = SAMPLE_BLUR(grab_uv, scale, depth).rgb;
 
-            d.color.rgb = lerp(back_color.rgb, d.color.rgb, d.color.a);
+            d.color.rgb = lerp(back_color.rgb, d.color.rgb, saturate(d.color.a));
             d.color.a = 1;
 FEATURE_TGL_END
         }

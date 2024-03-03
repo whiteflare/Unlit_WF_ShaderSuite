@@ -269,6 +269,23 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
+        [WFHeaderToggle(RimShadow)]
+            _TM_Enable              ("[TM] Enable", Float) = 0
+            _TM_Color               ("[TM] Rim Color", Color) = (0, 0, 0, 1)
+            _TM_Width               ("[TM] Width", Range(0, 1)) = 0
+            _TM_Feather             ("[TM] Feather", Range(0, 1)) = 0.1
+            _TM_Exponent            ("[TM] Exponent", Range(1, 8)) = 1
+            _TM_BlendNormal         ("[TM] Blend Normal", Range(0, 1)) = 0
+            _TM_BlendNormal2        ("[TM] Blend Normal 2nd", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TM_MaskTex             ("[TM] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _TM_InvMaskVal          ("[TM] Invert Mask Value", Range(0, 1)) = 0
+        [Header(RimShadow Advance)]
+            _TM_WidthTop            ("[TM] Width Top", Range(0, 1)) = 0.5
+            _TM_WidthSide           ("[TM] Width Side", Range(0, 1)) = 1
+            _TM_WidthBottom         ("[TM] Width Bottom", Range(0, 1)) = 1
+
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -472,7 +489,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
             #pragma target 5.0
 
-            #define _WF_ALPHA_CUSTOM    if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) { discard; } else { alpha = 1; } // _Cutoff 以上を描画
+            #define _WF_ALPHA_CUSTOM    alphaCutoutOutline(alpha);
             #define _WF_UNTOON_TESS
 
 
@@ -541,7 +558,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
 
             #pragma target 5.0
 
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha = 1; } // _Cutoff 以上を描画
+            #define _WF_ALPHA_CUSTOM    alpha3PassCutout(alpha);
             #define _WF_UNTOON_TESS
 
 
@@ -570,6 +587,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _HL_ENABLE_1
             #define _LME_ENABLE
             #define _MT_ENABLE
+            #define _TM_ENABLE
             #define _TR_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -603,7 +621,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #pragma target 5.0
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
+            #define _WF_ALPHA_CUSTOM    alpha3PassFade(alpha);
             #define _WF_FACE_BACK
             #define _WF_UNTOON_TESS
 
@@ -633,6 +651,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _HL_ENABLE_1
             #define _LME_ENABLE
             #define _MT_ENABLE
+            #define _TM_ENABLE
             #define _TR_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -666,7 +685,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #pragma target 5.0
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
+            #define _WF_ALPHA_CUSTOM    alpha3PassFade(alpha);
             #define _WF_UNTOON_TESS
 
 
@@ -695,6 +714,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass" {
             #define _HL_ENABLE_1
             #define _LME_ENABLE
             #define _MT_ENABLE
+            #define _TM_ENABLE
             #define _TR_ENABLE
 
             #pragma multi_compile_fwdbase

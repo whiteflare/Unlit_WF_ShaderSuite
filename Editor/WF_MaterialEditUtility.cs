@@ -545,6 +545,8 @@ namespace UnlitWF
 
         private static void CleanUpForWFMaterial(Material material)
         {
+            int steps = WFAccessor.GetInt(material, "_TS_Steps", 3);
+
             var props = ShaderSerializedProperty.AsList(material);
 
             // 無効になってる機能のプレフィックスを集める
@@ -558,12 +560,33 @@ namespace UnlitWF
                 }
             }
 
-            var del_props = new HashSet<ShaderSerializedProperty>();
-
-            // プレフィックスに合致する設定値を消去
-            props.FindAll(p => IsDisabledProperty(p, delPrefix)).ForEach(p => del_props.Add(p));
-            // 未使用の値を削除
-            props.FindAll(p => !p.HasPropertyInShader).ForEach(p => del_props.Add(p));
+            var del_props = new List<ShaderSerializedProperty>();
+            foreach(var p in props)
+            {
+                // プレフィックスに合致する設定値を消去
+                if (IsDisabledProperty(p, delPrefix))
+                {
+                    del_props.Add(p);
+                    continue;
+                }
+                // 未使用の値を削除
+                if (!p.HasPropertyInShader)
+                {
+                    del_props.Add(p);
+                    continue;
+                }
+                // 使っていない影テクスチャ削除
+                if (steps < 3 && (p.name == "_TS_3rdTex" || p.name == "_TS_3rdColor"))
+                {
+                    del_props.Add(p);
+                    continue;
+                }
+                if (steps < 2 && (p.name == "_TS_2ndTex" || p.name == "_TS_2ndColor"))
+                {
+                    del_props.Add(p);
+                    continue;
+                }
+            }
 
             // 削除実行
             DeleteProperties(del_props, material);
