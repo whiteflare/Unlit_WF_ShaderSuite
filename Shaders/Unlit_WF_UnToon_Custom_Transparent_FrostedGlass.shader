@@ -42,7 +42,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _CGL_Enable             ("[CGL] Enable", Float) = 1
             _CGL_Blur               ("[CGL] Blur", Range(0, 2)) = 0.4
             _CGL_BlurMin            ("[CGL] Blur Min", Range(0, 2)) = 0
-        [Enum(NORMAL,0,FAST,1)]
+        [Enum(GAUSSIAN,0,FAST,1,OCTAGON,2,HEXAGON,3,SQUARE,4)]
             _CGL_BlurMode           ("[CGL] Blur Mode", Float) = 0
             _CGL_BlurRandom         ("[CGL] Blur Random", Range(0, 1)) = 0
         [ToggleUI]
@@ -413,7 +413,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _CGL_BLURFAST_ENABLE
+            #pragma shader_feature_local_fragment _ _CGL_BLURFAST_ENABLE _CGL_BLUROCT_ENABLE _CGL_BLURHEX_ENABLE _CGL_BLURSQ_ENABLE
             #pragma shader_feature_local_fragment _ _CGL_DEPTH_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE

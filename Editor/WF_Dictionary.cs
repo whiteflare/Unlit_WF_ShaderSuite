@@ -321,7 +321,7 @@ namespace UnlitWF
                 enablePropName = "_TS_Enable",
             },
             // 特殊シェーダ用
-            new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE") {
+            new WFCustomKeywordSettingEnum("_CGL_BlurMode", "_", "_CGL_BLURFAST_ENABLE", "_CGL_BLUROCT_ENABLE", "_CGL_BLURHEX_ENABLE", "_CGL_BLURSQ_ENABLE") {
                 enablePropName = "_CGL_Enable",
             },
             new WFCustomKeywordSettingBool("_CGL_UseDepthTex", "_CGL_DEPTH_ENABLE") {
