@@ -82,7 +82,7 @@
 
     // CameraDepthTexture ======================================
 
-#if defined(_CGL_DEPTH_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+#if defined(_CRF_DEPTH_ENABLE) || defined(_CGL_DEPTH_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
         UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
 #endif
 
@@ -409,6 +409,7 @@
     half            _CRF_Distance;
     half3           _CRF_Tint;
     half            _CRF_BlendNormal;
+    half            _CRF_UseDepthTex;
 #endif
 
     // -------------------------

@@ -44,6 +44,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _CRF_Distance           ("[CRF] Distance", Range(0, 10)) = 10.0
             _CRF_Tint               ("[CRF] Tint Color", Color) = (0.5, 0.5, 0.5)
             _CRF_BlendNormal        ("[CRF] Blend Normal", Range(0, 1)) = 0.1
+        [ToggleUI]
+            _CRF_UseDepthTex        ("[CRF] Correct Refraction to exclude the foreground", Range(0, 1)) = 0
 
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
@@ -455,6 +457,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _CRF_DEPTH_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE

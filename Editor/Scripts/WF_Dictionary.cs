@@ -327,6 +327,9 @@ namespace UnlitWF
             new WFCustomKeywordSettingBool("_CGL_UseDepthTex", "_CGL_DEPTH_ENABLE") {
                 enablePropName = "_CGL_Enable",
             },
+            new WFCustomKeywordSettingBool("_CRF_UseDepthTex", "_CRF_DEPTH_ENABLE") {
+                enablePropName = "_CRF_Enable",
+            },
             new WFCustomKeywordSettingEnum("_GRS_HeightType", "_", "_", "_GRS_MASKTEX_ENABLE", "_"),
             new WFCustomKeywordSettingBool("_GRS_EraseSide", "_GRS_ERSSIDE_ENABLE"),
             new WFCustomKeywordSettingEnum("_WAM_CubemapType", "_", "_", "_WAM_ONLY2ND_ENABLE") {
@@ -646,6 +649,7 @@ namespace UnlitWF
             new WFI18NTranslation("FUR", "Tint Color (Tip)", "色調整 (先端)"),
             // Refraction
             new WFI18NTranslation("CRF", "Refractive Index", "屈折率"),
+            new WFI18NTranslation("CRF", "Correct Refraction to exclude the foreground", "屈折補正(手前のメッシュを映さない)"),
             // Frosted Glass
             new WFI18NTranslation("CGL", "Blur", "ブラー"),
             new WFI18NTranslation("CGL", "Blur Min", "ブラー(下限)"),
