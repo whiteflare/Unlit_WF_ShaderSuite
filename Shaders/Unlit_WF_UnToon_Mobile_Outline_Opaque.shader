@@ -346,7 +346,9 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
+            #define _WF_MOBILE
             #define _GL_NCC_ENABLE
+            #define _TL_ENABLE
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
@@ -357,28 +359,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             ENDCG
         }
 
-        Pass {
-            Name "META"
-            Tags { "LightMode" = "Meta" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-
-            #define _WF_MOBILE
-
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-
-            #pragma shader_feature EDITOR_VISUALIZATION
-
-            #include "WF_UnToon_Meta.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque/META"
     }
 
     FallBack "Unlit/Texture"

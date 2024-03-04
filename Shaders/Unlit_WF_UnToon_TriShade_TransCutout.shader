@@ -420,7 +420,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_TransCutout/META"
     }
 
