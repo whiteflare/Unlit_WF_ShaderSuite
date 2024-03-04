@@ -46,6 +46,10 @@
     DECL_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE);   // URPではGrabがサポートされていないのでここで宣言する
 #endif
 
+#if defined(_CRF_DEPTH_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+    UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
+#endif
+
     ////////////////////////////
     // Other uniform variable
     ////////////////////////////
@@ -150,6 +154,7 @@
     half            _CRF_Distance;
     half3           _CRF_Tint;
     half            _CRF_BlendNormal;
+    half            _CRF_UseDepthTex;
 #endif
 
     // -------------------------

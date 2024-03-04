@@ -1584,6 +1584,18 @@ FEATURE_TGL_END
 
     #ifdef _CRF_ENABLE
 
+        float isCancelEyeDepth(float2 grab_uv, float depth) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            return TGL_ON(_CRF_UseDepthTex) && LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+#else
+    #if _CRF_DEPTH_ENABLE
+            return LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+    #else
+            return 0;
+    #endif
+#endif
+        }
+
         void drawRefraction(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CRF_Enable)
             float3 view_dir = normalize(d.ws_vertex - _WorldSpaceCameraPos.xyz);
@@ -1597,6 +1609,12 @@ FEATURE_TGL_ON_BEGIN(_CRF_Enable)
 
             float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
             grab_uv.xy /= grab_uv.w;
+
+            float depth = -mul(UNITY_MATRIX_V, float4(d.ws_vertex.xyz, 1.0)).z;
+            if (isCancelEyeDepth(grab_uv, depth)) {
+                return;
+            }
+
             float4 grab_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv.xy);
             float3 back_color = grab_color.rgb * (_CRF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 

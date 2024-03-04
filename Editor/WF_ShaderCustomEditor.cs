@@ -78,6 +78,7 @@ namespace UnlitWF
 
             // 条件付きHide(Common Material Settings)
             new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx =>  WFEditorSetting.GetOneOfSettings().GetEnableNccInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_CRF_UseDepthTex", ctx =>  WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.PerMaterial, isRegex:false),
             new ConditionVisiblePropertyHook("_CGL_UseDepthTex", ctx =>  WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.PerMaterial, isRegex:false),
             new ConditionVisiblePropertyHook("_TS_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
             new ConditionVisiblePropertyHook("_TR_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
@@ -217,7 +218,7 @@ namespace UnlitWF
             new DuplicateDisplayHook("_NS_InvMaskVal", "_FlipMirror", dn => dn.Replace("[NM]", "[NS]"), isRegex:false),
 
             // _CGL_UseDepthTex の後に説明文を追加する
-            new HelpBoxPropertyHook("_CGL_UseDepthTex", ctx => ctx.current.floatValue == 0 ? null : WFI18N.Translate(WFMessageText.PsCameraDepthTex), MessageType.Info, isRegex:false),
+            new HelpBoxPropertyHook("_CRF_UseDepthTex|_CGL_UseDepthTex", ctx => ctx.current.floatValue == 0 ? null : WFI18N.Translate(WFMessageText.PsCameraDepthTex), MessageType.Info),
 
             // _TS_InvMaskVal の後に説明文を追加する
             new HelpBoxPropertyHook("_TS_InvMaskVal", ctx => WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info, isRegex:false),
