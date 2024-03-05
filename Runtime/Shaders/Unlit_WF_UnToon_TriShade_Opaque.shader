@@ -401,7 +401,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_Opaque" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Opaque/SHADOWCASTER"
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 

@@ -554,7 +554,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_TransCutout/META"
     }
 

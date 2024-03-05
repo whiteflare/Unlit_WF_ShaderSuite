@@ -577,7 +577,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent/SHADOWCASTER"
         UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
