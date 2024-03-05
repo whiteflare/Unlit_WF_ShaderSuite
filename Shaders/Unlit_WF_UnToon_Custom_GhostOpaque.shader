@@ -447,26 +447,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostOpaque" {
             ENDCG
         }
 
-        Pass {
-            Name "META"
-            Tags { "LightMode" = "Meta" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-
-            #define _ES_ENABLE
-            #define _VC_ENABLE
-
-            #pragma shader_feature EDITOR_VISUALIZATION
-
-            #include "WF_UnToon_Meta.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Opaque/META"
     }
 
     FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"

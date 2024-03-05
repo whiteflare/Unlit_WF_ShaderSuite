@@ -299,6 +299,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
             #pragma fragment frag_shadow
 
             #define _WF_ALPHA_CUTOUT
+            #define _WF_MOBILE
             #define _GL_NCC_ENABLE
 
             #pragma multi_compile_shadowcaster

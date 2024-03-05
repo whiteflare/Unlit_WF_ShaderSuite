@@ -55,6 +55,8 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
+        [ToggleUI]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
@@ -121,6 +123,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout" {
             ENDCG
         }
 
+        UsePass "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout/SHADOWCASTER"
         UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 

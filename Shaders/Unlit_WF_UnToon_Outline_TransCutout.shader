@@ -542,7 +542,31 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout" {
             ENDCG
         }
 
-        UsePass "UnlitWF/WF_UnToon_TransCutout/SHADOWCASTER"
+        Pass {
+            Name "SHADOWCASTER"
+            Tags{ "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
+
+            CGPROGRAM
+
+            #pragma vertex vert_shadow
+            #pragma fragment frag_shadow
+
+            #define _WF_ALPHA_CUTOUT
+            #define _GL_NCC_ENABLE
+            #define _DSV_ENABLE
+            #define _TL_ENABLE
+
+            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #include "WF_UnToon_ShadowCaster.cginc"
+
+            ENDCG
+        }
+
         UsePass "UnlitWF/WF_UnToon_TransCutout/META"
     }
 

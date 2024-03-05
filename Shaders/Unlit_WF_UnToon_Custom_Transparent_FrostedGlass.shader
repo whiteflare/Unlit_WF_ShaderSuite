@@ -42,7 +42,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _CGL_Enable             ("[CGL] Enable", Float) = 1
             _CGL_Blur               ("[CGL] Blur", Range(0, 2)) = 0.4
             _CGL_BlurMin            ("[CGL] Blur Min", Range(0, 2)) = 0
-        [Enum(NORMAL,0,FAST,1)]
+        [Enum(GAUSSIAN,0,FAST,1,OCTAGON,2,HEXAGON,3,SQUARE,4)]
             _CGL_BlurMode           ("[CGL] Blur Mode", Float) = 0
             _CGL_BlurRandom         ("[CGL] Blur Random", Range(0, 1)) = 0
         [ToggleUI]
@@ -445,51 +445,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             ENDCG
         }
 
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #define _WF_ALPHA_BLEND
-            #define _GL_NCC_ENABLE
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ LOD_FADE_CROSSFADE
-
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "META"
-            Tags { "LightMode" = "Meta" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-
-            #define _WF_ALPHA_BLEND
-
-            #define _ES_ENABLE
-            #define _VC_ENABLE
-
-            #pragma shader_feature EDITOR_VISUALIZATION
-
-            #include "WF_UnToon_Meta.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
     FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"

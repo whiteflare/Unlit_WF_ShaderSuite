@@ -44,6 +44,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _CRF_Distance           ("[CRF] Distance", Range(0, 10)) = 10.0
             _CRF_Tint               ("[CRF] Tint Color", Color) = (0.5, 0.5, 0.5)
             _CRF_BlendNormal        ("[CRF] Blend Normal", Range(0, 1)) = 0.1
+        [ToggleUI]
+            _CRF_UseDepthTex        ("[CRF] Correct Refraction to exclude the foreground", Range(0, 1)) = 0
 
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
@@ -460,6 +462,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
 
 
+
             #define _BKT_ENABLE
             #define _CHM_ENABLE
             #define _CGR_ENABLE
@@ -489,51 +492,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             ENDCG
         }
 
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #define _WF_ALPHA_BLEND
-            #define _GL_NCC_ENABLE
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ LOD_FADE_CROSSFADE
-
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "META"
-            Tags { "LightMode" = "Meta" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-
-            #define _WF_ALPHA_BLEND
-
-            #define _ES_ENABLE
-            #define _VC_ENABLE
-
-            #pragma shader_feature EDITOR_VISUALIZATION
-
-            #include "WF_UnToon_Meta.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
     FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"

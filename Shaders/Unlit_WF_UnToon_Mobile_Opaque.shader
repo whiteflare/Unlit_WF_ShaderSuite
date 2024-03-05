@@ -300,6 +300,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             #pragma vertex vert_shadow
             #pragma fragment frag_shadow
 
+            #define _WF_MOBILE
             #define _GL_NCC_ENABLE
 
             #pragma multi_compile_shadowcaster
