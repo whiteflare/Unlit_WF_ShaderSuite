@@ -1177,8 +1177,8 @@ FEATURE_TGL_END
 
                 float dir_pwr = length(dir_vec);
                 float width = _TM_Width * 0.1;
-                float2 rim_max = 1 - width * dir_pwr;
-                float2 rim_min = 1 - (width + _TM_Feather) * dir_pwr;
+                float rim_max = 1 - width * dir_pwr;
+                float rim_min = 1 - (width + _TM_Feather) * dir_pwr;
 
                 return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TM_Exponent));
             }
@@ -1215,8 +1215,8 @@ FEATURE_TGL_END
 
                 float dir_pwr = length(dir_vec);
                 float width = _TR_Width * 0.1;
-                float2 rim_max = 1 - width * dir_pwr;
-                float2 rim_min = 1 - (width + _TR_Feather) * dir_pwr;
+                float rim_max = 1 - width * dir_pwr;
+                float rim_min = 1 - (width + _TR_Feather) * dir_pwr;
 
                 return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TR_Exponent));
             }
@@ -1584,6 +1584,18 @@ FEATURE_TGL_END
 
     #ifdef _CRF_ENABLE
 
+        float isCancelEyeDepth(float2 grab_uv, float depth) {
+#ifdef _WF_LEGACY_FEATURE_SWITCH
+            return TGL_ON(_CRF_UseDepthTex) && LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+#else
+    #if _CRF_DEPTH_ENABLE
+            return LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, grab_uv)) < depth;
+    #else
+            return 0;
+    #endif
+#endif
+        }
+
         void drawRefraction(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CRF_Enable)
             float3 view_dir = normalize(d.ws_vertex - _WorldSpaceCameraPos.xyz);
@@ -1597,6 +1609,12 @@ FEATURE_TGL_ON_BEGIN(_CRF_Enable)
 
             float4 grab_uv = ComputeGrabScreenPos(refract_scr_pos);
             grab_uv.xy /= grab_uv.w;
+
+            float depth = -mul(UNITY_MATRIX_V, float4(d.ws_vertex.xyz, 1.0)).z;
+            if (isCancelEyeDepth(grab_uv, depth)) {
+                return;
+            }
+
             float4 grab_color = PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, grab_uv.xy);
             float3 back_color = grab_color.rgb * (_CRF_Tint.rgb * unity_ColorSpaceDouble.rgb);
 
@@ -1627,7 +1645,7 @@ FEATURE_TGL_END
 #endif
         }
 
-        float3 sampleScreenTextureBlur1(float2 uv, float2 scale, float depth) {    // NORMAL
+        float3 sampleScreenTextureBlur1(float2 uv, float2 scale, float depth) {    // GAUSSIAN
             static const int    BLUR_SAMPLE_COUNT = 7;
             static const float  BLUR_KERNEL[BLUR_SAMPLE_COUNT] = { -1, -2.0/3, -1.0/3, 0, 1.0/3, 2.0/3, 1 };
             static const half   BLUR_WEIGHTS[BLUR_SAMPLE_COUNT] = { 0.036, 0.113, 0.216, 0.269, 0.216, 0.113, 0.036 };
@@ -1672,14 +1690,97 @@ FEATURE_TGL_END
             return color;
         }
 
+        float3 sampleScreenTextureBlur3(float2 uv, float2 scale, float depth) {    // OCTAGON
+            static const int    BLUR_SAMPLE_COUNT = 8;
+            static const float2 BLUR_KERNEL[BLUR_SAMPLE_COUNT] = {
+                float2(+0.0, +1.0),
+                float2(+1.0, +0.0),
+                float2(+0.0, -1.0),
+                float2(-1.0, +0.0),
+                float2(+0.7, +0.7),
+                float2(+0.7, -0.7),
+                float2(-0.7, +0.7),
+                float2(-0.7, -0.7),
+            };
+            static const float  BLUR_WEIGHT = 1.0 / BLUR_SAMPLE_COUNT;
+
+            float3 color = ZERO_VEC3;
+            for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
+                float2 offset = BLUR_KERNEL[j] * scale * (1 - random2to1(uv + j.xx) * _CGL_BlurRandom);
+                float2 uv2 = uv + offset;
+                if (isCancelEyeDepth(uv2, depth)) {
+                    uv2 = uv;
+                }
+                color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv2).rgb * BLUR_WEIGHT;
+            }
+            return color;
+        }
+
+        float3 sampleScreenTextureBlur4(float2 uv, float2 scale, float depth) {    // HEXAGON
+            static const int    BLUR_SAMPLE_COUNT = 6;
+            static const float2 BLUR_KERNEL[BLUR_SAMPLE_COUNT] = {
+                float2(0, 1),
+                float2(+0.866, +0.5),
+                float2(+0.866, -0.5),
+                float2(0, -1),
+                float2(-0.866, -0.5),
+                float2(-0.866, +0.5),
+            };
+            static const float  BLUR_WEIGHT = 1.0 / BLUR_SAMPLE_COUNT;
+
+            float3 color = ZERO_VEC3;
+            for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
+                float2 offset = BLUR_KERNEL[j] * scale * (1 - random2to1(uv + j.xx) * _CGL_BlurRandom);
+                float2 uv2 = uv + offset;
+                if (isCancelEyeDepth(uv2, depth)) {
+                    uv2 = uv;
+                }
+                color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv2).rgb * BLUR_WEIGHT;
+            }
+            return color;
+        }
+
+        float3 sampleScreenTextureBlur5(float2 uv, float2 scale, float depth) {    // SQUARE
+            static const int    BLUR_SAMPLE_COUNT = 4;
+            static const float2 BLUR_KERNEL[BLUR_SAMPLE_COUNT] = {
+                float2(+0.0, +1.0),
+                float2(+1.0, +0.0),
+                float2(+0.0, -1.0),
+                float2(-1.0, +0.0),
+            };
+            static const float  BLUR_WEIGHT = 1.0 / BLUR_SAMPLE_COUNT;
+
+            float3 color = ZERO_VEC3;
+            for (int j = 0; j < BLUR_SAMPLE_COUNT; j++) {
+                float2 offset = BLUR_KERNEL[j] * scale * (1 - random2to1(uv + j.xx) * _CGL_BlurRandom);
+                float2 uv2 = uv + offset;
+                if (isCancelEyeDepth(uv2, depth)) {
+                    uv2 = uv;
+                }
+                color += PICK_GRAB_TEX2D(_WF_PB_GRAB_TEXTURE, uv2).rgb * BLUR_WEIGHT;
+            }
+            return color;
+        }
+
 #ifdef _WF_LEGACY_FEATURE_SWITCH
-        float3 sampleScreenTextureBlur(float2 uv, float2 scale, float depth) {
-            return _CGL_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale, depth).rgb : sampleScreenTextureBlur2(grab_uv, scale, depth).rgb;
+        float3 sampleScreenTextureBlur(float2 grab_uv, float2 scale, float depth) {
+            return
+                _CGL_BlurMode == 0 ? sampleScreenTextureBlur1(grab_uv, scale, depth).rgb :
+                _CGL_BlurMode == 1 ? sampleScreenTextureBlur2(grab_uv, scale, depth).rgb :
+                _CGL_BlurMode == 2 ? sampleScreenTextureBlur3(grab_uv, scale, depth).rgb :
+                _CGL_BlurMode == 3 ? sampleScreenTextureBlur4(grab_uv, scale, depth).rgb :
+                sampleScreenTextureBlur5(grab_uv, scale, depth).rgb;
         }
         #define SAMPLE_BLUR sampleScreenTextureBlur
 #else
-    #ifdef _CGL_BLURFAST_ENABLE
+    #if defined(_CGL_BLURFAST_ENABLE)
         #define SAMPLE_BLUR sampleScreenTextureBlur2
+    #elif defined(_CGL_BLUROCT_ENABLE)
+        #define SAMPLE_BLUR sampleScreenTextureBlur3
+    #elif defined(_CGL_BLURHEX_ENABLE)
+        #define SAMPLE_BLUR sampleScreenTextureBlur4
+    #elif defined(_CGL_BLURSQ_ENABLE)
+        #define SAMPLE_BLUR sampleScreenTextureBlur5
     #else
         #define SAMPLE_BLUR sampleScreenTextureBlur1
     #endif
@@ -1694,7 +1795,7 @@ FEATURE_TGL_ON_BEGIN(_CGL_Enable)
             // Scale 計算
             float2 scale = max(_CGL_BlurMin.xx, _CGL_Blur.xx / max(1, length( d.ws_vertex.xyz - worldSpaceViewPointPos() )));
             scale *= UNITY_MATRIX_P._m11 / 100;
-#ifdef USING_STEREO_MATRICES
+#ifdef UNITY_SINGLE_PASS_STEREO
             scale.x *= 0.5;
 #endif
             scale.y *= _ScreenParams.x / _ScreenParams.y;

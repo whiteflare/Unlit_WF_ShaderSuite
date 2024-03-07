@@ -162,6 +162,7 @@ namespace UnlitWF
                 var before = data.Count;
                 var strip = 0;
                 strip += DoStripForwardBasePass(shader, snippet, data, usedShaderVariantList);
+                strip += DoStripShadowCasterPass(shader, snippet, data);
                 strip += DoStripMetaPass(shader, snippet, data);
 
 #if WF_STRIP_LOG_RESULT
@@ -176,9 +177,9 @@ namespace UnlitWF
 
         protected int DoStripForwardBasePass(Shader shader, ShaderSnippetData snippet, IList<ShaderCompilerData> data, List<UsedShaderVariant> usedShaderVariantList)
         {
-            if (snippet.passType != PassType.ForwardBase && snippet.passType != PassType.ShadowCaster && snippet.passName != "CLR_BG")
+            if (snippet.passType != PassType.ForwardBase && snippet.passName != "CLR_BG")
             {
-                // ここで stripping するのは ForwardBase と ShadowCaster だけ
+                // ここで stripping するのは ForwardBase だけ
                 return 0;
             }
             if (!settings.stripUnusedVariant)
@@ -251,6 +252,55 @@ namespace UnlitWF
                     // 使用してないバリアントは削除
                     data.RemoveAt(i);
                     count++;
+                }
+            }
+
+            return count;
+        }
+
+        protected int DoStripShadowCasterPass(Shader shader, ShaderSnippetData snippet, IList<ShaderCompilerData> data)
+        {
+            if (snippet.passType != PassType.ShadowCaster)
+            {
+                // ここで stripping するのは ShadowCaster だけ
+                return 0;
+            }
+            if (!settings.stripUnusedVariant)
+            {
+                // 設定で無効化されているならば stripping しない
+                return 0;
+            }
+
+            var count = 0;
+
+            // LOD_FADE_CROSSFADE を除外する
+            if (CanStripLodFade())
+            {
+                var kwd_LOD_FADE_CROSSFADE = new ShaderKeyword(shader, "LOD_FADE_CROSSFADE");
+                for (int i = data.Count - 1; 0 <= i; i--)
+                {
+                    var d = data[i];
+                    if (d.shaderKeywordSet.IsEnabled(kwd_LOD_FADE_CROSSFADE))
+                    {
+                        data.RemoveAt(i);
+                        count++;
+                        continue;
+                    }
+                }
+            }
+
+            // _WF_EDITOR_HIDE_LMAP を除外する
+            {
+                var kwd_WF_EDITOR_HIDE_LMAP = new ShaderKeyword(shader, WFCommonUtility.KWD_EDITOR_HIDE_LMAP);
+                for (int i = data.Count - 1; 0 <= i; i--)
+                {
+                    var d = data[i];
+                    if (d.shaderKeywordSet.IsEnabled(kwd_WF_EDITOR_HIDE_LMAP))
+                    {
+                        data.RemoveAt(i);
+                        count++;
+                        continue;
+                    }
                 }
             }
 
