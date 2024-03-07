@@ -25,3 +25,10 @@ MonoBehaviour:
   autoSwitchQuestShader: 1
   enableNccInVRC3Avatar: 1
   enableNccInVRC3World: 0
+  enableNccInOther: -1
+  disableBackLitInVRC3Avatar: -1
+  disableBackLitInVRC3World: 1
+  disableBackLitInOther: -1
+  useDepthTexInVRC3Avatar: 0
+  useDepthTexInVRC3World: -1
+  useDepthTexInOther: -1
