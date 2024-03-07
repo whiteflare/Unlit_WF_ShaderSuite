@@ -57,6 +57,8 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
+        [WF_Enum(UnlitWF.MaskModeAL)]
+            _AL_MaskMode            ("[AL] Mask Mode", int) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 0.8
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 1
         [Enum(OFF,0,ON,1)]
@@ -91,7 +93,7 @@ Shader "UnlitWF_URP/WF_Gem_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
+            _CurrentVersion         ("2024/03/10 (1.11.0)", Float) = 0
     }
 
     SubShader {

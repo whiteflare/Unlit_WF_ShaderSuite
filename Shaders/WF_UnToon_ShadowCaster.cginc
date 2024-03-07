@@ -82,14 +82,14 @@
 #ifdef _TL_ENABLE
         if (TGL_ON(_TL_Enable)) {
             float3 ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-            ws_vertex = shiftNormalVertex(ws_vertex, normalize(v.normal), getOutlineShiftWidth(o.uv));
+            ws_vertex = shiftNormalVertex(ws_vertex, UnityObjectToWorldNormal(v.normal), getOutlineShiftWidth(o.uv));
             v.vertex.xyz = UnityWorldToObjectPos(ws_vertex);
         }
 #endif
 #ifdef _WF_DEPTHONLY_BRP
         if (0 < _GL_DepthOnlyWidth) {
             float3 ws_vertex = UnityObjectToWorldPos(v.vertex.xyz);
-            ws_vertex = shiftNormalVertex(ws_vertex, normalize(v.normal), _GL_DepthOnlyWidth);
+            ws_vertex = shiftNormalVertex(ws_vertex, UnityObjectToWorldNormal(v.normal), _GL_DepthOnlyWidth);
             v.vertex.xyz = UnityWorldToObjectPos(ws_vertex);
         }
 #endif
