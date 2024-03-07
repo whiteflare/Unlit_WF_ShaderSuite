@@ -207,7 +207,7 @@ Shader "UnlitWF/WF_FakeFur_Mix" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
+            _CurrentVersion         ("2024/03/10 (1.11.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
