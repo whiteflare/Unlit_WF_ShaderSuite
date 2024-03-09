@@ -33,6 +33,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
+        [WF_Enum(UnlitWF.MaskModeAL)]
+            _AL_MaskMode            ("[AL] Mask Mode", int) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
 
@@ -40,8 +42,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _CGL_Enable             ("[CGL] Enable", Float) = 1
             _CGL_Blur               ("[CGL] Blur", Range(0, 2)) = 0.4
             _CGL_BlurMin            ("[CGL] Blur Min", Range(0, 2)) = 0
-        [Enum(NORMAL,0,FAST,1)]
+        [Enum(GAUSSIAN,0,FAST,1,OCTAGON,2,HEXAGON,3,SQUARE,4)]
             _CGL_BlurMode           ("[CGL] Blur Mode", Float) = 0
+            _CGL_BlurRandom         ("[CGL] Blur Random", Range(0, 1)) = 0
+        [ToggleUI]
+            _CGL_UseDepthTex        ("[CGL] Correct Blur to exclude the foreground", Range(0, 1)) = 0
 
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
@@ -212,6 +217,23 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
+        [WFHeaderToggle(RimShadow)]
+            _TM_Enable              ("[TM] Enable", Float) = 0
+            _TM_Color               ("[TM] Rim Color", Color) = (0, 0, 0, 1)
+            _TM_Width               ("[TM] Width", Range(0, 1)) = 0
+            _TM_Feather             ("[TM] Feather", Range(0, 1)) = 0.1
+            _TM_Exponent            ("[TM] Exponent", Range(1, 8)) = 1
+            _TM_BlendNormal         ("[TM] Blend Normal", Range(0, 1)) = 0
+            _TM_BlendNormal2        ("[TM] Blend Normal 2nd", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TM_MaskTex             ("[TM] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _TM_InvMaskVal          ("[TM] Invert Mask Value", Range(0, 1)) = 0
+        [Header(RimShadow Advance)]
+            _TM_WidthTop            ("[TM] Width Top", Range(0, 1)) = 0.5
+            _TM_WidthSide           ("[TM] Width Side", Range(0, 1)) = 1
+            _TM_WidthBottom         ("[TM] Width Bottom", Range(0, 1)) = 1
+
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -345,7 +367,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
+            _CurrentVersion         ("2024/03/10 (1.11.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -391,7 +413,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _CGL_BLURFAST_ENABLE
+            #pragma shader_feature_local_fragment _ _CGL_BLURFAST_ENABLE _CGL_BLUROCT_ENABLE _CGL_BLURHEX_ENABLE _CGL_BLURSQ_ENABLE
+            #pragma shader_feature_local_fragment _ _CGL_DEPTH_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
@@ -404,6 +427,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonFrostedGlass
@@ -421,51 +445,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             ENDCG
         }
 
-        Pass {
-            Name "SHADOWCASTER"
-            Tags{ "LightMode" = "ShadowCaster" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_shadow
-            #pragma fragment frag_shadow
-
-            #define _WF_ALPHA_BLEND
-            #define _GL_NCC_ENABLE
-
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ LOD_FADE_CROSSFADE
-
-            #include "WF_UnToon_ShadowCaster.cginc"
-
-            ENDCG
-        }
-
-        Pass {
-            Name "META"
-            Tags { "LightMode" = "Meta" }
-
-            Cull OFF
-
-            CGPROGRAM
-
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-
-            #define _WF_ALPHA_BLEND
-
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
-
-            #pragma shader_feature EDITOR_VISUALIZATION
-
-            #include "WF_UnToon_Meta.cginc"
-
-            ENDCG
-        }
+        UsePass "UnlitWF/WF_UnToon_Transparent/SHADOWCASTER"
+        UsePass "UnlitWF/WF_UnToon_Transparent/META"
     }
 
     FallBack "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"

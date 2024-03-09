@@ -66,8 +66,6 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_GL_ShadowCutoff", ctx => IsAnyIntValue(ctx, "_GL_CastShadow", p => 1 <= p), isRegex:false),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5), isRegex:false),
-            new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx => WFEditorSetting.GetOneOfSettings().GetEnableNccInCurrentEnvironment() == MatForceSettingMode.PerMaterial, isRegex:false),
-            new ConditionVisiblePropertyHook("_T[SR]_DisableBackLit", ctx => WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode.PerMaterial),
             // 条件付きHide(Grass系列)
             new ConditionVisiblePropertyHook("_GRS_WorldYBase|_GRS_WorldYScale", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 0)),
             new ConditionVisiblePropertyHook("_GRS_HeightUVType", ctx => IsAnyIntValue(ctx, "_GRS_HeightType", p => p == 1 || p == 2), isRegex:false),
@@ -77,6 +75,13 @@ namespace UnlitWF
             // 条件付きHide(Water系列)
             new ConditionVisiblePropertyHook("_WAM_Cubemap", ctx => IsAnyIntValue(ctx, "_WAM_CubemapType", p => p != 0), isRegex:false),
             new ConditionVisiblePropertyHook("_WAM_CubemapHighCut", ctx => IsAnyIntValue(ctx, "_WAM_CubemapType", p => p != 0), isRegex:false),
+
+            // 条件付きHide(Common Material Settings)
+            new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx =>  WFEditorSetting.GetOneOfSettings().GetEnableNccInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_CRF_UseDepthTex", ctx =>  WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_CGL_UseDepthTex", ctx =>  WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_TS_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_TR_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
 
             // テクスチャとカラーを1行で表示する
             new SingleLineTexPropertyHook( "_TS_BaseColor", "_TS_BaseTex" ),
@@ -192,8 +197,9 @@ namespace UnlitWF
                 EditorGUILayout.Space(4);
 #endif
             }, isRegex:false),
+
             // _CGR_InvMaskValの後に、プレビューテクスチャが設定されているならば警告を出す
-            new CustomPropertyHook("_CGR_InvMaskVal", null, (ctx, changed) => {
+            new HelpBoxPropertyHook("_CGR_InvMaskVal", ctx => {
                 var hasPreviewTex = ctx.editor.targets.Any(mat => {
                     var tex = WFAccessor.GetTexture(mat as Material, "_CGR_GradMapTex");
                     return tex != null && string.IsNullOrWhiteSpace(AssetDatabase.GetAssetPath(tex));
@@ -203,37 +209,33 @@ namespace UnlitWF
 #if UNITY_2019_1_OR_NEWER
                     EditorGUILayout.Space(4);
 #endif
-                    var msg = WFI18N.Translate(WFMessageText.PsPreviewTexture);
-                    EditorGUILayout.HelpBox(msg, MessageType.Warning);
+                    return WFI18N.Translate(WFMessageText.PsPreviewTexture);
                 }
-            }, isRegex:false),
+                return null;
+            }, MessageType.Warning, isRegex:false),
 
             // _NS_InvMaskVal の直後に FlipMirror を再表示
-            new CustomPropertyHook("_NS_InvMaskVal", null, (ctx, changed) => {
-                var prop = ctx.all.Where(p => p.name == "_FlipMirror").FirstOrDefault();
-                if (prop != null)
-                {
-                    ctx.editor.ShaderProperty(prop, WFI18N.GetGUIContent(prop.displayName.Replace("[NM]", "[NS]")));
-                }
-            }, isRegex:false),
+            new DuplicateDisplayHook("_NS_InvMaskVal", "_FlipMirror", dn => dn.Replace("[NM]", "[NS]"), isRegex:false),
+
+            // _CGL_UseDepthTex の後に説明文を追加する
+            new HelpBoxPropertyHook("_CRF_UseDepthTex|_CGL_UseDepthTex", ctx => ctx.current.floatValue == 0 ? null : WFI18N.Translate(WFMessageText.PsCameraDepthTex), MessageType.Info),
 
             // _TS_InvMaskVal の後に説明文を追加する
-            new CustomPropertyHook("_TS_InvMaskVal", null, (ctx, changed) => {
-                EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info);
-            }, isRegex:false),
+            new HelpBoxPropertyHook("_TS_InvMaskVal", ctx => WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info, isRegex:false),
             // _HL_MatcapColor の後に説明文を追加する
-            new CustomPropertyHook("_HL_MatcapColor(_[0-9]+)?", null, (ctx, changed) => {
+            new HelpBoxPropertyHook("_HL_MatcapColor(_[0-9]+)?", ctx => {
                 var name = ctx.current.name.Replace("_MatcapColor", "_CapType");
                 if (IsAnyIntValue(ctx, name, p => p == 0)) {
-                    EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeMedian), MessageType.Info);
+                    return WFI18N.Translate(WFMessageText.PsCapTypeMedian);
                 }
                 if (IsAnyIntValue(ctx, name, p => p == 1)) {
-                    EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeLight), MessageType.Info);
+                    return WFI18N.Translate(WFMessageText.PsCapTypeLight);
                 }
                 if (IsAnyIntValue(ctx, name, p => p == 2)) {
-                    EditorGUILayout.HelpBox(WFI18N.Translate(WFMessageText.PsCapTypeShade), MessageType.Info);
+                    return WFI18N.Translate(WFMessageText.PsCapTypeShade);
                 }
-            }),
+                return null;
+            }, MessageType.Info),
 
             // _PA_Z_Offset の後に説明文を追加する
             new CustomPropertyHook("_PA_Z_Offset", null, (ctx, changed) => {
@@ -1566,6 +1568,55 @@ namespace UnlitWF
         }
 
         /// <summary>
+        /// 指定のプロパティの次に特定のプロパティを再表示する
+        /// </summary>
+        class DuplicateDisplayHook : AbstractPropertyHook
+        {
+            private readonly string targetPropName;
+            private readonly Func<String, String> displayNameReplacer;
+
+            public DuplicateDisplayHook(string pattern, string targetPropName, Func<String, String> displayNameReplacer, bool isRegex = true) : base(pattern, isRegex)
+            {
+                this.targetPropName = targetPropName;
+                this.displayNameReplacer = displayNameReplacer;
+            }
+
+            protected override void OnAfterProp(PropertyGUIContext context, bool changed)
+            {
+                var prop = context.all.Where(p => p.name == targetPropName).FirstOrDefault();
+                if (prop != null)
+                {
+                    context.editor.ShaderProperty(prop, WFI18N.GetGUIContent(displayNameReplacer(prop.displayName)));
+                }
+            }
+        }
+
+        /// <summary>
+        /// プロパティの後に説明文を表示する
+        /// </summary>
+        class HelpBoxPropertyHook : AbstractPropertyHook
+        {
+            private readonly Func<PropertyGUIContext, String> textSupplier;
+            private readonly MessageType type;
+
+            public HelpBoxPropertyHook(string pattern, Func<PropertyGUIContext, String> textSupplier, MessageType type, bool isRegex = true) : base(pattern, isRegex)
+            {
+                this.textSupplier = textSupplier;
+                this.type = type;
+            }
+
+            protected override void OnAfterProp(PropertyGUIContext context, bool changed)
+            {
+                var text = textSupplier(context);
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    return;
+                }
+                EditorGUILayout.HelpBox(text, type);
+            }
+        }
+
+        /// <summary>
         /// デリゲートでカスタマイズ可能な PropertyHook オブジェクト
         /// </summary>
         class CustomPropertyHook : AbstractPropertyHook
@@ -2299,6 +2350,12 @@ namespace UnlitWF
         MUL = 0,
         ADD = 1,
         SUB = 2,
+    }
+
+    public enum MaskModeAL
+    {
+        NORMAL = 0,
+        SUB = 1,
     }
 
     public enum SunSourceMode

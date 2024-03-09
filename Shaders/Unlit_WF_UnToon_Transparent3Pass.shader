@@ -242,6 +242,23 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
+        [WFHeaderToggle(RimShadow)]
+            _TM_Enable              ("[TM] Enable", Float) = 0
+            _TM_Color               ("[TM] Rim Color", Color) = (0, 0, 0, 1)
+            _TM_Width               ("[TM] Width", Range(0, 1)) = 0
+            _TM_Feather             ("[TM] Feather", Range(0, 1)) = 0.1
+            _TM_Exponent            ("[TM] Exponent", Range(1, 8)) = 1
+            _TM_BlendNormal         ("[TM] Blend Normal", Range(0, 1)) = 0
+            _TM_BlendNormal2        ("[TM] Blend Normal 2nd", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TM_MaskTex             ("[TM] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _TM_InvMaskVal          ("[TM] Invert Mask Value", Range(0, 1)) = 0
+        [Header(RimShadow Advance)]
+            _TM_WidthTop            ("[TM] Width Top", Range(0, 1)) = 0.5
+            _TM_WidthSide           ("[TM] Width Side", Range(0, 1)) = 1
+            _TM_WidthBottom         ("[TM] Width Bottom", Range(0, 1)) = 1
+
         [WFHeaderToggle(RimLight)]
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
@@ -398,7 +415,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
+            _CurrentVersion         ("2024/03/10 (1.11.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _ClearBgSupported       ("True", Float) = 0
@@ -461,7 +478,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
 
             #pragma target 4.5
 
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { discard; } else { alpha = 1; } // _Cutoff 以上を描画
+            #define _WF_ALPHA_CUSTOM    alpha3PassCutout(alpha);
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
@@ -488,6 +505,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -519,7 +537,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
+            #define _WF_ALPHA_CUSTOM    alpha3PassFade(alpha);
             #define _WF_FACE_BACK
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
@@ -547,6 +565,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -578,7 +597,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma target 4.5
 
             #define _WF_ALPHA_FRESNEL
-            #define _WF_ALPHA_CUSTOM    if (alpha < _Cutoff) { alpha *= _AL_Power; } else { discard; } // _Cutoff 以下を描画
+            #define _WF_ALPHA_CUSTOM    alpha3PassFade(alpha);
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
@@ -605,6 +624,7 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase

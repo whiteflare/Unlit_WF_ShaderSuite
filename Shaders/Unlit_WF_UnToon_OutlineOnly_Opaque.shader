@@ -69,6 +69,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
         [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
+        [ToggleUI]
+            _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
@@ -84,7 +86,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/02/12 (1.10.0)", Float) = 0
+            _CurrentVersion         ("2024/03/10 (1.11.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque", Float) = 0
@@ -137,6 +139,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque" {
             ENDCG
         }
 
+        UsePass "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque/SHADOWCASTER"
         UsePass "Hidden/UnlitWF/WF_UnToon_Hidden/META"
     }
 

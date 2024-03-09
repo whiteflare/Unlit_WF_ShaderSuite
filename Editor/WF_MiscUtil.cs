@@ -35,6 +35,12 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+#if UNITY_2021_2_OR_NEWER
+using UnityEditor.SceneManagement;
+#else
+using UnityEditor.Experimental.SceneManagement;
+#endif
+
 namespace UnlitWF
 {
     enum MatSelectMode
@@ -518,6 +524,81 @@ namespace UnlitWF
                     }
                 }
             }
+        }
+    }
+
+    internal class HierarchyComponentWatcher<T> where T : Component
+    {
+        protected readonly bool includeInactive;
+
+        public HierarchyComponentWatcher(bool includeInactive)
+        {
+            this.includeInactive = includeInactive;
+        }
+
+        public void OnEnable()
+        {
+            EditorApplication.hierarchyChanged += OnHierarchyChanged;
+            PrefabStage.prefabStageOpened += OnPrefabStageOpened;
+        }
+
+        public void OnDestroy()
+        {
+            EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+            PrefabStage.prefabStageOpened -= OnPrefabStageOpened;
+        }
+
+        private T[] components;
+
+        private void OnHierarchyChanged()
+        {
+            components = null;
+        }
+
+        private void OnPrefabStageOpened(PrefabStage obj)
+        {
+            components = null;
+        }
+
+        public T[] GetComponents()
+        {
+            if (components != null)
+            {
+                return components;
+            }
+
+            var list = new List<T>();
+
+            var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            if (prefabStage != null)
+            {
+                var root = prefabStage.prefabContentsRoot;
+                list.AddRange(GetComponentsInChildren(root));
+            }
+            else
+            {
+                for (int i = 0; i < SceneManager.sceneCount; i++)
+                {
+                    Scene scene = SceneManager.GetSceneAt(i);
+                    if (scene.isLoaded) // SceneManagerで取るときはisLoadedを確認する
+                    {
+                        foreach (var root in scene.GetRootGameObjects())
+                        {
+                            if (includeInactive || root.activeInHierarchy)
+                            {
+                                list.AddRange(GetComponentsInChildren(root));
+                            }
+                        }
+                    }
+                }
+            }
+
+            return components = list.ToArray();
+        }
+
+        protected virtual T[] GetComponentsInChildren(GameObject root)
+        {
+            return root.GetComponentsInChildren<T>(includeInactive);
         }
     }
 
