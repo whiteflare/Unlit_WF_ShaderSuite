@@ -36,6 +36,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
         [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
+            _AL_PowerMin            ("[AL] Power(Min)", Range(0, 2)) = 0
 
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
@@ -385,7 +386,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/03/10 (1.11.0)", Float) = 0
+            _CurrentVersion         ("2024/03/16 (1.12.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -428,7 +429,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
             #define _WF_ALPHA_BLEND
             #define _WF_FACE_BACK
-            #define _WF_ALPHA_CUSTOM    alpha *= _AL_Power * _CGO_Power;
+            #define _WF_ALPHA_CUSTOM    alpha = remapAndClamp(alpha, _AL_PowerMin, _AL_Power) * _CGO_Power;
 
 
 
@@ -485,7 +486,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma target 4.5
 
             #define _WF_ALPHA_BLEND
-            #define _WF_ALPHA_CUSTOM    alpha *= _AL_Power * _CGO_Power;
+            #define _WF_ALPHA_CUSTOM    alpha = remapAndClamp(alpha, _AL_PowerMin, _AL_Power) * _CGO_Power;
 
 
 

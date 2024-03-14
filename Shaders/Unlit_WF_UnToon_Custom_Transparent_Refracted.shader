@@ -33,9 +33,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _AL_MaskTex             ("[AL] Alpha Mask Texture", 2D) = "white" {}
         [ToggleUI]
             _AL_InvMaskVal          ("[AL] Invert Mask Value", Range(0, 1)) = 0
-        [WF_Enum(UnlitWF.MaskModeAL)]
-            _AL_MaskMode            ("[AL] Mask Mode", int) = 0
             _AL_Power               ("[AL] Power", Range(0, 2)) = 1.0
+            _AL_PowerMin            ("[AL] Power(Min)", Range(0, 2)) = 0
             _AL_Fresnel             ("[AL] Fresnel Power", Range(0, 2)) = 0
 
         [WFHeaderAlwaysOn(Refraction)]
@@ -411,7 +410,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/03/10 (1.11.0)", Float) = 0
+            _CurrentVersion         ("2024/03/16 (1.12.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
