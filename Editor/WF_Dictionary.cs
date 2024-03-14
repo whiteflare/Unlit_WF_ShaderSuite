@@ -729,8 +729,6 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.BlendModeVC.MUL", "乗算"),
             new WFI18NTranslation("UnlitWF.BlendModeVC.ADD", "加算"),
             new WFI18NTranslation("UnlitWF.BlendModeVC.SUB", "減算"),
-            new WFI18NTranslation("UnlitWF.MaskModeAL.NORMAL", "通常"),
-            new WFI18NTranslation("UnlitWF.MaskModeAL.SUB", "減算"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.AUTO", "自動"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_DIRECTIONAL_LIT", "DirectionalLightのみ"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.ONLY_POINT_LIT", "PointLightのみ"),
