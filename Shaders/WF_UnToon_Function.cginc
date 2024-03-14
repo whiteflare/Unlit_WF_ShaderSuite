@@ -199,6 +199,10 @@ FEATURE_TGL_END
                  : WF_TEX2D_ALPHA_MAIN_ALPHA(uv);
         }
 
+        inline float remapAndClamp(float value, float min, float max) {
+            return lerp(min, max, saturate(value));
+        }
+
         void alphaCutoutOutline(inout float alpha) {
 #ifdef _TL_ENABLE
             if (TGL_ON(_TL_UseCutout) && alpha < _Cutoff) {
@@ -220,7 +224,7 @@ FEATURE_TGL_END
 
         void alpha3PassFade(inout float alpha) {
             if (alpha < _Cutoff) {
-                alpha *= _AL_Power;
+                alpha = remapAndClamp(alpha, _AL_PowerMin, _AL_Power);
             }
             else {
                 discard;
@@ -248,10 +252,7 @@ FEATURE_TGL_END
                     }
                 #endif
             #else
-                alpha *= _AL_Power;
-                if (_AL_MaskMode == 1) {
-                    alpha = max(0, 1 - alpha);
-                }
+                alpha = remapAndClamp(alpha, _AL_PowerMin, _AL_Power);
                 alpha *= _AL_CustomValue;
             #endif
 
