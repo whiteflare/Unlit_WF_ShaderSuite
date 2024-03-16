@@ -96,6 +96,7 @@ namespace UnlitWF
             new SingleLineTexPropertyHook( "_DFD_Color", "_DFD_ColorTex" ),
 
             // MinMaxSlider
+            new MinMaxSliderPropertyHook("_AL_PowerMin", "_AL_Power", "[AL] Power"),
             new MinMaxSliderPropertyHook("_TE_MinDist", "_TE_MaxDist", "[TE] FadeOut Distance"),
             new MinMaxSliderPropertyHook("_TFG_MinDist", "_TFG_MaxDist", "[TFG] FadeOut Distance"),
             new MinMaxSliderPropertyHook("_LME_MinDist", "_LME_MaxDist", "[LME] FadeOut Distance"),
@@ -1471,10 +1472,18 @@ namespace UnlitWF
                     {
                         var display = string.IsNullOrWhiteSpace(displayName) ? context.guiContent : WFI18N.GetGUIContent(displayName);
                         DrawMinMaxProperty(context.editor, display, context.current, another);
+                        context.custom = true;
                     }
                 }
-                context.custom = true;
-                // 相方の側は何もしない
+                if (maxName == context.current.name)
+                {
+                    MaterialProperty another = FindProperty(minName, context.all, false);
+                    if (another != null)
+                    {
+                        // 相方は非表示
+                        context.custom = true;
+                    }
+                }
             }
         }
 
@@ -2350,12 +2359,6 @@ namespace UnlitWF
         MUL = 0,
         ADD = 1,
         SUB = 2,
-    }
-
-    public enum MaskModeAL
-    {
-        NORMAL = 0,
-        SUB = 1,
     }
 
     public enum SunSourceMode

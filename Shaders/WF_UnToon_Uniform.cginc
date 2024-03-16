@@ -110,11 +110,11 @@
 
     uint            _AL_Source;
     half            _AL_Power;
+    half            _AL_PowerMin;
     half            _AL_Fresnel;
     half            _AL_AlphaToMask;
     half            _AL_Z_Offset;
     half            _AL_InvMaskVal;
-    uint            _AL_MaskMode;
 
     // -------------------------
 
