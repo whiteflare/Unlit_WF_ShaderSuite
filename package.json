@@ -2,6 +2,7 @@
   "name": "jp.whiteflare.unlitwf",
   "displayName": "UnlitWF Shader",
   "version": "1.12.0",
+  "unity": "2019.1",
   "description": "General Shader Pack for VRChat, Unity.",
   "author": {
     "name": "whiteflare",
