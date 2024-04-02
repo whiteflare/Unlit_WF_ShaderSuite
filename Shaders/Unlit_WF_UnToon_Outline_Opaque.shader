@@ -188,10 +188,8 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque" {
             _LME_RandColor          ("[LME] Random Color", Color) = (0, 0, 0, 1)
         [Enum(POLYGON,0,POINT,1)]
             _LME_Shape              ("[LME] Shape", Float) = 0
-        [PowerSlider(4.0)]
             _LME_Scale              ("[LME] Scale", Range(0, 4)) = 0.5
-        [PowerSlider(4.0)]
-            _LME_Dencity            ("[LME] Dencity", Range(0.3, 4)) = 0.5
+            _LME_Dencity            ("[LME] Dencity", Range(0, 1)) = 0.2
             _LME_Glitter            ("[LME] Glitter", Range(0, 1)) = 0.5
             _LME_MinDist            ("[LME] FadeOut Distance (Near)", Range(0, 5)) = 2.0
             _LME_MaxDist            ("[LME] FadeOut Distance (Far)", Range(0, 5)) = 4.0
