@@ -1000,7 +1000,7 @@ FEATURE_TGL_ON_BEGIN(_LME_Enable)
                     for (int x = -1; x <= 1; x++) {
                         float2 neighbor = float2(x, y);
                         float3 pos;
-                        pos.xy  = 0.5 + 0.5 * sin( random2to2((ist + neighbor) * scale) * 2 - 1 );
+                        pos.xy  = sin(UNITY_TWO_PI * random2to2(ist + neighbor)) / 2 + 0.5;
                         pos.z   = length(neighbor + pos.xy - fst);
                         min_pos = pos.z < min_pos.z ? pos : min_pos;
                     }
@@ -1013,7 +1013,7 @@ FEATURE_TGL_ON_BEGIN(_LME_Enable)
                 // Glitter項
                 power = lerp(power, max(power, pow(power + 0.1, 32)), _LME_Glitter);
                 // 密度項
-                power *= step(1 - _LME_Dencity / 4, abs(min_pos.x));
+                power *= step(1 - _LME_Dencity / 4, random2to1(min_pos.xy));
                 // フレークのばらつき項
                 power *= random2to1(min_pos.xy);
                 // 距離フェード項
