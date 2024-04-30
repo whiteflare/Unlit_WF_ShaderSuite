@@ -50,17 +50,6 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
         [HDR]
             _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
-        [WFHeaderToggle(3ch Color Mask)]
-            _CHM_Enable             ("[CHM] Enable", Float) = 0
-        [NoScaleOffset]
-            _CHM_3chMaskTex         ("[CHM] 3ch Mask Texture", 2D) = "black" {}
-        [HDR]
-            _CHM_ColorR             ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
-        [HDR]
-            _CHM_ColorG             ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
-        [HDR]
-            _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
-
         [WFHeaderToggle(Gradient Map)]
             _CGR_Enable             ("[CGR] Enable", Float) = 0
         [NoScaleOffset]
@@ -421,7 +410,6 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent_Mask" {
             #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _BKT_ENABLE
-            #pragma shader_feature_local _CHM_ENABLE
             #pragma shader_feature_local _CGR_ENABLE
             #pragma shader_feature_local _CLC_ENABLE
             #pragma shader_feature_local _ES_ENABLE

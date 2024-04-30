@@ -34,10 +34,6 @@
         #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   saturate( TGL_OFF(_AL_InvMaskVal) ? PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a : 1 - PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a )
     #endif
 
-    #ifndef WF_TEX2D_3CH_MASK
-        #define WF_TEX2D_3CH_MASK(uv)           PICK_SUB_TEX2D(_CHM_3chMaskTex, _MainTex, uv).rgb
-    #endif
-
     #ifndef WF_TEX2D_GRADMAP
         #define WF_TEX2D_GRADMAP(uv)            PICK_MAIN_TEX2D(_CGR_GradMapTex, uv)
     #endif
@@ -484,28 +480,6 @@ FEATURE_TGL_END
 
     #else
         #define drawColorChange(d)
-    #endif
-
-    ////////////////////////////
-    // 3ch Color Mask
-    ////////////////////////////
-
-    #ifdef _CHM_ENABLE
-
-        void draw3chColorMask(inout drawing d) {
-FEATURE_TGL_ON_BEGIN(_CHM_Enable)
-            float3 mask  = WF_TEX2D_3CH_MASK(d.uv_main);
-            float4 c1 = d.color * _CHM_ColorR;
-            float4 c2 = d.color * _CHM_ColorG;
-            float4 c3 = d.color * _CHM_ColorB;
-            d.color = lerp(d.color, c1, mask.r);
-            d.color = lerp(d.color, c2, mask.g);
-            d.color = lerp(d.color, c3, mask.b);
-FEATURE_TGL_END
-        }
-
-    #else
-        #define draw3chColorMask(d)
     #endif
 
     ////////////////////////////

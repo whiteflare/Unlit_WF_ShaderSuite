@@ -48,17 +48,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
         [HDR]
             _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
-        [WFHeaderToggle(3ch Color Mask)]
-            _CHM_Enable             ("[CHM] Enable", Float) = 0
-        [NoScaleOffset]
-            _CHM_3chMaskTex         ("[CHM] 3ch Mask Texture", 2D) = "black" {}
-        [HDR]
-            _CHM_ColorR             ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
-        [HDR]
-            _CHM_ColorG             ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
-        [HDR]
-            _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
-
         [WFHeaderToggle(Gradient Map)]
             _CGR_Enable             ("[CGR] Enable", Float) = 0
         [NoScaleOffset]
@@ -494,7 +483,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
@@ -554,7 +542,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
@@ -613,7 +600,6 @@ Shader "UnlitWF/WF_UnToon_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE

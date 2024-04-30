@@ -248,7 +248,6 @@ namespace UnlitWF
 
                 // その他の機能
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
-                new WFShaderFunction("CHM", "CHM", "3ch Color Mask"),
                 new WFShaderFunction("CGR", "CGR", "Gradient Map"),
                 new WFShaderFunction("CLC", "CLC", "Color Change"),
                 new WFShaderFunction("LME", "LME", "Lame"),
@@ -266,7 +265,7 @@ namespace UnlitWF
                 new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => HasPropertyPrefix(mat, "_GL")),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
-                // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF
+                // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF, CHM
             };
 
         /// <summary>

@@ -40,7 +40,6 @@
     DECL_SUB_TEX2D      (_TM_MaskTex);
     DECL_SUB_TEX2D      (_OVL_MaskTex);
     DECL_SUB_TEX2D      (_TL_CustomColorTex);
-    DECL_SUB_TEX2D      (_CHM_3chMaskTex);
 #ifndef _WF_AO_ONLY_LMAP
     DECL_SUB_TEX2D      (_OcclusionMap);
 #endif
@@ -137,15 +136,6 @@
     half            _LBE_IndirectChroma;
     half            _LBE_IndirectMultiplier;
     half            _LBE_EmissionMultiplier;
-
-    // -------------------------
-
-#ifndef _WF_MOBILE
-    FEATURE_TGL    (_CHM_Enable);
-    half4           _CHM_ColorR;
-    half4           _CHM_ColorG;
-    half4           _CHM_ColorB;
-#endif
 
     // -------------------------
 
