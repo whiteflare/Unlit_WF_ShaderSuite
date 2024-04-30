@@ -1194,7 +1194,6 @@ FEATURE_TGL_END
             float3 rimColor =
                     _TR_BlendType == 0 ? (_TR_Color.rgb - MEDIAN_GRAY)  // ADD_AND_SUB
                     : _TR_BlendType == 1 ? (_TR_Color.rgb - color)      // ALPHA
-                    : _TR_BlendType == 3 ? (_TR_Color.rgb - ONE_VEC3) * color   // MUL
                     : _TR_Color.rgb // ADD
                 ;
             return rimColor;
@@ -1203,10 +1202,7 @@ FEATURE_TGL_END
         void drawRimLight(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TR_Enable)
             half angle_light_camera = d.angle_light_camera;
-            if (_TR_BlendType == 3) {
-                angle_light_camera = -0.2; // 乗算のときは常に最大
-            }
-            else if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
+            if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
             // 順光の場合はリムライトを暗くする
