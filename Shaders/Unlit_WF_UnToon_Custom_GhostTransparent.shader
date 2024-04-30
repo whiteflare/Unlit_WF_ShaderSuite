@@ -101,8 +101,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
         [ToggleUI]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
-        [Enum(MASK,0,METALLIC,1)]
-            _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [ToggleUI]

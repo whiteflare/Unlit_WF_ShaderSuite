@@ -727,15 +727,8 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
             float monochrome = _MT_Monochrome;
             float4 metalGlossMap = WF_TEX2D_METAL_GLOSS(d.uv_main);
 
-            // MetallicSmoothness をパラメータに反映
-            if (_MT_MetallicMapType == 0) {
-                // Metallic強度に反映する方式
-                metallic *= metalGlossMap.r;
-            }
-            else if (_MT_MetallicMapType == 1) {
-                // Metallic強度を固定して、モノクロ反射に反映する方式
-                monochrome = saturate(1 - (1 - monochrome) * metalGlossMap.r);
-            }
+            // MetallicSmoothness をMetallic強度に反映
+            metallic *= metalGlossMap.r;
 
             // Metallic描画
             if (0.01 < metallic) {

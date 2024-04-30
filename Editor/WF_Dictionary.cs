@@ -488,7 +488,6 @@ namespace UnlitWF
             new WFI18NTranslation("MT", "Smoothness", "滑らかさ"),
             new WFI18NTranslation("MT", "Monochrome Reflection", "モノクロ反射"),
             new WFI18NTranslation("MT", "Specular", "スペキュラ反射"),
-            new WFI18NTranslation("MT", "MetallicMap Type", "Metallicマップの種類"),
             new WFI18NTranslation("MT", "MetallicSmoothnessMap Texture", "MetallicSmoothnessマップ"),
             new WFI18NTranslation("MT", "RoughnessMap Texture", "Roughnessマップ"),
             new WFI18NTranslation("MT", "2nd CubeMap Blend", "キューブマップ混合タイプ"),
@@ -783,6 +782,9 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageButton.Cleanup, "マテリアルから不要データを削除"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "テンプレートから適用"),
             new WFI18NTranslation(WFMessageButton.SaveTemplate, "テンプレートとして保存"),
+
+            // 今は未使用
+            new WFI18NTranslation("MT", "MetallicMap Type", "Metallicマップの種類"),
         };
 
 
@@ -847,7 +849,6 @@ namespace UnlitWF
             new WFI18NTranslation("MT", "Smoothness", "부드럽게"),
             new WFI18NTranslation("MT", "Monochrome Reflection", "흑백 반사"),
             new WFI18NTranslation("MT", "Specular", "스펙큘러"),
-            new WFI18NTranslation("MT", "MetallicMap Type", "Metallic맵 타입"),
             new WFI18NTranslation("MT", "MetallicSmoothnessMap Texture", "MetallicSmoothness맵"),
             new WFI18NTranslation("MT", "RoughnessMap Texture", "Roughness맵"),
             new WFI18NTranslation("MT", "2nd CubeMap Blend", "큐브 맵 혼합"),
@@ -1003,10 +1004,12 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWF의 버전이 갱신되었습니다. \n프로젝트 내의 머티리얼을 검사하여 최신 머티리얼값으로 갱신하시겠습니까?"),
             new WFI18NTranslation(WFMessageText.DgMigrationManual, "프로젝트 내의 머티리얼을 검사하여 최신 머티리얼값으로 갱신하시겠습니까?"),
 
-
             new WFI18NTranslation(WFMessageButton.Cleanup, "머티리얼 내에서 불필요한 데이터 삭제"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "템플릿부터 적용"),
             new WFI18NTranslation(WFMessageButton.SaveTemplate, "템플릿으로 저장"),
+
+            // 今は未使用
+            new WFI18NTranslation("MT", "MetallicMap Type", "Metallic맵 타입"),
         };
     }
 

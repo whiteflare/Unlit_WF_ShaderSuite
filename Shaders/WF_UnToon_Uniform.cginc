@@ -200,7 +200,6 @@
     half            _MT_Brightness;
     half            _MT_Monochrome;
     half            _MT_GeomSpecAA;
-    uint            _MT_MetallicMapType;
     half            _MT_Specular;
     half            _MT_SpecSmooth;
     half            _MT_InvMaskVal;
