@@ -38,7 +38,7 @@ namespace UnlitWF
         /// </summary>
         private const string localTestData = null; // @"{ ""latestVersion"": ""2021/01/20"", ""downloadPage"": ""/releases/tag/Unlit_WF_ShaderSuite_20210120"" }";
 
-        [InitializeOnLoadMethod]
+        // [InitializeOnLoadMethod] // Unity2018版のサポート終了につき最新バージョンチェックを行わないようにする
         private static void Initialize()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
