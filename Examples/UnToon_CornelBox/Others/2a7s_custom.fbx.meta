@@ -1,11 +1,272 @@
 fileFormatVersion: 2
 guid: 65bb60b54cfd2664bb11c0b558338d5c
 ModelImporter:
-  serializedVersion: 19301
-  internalIDToNameTable: []
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Armature
+    100004: BackCloth1
+    100006: BackCloth10
+    100008: BackCloth2
+    100010: BackCloth3
+    100012: BackCloth4
+    100014: BackCloth5
+    100016: BackCloth6
+    100018: BackCloth7
+    100020: BackCloth8
+    100022: BackCloth9
+    100024: BackLeftParts
+    100026: BackParts
+    100028: BackRightParts
+    100030: Body.002
+    100032: Chest
+    100034: ChestArmor1
+    100036: ClothRoot
+    100038: Eye_L
+    100040: Eye_R
+    100042: FrontCloth1
+    100044: FrontCloth2
+    100046: FrontCloth3
+    100048: FrontCloth4
+    100050: FrontCloth5
+    100052: FrontCloth6
+    100054: FrontCloth7
+    100056: FrontCloth8
+    100058: FrontCloth9
+    100060: HairFront1
+    100062: HairFront2
+    100064: HairFront3
+    100066: Head
+    100068: Hips
+    100070: LeftBreast1
+    100072: LeftBreast2
+    100074: LeftCloth1
+    100076: LeftCloth2
+    100078: LeftCloth3
+    100080: LeftCloth4
+    100082: LeftCloth5
+    100084: LeftCloth6
+    100086: LeftCloth7
+    100088: LeftCloth8
+    100090: LeftEye
+    100092: LeftEye_end
+    100094: LeftFoot
+    100096: LeftHair1
+    100098: LeftHair2
+    100100: LeftHair3
+    100102: LeftHand
+    100104: LeftHorn1
+    100106: LeftIndexDistal
+    100108: LeftIndexIntermediate
+    100110: LeftIndexProximal
+    100112: LeftLittleDistal
+    100114: LeftLittleIntermediate
+    100116: LeftLittleProximal
+    100118: LeftLowerArm
+    100120: LeftLowerLeg
+    100122: LeftMiddleDistal
+    100124: LeftMiddleIntermediate
+    100126: LeftMiddleProximal
+    100128: LeftRingDistal
+    100130: LeftRingIntermediate
+    100132: LeftRingProximal
+    100134: LeftShoulder
+    100136: LeftThumbDistal
+    100138: LeftThumbIntermediate
+    100140: LeftThumbProximal
+    100142: LeftToeBase
+    100144: LeftUpperArm
+    100146: LeftUpperLeg
+    100148: Neck
+    100150: RightBreast1
+    100152: RightBreast2
+    100154: RightCloth1
+    100156: RightCloth2
+    100158: RightCloth3
+    100160: RightCloth4
+    100162: RightCloth5
+    100164: RightCloth6
+    100166: RightCloth7
+    100168: RightCloth8
+    100170: RightEye
+    100172: RightEye_end
+    100174: RightFoot
+    100176: RightHair1
+    100178: RightHair2
+    100180: RightHair3
+    100182: RightHand
+    100184: RightHorn1
+    100186: RightIndexDistal
+    100188: RightIndexIntermediate
+    100190: RightIndexProximal
+    100192: RightLittleDistal
+    100194: RightLittleIntermediate
+    100196: RightLittleProximal
+    100198: RightLowerArm
+    100200: RightLowerLeg
+    100202: RightMiddleDistal
+    100204: RightMiddleIntermediate
+    100206: RightMiddleProximal
+    100208: RightRingDistal
+    100210: RightRingIntermediate
+    100212: RightRingProximal
+    100214: RightShoulder
+    100216: RightThumbDistal
+    100218: RightThumbIntermediate
+    100220: RightThumbProximal
+    100222: RightToeBase
+    100224: RightUpperArm
+    100226: RightUpperLeg
+    100228: Spine
+    100230: Tail01
+    100232: Tail010
+    100234: Tail02
+    100236: Tail03
+    100238: Tail04
+    100240: Tail05
+    100242: Tail06
+    100244: Tail07
+    100246: Tail08
+    100248: Tail09
+    100250: Tail11
+    400000: //RootNode
+    400002: Armature
+    400004: BackCloth1
+    400006: BackCloth10
+    400008: BackCloth2
+    400010: BackCloth3
+    400012: BackCloth4
+    400014: BackCloth5
+    400016: BackCloth6
+    400018: BackCloth7
+    400020: BackCloth8
+    400022: BackCloth9
+    400024: BackLeftParts
+    400026: BackParts
+    400028: BackRightParts
+    400030: Body.002
+    400032: Chest
+    400034: ChestArmor1
+    400036: ClothRoot
+    400038: Eye_L
+    400040: Eye_R
+    400042: FrontCloth1
+    400044: FrontCloth2
+    400046: FrontCloth3
+    400048: FrontCloth4
+    400050: FrontCloth5
+    400052: FrontCloth6
+    400054: FrontCloth7
+    400056: FrontCloth8
+    400058: FrontCloth9
+    400060: HairFront1
+    400062: HairFront2
+    400064: HairFront3
+    400066: Head
+    400068: Hips
+    400070: LeftBreast1
+    400072: LeftBreast2
+    400074: LeftCloth1
+    400076: LeftCloth2
+    400078: LeftCloth3
+    400080: LeftCloth4
+    400082: LeftCloth5
+    400084: LeftCloth6
+    400086: LeftCloth7
+    400088: LeftCloth8
+    400090: LeftEye
+    400092: LeftEye_end
+    400094: LeftFoot
+    400096: LeftHair1
+    400098: LeftHair2
+    400100: LeftHair3
+    400102: LeftHand
+    400104: LeftHorn1
+    400106: LeftIndexDistal
+    400108: LeftIndexIntermediate
+    400110: LeftIndexProximal
+    400112: LeftLittleDistal
+    400114: LeftLittleIntermediate
+    400116: LeftLittleProximal
+    400118: LeftLowerArm
+    400120: LeftLowerLeg
+    400122: LeftMiddleDistal
+    400124: LeftMiddleIntermediate
+    400126: LeftMiddleProximal
+    400128: LeftRingDistal
+    400130: LeftRingIntermediate
+    400132: LeftRingProximal
+    400134: LeftShoulder
+    400136: LeftThumbDistal
+    400138: LeftThumbIntermediate
+    400140: LeftThumbProximal
+    400142: LeftToeBase
+    400144: LeftUpperArm
+    400146: LeftUpperLeg
+    400148: Neck
+    400150: RightBreast1
+    400152: RightBreast2
+    400154: RightCloth1
+    400156: RightCloth2
+    400158: RightCloth3
+    400160: RightCloth4
+    400162: RightCloth5
+    400164: RightCloth6
+    400166: RightCloth7
+    400168: RightCloth8
+    400170: RightEye
+    400172: RightEye_end
+    400174: RightFoot
+    400176: RightHair1
+    400178: RightHair2
+    400180: RightHair3
+    400182: RightHand
+    400184: RightHorn1
+    400186: RightIndexDistal
+    400188: RightIndexIntermediate
+    400190: RightIndexProximal
+    400192: RightLittleDistal
+    400194: RightLittleIntermediate
+    400196: RightLittleProximal
+    400198: RightLowerArm
+    400200: RightLowerLeg
+    400202: RightMiddleDistal
+    400204: RightMiddleIntermediate
+    400206: RightMiddleProximal
+    400208: RightRingDistal
+    400210: RightRingIntermediate
+    400212: RightRingProximal
+    400214: RightShoulder
+    400216: RightThumbDistal
+    400218: RightThumbIntermediate
+    400220: RightThumbProximal
+    400222: RightToeBase
+    400224: RightUpperArm
+    400226: RightUpperLeg
+    400228: Spine
+    400230: Tail01
+    400232: Tail010
+    400234: Tail02
+    400236: Tail03
+    400238: Tail04
+    400240: Tail05
+    400242: Tail06
+    400244: Tail07
+    400246: Tail08
+    400248: Tail09
+    400250: Tail11
+    2100000: tex_face
+    2100002: tex_body
+    2100004: tex_hair
+    2100006: tex_armor
+    2100008: tex_photon
+    2100010: tex_cloak
+    4300000: Body.002
+    9500000: //RootNode
+    13700000: Body.002
   externalObjects: {}
   materials:
-    materialImportMode: 1
+    importMaterials: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -38,28 +299,25 @@ ModelImporter:
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
-    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
-    fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
+    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
-    skinWeightsMode: 0
-    maxBonesPerVertex: 4
-    minBoneWeight: 0.001
-    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -68,10 +326,10 @@ ModelImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 2
     normalSmoothingSource: 0
-  referencedClips: []
   importAnimation: 1
+  copyAvatar: 0
   humanDescription:
-    serializedVersion: 3
+    serializedVersion: 2
     human: []
     skeleton: []
     armTwist: 0.5
@@ -81,16 +339,13 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 0
   additionalBone: 0
   userData: 
   assetBundleName: 

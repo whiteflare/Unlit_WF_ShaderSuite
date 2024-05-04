@@ -178,6 +178,7 @@ ModelImporter:
     100344: Body_armor_head
     100346: Body_armor_neck
     100348: cloak_tail
+    100350: ClothRoot
     400000: //RootNode
     400002: Armature
     400004: BackCloth1
@@ -353,6 +354,7 @@ ModelImporter:
     400344: Body_armor_head
     400346: Body_armor_neck
     400348: cloak_tail
+    400350: ClothRoot
     2100000: tex_hair
     2100002: tex_face
     2100004: tex_faceoption

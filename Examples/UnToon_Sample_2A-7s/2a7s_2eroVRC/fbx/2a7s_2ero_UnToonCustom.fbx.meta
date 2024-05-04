@@ -219,6 +219,7 @@ ModelImporter:
     100426: Body_armor_uparm
     100428: cloak_back
     100430: cloak_front
+    100432: ClothRoot
     400000: //RootNode
     400002: Armature
     400004: BackCloth1
@@ -435,6 +436,7 @@ ModelImporter:
     400426: Body_armor_uparm
     400428: cloak_back
     400430: cloak_front
+    400432: ClothRoot
     2100000: tex_body
     2100002: tex_photon
     2100004: tex_armor
