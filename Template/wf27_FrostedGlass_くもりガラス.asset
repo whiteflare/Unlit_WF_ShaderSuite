@@ -112,6 +112,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TM_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TR_MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -140,6 +144,7 @@ Material:
     - _AL_Fresnel: 1
     - _AL_InvMaskVal: 0
     - _AL_Power: 0.3
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AO_Brightness: 0
     - _AO_Contrast: 1
@@ -153,7 +158,9 @@ Material:
     - _CGL_Blur: 0.4
     - _CGL_BlurMin: 0.1
     - _CGL_BlurMode: 0
+    - _CGL_BlurRandom: 0
     - _CGL_Enable: 1
+    - _CGL_UseDepthTex: 0
     - _Category: 0
     - _CullMode: 2
     - _CurrentVersion: 0
@@ -214,7 +221,7 @@ Material:
     - _LBE_IndirectMultiplier: 1
     - _LME_AnimSpeed: 0.2
     - _LME_ChangeAlpha: 0
-    - _LME_Dencity: 0.5
+    - _LME_Dencity: 0.2
     - _LME_Enable: 0
     - _LME_Glitter: 0.5
     - _LME_InvMaskVal: 0
@@ -255,6 +262,16 @@ Material:
     - _OVL_UVType: 0
     - _OVL_VertColToDecal: 0
     - _OVL_VertColToMask: 0
+    - _TM_BlendNormal: 0
+    - _TM_BlendNormal2: 0
+    - _TM_Enable: 0
+    - _TM_Exponent: 1
+    - _TM_Feather: 0.1
+    - _TM_InvMaskVal: 0
+    - _TM_Width: 0
+    - _TM_WidthBottom: 1
+    - _TM_WidthSide: 1
+    - _TM_WidthTop: 0.5
     - _TR_BlendNormal: 0
     - _TR_BlendNormal2: 0
     - _TR_BlendType: 0
@@ -300,6 +317,7 @@ Material:
     - _LME_RandColor: {r: 0, g: 0, b: 0, a: 1}
     - _OVL_Color: {r: 1, g: 1, b: 1, a: 1}
     - _OVL_UVScroll: {r: 0, g: 0, b: 0, a: 0}
+    - _TM_Color: {r: 0, g: 0, b: 0, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.81, g: 0.81, b: 0.9, a: 1}
     - _TS_2ndColor: {r: 0.68, g: 0.68, b: 0.8, a: 1}

@@ -50,6 +50,7 @@ Material:
     - _AL_Fresnel: 0
     - _AL_InvMaskVal: 0
     - _AL_Power: 1
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_SrcAlpha: 5
     - _AL_ZTest: 4

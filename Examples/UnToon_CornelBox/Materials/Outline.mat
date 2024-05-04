@@ -44,6 +44,7 @@ Material:
     - _DSV_TexIsSRGB: 1
     - _FallBack: 0
     - _GL_BlendPower: 0.8
+    - _GL_CastShadow: 1
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
     - _GL_DisableBasePos: 1
