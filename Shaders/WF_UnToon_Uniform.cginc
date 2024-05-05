@@ -40,7 +40,6 @@
     DECL_SUB_TEX2D      (_TM_MaskTex);
     DECL_SUB_TEX2D      (_OVL_MaskTex);
     DECL_SUB_TEX2D      (_TL_CustomColorTex);
-    DECL_SUB_TEX2D      (_CHM_3chMaskTex);
 #ifndef _WF_AO_ONLY_LMAP
     DECL_SUB_TEX2D      (_OcclusionMap);
 #endif
@@ -141,15 +140,6 @@
     // -------------------------
 
 #ifndef _WF_MOBILE
-    FEATURE_TGL    (_CHM_Enable);
-    half4           _CHM_ColorR;
-    half4           _CHM_ColorG;
-    half4           _CHM_ColorB;
-#endif
-
-    // -------------------------
-
-#ifndef _WF_MOBILE
     FEATURE_TGL    (_CGR_Enable);
     half            _CGR_InvMaskVal;
 #endif
@@ -210,7 +200,6 @@
     half            _MT_Brightness;
     half            _MT_Monochrome;
     half            _MT_GeomSpecAA;
-    uint            _MT_MetallicMapType;
     half            _MT_Specular;
     half            _MT_SpecSmooth;
     half            _MT_InvMaskVal;
