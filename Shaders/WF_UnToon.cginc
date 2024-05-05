@@ -216,8 +216,6 @@
         drawMainTex(d);             // メインテクスチャ
         drawBackTex(d);             // 裏面テクスチャ
         drawVertexColor(d);         // 頂点カラー
-
-        draw3chColorMask(d);        // カラーマスク
         drawAlphaMask(d);           // アルファ
 
         drawGradientMap(d);         // グラデーションマップ
