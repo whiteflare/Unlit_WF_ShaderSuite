@@ -360,7 +360,7 @@ Shader "UnlitWF_URP/WF_UnToon_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/04/07 (1.12.1)", Float) = 0
+            _CurrentVersion         ("2024/05/25 (2.0.0)", Float) = 0
     }
 
     SubShader {
