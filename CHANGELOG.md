@@ -1,5 +1,22 @@
 # Change Log
 
+## 2024-05-25 (2.0.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20240525
+
+### Removed
+- Shader
+  - Deprecatedとなっていた以下の機能を削除しました。
+    - 3chカラーマスク
+    - Metallic の「Metallicマップの種類」
+    - リムライトの混合タイプ「乗算」
+
+### Notice
+- Shader
+  - Unitty2018向けシェーダ(シェーダキーワードを使わないもの)についてサポートを終了しました。最終版については以下のURLから取得可能です。
+    - https://github.com/whiteflare/Unlit_WF_ShaderSuite/tree/head_unity2018
+
+----
+
 ## 2024-04-07 (1.12.1)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20240407
 
