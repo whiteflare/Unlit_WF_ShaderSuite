@@ -34,10 +34,6 @@
         #define WF_TEX2D_ALPHA_MASK_ALPHA(uv)   saturate( TGL_OFF(_AL_InvMaskVal) ? PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a : 1 - PICK_SUB_TEX2D(_AL_MaskTex, _MainTex, uv).a )
     #endif
 
-    #ifndef WF_TEX2D_3CH_MASK
-        #define WF_TEX2D_3CH_MASK(uv)           PICK_SUB_TEX2D(_CHM_3chMaskTex, _MainTex, uv).rgb
-    #endif
-
     #ifndef WF_TEX2D_GRADMAP
         #define WF_TEX2D_GRADMAP(uv)            PICK_MAIN_TEX2D(_CGR_GradMapTex, uv)
     #endif
@@ -487,28 +483,6 @@ FEATURE_TGL_END
     #endif
 
     ////////////////////////////
-    // 3ch Color Mask
-    ////////////////////////////
-
-    #ifdef _CHM_ENABLE
-
-        void draw3chColorMask(inout drawing d) {
-FEATURE_TGL_ON_BEGIN(_CHM_Enable)
-            float3 mask  = WF_TEX2D_3CH_MASK(d.uv_main);
-            float4 c1 = d.color * _CHM_ColorR;
-            float4 c2 = d.color * _CHM_ColorG;
-            float4 c3 = d.color * _CHM_ColorB;
-            d.color = lerp(d.color, c1, mask.r);
-            d.color = lerp(d.color, c2, mask.g);
-            d.color = lerp(d.color, c3, mask.b);
-FEATURE_TGL_END
-        }
-
-    #else
-        #define draw3chColorMask(d)
-    #endif
-
-    ////////////////////////////
     // Emissive Scroll
     ////////////////////////////
 
@@ -753,15 +727,8 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
             float monochrome = _MT_Monochrome;
             float4 metalGlossMap = WF_TEX2D_METAL_GLOSS(d.uv_main);
 
-            // MetallicSmoothness をパラメータに反映
-            if (_MT_MetallicMapType == 0) {
-                // Metallic強度に反映する方式
-                metallic *= metalGlossMap.r;
-            }
-            else if (_MT_MetallicMapType == 1) {
-                // Metallic強度を固定して、モノクロ反射に反映する方式
-                monochrome = saturate(1 - (1 - monochrome) * metalGlossMap.r);
-            }
+            // MetallicSmoothness をMetallic強度に反映
+            metallic *= metalGlossMap.r;
 
             // Metallic描画
             if (0.01 < metallic) {
@@ -1227,7 +1194,6 @@ FEATURE_TGL_END
             float3 rimColor =
                     _TR_BlendType == 0 ? (_TR_Color.rgb - MEDIAN_GRAY)  // ADD_AND_SUB
                     : _TR_BlendType == 1 ? (_TR_Color.rgb - color)      // ALPHA
-                    : _TR_BlendType == 3 ? (_TR_Color.rgb - ONE_VEC3) * color   // MUL
                     : _TR_Color.rgb // ADD
                 ;
             return rimColor;
@@ -1236,10 +1202,7 @@ FEATURE_TGL_END
         void drawRimLight(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TR_Enable)
             half angle_light_camera = d.angle_light_camera;
-            if (_TR_BlendType == 3) {
-                angle_light_camera = -0.2; // 乗算のときは常に最大
-            }
-            else if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
+            if (isInMirror() || TGL_ON(_TR_DisableBackLit)) {
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
             // 順光の場合はリムライトを暗くする
