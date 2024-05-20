@@ -9,6 +9,8 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
     - 3chカラーマスク
     - Metallic の「Metallicマップの種類」
     - リムライトの混合タイプ「乗算」
+- GUI
+  - GameObjectメニューの「UnlitWFマテリアルをクリンナップ」を削除しました。(GameObjectメニュー配下の整理のため)
 
 ### Notice
 - Shader
