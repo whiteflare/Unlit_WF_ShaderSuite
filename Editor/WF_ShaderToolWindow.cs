@@ -41,7 +41,6 @@ namespace UnlitWF
         public const string PATH_ASSETS = "Assets/UnlitWF Material Tools/";
         public const string PATH_TOOLS = "Tools/UnlitWF/";
         public const string PATH_MATERIAL = "CONTEXT/Material/";
-        public const string PATH_GAMEOBJECT = "GameObject/";
 
 #if WF_ML_JP
         public const string ASSETS_AUTOCNV_01 = PATH_ASSETS + "UnlitWF のマテリアルに変換する/InternalErrorShaderのみ";
@@ -70,8 +69,6 @@ namespace UnlitWF
         public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "UnlitWF のマテリアルに変換する";
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "DebugView シェーダに切り替える";
         public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "モバイル向けシェーダに変換する";
-
-        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "UnlitWFマテリアルのクリンナップ";
 #else
         public const string ASSETS_AUTOCNV_01 = PATH_ASSETS + "Convert UnlitWF Material/Only InternalErrorShader";
         public const string ASSETS_AUTOCNV_02 = PATH_ASSETS + "Convert UnlitWF Material/Exclude Unity-builtin Shaders";
@@ -99,8 +96,6 @@ namespace UnlitWF
         public const string MATERIAL_AUTOCNV = PATH_MATERIAL + "Convert UnlitWF Material";
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView Shader";
         public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "Change Mobile shader";
-
-        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "CleanUp UnlitWF Material Property";
 #endif
 
         public const string TOOLS_LNG_EN = PATH_TOOLS + "Menu Language Change To English";
@@ -551,20 +546,6 @@ namespace UnlitWF
         private static void OpenWindowFromMenu_Asset()
         {
             ToolCommon.SetSelectedMaterials(MatSelectMode.FromAssetDeep);
-            GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
-        }
-
-        [MenuItem(WFMenu.GAMEOBJECT_CREANUP, priority = 10)] // GameObject/配下は priority の扱いがちょっと特殊
-        private static void OpenWindowFromMenu_GameObject()
-        {
-            if (Selection.GetFiltered<GameObject>(SelectionMode.Unfiltered).Length == 0)
-            {
-                ToolCommon.SetMaterials(new MaterialSeeker().GetAllMaterialsInScene().ToArray());
-            }
-            else
-            {
-                ToolCommon.SetSelectedMaterials(MatSelectMode.FromScene);
-            }
             GetWindow<ToolCreanUpWindow>("UnlitWF/CleanUp material property");
         }
 
