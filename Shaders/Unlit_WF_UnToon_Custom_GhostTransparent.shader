@@ -46,17 +46,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
         [HDR]
             _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
-        [WFHeaderToggle(3ch Color Mask)]
-            _CHM_Enable             ("[CHM] Enable", Float) = 0
-        [NoScaleOffset]
-            _CHM_3chMaskTex         ("[CHM] 3ch Mask Texture", 2D) = "black" {}
-        [HDR]
-            _CHM_ColorR             ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
-        [HDR]
-            _CHM_ColorG             ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
-        [HDR]
-            _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
-
         [WFHeaderToggle(Gradient Map)]
             _CGR_Enable             ("[CGR] Enable", Float) = 0
         [NoScaleOffset]
@@ -112,8 +101,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
         [ToggleUI]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
-        [Enum(MASK,0,METALLIC,1)]
-            _MT_MetallicMapType     ("[MT] MetallicMap Type", Float) = 0
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
         [ToggleUI]
@@ -258,7 +245,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB,MUL)]
+        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB)]
             _TR_BlendType           ("[TR] Blend Type", Float) = 0
             _TR_Width               ("[TR] Width", Range(0, 1)) = 0.1
             _TR_Feather             ("[TR] Feather", Range(0, 1)) = 0.05
@@ -384,7 +371,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/04/07 (1.12.1)", Float) = 0
+            _CurrentVersion         ("2024/05/25 (2.0.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -444,7 +431,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
@@ -501,7 +487,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostTransparent" {
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE

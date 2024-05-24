@@ -45,17 +45,6 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
         [HDR]
             _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
-        [WFHeaderToggle(3ch Color Mask)]
-            _CHM_Enable             ("[CHM] Enable", Float) = 0
-        [NoScaleOffset]
-            _CHM_3chMaskTex         ("[CHM] 3ch Mask Texture", 2D) = "black" {}
-        [HDR]
-            _CHM_ColorR             ("[CHM] R ch Color", Color) = (1, 1, 1, 1)
-        [HDR]
-            _CHM_ColorG             ("[CHM] G ch Color", Color) = (1, 1, 1, 1)
-        [HDR]
-            _CHM_ColorB             ("[CHM] B ch Color", Color) = (1, 1, 1, 1)
-
         [WFHeaderToggle(Gradient Map)]
             _CGR_Enable             ("[CGR] Enable", Float) = 0
         [NoScaleOffset]
@@ -311,7 +300,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _TR_Enable              ("[TR] Enable", Float) = 0
         [HDR]
             _TR_Color               ("[TR] Rim Color", Color) = (0.8, 0.8, 0.8, 1)
-        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB,MUL)]
+        [WF_Enum(UnlitWF.BlendModeTR,ADD,ALPHA,ADD_AND_SUB)]
             _TR_BlendType           ("[TR] Blend Type", Float) = 0
             _TR_Width               ("[TR] Width", Range(0, 1)) = 0.1
             _TR_Feather             ("[TR] Feather", Range(0, 1)) = 0.05
@@ -443,7 +432,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/04/07 (1.12.1)", Float) = 0
+            _CurrentVersion         ("2024/05/25 (2.0.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
@@ -490,7 +479,6 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
-            #pragma shader_feature_local_fragment _CHM_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
