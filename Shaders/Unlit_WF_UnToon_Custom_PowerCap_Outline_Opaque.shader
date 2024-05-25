@@ -14,7 +14,7 @@
  *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
+Shader "UnlitWF/UnToon_PowerCap_Outline/WF_UnToon_PowerCap_Outline_Opaque" {
 
     Properties {
         [WFHeader(Base)]
@@ -519,9 +519,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_PowerCap_Outline_Opaque" {
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque", Float) = 0
-        [HideInInspector]
-        [WF_FixFloat(0.0)]
-            _Category               ("BRP|UnToon|Custom/PowerCap_Outline|Opaque", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _VRCFallback            ("Unlit", Float) = 0
