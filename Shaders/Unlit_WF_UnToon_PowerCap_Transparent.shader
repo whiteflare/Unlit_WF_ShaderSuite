@@ -501,8 +501,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
@@ -510,11 +510,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _TM_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
-
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _HL_ENABLE_2
             #pragma shader_feature_local_fragment _HL_ENABLE_3
@@ -522,6 +518,9 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local_fragment _HL_ENABLE_5
             #pragma shader_feature_local_fragment _HL_ENABLE_6
             #pragma shader_feature_local_fragment _HL_ENABLE_7
+            #pragma shader_feature_local_fragment _TFG_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -562,8 +561,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
@@ -571,11 +570,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _TM_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
-
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _HL_ENABLE_2
             #pragma shader_feature_local_fragment _HL_ENABLE_3
@@ -583,6 +578,9 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent" {
             #pragma shader_feature_local_fragment _HL_ENABLE_5
             #pragma shader_feature_local_fragment _HL_ENABLE_6
             #pragma shader_feature_local_fragment _HL_ENABLE_7
+            #pragma shader_feature_local_fragment _TFG_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog

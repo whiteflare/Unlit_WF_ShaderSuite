@@ -111,8 +111,8 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb = lerp(ONE_VEC3, d.color.rgb, d.color.a); if (1 <= MIN_RGB(d.color.rgb)) { discard; }
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
@@ -147,8 +147,8 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb = lerp(ONE_VEC3, d.color.rgb, d.color.a); if (1 <= MIN_RGB(d.color.rgb)) { discard; }
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
@@ -183,8 +183,8 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb = lerp(ONE_VEC3, d.color.rgb, d.color.a); if (1 <= MIN_RGB(d.color.rgb)) { discard; }
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 

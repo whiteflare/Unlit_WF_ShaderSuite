@@ -111,8 +111,8 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb *= d.color.a; if (MAX_RGB(d.color.rgb) <= 0) { discard; }
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
@@ -147,8 +147,8 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb *= d.color.a; if (MAX_RGB(d.color.rgb) <= 0) { discard; }
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
@@ -183,8 +183,8 @@ Shader "UnlitWF/WF_Particle_Addition" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(0, 0, 0, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb *= d.color.a; if (MAX_RGB(d.color.rgb) <= 0) { discard; }
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
