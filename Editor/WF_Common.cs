@@ -1801,6 +1801,7 @@ namespace UnlitWF
             {
                 if (name.Familly == group.First().Familly)
                 {
+                    // current と Familly が一致するものは current 自体を詰める
                     result.familyList.Add(name);
                     result.labelFamilyList.Add(name.Familly);
                 }
@@ -1824,32 +1825,9 @@ namespace UnlitWF
                 return;
             }
 
-            // カスタム以外をVariantでグループ化
-            foreach (var group in GetCurrentFamillyNames(name).Where(nm => !IsVariantCustomOrLegacy(nm)).GroupBy(nm => nm.Variant))
+            void AddToList(IEnumerable<WFShaderName> shaders)
             {
-                var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
-                if (snm != null)
-                {
-                    // RenderTypeが一致するものを追加
-                    result.variantList.Add(snm);
-                    result.labelVariantList.Add(snm.Variant);
-                }
-                else
-                {
-                    // RenderTypeが一致するものがない場合は、ラベルに印を付けて追加
-                    result.variantList.Add(group.First());
-                    result.labelVariantList.Add(group.First().Variant + " *");
-                }
-            }
-
-            // カスタムシェーダをVariantでグループ化
-            var custonVariants = GetCurrentFamillyNames(name).Where(nm => IsVariantCustomOrLegacy(nm)).GroupBy(nm => nm.Variant);
-            if (0 < custonVariants.Count())
-            {
-                result.variantList.Add(null);
-                result.labelVariantList.Add("");
-
-                foreach (var group in custonVariants)
+                foreach (var group in shaders.GroupBy(nm => nm.Variant))
                 {
                     var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
                     if (snm != null)
@@ -1861,10 +1839,33 @@ namespace UnlitWF
                     else
                     {
                         // RenderTypeが一致するものがない場合は、ラベルに印を付けて追加
-                        result.variantList.Add(group.First());
-                        result.labelVariantList.Add(group.First().Variant + " *");
+                        var snm2 = group.OrderByDescending(nm => nm.RenderType.Length).Where(nm => name.RenderType.StartsWith(nm.RenderType)).FirstOrDefault();
+                        if (snm2 != null)
+                        {
+                            // RenderTypeの文字数の降順に並べて先頭一致する最初のものを追加
+                            result.variantList.Add(snm2);
+                            result.labelVariantList.Add(snm2.Variant + " *");
+                        }
+                        else
+                        {
+                            // 一致するものがなければグループの先頭を追加
+                            result.variantList.Add(group.First());
+                            result.labelVariantList.Add(group.First().Variant + " *");
+                        }
                     }
                 }
+            }
+
+            // カスタム以外を追加
+            AddToList(GetCurrentFamillyNames(name).Where(nm => !IsVariantCustomOrLegacy(nm)));
+
+            // カスタムシェーダを追加
+            var custonVariants = GetCurrentFamillyNames(name).Where(nm => IsVariantCustomOrLegacy(nm));
+            if (0 < custonVariants.Count())
+            {
+                result.variantList.Add(null);
+                result.labelVariantList.Add("");
+                AddToList(custonVariants);
             }
         }
 
