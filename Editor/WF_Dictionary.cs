@@ -708,6 +708,14 @@ namespace UnlitWF
             new WFI18NTranslation("Paste value", "貼り付け"),
             new WFI18NTranslation("Paste (without Textures)", "貼り付け (Texture除く)"),
             new WFI18NTranslation("Reset", "リセット"),
+            new WFI18NTranslation("Swap value/Light Matcap", "入れ替え/マットキャップ"),
+            new WFI18NTranslation("Swap value/Light Matcap 2", "入れ替え/マットキャップ 2"),
+            new WFI18NTranslation("Swap value/Light Matcap 3", "入れ替え/マットキャップ 3"),
+            new WFI18NTranslation("Swap value/Light Matcap 4", "入れ替え/マットキャップ 4"),
+            new WFI18NTranslation("Swap value/Light Matcap 5", "入れ替え/マットキャップ 5"),
+            new WFI18NTranslation("Swap value/Light Matcap 6", "入れ替え/マットキャップ 6"),
+            new WFI18NTranslation("Swap value/Light Matcap 7", "入れ替え/マットキャップ 7"),
+            new WFI18NTranslation("Swap value/Light Matcap 8", "入れ替え/マットキャップ 8"),
 
             // 列挙体
             new WFI18NTranslation("UnlitWF.BlendModeOVL.ALPHA", "アルファ合成"),
