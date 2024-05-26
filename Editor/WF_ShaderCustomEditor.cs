@@ -292,7 +292,8 @@ namespace UnlitWF
 
         static class Styles
         {
-            public static readonly Texture2D menuTex = LoadTextureByFileName("wf_icon_menu");
+            public static readonly Texture2D menuTex = (Texture2D)EditorGUIUtility.Load("_Menu@2x"); // LoadTextureByFileName("wf_icon_menu");
+            public static readonly Texture2D helpTex = (Texture2D)EditorGUIUtility.Load("_Help@2x");
         }
 
         private static Texture2D LoadTextureByFileName(string search_name)
@@ -876,7 +877,7 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static Rect DrawShurikenStyleHeader(Rect position, string text, Func<GenericMenu> gen_menu = null)
+        public static Rect DrawShurikenStyleHeader(Rect position, string text, Func<GenericMenu> gen_menu = null, string helpUrl = null)
         {
             var content = new GUIContent(text);
 
@@ -901,15 +902,28 @@ namespace UnlitWF
                 GUI.Label(rect, helpText, style2);
             }
 
+            var left = position.x + position.width;
+
             // コンテキストメニュー
             if (gen_menu != null)
             {
-                var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
+                left -= 20f;
+                var rect = new Rect(left, position.y, 20f, 20f);
                 if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel))
                 {
                     Event.current.Use();
                     var menu = gen_menu();
                     menu?.DropDown(rect);
+                }
+            }
+
+            // ヘルプボタン
+            if (!string.IsNullOrWhiteSpace(helpUrl)) {
+                left -= 20f;
+                var rect = new Rect(left, position.y, 20f, 20f);
+                if (GUI.Button(rect, Styles.helpTex, EditorStyles.largeLabel))
+                {
+                    Application.OpenURL(helpUrl);
                 }
             }
 
@@ -923,9 +937,9 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static Rect DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, Func<GenericMenu> gen_menu = null)
+        public static Rect DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, Func<GenericMenu> gen_menu = null, string helpUrl = null)
         {
-            position = DrawShurikenStyleHeader(position, text, gen_menu);
+            position = DrawShurikenStyleHeader(position, text, gen_menu, helpUrl);
 
             if (alwaysOn)
             {
@@ -1825,7 +1839,8 @@ namespace UnlitWF
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
         {
-            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
+            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, WFHeaderMenuController.GenerateMenuOrNull(editor, prop),
+                WFShaderFunction.GetHelpUrlFromPrefix(WFCommonUtility.GetPrefixFromPropName(prop.name)));
         }
     }
 
@@ -1848,7 +1863,8 @@ namespace UnlitWF
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
         {
-            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, false, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
+            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, false, WFHeaderMenuController.GenerateMenuOrNull(editor, prop), 
+                WFShaderFunction.GetHelpUrlFromPrefix(WFCommonUtility.GetPrefixFromPropName(prop.name)));
         }
     }
 
@@ -1871,7 +1887,8 @@ namespace UnlitWF
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
         {
-            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, true, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
+            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, true, WFHeaderMenuController.GenerateMenuOrNull(editor, prop), 
+                WFShaderFunction.GetHelpUrlFromPrefix(WFCommonUtility.GetPrefixFromPropName(prop.name)));
         }
     }
 
