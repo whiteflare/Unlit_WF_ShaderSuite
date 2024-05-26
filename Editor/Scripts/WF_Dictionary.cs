@@ -200,35 +200,37 @@ namespace UnlitWF
             return false;
         }
 
+        private static readonly string HELP_URL_UNTOON = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/UnToon-Manual";
+
         /// <summary>
         /// シェーダ機能のリスト。
         /// </summary>
         public static readonly List<WFShaderFunction> ShaderFuncList = new List<WFShaderFunction>() {
                 // 基本機能
-                new WFShaderFunction("AL", "AL", "Transparent Alpha", (self, mat) => mat.shader.name.Contains("Trans") && mat.HasProperty("_AL_Source")),
-                new WFShaderFunction("NM", "NM", "NormalMap"),
-                new WFShaderFunction("NS", "NS", "Detail NormalMap"),
-                new WFShaderFunction("MT", "MT", "Metallic"),
-                new WFShaderFunction("ES", "ES", "Emission"),
-                new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
-                new WFShaderFunction("TE", "TE", "Tessellation", (self, mat) => mat.shader.name.Contains("Tess")),
+                new WFShaderFunction("AL", "AL", "Transparent Alpha", (self, mat) => mat.shader.name.Contains("Trans") && mat.HasProperty("_AL_Source")).HelpUrl(HELP_URL_UNTOON + "#TransparentAlpha"),
+                new WFShaderFunction("NM", "NM", "NormalMap").HelpUrl(HELP_URL_UNTOON + "#NormalMap"),
+                new WFShaderFunction("NS", "NS", "Detail NormalMap").HelpUrl(HELP_URL_UNTOON + "#DetailNormalMap"),
+                new WFShaderFunction("MT", "MT", "Metallic").HelpUrl(HELP_URL_UNTOON + "#Metallic"),
+                new WFShaderFunction("ES", "ES", "Emission").HelpUrl(HELP_URL_UNTOON + "#Emission"),
+                new WFShaderFunction("AO", "AO", "Ambient Occlusion").HelpUrl(HELP_URL_UNTOON + "#AmbientOcclusion"),
+                new WFShaderFunction("TE", "TE", "Tessellation", (self, mat) => mat.shader.name.Contains("Tess")).HelpUrl(HELP_URL_UNTOON + "#Tessellation"),
 
                 // Toon系機能
-                new WFShaderFunction("TS", "TS", "ToonShade"),
-                new WFShaderFunction("TR", "TR", "RimLight"),
+                new WFShaderFunction("TS", "TS", "ToonShade").HelpUrl(HELP_URL_UNTOON + "#ToonShade"),
+                new WFShaderFunction("TR", "TR", "RimLight").HelpUrl(HELP_URL_UNTOON + "#RimLight"),
                 new WFShaderFunction("TM", "TM", "RimShadow"),
-                new WFShaderFunction("TL", "TL", "Outline"),
-                new WFShaderFunction("TFG", "TFG", "ToonFog"),
+                new WFShaderFunction("TL", "TL", "Outline").HelpUrl(HELP_URL_UNTOON + "#Outline"),
+                new WFShaderFunction("TFG", "TFG", "ToonFog").HelpUrl(HELP_URL_UNTOON + "#Fog"),
 
                 // matcap一味
-                new WFShaderFunction("HL", "HL", "Light Matcap"),
-                new WFShaderFunction("HA", "HL_1", "Light Matcap 2", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_1", mat)),
-                new WFShaderFunction("HB", "HL_2", "Light Matcap 3", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_2", mat)),
-                new WFShaderFunction("HC", "HL_3", "Light Matcap 4", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_3", mat)),
-                new WFShaderFunction("HD", "HL_4", "Light Matcap 5", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_4", mat)),
-                new WFShaderFunction("HE", "HL_5", "Light Matcap 6", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_5", mat)),
-                new WFShaderFunction("HF", "HL_6", "Light Matcap 7", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_6", mat)),
-                new WFShaderFunction("HG", "HL_7", "Light Matcap 8", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_7", mat)),
+                new WFShaderFunction("HL", "HL", "Light Matcap").HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
+                new WFShaderFunction("HA", "HL_1", "Light Matcap 2", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_1", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
+                new WFShaderFunction("HB", "HL_2", "Light Matcap 3", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_2", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
+                new WFShaderFunction("HC", "HL_3", "Light Matcap 4", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_3", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
+                new WFShaderFunction("HD", "HL_4", "Light Matcap 5", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_4", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
+                new WFShaderFunction("HE", "HL_5", "Light Matcap 6", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_5", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
+                new WFShaderFunction("HF", "HL_6", "Light Matcap 7", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_6", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
+                new WFShaderFunction("HG", "HL_7", "Light Matcap 8", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_7", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
 
                 // 個別機能
                 new WFShaderFunction("GMB", "GMB", "Gem Background"),
@@ -250,13 +252,13 @@ namespace UnlitWF
                 new WFShaderFunction("PA", "PA", "Particle System"),
 
                 // その他の機能
-                new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
-                new WFShaderFunction("CGR", "CGR", "Gradient Map"),
-                new WFShaderFunction("CLC", "CLC", "Color Change"),
-                new WFShaderFunction("LME", "LME", "Lame"),
-                new WFShaderFunction("OVL", "OVL", "Overlay Texture"),
-                new WFShaderFunction("DFD", "DFD", "Distance Fade"),
-                new WFShaderFunction("DSV", "DSV", "Dissolve"),
+                new WFShaderFunction("BKT", "BKT", "BackFace Texture").HelpUrl(HELP_URL_UNTOON + "#BackFaceTexture"),
+                new WFShaderFunction("CGR", "CGR", "Gradient Map").HelpUrl(HELP_URL_UNTOON + "#GradientMap"),
+                new WFShaderFunction("CLC", "CLC", "Color Change").HelpUrl(HELP_URL_UNTOON + "#ColorChange"),
+                new WFShaderFunction("LME", "LME", "Lame").HelpUrl(HELP_URL_UNTOON + "#Lame"),
+                new WFShaderFunction("OVL", "OVL", "Overlay Texture").HelpUrl(HELP_URL_UNTOON + "#OverlayTexture"),
+                new WFShaderFunction("DFD", "DFD", "Distance Fade").HelpUrl(HELP_URL_UNTOON + "#DistanceFade"),
+                new WFShaderFunction("DSV", "DSV", "Dissolve").HelpUrl(HELP_URL_UNTOON + "#Dissolve"),
                 new WFShaderFunction("LBE", "LBE", "Light Bake Effects"),
 
                 // カスタムシェーダ系
@@ -265,7 +267,7 @@ namespace UnlitWF
                 new WFShaderFunction("CGO", "CGO", "Ghost Transparent"),
                 new WFShaderFunction("CCT", "CCT", "ClearCoat"),
 
-                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => HasPropertyPrefix(mat, "_GL")),
+                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => HasPropertyPrefix(mat, "_GL")).HelpUrl(HELP_URL_UNTOON + "#Lit"),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF, CHM
@@ -708,6 +710,14 @@ namespace UnlitWF
             new WFI18NTranslation("Paste value", "貼り付け"),
             new WFI18NTranslation("Paste (without Textures)", "貼り付け (Texture除く)"),
             new WFI18NTranslation("Reset", "リセット"),
+            new WFI18NTranslation("Swap value/Light Matcap", "入れ替え/マットキャップ"),
+            new WFI18NTranslation("Swap value/Light Matcap 2", "入れ替え/マットキャップ 2"),
+            new WFI18NTranslation("Swap value/Light Matcap 3", "入れ替え/マットキャップ 3"),
+            new WFI18NTranslation("Swap value/Light Matcap 4", "入れ替え/マットキャップ 4"),
+            new WFI18NTranslation("Swap value/Light Matcap 5", "入れ替え/マットキャップ 5"),
+            new WFI18NTranslation("Swap value/Light Matcap 6", "入れ替え/マットキャップ 6"),
+            new WFI18NTranslation("Swap value/Light Matcap 7", "入れ替え/マットキャップ 7"),
+            new WFI18NTranslation("Swap value/Light Matcap 8", "入れ替え/マットキャップ 8"),
 
             // 列挙体
             new WFI18NTranslation("UnlitWF.BlendModeOVL.ALPHA", "アルファ合成"),

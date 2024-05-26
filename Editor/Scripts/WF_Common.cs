@@ -1319,6 +1319,7 @@ namespace UnlitWF
         public readonly string Prefix;
         public readonly string Name;
         private readonly Func<WFShaderFunction, Material, bool> _contains;
+        private string helpUrl;
 
         internal WFShaderFunction(string label, string prefix, string name) : this(label, prefix, name, IsEnable)
         {
@@ -1355,6 +1356,12 @@ namespace UnlitWF
             }
         }
 
+        internal WFShaderFunction HelpUrl(string url)
+        {
+            helpUrl = url;
+            return this;
+        }
+
         public bool IsEnable(Material mat)
         {
             if (!WFCommonUtility.IsSupportedShader(mat))
@@ -1371,6 +1378,10 @@ namespace UnlitWF
 
         public static string LabelToPrefix(string label)
         {
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                return null;
+            }
             return WFShaderDictionary.ShaderFuncList.Where(func => func.Label == label).Select(func => func.Prefix).FirstOrDefault();
         }
 
@@ -1385,6 +1396,15 @@ namespace UnlitWF
                 }
             }
             return result.ToArray();
+        }
+
+        public static string GetHelpUrlFromPrefix(string prefix)
+        {
+            if (string.IsNullOrWhiteSpace(prefix))
+            {
+                return null;
+            }
+            return WFShaderDictionary.ShaderFuncList.Where(func => func.Prefix == prefix).Select(func => func.helpUrl).FirstOrDefault();
         }
     }
 

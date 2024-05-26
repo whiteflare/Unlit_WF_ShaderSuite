@@ -292,7 +292,8 @@ namespace UnlitWF
 
         static class Styles
         {
-            public static readonly Texture2D menuTex = LoadTextureByFileName("wf_icon_menu");
+            public static readonly Texture2D menuTex = (Texture2D)EditorGUIUtility.Load("_Menu@2x"); // LoadTextureByFileName("wf_icon_menu");
+            public static readonly Texture2D helpTex = (Texture2D)EditorGUIUtility.Load("_Help@2x");
         }
 
         private static Texture2D LoadTextureByFileName(string search_name)
@@ -876,7 +877,7 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static Rect DrawShurikenStyleHeader(Rect position, string text, GenericMenu menu = null)
+        public static Rect DrawShurikenStyleHeader(Rect position, string text, Func<GenericMenu> gen_menu = null, string helpUrl = null)
         {
             var content = new GUIContent(text);
 
@@ -901,14 +902,28 @@ namespace UnlitWF
                 GUI.Label(rect, helpText, style2);
             }
 
+            var left = position.x + position.width;
+
             // コンテキストメニュー
-            if (menu != null)
+            if (gen_menu != null)
             {
-                var rect = new Rect(position.x + position.width - 20f, position.y + 1f, 16f, 16f);
+                left -= 20f;
+                var rect = new Rect(left, position.y, 20f, 20f);
                 if (GUI.Button(rect, Styles.menuTex, EditorStyles.largeLabel))
                 {
                     Event.current.Use();
-                    menu.DropDown(rect);
+                    var menu = gen_menu();
+                    menu?.DropDown(rect);
+                }
+            }
+
+            // ヘルプボタン
+            if (!string.IsNullOrWhiteSpace(helpUrl)) {
+                left -= 20f;
+                var rect = new Rect(left, position.y, 20f, 20f);
+                if (GUI.Button(rect, Styles.helpTex, EditorStyles.largeLabel))
+                {
+                    Application.OpenURL(helpUrl);
                 }
             }
 
@@ -922,9 +937,9 @@ namespace UnlitWF
         /// <param name="text">テキスト</param>
         /// <param name="prop">EnableトグルのProperty(またはnull)</param>
         /// <param name="alwaysOn">常時trueにするならばtrue、デフォルトはfalse</param>
-        public static Rect DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, GenericMenu menu = null)
+        public static Rect DrawShurikenStyleHeaderToggle(Rect position, string text, MaterialProperty prop, bool alwaysOn, Func<GenericMenu> gen_menu = null, string helpUrl = null)
         {
-            position = DrawShurikenStyleHeader(position, text, menu);
+            position = DrawShurikenStyleHeader(position, text, gen_menu, helpUrl);
 
             if (alwaysOn)
             {
@@ -1685,7 +1700,7 @@ namespace UnlitWF
     {
         private static Material copiedMaterial = null;
 
-        public static GenericMenu GenerateMenuOrNull(MaterialEditor editor, MaterialProperty prop)
+        public static Func<GenericMenu> GenerateMenuOrNull(MaterialEditor editor, MaterialProperty prop)
         {
             var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
             if (string.IsNullOrWhiteSpace(prefix))
@@ -1693,53 +1708,115 @@ namespace UnlitWF
                 return null;
             }
 
-            var menu = new GenericMenu();
-            menu.AddItem(WFI18N.GetGUIContent("Copy material"), false, () =>
+            return () =>
             {
-                if (editor.target is Material)
+                var currentMaterial = editor.target as Material;
+                var oneMaterial = editor.targets.Length == 1;
+
+                var menu = new GenericMenu();
+
+                // コピー
+                if (oneMaterial)
                 {
-                    copiedMaterial = new Material((Material)editor.target);
+                    menu.AddItem(WFI18N.GetGUIContent("Copy material"), false, () =>
+                    {
+                        copiedMaterial = currentMaterial;
+                    });
                 }
                 else
                 {
-                    copiedMaterial = null;
+                    menu.AddDisabledItem(WFI18N.GetGUIContent("Copy material"));
                 }
-            });
-            if (copiedMaterial != null)
-            {
-                menu.AddItem(WFI18N.GetGUIContent("Paste value"), false, () =>
-                {
-                    var param = CopyPropParameter.Create();
-                    param.materialSource = copiedMaterial;
-                    param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
-                    param.prefixs = new string[] { prefix };
-                    WFMaterialEditUtility.CopyProperties(param);
-                });
-                menu.AddItem(WFI18N.GetGUIContent("Paste (without Textures)"), false, () =>
-                {
-                    var param = CopyPropParameter.Create();
-                    param.materialSource = copiedMaterial;
-                    param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
-                    param.prefixs = new string[] { prefix };
-                    param.withoutTextures = true;
-                    WFMaterialEditUtility.CopyProperties(param);
-                });
-            }
-            else
-            {
-                menu.AddDisabledItem(WFI18N.GetGUIContent("Paste value"));
-                menu.AddDisabledItem(WFI18N.GetGUIContent("Paste (without Textures)"));
-            }
-            menu.AddSeparator("");
-            menu.AddItem(WFI18N.GetGUIContent("Reset"), false, () =>
-            {
-                var param = ResetParameter.Create();
-                param.materials = WFCommonUtility.AsMaterials(editor.targets);
-                param.resetPrefixs = new string[] { prefix };
-                WFMaterialEditUtility.ResetProperties(param);
-            });
 
-            return menu;
+                // ペースト
+                if (copiedMaterial != null)
+                {
+                    menu.AddItem(WFI18N.GetGUIContent("Paste value"), false, () =>
+                    {
+                        var param = CopyPropParameter.Create();
+                        param.materialSource = copiedMaterial;
+                        param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
+                        param.prefixs = new string[] { prefix };
+                        WFMaterialEditUtility.CopyProperties(param);
+                    });
+                    menu.AddItem(WFI18N.GetGUIContent("Paste (without Textures)"), false, () =>
+                    {
+                        var param = CopyPropParameter.Create();
+                        param.materialSource = copiedMaterial;
+                        param.materialDestination = WFCommonUtility.AsMaterials(editor.targets);
+                        param.prefixs = new string[] { prefix };
+                        param.withoutTextures = true;
+                        WFMaterialEditUtility.CopyProperties(param);
+                    });
+                }
+                else
+                {
+                    menu.AddDisabledItem(WFI18N.GetGUIContent("Paste value"));
+                    menu.AddDisabledItem(WFI18N.GetGUIContent("Paste (without Textures)"));
+                }
+
+                // matcap の入れ替え
+                if (prefix.StartsWith("HL"))
+                {
+                    var current_num = prefix.Replace("HL", "");
+                    foreach (var entry in new Dictionary<string, string>
+                {
+                    { "", "Light Matcap" },
+                    { "_1", "Light Matcap 2" },
+                    { "_2", "Light Matcap 3" },
+                    { "_3", "Light Matcap 4" },
+                    { "_4", "Light Matcap 5" },
+                    { "_5", "Light Matcap 6" },
+                    { "_6", "Light Matcap 7" },
+                    { "_7", "Light Matcap 8" },
+                })
+                    {
+                        var other_num = entry.Key;
+                        if (!currentMaterial.HasProperty("_HL_Enable" + other_num))
+                        {
+                            break;
+                        }
+                        if (current_num != other_num)
+                        {
+                            if (oneMaterial)
+                            {
+                                menu.AddItem(WFI18N.GetGUIContent("Swap value/" + entry.Value), false, () => {
+                                    var param = CopyPropParameter.Create();
+                                    param.materialSource = new Material(currentMaterial); // コピーしてスワップできるように
+                                    param.materialDestination = new Material[] { currentMaterial };
+                                    param.prefixs = new string[] { "HL" + current_num, "HL" + other_num };
+                                    param.propNameReplacer = name =>
+                                    {
+                                        var px = WFCommonUtility.GetPrefixFromPropName(name);
+                                        if (px != null)
+                                        {
+                                            return Regex.Replace(name, @"_\d$", "") + (px == prefix ? other_num : current_num);
+                                        }
+                                        return null;
+                                    };
+                                    WFMaterialEditUtility.CopyProperties(param);
+                                });
+                            }
+                            else
+                            {
+                                menu.AddDisabledItem(WFI18N.GetGUIContent("Swap value/" + entry.Value));
+                            }
+                        }
+                    }
+                }
+
+                // リセット
+                menu.AddSeparator("");
+                menu.AddItem(WFI18N.GetGUIContent("Reset"), false, () =>
+                {
+                    var param = ResetParameter.Create();
+                    param.materials = WFCommonUtility.AsMaterials(editor.targets);
+                    param.resetPrefixs = new string[] { prefix };
+                    WFMaterialEditUtility.ResetProperties(param);
+                });
+
+                return menu;
+            };
         }
     }
 
@@ -1762,7 +1839,8 @@ namespace UnlitWF
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
         {
-            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
+            ShaderCustomEditor.DrawShurikenStyleHeader(position, text, WFHeaderMenuController.GenerateMenuOrNull(editor, prop),
+                WFShaderFunction.GetHelpUrlFromPrefix(WFCommonUtility.GetPrefixFromPropName(prop.name)));
         }
     }
 
@@ -1785,7 +1863,8 @@ namespace UnlitWF
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
         {
-            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, false, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
+            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, false, WFHeaderMenuController.GenerateMenuOrNull(editor, prop), 
+                WFShaderFunction.GetHelpUrlFromPrefix(WFCommonUtility.GetPrefixFromPropName(prop.name)));
         }
     }
 
@@ -1808,7 +1887,8 @@ namespace UnlitWF
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
         {
-            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, true, WFHeaderMenuController.GenerateMenuOrNull(editor, prop));
+            ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, true, WFHeaderMenuController.GenerateMenuOrNull(editor, prop), 
+                WFShaderFunction.GetHelpUrlFromPrefix(WFCommonUtility.GetPrefixFromPropName(prop.name)));
         }
     }
 
