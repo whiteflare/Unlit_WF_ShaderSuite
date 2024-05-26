@@ -596,7 +596,7 @@ namespace UnlitWF
                 // ファミリー
                 {
                     EditorGUI.BeginChangeCheck();
-                    int idxFamily = EditorGUILayout.Popup("Family", lists.idxFamily, lists.LabelFamilyList);
+                    int idxFamily = EditorGUILayout.Popup("Family", lists.idxFamily, lists.labelFamilyList.ToArray());
                     if (EditorGUI.EndChangeCheck() && lists.idxFamily != idxFamily)
                     {
                         WFCommonUtility.ChangeShader(lists.familyList[idxFamily].Name, targets);
@@ -605,7 +605,7 @@ namespace UnlitWF
                 // バリアント
                 {
                     EditorGUI.BeginChangeCheck();
-                    int idxVariant = EditorGUILayout.Popup("Variant", lists.idxVariant, lists.LabelVariantList);
+                    int idxVariant = EditorGUILayout.Popup("Variant", lists.idxVariant, lists.labelVariantList.ToArray());
                     if (EditorGUI.EndChangeCheck() && lists.idxVariant != idxVariant)
                     {
                         WFCommonUtility.ChangeShader(lists.variantList[idxVariant].Name, targets);
@@ -614,7 +614,7 @@ namespace UnlitWF
                 // Render Type
                 {
                     EditorGUI.BeginChangeCheck();
-                    int idxRenderType = EditorGUILayout.Popup("RenderType", lists.idxRenderType, lists.LabelRenderTypeList);
+                    int idxRenderType = EditorGUILayout.Popup("RenderType", lists.idxRenderType, lists.labelRenderTypeList.ToArray());
                     if (EditorGUI.EndChangeCheck() && lists.idxRenderType != idxRenderType)
                     {
                         WFCommonUtility.ChangeShader(lists.renderTypeList[idxRenderType].Name, targets);

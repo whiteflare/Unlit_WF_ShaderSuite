@@ -1689,6 +1689,10 @@ namespace UnlitWF
         public readonly List<WFShaderName> variantList = new List<WFShaderName>();
         public readonly List<WFShaderName> renderTypeList = new List<WFShaderName>();
 
+        public readonly List<string> labelFamilyList = new List<string>();
+        public readonly List<string> labelVariantList = new List<string>();
+        public readonly List<string> labelRenderTypeList = new List<string>();
+
         public int idxFamily = -1;
         public int idxVariant = -1;
         public int idxRenderType = -1;
@@ -1697,10 +1701,6 @@ namespace UnlitWF
         {
             this.current = current;
         }
-
-        public string[] LabelFamilyList { get => familyList.Select(nm => nm == null ? "" : nm.Familly).ToArray(); }
-        public string[] LabelVariantList { get => variantList.Select(nm => nm == null ? "" : nm.Variant).ToArray(); }
-        public string[] LabelRenderTypeList { get => renderTypeList.Select(nm => nm == null ? "" : nm.RenderType).ToArray(); }
     }
 
     static class WFShaderNameDictionary
@@ -1785,117 +1785,122 @@ namespace UnlitWF
             return result;
         }
 
+        private static IEnumerable<WFShaderName> GetCurrentFamillyNames(WFShaderName name)
+        {
+            return GetCurrentRpNames().Where(nm => nm.Familly == name.Familly);
+        }
+
         public static WFShaderName TryFindFromName(string name)
         {
             return GetCurrentRpNames().Where(nm => nm.Name == name).FirstOrDefault();
         }
 
-        public static List<WFShaderName> GetFamilyList()
+        public static void CreateFamilyList(WFShaderName name, WFVariantList result)
         {
-            var result = new List<WFShaderName>();
             foreach(var group in GetCurrentRpNames().GroupBy(p => p.Familly))
             {
-                // Family ごとにグループ化して、Represent が true のものがあればそれを取得、そうでなければ最初の1件を取得してリストに詰める
-                var represent = group.Where(p => p.Represent).Union(group).FirstOrDefault();
-                if (represent != null)
+                if (name.Familly == group.First().Familly)
                 {
-                    result.Add(represent);
-                }
-            }
-            return result;
-        }
-
-        public static List<WFShaderName> GetVariantList(WFShaderName name)
-        {
-            var first = new List<WFShaderName>();
-            if (name == null)
-            {
-                return first;
-            }
-
-            var second = new List<WFShaderName>();
-            var third = new List<WFShaderName>();
-
-            // Variant でグループ化して、RenderType の一致するものを first に、一致しないものを second に追加
-            foreach (var group in GetCurrentRpNames().Where(nm => nm.Familly == name.Familly).GroupBy(nm => nm.Variant))
-            {
-                if (!IsVariantCustomOrLegacy(group.Key))
-                {
-                    var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
-                    if (snm != null)
-                    {
-                        first.Add(snm);
-                    }
-                    else
-                    {
-                        second.Add(group.First());
-                    }
+                    result.familyList.Add(name);
+                    result.labelFamilyList.Add(name.Familly);
                 }
                 else
                 {
-                    var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
-                    if (snm != null)
+                    // Represent が true のものがあればそれを取得、そうでなければ最初の1件を取得してリストに詰める
+                    var represent = group.Where(p => p.Represent).Union(group).FirstOrDefault();
+                    if (represent != null)
                     {
-                        third.Add(snm);
-                    }
-                    else
-                    {
-                        third.Add(group.First());
+                        result.familyList.Add(represent);
+                        result.labelFamilyList.Add(represent.Familly);
                     }
                 }
             }
-
-            // 結合
-            if (0 < first.Count && 0 < second.Count)
-            {
-                first.Add(null);
-            }
-            first.AddRange(second);
-            if (0 < first.Count && 0 < third.Count)
-            {
-                first.Add(null);
-            }
-            first.AddRange(third);
-
-            return first;
         }
 
-        public static List<WFShaderName> GetRenderTypeList(WFShaderName name)
+        public static void CreateVariantList(WFShaderName name, WFVariantList result)
         {
-            var first = new List<WFShaderName>();
             if (name == null)
             {
-                return first;
+                return;
             }
 
-            var second = new List<WFShaderName>();
-
-            // RenderType でグループ化して、Variant の一致するものを first に、一致しないものを second に追加
-            foreach (var group in GetCurrentRpNames().Where(nm => nm.Familly == name.Familly).GroupBy(nm => nm.RenderType))
+            // カスタム以外をVariantでグループ化
+            foreach (var group in GetCurrentFamillyNames(name).Where(nm => !IsVariantCustomOrLegacy(nm)).GroupBy(nm => nm.Variant))
             {
-                var snm = group.Where(nm => nm.Variant == name.Variant).FirstOrDefault();
+                var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
                 if (snm != null)
                 {
-                    first.Add(snm);
+                    // RenderTypeが一致するものを追加
+                    result.variantList.Add(snm);
+                    result.labelVariantList.Add(snm.Variant);
                 }
                 else
                 {
-                    // ただし一致しない場合では Custom と Legacy は無視する
-                    snm = group.Where(nm => !(IsVariantCustomOrLegacy(nm))).FirstOrDefault();
-                    if (snm != null)
-                    {
-                        second.Add(snm);
-                    }
+                    // RenderTypeが一致するものがない場合は、ラベルに印を付けて追加
+                    result.variantList.Add(group.First());
+                    result.labelVariantList.Add(group.First().Variant + " *");
                 }
             }
 
-            if (0 < first.Count && 0 < second.Count)
+            // カスタムシェーダをVariantでグループ化
+            var custonVariants = GetCurrentFamillyNames(name).Where(nm => IsVariantCustomOrLegacy(nm)).GroupBy(nm => nm.Variant);
+            if (0 < custonVariants.Count())
             {
-                first.Add(null);
-            }
-            first.AddRange(second);
+                result.variantList.Add(null);
+                result.labelVariantList.Add("");
 
-            return first;
+                foreach (var group in custonVariants)
+                {
+                    var snm = group.Where(nm => nm.RenderType == name.RenderType).FirstOrDefault();
+                    if (snm != null)
+                    {
+                        // RenderTypeが一致するものを追加
+                        result.variantList.Add(snm);
+                        result.labelVariantList.Add(snm.Variant);
+                    }
+                    else
+                    {
+                        // RenderTypeが一致するものがない場合は、ラベルに印を付けて追加
+                        result.variantList.Add(group.First());
+                        result.labelVariantList.Add(group.First().Variant + " *");
+                    }
+                }
+            }
+        }
+
+        public static void CreateRenderTypeList(WFShaderName name, WFVariantList result)
+        {
+            if (name == null)
+            {
+                return;
+            }
+
+            var listedRenderType = new List<string>();
+
+            // Familly と Variant が一致するものの RenderType をまず追加
+            foreach (var snm in GetCurrentFamillyNames(name).Where(nm => nm.Variant == name.Variant))
+            {
+                result.renderTypeList.Add(snm);
+                listedRenderType.Add(snm.RenderType);
+            }
+
+            var tempList = new List<WFShaderName>();
+
+            // Familly が一致するが Variant が一致しないものについて
+            foreach (var group in GetCurrentFamillyNames(name).Where(nm => nm.Variant != name.Variant
+                // 未追加のRenderTypeかつLegacyでもCustomでもないものをRenderTypeでグループ化
+                && !listedRenderType.Contains(nm.RenderType) && !IsVariantCustomOrLegacy(nm)).GroupBy(nm => nm.RenderType))
+            {
+                tempList.AddRange(group);
+            }
+
+            if (0 < tempList.Count)
+            {
+                result.renderTypeList.Add(null);
+                result.renderTypeList.AddRange(tempList);
+            }
+
+            result.labelRenderTypeList.AddRange(result.renderTypeList.Select(nm => nm == null ? "" : (nm.Variant == name.Variant ? nm.RenderType : nm.RenderType + "/" + nm.Variant)));
         }
 
         private static bool IsVariantCustomOrLegacy(WFShaderName nm)
@@ -1911,18 +1916,15 @@ namespace UnlitWF
         public static WFVariantList CreateVariantList(WFShaderName current)
         {
             WFVariantList result = new WFVariantList(current);
-            {
-                result.familyList.AddRange(GetFamilyList());
-                result.idxFamily = Array.IndexOf(result.LabelFamilyList, current.Familly);
-            }
-            {
-                result.variantList.AddRange(GetVariantList(current));
-                result.idxVariant = Array.IndexOf(result.LabelVariantList, current.Variant);
-            }
-            {
-                result.renderTypeList.AddRange(GetRenderTypeList(current));
-                result.idxRenderType = Array.IndexOf(result.LabelRenderTypeList, current.RenderType);
-            }
+
+            CreateFamilyList(current, result);
+            CreateVariantList(current, result);
+            CreateRenderTypeList(current, result);
+
+            result.idxFamily = result.familyList.IndexOf(current);
+            result.idxVariant = result.variantList.IndexOf(current);
+            result.idxRenderType = result.renderTypeList.IndexOf(current);
+
             return result;
         }
     }
