@@ -1688,14 +1688,14 @@ namespace UnlitWF
 
         public static Func<GenericMenu> GenerateMenuOrNull(MaterialEditor editor, MaterialProperty prop)
         {
+            var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
+            if (string.IsNullOrWhiteSpace(prefix))
+            {
+                return null;
+            }
+
             return () =>
             {
-                var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
-                if (string.IsNullOrWhiteSpace(prefix))
-                {
-                    return null;
-                }
-
                 var currentMaterial = editor.target as Material;
                 var oneMaterial = editor.targets.Length == 1;
 
