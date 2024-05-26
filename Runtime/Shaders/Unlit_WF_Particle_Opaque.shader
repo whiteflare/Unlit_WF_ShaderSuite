@@ -115,8 +115,8 @@ Shader "UnlitWF/WF_Particle_Opaque" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _GL_ENABLE
             #pragma shader_feature_local _PF_ENABLE
@@ -150,8 +150,8 @@ Shader "UnlitWF/WF_Particle_Opaque" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
@@ -184,8 +184,8 @@ Shader "UnlitWF/WF_Particle_Opaque" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 

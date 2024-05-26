@@ -90,6 +90,37 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
         [ToggleUI]
             _NS_InvMaskVal          ("[NS] Invert Mask Value", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Metallic)]
+            _MT_Enable              ("[MT] Enable", Float) = 0
+            _MT_Metallic            ("[MT] Metallic", Range(0, 1)) = 1
+            _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
+            _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
+            _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
+            _MT_BlendNormal2        ("[MT] Blend Normal 2nd", Range(0, 1)) = 0.1
+            _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
+        [ToggleUI]
+            _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
+        [NoScaleOffset]
+            _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
+        [ToggleUI]
+            _MT_InvMaskVal          ("[MT] Invert Mask Value", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _SpecGlossMap           ("[MT] RoughnessMap Texture", 2D) = "black" {}
+        [ToggleUI]
+            _MT_InvRoughnessMaskVal ("[MT] Invert Mask Value", Range(0, 1)) = 0
+
+        [Header(Metallic Specular)]
+            _MT_Specular            ("[MT] Specular", Range(0, 1)) = 0
+            _MT_SpecSmooth          ("[MT] Smoothness", Range(0, 1)) = 0.8
+
+        [Header(Metallic Secondary)]
+        [Enum(OFF,0,ONLY_SECOND_MAP,2)]
+            _MT_CubemapType         ("[MT] 2nd CubeMap Blend", Float) = 0
+        [NoScaleOffset]
+            _MT_Cubemap             ("[MT] 2nd CubeMap", Cube) = "" {}
+            _MT_CubemapPower        ("[MT] 2nd CubeMap Power", Range(0, 2)) = 1
+            _MT_CubemapHighCut      ("[MT] 2nd CubeMap Hi-Cut Filter", Range(0, 1)) = 0
+
         [WFHeaderToggle(Light Matcap)]
             _HL_Enable              ("[HL] Enable", Float) = 0
         [WF_Enum(UnlitWF.BlendModeHL)]
@@ -242,6 +273,29 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _HL_MatcapMonochrome_7  ("[HG] Matcap Monochrome", Range(0, 1)) = 0
             _HL_MatcapColor_7       ("[HG] Matcap Tint Color", Color) = (0.5, 0.5, 0.5, 1)
 
+        [WFHeaderToggle(Lame)]
+            _LME_Enable             ("[LME] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _LME_UVType             ("[LME] UV Type", Float) = 0
+        [HDR]
+            _LME_Color              ("[LME] Color", Color) = (1, 1, 1, 1)
+            _LME_Texture            ("[LME] Texture", 2D) = "white" {}
+        [HDR]
+            _LME_RandColor          ("[LME] Random Color", Color) = (0, 0, 0, 1)
+        [Enum(POLYGON,0,POINT,1)]
+            _LME_Shape              ("[LME] Shape", Float) = 0
+            _LME_Scale              ("[LME] Scale", Range(0, 4)) = 0.5
+            _LME_Dencity            ("[LME] Dencity", Range(0, 1)) = 0.2
+            _LME_Glitter            ("[LME] Glitter", Range(0, 1)) = 0.5
+            _LME_MinDist            ("[LME] FadeOut Distance (Near)", Range(0, 5)) = 2.0
+            _LME_MaxDist            ("[LME] FadeOut Distance (Far)", Range(0, 5)) = 4.0
+            _LME_Spot               ("[LME] FadeOut Angle", Range(0, 16)) = 2.0
+            _LME_AnimSpeed          ("[LME] Anim Speed", Range(0, 1)) = 0.2
+        [NoScaleOffset]
+            _LME_MaskTex            ("[LME] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _LME_InvMaskVal         ("[LME] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(ToonShade)]
             _TS_Enable              ("[TS] Enable", Float) = 0
         [IntRange]
@@ -317,6 +371,30 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             _TR_WidthBottom         ("[TR] Width Bottom", Range(0, 1)) = 1
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
+
+        [WFHeaderToggle(Overlay Texture)]
+            _OVL_Enable             ("[OVL] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
+            _OVL_UVType             ("[OVL] UV Type", Float) = 0
+        [HDR]
+            _OVL_Color              ("[OVL] Overlay Color", Color) = (1, 1, 1, 1)
+            _OVL_OverlayTex         ("[OVL] Overlay Texture", 2D) = "white" {}
+        [Enum(REPEAT,0,CLIP,1)]
+            _OVL_OutUVType          ("[OVL] Out of UV Mode", Float) = 0
+        [WF_Vector2]
+            _OVL_UVScroll           ("[OVL] UV Scroll", Vector) = (0, 0, 0, 0)
+        [ToggleUI]
+            _OVL_VertColToDecal     ("[OVL] Multiply VertexColor To Overlay Texture", Range(0, 1)) = 0
+        [WF_Enum(UnlitWF.BlendModeOVL)]
+            _OVL_BlendType          ("[OVL] Blend Type", Float) = 0
+            _OVL_Power              ("[OVL] Blend Power", Range(0, 1)) = 1
+            _OVL_CustomParam1       ("[OVL] Customize Parameter 1", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _OVL_MaskTex            ("[OVL] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _OVL_VertColToMask      ("[OVL] Multiply VertexColor To Mask Texture", Range(0, 1)) = 0
+        [ToggleUI]
+            _OVL_InvMaskVal         ("[OVL] Invert Mask Value", Range(0, 1)) = 0
 
         [WFHeaderToggle(Distance Fade)]
             _DFD_Enable             ("[DFD] Enable", Float) = 0
@@ -473,10 +551,13 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _NS_ENABLE
+            #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
+            #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
@@ -484,11 +565,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #pragma shader_feature_local_fragment _DFD_ENABLE
             #pragma shader_feature_local_fragment _DSV_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
-            #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
-            #pragma shader_feature_local_fragment _TM_ENABLE
-            #pragma shader_feature_local_fragment _TR_ENABLE
-
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _HL_ENABLE_2
             #pragma shader_feature_local_fragment _HL_ENABLE_3
@@ -496,6 +573,11 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout" {
             #pragma shader_feature_local_fragment _HL_ENABLE_5
             #pragma shader_feature_local_fragment _HL_ENABLE_6
             #pragma shader_feature_local_fragment _HL_ENABLE_7
+            #pragma shader_feature_local_fragment _LME_ENABLE
+            #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TFG_ENABLE
+            #pragma shader_feature_local_fragment _TM_ENABLE
+            #pragma shader_feature_local_fragment _TR_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
