@@ -200,37 +200,35 @@ namespace UnlitWF
             return false;
         }
 
-        private static readonly string HELP_URL_UNTOON = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/UnToon-Manual";
-
         /// <summary>
         /// シェーダ機能のリスト。
         /// </summary>
         public static readonly List<WFShaderFunction> ShaderFuncList = new List<WFShaderFunction>() {
                 // 基本機能
-                new WFShaderFunction("AL", "AL", "Transparent Alpha", (self, mat) => mat.shader.name.Contains("Trans") && mat.HasProperty("_AL_Source")).HelpUrl(HELP_URL_UNTOON + "#TransparentAlpha"),
-                new WFShaderFunction("NM", "NM", "NormalMap").HelpUrl(HELP_URL_UNTOON + "#NormalMap"),
-                new WFShaderFunction("NS", "NS", "Detail NormalMap").HelpUrl(HELP_URL_UNTOON + "#DetailNormalMap"),
-                new WFShaderFunction("MT", "MT", "Metallic").HelpUrl(HELP_URL_UNTOON + "#Metallic"),
-                new WFShaderFunction("ES", "ES", "Emission").HelpUrl(HELP_URL_UNTOON + "#Emission"),
-                new WFShaderFunction("AO", "AO", "Ambient Occlusion").HelpUrl(HELP_URL_UNTOON + "#AmbientOcclusion"),
-                new WFShaderFunction("TE", "TE", "Tessellation", (self, mat) => mat.shader.name.Contains("Tess")).HelpUrl(HELP_URL_UNTOON + "#Tessellation"),
+                new WFShaderFunction("AL", "AL", "Transparent Alpha", (self, mat) => mat.shader.name.Contains("Trans") && mat.HasProperty("_AL_Source")),
+                new WFShaderFunction("NM", "NM", "NormalMap"),
+                new WFShaderFunction("NS", "NS", "Detail NormalMap"),
+                new WFShaderFunction("MT", "MT", "Metallic"),
+                new WFShaderFunction("ES", "ES", "Emission"),
+                new WFShaderFunction("AO", "AO", "Ambient Occlusion"),
+                new WFShaderFunction("TE", "TE", "Tessellation", (self, mat) => mat.shader.name.Contains("Tess")),
 
                 // Toon系機能
-                new WFShaderFunction("TS", "TS", "ToonShade").HelpUrl(HELP_URL_UNTOON + "#ToonShade"),
-                new WFShaderFunction("TR", "TR", "RimLight").HelpUrl(HELP_URL_UNTOON + "#RimLight"),
+                new WFShaderFunction("TS", "TS", "ToonShade"),
+                new WFShaderFunction("TR", "TR", "RimLight"),
                 new WFShaderFunction("TM", "TM", "RimShadow"),
-                new WFShaderFunction("TL", "TL", "Outline").HelpUrl(HELP_URL_UNTOON + "#Outline"),
-                new WFShaderFunction("TFG", "TFG", "ToonFog").HelpUrl(HELP_URL_UNTOON + "#Fog"),
+                new WFShaderFunction("TL", "TL", "Outline"),
+                new WFShaderFunction("TFG", "TFG", "ToonFog"),
 
                 // matcap一味
-                new WFShaderFunction("HL", "HL", "Light Matcap").HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
-                new WFShaderFunction("HA", "HL_1", "Light Matcap 2", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_1", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
-                new WFShaderFunction("HB", "HL_2", "Light Matcap 3", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_2", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
-                new WFShaderFunction("HC", "HL_3", "Light Matcap 4", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_3", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
-                new WFShaderFunction("HD", "HL_4", "Light Matcap 5", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_4", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
-                new WFShaderFunction("HE", "HL_5", "Light Matcap 6", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_5", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
-                new WFShaderFunction("HF", "HL_6", "Light Matcap 7", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_6", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
-                new WFShaderFunction("HG", "HL_7", "Light Matcap 8", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_7", mat)).HelpUrl(HELP_URL_UNTOON + "#LightMatcap"),
+                new WFShaderFunction("HL", "HL", "Light Matcap"),
+                new WFShaderFunction("HA", "HL_1", "Light Matcap 2", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_1", mat)),
+                new WFShaderFunction("HB", "HL_2", "Light Matcap 3", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_2", mat)),
+                new WFShaderFunction("HC", "HL_3", "Light Matcap 4", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_3", mat)),
+                new WFShaderFunction("HD", "HL_4", "Light Matcap 5", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_4", mat)),
+                new WFShaderFunction("HE", "HL_5", "Light Matcap 6", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_5", mat)),
+                new WFShaderFunction("HF", "HL_6", "Light Matcap 7", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_6", mat)),
+                new WFShaderFunction("HG", "HL_7", "Light Matcap 8", (self, mat) => WFShaderFunction.IsEnable("_HL_Enable_7", mat)),
 
                 // 個別機能
                 new WFShaderFunction("GMB", "GMB", "Gem Background"),
@@ -252,13 +250,13 @@ namespace UnlitWF
                 new WFShaderFunction("PA", "PA", "Particle System"),
 
                 // その他の機能
-                new WFShaderFunction("BKT", "BKT", "BackFace Texture").HelpUrl(HELP_URL_UNTOON + "#BackFaceTexture"),
-                new WFShaderFunction("CGR", "CGR", "Gradient Map").HelpUrl(HELP_URL_UNTOON + "#GradientMap"),
-                new WFShaderFunction("CLC", "CLC", "Color Change").HelpUrl(HELP_URL_UNTOON + "#ColorChange"),
-                new WFShaderFunction("LME", "LME", "Lame").HelpUrl(HELP_URL_UNTOON + "#Lame"),
-                new WFShaderFunction("OVL", "OVL", "Overlay Texture").HelpUrl(HELP_URL_UNTOON + "#OverlayTexture"),
-                new WFShaderFunction("DFD", "DFD", "Distance Fade").HelpUrl(HELP_URL_UNTOON + "#DistanceFade"),
-                new WFShaderFunction("DSV", "DSV", "Dissolve").HelpUrl(HELP_URL_UNTOON + "#Dissolve"),
+                new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
+                new WFShaderFunction("CGR", "CGR", "Gradient Map"),
+                new WFShaderFunction("CLC", "CLC", "Color Change"),
+                new WFShaderFunction("LME", "LME", "Lame"),
+                new WFShaderFunction("OVL", "OVL", "Overlay Texture"),
+                new WFShaderFunction("DFD", "DFD", "Distance Fade"),
+                new WFShaderFunction("DSV", "DSV", "Dissolve"),
                 new WFShaderFunction("LBE", "LBE", "Light Bake Effects"),
 
                 // カスタムシェーダ系
@@ -267,11 +265,51 @@ namespace UnlitWF
                 new WFShaderFunction("CGO", "CGO", "Ghost Transparent"),
                 new WFShaderFunction("CCT", "CCT", "ClearCoat"),
 
-                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => HasPropertyPrefix(mat, "_GL")).HelpUrl(HELP_URL_UNTOON + "#Lit"),
+                new WFShaderFunction("GL", "GL", "Lit & Lit Advance", (self, mat) => HasPropertyPrefix(mat, "_GL")),
 
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF, CHM
             };
+
+        private static readonly string HELP_URL_UNTOON = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/UnToon-Manual";
+
+        /// <summary>
+        /// シェーダ機能→ヘルプURL
+        /// </summary>
+        public static readonly Dictionary<string, string> ShaderFuncHelpUrl = new Dictionary<string, string>()
+        {
+                { "UnToon/Base", HELP_URL_UNTOON + "#Base" },
+                { "AL", HELP_URL_UNTOON + "#TransparentAlpha" },
+                { "NM", HELP_URL_UNTOON + "#NormalMap" },
+                { "NS", HELP_URL_UNTOON + "#DetailNormalMap" },
+                { "MT", HELP_URL_UNTOON + "#Metallic" },
+                { "ES", HELP_URL_UNTOON + "#Emission" },
+                { "AO", HELP_URL_UNTOON + "#AmbientOcclusion" },
+                { "TE", HELP_URL_UNTOON + "#Tessellation" },
+                { "TS", HELP_URL_UNTOON + "#ToonShade" },
+                { "TR", HELP_URL_UNTOON + "#RimLight" },
+                { "TM", HELP_URL_UNTOON + "#RimShadow" },
+                { "TL", HELP_URL_UNTOON + "#Outline" },
+                { "TFG", HELP_URL_UNTOON + "#Fog" },
+                { "HL", HELP_URL_UNTOON + "#LightMatcap" },
+                { "HA", HELP_URL_UNTOON + "#LightMatcap" },
+                { "HB", HELP_URL_UNTOON + "#LightMatcap" },
+                { "HC", HELP_URL_UNTOON + "#LightMatcap" },
+                { "HD", HELP_URL_UNTOON + "#LightMatcap" },
+                { "HE", HELP_URL_UNTOON + "#LightMatcap" },
+                { "HF", HELP_URL_UNTOON + "#LightMatcap" },
+                { "HG", HELP_URL_UNTOON + "#LightMatcap" },
+                { "BKT", HELP_URL_UNTOON + "#BackFaceTexture" },
+                { "CGR", HELP_URL_UNTOON + "#GradientMap" },
+                { "CLC", HELP_URL_UNTOON + "#ColorChange" },
+                { "LME", HELP_URL_UNTOON + "#Lame" },
+                { "OVL", HELP_URL_UNTOON + "#OverlayTexture" },
+                { "DFD", HELP_URL_UNTOON + "#DistanceFade" },
+                { "DSV", HELP_URL_UNTOON + "#Dissolve" },
+                { "Lit", HELP_URL_UNTOON + "#Lit" },
+                { "Lit Advance", HELP_URL_UNTOON + "#LitAdvance" },
+                { "UnToon/Stencil Mask", HELP_URL_UNTOON + "#Stencil" },
+        };
 
         /// <summary>
         /// プレフィックス名のついてない特殊なプロパティ名 → ラベルの変換マップ。

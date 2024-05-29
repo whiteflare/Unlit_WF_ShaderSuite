@@ -71,8 +71,8 @@ namespace UnlitWF
             // 元シェーダに戻すボタン
             OnGuiSub_SwitchPrevShaderButton(materialEditor);
 
-            var mat = materialEditor.target as Material;
-            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
+            var mat = WFCommonUtility.GetCurrentMaterial(materialEditor);
+            var mats = WFCommonUtility.GetCurrentMaterials(materialEditor);
 
             // モード変更メニュー表示
             foreach (var section in sections)
@@ -120,7 +120,7 @@ namespace UnlitWF
         private static void OnGuiSub_SwitchPrevShaderButton(MaterialEditor materialEditor)
         {
             // 編集中のマテリアルの配列
-            var mats = WFCommonUtility.AsMaterials(materialEditor.targets);
+            var mats = WFCommonUtility.GetCurrentMaterials(materialEditor);
 
             // PrevShader タグを持っているものがひとつでもあればボタン表示
             if (mats.Select(m => m.GetTag(TAG_PREV_SHADER, false)).Any(tag => !string.IsNullOrWhiteSpace(tag)))

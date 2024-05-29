@@ -119,6 +119,31 @@ namespace UnlitWF
             return label;
         }
 
+        public static string GetHelpUrl(MaterialEditor editor, string displayName, string headerTitle)
+        {
+            string url;
+            if (FormatDispName(displayName, out var label, out var _, out var _))
+            {
+                if (WFShaderDictionary.ShaderFuncHelpUrl.TryGetValue(label, out url))
+                {
+                    return url;
+                }
+            }
+            var shaderName = WFShaderNameDictionary.TryFindFromName(GetCurrentShader(editor)?.name);
+            if (shaderName != null)
+            {
+                if (WFShaderDictionary.ShaderFuncHelpUrl.TryGetValue(shaderName.Familly + "/" + headerTitle, out url))
+                {
+                    return url;
+                }
+            }
+            if (WFShaderDictionary.ShaderFuncHelpUrl.TryGetValue(headerTitle, out url))
+            {
+                return url;
+            }
+            return null;
+        }
+
         /// <summary>
         /// プロパティ物理名から Enable トグルかどうかを判定する。
         /// </summary>
@@ -669,6 +694,29 @@ namespace UnlitWF
         #endregion
 
         #region その他の汎用ユーティリティ
+
+        public static Material GetCurrentMaterial(MaterialEditor editor)
+        {
+            if (editor == null)
+            {
+                return null;
+            }
+            return editor.target as Material;
+        }
+
+        public static Material[] GetCurrentMaterials(MaterialEditor editor)
+        {
+            if (editor == null)
+            {
+                return null;
+            }
+            return AsMaterials(editor.targets);
+        }
+
+        public static Shader GetCurrentShader(MaterialEditor editor)
+        {
+            return GetCurrentMaterial(editor)?.shader;
+        }
 
         /// <summary>
         /// Object[] -> Material[] のユーティリティ関数。
@@ -1319,7 +1367,6 @@ namespace UnlitWF
         public readonly string Prefix;
         public readonly string Name;
         private readonly Func<WFShaderFunction, Material, bool> _contains;
-        private string helpUrl;
 
         internal WFShaderFunction(string label, string prefix, string name) : this(label, prefix, name, IsEnable)
         {
@@ -1356,12 +1403,6 @@ namespace UnlitWF
             }
         }
 
-        internal WFShaderFunction HelpUrl(string url)
-        {
-            helpUrl = url;
-            return this;
-        }
-
         public bool IsEnable(Material mat)
         {
             if (!WFCommonUtility.IsSupportedShader(mat))
@@ -1396,15 +1437,6 @@ namespace UnlitWF
                 }
             }
             return result.ToArray();
-        }
-
-        public static string GetHelpUrlFromPrefix(string prefix)
-        {
-            if (string.IsNullOrWhiteSpace(prefix))
-            {
-                return null;
-            }
-            return WFShaderDictionary.ShaderFuncList.Where(func => func.Prefix == prefix).Select(func => func.helpUrl).FirstOrDefault();
         }
     }
 
@@ -1801,6 +1833,10 @@ namespace UnlitWF
 
         public static WFShaderName TryFindFromName(string name)
         {
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
             return GetCurrentRpNames().Where(nm => nm.Name == name).FirstOrDefault();
         }
 
