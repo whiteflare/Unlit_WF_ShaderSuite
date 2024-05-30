@@ -306,6 +306,9 @@ namespace UnlitWF
             return AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath(guids[0]));
         }
 
+        /// <summary>
+        /// 他シェーダからの切替時に呼び出される
+        /// </summary>
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)
         {
             PreChangeShader(material, oldShader, newShader);
@@ -413,6 +416,14 @@ namespace UnlitWF
             {
                 newMat.renderQueue = oldMat.renderQueue;
             }
+        }
+
+        /// <summary>
+        /// 他シェーダへの切替時に呼び出される
+        /// </summary>
+        public override void OnClosed(Material material)
+        {
+            material.SetShaderPassEnabled("Always", true); // Transparent が使用している ClearBg の無効化を掃除
         }
 
         public static bool IsSupportedShader(Shader shader)
