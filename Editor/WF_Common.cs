@@ -143,6 +143,10 @@ namespace UnlitWF
             var shaderName = WFShaderNameDictionary.TryFindFromName(GetCurrentShader(editor)?.name);
             if (shaderName != null)
             {
+                if (WFShaderDictionary.ShaderFuncHelpUrl.TryGetValue(shaderName.Familly + "/" + shaderName.Variant + "/" + headerTitle, out url))
+                {
+                    return url;
+                }
                 if (WFShaderDictionary.ShaderFuncHelpUrl.TryGetValue(shaderName.Familly + "/" + headerTitle, out url))
                 {
                     return url;
