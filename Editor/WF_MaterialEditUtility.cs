@@ -753,7 +753,7 @@ namespace UnlitWF
                 if (WFAccessor.HasShaderPropertyTexture(shader, pn))
                 {
                     var tex = importer.GetDefaultTexture(pn);
-                    if (tex != null)
+                    if (tex != null && material.HasProperty(pn)) // ResetDefaultTextureの直前でSerializeObject.ApplyPropertyChangeした内容はHasPropertyなどでアクセスしないとコミットされない？
                     {
                         material.SetTexture(pn, tex);
                     }
