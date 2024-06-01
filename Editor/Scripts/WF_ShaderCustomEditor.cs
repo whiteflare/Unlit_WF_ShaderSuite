@@ -292,7 +292,7 @@ namespace UnlitWF
 
         static class Styles
         {
-            public static readonly Texture2D menuTex = (Texture2D)EditorGUIUtility.Load("_Menu@2x"); // LoadTextureByFileName("wf_icon_menu");
+            public static readonly Texture2D menuTex = (Texture2D)EditorGUIUtility.Load("_Menu@2x");
             public static readonly Texture2D helpTex = (Texture2D)EditorGUIUtility.Load("_Help@2x");
         }
 
@@ -482,7 +482,7 @@ namespace UnlitWF
                 }
             }
 
-            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Material Options");
+            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Material Options", null, WFCommonUtility.GetHelpUrl(materialEditor, "", "MaterialOptions"));
             materialEditor.RenderQueueField();
             {
                 var mat = WFCommonUtility.GetCurrentMaterial(materialEditor);
