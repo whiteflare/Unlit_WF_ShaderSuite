@@ -271,15 +271,20 @@ namespace UnlitWF
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF, CHM
             };
 
-        private static readonly string HELP_URL_UNTOON = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/UnToon-Manual";
-        private static readonly string HELP_URL_FAKEFUR = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/FakeFur-Manual";
-        private static readonly string HELP_URL_WATER = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Water-Manual";
+        private static readonly string HELP_URL_COMMON = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-Common";
+        private static readonly string HELP_URL_UNTOON = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-UnToon";
+        private static readonly string HELP_URL_FAKEFUR = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-FakeFur";
+        private static readonly string HELP_URL_GEM = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-Gem";
+        private static readonly string HELP_URL_WATER = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-Water";
 
         /// <summary>
         /// シェーダ機能→ヘルプURL
         /// </summary>
         public static readonly Dictionary<string, string> ShaderFuncHelpUrl = new Dictionary<string, string>()
         {
+            // Common
+            { "MaterialOptions", HELP_URL_COMMON + "#MaterialOptions" },
+
             // UnToon
             { "UnToon/Base", HELP_URL_UNTOON + "#Base" },
             { "AL", HELP_URL_UNTOON + "#TransparentAlpha" },
@@ -313,9 +318,17 @@ namespace UnlitWF
             { "Lit", HELP_URL_UNTOON + "#Lit" },
             { "Lit Advance", HELP_URL_UNTOON + "#LitAdvance" },
             { "UnToon/Stencil Mask", HELP_URL_UNTOON + "#Stencil" },
+
             // FakeFur
             { "FakeFur/Base", HELP_URL_FAKEFUR + "#Base" },
             { "FUR", HELP_URL_FAKEFUR + "#FakeFur" },
+
+            // Gem
+            { "Gem/Gem Surface", HELP_URL_GEM + "#GemSurface" },
+            { "GMB", HELP_URL_GEM + "#GemBackground" },
+            { "GMF", HELP_URL_GEM + "#GemFlake" },
+            { "GMR", HELP_URL_GEM + "#GemReflection" },
+
             // Water
             { "Water/Surface/Base", HELP_URL_WATER + "#SurfaceBase" },
             { "WA1", HELP_URL_WATER + "#SurfaceWaving" },
@@ -685,8 +698,12 @@ namespace UnlitWF
             new WFI18NTranslation("LBE", "Indirect Multiplier", "間接光の倍率"),
             new WFI18NTranslation("LBE", "Emission Multiplier", "Emissionの倍率"),
             new WFI18NTranslation("LBE", "Indirect Chroma", "間接光の彩度"),
+            // Gem Surface
+            new WFI18NTranslation("Transparency (front)", "透明度 (表面)"),
+            new WFI18NTranslation("Transparency (back)", "透明度 (裏面)"),
             // Gem Background
-            new WFI18NTranslation("GMB", "Background Color", "背景色 (裏面色)"),
+            new WFI18NTranslation("GMB", "Background Color", "裏面色"),
+            new WFI18NTranslation("GMB", "Background CullMode", "カリングモード (裏面)"),
             // Gem Reflection
             new WFI18NTranslation("GMR", "CubeMap", "キューブマップ"),
             new WFI18NTranslation("GMR", "Monochrome Reflection", "モノクロ反射"),

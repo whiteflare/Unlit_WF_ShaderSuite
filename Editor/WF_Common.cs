@@ -72,21 +72,21 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool FormatDispName(string text, out string label, out string name, out string dispName)
         {
-            var mm = PAT_DISP_NAME.Match(text ?? "");
-            if (mm.Success)
+            if (text != null)
             {
-                label = mm.Groups["label"].Value.ToUpper();
-                name = mm.Groups["name"].Value;
-                dispName = "[" + label + "] " + name;
-                return true;
+                var mm = PAT_DISP_NAME.Match(text ?? "");
+                if (mm.Success)
+                {
+                    label = mm.Groups["label"].Value.ToUpper();
+                    name = mm.Groups["name"].Value;
+                    dispName = "[" + label + "] " + name;
+                    return true;
+                }
             }
-            else
-            {
-                label = null;
-                name = text;
-                dispName = text;
-                return false;
-            }
+            label = null;
+            name = text;
+            dispName = text;
+            return false;
         }
 
         /// <summary>

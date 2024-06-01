@@ -482,7 +482,7 @@ namespace UnlitWF
                 }
             }
 
-            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Material Options");
+            DrawShurikenStyleHeader(EditorGUILayout.GetControlRect(false, 32), "Material Options", null, WFCommonUtility.GetHelpUrl(materialEditor, "", "MaterialOptions"));
             materialEditor.RenderQueueField();
             {
                 var mat = WFCommonUtility.GetCurrentMaterial(materialEditor);
