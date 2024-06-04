@@ -1828,7 +1828,7 @@ namespace UnlitWF
             return result;
         }
 
-        private static IEnumerable<WFShaderName> GetCurrentRpNames()
+        internal static IEnumerable<WFShaderName> GetCurrentRpNames()
         {
             var result = new List<WFShaderName>();
             var rp = WFCommonUtility.GetCurrentRenderPipeline();
@@ -1841,7 +1841,7 @@ namespace UnlitWF
             return result;
         }
 
-        private static IEnumerable<WFShaderName> GetCurrentFamillyNames(WFShaderName name)
+        internal static IEnumerable<WFShaderName> GetCurrentFamillyNames(WFShaderName name)
         {
             return GetCurrentRpNames().Where(nm => nm.Familly == name.Familly);
         }
