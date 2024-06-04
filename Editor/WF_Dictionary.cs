@@ -728,6 +728,8 @@ namespace UnlitWF
             new WFI18NTranslation("FUR", "Fur ShadowPower", "影の強さ"),
             new WFI18NTranslation("FUR", "Tint Color (Base)", "色調整 (根元)"),
             new WFI18NTranslation("FUR", "Tint Color (Tip)", "色調整 (先端)"),
+            new WFI18NTranslation("FUR", "Length Mask Texture", "長さマスク"),
+            new WFI18NTranslation("FUR", "Alpha Mask Texture", "アルファマスク"),
             // Refraction
             new WFI18NTranslation("CRF", "Refractive Index", "屈折率"),
             new WFI18NTranslation("CRF", "Correct Refraction to exclude the foreground", "屈折補正(手前のメッシュを映さない)"),

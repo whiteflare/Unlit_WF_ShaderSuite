@@ -29,6 +29,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             _FUR_Height             ("[FUR] Fur Height", Range(0, 0.2)) = 0.02
         [IntRange]
             _FUR_Repeat             ("[FUR] Fur Repeat", Range(1, 6)) = 3
+
         [Header(Fur Shape)]
             _FUR_NoiseTex           ("[FUR] Fur Noise Texture", 2D) = "white" {}
         [WF_Vector3]
@@ -39,13 +40,19 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             _FUR_BumpMap            ("[FUR] NormalMap Texture", 2D) = "bump" {}
         [Enum(NONE,0,X,1,Y,2,XY,3)]
             _FlipMirror             ("[FUR] Flip Mirror", Float) = 0
+
         [Header(Fur Color)]
             _FUR_ShadowPower        ("[FUR] Fur ShadowPower", Range(0, 1)) = 0
             _FUR_TintColorBase      ("[FUR] Tint Color (Base)", Color) = (1, 1, 1, 1)
             _FUR_TintColorTip       ("[FUR] Tint Color (Tip)", Color) = (1, 1, 1, 1)
+
         [Header(Fur Mask Texture)]
         [NoScaleOffset]
-            _FUR_MaskTex            ("[FUR] Mask Texture", 2D) = "white" {}
+            _FUR_LenMaskTex         ("[FUR] Length Mask Texture", 2D) = "white" {}
+        [ToggleUI]
+            _FUR_InvLenMaskVal      ("[FUR] Invert Mask Value", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _FUR_MaskTex            ("[FUR] Alpha Mask Texture", 2D) = "white" {}
         [ToggleUI]
             _FUR_InvMaskVal         ("[FUR] Invert Mask Value", Range(0, 1)) = 0
 

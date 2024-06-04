@@ -26,6 +26,7 @@
 
     DECL_MAIN_TEX2D (_FUR_NoiseTex);
     DECL_VERT_TEX2D (_FUR_BumpMap);
+    DECL_VERT_TEX2D (_FUR_LenMaskTex);
     DECL_SUB_TEX2D  (_FUR_MaskTex);
 
     ////////////////////////////
@@ -48,6 +49,7 @@
     half4           _FUR_TintColorBase;
     half4           _FUR_TintColorTip;
     half            _FUR_InvMaskVal;
+    half            _FUR_InvLenMaskVal;
     half            _FUR_Random;
 
 #endif
