@@ -33,7 +33,7 @@
         float2  uv                  : TEXCOORD0;
         half3   normal              : NORMAL;
         half4   tangent             : TANGENT;
-        uint vid                    : SV_VertexID;
+        uint    vid                 : SV_VertexID;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
@@ -45,6 +45,7 @@
         half3   ws_bitangent        : TEXCOORD4;
         half3   ws_light_dir        : TEXCOORD5;    // ws_light_dir.w は frag では使わないので削減
         float   vid                 : TEXCOORD6;
+        half    height              : COLOR0;
         half3   light_color         : COLOR1;
 #ifdef _V2F_HAS_SHADOWPOWER
         half    shadow_power        : COLOR2;
@@ -130,6 +131,10 @@
         o.vid = (float) v.vid;
 
         localNormalToWorldTangentSpace(v.normal, v.tangent, o.ws_normal, o.ws_tangent, o.ws_bitangent, _FlipMirror & 1, _FlipMirror & 2);
+
+        // 長さマップから長さを取得
+        float2 uv_main = TRANSFORM_TEX(v.uv, _MainTex);
+        o.height = SAMPLE_MASK_VALUE_LOD(_FUR_LenMaskTex, uv_main, _FUR_InvLenMaskVal).r;
 
         half4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
         o.ws_light_dir = ws_light_dir.xyz;
@@ -228,22 +233,24 @@
     void geom_fakefur(triangle v2g v[3], inout TriangleStream<g2f> triStream) {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(v[0]);
 
-        // ファーを伸ばす方向を計算
-        float3 ws_fur_vector[3];
-        {for (uint i = 0; i < 3; i++) {
-            ws_fur_vector[i] = calcFurVector(v[i].ws_tangent, v[i].ws_bitangent, v[i].ws_normal, v[i].uv) * _FUR_HEIGHT_PARAM;
-        }}
+        if (0 < v[0].height || 0 < v[1].height || 0 < v[2].height) {
+            // ファーを伸ばす方向を計算
+            float3 ws_fur_vector[3];
+            {for (uint i = 0; i < 3; i++) {
+                ws_fur_vector[i] = calcFurVector(v[i].ws_tangent, v[i].ws_bitangent, v[i].ws_normal, v[i].uv) * _FUR_HEIGHT_PARAM * v[i].height;
+            }}
 
-        v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
-        {for (uint i = 0; i < _FUR_REPEAT_PARAM; i++) {
-            float rate = i / (float) _FUR_REPEAT_PARAM;
-            v2g v2[3] = {
-                lerp_v2g(v[0], c, rate),
-                lerp_v2g(v[1], c, rate),
-                lerp_v2g(v[2], c, rate)
-            };
-            fakefur(v2, ws_fur_vector, rate, triStream);
-        }}
+            v2g c = lerp_v2g(v[0], lerp_v2g(v[1], v[2], 0.5), 2.0 / 3.0);
+            {for (uint i = 0; i < _FUR_REPEAT_PARAM; i++) {
+                float rate = i / (float) _FUR_REPEAT_PARAM;
+                v2g v2[3] = {
+                    lerp_v2g(v[0], c, rate),
+                    lerp_v2g(v[1], c, rate),
+                    lerp_v2g(v[2], c, rate)
+                };
+                fakefur(v2, ws_fur_vector, rate, triStream);
+            }}
+        }
     }
 
     half4 frag_fakefur(g2f i) : SV_Target {
