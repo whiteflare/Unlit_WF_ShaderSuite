@@ -392,7 +392,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/05/25 (2.0.0)", Float) = 0
+            _CurrentVersion         ("2024/06/12 (2.1.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _ClearBgSupported       ("True", Float) = 0
