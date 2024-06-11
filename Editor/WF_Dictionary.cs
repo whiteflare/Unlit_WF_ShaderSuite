@@ -37,148 +37,151 @@ namespace UnlitWF
             // UnToon 系列
             // ================
 
-            new WFShaderName("BRP", "UnToon", "Basic", "Opaque",                       "UnlitWF/WF_UnToon_Opaque", represent: true),
-            new WFShaderName("BRP", "UnToon", "Basic", "TransCutout",                  "UnlitWF/WF_UnToon_TransCutout"),
-            new WFShaderName("BRP", "UnToon", "Basic", "Transparent",                  "UnlitWF/WF_UnToon_Transparent"),
-            new WFShaderName("BRP", "UnToon", "Basic", "Transparent3Pass",             "UnlitWF/WF_UnToon_Transparent3Pass"),
-            new WFShaderName("BRP", "UnToon", "Basic", "Transparent_Mask",             "UnlitWF/WF_UnToon_Transparent_Mask"),
-            new WFShaderName("BRP", "UnToon", "Basic", "Transparent_MaskOut",          "UnlitWF/WF_UnToon_Transparent_MaskOut"),
-            new WFShaderName("BRP", "UnToon", "Basic", "Transparent_MaskOut_Blend",    "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
-            
-            new WFShaderName("BRP", "UnToon", "Outline", "Opaque",                     "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
-            new WFShaderName("BRP", "UnToon", "Outline", "TransCutout",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
-            new WFShaderName("BRP", "UnToon", "Outline", "Transparent",                "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent"),
-            new WFShaderName("BRP", "UnToon", "Outline", "Transparent3Pass",           "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass"),
-            new WFShaderName("BRP", "UnToon", "Outline", "Transparent_MaskOut",        "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut"),
-            new WFShaderName("BRP", "UnToon", "Outline", "Transparent_MaskOut_Blend",  "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend"),
+            new WFShaderName("BRP", "UnToon", "Basic/No Outline", "Opaque",                     "UnlitWF/WF_UnToon_Opaque", represent: true),
+            new WFShaderName("BRP", "UnToon", "Basic/No Outline", "TransCutout",                "UnlitWF/WF_UnToon_TransCutout"),
+            new WFShaderName("BRP", "UnToon", "Basic/No Outline", "Transparent",                "UnlitWF/WF_UnToon_Transparent"),
+            new WFShaderName("BRP", "UnToon", "Basic/No Outline", "Transparent_3Pass",          "UnlitWF/WF_UnToon_Transparent3Pass"),
+            new WFShaderName("BRP", "UnToon", "Basic/No Outline", "Transparent_Mask",           "UnlitWF/WF_UnToon_Transparent_Mask"),
+            new WFShaderName("BRP", "UnToon", "Basic/No Outline", "Transparent_MaskOut",        "UnlitWF/WF_UnToon_Transparent_MaskOut"),
+            new WFShaderName("BRP", "UnToon", "Basic/No Outline", "Transparent_MaskOut_Blend",  "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend"),
 
-            new WFShaderName("BRP", "UnToon", "Outline_LineOnly", "Opaque",            "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque"),
-            new WFShaderName("BRP", "UnToon", "Outline_LineOnly", "TransCutout",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
-            new WFShaderName("BRP", "UnToon", "Outline_LineOnly", "Transparent",       "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent"),
-            new WFShaderName("BRP", "UnToon", "Outline_LineOnly", "Transparent_MaskOut",   "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline", "Opaque",                        "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline", "TransCutout",                   "UnlitWF/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline", "Transparent",                   "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline", "Transparent_3Pass",             "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline", "Transparent_MaskOut",           "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline", "Transparent_MaskOut_Blend",     "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend"),
 
-            new WFShaderName("BRP", "UnToon", "Mobile", "Opaque",                      "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
-            new WFShaderName("BRP", "UnToon", "Mobile", "TransCutout",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
-            new WFShaderName("BRP", "UnToon", "Mobile", "Transparent",                 "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
-            new WFShaderName("BRP", "UnToon", "Mobile", "TransparentOverlay",          "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline Only", "Opaque",                   "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline Only", "TransCutout",              "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline Only", "Transparent",              "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent"),
+            new WFShaderName("BRP", "UnToon", "Basic/Outline Only", "Transparent_MaskOut",      "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent_MaskOut"),
 
-            new WFShaderName("BRP", "UnToon", "Mobile_Outline", "Opaque",              "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"),
-            new WFShaderName("BRP", "UnToon", "Mobile_Outline", "TransCutout",         "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout"),
+            new WFShaderName("BRP", "UnToon", "Mobile/No Outline", "Opaque",                    "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
+            new WFShaderName("BRP", "UnToon", "Mobile/No Outline", "TransCutout",               "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
+            new WFShaderName("BRP", "UnToon", "Mobile/No Outline", "Transparent",               "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
+            new WFShaderName("BRP", "UnToon", "Mobile/No Outline", "Transparent_Overlay",       "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
 
-            new WFShaderName("BRP", "UnToon", "Mobile_LineOnly", "Opaque",             "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
-            new WFShaderName("BRP", "UnToon", "Mobile_LineOnly", "TransCutout",        "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
+            new WFShaderName("BRP", "UnToon", "Mobile/Outline", "Opaque",                       "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"),
+            new WFShaderName("BRP", "UnToon", "Mobile/Outline", "TransCutout",                  "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout"),
 
-            new WFShaderName("BRP", "UnToon", "PowerCap", "Opaque",                    "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque"),
-            new WFShaderName("BRP", "UnToon", "PowerCap", "TransCutout",               "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout"),
-            new WFShaderName("BRP", "UnToon", "PowerCap", "Transparent",               "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent"),
-            new WFShaderName("BRP", "UnToon", "PowerCap", "Transparent3Pass",          "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass"),
+            new WFShaderName("BRP", "UnToon", "Mobile/Outline Only", "Opaque",                  "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
+            new WFShaderName("BRP", "UnToon", "Mobile/Outline Only", "TransCutout",             "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
 
-            new WFShaderName("BRP", "UnToon", "Tessellation", "Opaque",                "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque"),
-            new WFShaderName("BRP", "UnToon", "Tessellation", "TransCutout",           "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout"),
-            new WFShaderName("BRP", "UnToon", "Tessellation", "Transparent",           "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
-            new WFShaderName("BRP", "UnToon", "Tessellation", "Transparent3Pass",      "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
+            new WFShaderName("BRP", "UnToon", "PowerCap/No Outline", "Opaque",                  "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque"),
+            new WFShaderName("BRP", "UnToon", "PowerCap/No Outline", "TransCutout",             "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_TransCutout"),
+            new WFShaderName("BRP", "UnToon", "PowerCap/No Outline", "Transparent",             "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent"),
+            new WFShaderName("BRP", "UnToon", "PowerCap/No Outline", "Transparent_3Pass",       "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Transparent3Pass"),
+
+            new WFShaderName("BRP", "UnToon", "PowerCap/Outline", "Opaque",                     "UnlitWF/UnToon_PowerCap_Outline/WF_UnToon_PowerCap_Outline_Opaque"),
+            new WFShaderName("BRP", "UnToon", "PowerCap/Outline", "TransCutout",                "UnlitWF/UnToon_PowerCap_Outline/WF_UnToon_PowerCap_Outline_TransCutout"),
+
+            new WFShaderName("BRP", "UnToon", "Tessellation/Outline", "Opaque",                 "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque"),
+            new WFShaderName("BRP", "UnToon", "Tessellation/Outline", "TransCutout",            "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_TransCutout"),
+            new WFShaderName("BRP", "UnToon", "Tessellation/Outline", "Transparent",            "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent"),
+            new WFShaderName("BRP", "UnToon", "Tessellation/Outline", "Transparent_3Pass",      "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent3Pass"),
 
             // ================
             // FakeFur 系列
             // ================
 
-            new WFShaderName("BRP", "FakeFur", "Basic", "TransCutout",                 "UnlitWF/WF_FakeFur_TransCutout"),
-            new WFShaderName("BRP", "FakeFur", "Basic", "Transparent",                 "UnlitWF/WF_FakeFur_Transparent"),
-            new WFShaderName("BRP", "FakeFur", "Basic", "Mix",                         "UnlitWF/WF_FakeFur_Mix", represent: true),
+            new WFShaderName("BRP", "FakeFur", "Basic", "TransCutout",                          "UnlitWF/WF_FakeFur_TransCutout"),
+            new WFShaderName("BRP", "FakeFur", "Basic", "Transparent",                          "UnlitWF/WF_FakeFur_Transparent"),
+            new WFShaderName("BRP", "FakeFur", "Basic", "Mix",                                  "UnlitWF/WF_FakeFur_Mix", represent: true),
 
-            new WFShaderName("BRP", "FakeFur", "FurOnly", "TransCutout",               "UnlitWF/WF_FakeFur_FurOnly_TransCutout"),
-            new WFShaderName("BRP", "FakeFur", "FurOnly", "Transparent",               "UnlitWF/WF_FakeFur_FurOnly_Transparent"),
-            new WFShaderName("BRP", "FakeFur", "FurOnly", "Mix",                       "UnlitWF/WF_FakeFur_FurOnly_Mix"),
+            new WFShaderName("BRP", "FakeFur", "FurOnly", "TransCutout",                        "UnlitWF/WF_FakeFur_FurOnly_TransCutout"),
+            new WFShaderName("BRP", "FakeFur", "FurOnly", "Transparent",                        "UnlitWF/WF_FakeFur_FurOnly_Transparent"),
+            new WFShaderName("BRP", "FakeFur", "FurOnly", "Mix",                                "UnlitWF/WF_FakeFur_FurOnly_Mix"),
 
             // ================
             // Gem 系列
             // ================
 
-            new WFShaderName("BRP", "Gem", "Basic", "Opaque",                          "UnlitWF/WF_Gem_Opaque"),
-            new WFShaderName("BRP", "Gem", "Basic", "Transparent",                     "UnlitWF/WF_Gem_Transparent", represent: true),
+            new WFShaderName("BRP", "Gem", "Basic", "Opaque",                                   "UnlitWF/WF_Gem_Opaque"),
+            new WFShaderName("BRP", "Gem", "Basic", "Transparent",                              "UnlitWF/WF_Gem_Transparent", represent: true),
 
             // ================
             // Grass 系列
             // ================
 
-            new WFShaderName("BRP", "Grass", "Basic", "TransCutout",                   "UnlitWF/WF_Grass_TransCutout", represent: true),
+            new WFShaderName("BRP", "Grass", "Basic", "TransCutout",                            "UnlitWF/WF_Grass_TransCutout", represent: true),
 
             // ================
             // Water 系列
             // ================
 
-            new WFShaderName("BRP", "Water", "Surface", "Opaque",                      "UnlitWF/WF_Water_Surface_Opaque", represent: true),
-            new WFShaderName("BRP", "Water", "Surface", "TransCutout",                 "UnlitWF/WF_Water_Surface_TransCutout"),
-            new WFShaderName("BRP", "Water", "Surface", "Transparent",                 "UnlitWF/WF_Water_Surface_Transparent"),
-            new WFShaderName("BRP", "Water", "Surface", "Transparent_Refracted",       "UnlitWF/WF_Water_Surface_Transparent_Refracted"),
-            new WFShaderName("BRP", "Water", "FX_Caustics", "Addition",                "UnlitWF/WF_Water_Caustics_Addition"),
-            new WFShaderName("BRP", "Water", "FX_DepthFog", "Transparent",             "UnlitWF/WF_Water_DepthFog_Fade"),
-            new WFShaderName("BRP", "Water", "FX_Sun", "Addition",                     "UnlitWF/WF_Water_Sun_Addition"),
-            new WFShaderName("BRP", "Water", "FX_Lamp", "Addition",                    "UnlitWF/WF_Water_Lamp_Addition"),
+            new WFShaderName("BRP", "Water", "Surface", "Opaque",                               "UnlitWF/WF_Water_Surface_Opaque", represent: true),
+            new WFShaderName("BRP", "Water", "Surface", "TransCutout",                          "UnlitWF/WF_Water_Surface_TransCutout"),
+            new WFShaderName("BRP", "Water", "Surface", "Transparent",                          "UnlitWF/WF_Water_Surface_Transparent"),
+            new WFShaderName("BRP", "Water", "Surface", "Transparent_Refracted",                "UnlitWF/WF_Water_Surface_Transparent_Refracted"),
+            new WFShaderName("BRP", "Water", "FX/Caustics", "Addition",                         "UnlitWF/WF_Water_Caustics_Addition"),
+            new WFShaderName("BRP", "Water", "FX/DepthFog", "Transparent",                      "UnlitWF/WF_Water_DepthFog_Fade"),
+            new WFShaderName("BRP", "Water", "FX/Sun", "Addition",                              "UnlitWF/WF_Water_Sun_Addition"),
+            new WFShaderName("BRP", "Water", "FX/Lamp", "Addition",                             "UnlitWF/WF_Water_Lamp_Addition"),
 
             // ================
             // Particle 系列
             // ================
 
 #if UNITY_2019_1_OR_NEWER // Particle系は2018には入れないのでスキップする
-            new WFShaderName("BRP", "Particle", "Basic", "Opaque",                     "UnlitWF/WF_Particle_Opaque"),
-            new WFShaderName("BRP", "Particle", "Basic", "TransCutout",                "UnlitWF/WF_Particle_TransCutout"),
-            new WFShaderName("BRP", "Particle", "Basic", "Transparent",                "UnlitWF/WF_Particle_Transparent"),
-            new WFShaderName("BRP", "Particle", "Basic", "Addition",                   "UnlitWF/WF_Particle_Addition"),
-            new WFShaderName("BRP", "Particle", "Basic", "Multiply",                   "UnlitWF/WF_Particle_Multiply"),
+            new WFShaderName("BRP", "Particle", "Basic", "Opaque",                              "UnlitWF/WF_Particle_Opaque"),
+            new WFShaderName("BRP", "Particle", "Basic", "TransCutout",                         "UnlitWF/WF_Particle_TransCutout"),
+            new WFShaderName("BRP", "Particle", "Basic", "Transparent",                         "UnlitWF/WF_Particle_Transparent"),
+            new WFShaderName("BRP", "Particle", "Basic", "Addition",                            "UnlitWF/WF_Particle_Addition"),
+            new WFShaderName("BRP", "Particle", "Basic", "Multiply",                            "UnlitWF/WF_Particle_Multiply"),
 #endif
 
             // ================
             // UnToon 系列(URP)
             // ================
 
-            new WFShaderName("URP", "UnToon", "Basic", "Opaque",                       "UnlitWF_URP/WF_UnToon_Opaque", represent: true),
-            new WFShaderName("URP", "UnToon", "Basic", "TransCutout",                  "UnlitWF_URP/WF_UnToon_TransCutout"),
-            new WFShaderName("URP", "UnToon", "Basic", "Transparent",                  "UnlitWF_URP/WF_UnToon_Transparent"),
-            new WFShaderName("URP", "UnToon", "Basic", "Transparent_Mask",             "UnlitWF_URP/WF_UnToon_Transparent_Mask"),
-            new WFShaderName("URP", "UnToon", "Basic", "Transparent_MaskOut",          "UnlitWF_URP/WF_UnToon_Transparent_MaskOut"),
+            new WFShaderName("URP", "UnToon", "Basic/No Outline", "Opaque",                     "UnlitWF_URP/WF_UnToon_Opaque", represent: true),
+            new WFShaderName("URP", "UnToon", "Basic/No Outline", "TransCutout",                "UnlitWF_URP/WF_UnToon_TransCutout"),
+            new WFShaderName("URP", "UnToon", "Basic/No Outline", "Transparent",                "UnlitWF_URP/WF_UnToon_Transparent"),
+            new WFShaderName("URP", "UnToon", "Basic/No Outline", "Transparent_Mask",           "UnlitWF_URP/WF_UnToon_Transparent_Mask"),
+            new WFShaderName("URP", "UnToon", "Basic/No Outline", "Transparent_MaskOut",        "UnlitWF_URP/WF_UnToon_Transparent_MaskOut"),
 
-            new WFShaderName("URP", "UnToon", "Mobile", "Opaque",                      "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
-            new WFShaderName("URP", "UnToon", "Mobile", "TransCutout",                 "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
-            new WFShaderName("URP", "UnToon", "Mobile", "Transparent",                 "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
-            new WFShaderName("URP", "UnToon", "Mobile", "TransparentOverlay",          "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
+            new WFShaderName("URP", "UnToon", "Basic/Outline", "Opaque",                        "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_Opaque"),
+            new WFShaderName("URP", "UnToon", "Basic/Outline", "TransCutout",                   "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
 
-            new WFShaderName("URP", "UnToon", "Outline", "Opaque",                     "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_Opaque"),
-            new WFShaderName("URP", "UnToon", "Outline", "TransCutout",                "UnlitWF_URP/UnToon_Outline/WF_UnToon_Outline_TransCutout"),
+            new WFShaderName("URP", "UnToon", "Basic/Outline Only", "Opaque",                   "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque"),
+            new WFShaderName("URP", "UnToon", "Basic/Outline Only", "TransCutout",              "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
 
-            new WFShaderName("URP", "UnToon", "Outline_LineOnly", "Opaque",            "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_Opaque"),
-            new WFShaderName("URP", "UnToon", "Outline_LineOnly", "TransCutout",       "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout"),
+            new WFShaderName("URP", "UnToon", "Mobile/No Outline", "Opaque",                    "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque"),
+            new WFShaderName("URP", "UnToon", "Mobile/No Outline", "TransCutout",               "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout"),
+            new WFShaderName("URP", "UnToon", "Mobile/No Outline", "Transparent",               "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Transparent"),
+            new WFShaderName("URP", "UnToon", "Mobile/No Outline", "Transparent_Overlay",       "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay"),
 
-            new WFShaderName("URP", "UnToon", "Mobile_Outline", "Opaque",              "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"),
-            new WFShaderName("URP", "UnToon", "Mobile_Outline", "TransCutout",         "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout"),
+            new WFShaderName("URP", "UnToon", "Mobile/Outline", "Opaque",                       "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque"),
+            new WFShaderName("URP", "UnToon", "Mobile/Outline", "TransCutout",                  "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout"),
 
-            new WFShaderName("URP", "UnToon", "Mobile_LineOnly", "Opaque",             "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
-            new WFShaderName("URP", "UnToon", "Mobile_LineOnly", "TransCutout",        "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
+            new WFShaderName("URP", "UnToon", "Mobile/Outline Only", "Opaque",                  "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_Opaque"),
+            new WFShaderName("URP", "UnToon", "Mobile/Outline Only", "TransCutout",             "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_OutlineOnly_TransCutout"),
 
             // ================
             // FakeFur 系列(URP)
             // ================
 
-            new WFShaderName("URP", "FakeFur", "Basic", "TransCutout",                 "UnlitWF_URP/WF_FakeFur_TransCutout", represent: true),
-            new WFShaderName("URP", "FakeFur", "Basic", "Transparent",                 "UnlitWF_URP/WF_FakeFur_Transparent"),
+            new WFShaderName("URP", "FakeFur", "Basic", "TransCutout",                          "UnlitWF_URP/WF_FakeFur_TransCutout", represent: true),
+            new WFShaderName("URP", "FakeFur", "Basic", "Transparent",                          "UnlitWF_URP/WF_FakeFur_Transparent"),
 
-            new WFShaderName("URP", "FakeFur", "FurOnly", "TransCutout",               "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout"),
-            new WFShaderName("URP", "FakeFur", "FurOnly", "Transparent",               "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent"),
+            new WFShaderName("URP", "FakeFur", "FurOnly", "TransCutout",                        "UnlitWF_URP/WF_FakeFur_FurOnly_TransCutout"),
+            new WFShaderName("URP", "FakeFur", "FurOnly", "Transparent",                        "UnlitWF_URP/WF_FakeFur_FurOnly_Transparent"),
 
             // ================
             // Gem 系列(URP)
             // ================
 
-            new WFShaderName("URP", "Gem", "Basic", "Opaque",                          "UnlitWF_URP/WF_Gem_Opaque"),
-            new WFShaderName("URP", "Gem", "Basic", "Transparent",                     "UnlitWF_URP/WF_Gem_Transparent", represent: true),
+            new WFShaderName("URP", "Gem", "Basic", "Opaque",                                   "UnlitWF_URP/WF_Gem_Opaque"),
+            new WFShaderName("URP", "Gem", "Basic", "Transparent",                              "UnlitWF_URP/WF_Gem_Transparent", represent: true),
 
             // ================
             // Water 系列(URP)
             // ================
 
-            new WFShaderName("URP", "Water", "Surface", "Opaque",                      "UnlitWF_URP/WF_Water_Surface_Opaque", represent: true),
-            new WFShaderName("URP", "Water", "Surface", "TransCutout",                 "UnlitWF_URP/WF_Water_Surface_TransCutout"),
-            new WFShaderName("URP", "Water", "Surface", "Transparent",                 "UnlitWF_URP/WF_Water_Surface_Transparent"),
+            new WFShaderName("URP", "Water", "Surface", "Opaque",                               "UnlitWF_URP/WF_Water_Surface_Opaque", represent: true),
+            new WFShaderName("URP", "Water", "Surface", "TransCutout",                          "UnlitWF_URP/WF_Water_Surface_TransCutout"),
+            new WFShaderName("URP", "Water", "Surface", "Transparent",                          "UnlitWF_URP/WF_Water_Surface_Transparent"),
         };
 
         private static bool HasPropertyPrefix(Material mat, string prefix)
@@ -267,6 +270,82 @@ namespace UnlitWF
                 // 以下のプレフィックスは昔使っていたものなので使わない方が良い
                 // GB, GF, GR, FG, BK, CH, CL, LM, OL, DF, GI, RF, CHM
             };
+
+        private static readonly string HELP_URL_COMMON = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-Common";
+        private static readonly string HELP_URL_UNTOON = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-UnToon";
+        private static readonly string HELP_URL_FAKEFUR = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-FakeFur";
+        private static readonly string HELP_URL_GEM = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-Gem";
+        private static readonly string HELP_URL_WATER = "https://whiteflare.github.io/vpm-repos/docs/unlitwf/Manual-Water";
+
+        /// <summary>
+        /// シェーダ機能→ヘルプURL
+        /// </summary>
+        public static readonly Dictionary<string, string> ShaderFuncHelpUrl = new Dictionary<string, string>()
+        {
+            // Common
+            { "MaterialOptions", HELP_URL_COMMON + "#MaterialOptions" },
+
+            // UnToon
+            { "UnToon/Base", HELP_URL_UNTOON + "#Base" },
+            { "AL", HELP_URL_UNTOON + "#TransparentAlpha" },
+            { "NM", HELP_URL_UNTOON + "#NormalMap" },
+            { "NS", HELP_URL_UNTOON + "#DetailNormalMap" },
+            { "MT", HELP_URL_UNTOON + "#Metallic" },
+            { "ES", HELP_URL_UNTOON + "#Emission" },
+            { "AO", HELP_URL_UNTOON + "#AmbientOcclusion" },
+            { "TE", HELP_URL_UNTOON + "#Tessellation" },
+            { "TS", HELP_URL_UNTOON + "#ToonShade" },
+            { "TR", HELP_URL_UNTOON + "#RimLight" },
+            { "TM", HELP_URL_UNTOON + "#RimShadow" },
+            { "TL", HELP_URL_UNTOON + "#Outline" },
+            { "TFG", HELP_URL_UNTOON + "#Fog" },
+            { "HL", HELP_URL_UNTOON + "#LightMatcap" },
+            { "HA", HELP_URL_UNTOON + "#LightMatcap" },
+            { "HB", HELP_URL_UNTOON + "#LightMatcap" },
+            { "HC", HELP_URL_UNTOON + "#LightMatcap" },
+            { "HD", HELP_URL_UNTOON + "#LightMatcap" },
+            { "HE", HELP_URL_UNTOON + "#LightMatcap" },
+            { "HF", HELP_URL_UNTOON + "#LightMatcap" },
+            { "HG", HELP_URL_UNTOON + "#LightMatcap" },
+            { "BKT", HELP_URL_UNTOON + "#BackFaceTexture" },
+            { "CGR", HELP_URL_UNTOON + "#GradientMap" },
+            { "CLC", HELP_URL_UNTOON + "#ColorChange" },
+            { "LME", HELP_URL_UNTOON + "#Lame" },
+            { "OVL", HELP_URL_UNTOON + "#OverlayTexture" },
+            { "DFD", HELP_URL_UNTOON + "#DistanceFade" },
+            { "DSV", HELP_URL_UNTOON + "#Dissolve" },
+            { "LBE", HELP_URL_UNTOON + "#LightBakeEffects" },
+            { "Lit", HELP_URL_UNTOON + "#Lit" },
+            { "Lit Advance", HELP_URL_UNTOON + "#LitAdvance" },
+            { "UnToon/Stencil Mask", HELP_URL_UNTOON + "#Stencil" },
+
+            // FakeFur
+            { "FakeFur/Base", HELP_URL_FAKEFUR + "#Base" },
+            { "FUR", HELP_URL_FAKEFUR + "#FakeFur" },
+
+            // Gem
+            { "Gem/Gem Surface", HELP_URL_GEM + "#GemSurface" },
+            { "GMB", HELP_URL_GEM + "#GemBackground" },
+            { "GMF", HELP_URL_GEM + "#GemFlake" },
+            { "GMR", HELP_URL_GEM + "#GemReflection" },
+
+            // Water
+            { "Water/Surface/Base", HELP_URL_WATER + "#SurfaceBase" },
+            { "WA1", HELP_URL_WATER + "#SurfaceWaving" },
+            { "WA2", HELP_URL_WATER + "#SurfaceWaving" },
+            { "WA3", HELP_URL_WATER + "#SurfaceWaving" },
+            { "WAD", HELP_URL_WATER + "#SurfaceDistanceFade" },
+            { "WAS", HELP_URL_WATER + "#SurfaceSpecular" },
+            { "WAM", HELP_URL_WATER + "#SurfaceReflection" },
+            { "Water/FX/Caustics/Base", HELP_URL_WATER + "#CausticsBase" },
+            { "Water/FX/Caustics/Water", HELP_URL_WATER + "#CausticsWater" },
+            { "Water/FX/DepthFog/Base", HELP_URL_WATER + "#DepthFogBase" },
+            { "Water/FX/DepthFog/Water", HELP_URL_WATER + "#DepthFogBase" },
+            { "Water/FX/Sun/Base", HELP_URL_WATER + "#SunReflectionBase" },
+            { "Water/FX/Sun/Sun Reflection", HELP_URL_WATER + "#SunReflectionBase" },
+            { "Water/FX/Lamp/Base", HELP_URL_WATER + "#SunReflectionBase" },
+            { "Water/FX/Lamp/Lamp Reflection", HELP_URL_WATER + "#SunReflectionBase" },
+        };
 
         /// <summary>
         /// プレフィックス名のついてない特殊なプロパティ名 → ラベルの変換マップ。
@@ -619,8 +698,12 @@ namespace UnlitWF
             new WFI18NTranslation("LBE", "Indirect Multiplier", "間接光の倍率"),
             new WFI18NTranslation("LBE", "Emission Multiplier", "Emissionの倍率"),
             new WFI18NTranslation("LBE", "Indirect Chroma", "間接光の彩度"),
+            // Gem Surface
+            new WFI18NTranslation("Transparency (front)", "透明度 (表面)"),
+            new WFI18NTranslation("Transparency (back)", "透明度 (裏面)"),
             // Gem Background
-            new WFI18NTranslation("GMB", "Background Color", "背景色 (裏面色)"),
+            new WFI18NTranslation("GMB", "Background Color", "裏面色"),
+            new WFI18NTranslation("GMB", "Background CullMode", "カリングモード (裏面)"),
             // Gem Reflection
             new WFI18NTranslation("GMR", "CubeMap", "キューブマップ"),
             new WFI18NTranslation("GMR", "Monochrome Reflection", "モノクロ反射"),
@@ -645,6 +728,8 @@ namespace UnlitWF
             new WFI18NTranslation("FUR", "Fur ShadowPower", "影の強さ"),
             new WFI18NTranslation("FUR", "Tint Color (Base)", "色調整 (根元)"),
             new WFI18NTranslation("FUR", "Tint Color (Tip)", "色調整 (先端)"),
+            new WFI18NTranslation("FUR", "Length Mask Texture", "長さマスク"),
+            new WFI18NTranslation("FUR", "Alpha Mask Texture", "アルファマスク"),
             // Refraction
             new WFI18NTranslation("CRF", "Refractive Index", "屈折率"),
             new WFI18NTranslation("CRF", "Correct Refraction to exclude the foreground", "屈折補正(手前のメッシュを映さない)"),
@@ -705,6 +790,14 @@ namespace UnlitWF
             new WFI18NTranslation("Paste value", "貼り付け"),
             new WFI18NTranslation("Paste (without Textures)", "貼り付け (Texture除く)"),
             new WFI18NTranslation("Reset", "リセット"),
+            new WFI18NTranslation("Swap value/Light Matcap", "入れ替え/マットキャップ"),
+            new WFI18NTranslation("Swap value/Light Matcap 2", "入れ替え/マットキャップ 2"),
+            new WFI18NTranslation("Swap value/Light Matcap 3", "入れ替え/マットキャップ 3"),
+            new WFI18NTranslation("Swap value/Light Matcap 4", "入れ替え/マットキャップ 4"),
+            new WFI18NTranslation("Swap value/Light Matcap 5", "入れ替え/マットキャップ 5"),
+            new WFI18NTranslation("Swap value/Light Matcap 6", "入れ替え/マットキャップ 6"),
+            new WFI18NTranslation("Swap value/Light Matcap 7", "入れ替え/マットキャップ 7"),
+            new WFI18NTranslation("Swap value/Light Matcap 8", "入れ替え/マットキャップ 8"),
 
             // 列挙体
             new WFI18NTranslation("UnlitWF.BlendModeOVL.ALPHA", "アルファ合成"),
