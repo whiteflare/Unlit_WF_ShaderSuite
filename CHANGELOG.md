@@ -1,5 +1,24 @@
 # Change Log
 
+## 2024-06-12 (2.1.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20240612
+
+### Changed
+- Shader
+  - Customの中に入れていたアウトライン付きPowerCapを `UnToon_PowerCap_Outline` として整理しました。
+  - FakeFur のマスクを `長さマスク` と `アルファマスク` に分割しました。
+- GUI
+  - Custom Shader Variants の表示とシェーダ切り替えメニューを新しくしました。
+  - ヘルプページを開くボタンを追加しました。
+  - matcapを入れ替えるメニューを追加しました。
+
+### Fixed
+- GUI
+  - Transparent系列のUnToonからUnityビルトインのUnlitに切り替えた後に描画が行われない問題を修正しました。
+  - プロパティをリセットしたときにデフォルトテクスチャが割り当てられない問題を修正しました。
+
+----
+
 ## 2024-05-25 (2.0.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20240525
 

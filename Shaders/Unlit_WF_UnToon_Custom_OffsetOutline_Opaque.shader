@@ -368,7 +368,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/05/25 (2.0.0)", Float) = 0
+            _CurrentVersion         ("2024/06/12 (2.1.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
@@ -445,8 +445,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
-            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE

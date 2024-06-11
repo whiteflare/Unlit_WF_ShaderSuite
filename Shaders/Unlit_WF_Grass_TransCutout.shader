@@ -76,7 +76,7 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/05/25 (2.0.0)", Float) = 0
+            _CurrentVersion         ("2024/06/12 (2.1.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -103,8 +103,8 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
             #pragma shader_feature_local _ _GRS_ERSSIDE_ENABLE
+            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GRW_ENABLE
             #pragma shader_feature_local _VC_ENABLE
@@ -136,8 +136,8 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             // #define _WF_ALPHA_CUTOUT // UnToon の AlphaCutout は使用せず自前でclipする
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
             #pragma shader_feature_local _ _GRS_ERSSIDE_ENABLE
+            #pragma shader_feature_local _ _GRS_MASKTEX_ENABLE
             #pragma shader_feature_local _GRW_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 

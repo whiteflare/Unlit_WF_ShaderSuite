@@ -90,7 +90,7 @@ Shader "UnlitWF/WF_Particle_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/05/25 (2.0.0)", Float) = 0
+            _CurrentVersion         ("2024/06/12 (2.1.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -129,8 +129,8 @@ Shader "UnlitWF/WF_Particle_TransCutout" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _GL_ENABLE
             #pragma shader_feature_local _PF_ENABLE
@@ -165,8 +165,8 @@ Shader "UnlitWF/WF_Particle_TransCutout" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
@@ -200,8 +200,8 @@ Shader "UnlitWF/WF_Particle_TransCutout" {
             #define _WF_MAIN_Z_SHIFT    (_PA_Z_Offset)
             #define _WF_MOBILE
 
-            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
 
