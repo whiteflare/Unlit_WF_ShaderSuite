@@ -172,14 +172,14 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Opaque" {
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
         [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
+            _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
+            _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
             _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
         [Enum(UV1,0,UV2,1)]
             _ES_SC_UVType           ("[ES] UV Type", Float) = 0
         [WF_Vector3]
             _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
-            _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
-            _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         [WFHeader(Lit)]
