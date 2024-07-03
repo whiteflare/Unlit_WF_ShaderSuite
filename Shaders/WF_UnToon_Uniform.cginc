@@ -25,35 +25,35 @@
     // _MainTex ================================================
 
     DECL_MAIN_TEX2D     (_MainTex);
-#ifndef _WF_MOBILE
-    DECL_MAIN_TEX2D     (_BKT_BackTex);
-#endif
 
     // _MainTex の Sampler で参照するサブテクスチャ ============
 
     DECL_SUB_TEX2D      (_AL_MaskTex);
     DECL_SUB_TEX2D      (_EmissionMap);
     DECL_SUB_TEX2D      (_MetallicGlossMap);
-    DECL_SUB_TEX2D      (_SpecGlossMap);
-    DECL_SUB_TEX2D      (_TS_MaskTex);
-    DECL_SUB_TEX2D      (_TR_MaskTex);
-    DECL_SUB_TEX2D      (_TM_MaskTex);
     DECL_SUB_TEX2D      (_OVL_MaskTex);
+    DECL_SUB_TEX2D      (_SpecGlossMap);
     DECL_SUB_TEX2D      (_TL_CustomColorTex);
+    DECL_SUB_TEX2D      (_TM_MaskTex);
+    DECL_SUB_TEX2D      (_TR_MaskTex);
+    DECL_SUB_TEX2D      (_TS_MaskTex);
 #ifndef _WF_AO_ONLY_LMAP
     DECL_SUB_TEX2D      (_OcclusionMap);
 #endif
 #ifndef _WF_MOBILE
+    DECL_SUB_TEX2D      (_BKT_BackTex);
+    DECL_SUB_TEX2D      (_CGR_MaskTex);
+    DECL_SUB_TEX2D      (_CLC_MaskTex);
+    DECL_SUB_TEX2D      (_DFD_ColorTex);
+    DECL_SUB_TEX2D      (_LME_MaskTex);
+    DECL_SUB_TEX2D      (_LME_Texture);
     DECL_SUB_TEX2D      (_NS_2ndMaskTex);
-    DECL_SUB_TEX2D      (_TS_BaseTex);
     DECL_SUB_TEX2D      (_TS_1stTex);
     DECL_SUB_TEX2D      (_TS_2ndTex);
     DECL_SUB_TEX2D      (_TS_3rdTex);
-    DECL_SUB_TEX2D      (_LME_Texture);
-    DECL_SUB_TEX2D      (_LME_MaskTex);
-    DECL_SUB_TEX2D      (_DFD_ColorTex);
-    DECL_SUB_TEX2D      (_CGR_MaskTex);
-    DECL_SUB_TEX2D      (_CLC_MaskTex);
+    DECL_SUB_TEX2D      (_TS_BaseTex);
+    DECL_SUB_TEX2D      (_TX2_MainTex);
+    DECL_SUB_TEX2D      (_TX2_MaskTex);
 #endif
 
     // 独自の Sampler で参照するサブテクスチャ =================
@@ -95,6 +95,16 @@
     half            _UseVertexColor;
     half            _Z_Shift;
     uint            _FlipMirror;
+
+    // -------------------------
+
+#ifndef _WF_MOBILE
+    FEATURE_TGL    (_TX2_Enable);
+    float4          _TX2_MainTex_ST;
+    half4           _TX2_Color;
+    uint            _TX2_UVType;
+    half            _TX2_InvMaskVal;
+#endif
 
     // -------------------------
 

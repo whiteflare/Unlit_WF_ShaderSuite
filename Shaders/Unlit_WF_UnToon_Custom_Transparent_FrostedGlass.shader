@@ -47,6 +47,18 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [ToggleUI]
             _CGL_UseDepthTex        ("[CGL] Correct Blur to exclude the foreground", Range(0, 1)) = 0
 
+        [WFHeaderToggle(Main Texture 2nd)]
+            _TX2_Enable             ("[TX2] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _TX2_UVType             ("[TX2] UV Type", Float) = 0
+            _TX2_MainTex            ("[TX2] Main Texture", 2D) = "white" {}
+        [HDR]
+            _TX2_Color              ("[TX2] Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _TX2_MaskTex            ("[TX2] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _TX2_InvMaskVal         ("[TX2] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -424,6 +436,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonFrostedGlass
 

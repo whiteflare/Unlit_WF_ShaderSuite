@@ -24,6 +24,10 @@
 
     /* このセクションでは、どのテクスチャから何色を参照するかを定義する */
 
+    #ifndef WF_TEX2D_MAIN_2ND_MASK
+        #define WF_TEX2D_MAIN_2ND_MASK(uv)      SAMPLE_MASK_VALUE(_TX2_MaskTex, uv, _TX2_InvMaskVal).r
+    #endif
+
     #ifndef WF_TEX2D_ALPHA_MAIN_ALPHA
         #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   saturate( TGL_OFF(_AL_InvMaskVal) ? alpha : 1 - alpha )
     #endif
@@ -156,7 +160,7 @@ FEATURE_TGL_ON_BEGIN(_BKT_Enable)
         if (!d.facing) {
             float2 uv_back = _BKT_UVType == 1 ? d.uv2 : d.uv1;
             uv_back = TRANSFORM_TEX(uv_back, _BKT_BackTex);
-            d.color = PICK_MAIN_TEX2D(_BKT_BackTex, uv_back) * _BKT_BackColor;
+            d.color = PICK_SUB_TEX2D(_BKT_BackTex, _MainTex, uv_back) * _BKT_BackColor;
         }
 FEATURE_TGL_END
 #endif
@@ -167,6 +171,25 @@ FEATURE_TGL_END
         d.color *= lerp(ONE_VEC4, d.vertex_color, _UseVertexColor);
 #endif
     }
+
+    ////////////////////////////
+    // Main Texture 2nd
+    ////////////////////////////
+
+    #ifdef _TX2_ENABLE
+        void drawMainTex2nd(inout drawing d) {
+FEATURE_TGL_ON_BEGIN(_TX2_Enable)
+            float2 uv_main2 = _TX2_UVType == 1 ? d.uv2 : d.uv1;
+            uv_main2 = TRANSFORM_TEX(uv_main2, _TX2_MainTex);
+            float4 tex = PICK_SUB_TEX2D(_TX2_MainTex, _MainTex, uv_main2);
+            float alpha = tex.a * _TX2_Color.a * WF_TEX2D_MAIN_2ND_MASK(d.uv_main);
+            d.color.rgb = lerp(d.color.rgb, tex.rgb * _TX2_Color.rgb, alpha);
+FEATURE_TGL_END
+        }
+
+    #else
+        #define drawMainTex2nd(d)
+    #endif
 
     ////////////////////////////
     // Alpha Transparent
