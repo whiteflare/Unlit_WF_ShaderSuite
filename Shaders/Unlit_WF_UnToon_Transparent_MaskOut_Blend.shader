@@ -345,10 +345,12 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
         [Header(Emissive Scroll)]
         [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
+        [WF_Enum(UnlitWF.EmissiveScrollMode,STANDARD,SAWTOOTH,SIN_WAVE,CUSTOM)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
             _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _ES_SC_GradTex          ("[ES] Wave Grad Tex", 2D) = "white" {}
         [ToggleUI]
             _ES_SC_AlphaScroll      ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
@@ -498,6 +500,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
@@ -562,6 +565,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
@@ -627,6 +631,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
@@ -694,6 +699,7 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE

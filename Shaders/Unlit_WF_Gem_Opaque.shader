@@ -69,10 +69,12 @@ Shader "UnlitWF/WF_Gem_Opaque" {
         [Header(Emissive Scroll)]
         [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
+        [WF_Enum(UnlitWF.EmissiveScrollMode,STANDARD,SAWTOOTH,SIN_WAVE,CUSTOM)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
             _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _ES_SC_GradTex          ("[ES] Wave Grad Tex", 2D) = "white" {}
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
             _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -160,6 +162,7 @@ Shader "UnlitWF/WF_Gem_Opaque" {
             #define _WF_MOBILE
 
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _DSV_ENABLE

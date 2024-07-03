@@ -65,6 +65,7 @@
     DECL_MAIN_TEXCUBE   (_MT_Cubemap);
     DECL_MAIN_TEX2D     (_OVL_OverlayTex);
     DECL_MAIN_TEX2D     (_CGR_GradMapTex);
+    DECL_MAIN_TEX2D     (_ES_SC_GradTex);
 
     // vert から tex2Dlod で参照するサブテクスチャ =============
 

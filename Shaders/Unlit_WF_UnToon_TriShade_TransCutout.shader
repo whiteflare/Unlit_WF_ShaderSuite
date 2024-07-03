@@ -261,7 +261,7 @@ Shader "UnlitWF/UnToon_TriShade/WF_UnToon_TriShade_TransCutout" {
         [Header(Emissive Scroll)]
         [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
+        [WF_Enum(UnlitWF.EmissiveScrollMode,STANDARD,SAWTOOTH,SIN_WAVE)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
             _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
