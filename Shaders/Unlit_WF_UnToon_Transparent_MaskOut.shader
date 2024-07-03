@@ -344,6 +344,12 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
         [Header(Emissive Scroll)]
         [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
+        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
+            _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _ES_SC_UVType           ("[ES] UV Type", Float) = 0
+        [WF_Vector3]
+            _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
         [WF_Enum(UnlitWF.EmissiveScrollMode,STANDARD,SAWTOOTH,SIN_WAVE,CUSTOM)]
             _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
             _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
@@ -352,12 +358,6 @@ Shader "UnlitWF/WF_UnToon_Transparent_MaskOut" {
             _ES_SC_GradTex          ("[ES] Wave Grad Tex", 2D) = "white" {}
         [ToggleUI]
             _ES_SC_AlphaScroll      ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
-        [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
-            _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
-        [Enum(UV1,0,UV2,1)]
-            _ES_SC_UVType           ("[ES] UV Type", Float) = 0
-        [WF_Vector3]
-            _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         [Header(Emissive AudioLink)]
