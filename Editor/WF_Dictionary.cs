@@ -395,7 +395,7 @@ namespace UnlitWF
                 enablePropName = "_ES_Enable",
             },
             new WFCustomKeywordSettingCustom("_ES_SC_GradTex",
-                mat => WFAccessor.HasShaderPropertyTexture(mat.shader,"_ES_SC_GradTex") && WFAccessor.GetInt(mat, "_ES_SC_Shape", 0) == 3 , "_ES_SCROLLGRAD_ENABLE") {
+                mat => WFAccessor.HasShaderPropertyTexture(mat.shader,"_ES_SC_GradTex") && WFAccessor.GetBool(mat, "_ES_ScrollEnable", false) && WFAccessor.GetInt(mat, "_ES_SC_Shape", 0) == 3 , "_ES_SCROLLGRAD_ENABLE") {
                 enablePropName = "_ES_Enable",
             },
             new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
