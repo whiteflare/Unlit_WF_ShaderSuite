@@ -250,6 +250,7 @@ namespace UnlitWF
                 new WFShaderFunction("PA", "PA", "Particle System"),
 
                 // その他の機能
+                new WFShaderFunction("TX2", "TX2", "Main Texture 2nd"),
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
                 new WFShaderFunction("CGR", "CGR", "Gradient Map"),
                 new WFShaderFunction("CLC", "CLC", "Color Change"),
@@ -307,6 +308,7 @@ namespace UnlitWF
             { "HE", HELP_URL_UNTOON + "#LightMatcap" },
             { "HF", HELP_URL_UNTOON + "#LightMatcap" },
             { "HG", HELP_URL_UNTOON + "#LightMatcap" },
+            { "TX2", HELP_URL_UNTOON + "#MainTex2nd" },
             { "BKT", HELP_URL_UNTOON + "#BackFaceTexture" },
             { "CGR", HELP_URL_UNTOON + "#GradientMap" },
             { "CLC", HELP_URL_UNTOON + "#ColorChange" },
@@ -392,6 +394,10 @@ namespace UnlitWF
             new WFCustomKeywordSettingBool("_ES_ScrollEnable", "_ES_SCROLL_ENABLE") {
                 enablePropName = "_ES_Enable",
             },
+            new WFCustomKeywordSettingCustom("_ES_SC_GradTex",
+                mat => WFAccessor.HasShaderPropertyTexture(mat.shader,"_ES_SC_GradTex") && WFAccessor.GetInt(mat, "_ES_SC_Shape", 0) == 3 , "_ES_SCROLLGRAD_ENABLE") {
+                enablePropName = "_ES_Enable",
+            },
             new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
                 enablePropName = "_ES_Enable",
             },
@@ -437,6 +443,7 @@ namespace UnlitWF
             // HeaderTitle
             new WFI18NTranslation("3ch Color Mask", "3chカラーマスク"),
             new WFI18NTranslation("Ambient Occlusion", "AOマップとライトマップ"),
+            new WFI18NTranslation("Main Texture 2nd", "メインテクスチャ 2nd"),
             new WFI18NTranslation("BackFace Texture", "裏面テクスチャ"),
             new WFI18NTranslation("Base", "基本設定"),
             new WFI18NTranslation("ClearCoat", "クリアコート"),
@@ -634,6 +641,7 @@ namespace UnlitWF
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Enable EmissiveScroll", "スクロールを使用する"),
             new WFI18NTranslation("ES", "Wave Type", "波形"),
+            new WFI18NTranslation("ES", "Wave Grad Tex", "波形グラデーションテクスチャ"),
             new WFI18NTranslation("ES", "Change Alpha Transparency", "透明度も反映する"),
             new WFI18NTranslation("ES", "Direction Type", "方向の種類"),
             new WFI18NTranslation("ES", "LevelOffset", "ゼロ点調整"),
@@ -826,6 +834,10 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_DIR", "カスタム(ワールド方向)"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_LOCAL_DIR", "カスタム(ローカル方向)"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_POS", "カスタム(ワールド座標)"),
+            new WFI18NTranslation("UnlitWF.EmissiveScrollMode.STANDARD", "標準"),
+            new WFI18NTranslation("UnlitWF.EmissiveScrollMode.SAWTOOTH", "のこぎり波"),
+            new WFI18NTranslation("UnlitWF.EmissiveScrollMode.SIN_WAVE", "正弦波"),
+            new WFI18NTranslation("UnlitWF.EmissiveScrollMode.CUSTOM", "カスタム"),
 
             // WFEditorSetting
             new WFI18NTranslation("WFEditorSetting", "This is the current setting used.", "これは現在有効な設定です。"),

@@ -44,6 +44,18 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
         [Enum(OFF,0,FRONT,1,BACK,2)]
             _CCT_CullMode           ("[CCT] Cull Mode", int) = 2
 
+        [WFHeaderToggle(Main Texture 2nd)]
+            _TX2_Enable             ("[TX2] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _TX2_UVType             ("[TX2] UV Type", Float) = 0
+            _TX2_MainTex            ("[TX2] Main Texture", 2D) = "white" {}
+        [HDR]
+            _TX2_Color              ("[TX2] Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _TX2_MaskTex            ("[TX2] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _TX2_InvMaskVal         ("[TX2] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -327,16 +339,18 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
         [Header(Emissive Scroll)]
         [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
-            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
             _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
         [Enum(UV1,0,UV2,1)]
             _ES_SC_UVType           ("[ES] UV Type", Float) = 0
         [WF_Vector3]
             _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [WF_Enum(UnlitWF.EmissiveScrollMode,STANDARD,SAWTOOTH,SIN_WAVE,CUSTOM)]
+            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
             _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _ES_SC_GradTex          ("[ES] Wave Grad Tex", 2D) = "white" {}
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         [Header(Emissive AudioLink)]
@@ -427,6 +441,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
@@ -437,6 +452,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
