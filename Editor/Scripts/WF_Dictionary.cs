@@ -395,10 +395,14 @@ namespace UnlitWF
                 enablePropName = "_ES_Enable",
             },
             new WFCustomKeywordSettingCustom("_ES_SC_GradTex",
-                mat => WFAccessor.HasShaderPropertyTexture(mat.shader,"_ES_SC_GradTex") && WFAccessor.GetInt(mat, "_ES_SC_Shape", 0) == 3 , "_ES_SCROLLGRAD_ENABLE") {
+                mat => WFAccessor.HasShaderPropertyTexture(mat.shader,"_ES_SC_GradTex") && WFAccessor.GetBool(mat, "_ES_ScrollEnable", false) && WFAccessor.GetInt(mat, "_ES_SC_Shape", 0) == 3 , "_ES_SCROLLGRAD_ENABLE") {
                 enablePropName = "_ES_Enable",
             },
             new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
+                enablePropName = "_ES_Enable",
+            },
+            new WFCustomKeywordSettingCustom("_ES_AU_DelayTex",
+                mat => WFAccessor.HasShaderPropertyTexture(mat.shader,"_ES_AU_DelayTex") && WFAccessor.GetBool(mat, "_ES_AuLinkEnable", false) && WFAccessor.GetInt(mat, "_ES_AU_DelayDir", 0) == 5 , "_ES_AULINKDTEX_ENABLE") {
                 enablePropName = "_ES_Enable",
             },
             new WFCustomKeywordSettingEnum("_TS_FixContrast", "_", "_TS_FIXC_ENABLE") {
@@ -657,6 +661,10 @@ namespace UnlitWF
             new WFI18NTranslation("ES", "Threshold (Min)", "しきい値 (Min)"),
             new WFI18NTranslation("ES", "Threshold (Max)", "しきい値 (Max)"),
             new WFI18NTranslation("ES", "Dont Emit when AudioLink is disabled", "AudioLink無効時は光らせない"),
+            new WFI18NTranslation("ES", "Delay Direction", "ディレイ方向"),
+            new WFI18NTranslation("ES", "Delay Control Texture", "ディレイ制御テクスチャ"),
+            new WFI18NTranslation("ES", "Delay Reverse", "ディレイ反転"),
+            new WFI18NTranslation("ES", "Delay Length", "ディレイ長"),
             // Outline
             new WFI18NTranslation("TL", "Line Color", "線の色"),
             new WFI18NTranslation("TL", "Line Width", "線の太さ"),

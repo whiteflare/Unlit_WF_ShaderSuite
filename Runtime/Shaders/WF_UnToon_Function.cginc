@@ -469,7 +469,7 @@ FEATURE_TGL_END
         void drawGradientMap(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CGR_Enable)
             float x = saturate(calcBrightness(d.color.rgb));
-            float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0)).rgb;
+            float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0.5)).rgb;
             d.color.rgb = lerp(d.color.rgb, cgr, WF_TEX2D_GRADMAP_MASK(d.uv_main));
 FEATURE_TGL_END
         }
@@ -534,7 +534,7 @@ FEATURE_TGL_END
         }
 
         float4 calcEmissiveWavingCustom(float time) {
-            return WF_TEX2D_ES_SC_GRAD_MAP(float2(1 - frac(time), 0)).rgba;
+            return WF_TEX2D_ES_SC_GRAD_MAP(float2(1 - frac(time), 0.5)).rgba;
         }
 
         float4 calcEmissiveWaving(inout drawing d) {
@@ -582,10 +582,44 @@ FEATURE_TGL_END
         float   _ES_AU_MaxThreshold;
         float   _ES_AU_BlackOut;
         float   _ES_AU_AlphaLink;
+        float   _ES_AU_DelayDir;
+        float   _ES_AU_DelayReverse;
+        float   _ES_AU_DelayHistory;
+        DECL_SUB_TEX2D  (_ES_AU_DelayTex);
+
+        float calcEmissiveAudioLinkDelay(drawing d) {
+            float delay = 0;
+            if (_ES_AU_DelayDir == 1) {
+                delay = d.uv1.x;
+            }
+            else if (_ES_AU_DelayDir == 2) {
+                delay = d.uv1.y;
+            }
+            else if (_ES_AU_DelayDir == 3) {
+                delay = d.uv2.x;
+            }
+            else if (_ES_AU_DelayDir == 4) {
+                delay = d.uv2.y;
+            }
+            else if (_ES_AU_DelayDir == 5) {
+#if defined(_ES_AULINKDTEX_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+                delay = PICK_SUB_TEX2D(_ES_AU_DelayTex, _MainTex, d.uv_main).r;
+#endif
+            }
+            if (TGL_ON(_ES_AU_DelayReverse)) {
+                delay = 1 - delay;
+            }
+            return delay * _ES_AU_DelayHistory;
+        }
+
+        float calcEmissiveAudioLinkPower(float au) {
+            return lerp(au * _ES_AU_Slope, lerp(1, au, _ES_AU_Slope), smoothstep(_ES_AU_MinThreshold, _ES_AU_MaxThreshold, au));
+        }
 
         float calcEmissiveAudioLink(inout drawing d) {
-            float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( 0, _ES_AU_Band ) ).r);
-            au = lerp(au * _ES_AU_Slope, lerp(1, au, _ES_AU_Slope), smoothstep(_ES_AU_MinThreshold, _ES_AU_MaxThreshold, au));
+            float delay = calcEmissiveAudioLinkDelay(d);
+            float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, _ES_AU_Band ) ).r);
+            au = calcEmissiveAudioLinkPower(au);
             return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, au);
         }
 
