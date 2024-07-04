@@ -391,6 +391,13 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             _ES_AU_Slope            ("[ES] Slope", Range(0, 1)) = 0.2
             _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
             _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
+        [Enum(NONE,0,UV1_X,1,UV1_Y,2,UV2_X,3,UV2_Y,4,UV1_TEX,5)]
+            _ES_AU_DelayDir         ("[ES] Delay Direction", Float) = 0
+        [NoScaleOffset]
+            _ES_AU_DelayTex         ("[ES] Delay Control Texture", 2D) = "black" {}
+        [ToggleUI]
+            _ES_AU_DelayReverse     ("[ES] Delay Reverse", Float) = 0
+            _ES_AU_DelayHistory     ("[ES] Delay Length", Range(0,128)) = 32
 
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
@@ -607,6 +614,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
@@ -673,6 +681,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
@@ -739,6 +748,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
@@ -808,6 +818,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut_Blend" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
