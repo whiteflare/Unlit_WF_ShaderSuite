@@ -469,7 +469,7 @@ FEATURE_TGL_END
         void drawGradientMap(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CGR_Enable)
             float x = saturate(calcBrightness(d.color.rgb));
-            float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0)).rgb;
+            float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0.5)).rgb;
             d.color.rgb = lerp(d.color.rgb, cgr, WF_TEX2D_GRADMAP_MASK(d.uv_main));
 FEATURE_TGL_END
         }
@@ -534,7 +534,7 @@ FEATURE_TGL_END
         }
 
         float4 calcEmissiveWavingCustom(float time) {
-            return WF_TEX2D_ES_SC_GRAD_MAP(float2(1 - frac(time), 0)).rgba;
+            return WF_TEX2D_ES_SC_GRAD_MAP(float2(1 - frac(time), 0.5)).rgba;
         }
 
         float4 calcEmissiveWaving(inout drawing d) {
