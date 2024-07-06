@@ -52,10 +52,10 @@ namespace UnlitWF
         private static readonly Regex PAT_ENABLE_KEYWORD = new Regex(@"^_(?<prefix>[A-Z][A-Z0-9]*)_((?<func>[A-Z0-9]+)_)?ENABLE(?<suffix>(?:_\d+)?)$", RegexOptions.Compiled);
 
         /// <summary>
-        /// プロパティのディスプレイ名から、Prefixと名前を分割する。
+        /// プロパティのディスプレイ名から、Labelと名前を分割する。
         /// </summary>
         /// <param name="text">ディスプレイ名</param>
-        /// <param name="label">Prefix</param>
+        /// <param name="label">Label</param>
         /// <param name="name">名前</param>
         /// <param name="dispName">ディスプレイ文字列</param>
         /// <returns></returns>
@@ -82,21 +82,21 @@ namespace UnlitWF
         /// プロパティ名の文字列から、Prefix+Suffixと名前を分割する。
         /// </summary>
         /// <param name="text">プロパティ名</param>
-        /// <param name="label">Prefix+Suffix</param>
+        /// <param name="prefix">Prefix+Suffix</param>
         /// <param name="name">名前</param>
         /// <returns></returns>
-        public static bool FormatPropName(string text, out string label, out string name)
+        public static bool FormatPropName(string text, out string prefix, out string name)
         {
             var mm = PAT_PROP_NAME.Match(text ?? "");
             if (mm.Success)
             {
-                label = mm.Groups["prefix"].Value.ToUpper() + mm.Groups["suffix"].Value.ToUpper();
+                prefix = mm.Groups["prefix"].Value.ToUpper() + mm.Groups["suffix"].Value.ToUpper();
                 name = mm.Groups["name"].Value;
                 return true;
             }
             else
             {
-                label = null;
+                prefix = null;
                 name = text;
                 return false;
             }
@@ -109,14 +109,14 @@ namespace UnlitWF
         /// <returns></returns>
         public static string GetPrefixFromPropName(string prop_name)
         {
-            string label = WFShaderDictionary.SpecialPropNameToLabelMap.GetValueOrNull(prop_name);
-            if (label != null)
+            string prefix = WFShaderDictionary.SpecialPropNameToLabelMap.GetValueOrNull(prop_name);
+            if (prefix != null)
             {
-                return label;
+                return prefix;
             }
             string name;
-            FormatPropName(prop_name, out label, out name);
-            return label;
+            FormatPropName(prop_name, out prefix, out name);
+            return prefix;
         }
 
         public static string GetHelpUrl(MaterialEditor editor, string displayName, string headerTitle)
@@ -155,9 +155,8 @@ namespace UnlitWF
         /// <returns></returns>
         public static bool IsEnableToggleFromPropName(string prop_name)
         {
-            string label, name;
-            FormatPropName(prop_name, out label, out name);
-            return IsEnableToggle(label, name);
+            FormatPropName(prop_name, out var prefix, out var name);
+            return IsEnableToggle(prefix, name);
         }
 
         /// <summary>

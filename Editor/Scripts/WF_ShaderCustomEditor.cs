@@ -1760,7 +1760,11 @@ namespace UnlitWF
 
         public static Func<GenericMenu> GenerateMenuOrNull(MaterialEditor editor, MaterialProperty prop)
         {
-            var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
+            return GenerateMenuOrNull(editor, WFCommonUtility.GetPrefixFromPropName(prop.name));
+        }
+
+        public static Func<GenericMenu> GenerateMenuOrNull(MaterialEditor editor, string prefix)
+        {
             if (string.IsNullOrWhiteSpace(prefix))
             {
                 return null;
@@ -1921,8 +1925,23 @@ namespace UnlitWF
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
         {
+            EditorGUI.BeginChangeCheck();
+
             ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, false, WFHeaderMenuController.GenerateMenuOrNull(editor, prop),
                 WFCommonUtility.GetHelpUrl(editor, prop.displayName, text));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
+                // トグルでオンにされた場合はテクスチャを復活させる
+                foreach (var mat in WFCommonUtility.AsMaterials(editor.targets))
+                {
+                    if (WFCommonUtility.IsPropertyTrue(prop.floatValue))
+                    {
+                        WFMaterialEditUtility.ResetDefaultTextures(mat, prefix);
+                    }
+                }
+            }
         }
     }
 
