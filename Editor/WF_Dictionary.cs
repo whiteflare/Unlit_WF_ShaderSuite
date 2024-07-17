@@ -553,6 +553,9 @@ namespace UnlitWF
             new WFI18NTranslation("AL", "Power", "アルファ強度"),
             new WFI18NTranslation("AL", "Fresnel Power", "フレネル強度"),
             new WFI18NTranslation("AL", "Cutoff Threshold", "カットアウトしきい値"),
+            // MainTexture2nd
+            new WFI18NTranslation("TX2", "Main Texture 2nd", "メインテクスチャ 2nd"),
+            new WFI18NTranslation("TX2", "Color 2nd", "マテリアルカラー 2nd"),
             // BackFace Texture
             new WFI18NTranslation("BKT", "Back Texture", "裏面テクスチャ"),
             new WFI18NTranslation("BKT", "Back Color", "裏面色"),
@@ -662,7 +665,7 @@ namespace UnlitWF
             new WFI18NTranslation("ES", "Threshold (Max)", "しきい値 (Max)"),
             new WFI18NTranslation("ES", "Dont Emit when AudioLink is disabled", "AudioLink無効時は光らせない"),
             new WFI18NTranslation("ES", "Delay Direction", "ディレイ方向"),
-            new WFI18NTranslation("ES", "Delay Control Texture", "ディレイ制御テクスチャ"),
+            new WFI18NTranslation("ES", "Delay Control Texture (R)", "ディレイ制御テクスチャ (R)"),
             new WFI18NTranslation("ES", "Delay Reverse", "ディレイ反転"),
             new WFI18NTranslation("ES", "Delay Length", "ディレイ長"),
             // Outline
