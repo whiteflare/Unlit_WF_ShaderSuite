@@ -534,7 +534,7 @@ namespace UnlitWF.Converter
                 },
                 ctx => { 
                     // シェーダ切り替える直前に、削除したいプロパティを削除
-                    WFMaterialEditUtility.RemovePropertiesWithoutUndo(ctx.target, "_GI_Intensity");
+                    WFMaterialEditUtility.DeletePropertiesWithoutUndo(ctx.target, "_GI_Intensity");
                     // _GI_Intensity は UTS が保持しているが、UnToon でも過去に同名プロパティを持っていてマイグレーション対象にしているため削除する
                 },
                 ctx => {
@@ -1183,7 +1183,7 @@ namespace UnlitWF.Converter
                         // BlendNormalを複製する
                         foreach(var propName in ctx.oldProps.Keys)
                         {
-                            if (WFCommonUtility.FormatPropName(propName, out var label, out var name)) {
+                            if (WFCommonUtility.FormatPropName(propName, out var _, out var name)) {
                                 if (name == "BlendNormal")
                                 {
                                     var propName2 = propName.Replace("_BlendNormal", "_BlendNormal2");

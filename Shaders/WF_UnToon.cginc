@@ -214,6 +214,7 @@
         d.matcapVector = calcMatcapVectorArray(d.ws_view_dir, d.ws_camera_dir, d.ws_normal, d.ws_bump_normal, d.ws_detail_normal);
 
         drawMainTex(d);             // メインテクスチャ
+        drawMainTex2nd(d);          // メインテクスチャ2nd
         drawBackTex(d);             // 裏面テクスチャ
         drawVertexColor(d);         // 頂点カラー
         drawAlphaMask(d);           // アルファ

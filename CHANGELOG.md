@@ -1,5 +1,25 @@
 # Change Log
 
+## 2024-07-21 (2.2.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20240721
+
+### Added
+- Shader
+  - MainTexture 2nd 機能を追加しました。
+  - EmissiveScroll に波形グラデーションテクスチャを追加しました。
+  - EmissiveAudioLink にディレイを追加しました。
+
+### Changed
+- GUI
+  - Hierarchy右クリックの「UnlitWF Shader/マテリアルのクリンナップ」を復活させました。
+  - グラデーションマップを参照する時の縦座標を今までは 0.0 で参照していたものを 0.5 に変更しました。
+
+### Fixed
+- GUI
+  - 機能を有効化したときにデフォルトテクスチャが割り当てられない問題を修正しました。
+
+----
+
 ## 2024-06-12 (2.1.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20240612
 
