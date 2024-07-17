@@ -184,14 +184,14 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
         [Header(Emissive Scroll)]
         [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
-            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
             _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
         [Enum(UV1,0,UV2,1)]
             _ES_SC_UVType           ("[ES] UV Type", Float) = 0
         [WF_Vector3]
             _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [WF_Enum(UnlitWF.EmissiveScrollMode,STANDARD,SAWTOOTH,SIN_WAVE)]
+            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
             _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
@@ -208,6 +208,13 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             _ES_AU_Slope            ("[ES] Slope", Range(0, 1)) = 0.2
             _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
             _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
+        [Enum(NONE,0,UV1_X,1,UV1_Y,2,UV2_X,3,UV2_Y,4,UV1_TEX,5)]
+            _ES_AU_DelayDir         ("[ES] Delay Direction", Float) = 0
+        [NoScaleOffset]
+            _ES_AU_DelayTex         ("[ES] Delay Control Texture", 2D) = "black" {}
+        [ToggleUI]
+            _ES_AU_DelayReverse     ("[ES] Delay Reverse", Float) = 0
+            _ES_AU_DelayHistory     ("[ES] Delay Length", Range(0,128)) = 32
 
         [WFHeader(Lit)]
         [Gamma]
@@ -238,7 +245,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/06/12 (2.1.0)", Float) = 0
+            _CurrentVersion         ("2024/07/21 (2.2.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -302,6 +309,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             #define _WF_AO_ONLY_LMAP
             #define _WF_MOBILE
 
+            #pragma shader_feature_local _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE

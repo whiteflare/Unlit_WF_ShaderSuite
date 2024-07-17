@@ -61,8 +61,14 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_ES_SC_.*", ctx => IsAnyIntValue(ctx, "_ES_ScrollEnable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_ES_SC_LevelOffset", ctx => IsAnyIntValue(ctx, "_ES_SC_Shape", p => p != 3), isRegex:false),
+            new ConditionVisiblePropertyHook("_ES_SC_Sharpness", ctx => IsAnyIntValue(ctx, "_ES_SC_Shape", p => p != 3), isRegex:false),
+            new ConditionVisiblePropertyHook("_ES_SC_GradTex", ctx => IsAnyIntValue(ctx, "_ES_SC_Shape", p => p == 3), isRegex:false),
             new ConditionVisiblePropertyHook("_ES_SC_UVType", ctx => IsAnyIntValue(ctx, "_ES_SC_DirType", p => p == 2), isRegex:false),
             new ConditionVisiblePropertyHook("_ES_AU_.*", ctx => IsAnyIntValue(ctx, "_ES_AuLinkEnable", p => p != 0)),
+            new ConditionVisiblePropertyHook("_ES_AU_DelayTex", ctx => IsAnyIntValue(ctx, "_ES_AU_DelayDir", p => p == 5), isRegex:false),
+            new ConditionVisiblePropertyHook("_ES_AU_DelayReverse", ctx => IsAnyIntValue(ctx, "_ES_AU_DelayDir", p => p != 0), isRegex:false),
+            new ConditionVisiblePropertyHook("_ES_AU_DelayHistory", ctx => IsAnyIntValue(ctx, "_ES_AU_DelayDir", p => p != 0), isRegex:false),
             new ConditionVisiblePropertyHook("_GL_ShadowCutoff", ctx => IsAnyIntValue(ctx, "_GL_CastShadow", p => 1 <= p), isRegex:false),
             new ConditionVisiblePropertyHook("_GL_CustomAzimuth|_GL_CustomAltitude", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p != 5)),
             new ConditionVisiblePropertyHook("_GL_CustomLitPos", ctx => IsAnyIntValue(ctx, "_GL_LightMode", p => p == 5), isRegex:false),
@@ -189,31 +195,12 @@ namespace UnlitWF
             }, isRegex:false),
 
             // _CGR_GradMapTexの後にグラデーションマップ作成ボタンを追加する
-            new CustomPropertyHook("_CGR_GradMapTex", null, (ctx, changed) => {
-                var rect = EditorGUILayout.GetControlRect();
-                if (GUI.Button(rect, WFI18N.GetGUIContent("Create GradationMap Texture"))) {
-                    GradientMakerWindow.Show(rect, WFCommonUtility.GetCurrentMaterials(ctx.editor));
-                }
-#if UNITY_2019_1_OR_NEWER
-                EditorGUILayout.Space(4);
-#endif
-            }, isRegex:false),
+            new GradientGeneratePropertyHook("_CGR_GradMapTex", isRegex:false),
+            new GradientGeneratePropertyHook("_ES_SC_GradTex", isRegex:false),
 
             // _CGR_InvMaskValの後に、プレビューテクスチャが設定されているならば警告を出す
-            new HelpBoxPropertyHook("_CGR_InvMaskVal", ctx => {
-                var hasPreviewTex = WFCommonUtility.GetCurrentMaterials(ctx.editor).Any(mat => {
-                    var tex = WFAccessor.GetTexture(mat, "_CGR_GradMapTex");
-                    return tex != null && string.IsNullOrWhiteSpace(AssetDatabase.GetAssetPath(tex));
-                });
-                if (hasPreviewTex)
-                {
-#if UNITY_2019_1_OR_NEWER
-                    EditorGUILayout.Space(4);
-#endif
-                    return WFI18N.Translate(WFMessageText.PsPreviewTexture);
-                }
-                return null;
-            }, MessageType.Warning, isRegex:false),
+            new GradientPreviewWarningPropertyHook("_CGR_InvMaskVal", "_CGR_GradMapTex", isRegex:false),
+            new GradientPreviewWarningPropertyHook("_ES_SC_Speed", "_ES_SC_GradTex", isRegex:false),
 
             // _NS_InvMaskVal の直後に FlipMirror を再表示
             new DuplicateDisplayHook("_NS_InvMaskVal", "_FlipMirror", dn => dn.Replace("[NM]", "[NS]"), isRegex:false),
@@ -1652,6 +1639,66 @@ namespace UnlitWF
         }
 
         /// <summary>
+        /// グラデーションマップ作成ボタンを追加する
+        /// </summary>
+        class GradientGeneratePropertyHook : AbstractPropertyHook
+        {
+            private readonly string texPropName;
+
+            public GradientGeneratePropertyHook(string name, bool isRegex = true) : base(name, isRegex)
+            {
+                this.texPropName = name;
+            }
+
+            protected override void OnAfterProp(PropertyGUIContext context, bool changed)
+            {
+                if (context.hidden)
+                {
+                    return;
+                }
+                var rect = EditorGUILayout.GetControlRect();
+                if (GUI.Button(rect, WFI18N.GetGUIContent("Create GradationMap Texture")))
+                {
+                    GradientMakerWindow.Show(texPropName, rect, WFCommonUtility.GetCurrentMaterials(context.editor));
+                }
+#if UNITY_2019_1_OR_NEWER
+                EditorGUILayout.Space(4);
+#endif
+            }
+        }
+
+        /// <summary>
+        /// プロパティの後に説明文を表示する
+        /// </summary>
+        class GradientPreviewWarningPropertyHook : AbstractPropertyHook
+        {
+            private readonly string texPropName;
+
+            public GradientPreviewWarningPropertyHook(string pattern, string texPropName, bool isRegex = true) : base(pattern, isRegex)
+            {
+                this.texPropName = texPropName;
+            }
+
+            protected override void OnAfterProp(PropertyGUIContext context, bool changed)
+            {
+                var hasPreviewTex = WFCommonUtility.GetCurrentMaterials(context.editor).Any(mat => {
+                    var tex = WFAccessor.GetTexture(mat, texPropName);
+                    return tex != null && string.IsNullOrWhiteSpace(AssetDatabase.GetAssetPath(tex));
+                });
+                if (!hasPreviewTex)
+                {
+                    return;
+                }
+
+                var text = WFI18N.Translate(WFMessageText.PsPreviewTexture);
+#if UNITY_2019_1_OR_NEWER
+                EditorGUILayout.Space(4);
+#endif
+                EditorGUILayout.HelpBox(text, MessageType.Warning);
+            }
+        }
+
+        /// <summary>
         /// デリゲートでカスタマイズ可能な PropertyHook オブジェクト
         /// </summary>
         class CustomPropertyHook : AbstractPropertyHook
@@ -1713,7 +1760,11 @@ namespace UnlitWF
 
         public static Func<GenericMenu> GenerateMenuOrNull(MaterialEditor editor, MaterialProperty prop)
         {
-            var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
+            return GenerateMenuOrNull(editor, WFCommonUtility.GetPrefixFromPropName(prop.name));
+        }
+
+        public static Func<GenericMenu> GenerateMenuOrNull(MaterialEditor editor, string prefix)
+        {
             if (string.IsNullOrWhiteSpace(prefix))
             {
                 return null;
@@ -1874,8 +1925,23 @@ namespace UnlitWF
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor editor)
         {
+            EditorGUI.BeginChangeCheck();
+
             ShaderCustomEditor.DrawShurikenStyleHeaderToggle(position, text, prop, false, WFHeaderMenuController.GenerateMenuOrNull(editor, prop),
                 WFCommonUtility.GetHelpUrl(editor, prop.displayName, text));
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                var prefix = WFCommonUtility.GetPrefixFromPropName(prop.name);
+                // トグルでオンにされた場合はテクスチャを復活させる
+                foreach (var mat in WFCommonUtility.AsMaterials(editor.targets))
+                {
+                    if (WFCommonUtility.IsPropertyTrue(prop.floatValue))
+                    {
+                        WFMaterialEditUtility.ResetDefaultTextures(mat, prefix);
+                    }
+                }
+            }
         }
     }
 
@@ -2284,7 +2350,7 @@ namespace UnlitWF
 
     public class GradientMakerWindow : PopupWindowContent
     {
-        public static void Show(Rect ownerRect, params Material[] targets)
+        public static void Show(string targetProperty, Rect ownerRect, params Material[] targets)
         {
             if (targets.Length == 0)
             {
@@ -2292,6 +2358,7 @@ namespace UnlitWF
             }
             var contents = new GradientMakerWindow();
             contents.targets = targets;
+            contents.targetProperty = targetProperty;
             contents.ownerRect = ownerRect;
             PopupWindow.Show(ownerRect, contents);
         }
@@ -2299,6 +2366,7 @@ namespace UnlitWF
         private static Gradient grad = null;
         private Material[] targets;
         private Rect ownerRect;
+        private string targetProperty;
 
         public override Vector2 GetWindowSize()
         {
@@ -2345,13 +2413,17 @@ namespace UnlitWF
 
         private void Execute(bool preview)
         {
+            if (string.IsNullOrWhiteSpace(targetProperty))
+            {
+                return;
+            }
             var tex = GenerateTexture(preview);
             if (tex != null)
             {
                 Undo.RecordObjects(targets, "Set Material GradientMap");
                 foreach (var mat in targets)
                 {
-                    WFAccessor.SetTexture(mat, "_CGR_GradMapTex", tex);
+                    WFAccessor.SetTexture(mat, targetProperty, tex);
                 }
             }
         }
@@ -2401,6 +2473,7 @@ namespace UnlitWF
                 importer.textureCompression = TEX_COMPRESS;
                 importer.wrapMode = TextureWrapMode.Clamp;
                 importer.filterMode = FilterMode.Bilinear;
+                importer.alphaIsTransparency = true;
                 importer.mipmapEnabled = false;
                 importer.streamingMipmaps = false;
                 importer.SaveAndReimport();
@@ -2460,6 +2533,14 @@ namespace UnlitWF
         CUSTOM_WORLD_DIR = 3,
         CUSTOM_LOCAL_DIR = 4,
         CUSTOM_WORLD_POS = 5
+    }
+
+    public enum EmissiveScrollMode
+    {
+        STANDARD = 0,
+        SAWTOOTH = 1,
+        SIN_WAVE = 2,
+        CUSTOM = 3
     }
 }
 

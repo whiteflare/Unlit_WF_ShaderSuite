@@ -50,6 +50,18 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             _TE_MinDist             ("[TE] FadeOut Distance (Near)", Range(0, 4)) = 0.5
             _TE_MaxDist             ("[TE] FadeOut Distance (Far)", Range(0, 4)) = 2
 
+        [WFHeaderToggle(Main Texture 2nd)]
+            _TX2_Enable             ("[TX2] Enable", Float) = 0
+        [Enum(UV1,0,UV2,1)]
+            _TX2_UVType             ("[TX2] UV Type", Float) = 0
+            _TX2_MainTex            ("[TX2] Main Texture", 2D) = "white" {}
+        [HDR]
+            _TX2_Color              ("[TX2] Color", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]
+            _TX2_MaskTex            ("[TX2] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _TX2_InvMaskVal         ("[TX2] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(BackFace Texture)]
             _BKT_Enable             ("[BKT] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -340,18 +352,20 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
         [Header(Emissive Scroll)]
         [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
-            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
-        [ToggleUI]
-            _ES_SC_AlphaScroll      ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
             _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
         [Enum(UV1,0,UV2,1)]
             _ES_SC_UVType           ("[ES] UV Type", Float) = 0
         [WF_Vector3]
             _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [WF_Enum(UnlitWF.EmissiveScrollMode,STANDARD,SAWTOOTH,SIN_WAVE,CUSTOM)]
+            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
             _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _ES_SC_GradTex          ("[ES] Wave Grad Tex", 2D) = "white" {}
+        [ToggleUI]
+            _ES_SC_AlphaScroll      ("[ES] Change Alpha Transparency", Range(0, 1)) = 0
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         [Header(Emissive AudioLink)]
@@ -368,6 +382,13 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             _ES_AU_Slope            ("[ES] Slope", Range(0, 1)) = 0.2
             _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
             _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
+        [Enum(NONE,0,UV1_X,1,UV1_Y,2,UV2_X,3,UV2_Y,4,UV1_TEX,5)]
+            _ES_AU_DelayDir         ("[ES] Delay Direction", Float) = 0
+        [NoScaleOffset]
+            _ES_AU_DelayTex         ("[ES] Delay Control Texture", 2D) = "black" {}
+        [ToggleUI]
+            _ES_AU_DelayReverse     ("[ES] Delay Reverse", Float) = 0
+            _ES_AU_DelayHistory     ("[ES] Delay Length", Range(0,128)) = 32
 
         [WFHeaderToggle(Dissolve)]
             _DSV_Enable             ("[DSV] Enable", Float) = 0
@@ -422,7 +443,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/06/12 (2.1.0)", Float) = 0
+            _CurrentVersion         ("2024/07/21 (2.2.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent", Float) = 0
@@ -468,7 +489,9 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
@@ -484,6 +507,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
@@ -527,7 +551,9 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             #pragma shader_feature_local _OVL_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local _VC_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
@@ -545,6 +571,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Transparent" {
             #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
