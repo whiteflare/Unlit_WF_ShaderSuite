@@ -24,6 +24,10 @@
 
     /* このセクションでは、どのテクスチャから何色を参照するかを定義する */
 
+    #ifndef WF_TEX2D_MAIN_2ND_MASK
+        #define WF_TEX2D_MAIN_2ND_MASK(uv)      SAMPLE_MASK_VALUE(_TX2_MaskTex, uv, _TX2_InvMaskVal).r
+    #endif
+
     #ifndef WF_TEX2D_ALPHA_MAIN_ALPHA
         #define WF_TEX2D_ALPHA_MAIN_ALPHA(uv)   saturate( TGL_OFF(_AL_InvMaskVal) ? alpha : 1 - alpha )
     #endif
@@ -47,6 +51,9 @@
 
     #ifndef WF_TEX2D_EMISSION
         #define WF_TEX2D_EMISSION(uv)           PICK_SUB_TEX2D(_EmissionMap, _MainTex, uv).rgba
+    #endif
+    #ifndef WF_TEX2D_ES_SC_GRAD_MAP
+        #define WF_TEX2D_ES_SC_GRAD_MAP(uv)     PICK_MAIN_TEX2D(_ES_SC_GradTex, uv)
     #endif
 
     #ifndef WF_TEX2D_NORMAL
@@ -156,7 +163,7 @@ FEATURE_TGL_ON_BEGIN(_BKT_Enable)
         if (!d.facing) {
             float2 uv_back = _BKT_UVType == 1 ? d.uv2 : d.uv1;
             uv_back = TRANSFORM_TEX(uv_back, _BKT_BackTex);
-            d.color = PICK_MAIN_TEX2D(_BKT_BackTex, uv_back) * _BKT_BackColor;
+            d.color = PICK_SUB_TEX2D(_BKT_BackTex, _MainTex, uv_back) * _BKT_BackColor;
         }
 FEATURE_TGL_END
 #endif
@@ -167,6 +174,25 @@ FEATURE_TGL_END
         d.color *= lerp(ONE_VEC4, d.vertex_color, _UseVertexColor);
 #endif
     }
+
+    ////////////////////////////
+    // Main Texture 2nd
+    ////////////////////////////
+
+    #ifdef _TX2_ENABLE
+        void drawMainTex2nd(inout drawing d) {
+FEATURE_TGL_ON_BEGIN(_TX2_Enable)
+            float2 uv_main2 = _TX2_UVType == 1 ? d.uv2 : d.uv1;
+            uv_main2 = TRANSFORM_TEX(uv_main2, _TX2_MainTex);
+            float4 tex = PICK_SUB_TEX2D(_TX2_MainTex, _MainTex, uv_main2);
+            float alpha = tex.a * _TX2_Color.a * WF_TEX2D_MAIN_2ND_MASK(d.uv_main);
+            d.color.rgb = lerp(d.color.rgb, tex.rgb * _TX2_Color.rgb, alpha);
+FEATURE_TGL_END
+        }
+
+    #else
+        #define drawMainTex2nd(d)
+    #endif
 
     ////////////////////////////
     // Alpha Transparent
@@ -443,7 +469,7 @@ FEATURE_TGL_END
         void drawGradientMap(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_CGR_Enable)
             float x = saturate(calcBrightness(d.color.rgb));
-            float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0)).rgb;
+            float3 cgr = WF_TEX2D_GRADMAP(float2(x, 0.5)).rgb;
             d.color.rgb = lerp(d.color.rgb, cgr, WF_TEX2D_GRADMAP_MASK(d.uv_main));
 FEATURE_TGL_END
         }
@@ -490,7 +516,28 @@ FEATURE_TGL_END
 
     #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
 
-        float calcEmissiveWaving(inout drawing d) {
+        float calcEmissiveWavingShape(float time) {
+            // 周期 2PI、値域 [-1, +1]
+            if (_ES_SC_Shape == 1) {
+                float waving = (1 - 2 * frac(time)) * _ES_SC_Sharpness;
+                return saturate(waving + _ES_SC_LevelOffset);
+            }
+            else if (_ES_SC_Shape == 2) {
+                float waving = sin( time * UNITY_TWO_PI ) * _ES_SC_Sharpness;
+                return saturate(waving + _ES_SC_LevelOffset);
+            }
+            else {
+                float v = pow( 1 - frac(time), _ES_SC_Sharpness + 2 );
+                float waving = 8 * v * (1 - v) - 1;
+                return saturate(waving + _ES_SC_LevelOffset);
+            }
+        }
+
+        float4 calcEmissiveWavingCustom(float time) {
+            return WF_TEX2D_ES_SC_GRAD_MAP(float2(1 - frac(time), 0.5)).rgba;
+        }
+
+        float4 calcEmissiveWaving(inout drawing d) {
             float3 uv =
                     _ES_SC_DirType == 1 ? UnityWorldToObjectPos(d.ws_vertex)    // ローカル座標
                     : _ES_SC_DirType == 2 ? (                                   // UV
@@ -503,20 +550,15 @@ FEATURE_TGL_END
             float time = _Time.y * _ES_SC_Speed - dot(uv, _ES_SC_Direction.xyz);
             time *= UNITY_INV_TWO_PI;
 
-            // 周期 2PI、値域 [-1, +1]
-            float waving = 0;
-            if (_ES_SC_Shape == 0) {
-                float v = pow( 1 - frac(time), _ES_SC_Sharpness + 2 );
-                waving = 8 * v * (1 - v) - 1;
-            }
-            else if (_ES_SC_Shape == 1) {
-                waving = (1 - 2 * frac(time)) * _ES_SC_Sharpness;
-            }
-            else {
-                waving = sin( time * UNITY_TWO_PI ) * _ES_SC_Sharpness;
-            }
-
-            return saturate(waving + _ES_SC_LevelOffset);
+#if !defined(_WF_LEGACY_FEATURE_SWITCH)
+    #if !defined(_ES_SCROLLGRAD_ENABLE)
+            return calcEmissiveWavingShape(time).xxxx;
+    #else
+            return calcEmissiveWavingCustom(time);
+    #endif
+#else
+            return _ES_SC_Shape != 3 ? calcEmissiveWavingShape(time).xxxx : calcEmissiveWavingCustom(time);
+#endif
         }
 
         half enableEmissiveScroll(inout drawing d) {
@@ -524,7 +566,7 @@ FEATURE_TGL_END
         }
 
     #else
-        #define calcEmissiveWaving(d)       (1)
+        #define calcEmissiveWaving(d)       (ONE_VEC4)
         #define enableEmissiveScroll(d)     (0)
     #endif
 
@@ -540,10 +582,44 @@ FEATURE_TGL_END
         float   _ES_AU_MaxThreshold;
         float   _ES_AU_BlackOut;
         float   _ES_AU_AlphaLink;
+        float   _ES_AU_DelayDir;
+        float   _ES_AU_DelayReverse;
+        float   _ES_AU_DelayHistory;
+        DECL_SUB_TEX2D  (_ES_AU_DelayTex);
+
+        float calcEmissiveAudioLinkDelay(drawing d) {
+            float delay = 0;
+            if (_ES_AU_DelayDir == 1) {
+                delay = d.uv1.x;
+            }
+            else if (_ES_AU_DelayDir == 2) {
+                delay = d.uv1.y;
+            }
+            else if (_ES_AU_DelayDir == 3) {
+                delay = d.uv2.x;
+            }
+            else if (_ES_AU_DelayDir == 4) {
+                delay = d.uv2.y;
+            }
+            else if (_ES_AU_DelayDir == 5) {
+#if defined(_ES_AULINKDTEX_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
+                delay = PICK_SUB_TEX2D(_ES_AU_DelayTex, _MainTex, d.uv_main).r;
+#endif
+            }
+            if (TGL_ON(_ES_AU_DelayReverse)) {
+                delay = 1 - delay;
+            }
+            return delay * _ES_AU_DelayHistory;
+        }
+
+        float calcEmissiveAudioLinkPower(float au) {
+            return lerp(au * _ES_AU_Slope, lerp(1, au, _ES_AU_Slope), smoothstep(_ES_AU_MinThreshold, _ES_AU_MaxThreshold, au));
+        }
 
         float calcEmissiveAudioLink(inout drawing d) {
-            float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( 0, _ES_AU_Band ) ).r);
-            au = lerp(au * _ES_AU_Slope, lerp(1, au, _ES_AU_Slope), smoothstep(_ES_AU_MinThreshold, _ES_AU_MaxThreshold, au));
+            float delay = calcEmissiveAudioLinkDelay(d);
+            float au = saturate(AudioLinkLerp( ALPASS_AUDIOLINK + float2( delay, _ES_AU_Band ) ).r);
+            au = calcEmissiveAudioLinkPower(au);
             return lerp(_ES_AU_MinValue, _ES_AU_MaxValue, au);
         }
 
@@ -564,49 +640,48 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
             }
             half es_status = enableEmissiveScroll(d);
 
-            float waving;
+            float4 waving;
             if (0 < au_status) {
-                waving = calcEmissiveAudioLink(d);
+                waving = calcEmissiveAudioLink(d).xxxx;
             }
             else if(0 < es_status) {
                 waving = calcEmissiveWaving(d);
             }
             else {
-                waving = 1;
+                waving = ONE_VEC4;
             }
 
             float4 es_mask  = WF_TEX2D_EMISSION(d.uv_main);
-            float4 es_color = _EmissionColor * es_mask;
-            float es_power  = MAX_RGB(es_mask.rgb);
+            float4 es_color = _EmissionColor * es_mask.rgba;
 
             // RGB側の合成
             d.color.rgb =
                 // 加算合成
-                _ES_BlendType == 0 ? d.color.rgb + es_color.rgb * waving :
+                _ES_BlendType == 0 ? d.color.rgb + es_color.rgb * waving.rgb * waving.a:
                 // 旧形式のブレンド
-                _ES_BlendType == 1 ? lerp(d.color.rgb, es_color.rgb, waving * es_power) :
+                _ES_BlendType == 1 ? lerp(d.color.rgb, es_color.rgb, waving.rgb * waving.a * MAX_RGB(es_mask.rgb)) :
                 // ブレンド
-                lerp(d.color.rgb, es_color.rgb, waving);
+                lerp(d.color.rgb, es_color.rgb, waving.rgb * waving.a);
 
             // Alpha側の合成
 #if defined(_WF_ALPHA_BLEND)
             if (0 < au_status) {
     #if defined(_ES_AULINK_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 if (0 < au_status && TGL_ON(_ES_AU_AlphaLink)) {
-                    d.color.a = max(d.color.a, waving * es_power);
+                    d.color.a = max(d.color.a, waving.a * MAX_RGB(es_mask.rgb));
                 }
     #endif
             }
             else if(0 < es_status) {
     #if defined(_ES_SCROLL_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 if (0 < es_status && TGL_ON(_ES_SC_AlphaScroll)) {
-                    d.color.a = max(d.color.a, waving * es_power);
+                    d.color.a = max(d.color.a, waving.a * MAX_RGB(es_mask.rgb));
                 }
     #endif
             }
             else {
                 if (TGL_ON(_ES_ChangeAlpha)) {
-                    d.color.a = max(d.color.a, es_color.a * es_power);
+                    d.color.a = max(d.color.a, es_color.a * MAX_RGB(es_mask.rgb));
                 }
             }
 #endif
