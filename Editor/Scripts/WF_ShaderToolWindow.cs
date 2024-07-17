@@ -60,7 +60,7 @@ namespace UnlitWF
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "DebugView シェーダに切り替える";
         public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "モバイル向けシェーダに変換する";
 
-        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "UnlitWFマテリアルのクリンナップ";
+        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "UnlitWF Shader/マテリアルのクリンナップ";
 #else
         public const string ASSETS_AUTOCNV_01 = PATH_ASSETS + "Convert UnlitWF Material/Only InternalErrorShader";
         public const string ASSETS_AUTOCNV_02 = PATH_ASSETS + "Convert UnlitWF Material/Exclude Unity-builtin Shaders";
@@ -89,7 +89,7 @@ namespace UnlitWF
         public const string MATERIAL_DEBUGVIEW = PATH_MATERIAL + "Switch WF_DebugView Shader";
         public const string MATERIAL_CNGMOBILE = PATH_MATERIAL + "Change Mobile shader";
 
-        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "CleanUp UnlitWF Material Property";
+        public const string GAMEOBJECT_CREANUP = PATH_GAMEOBJECT + "UnlitWF Shader/CleanUp Material Property";
 #endif
 
         public const string TOOLS_LNG_EN = PATH_TOOLS + "Menu Language Change To English";
