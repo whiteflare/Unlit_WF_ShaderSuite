@@ -73,7 +73,7 @@ Shader "UnlitWF/WF_Particle_Opaque" {
         [Enum(NONE,0,UV1_X,1,UV1_Y,2,UV2_X,3,UV2_Y,4,UV1_TEX,5)]
             _ES_AU_DelayDir         ("[ES] Delay Direction", Float) = 0
         [NoScaleOffset]
-            _ES_AU_DelayTex         ("[ES] Delay Control Texture", 2D) = "black" {}
+            _ES_AU_DelayTex         ("[ES] Delay Control Texture (R)", 2D) = "black" {}
         [ToggleUI]
             _ES_AU_DelayReverse     ("[ES] Delay Reverse", Float) = 0
             _ES_AU_DelayHistory     ("[ES] Delay Length", Range(0,128)) = 32
