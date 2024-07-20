@@ -270,7 +270,7 @@ namespace UnlitWF
         }
 
         private static Material editReplaceTarget = null;
-        private static List<string> editReplaceNamesCache = null;
+        private static ShaderSerializedProperty.RemovePropertyCache editReplaceNamesCache = null;
 
         public static void BeginReplacePropertyNames(Material mat)
         {
@@ -477,6 +477,11 @@ namespace UnlitWF
 
         #region リセット・クリーンナップ
 
+        /// <summary>
+        /// クリンナップのエントリポイント
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public static bool CleanUpProperties(CleanUpParameter param)
         {
             param.materials = param.materials.Where(m => m != null).Distinct().ToArray();
@@ -552,6 +557,10 @@ namespace UnlitWF
             return true;
         }
 
+        /// <summary>
+        /// WFマテリアルのクリンナップ
+        /// </summary>
+        /// <param name="material"></param>
         private static void CleanUpForWFMaterial(Material material)
         {
             int steps = WFAccessor.GetInt(material, "_TS_Steps", 3);
@@ -562,10 +571,10 @@ namespace UnlitWF
             var delPrefix = new List<string>();
             foreach (var p in props)
             {
-                WFCommonUtility.FormatPropName(p.name, out var label, out var name);
-                if (label != null && name.ToLower() == "enable" && p.FloatValue == 0)
+                WFCommonUtility.FormatPropName(p.name, out var prefix, out var name);
+                if (WFCommonUtility.IsEnableToggle(prefix, name) && p.FloatValue == 0)
                 {
-                    delPrefix.Add(label);
+                    delPrefix.Add(prefix);
                 }
             }
 
@@ -612,6 +621,10 @@ namespace UnlitWF
             EditorUtility.SetDirty(material);
         }
 
+        /// <summary>
+        /// その他のマテリアルのクリンナップ
+        /// </summary>
+        /// <param name="material"></param>
         private static void CleanUpForNonWFMaterial(Material material)
         {
             var props = ShaderSerializedProperty.AsList(material);
@@ -627,12 +640,24 @@ namespace UnlitWF
             EditorUtility.SetDirty(material);
         }
 
+        /// <summary>
+        /// リセットのエントリポイント
+        /// </summary>
+        /// <param name="param"></param>
         public static void ResetProperties(ResetParameter param)
         {
             Undo.RecordObjects(param.materials, "WF reset materials");
+
             ResetPropertiesWithoutUndo(param);
+
+            // 新旧キャッシュから指定のマテリアルを削除
+            WFMaterialCache.instance.ResetOldMaterialTable(param.materials);
         }
 
+        /// <summary>
+        /// リセットのエントリポイント(Undoなし)
+        /// </summary>
+        /// <param name="param"></param>
         internal static void ResetPropertiesWithoutUndo(ResetParameter param)
         {
             foreach (Material material in param.materials)
@@ -647,6 +672,11 @@ namespace UnlitWF
             WFMaterialCache.instance.ResetOldMaterialTable(param.materials);
         }
 
+        /// <summary>
+        /// リセット本体
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="material"></param>
         private static void ResetPropertiesWithoutUndo(ResetParameter param, Material material)
         {
             var props = ShaderSerializedProperty.AsList(material);
@@ -698,11 +728,14 @@ namespace UnlitWF
             // キーワードクリア
             if (param.resetKeywords)
             {
-                DeleteShaderKeyword(material, props);
+                foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
+                {
+                    DeleteShaderKeyword(so, material);
+                }
             }
 
             // Default割り当てTextureを再設定する
-            ResetDefaultTextures(material, del_names);
+            ResetEnabledDefaultTextures(material, del_names);
 
             // キーワードを整理する
             WFCommonUtility.SetupMaterial(material);
@@ -710,7 +743,12 @@ namespace UnlitWF
             EditorUtility.SetDirty(material);
         }
 
-        internal static void RemovePropertiesWithoutUndo(Material material, params string[] propNames)
+        /// <summary>
+        /// 特定の名前のプロパティを削除する
+        /// </summary>
+        /// <param name="material"></param>
+        /// <param name="propNames"></param>
+        internal static void DeletePropertiesWithoutUndo(Material material, params string[] propNames)
         {
             var props = ShaderSerializedProperty.AsDict(material);
             var del_props = new List<ShaderSerializedProperty>();
@@ -727,44 +765,21 @@ namespace UnlitWF
             }
 
             // 削除実行
-            var del_names = DeleteProperties(del_props, material);
-            // Default割り当てTextureを再設定する
-            ResetDefaultTextures(material, del_names);
+            DeleteProperties(del_props, material);
             // 反映
             EditorUtility.SetDirty(material);
         }
 
-        private static void ResetDefaultTextures(Material material, IEnumerable<string> del_names)
-        {
-            var shader = material.shader;
-            var path = AssetDatabase.GetAssetPath(shader);
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                return;
-            }
-            var importer = AssetImporter.GetAtPath(path) as ShaderImporter;
-            if (importer == null)
-            {
-                return;
-            }
-
-            foreach (var pn in del_names)
-            {
-                if (WFAccessor.HasShaderPropertyTexture(shader, pn))
-                {
-                    var tex = importer.GetDefaultTexture(pn);
-                    if (tex != null && material.HasProperty(pn)) // ResetDefaultTextureの直前でSerializeObject.ApplyPropertyChangeした内容はHasPropertyなどでアクセスしないとコミットされない？
-                    {
-                        material.SetTexture(pn, tex);
-                    }
-                }
-            }
-        }
-
+        /// <summary>
+        /// プロパティを削除する。クリンナップとリセットの両方から呼び出される。
+        /// </summary>
+        /// <param name="props"></param>
+        /// <param name="material"></param>
+        /// <returns></returns>
         private static HashSet<string> DeleteProperties(IEnumerable<ShaderSerializedProperty> props, Material material)
         {
             var del_names = new HashSet<string>();
-            var cachedNames = new List<string>();
+            ShaderSerializedProperty.RemovePropertyCache cachedNames = null;
 
             foreach (var p in props)
             {
@@ -784,15 +799,12 @@ namespace UnlitWF
             return del_names;
         }
 
-        internal static void DeleteShaderKeyword(Material material, List<ShaderSerializedProperty> props)
-        {
-            foreach (var so in ShaderSerializedProperty.GetUniqueSerialObject(props))
-            {
-                DeleteShaderKeyword(so, material);
-            }
-        }
-
-        internal static void DeleteShaderKeyword(SerializedObject so, Material logTarget)
+        /// <summary>
+        /// キーワードを削除する。クリンナップとリセットの両方から呼び出される。
+        /// </summary>
+        /// <param name="so"></param>
+        /// <param name="logTarget"></param>
+        private static void DeleteShaderKeyword(SerializedObject so, Material logTarget)
         {
             var changed = false;
 
@@ -820,6 +832,109 @@ namespace UnlitWF
             if (changed)
             {
                 so.ApplyModifiedProperties();
+            }
+        }
+
+        /// <summary>
+        /// 有効になっている機能のデフォルトテクスチャを割り当てる
+        /// </summary>
+        /// <param name="material"></param>
+        /// <param name="prefix"></param>
+        private static void ResetEnabledDefaultTextures(Material material, IEnumerable<string> del_names)
+        {
+            // まずは削除されたプロパティのプレフィックスを全て集める
+            var del_prefixs = new HashSet<string>();
+            foreach (var prop_name in del_names)
+            {
+                if (WFCommonUtility.FormatPropName(prop_name, out var prefix, out var name))
+                {
+                    del_prefixs.Add(prefix);
+                }
+            }
+
+            // Enableトグルがオフになっているプレフィックスは復元しないので削除
+            foreach(var prop in ShaderMaterialProperty.AsList(material))
+            {
+                if (WFCommonUtility.FormatPropName(prop.Name, out var prefix, out var name) && WFCommonUtility.IsEnableToggle(prefix, name))
+                {
+                    if (!WFAccessor.GetBool(material, prop.Name, false))
+                    {
+                        del_prefixs.Remove(prefix);
+                    }
+                }
+            }
+
+            // テクスチャをデフォルトに設定
+            ResetDefaultTextures(material, del_names.Where(nm => !WFCommonUtility.FormatPropName(nm, out var prefix, out var name) || del_prefixs.Contains(prefix)));
+        }
+
+        /// <summary>
+        /// デフォルトテクスチャを割り当てる。WFHeaderToggle がオンになったときに呼び出される。
+        /// </summary>
+        /// <param name="material"></param>
+        /// <param name="prefix"></param>
+        internal static void ResetDefaultTextures(Material material, params string[] prefixs)
+        {
+            List<string> prop_names = new List<string>();
+
+            foreach(var p in ShaderMaterialProperty.AsList(material))
+            {
+                var px = WFCommonUtility.GetPrefixFromPropName(p.Name);
+                if (prefixs.Contains(px))
+                {
+                    prop_names.Add(p.Name);
+                }
+            }
+
+            ResetDefaultTextures(material, prop_names);
+
+            EditorUtility.SetDirty(material);
+        }
+
+        /// <summary>
+        /// デフォルトテクスチャを割り当てる
+        /// </summary>
+        /// <param name="material"></param>
+        /// <param name="prop_names"></param>
+        private static void ResetDefaultTextures(Material material, IEnumerable<string> prop_names)
+        {
+            var shader = material.shader;
+
+            List<string> tex_prop_names = new List<string>();
+            foreach (var pn in prop_names)
+            {
+                if (WFAccessor.HasShaderPropertyTexture(shader, pn))
+                {
+                    var oldTex = WFAccessor.GetTexture(material, pn); // ResetDefaultTextureの直前でSerializeObject.ApplyPropertyChangeした内容はHasPropertyなどでアクセスしないとコミットされない？
+                    if (oldTex == null) // テクスチャが設定されていないときだけデフォルトテクスチャを設定する
+                    {
+                        tex_prop_names.Add(pn);
+                    }
+                }
+            }
+            if (tex_prop_names.Count == 0)
+            {
+                return;
+            }
+
+            var path = AssetDatabase.GetAssetPath(shader);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+            var importer = AssetImporter.GetAtPath(path) as ShaderImporter;
+            if (importer == null)
+            {
+                return;
+            }
+
+            foreach (var pn in tex_prop_names)
+            {
+                var defaultTex = importer.GetDefaultTexture(pn);
+                if (defaultTex != null)
+                {
+                    material.SetTexture(pn, defaultTex);
+                }
             }
         }
 
@@ -1070,29 +1185,47 @@ namespace UnlitWF
 
         public void Remove()
         {
-            List<string> cachedNames = null;
-            Remove(ref cachedNames);
+            RemovePropertyCache cache = null;
+            Remove(ref cache);
         }
 
-        public void Remove(ref List<string> cachedNames)
+        public void Remove(ref RemovePropertyCache cache)
         {
-            if (cachedNames == null || cachedNames.Count != parent.arraySize)
+            if (!RemovePropertyCache.Acceptable(cache, this))
             {
-                cachedNames = new List<string>();
-                for (int i = 0; i < parent.arraySize; i++)
-                {
-                    var prop = parent.GetArrayElementAtIndex(i);
-                    cachedNames.Add(GetSerializedName(prop));
-                }
+                cache = new RemovePropertyCache(parent);
             }
 
             for (int i = parent.arraySize - 1; 0 <= i; i--)
             {
-                if (cachedNames[i] == this.name)
+                if (cache.propNames[i] == this.name)
                 {
                     parent.DeleteArrayElementAtIndex(i);
-                    cachedNames.RemoveAt(i);
+                    cache.propNames.RemoveAt(i);
                 }
+            }
+        }
+
+        public class RemovePropertyCache
+        {
+            public readonly SerializedProperty parent;
+            public readonly List<string> propNames;
+
+            public RemovePropertyCache(SerializedProperty parent)
+            {
+                this.parent = parent;
+
+                propNames = new List<string>();
+                for (int i = 0; i < parent.arraySize; i++)
+                {
+                    var prop = parent.GetArrayElementAtIndex(i);
+                    propNames.Add(GetSerializedName(prop));
+                }
+            }
+
+            public static bool Acceptable(RemovePropertyCache cache, ShaderSerializedProperty _this)
+            {
+                return cache != null && cache.parent == _this.parent && cache.propNames.Count == _this.parent.arraySize;
             }
         }
 

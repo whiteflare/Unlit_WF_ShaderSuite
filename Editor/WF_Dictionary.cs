@@ -250,6 +250,7 @@ namespace UnlitWF
                 new WFShaderFunction("PA", "PA", "Particle System"),
 
                 // その他の機能
+                new WFShaderFunction("TX2", "TX2", "Main Texture 2nd"),
                 new WFShaderFunction("BKT", "BKT", "BackFace Texture"),
                 new WFShaderFunction("CGR", "CGR", "Gradient Map"),
                 new WFShaderFunction("CLC", "CLC", "Color Change"),
@@ -307,6 +308,7 @@ namespace UnlitWF
             { "HE", HELP_URL_UNTOON + "#LightMatcap" },
             { "HF", HELP_URL_UNTOON + "#LightMatcap" },
             { "HG", HELP_URL_UNTOON + "#LightMatcap" },
+            { "TX2", HELP_URL_UNTOON + "#MainTex2nd" },
             { "BKT", HELP_URL_UNTOON + "#BackFaceTexture" },
             { "CGR", HELP_URL_UNTOON + "#GradientMap" },
             { "CLC", HELP_URL_UNTOON + "#ColorChange" },
@@ -392,7 +394,15 @@ namespace UnlitWF
             new WFCustomKeywordSettingBool("_ES_ScrollEnable", "_ES_SCROLL_ENABLE") {
                 enablePropName = "_ES_Enable",
             },
+            new WFCustomKeywordSettingCustom("_ES_SC_GradTex",
+                mat => WFAccessor.HasShaderPropertyTexture(mat.shader,"_ES_SC_GradTex") && WFAccessor.GetBool(mat, "_ES_ScrollEnable", false) && WFAccessor.GetInt(mat, "_ES_SC_Shape", 0) == 3 , "_ES_SCROLLGRAD_ENABLE") {
+                enablePropName = "_ES_Enable",
+            },
             new WFCustomKeywordSettingBool("_ES_AuLinkEnable", "_ES_AULINK_ENABLE") {
+                enablePropName = "_ES_Enable",
+            },
+            new WFCustomKeywordSettingCustom("_ES_AU_DelayTex",
+                mat => WFAccessor.HasShaderPropertyTexture(mat.shader,"_ES_AU_DelayTex") && WFAccessor.GetBool(mat, "_ES_AuLinkEnable", false) && WFAccessor.GetInt(mat, "_ES_AU_DelayDir", 0) == 5 , "_ES_AULINKDTEX_ENABLE") {
                 enablePropName = "_ES_Enable",
             },
             new WFCustomKeywordSettingEnum("_TS_FixContrast", "_", "_TS_FIXC_ENABLE") {
@@ -437,6 +447,7 @@ namespace UnlitWF
             // HeaderTitle
             new WFI18NTranslation("3ch Color Mask", "3chカラーマスク"),
             new WFI18NTranslation("Ambient Occlusion", "AOマップとライトマップ"),
+            new WFI18NTranslation("Main Texture 2nd", "メインテクスチャ 2nd"),
             new WFI18NTranslation("BackFace Texture", "裏面テクスチャ"),
             new WFI18NTranslation("Base", "基本設定"),
             new WFI18NTranslation("ClearCoat", "クリアコート"),
@@ -542,6 +553,9 @@ namespace UnlitWF
             new WFI18NTranslation("AL", "Power", "アルファ強度"),
             new WFI18NTranslation("AL", "Fresnel Power", "フレネル強度"),
             new WFI18NTranslation("AL", "Cutoff Threshold", "カットアウトしきい値"),
+            // MainTexture2nd
+            new WFI18NTranslation("TX2", "Main Texture 2nd", "メインテクスチャ 2nd"),
+            new WFI18NTranslation("TX2", "Color 2nd", "マテリアルカラー 2nd"),
             // BackFace Texture
             new WFI18NTranslation("BKT", "Back Texture", "裏面テクスチャ"),
             new WFI18NTranslation("BKT", "Back Color", "裏面色"),
@@ -634,6 +648,7 @@ namespace UnlitWF
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Enable EmissiveScroll", "スクロールを使用する"),
             new WFI18NTranslation("ES", "Wave Type", "波形"),
+            new WFI18NTranslation("ES", "Wave Grad Tex", "波形グラデーションテクスチャ"),
             new WFI18NTranslation("ES", "Change Alpha Transparency", "透明度も反映する"),
             new WFI18NTranslation("ES", "Direction Type", "方向の種類"),
             new WFI18NTranslation("ES", "LevelOffset", "ゼロ点調整"),
@@ -649,6 +664,10 @@ namespace UnlitWF
             new WFI18NTranslation("ES", "Threshold (Min)", "しきい値 (Min)"),
             new WFI18NTranslation("ES", "Threshold (Max)", "しきい値 (Max)"),
             new WFI18NTranslation("ES", "Dont Emit when AudioLink is disabled", "AudioLink無効時は光らせない"),
+            new WFI18NTranslation("ES", "Delay Direction", "ディレイ方向"),
+            new WFI18NTranslation("ES", "Delay Control Texture (R)", "ディレイ制御テクスチャ (R)"),
+            new WFI18NTranslation("ES", "Delay Reverse", "ディレイ反転"),
+            new WFI18NTranslation("ES", "Delay Length", "ディレイ長"),
             // Outline
             new WFI18NTranslation("TL", "Line Color", "線の色"),
             new WFI18NTranslation("TL", "Line Width", "線の太さ"),
@@ -826,6 +845,10 @@ namespace UnlitWF
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_DIR", "カスタム(ワールド方向)"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_LOCAL_DIR", "カスタム(ローカル方向)"),
             new WFI18NTranslation("UnlitWF.SunSourceMode.CUSTOM_WORLD_POS", "カスタム(ワールド座標)"),
+            new WFI18NTranslation("UnlitWF.EmissiveScrollMode.STANDARD", "標準"),
+            new WFI18NTranslation("UnlitWF.EmissiveScrollMode.SAWTOOTH", "のこぎり波"),
+            new WFI18NTranslation("UnlitWF.EmissiveScrollMode.SIN_WAVE", "正弦波"),
+            new WFI18NTranslation("UnlitWF.EmissiveScrollMode.CUSTOM", "カスタム"),
 
             // WFEditorSetting
             new WFI18NTranslation("WFEditorSetting", "This is the current setting used.", "これは現在有効な設定です。"),

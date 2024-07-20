@@ -43,8 +43,6 @@ Shader "UnlitWF/WF_Particle_Multiply" {
         [Header(Emissive Scroll)]
         [ToggleUI]
             _ES_ScrollEnable        ("[ES] Enable EmissiveScroll", Float) = 0
-        [Enum(STANDARD,0,SAWTOOTH,1,SIN_WAVE,2)]
-            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
         [Enum(WORLD_SPACE,0,LOCAL_SPACE,1,UV,2)]
             _ES_SC_DirType          ("[ES] Direction Type", Float) = 0
         [HideInInspector]
@@ -52,8 +50,12 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             _ES_SC_UVType           ("[ES] UV Type", Float) = 0
         [WF_Vector3]
             _ES_SC_Direction        ("[ES] Direction", Vector) = (0, -10, 0, 0)
+        [WF_Enum(UnlitWF.EmissiveScrollMode,STANDARD,SAWTOOTH,SIN_WAVE,CUSTOM)]
+            _ES_SC_Shape            ("[ES] Wave Type", Float) = 0
             _ES_SC_LevelOffset      ("[ES] LevelOffset", Range(-1, 1)) = 0
             _ES_SC_Sharpness        ("[ES] Sharpness", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _ES_SC_GradTex          ("[ES] Wave Grad Tex", 2D) = "white" {}
             _ES_SC_Speed            ("[ES] ScrollSpeed", Range(0, 8)) = 2
 
         [Header(Emissive AudioLink)]
@@ -68,10 +70,17 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             _ES_AU_Slope            ("[ES] Slope", Range(0, 1)) = 0.2
             _ES_AU_MinThreshold     ("[ES] Threshold (Min)", Range(0, 1)) = 0.1
             _ES_AU_MaxThreshold     ("[ES] Threshold (Max)", Range(0, 1)) = 0.5
+        [Enum(NONE,0,UV1_X,1,UV1_Y,2,UV2_X,3,UV2_Y,4,UV1_TEX,5)]
+            _ES_AU_DelayDir         ("[ES] Delay Direction", Float) = 0
+        [NoScaleOffset]
+            _ES_AU_DelayTex         ("[ES] Delay Control Texture (R)", 2D) = "black" {}
+        [ToggleUI]
+            _ES_AU_DelayReverse     ("[ES] Delay Reverse", Float) = 0
+            _ES_AU_DelayHistory     ("[ES] Delay Length", Range(0,128)) = 32
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/06/12 (2.1.0)", Float) = 0
+            _CurrentVersion         ("2024/07/21 (2.2.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -111,7 +120,9 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb = lerp(ONE_VEC3, d.color.rgb, d.color.a); if (1 <= MIN_RGB(d.color.rgb)) { discard; }
 
+            #pragma shader_feature_local _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
@@ -147,7 +158,9 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb = lerp(ONE_VEC3, d.color.rgb, d.color.a); if (1 <= MIN_RGB(d.color.rgb)) { discard; }
 
+            #pragma shader_feature_local _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
@@ -183,7 +196,9 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             #define _WF_CUSTOM_FOG_COLOR (fixed4(1, 1, 1, 0))
             #define _WF_PREMUL_ALPHA d.color.rgb = lerp(ONE_VEC3, d.color.rgb, d.color.a); if (1 <= MIN_RGB(d.color.rgb)) { discard; }
 
+            #pragma shader_feature_local _ _ES_AULINKDTEX_ENABLE
             #pragma shader_feature_local _ _ES_AULINK_ENABLE
+            #pragma shader_feature_local _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local _ES_ENABLE
             #pragma shader_feature_local _PF_ENABLE
