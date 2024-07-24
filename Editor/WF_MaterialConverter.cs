@@ -788,7 +788,7 @@ namespace UnlitWF.Converter
                         if (sat < 0.05f) {
                             hur = 4 / 6f;
                         }
-                        WFAccessor.SetColor(ctx.target, "_TS_2ndColor", Color.HSVToRGB(hur, 0.1f, 0.9f));
+                        WFAccessor.SetColor(ctx.target, "_TS_2ndColor", Color.HSVToRGB(hur, 0.15f, 0.8f));
                     }
                     // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
                     if (HasNewPropertyValue(ctx, "_TS_1stTex", "_TS_2ndTex")) {
