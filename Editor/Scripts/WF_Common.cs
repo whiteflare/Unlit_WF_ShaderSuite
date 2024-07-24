@@ -368,10 +368,16 @@ namespace UnlitWF
             var changed = false;
             foreach (var m in mats)
             {
-                if (m == null)
+                if (m == null || m.shader == newShader)
                 {
                     continue;
                 }
+#if UNITY_2022_1_OR_NEWER
+                if (m.isVariant)
+                {
+                    continue; // バリアントはシェーダを変更できない
+                }
+#endif
                 var oldM = new Material(m);
 
                 // 初期化処理の呼び出し (カスタムエディタを取得してAssignNewShaderToMaterialしたかったけど手が届かなかったので静的アクセス)
