@@ -84,7 +84,8 @@ namespace UnlitWF.Converter
 
         public int ExecAutoConvertWithoutUndo(params Material[] mats)
         {
-            int count = 0;
+            // 対象を収集
+            var targets = new List<Material>();
             foreach (var mat in mats)
             {
                 if (mat == null)
@@ -96,7 +97,19 @@ namespace UnlitWF.Converter
                     OnSkipConvert(mat);
                     continue;
                 }
+                targets.Add(mat);
+            }
 
+            // 変換前処理
+            foreach(var mat in targets)
+            {
+                PreConvert(mat);
+            }
+
+            // 変換本体を実行
+            int count = 0;
+            foreach (var mat in targets)
+            {
                 var ctx = CreateContext(mat);
                 try
                 {
@@ -114,7 +127,9 @@ namespace UnlitWF.Converter
                     EditorUtility.SetDirty(ctx.target);
                 }
             }
+
             OnAfterExecute(mats, count);
+
             return count;
         }
 
@@ -147,6 +162,15 @@ namespace UnlitWF.Converter
         /// <param name="mat"></param>
         /// <returns></returns>
         protected abstract bool Validate(Material mat);
+
+        /// <summary>
+        /// 変換前処理を行う。
+        /// </summary>
+        /// <param name="mat"></param>
+        protected virtual void PreConvert(Material mat)
+        {
+
+        }
 
         protected static bool IsMatchShaderName(ConvertContext ctx, string name)
         {
@@ -335,6 +359,17 @@ namespace UnlitWF.Converter
             return WFCommonUtility.IsSupportedShader(mat) && !WFCommonUtility.IsMobileSupportedShader(mat) && !WFCommonUtility.IsURP();
         }
 
+        protected override void PreConvert(Material mat)
+        {
+#if UNITY_2022_1_OR_NEWER
+            // マテリアルバリアントは変換できないのでこのタイミングでフラットにする
+            if (mat.isVariant)
+            {
+                mat.parent = null;
+            }
+#endif
+        }
+
         protected static List<Action<ConvertContext>> CreateConverterList()
         {
             return new List<Action<ConvertContext>>() {
@@ -345,6 +380,11 @@ namespace UnlitWF.Converter
                         // シェーダ切り替え
                         var fallback = WFAccessor.GetShaderFallBackTarget(shader) ?? "Hidden/UnlitWF/WF_UnToon_Hidden";
                         WFCommonUtility.ChangeShader(fallback, ctx.target);
+                        if (shader == ctx.target.shader)
+                        {
+                            // 変換できなかった場合は変換を中止
+                            throw new AbortAndResetConvertException();
+                        }
 
                         // シェーダ切り替え後に RenderQueue をコピー
                         if (ctx.oldMaterial.renderQueue != ctx.oldMaterial.shader.renderQueue   // FromShader では無かった場合
@@ -411,6 +451,17 @@ namespace UnlitWF.Converter
         internal enum ShaderType
         {
             NoMatch, Opaque, Cutout, Transparent, Additive, Multiply
+        }
+
+        protected override void PreConvert(Material mat)
+        {
+#if UNITY_2022_1_OR_NEWER
+            // マテリアルバリアントは変換できないのでこのタイミングでフラットにする
+            if (mat.isVariant)
+            {
+                mat.parent = null;
+            }
+#endif
         }
 
         protected static List<Action<SelectShaderContext>> CreateConverterList()
@@ -737,7 +788,7 @@ namespace UnlitWF.Converter
                         if (sat < 0.05f) {
                             hur = 4 / 6f;
                         }
-                        WFAccessor.SetColor(ctx.target, "_TS_2ndColor", Color.HSVToRGB(hur, 0.1f, 0.9f));
+                        WFAccessor.SetColor(ctx.target, "_TS_2ndColor", Color.HSVToRGB(hur, 0.15f, 0.8f));
                     }
                     // これらのテクスチャが設定されているならば _MainTex を _TS_BaseTex にも設定する
                     if (HasNewPropertyValue(ctx, "_TS_1stTex", "_TS_2ndTex")) {
