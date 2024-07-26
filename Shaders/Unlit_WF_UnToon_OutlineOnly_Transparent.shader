@@ -97,7 +97,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_OutlineOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/07/21 (2.2.0)", Float) = 0
+            _CurrentVersion         ("2024/07/27 (2.2.1)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _VRCFallback            ("Hidden", Float) = 0
