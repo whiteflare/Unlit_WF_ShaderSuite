@@ -607,7 +607,7 @@ namespace UnlitWF
                 {
                     Debug.LogWarningFormat(mat, "[WF][Preprocess] {0}, mat = {1}", WFI18N.Translate(WFMessageText.LgWarnOlderVersion), mat);
                 }
-                if (WFCommonUtility.IsQuestPlatform() && !WFCommonUtility.IsMobileSupportedShader(mat))
+                if (WFCommonUtility.IsMobilePlatform() && !WFCommonUtility.IsMobileSupportedShader(mat))
                 {
                     Debug.LogWarningFormat(mat, "[WF][Preprocess] {0}, mat = {1}", WFI18N.Translate(WFMessageText.LgWarnNotSupportAndroid), mat);
                 }
