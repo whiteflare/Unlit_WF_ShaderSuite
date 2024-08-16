@@ -265,7 +265,7 @@ namespace UnlitWF
 
             // モバイル向けではないシェーダを使用している場合にメッセージ
             new WFMaterialValidator(
-                targets => WFCommonUtility.IsQuestPlatform() ? targets.Where(tgt => !WFCommonUtility.IsMobileSupportedShader(tgt)).ToArray() : new Material[0],
+                targets => WFCommonUtility.IsMobilePlatform() ? targets.Where(tgt => !WFCommonUtility.IsMobileSupportedShader(tgt)).ToArray() : new Material[0],
                 MessageType.Info,
                 targets => WFI18N.Translate(WFMessageText.PlzQuestSupport),
                 null // アクションなし、変えると戻すのが大変なので

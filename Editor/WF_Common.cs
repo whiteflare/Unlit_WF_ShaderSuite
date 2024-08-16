@@ -762,9 +762,9 @@ namespace UnlitWF
 #endif
         }
 
-        public static bool IsQuestPlatform()
+        public static bool IsMobilePlatform()
         {
-            return EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android;
+            return EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android || EditorUserBuildSettings.activeBuildTarget == BuildTarget.iOS;
         }
 
         public static bool IsManagedUPM()
