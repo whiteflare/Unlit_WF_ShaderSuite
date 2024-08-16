@@ -52,7 +52,7 @@ namespace UnlitWF
 
         private void ReplaceQuestSupportShader(Scene scene)
         {
-            if (!WFCommonUtility.IsQuestPlatform())
+            if (!WFCommonUtility.IsMobilePlatform())
             {
                 return;
             }
