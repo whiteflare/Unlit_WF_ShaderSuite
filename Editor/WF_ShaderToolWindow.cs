@@ -287,9 +287,9 @@ namespace UnlitWF
                 return;
             }
             BuildTargetGroup currentTarget = EditorUserBuildSettings.selectedBuildTargetGroup;
-            var symbols = new List<string>(PlayerSettings.GetScriptingDefineSymbolsForGroup(currentTarget).Split(';'));
+            var symbols = GetCurrentScriptingDefineSymbols();
             symbols.Remove("WF_ML_JP");
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(currentTarget, string.Join(";", symbols));
+            SetCurrentScriptingDefineSymbols(symbols);
         }
 #else
         [MenuItem(TOOLS_LNG_JP, priority = WFMenu.PRI_TOOLS_CNGLANG)]
@@ -300,12 +300,35 @@ namespace UnlitWF
                 return;
             }
             BuildTargetGroup currentTarget = EditorUserBuildSettings.selectedBuildTargetGroup;
-            var symbols = new List<string>(PlayerSettings.GetScriptingDefineSymbolsForGroup(currentTarget).Split(';'));
+            var symbols = GetCurrentScriptingDefineSymbols();
             symbols.Remove("WF_ML_JP");
             symbols.Add("WF_ML_JP");
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(currentTarget, string.Join(";", symbols));
+            SetCurrentScriptingDefineSymbols(symbols);
         }
 #endif
+
+        private static List<string> GetCurrentScriptingDefineSymbols()
+        {
+            BuildTargetGroup currentTarget = EditorUserBuildSettings.selectedBuildTargetGroup;
+            return new List<string>(
+#if UNITY_6000_0_OR_NEWER
+                PlayerSettings.GetScriptingDefineSymbols(UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(currentTarget))
+#else
+                PlayerSettings.GetScriptingDefineSymbolsForGroup(currentTarget)
+#endif
+                .Split(';'));
+        }
+
+        private static void SetCurrentScriptingDefineSymbols(List<string> symbols)
+        {
+            BuildTargetGroup currentTarget = EditorUserBuildSettings.selectedBuildTargetGroup;
+#if UNITY_6000_0_OR_NEWER
+            PlayerSettings.SetScriptingDefineSymbols(UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(currentTarget)
+#else
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(currentTarget
+#endif
+                , string.Join(";", symbols));
+        }
 
         #endregion
 
