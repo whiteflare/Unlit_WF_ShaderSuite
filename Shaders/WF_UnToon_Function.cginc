@@ -1528,7 +1528,7 @@ FEATURE_TGL_ON_BEGIN(_DFD_Enable)
             if (!d.facing && TGL_ON(_DFD_BackShadow)) {
                 dist = 0;
             }
-            d.color.rgb = lerp(d.color.rgb, _DFD_Color.rgb * WF_TEX2D_DFD_COLOR(d.uv_main), _DFD_Power * (1 - smoothstep(_DFD_MinDist, max(_DFD_MinDist + NZF, _DFD_MaxDist), dist)));
+            d.color.rgb = lerp(d.color.rgb, _DFD_Color.rgb * WF_TEX2D_DFD_COLOR(d.uv_main) * d.light_color, _DFD_Power * (1 - smoothstep(_DFD_MinDist, max(_DFD_MinDist + NZF, _DFD_MaxDist), dist)));
 FEATURE_TGL_END
         }
 

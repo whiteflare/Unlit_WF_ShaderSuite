@@ -233,13 +233,13 @@
         drawRimLight(d);            // リムライト
 
         drawOverlayTexture(d);      // オーバーレイ
-        drawDistanceFade(d);        // 距離フェード
         drawOutline(d);             // アウトライン
 
         // Anti-Glare とライト色ブレンドを同時に計算
         d.color.rgb *= d.light_color;
 
         drawOcclusion(d);           // オクルージョンとライトマップ
+        drawDistanceFade(d);        // 距離フェード
         drawEmissiveScroll(d);      // エミッション
 
         drawToonFog(d);             // トゥーンフォグ
