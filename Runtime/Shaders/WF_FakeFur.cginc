@@ -272,11 +272,11 @@
         drawColorChange(d);         // 色変換
 
         drawToonShade(d);           // 階調影
-        drawDistanceFade(d);        // 距離フェード
 
         // Anti-Glare とライト色ブレンドを同時に計算
         d.color.rgb *= d.light_color;
 
+        drawDistanceFade(d);        // 距離フェード
         drawDissolve(d);            // ディゾルブ
 
         // Alpha は 0-1 にクランプ
