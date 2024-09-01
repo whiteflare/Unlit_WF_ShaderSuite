@@ -557,13 +557,50 @@ namespace UnlitWF
             return true;
         }
 
+        private static HashSet<string> GetResetablePropertyName(Material material)
+        {
+            var result = new HashSet<string>();
+
+            // TS影
+            int _TS_Steps = WFAccessor.GetInt(material, "_TS_Steps", 3);
+            if (_TS_Steps < 3)
+            {
+                result.Add("_TS_3rdTex");
+                result.Add("_TS_3rdColor");
+            }
+            if (_TS_Steps < 2)
+            {
+                result.Add("_TS_2ndTex");
+                result.Add("_TS_2ndColor");
+            }
+
+            // 2nd CubeMap
+            int _MT_CubemapType = WFAccessor.GetInt(material, "_MT_CubemapType", -1);
+            if (_MT_CubemapType == 0)
+            {
+                result.Add("_MT_Cubemap");
+                result.Add("_MT_CubemapPower");
+                result.Add("_MT_CubemapHighCut");
+            }
+
+            // Alpha Mask
+            int _AL_Source = WFAccessor.GetInt(material, "_AL_Source", -1);
+            if (_AL_Source == 0) // MAIN_TEX_ALPHA
+            {
+                result.Add("_AL_MaskTex");
+                // result.Add("_AL_InvMaskVal"); // これはMAIN_TEX_ALPHAでも使うのでリセットしない
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// WFマテリアルのクリンナップ
         /// </summary>
         /// <param name="material"></param>
         private static void CleanUpForWFMaterial(Material material)
         {
-            int steps = WFAccessor.GetInt(material, "_TS_Steps", 3);
+            var resetable = GetResetablePropertyName(material);
 
             var props = ShaderSerializedProperty.AsList(material);
 
@@ -593,13 +630,8 @@ namespace UnlitWF
                     del_props.Add(p);
                     continue;
                 }
-                // 使っていない影テクスチャ削除
-                if (steps < 3 && (p.name == "_TS_3rdTex" || p.name == "_TS_3rdColor"))
-                {
-                    del_props.Add(p);
-                    continue;
-                }
-                if (steps < 2 && (p.name == "_TS_2ndTex" || p.name == "_TS_2ndColor"))
+                // 機能がオフされているプロパティを削除
+                if (resetable.Contains(p.name))
                 {
                     del_props.Add(p);
                     continue;
