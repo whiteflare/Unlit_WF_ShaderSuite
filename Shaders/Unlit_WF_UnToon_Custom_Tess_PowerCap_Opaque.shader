@@ -1,18 +1,26 @@
 ﻿/*
- *  The MIT License
+ *  The zlib/libpng License
  *
  *  Copyright 2018-2024 whiteflare.
  *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *  This software is provided ‘as-is’, without any express or implied
+ *  warranty. In no event will the authors be held liable for any damages
+ *  arising from the use of this software.
  *
- *  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *  Permission is granted to anyone to use this software for any purpose,
+ *  including commercial applications, and to alter it and redistribute it
+ *  freely, subject to the following restrictions:
  *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *  1. The origin of this software must not be misrepresented; you must not
+ *  claim that you wrote the original software. If you use this software
+ *  in a product, an acknowledgment in the product documentation would be
+ *  appreciated but is not required.
+ *
+ *  2. Altered source versions must be plainly marked as such, and must not be
+ *  misrepresented as being the original software.
+ *
+ *  3. This notice may not be removed or altered from any source
+ *  distribution.
  */
 Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
@@ -344,17 +352,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
-        [WFHeaderToggle(Distance Fade)]
-            _DFD_Enable             ("[DFD] Enable", Float) = 0
-        [NoScaleOffset]
-            _DFD_ColorTex           ("[DFD] Color Texture", 2D) = "white" {}
-            _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
-            _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
-            _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
-            _DFD_Power              ("[DFD] Power", Range(0, 1)) = 1
-        [ToggleUI]
-            _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
-
         [WFHeaderToggle(Ambient Occlusion)]
             _AO_Enable              ("[AO] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
@@ -368,6 +365,17 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
+
+        [WFHeaderToggle(Distance Fade)]
+            _DFD_Enable             ("[DFD] Enable", Float) = 0
+        [NoScaleOffset]
+            _DFD_ColorTex           ("[DFD] Color Texture", 2D) = "white" {}
+            _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DFD_Power              ("[DFD] Power", Range(0, 1)) = 1
+        [ToggleUI]
+            _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
 
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
@@ -467,7 +475,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/07/27 (2.2.1)", Float) = 0
+            _CurrentVersion         ("2024/09/07 (2.3.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", Float) = 0

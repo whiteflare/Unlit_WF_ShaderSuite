@@ -1,18 +1,26 @@
 ﻿/*
- *  The MIT License
+ *  The zlib/libpng License
  *
  *  Copyright 2018-2024 whiteflare.
  *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- *  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *  This software is provided ‘as-is’, without any express or implied
+ *  warranty. In no event will the authors be held liable for any damages
+ *  arising from the use of this software.
  *
- *  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *  Permission is granted to anyone to use this software for any purpose,
+ *  including commercial applications, and to alter it and redistribute it
+ *  freely, subject to the following restrictions:
  *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *  1. The origin of this software must not be misrepresented; you must not
+ *  claim that you wrote the original software. If you use this software
+ *  in a product, an acknowledgment in the product documentation would be
+ *  appreciated but is not required.
+ *
+ *  2. Altered source versions must be plainly marked as such, and must not be
+ *  misrepresented as being the original software.
+ *
+ *  3. This notice may not be removed or altered from any source
+ *  distribution.
  */
 
 #if UNITY_EDITOR
@@ -557,13 +565,50 @@ namespace UnlitWF
             return true;
         }
 
+        private static HashSet<string> GetResetablePropertyName(Material material)
+        {
+            var result = new HashSet<string>();
+
+            // TS影
+            int _TS_Steps = WFAccessor.GetInt(material, "_TS_Steps", 3);
+            if (_TS_Steps < 3)
+            {
+                result.Add("_TS_3rdTex");
+                result.Add("_TS_3rdColor");
+            }
+            if (_TS_Steps < 2)
+            {
+                result.Add("_TS_2ndTex");
+                result.Add("_TS_2ndColor");
+            }
+
+            // 2nd CubeMap
+            int _MT_CubemapType = WFAccessor.GetInt(material, "_MT_CubemapType", -1);
+            if (_MT_CubemapType == 0)
+            {
+                result.Add("_MT_Cubemap");
+                result.Add("_MT_CubemapPower");
+                result.Add("_MT_CubemapHighCut");
+            }
+
+            // Alpha Mask
+            int _AL_Source = WFAccessor.GetInt(material, "_AL_Source", -1);
+            if (_AL_Source == 0) // MAIN_TEX_ALPHA
+            {
+                result.Add("_AL_MaskTex");
+                // result.Add("_AL_InvMaskVal"); // これはMAIN_TEX_ALPHAでも使うのでリセットしない
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// WFマテリアルのクリンナップ
         /// </summary>
         /// <param name="material"></param>
         private static void CleanUpForWFMaterial(Material material)
         {
-            int steps = WFAccessor.GetInt(material, "_TS_Steps", 3);
+            var resetable = GetResetablePropertyName(material);
 
             var props = ShaderSerializedProperty.AsList(material);
 
@@ -593,13 +638,8 @@ namespace UnlitWF
                     del_props.Add(p);
                     continue;
                 }
-                // 使っていない影テクスチャ削除
-                if (steps < 3 && (p.name == "_TS_3rdTex" || p.name == "_TS_3rdColor"))
-                {
-                    del_props.Add(p);
-                    continue;
-                }
-                if (steps < 2 && (p.name == "_TS_2ndTex" || p.name == "_TS_2ndColor"))
+                // 機能がオフされているプロパティを削除
+                if (resetable.Contains(p.name))
                 {
                     del_props.Add(p);
                     continue;
