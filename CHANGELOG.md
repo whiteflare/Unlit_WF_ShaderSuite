@@ -1,5 +1,28 @@
 # Change Log
 
+## 2024-09-07 (2.3.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20240907
+
+### Important Notice
+- Shader
+  - 配布ライセンスを MIT LICENSE から zlib/libpng License に変更しました。
+    - 変更の意図: MIT LICENSE を厳密に適用すると、UnlitWFを使用したアバターやワールドにも著作権表示が必要となってしまう問題がありました。アバターやワールドにまで著作権表示を求めたくないため、より実態に即したライセンスである zlib/libpng License に変更します。
+    - このライセンスの変更では、次の点は従来より変更ありません。
+      - 無保証・無責任
+      - 自由な利用の許可
+      - 自由な改変と再頒布の許可
+      - 虚偽の著作権表示の禁止
+    - 過去バージョンのソースコードは MIT LICENSE が適用されています。より制限の緩い zlib/libpng License を用いた最新バージョンのソースコードをぜひお使いください。
+
+### Changed
+- Shader
+  - 距離フェードとAOの適用順を入れ替えました。以前は距離フェードの効果にAOの効果を上乗せしてしまっていましたが、入れ替えによりAOに関わらず距離フェードの効果が掛かるようになりました。
+- Tool
+  - 特定のテクスチャがオフになっている場合、クリンナップ処理でそのテクスチャを外すようにしました。
+    - 例えば、アルファマスクテクスチャが設定されているのにアルファ値をメインテクスチャから取得している場合、無駄な設定となっているアルファマスクを外してNoneにします。
+
+----
+
 ## 2024-07-27 (2.2.1)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20240727
 
