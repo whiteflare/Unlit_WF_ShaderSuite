@@ -65,7 +65,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             _MT_ReflSmooth          ("[MT] Smoothness", Range(0, 1)) = 1
             _MT_Brightness          ("[MT] Brightness", Range(0, 1)) = 0.2
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
-        [ToggleUI]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
