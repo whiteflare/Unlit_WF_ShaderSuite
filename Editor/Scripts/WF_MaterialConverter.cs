@@ -839,6 +839,7 @@ namespace UnlitWF.Converter
                         if (HasNewPropertyValue(ctx, "_TR_Color")) {
                             WFAccessor.SetInt(ctx.target, "_TR_BlendType", 2);  // ADD
                         }
+                        WFAccessor.SetInt(ctx.target, "_TR_TintBaseCol", 1);  // ベースカラーを混合する
                     }
                 },
                 ctx => {
