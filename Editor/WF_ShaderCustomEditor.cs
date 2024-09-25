@@ -189,19 +189,6 @@ namespace UnlitWF
                 EditorGUILayout.Space();
             }),
 
-            // _TR_InvMaskVal の直後に設定ボタンを追加する
-            new CustomPropertyHook("_TR_InvMaskVal", null, (ctx, changed) => {
-                var guiContent = WFI18N.GetGUIContent("TR", "Assign MainTex to MaskTexture", "メインテクスチャをリムライトマスクに設定します");
-                if (DrawButtonFieldProperty(guiContent, "APPLY")) {
-                    ctx.editor.RegisterPropertyChangeUndo("Assign MainTex to MaskTexture");
-                    foreach(var mat in WFCommonUtility.GetCurrentMaterials(ctx.editor))
-                    {
-                        WFAccessor.SetTexture(mat, "_TR_MaskTex", mat.GetTexture("_MainTex"));
-                        WFAccessor.SetFloat(mat, "_TR_InvMaskVal", 0);
-                    }
-                }
-            }, isRegex:false),
-
             // _CGR_GradMapTexの後にグラデーションマップ作成ボタンを追加する
             new GradientGeneratePropertyHook("_CGR_GradMapTex", isRegex:false),
             new GradientGeneratePropertyHook("_ES_SC_GradTex", isRegex:false),

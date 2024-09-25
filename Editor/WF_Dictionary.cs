@@ -642,7 +642,7 @@ namespace UnlitWF
             new WFI18NTranslation("TR", "Width Bottom", "幅(下)").AddTag("TM"),
             new WFI18NTranslation("TR", "Feather", "ぼかし幅").AddTag("TM"),
             new WFI18NTranslation("TR", "Exponent", "ぼかし指数").AddTag("TM"),
-            new WFI18NTranslation("TR", "Assign MainTex to MaskTexture", "MainTexをマスクに設定する"),
+            new WFI18NTranslation("TR", "Tint Base Color", "ベースカラーをリムライト色に混合"),
             new WFI18NTranslation("TM", "Rim Color", "リムシャドウ色"),
             // Overlay Texture
             new WFI18NTranslation("OVL", "Overlay Color", "オーバーレイ テクスチャ"),
@@ -909,6 +909,7 @@ namespace UnlitWF
 
             // 今は未使用
             new WFI18NTranslation("MT", "MetallicMap Type", "Metallicマップの種類"),
+            new WFI18NTranslation("TR", "Assign MainTex to MaskTexture", "MainTexをマスクに設定する"),
         };
 
 

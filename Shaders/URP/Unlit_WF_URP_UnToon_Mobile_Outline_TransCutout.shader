@@ -157,6 +157,8 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             _TR_Width               ("[TR] Width", Range(0, 1)) = 0.1
             _TR_Feather             ("[TR] Feather", Range(0, 1)) = 0.05
             _TR_Exponent            ("[TR] Exponent", Range(1, 8)) = 1
+        [ToggleUI]
+            _TR_TintBaseCol         ("[TR] Tint Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
         [ToggleUI]

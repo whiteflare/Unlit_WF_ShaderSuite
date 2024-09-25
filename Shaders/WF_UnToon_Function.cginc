@@ -1289,7 +1289,7 @@ FEATURE_TGL_ON_BEGIN(_TR_Enable)
                 angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
             }
             // 順光の場合はリムライトを暗くする
-            float3 rimPower = saturate(0.8 - angle_light_camera) * WF_TEX2D_RIM_MASK(d.uv_main);
+            float3 rimPower = saturate(0.8 - angle_light_camera) * WF_TEX2D_RIM_MASK(d.uv_main) * lerp(ONE_VEC3, d.base_color.rgb, _TR_TintBaseCol);
             // 色計算
             float3 rimColor = calcRimLightColor(d.color.rgb);
             // 合成
