@@ -825,12 +825,12 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
                 float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
                 float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
 
-                if (TGL_ON(_MT_GeomSpecAA)) {
+                if (0 < _MT_GeomSpecAA) {
                     half3 normal_ddx = ddx(ws_metal_normal);
                     half3 normal_ddy = ddy(ws_metal_normal);
                     float geom_roughness = pow(saturate(max(dot(normal_ddx, normal_ddx), dot(normal_ddy, normal_ddy))), 0.333);
-                    reflSmooth = min(reflSmooth, 1.0 - geom_roughness);
-                    specSmooth = min(specSmooth, 1.0 - geom_roughness);
+                    reflSmooth = lerp(reflSmooth, min(reflSmooth, 1.0 - geom_roughness), _MT_GeomSpecAA);
+                    specSmooth = lerp(specSmooth, min(specSmooth, 1.0 - geom_roughness), _MT_GeomSpecAA);
                 }
 
                 // リフレクション
