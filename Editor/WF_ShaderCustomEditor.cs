@@ -31,6 +31,7 @@ using System.Linq;
 using UnityEditor;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using System.IO;
 
 namespace UnlitWF
 {
@@ -627,7 +628,7 @@ namespace UnlitWF
 
             // テンプレート
             var rect = EditorGUILayout.GetControlRect();
-            if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate)))
+            if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.ApplyTemplate), new GUIStyle("DropDownButton")))
             {
                 // WFMaterialTemplate を検索
                 var temps = AssetDatabase.FindAssets("t:" + typeof(WFMaterialTemplate))
@@ -641,7 +642,6 @@ namespace UnlitWF
                 var menu = new GenericMenu();
                 foreach (var temp in temps)
                 {
-                    Debug.Log(temp.material.shader);
                     menu.AddItem(new GUIContent(temp.GetDisplayString()), false, () =>
                     {
                         temp.ApplyToMaterial(WFCommonUtility.GetCurrentMaterials(materialEditor));
@@ -663,18 +663,34 @@ namespace UnlitWF
                 menu.DropDown(rect);
             }
 
-            // クリンナップ
-            if (ButtonWithDropdownList(WFI18N.GetGUIContent(WFMessageButton.Cleanup), new string[] { "Open Cleanup Utility" }, idx =>
+            // テクスチャベイク
+            ButtonMenu(WFI18N.GetGUIContent(WFMessageButton.BakeMainTexture), new string[] {
+                WFI18N.Translate(WFMessageButton.BakeAndSaveTexture),
+                WFI18N.Translate(WFMessageButton.BakeAndUpdateMaterial),
+                WFI18N.Translate(WFMessageButton.BakeAndNewMaterial) }, idx =>
             {
+                var param = BakeTextureParameter.Create();
+                param.materials = WFCommonUtility.GetCurrentMaterials(materialEditor);
                 switch (idx)
                 {
                     case 0:
-                        ToolCreanUpWindow.OpenWindowFromShaderGUI(WFCommonUtility.GetCurrentMaterials(materialEditor));
+                        param.mode = BakeMainTextureMode.OnlyBakeTexture;
+                        WFMaterialEditUtility.BakeMainTexture(param);
                         break;
-                    default:
+                    case 1:
+                        param.mode = BakeMainTextureMode.BakeAndUpdate;
+                        WFMaterialEditUtility.BakeMainTexture(param);
+                        break;
+                    case 2:
+                        param.mode = BakeMainTextureMode.BakeAndNew;
+                        WFMaterialEditUtility.BakeMainTexture(param);
                         break;
                 }
-            }))
+            });
+
+            // クリンナップ
+            rect = EditorGUILayout.GetControlRect();
+            if (GUI.Button(rect, WFI18N.GetGUIContent(WFMessageButton.Cleanup)))
             {
                 var param = CleanUpParameter.Create();
                 param.materials = WFCommonUtility.GetCurrentMaterials(materialEditor);
@@ -1173,7 +1189,7 @@ namespace UnlitWF
         internal static bool ButtonWithDropdownList(GUIContent content, Action<Rect> openMenuCallback)
         {
             var style = new GUIStyle("DropDownButton");
-            var rect = EditorGUILayout.GetControlRect(false, 20, style);
+            var rect = EditorGUILayout.GetControlRect();
 
             var dropDownRect = rect;
             const float kDropDownButtonWidth = 20f;
@@ -1200,6 +1216,20 @@ namespace UnlitWF
                 }
                 menu.DropDown(rect);
             });
+        }
+
+        internal static void ButtonMenu(GUIContent content, string[] buttonNames, GenericMenu.MenuFunction2 selectMenuCallback)
+        {
+            var rect = EditorGUILayout.GetControlRect();
+            if (GUI.Button(rect, content, new GUIStyle("DropDownButton")))
+            {
+                var menu = new GenericMenu();
+                for (int i = 0; i != buttonNames.Length; i++)
+                {
+                    menu.AddItem(new GUIContent(buttonNames[i]), false, selectMenuCallback, i);
+                }
+                menu.DropDown(rect);
+            }
         }
 
         private static readonly string[] vrcFallbackPopupLabel = { "From Shader", "Custom", "", 
@@ -2243,7 +2273,7 @@ namespace UnlitWF
             }
             catch (Exception)
             {
-                Debug.LogWarningFormat("Failed to create MaterialEnum, enum {0} not found", enumName);
+                Debug.LogWarningFormat("[WF] Failed to create MaterialEnum, enum {0} not found", enumName);
                 throw;
             }
         }
@@ -2450,30 +2480,16 @@ namespace UnlitWF
             }
             else
             {
-                var path = EditorUtility.SaveFilePanelInProject("Save Texture", "", "png", "Save Texture");
-                if (string.IsNullOrWhiteSpace(path))
+                return AssetFileSaver.SaveAsFile(tex, null, importer =>
                 {
-                    return null;
-                }
-
-                System.IO.File.WriteAllBytes(path, tex.EncodeToPNG());
-
-                AssetDatabase.ImportAsset(path);
-                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
-                if (importer == null)
-                {
-                    return null;
-                }
-
-                importer.textureCompression = TEX_COMPRESS;
-                importer.wrapMode = TextureWrapMode.Clamp;
-                importer.filterMode = FilterMode.Bilinear;
-                importer.alphaIsTransparency = true;
-                importer.mipmapEnabled = false;
-                importer.streamingMipmaps = false;
-                importer.SaveAndReimport();
-
-                return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+                    importer.textureCompression = TEX_COMPRESS;
+                    importer.wrapMode = TextureWrapMode.Clamp;
+                    importer.filterMode = FilterMode.Bilinear;
+                    importer.alphaIsTransparency = true;
+                    importer.mipmapEnabled = false;
+                    importer.streamingMipmaps = false;
+                    return true;
+                });
             }
         }
     }

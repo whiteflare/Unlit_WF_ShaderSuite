@@ -145,7 +145,7 @@ namespace UnlitWF.Converter
         {
             if (ctx.oldMaterial.shader.name != ctx.target.shader.name)
             {
-                Debug.LogFormat("[WF] {0} {1}: {2} -> {3}", GetShortName(), ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
+                Debug.LogFormat("[WF][Convert] {0} {1}: {2} -> {3}", GetShortName(), ctx.target, ctx.oldMaterial.shader.name, ctx.target.shader.name);
             }
         }
 
@@ -161,7 +161,7 @@ namespace UnlitWF.Converter
 
         protected virtual void OnAbortConvert(CTX ctx, AbortAndResetConvertException ex)
         {
-            Debug.LogWarningFormat("[WF] {0} {1}: Abort Convert", GetShortName(), ctx.target);
+            Debug.LogWarningFormat("[WF][Convert] {0} {1}: Abort Convert", GetShortName(), ctx.target);
         }
 
         /// <summary>
@@ -1042,7 +1042,7 @@ namespace UnlitWF.Converter
             }
             if (0 < done)
             {
-                Debug.LogFormat("[WF] Import And Migration {0} materials", done);
+                Debug.LogFormat("[WF][Convert] Import And Migration {0} materials", done);
             }
         }
 
@@ -1073,7 +1073,7 @@ namespace UnlitWF.Converter
             if (0 < done)
             {
                 AssetDatabase.SaveAssets();
-                Debug.LogFormat("[WF] Scan And Migration {0} materials", done);
+                Debug.LogFormat("[WF][Convert] Scan And Migration {0} materials", done);
             }
         }
 
