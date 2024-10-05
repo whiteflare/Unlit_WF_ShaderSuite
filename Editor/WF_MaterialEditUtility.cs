@@ -958,6 +958,7 @@ namespace UnlitWF
             {
                 return AssetFileSaver.SaveAsFile(tex, WFAccessor.GetTexture(srcMaterial, "_MainTex"), importer =>
                 {
+                    importer.sRGBTexture = true;
                     importer.alphaIsTransparency = true;
                     importer.alphaSource = TextureImporterAlphaSource.FromInput;
                     return true;
