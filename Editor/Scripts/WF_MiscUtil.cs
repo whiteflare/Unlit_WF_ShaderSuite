@@ -707,6 +707,91 @@ namespace UnlitWF
             return instance.StartCoroutine(coroutine);
         }
     }
+
+    class AssetFileSaver
+    {
+        public static Texture2D SaveAsFile(Texture2D tex, Texture template = null, System.Func<TextureImporter, bool> config = null)
+        {
+            if (tex == null)
+            {
+                return null;
+            }
+
+            var outputPath = EditorUtility.SaveFilePanelInProject("Save Texture", "", "png", "Save Texture");
+            if (string.IsNullOrWhiteSpace(outputPath))
+            {
+                return null;
+            }
+
+            TextureImporter configTemplate = null;
+            {
+                var tempPath = AssetDatabase.GetAssetPath(template);
+                if (!string.IsNullOrEmpty(tempPath))
+                {
+                    configTemplate = AssetImporter.GetAtPath(tempPath) as TextureImporter;
+                }
+            }
+
+            System.IO.File.WriteAllBytes(outputPath, tex.EncodeToPNG());
+
+            var importer = AssetImporter.GetAtPath(outputPath) as TextureImporter;
+            if (importer == null)
+            {
+                AssetDatabase.ImportAsset(outputPath);
+                importer = AssetImporter.GetAtPath(outputPath) as TextureImporter;
+            }
+            if (importer == null)
+            {
+                return null;
+            }
+
+            var saveAndReimport = false;
+            if (configTemplate != null)
+            {
+                EditorUtility.CopySerialized(configTemplate, importer);
+                saveAndReimport = true;
+            }
+            if (config != null)
+            {
+                saveAndReimport |= config(importer);
+            }
+
+            if (saveAndReimport) {
+                importer.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(outputPath);
+        }
+
+        public static T SaveAsFile<T>(T obj, string title, string ext) where T : UnityEngine.Object
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+
+            var outputPath = EditorUtility.SaveFilePanelInProject(title, "", ext, title);
+            if (string.IsNullOrWhiteSpace(outputPath))
+            {
+                return null;
+            }
+
+            var existsAsset = AssetDatabase.LoadAssetAtPath<T>(outputPath);
+            if (existsAsset != null)
+            {
+                // GUID保存するためにファイルが既にあるなら転写する
+                EditorUtility.CopySerialized(obj, existsAsset);
+                EditorUtility.SetDirty(existsAsset);
+                AssetDatabase.SaveAssets();
+                return existsAsset;
+            }
+            else
+            {
+                // ファイルが無いならば新しいファイルを作成して読み込み直す
+                AssetDatabase.CreateAsset(obj, outputPath);
+                return AssetDatabase.LoadAssetAtPath<T>(outputPath);
+            }
+        }
+    }
 }
 
 #endif
