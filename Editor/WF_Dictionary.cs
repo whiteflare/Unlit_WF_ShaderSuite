@@ -642,7 +642,7 @@ namespace UnlitWF
             new WFI18NTranslation("TR", "Width Bottom", "幅(下)").AddTag("TM"),
             new WFI18NTranslation("TR", "Feather", "ぼかし幅").AddTag("TM"),
             new WFI18NTranslation("TR", "Exponent", "ぼかし指数").AddTag("TM"),
-            new WFI18NTranslation("TR", "Assign MainTex to MaskTexture", "MainTexをマスクに設定する"),
+            new WFI18NTranslation("TR", "Tint Base Color", "ベースカラーをリムライト色に混合"),
             new WFI18NTranslation("TM", "Rim Color", "リムシャドウ色"),
             // Overlay Texture
             new WFI18NTranslation("OVL", "Overlay Color", "オーバーレイ テクスチャ"),
@@ -899,16 +899,23 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.DgMigrationAuto, "UnlitWFシェーダがインポートされました。\nプロジェクト内に古いマテリアルが残っていないかスキャンしますか？"),
             new WFI18NTranslation(WFMessageText.DgMigrationManual, "プロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
             new WFI18NTranslation(WFMessageText.DgDontImportUnityPackage, "パッケージは UPM(VPM) で管理されています。\nunitypackage からインポートするかわりに VCC 等の管理ツールを使用してください。"),
+            new WFI18NTranslation(WFMessageText.DgBakeWarning, "ベイクできない設定がマテリアルに含まれています。続行しますか？"),
 
             new WFI18NTranslation(WFMessageText.LgWarnOlderVersion, "古いバージョンで作成されたマテリアルがあります。"),
             new WFI18NTranslation(WFMessageText.LgWarnNotSupportAndroid, "Android非対応のシェーダが使われているマテリアルがあります。"),
+            new WFI18NTranslation(WFMessageText.LgWarnCancelBakeTexture, "ベイクできない設定がマテリアルに含まれています。ベイクがキャンセルされました。"),
 
             new WFI18NTranslation(WFMessageButton.Cleanup, "マテリアルから不要データを削除"),
             new WFI18NTranslation(WFMessageButton.ApplyTemplate, "テンプレートから適用"),
             new WFI18NTranslation(WFMessageButton.SaveTemplate, "テンプレートとして保存"),
+            new WFI18NTranslation(WFMessageButton.BakeMainTexture, "メインテクスチャのベイク"),
+            new WFI18NTranslation(WFMessageButton.BakeAndSaveTexture, "ベイクしてテクスチャのみ保存"),
+            new WFI18NTranslation(WFMessageButton.BakeAndUpdateMaterial, "ベイクしてマテリアル変更"),
+            new WFI18NTranslation(WFMessageButton.BakeAndNewMaterial, "ベイクしてマテリアル新規保存"),
 
             // 今は未使用
             new WFI18NTranslation("MT", "MetallicMap Type", "Metallicマップの種類"),
+            new WFI18NTranslation("TR", "Assign MainTex to MaskTexture", "MainTexをマスクに設定する"),
         };
 
 
@@ -1162,8 +1169,10 @@ namespace UnlitWF
         public static readonly string DgMigrationAuto = "UnlitWF shaders have been imported.\nDo you want to scan for old materials still in the project?";
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
         public static readonly string DgDontImportUnityPackage = "The package is managed by UPM(VPM).\nUse a management tool such as VCC instead of importing from unitypackage.";
+        public static readonly string DgBakeWarning = "Material contain settings that cannot be bakeable. Continue?";
         public static readonly string LgWarnOlderVersion = "A material was created with an older shader version.";
         public static readonly string LgWarnNotSupportAndroid = "A material uses a shader that is not supported by Android.";
+        public static readonly string LgWarnCancelBakeTexture = "Material contains settings that cannot be bakeable. Bake canceled.";
     }
 
     static class WFMessageButton
@@ -1171,6 +1180,10 @@ namespace UnlitWF
         public static readonly string Cleanup = "Remove unused properties from Materials";
         public static readonly string ApplyTemplate = "Apply from Template";
         public static readonly string SaveTemplate = "Save as Template";
+        public static readonly string BakeMainTexture = "Bake Main Texture";
+        public static readonly string BakeAndSaveTexture = "Bake and Save Texture";
+        public static readonly string BakeAndUpdateMaterial = "Bake and Update Material";
+        public static readonly string BakeAndNewMaterial = "Bake and New Material";
     }
 }
 

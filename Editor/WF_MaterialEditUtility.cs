@@ -100,140 +100,40 @@ namespace UnlitWF
         }
     }
 
-    abstract class PropertyNameReplacement
+    public enum BakeMainTextureMode
     {
-        public readonly Action<ShaderSerializedProperty> onAfterCopy;
+        OnlyBakeTexture,
+        BakeAndUpdate,
+        BakeAndNew,
+    }
 
-        public PropertyNameReplacement(Action<ShaderSerializedProperty> onAfterCopy = null)
+    public class BakeTextureParameter : ScriptableObject
+    {
+        public Material[] materials = { };
+        public BakeMainTextureMode mode = BakeMainTextureMode.OnlyBakeTexture;
+
+        public static BakeTextureParameter Create()
         {
-            this.onAfterCopy = onAfterCopy ?? (p => { });
-        }
-
-        public virtual bool Test(string version)
-        {
-            return true;
-        }
-
-        public abstract bool IsMatch(string beforeName);
-
-        protected abstract string Replace(string beforeName);
-
-        public virtual bool TryReplace(string beforeName, out string afterName)
-        {
-            if (IsMatch(beforeName))
-            {
-                afterName = Replace(beforeName);
-                return true;
-            }
-            else
-            {
-                afterName = null;
-                return false;
-            }
-        }
-
-        public static PropertyNameReplacement Match(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
-        {
-            return new MatchRename(bn, false, an, onAfterCopy);
-        }
-
-        public static PropertyNameReplacement MatchIgnoreCase(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
-        {
-            return new MatchRename(bn, true, an, onAfterCopy);
-        }
-
-        public static PropertyNameReplacement Prefix(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy = null)
-        {
-            return new PrefixRename(beforePrefix, afterPrefix, onAfterCopy);
-        }
-
-        public static PropertyNameReplacement Regex(string pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy = null)
-        {
-            return new RegexRename(new Regex(pattern, RegexOptions.Compiled), replacement, onAfterCopy);
-        }
-
-        public static PropertyNameReplacement Group(string version)
-        {
-            return new GroupCondition(version);
-        }
-
-        private class GroupCondition : PropertyNameReplacement
-        {
-            private readonly string version;
-
-            public GroupCondition(string version) : base(null)
-            {
-                this.version = version;
-            }
-
-            public override bool Test(string version)
-            {
-                if (string.IsNullOrWhiteSpace(version))
-                {
-                    return true;
-                }
-                // このグループのバージョンが、指定されたバージョン以下である場合
-                return this.version.CompareTo(version) <= 0;
-            }
-
-            public override bool IsMatch(string beforeName) => false;
-            protected override string Replace(string beforeName) => beforeName;
-        }
-
-
-        private class MatchRename : PropertyNameReplacement
-        {
-            private readonly string beforeName;
-            private readonly string afterName;
-            private readonly bool ignoreCase;
-
-            public MatchRename(string beforeName, bool ignoreCase, string afterName, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
-            {
-                this.beforeName = beforeName;
-                this.afterName = afterName;
-                this.ignoreCase = ignoreCase;
-            }
-
-            public override bool IsMatch(string beforeName) => string.Equals(this.beforeName, beforeName, 
-                ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
-            protected override string Replace(string beforeName) => afterName;
-        }
-
-        private class PrefixRename : PropertyNameReplacement
-        {
-            private readonly string beforePrefix;
-            private readonly string afterPrefix;
-
-            public PrefixRename(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
-            {
-                this.beforePrefix = beforePrefix;
-                this.afterPrefix = afterPrefix;
-            }
-
-            public override bool IsMatch(string beforeName) => beforeName.StartsWith(beforePrefix);
-            protected override string Replace(string beforeName) => afterPrefix + beforeName.Substring(beforePrefix.Length);
-        }
-
-        private class RegexRename : PropertyNameReplacement
-        {
-            private readonly Regex pattern;
-            private readonly string replacement;
-
-            public RegexRename(Regex pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
-            {
-                this.pattern = pattern;
-                this.replacement = replacement;
-            }
-
-            public override bool IsMatch(string beforeName) => pattern.IsMatch(beforeName);
-            protected override string Replace(string beforeName) => pattern.Replace(beforeName, replacement);
+            var result = ScriptableObject.CreateInstance<BakeTextureParameter>();
+            result.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
+            return result;
         }
     }
 
+    /// <summary>
+    /// UnlitWFのマテリアルを外部から編集するユーティリティ。
+    /// </summary>
     public static class WFMaterialEditUtility
     {
         #region マイグレーション
 
+        /// <summary>
+        /// マテリアルがマイグレーションを必要としているかを返却する。<br/>
+        /// <br/>
+        /// UnlitWFのマテリアルではない場合およびnullの場合はfalseを返却する。<br/>
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
         public static bool ExistsNeedsMigration(Material mat)
         {
             return Converter.WFMaterialMigrationConverter.ExistsNeedsMigration(mat);
@@ -263,11 +163,23 @@ namespace UnlitWF
             return false;
         }
 
+        /// <summary>
+        /// マテリアルをマイグレーションする。<br/>
+        /// <br/>
+        /// この処理はマテリアルのUndo.RecordObjectsを呼び出す。<br/>
+        /// </summary>
+        /// <param name="param"></param>
         public static void MigrationMaterial(MigrationParameter param)
         {
             MigrationMaterial(param.materials);
         }
 
+        /// <summary>
+        /// マテリアルをマイグレーションする。<br/>
+        /// <br/>
+        /// この処理はマテリアルのUndo.RecordObjectsを呼び出す。<br/>
+        /// </summary>
+        /// <param name="mats"></param>
         public static void MigrationMaterial(params Material[] mats)
         {
             Undo.RecordObjects(mats, "WF Migration materials");
@@ -280,12 +192,20 @@ namespace UnlitWF
         private static Material editReplaceTarget = null;
         private static ShaderSerializedProperty.RemovePropertyCache editReplaceNamesCache = null;
 
+        /// <summary>
+        /// マテリアルのプロパティを連続して変更するときにキャッシュを内部で保持する。
+        /// </summary>
+        /// <param name="mat"></param>
         public static void BeginReplacePropertyNames(Material mat)
         {
             editReplaceTarget = mat;
             editReplaceNamesCache = null;
         }
 
+        /// <summary>
+        /// マテリアルのプロパティ編集を終了して内部のキャッシュをクリアするために呼び出される。
+        /// </summary>
+        /// <param name="mat"></param>
         public static void EndReplacePropertyNames(Material mat)
         {
             if (mat == editReplaceTarget)
@@ -294,7 +214,6 @@ namespace UnlitWF
                 editReplaceNamesCache = null;
             }
         }
-
 
         internal static bool ReplacePropertyNamesWithoutUndo(Material mat, IEnumerable<PropertyNameReplacement> replacement)
         {
@@ -367,11 +286,23 @@ namespace UnlitWF
 
         #region コピー
 
+        /// <summary>
+        /// マテリアルの設定値を別のマテリアルにコピーする。<br/>
+        /// <br/>
+        /// この処理はマテリアルのUndo.RecordObjectsを呼び出す。<br/>
+        /// </summary>
+        /// <param name="param"></param>
         public static void CopyProperties(CopyPropParameter param)
         {
             copyProperties(param, true);
         }
 
+        /// <summary>
+        /// マテリアルの設定値を別のマテリアルにコピーする。<br/>
+        /// <br/>
+        /// この処理はマテリアルのUndo.RecordObjectsを呼び出さない。<br/>
+        /// </summary>
+        /// <param name="param"></param>
         internal static void CopyPropertiesWithoutUndo(CopyPropParameter param)
         {
             copyProperties(param, false);
@@ -486,7 +417,12 @@ namespace UnlitWF
         #region リセット・クリーンナップ
 
         /// <summary>
-        /// クリンナップのエントリポイント
+        /// マテリアルをクリンナップし、不要なプロパティをリセットする。<br/>
+        /// <br/>
+        /// UnlitWFのマテリアルを渡した場合、有効化されている機能などを考慮してクリンナップを実行する。<br/>
+        /// UnlitWF以外のマテリアルを渡した場合、WFマテリアル以外のクリンナップ処理が実行される。<br/>
+        /// <br/>
+        /// この処理はマテリアルのUndo.RecordObjectsを呼び出す。<br/>
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -624,7 +560,7 @@ namespace UnlitWF
             }
 
             var del_props = new List<ShaderSerializedProperty>();
-            foreach(var p in props)
+            foreach (var p in props)
             {
                 // プレフィックスに合致する設定値を消去
                 if (IsDisabledProperty(p, delPrefix))
@@ -681,7 +617,9 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// リセットのエントリポイント
+        /// マテリアルの設定値をリセットする。<br/>
+        /// <br/>
+        /// この処理はマテリアルのUndo.RecordObjectsを呼び出す。<br/>
         /// </summary>
         /// <param name="param"></param>
         public static void ResetProperties(ResetParameter param)
@@ -695,7 +633,9 @@ namespace UnlitWF
         }
 
         /// <summary>
-        /// リセットのエントリポイント(Undoなし)
+        /// マテリアルの設定値をリセットする。<br/>
+        /// <br/>
+        /// この処理はマテリアルのUndo.RecordObjectsを呼び出さない。<br/>
         /// </summary>
         /// <param name="param"></param>
         internal static void ResetPropertiesWithoutUndo(ResetParameter param)
@@ -893,7 +833,7 @@ namespace UnlitWF
             }
 
             // Enableトグルがオフになっているプレフィックスは復元しないので削除
-            foreach(var prop in ShaderMaterialProperty.AsList(material))
+            foreach (var prop in ShaderMaterialProperty.AsList(material))
             {
                 if (WFCommonUtility.FormatPropName(prop.Name, out var prefix, out var name) && WFCommonUtility.IsEnableToggle(prefix, name))
                 {
@@ -917,7 +857,7 @@ namespace UnlitWF
         {
             List<string> prop_names = new List<string>();
 
-            foreach(var p in ShaderMaterialProperty.AsList(material))
+            foreach (var p in ShaderMaterialProperty.AsList(material))
             {
                 var px = WFCommonUtility.GetPrefixFromPropName(p.Name);
                 if (prefixs.Contains(px))
@@ -979,6 +919,328 @@ namespace UnlitWF
         }
 
         #endregion
+
+        #region テクスチャベイク
+
+        public static void BakeMainTexture(BakeTextureParameter param)
+        {
+            Func<Material, Texture2D, Texture2D> saveTexture = null;
+            Func<Material, Material, Material> saveMaterial = null;
+
+            switch(param.mode)
+            {
+                case BakeMainTextureMode.OnlyBakeTexture:
+                    saveTexture = SaveTextureAsFile;
+                    saveMaterial = (srcMaterial, newMaterial) => newMaterial;
+                    break;
+
+                case BakeMainTextureMode.BakeAndUpdate:
+                    Undo.RecordObjects(param.materials, "Bake Texture and Update"); // BakeAndUpdate 以外はマテリアルを変更しないのでRecordObjectsしない
+                    saveTexture = SaveTextureAsFile;
+                    saveMaterial = CopyMaterialToSource;
+                    break;
+
+                case BakeMainTextureMode.BakeAndNew:
+                    saveTexture = SaveTextureAsFile;
+                    saveMaterial = SaveMaterialAsFile;
+                    break;
+            }
+
+            foreach (var srcMaterial in param.materials)
+            {
+                BakeMainTexture(srcMaterial, saveTexture, saveMaterial);
+            }
+
+            Texture2D SaveTextureAsFile(Material srcMaterial, Texture2D tex)
+            {
+                return AssetFileSaver.SaveAsFile(tex, WFAccessor.GetTexture(srcMaterial, "_MainTex"), importer =>
+                {
+                    importer.sRGBTexture = true;
+                    importer.alphaIsTransparency = true;
+                    importer.alphaSource = TextureImporterAlphaSource.FromInput;
+                    return true;
+                });
+            }
+
+            Material SaveMaterialAsFile(Material srcMaterial, Material newMaterial)
+            {
+                return AssetFileSaver.SaveAsFile(newMaterial, "Save New Material", "mat");
+            }
+
+            Material CopyMaterialToSource(Material srcMaterial, Material newMaterial)
+            {
+                EditorUtility.CopySerialized(newMaterial, srcMaterial);
+                EditorUtility.SetDirty(srcMaterial);
+                return srcMaterial;
+            }
+        }
+
+        public static bool BakeMainTexture(Material srcMaterial, 
+            Func<Material, Texture2D, Texture2D> saveTexture, Func<Material, Material, Material> saveMaterial, bool quiet = false)
+        {
+            // 元マテリアルをもとに判定
+            if (!IsUnlitWFMaterial(srcMaterial))
+            {
+                return false;
+            }
+
+            // ベイクして見た目が変化する場合は警告する
+            switch(ValidateMaterial(srcMaterial))
+            {
+                case -1: // 不要
+                    return false;
+                case 1: // 警告付き
+                    if (quiet || !EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, WFI18N.Translate(WFMessageText.DgBakeWarning), "OK", "Cancel"))
+                    {
+                        Debug.LogWarningFormat(srcMaterial, "[WF][Tool] {0}, mat = {1}", WFI18N.Translate(WFMessageText.LgWarnCancelBakeTexture), srcMaterial);
+                        return false;
+                    }
+                    break;
+            }
+
+            var transparent = srcMaterial.HasProperty("_AL_Source"); // _AL_Source がある場合はTransparentと判断する
+
+            // ベイク用マテリアル作成
+            var tempMat = new Material(srcMaterial);
+#if UNITY_2022_1_OR_NEWER
+            tempMat.parent = null;
+#endif
+            if (!WFCommonUtility.ChangeShader("Hidden/UnlitWF/WF_UnToon_BakeTexture", tempMat))
+            {
+                return false;
+            }
+            var _MainTex = WFAccessor.GetTexture(tempMat, "_MainTex");
+            if (_MainTex == null)
+            {
+                return false;
+            }
+            var width = _MainTex.width;
+            var height = _MainTex.height;
+
+            // ベイク用マテリアルの設定
+            tempMat.SetTextureScale("_MainTex", Vector2.one);
+            tempMat.SetTextureOffset("_MainTex", Vector2.zero);
+            if (transparent)
+            {
+                tempMat.EnableKeyword("_WF_ALPHA_BLEND");
+            }
+            WFAccessor.SetFloat(tempMat, "_AL_Power", 1);
+            WFAccessor.SetFloat(tempMat, "_AL_PowerMin", 0);
+
+            var color = WFAccessor.GetColor(tempMat, "_Color", Color.white);
+            var hdr = 1 < color.r || 1 < color.g || 1 < color.b;
+            if (hdr)
+            {
+                // HDRカラーの場合は Color をリセットして続行
+                WFAccessor.SetColor(tempMat, "_Color", new Color(1, 1, 1, color.a));
+            }
+
+            // ベイク本体
+            Texture2D newMainTex = null;
+            var oldRT = RenderTexture.active;
+            var tempRT = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGB32);
+            try
+            {
+                Graphics.Blit(_MainTex, tempRT, tempMat);
+
+                newMainTex = new Texture2D(width, height, TextureFormat.ARGB32, false);
+                RenderTexture.active = tempRT;
+                newMainTex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                newMainTex.Apply();
+            }
+            finally
+            {
+                RenderTexture.ReleaseTemporary(tempRT);
+                RenderTexture.active = oldRT;
+            }
+
+            // テクスチャ保存
+            newMainTex = saveTexture(srcMaterial, newMainTex);
+            if (newMainTex == null)
+            {
+                return false;
+            }
+
+            // 新マテリアル設定
+            var newMaterial = new Material(srcMaterial);
+            WFAccessor.SetTexture(newMaterial, "_MainTex", newMainTex);
+            if (!hdr)
+            {
+                WFAccessor.SetColor(newMaterial, "_Color", Color.white);
+            }
+            WFAccessor.SetInt(newMaterial, "_AL_Source", 0);
+            WFAccessor.SetTexture(newMaterial, "_AL_MaskTex", null);
+            WFAccessor.SetInt(newMaterial, "_AL_InvMaskVal", 0);
+            WFAccessor.SetInt(newMaterial, "_TX2_Enable", 0);
+            WFAccessor.SetInt(newMaterial, "_CGR_Enable", 0);
+            WFAccessor.SetInt(newMaterial, "_CLC_Enable", 0);
+
+            WFCommonUtility.SetupMaterial(newMaterial);
+            EditorUtility.SetDirty(newMaterial);
+
+            // マテリアル保存
+            newMaterial = saveMaterial(srcMaterial, newMaterial);
+
+            return newMaterial != null;
+
+            int ValidateMaterial(Material mat)
+            {
+                var _Color = WFAccessor.GetColor(mat, "_Color", Color.white);
+                var _AL_Source = WFAccessor.GetInt(mat, "_AL_Source", 0);
+                var _TX2_Enable = WFAccessor.GetBool(mat, "_TX2_Enable", false);
+                var _CGR_Enable = WFAccessor.GetBool(mat, "_CGR_Enable", false);
+                var _CLC_Enable = WFAccessor.GetBool(mat, "_CLC_Enable", false);
+                if (
+                    (_Color.r <= 1 && _Color.g <= 1 && _Color.b <= 1 && (_Color.r < 1 || _Color.g < 1 || _Color.b < 1))
+                    || _AL_Source != 0
+                    || _CGR_Enable
+                    || _CLC_Enable
+                    )
+                {
+                    var _UseVertexColor = WFAccessor.GetBool(mat, "_UseVertexColor", false);
+                    var _TX2_UVType = _TX2_Enable && WFAccessor.GetBool(mat, "_TX2_UVType", false);
+                    var _BKT_Enable = WFAccessor.GetBool(mat, "_BKT_Enable", false);
+                    if (_UseVertexColor || _TX2_UVType || _BKT_Enable)
+                    {
+                        return 1; // 警告付き
+                    }
+                    return 0; // ベイク可能
+                }
+                return -1; // 不要
+            }
+        }
+
+        #endregion
+    }
+
+    abstract class PropertyNameReplacement
+    {
+        public readonly Action<ShaderSerializedProperty> onAfterCopy;
+
+        public PropertyNameReplacement(Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            this.onAfterCopy = onAfterCopy ?? (p => { });
+        }
+
+        public virtual bool Test(string version)
+        {
+            return true;
+        }
+
+        public abstract bool IsMatch(string beforeName);
+
+        protected abstract string Replace(string beforeName);
+
+        public virtual bool TryReplace(string beforeName, out string afterName)
+        {
+            if (IsMatch(beforeName))
+            {
+                afterName = Replace(beforeName);
+                return true;
+            }
+            else
+            {
+                afterName = null;
+                return false;
+            }
+        }
+
+        public static PropertyNameReplacement Match(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new MatchRename(bn, false, an, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement MatchIgnoreCase(string bn, string an, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new MatchRename(bn, true, an, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement Prefix(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new PrefixRename(beforePrefix, afterPrefix, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement Regex(string pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy = null)
+        {
+            return new RegexRename(new Regex(pattern, RegexOptions.Compiled), replacement, onAfterCopy);
+        }
+
+        public static PropertyNameReplacement Group(string version)
+        {
+            return new GroupCondition(version);
+        }
+
+        private class GroupCondition : PropertyNameReplacement
+        {
+            private readonly string version;
+
+            public GroupCondition(string version) : base(null)
+            {
+                this.version = version;
+            }
+
+            public override bool Test(string version)
+            {
+                if (string.IsNullOrWhiteSpace(version))
+                {
+                    return true;
+                }
+                // このグループのバージョンが、指定されたバージョン以下である場合
+                return this.version.CompareTo(version) <= 0;
+            }
+
+            public override bool IsMatch(string beforeName) => false;
+            protected override string Replace(string beforeName) => beforeName;
+        }
+
+
+        private class MatchRename : PropertyNameReplacement
+        {
+            private readonly string beforeName;
+            private readonly string afterName;
+            private readonly bool ignoreCase;
+
+            public MatchRename(string beforeName, bool ignoreCase, string afterName, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            {
+                this.beforeName = beforeName;
+                this.afterName = afterName;
+                this.ignoreCase = ignoreCase;
+            }
+
+            public override bool IsMatch(string beforeName) => string.Equals(this.beforeName, beforeName, 
+                ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
+            protected override string Replace(string beforeName) => afterName;
+        }
+
+        private class PrefixRename : PropertyNameReplacement
+        {
+            private readonly string beforePrefix;
+            private readonly string afterPrefix;
+
+            public PrefixRename(string beforePrefix, string afterPrefix, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            {
+                this.beforePrefix = beforePrefix;
+                this.afterPrefix = afterPrefix;
+            }
+
+            public override bool IsMatch(string beforeName) => beforeName.StartsWith(beforePrefix);
+            protected override string Replace(string beforeName) => afterPrefix + beforeName.Substring(beforePrefix.Length);
+        }
+
+        private class RegexRename : PropertyNameReplacement
+        {
+            private readonly Regex pattern;
+            private readonly string replacement;
+
+            public RegexRename(Regex pattern, string replacement, Action<ShaderSerializedProperty> onAfterCopy) : base(onAfterCopy)
+            {
+                this.pattern = pattern;
+                this.replacement = replacement;
+            }
+
+            public override bool IsMatch(string beforeName) => pattern.IsMatch(beforeName);
+            protected override string Replace(string beforeName) => pattern.Replace(beforeName, replacement);
+        }
     }
 
     /// <summary>
