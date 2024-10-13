@@ -416,28 +416,26 @@ namespace UnlitWF
 
         private void CreateNewSettingsAsset()
         {
-            if (target == null)
-            {
-                return;
-            }
-            var path = EditorUtility.SaveFilePanelInProject("Create New Settings asset", "", "asset", "");
-            if (string.IsNullOrWhiteSpace(path))
+            var origin = target as WFEditorSetting;
+            if (origin == null)
             {
                 return;
             }
 
             // 現在の設定をコピーして新しいアセットとする
-            var newSettings = Instantiate((WFEditorSetting)target);
+            var newSettings = Instantiate(origin);
             // 優先度は現在有効になっている設定より小さくする
             newSettings.settingPriority = WFEditorSetting.GetOneOfSettings().settingPriority - 1;
 
-            // 新規作成
-            AssetDatabase.CreateAsset(newSettings, path);
-            // 選択する
-            Selection.activeObject = newSettings;
-
-            // リロード
-            WFEditorSetting.GetOneOfSettings(true);
+            // 保存
+            newSettings = AssetFileSaver.SaveAsFile(newSettings, "Create New Settings asset", "asset");
+            if (newSettings != null)
+            {
+                // 選択する
+                Selection.activeObject = newSettings;
+                // リロード
+                WFEditorSetting.GetOneOfSettings(true);
+            }
         }
 
         private GUIContent toDisplay(SerializedProperty p)

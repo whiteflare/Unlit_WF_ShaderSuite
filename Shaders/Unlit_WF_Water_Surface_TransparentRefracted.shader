@@ -141,7 +141,7 @@ Shader "UnlitWF/WF_Water_Surface_Transparent_Refracted" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/09/07 (2.3.0)", Float) = 0
+            _CurrentVersion         ("2024/10/14 (2.4.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/WF_Water_Surface_Transparent", Float) = 0

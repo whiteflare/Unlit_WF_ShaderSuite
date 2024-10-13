@@ -207,7 +207,7 @@ namespace UnlitWF
 
             if (0 < total)
             {
-                Debug.LogFormat("[WF] {0}: total {1} material converted", converter.GetShortName(), total);
+                Debug.LogFormat("[WF][Tool] {0}: total {1} material converted", converter.GetShortName(), total);
             }
         }
 
@@ -257,7 +257,7 @@ namespace UnlitWF
             var total = converter.ExecAutoConvert(cmd.context as Material);
             if (0 < total)
             {
-                Debug.LogFormat("[WF] {0}: total {1} material converted", converter.GetShortName(), total);
+                Debug.LogFormat("[WF][Tool] {0}: total {1} material converted", converter.GetShortName(), total);
             }
         }
 
@@ -278,7 +278,7 @@ namespace UnlitWF
             var total = seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, mat => converter.ExecAutoConvert(mat) != 0);
             if (0 < total)
             {
-                Debug.LogFormat("[WF] {0}: total {1} material converted", converter.GetShortName(), total);
+                Debug.LogFormat("[WF][Tool] {0}: total {1} material converted", converter.GetShortName(), total);
             }
         }
 

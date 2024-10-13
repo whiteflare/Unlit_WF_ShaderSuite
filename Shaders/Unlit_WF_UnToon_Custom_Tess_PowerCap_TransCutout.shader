@@ -352,6 +352,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_TransCutout" {
             _TR_Exponent            ("[TR] Exponent", Range(1, 8)) = 1
             _TR_BlendNormal         ("[TR] Blend Normal", Range(0, 1)) = 0
             _TR_BlendNormal2        ("[TR] Blend Normal 2nd", Range(0, 1)) = 0
+        [ToggleUI]
+            _TR_TintBaseCol         ("[TR] Tint Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
         [ToggleUI]
@@ -486,7 +488,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/09/07 (2.3.0)", Float) = 0
+            _CurrentVersion         ("2024/10/14 (2.4.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/WF_UnToon_TransCutout", Float) = 0

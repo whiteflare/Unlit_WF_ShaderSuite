@@ -315,6 +315,7 @@
     half            _TR_Feather;
     half            _TR_Exponent;
     half            _TR_InvMaskVal;
+    half            _TR_TintBaseCol;
     half            _TR_BlendNormal;
     half            _TR_BlendNormal2;
     half            _TR_WidthTop;
