@@ -132,7 +132,6 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
             _MT_BlendNormal         ("[MT] Blend Normal", Range(0, 1)) = 0.1
             _MT_BlendNormal2        ("[MT] Blend Normal 2nd", Range(0, 1)) = 0.1
             _MT_Monochrome          ("[MT] Monochrome Reflection", Range(0, 1)) = 0
-        [ToggleUI]
             _MT_GeomSpecAA          ("[MT] Geometric Specular AA", Range(0, 1)) = 1
         [NoScaleOffset]
             _MetallicGlossMap       ("[MT] MetallicSmoothnessMap Texture", 2D) = "white" {}
@@ -281,6 +280,8 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
             _TR_Exponent            ("[TR] Exponent", Range(1, 8)) = 1
             _TR_BlendNormal         ("[TR] Blend Normal", Range(0, 1)) = 0
             _TR_BlendNormal2        ("[TR] Blend Normal 2nd", Range(0, 1)) = 0
+        [ToggleUI]
+            _TR_TintBaseCol         ("[TR] Tint Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TR_MaskTex             ("[TR] Mask Texture (RGB)", 2D) = "white" {}
         [ToggleUI]
@@ -439,7 +440,7 @@ Shader "UnlitWF/UnToon_Tessellation/WF_UnToon_Tess_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/09/07 (2.3.0)", Float) = 0
+            _CurrentVersion         ("2024/10/14 (2.4.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", Float) = 0
