@@ -71,6 +71,8 @@ Shader "UnlitWF/WF_Gem_Opaque" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
+        [ToggleUI]
+            _ES_TintBaseCol         ("[ES] Tint Base Color", Range(0, 1)) = 0
         [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 

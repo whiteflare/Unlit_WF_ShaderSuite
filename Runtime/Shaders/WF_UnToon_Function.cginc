@@ -661,6 +661,7 @@ FEATURE_TGL_ON_BEGIN(_ES_Enable)
 
             float4 es_mask  = WF_TEX2D_EMISSION(d.uv_main);
             float4 es_color = _EmissionColor * es_mask.rgba;
+            es_color.rgb *= lerp(ONE_VEC3, d.base_color.rgb, _ES_TintBaseCol);
 
             // RGB側の合成
             d.color.rgb =

@@ -654,6 +654,7 @@ namespace UnlitWF
             // EmissiveScroll
             new WFI18NTranslation("ES", "Emission", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),
+            new WFI18NTranslation("ES", "Tint Base Color", "ベースカラーをEmission色に乗算"),
             new WFI18NTranslation("ES", "Enable EmissiveScroll", "スクロールを使用する"),
             new WFI18NTranslation("ES", "Wave Type", "波形"),
             new WFI18NTranslation("ES", "Wave Grad Tex", "波形グラデーションテクスチャ"),
