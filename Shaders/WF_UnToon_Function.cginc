@@ -762,6 +762,17 @@ FEATURE_TGL_END
         #define prepareDetailNormal(i, d)  d.ws_detail_normal = d.ws_bump_normal
     #endif
 
+
+#if defined(_NM_ENABLE) && defined(_NS_ENABLE)
+    #define LERP_NORMAL_MAPS(d, blendNormal, blendNormal2)  lerpNormals(lerpNormals(d.ws_normal, d.ws_bump_normal, blendNormal), d.ws_detail_normal, blendNormal2)
+#elif defined(_NM_ENABLE)
+    #define LERP_NORMAL_MAPS(d, blendNormal, blendNormal2)  lerpNormals(d.ws_normal, d.ws_bump_normal, blendNormal)
+#elif defined(_NS_ENABLE)
+    #define LERP_NORMAL_MAPS(d, blendNormal, blendNormal2)  lerpNormals(d.ws_normal, d.ws_detail_normal, blendNormal2)
+#else
+    #define LERP_NORMAL_MAPS(d, blendNormal, blendNormal2)  (d.ws_normal)
+#endif
+
     ////////////////////////////
     // Metallic
     ////////////////////////////
@@ -816,13 +827,7 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
 
             // Metallic描画
             if (0.01 < metallic) {
-                float3 ws_metal_normal = d.ws_normal;
-#ifdef _NM_ENABLE
-                ws_metal_normal = lerpNormals(ws_metal_normal, d.ws_bump_normal, _MT_BlendNormal);
-#endif
-#ifdef _NS_ENABLE
-                ws_metal_normal = lerpNormals(ws_metal_normal, d.ws_detail_normal, _MT_BlendNormal2);
-#endif
+                float3 ws_metal_normal = LERP_NORMAL_MAPS(d, _MT_BlendNormal, _MT_BlendNormal2);
                 float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
                 float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
 
@@ -1156,13 +1161,7 @@ FEATURE_TGL_ON_BEGIN(_TS_Enable)
             }
 
             // 陰用法線とライト方向から Harf-Lambert
-            float3 ws_shade_normal = d.ws_normal;
-#ifdef _NM_ENABLE
-            ws_shade_normal = lerpNormals(ws_shade_normal, d.ws_bump_normal, _TS_BlendNormal);
-#endif
-#ifdef _NS_ENABLE
-            ws_shade_normal = lerpNormals(ws_shade_normal, d.ws_detail_normal, _TS_BlendNormal2);
-#endif
+            float3 ws_shade_normal = LERP_NORMAL_MAPS(d, _TS_BlendNormal, _TS_BlendNormal2);
             float brightness = lerp(dot(ws_shade_normal, d.ws_light_dir), 1, 0.5);  // 0.0 ～ 1.0
 
             // アンチシャドウマスク加算
