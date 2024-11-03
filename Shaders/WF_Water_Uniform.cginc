@@ -143,6 +143,7 @@
     #define _GL_LevelMax        1
     #define _GL_BlendPower      1
     #define _GL_DisableBasePos  0
+    #define _GL_LitOverride     0
 
     // -------------------------
 

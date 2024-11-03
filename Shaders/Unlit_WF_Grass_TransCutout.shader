@@ -68,10 +68,10 @@ Shader "UnlitWF/WF_Grass_TransCutout" {
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
         [WFHeader(Lit)]
-        [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
-        [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+        [WF_FixFloat(0.0)]
+            _GL_LevelTweak          ("Tweak Intensity", Float) = 0
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1

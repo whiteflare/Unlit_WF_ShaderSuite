@@ -55,6 +55,7 @@
     #define _GL_CustomAltitude  0
     #define _GL_CustomLitPos    0
     #define _GL_DisableBasePos  0
+    #define _GL_LitOverride     0
 
     // -------------------------
 
