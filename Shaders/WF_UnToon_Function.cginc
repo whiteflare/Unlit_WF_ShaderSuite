@@ -355,36 +355,51 @@ FEATURE_TGL_END
 
 #if defined(_GL_AUTO_ENABLE)
 
-		if (TGL_OFF(_GL_LitOverride)) {
-	        uint mode = calcAutoSelectMainLight(ws_vertex);
-	        if (mode == LIT_MODE_ONLY_DIR_LIT) {
-	            return float4( getMainLightDirection() , +1 );
-	        }
-	        if (mode == LIT_MODE_ONLY_POINT_LIT) {
-	            return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
-	        }
-		}
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
+        if (TGL_OFF(_GL_LitOverride)) {
+            uint mode = calcAutoSelectMainLight(ws_vertex);
+            if (mode == LIT_MODE_ONLY_DIR_LIT) {
+                return float4( getMainLightDirection() , +1 );
+            }
+            else if (mode == LIT_MODE_ONLY_POINT_LIT) {
+                return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
+        }
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
+        }
 
 #elif defined(_GL_ONLYDIR_ENABLE)
 
-		if (TGL_OFF(_GL_LitOverride)) {
-	        float3 dir = getMainLightDirection();
-	        if (any(dir)) {
-	            return float4( dir , +1 );
-	        }
+        if (TGL_OFF(_GL_LitOverride)) {
+            float3 dir = getMainLightDirection();
+            if (any(dir)) {
+                return float4( dir , +1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
         }
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
+        }
 
 #elif defined(_GL_ONLYPOINT_ENABLE)
 
-		if (TGL_OFF(_GL_LitOverride)) {
-	        float3 dir = calcPointLight1WorldDir(ws_vertex);
-	        if (any(dir)) {
-	            return float4( dir , -1 );
-	        }
-	    }
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
+        if (TGL_OFF(_GL_LitOverride)) {
+            float3 dir = calcPointLight1WorldDir(ws_vertex);
+            if (any(dir)) {
+                return float4( dir , -1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
+        }
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
+        }
 
 #elif defined(_GL_WSDIR_ENABLE)
 
@@ -405,21 +420,21 @@ FEATURE_TGL_END
             mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
-			if (TGL_OFF(_GL_LitOverride)) {
-	            float3 dir = getMainLightDirection();
-	            if (any(dir)) {
-	                return float4( dir , +1 );
-	            }
-	            mode = LIT_MODE_CUSTOM_WORLDSPACE;
-	        }
+            if (TGL_OFF(_GL_LitOverride)) {
+                float3 dir = getMainLightDirection();
+                if (any(dir)) {
+                    return float4( dir , +1 );
+                }
+                mode = LIT_MODE_CUSTOM_WORLDSPACE;
+            }
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
-			if (TGL_OFF(_GL_LitOverride)) {
-	            float3 dir = calcPointLight1WorldDir(ws_vertex);
-	            if (any(dir)) {
-	                return float4( dir , -1 );
-	            }
-	        }
+            if (TGL_OFF(_GL_LitOverride)) {
+                float3 dir = calcPointLight1WorldDir(ws_vertex);
+                if (any(dir)) {
+                    return float4( dir , -1 );
+                }
+            }
             mode = LIT_MODE_CUSTOM_WORLDSPACE;
         }
         if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
@@ -444,7 +459,7 @@ FEATURE_TGL_END
         float3 lightColorMain = sampleMainLightColor();
         float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
 
-        half level_min = GammaToCurrentColorSpace(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
+        half level_min = GammaToCurrentColorSpaceExact(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
         half level_max = _GL_LevelMax;
 
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
