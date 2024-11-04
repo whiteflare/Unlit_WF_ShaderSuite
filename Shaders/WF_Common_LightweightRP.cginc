@@ -84,6 +84,7 @@
     #define UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(tex, name, dir, lod)       SAMPLE_TEXTURECUBE_LOD(tex, sampler##name, dir, lod)
 
     #define GammaToLinearSpace          SRGBToLinear
+    #define GammaToLinearSpaceExact     SRGBToLinear
     #define LinearToGammaSpace          LinearToSRGB
     #define UNITY_TWO_PI                6.28318530718f
     #define UNITY_INV_TWO_PI            0.15915494309f
