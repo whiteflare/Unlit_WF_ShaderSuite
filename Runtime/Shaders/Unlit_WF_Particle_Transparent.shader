@@ -108,10 +108,10 @@ Shader "UnlitWF/WF_Particle_Transparent" {
 
         [WFHeaderToggle(Lit)]
             _GL_Enable              ("[GL] Enable", Float) = 0
-        [Gamma]
             _GL_LevelMin            ("[GL] Unlit Intensity", Range(0, 1)) = 0.125
-        [Gamma]
             _GL_LevelMax            ("[GL] Saturate Intensity", Range(0, 1)) = 0.8
+        [WF_FixFloat(0.0)]
+            _GL_LevelTweak          ("Tweak Intensity", Float) = 0
             _GL_BlendPower          ("[GL] Chroma Reaction", Range(0, 1)) = 0.8
 
         [HideInInspector]

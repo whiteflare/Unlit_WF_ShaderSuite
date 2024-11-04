@@ -355,30 +355,51 @@ FEATURE_TGL_END
 
 #if defined(_GL_AUTO_ENABLE)
 
-        uint mode = calcAutoSelectMainLight(ws_vertex);
-        if (mode == LIT_MODE_ONLY_DIR_LIT) {
-            return float4( getMainLightDirection() , +1 );
+        if (TGL_OFF(_GL_LitOverride)) {
+            uint mode = calcAutoSelectMainLight(ws_vertex);
+            if (mode == LIT_MODE_ONLY_DIR_LIT) {
+                return float4( getMainLightDirection() , +1 );
+            }
+            else if (mode == LIT_MODE_ONLY_POINT_LIT) {
+                return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
         }
-        if (mode == LIT_MODE_ONLY_POINT_LIT) {
-            return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
         }
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
 
 #elif defined(_GL_ONLYDIR_ENABLE)
 
-        float3 dir = getMainLightDirection();
-        if (any(dir)) {
-            return float4( dir , +1 );
+        if (TGL_OFF(_GL_LitOverride)) {
+            float3 dir = getMainLightDirection();
+            if (any(dir)) {
+                return float4( dir , +1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
         }
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
+        }
 
 #elif defined(_GL_ONLYPOINT_ENABLE)
 
-        float3 dir = calcPointLight1WorldDir(ws_vertex);
-        if (any(dir)) {
-            return float4( dir , -1 );
+        if (TGL_OFF(_GL_LitOverride)) {
+            float3 dir = calcPointLight1WorldDir(ws_vertex);
+            if (any(dir)) {
+                return float4( dir , -1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
         }
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
+        }
 
 #elif defined(_GL_WSDIR_ENABLE)
 
@@ -399,16 +420,20 @@ FEATURE_TGL_END
             mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
-            float3 dir = getMainLightDirection();
-            if (any(dir)) {
-                return float4( dir , +1 );
+            if (TGL_OFF(_GL_LitOverride)) {
+                float3 dir = getMainLightDirection();
+                if (any(dir)) {
+                    return float4( dir , +1 );
+                }
+                mode = LIT_MODE_CUSTOM_WORLDSPACE;
             }
-            mode = LIT_MODE_CUSTOM_WORLDSPACE;
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
-            float3 dir = calcPointLight1WorldDir(ws_vertex);
-            if (any(dir)) {
-                return float4( dir , -1 );
+            if (TGL_OFF(_GL_LitOverride)) {
+                float3 dir = calcPointLight1WorldDir(ws_vertex);
+                if (any(dir)) {
+                    return float4( dir , -1 );
+                }
             }
             mode = LIT_MODE_CUSTOM_WORLDSPACE;
         }
@@ -434,11 +459,14 @@ FEATURE_TGL_END
         float3 lightColorMain = sampleMainLightColor();
         float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
 
+        half level_min = GammaToCurrentColorSpaceExact(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
+        half level_max = _GL_LevelMax;
+
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
         float power = MAX_RGB(color);                       // 明度
         color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
         color /= power;                                     // 正規化(colorはゼロではないのでpowerが0除算になることはない)
-        color *= lerp(saturate(power / NON_ZERO_FLOAT(_GL_LevelMax)), 1, _GL_LevelMin);  // 明度のsaturateと書き戻し
+        color *= lerp(saturate(power / NON_ZERO_FLOAT(level_max)), 1, level_min);  // 明度のsaturateと書き戻し
         return color;
     }
 
@@ -762,6 +790,17 @@ FEATURE_TGL_END
         #define prepareDetailNormal(i, d)  d.ws_detail_normal = d.ws_bump_normal
     #endif
 
+
+#if defined(_NM_ENABLE) && defined(_NS_ENABLE)
+    #define LERP_NORMAL_MAPS(d, blendNormal, blendNormal2)  lerpNormals(lerpNormals(d.ws_normal, d.ws_bump_normal, blendNormal), d.ws_detail_normal, blendNormal2)
+#elif defined(_NM_ENABLE)
+    #define LERP_NORMAL_MAPS(d, blendNormal, blendNormal2)  lerpNormals(d.ws_normal, d.ws_bump_normal, blendNormal)
+#elif defined(_NS_ENABLE)
+    #define LERP_NORMAL_MAPS(d, blendNormal, blendNormal2)  lerpNormals(d.ws_normal, d.ws_detail_normal, blendNormal2)
+#else
+    #define LERP_NORMAL_MAPS(d, blendNormal, blendNormal2)  (d.ws_normal)
+#endif
+
     ////////////////////////////
     // Metallic
     ////////////////////////////
@@ -816,13 +855,7 @@ FEATURE_TGL_ON_BEGIN(_MT_Enable)
 
             // Metallic描画
             if (0.01 < metallic) {
-                float3 ws_metal_normal = d.ws_normal;
-#ifdef _NM_ENABLE
-                ws_metal_normal = lerpNormals(ws_metal_normal, d.ws_bump_normal, _MT_BlendNormal);
-#endif
-#ifdef _NS_ENABLE
-                ws_metal_normal = lerpNormals(ws_metal_normal, d.ws_detail_normal, _MT_BlendNormal2);
-#endif
+                float3 ws_metal_normal = LERP_NORMAL_MAPS(d, _MT_BlendNormal, _MT_BlendNormal2);
                 float reflSmooth = metalGlossMap.a * _MT_ReflSmooth;
                 float specSmooth = metalGlossMap.a * _MT_SpecSmooth;
 
@@ -1156,13 +1189,7 @@ FEATURE_TGL_ON_BEGIN(_TS_Enable)
             }
 
             // 陰用法線とライト方向から Harf-Lambert
-            float3 ws_shade_normal = d.ws_normal;
-#ifdef _NM_ENABLE
-            ws_shade_normal = lerpNormals(ws_shade_normal, d.ws_bump_normal, _TS_BlendNormal);
-#endif
-#ifdef _NS_ENABLE
-            ws_shade_normal = lerpNormals(ws_shade_normal, d.ws_detail_normal, _TS_BlendNormal2);
-#endif
+            float3 ws_shade_normal = LERP_NORMAL_MAPS(d, _TS_BlendNormal, _TS_BlendNormal2);
             float brightness = lerp(dot(ws_shade_normal, d.ws_light_dir), 1, 0.5);  // 0.0 ～ 1.0
 
             // アンチシャドウマスク加算
