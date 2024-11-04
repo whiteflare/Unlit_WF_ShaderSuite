@@ -554,6 +554,7 @@ namespace UnlitWF
             new WFI18NTranslation("Cast Shadows", "他の物体に影を落とす"),
             new WFI18NTranslation("Shadow Cutoff Threshold", "影のカットアウトしきい値"),
             new WFI18NTranslation("Use CameraDepthTexture", "CameraDepthTexture を使う"),
+            new WFI18NTranslation("Light Direction Override", "ライト方向をオーバーライド"),
             // Alpha
             new WFI18NTranslation("AL", "Alpha Source", "アルファソース"),
             new WFI18NTranslation("AL", "Alpha Mask Texture", "アルファマスク"),
@@ -654,6 +655,7 @@ namespace UnlitWF
             // EmissiveScroll
             new WFI18NTranslation("ES", "Emission", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),
+            new WFI18NTranslation("ES", "Tint Base Color", "ベースカラーをEmission色に乗算"),
             new WFI18NTranslation("ES", "Enable EmissiveScroll", "スクロールを使用する"),
             new WFI18NTranslation("ES", "Wave Type", "波形"),
             new WFI18NTranslation("ES", "Wave Grad Tex", "波形グラデーションテクスチャ"),

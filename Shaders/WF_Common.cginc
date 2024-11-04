@@ -59,7 +59,23 @@
     #define TGL_OFF(value)  (value < 0.5)
     #define TGL_01(value)   step(0.5, value)
 
-    static const half3 MEDIAN_GRAY = IsGammaSpace() ? half3(0.5, 0.5, 0.5) : GammaToLinearSpace( half3(0.5, 0.5, 0.5) );
+    float GammaToCurrentColorSpace(float v) {
+#ifdef UNITY_COLORSPACE_GAMMA
+        return v;
+#else
+        return GammaToLinearSpaceExact(v);
+#endif
+    }
+
+    half3 GammaToCurrentColorSpace(half3 v) {
+#ifdef UNITY_COLORSPACE_GAMMA
+        return v;
+#else
+        return GammaToLinearSpace(v);
+#endif
+    }
+
+    static const half3 MEDIAN_GRAY = GammaToCurrentColorSpace(half3(0.5, 0.5, 0.5));
 
     #define MAX3(r, g, b)   max(r, max(g, b) )
     #define AVE3(r, g, b)   ((r + g + b) / 3)

@@ -140,8 +140,10 @@
     half            _GL_ShadowCutoff;
     half            _GL_LevelMin;
     half            _GL_LevelMax;
+    half            _GL_LevelTweak;
     half            _GL_BlendPower;
     uint            _GL_LightMode;
+    half            _GL_LitOverride;
     half            _GL_CustomAzimuth;
     half            _GL_CustomAltitude;
     half3           _GL_CustomLitPos;
@@ -181,6 +183,7 @@
     half4           _EmissionColor;
     uint            _ES_BlendType;
     half            _ES_ChangeAlpha;
+    half            _ES_TintBaseCol;
 
     half            _ES_ScrollEnable;
     uint            _ES_SC_Shape;
