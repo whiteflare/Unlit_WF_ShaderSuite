@@ -294,6 +294,23 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
+        [WFHeaderToggle(BackLight)]
+            _TBL_Enable              ("[TBL] Enable", Float) = 0
+        [HDR]
+            _TBL_Color               ("[TBL] Back Light Color", Color) = (1, 1, 1, 1)
+            _TBL_Power               ("[TBL] Power", Range(0, 1)) = 1
+            _TBL_Angle               ("[TBL] Angle of Visibility", Range(0, 1)) = 0.3
+            _TBL_Width               ("[TBL] Width", Range(0, 1)) = 0.1
+            _TBL_Feather             ("[TBL] Feather", Range(0, 1)) = 0.05
+            _TBL_BlendNormal         ("[TBL] Blend Normal", Range(0, 1)) = 0.1
+            _TBL_BlendNormal2        ("[TBL] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [ToggleUI]
+            _TBL_TintBaseCol         ("[TBL] Tint Base Color", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TBL_MaskTex             ("[TBL] Mask Texture (RGB)", 2D) = "white" {}
+        [ToggleUI]
+            _TBL_InvMaskVal          ("[TBL] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(Overlay Texture)]
             _OVL_Enable             ("[OVL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
@@ -397,6 +414,18 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             _ES_AU_DelayReverse     ("[ES] Delay Reverse", Float) = 0
             _ES_AU_DelayHistory     ("[ES] Delay Length", Range(0,128)) = 32
 
+        [WFHeaderToggle(Dissolve)]
+            _DSV_Enable             ("[DSV] Enable", Float) = 0
+            _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
+        [ToggleUI]
+            _DSV_Invert             ("[DSV] Invert", Range(0, 1)) = 0
+            _DSV_CtrlTex            ("[DSV] Control Texture (R)", 2D) = "black" {}
+        [ToggleUI]
+            _DSV_TexIsSRGB          ("[DSV] sRGB", Range(0, 1)) = 1
+        [HDR]
+            _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
+            _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
+
         [WFHeader(Lit)]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
@@ -467,6 +496,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
 
             #define _WF_ALPHA_FRESNEL
 
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
@@ -488,6 +518,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #pragma shader_feature_local_fragment _CLC_ENABLE
             #pragma shader_feature_local_fragment _CRF_ENABLE
             #pragma shader_feature_local_fragment _DFD_ENABLE
+            #pragma shader_feature_local_fragment _DSV_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
@@ -495,6 +526,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_Refracted" {
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonRefractionBack

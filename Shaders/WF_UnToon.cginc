@@ -244,6 +244,7 @@
         drawToonShade(d);           // 階調影
         drawRimShadow(d);           // リムシャドウ
         drawRimLight(d);            // リムライト
+        drawBackLight(d);           // バックライト
 
         drawOverlayTexture(d);      // オーバーレイ
         drawOutline(d);             // アウトライン

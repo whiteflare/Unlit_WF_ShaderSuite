@@ -68,6 +68,7 @@
         d.color.rgb *= d.light_color;
 
         drawOcclusion(d);           // オクルージョンとライトマップ
+        drawDissolve(d);            // ディゾルブ
 
         return d.color;
     }
