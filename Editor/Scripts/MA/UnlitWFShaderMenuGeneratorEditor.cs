@@ -46,11 +46,12 @@ namespace UnlitWF.MA
 
 #if ENV_VRCSDK3_AVATAR
         [MenuItem(WFMenu.GAMEOBJECT_AVATARMENU, priority = 11)] // GameObject/配下は priority の扱いがちょっと特殊
-        private static void Generate_GameObject()
+        private static void Generate_GameObject(MenuCommand menuCommand)
         {
-            foreach(var go in Selection.gameObjects)
+            var go = menuCommand.context as GameObject;
+            if (go != null)
             {
-                var desc = go.GetComponentInParent<VRC_AvatarDescriptor>();
+                var desc = go.GetComponentInParent<VRC_AvatarDescriptor>(true);
                 if (desc != null)
                 {
                     var menuGo = new GameObject();
