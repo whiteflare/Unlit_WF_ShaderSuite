@@ -1,0 +1,23 @@
+{
+    "name": "jp.whiteflare.unlitwf",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "VRCSDKBase.dll",
+        "VRCSDK3.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.vrchat.avatars",
+            "expression": "[3.0.0,4.0.0)",
+            "define": "ENV_VRCSDK3_AVATAR"
+        }
+    ],
+    "noEngineReferences": false
+}

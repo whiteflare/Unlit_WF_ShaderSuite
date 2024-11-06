@@ -1,6 +1,10 @@
 {
     "name": "jp.whiteflare.unlitwf.Editor",
-    "references": [],
+    "references": [
+        "GUID:b7ab6cb77569a58459a037b298aa8569",
+        "GUID:62ced99b048af7f4d8dfe4bed8373d76",
+        "GUID:fc900867c0f47cd49b6e2ae4ef907300"
+    ],
     "includePlatforms": [
         "Editor"
     ],
@@ -25,6 +29,11 @@
             "name": "com.vrchat.avatars",
             "expression": "[3.0.0,4.0.0)",
             "define": "ENV_VRCSDK3_AVATAR"
+        },
+        {
+            "name": "nadena.dev.modular-avatar",
+            "expression": "[1.10.0,2.0.0)",
+            "define": "ENV_MA"
         }
     ],
     "noEngineReferences": false
