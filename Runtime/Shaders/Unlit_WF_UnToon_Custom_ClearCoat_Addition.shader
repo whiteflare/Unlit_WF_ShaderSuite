@@ -142,6 +142,18 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
+        [WFHeaderToggle(Dissolve)]
+            _DSV_Enable             ("[DSV] Enable", Float) = 0
+            _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
+        [ToggleUI]
+            _DSV_Invert             ("[DSV] Invert", Range(0, 1)) = 0
+            _DSV_CtrlTex            ("[DSV] Control Texture (R)", 2D) = "black" {}
+        [ToggleUI]
+            _DSV_TexIsSRGB          ("[DSV] sRGB", Range(0, 1)) = 1
+        [HDR]
+            _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
+            _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
+
         [WFHeader(Lit)]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
@@ -206,6 +218,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Addition" {
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _DSV_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _MT_ENABLE

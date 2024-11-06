@@ -306,6 +306,23 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
+        [WFHeaderToggle(BackLight)]
+            _TBL_Enable              ("[TBL] Enable", Float) = 0
+        [HDR]
+            _TBL_Color               ("[TBL] Back Light Color", Color) = (1, 1, 1, 1)
+            _TBL_Power               ("[TBL] Power", Range(0, 1)) = 1
+            _TBL_Angle               ("[TBL] Angle of Visibility", Range(0, 1)) = 0.3
+            _TBL_Width               ("[TBL] Width", Range(0, 1)) = 0.1
+            _TBL_Feather             ("[TBL] Feather", Range(0, 1)) = 0.05
+            _TBL_BlendNormal         ("[TBL] Blend Normal", Range(0, 1)) = 0.1
+            _TBL_BlendNormal2        ("[TBL] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [ToggleUI]
+            _TBL_TintBaseCol         ("[TBL] Tint Base Color", Range(0, 1)) = 0
+        [NoScaleOffset]
+            _TBL_MaskTex             ("[TBL] Mask Texture (RGB)", 2D) = "white" {}
+        [ToggleUI]
+            _TBL_InvMaskVal          ("[TBL] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(Overlay Texture)]
             _OVL_Enable             ("[OVL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
@@ -652,6 +669,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #pragma multi_compile_fwdbase

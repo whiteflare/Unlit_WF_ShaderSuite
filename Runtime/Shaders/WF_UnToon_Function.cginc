@@ -125,6 +125,10 @@
         #define WF_TEX2D_RIM_MASK(uv)           SAMPLE_MASK_VALUE(_TR_MaskTex, uv, _TR_InvMaskVal).rgb
     #endif
 
+    #ifndef WF_TEX2D_BACKLIT_MASK
+        #define WF_TEX2D_BACKLIT_MASK(uv)       SAMPLE_MASK_VALUE(_TBL_MaskTex, uv, _TBL_InvMaskVal).rgb
+    #endif
+
     #ifndef WF_TEX2D_RIM_SHADOW_MASK
         #define WF_TEX2D_RIM_SHADOW_MASK(uv)    SAMPLE_MASK_VALUE(_TM_MaskTex, uv, _TM_InvMaskVal).r
     #endif
@@ -1327,6 +1331,31 @@ FEATURE_TGL_END
 
     #else
         #define drawRimLight(d)
+    #endif
+
+    ////////////////////////////
+    // Back Light
+    ////////////////////////////
+
+    #ifdef _TBL_ENABLE
+
+        void drawBackLight(inout drawing d) {
+FEATURE_TGL_ON_BEGIN(_TBL_Enable)
+            // 色計算
+            float3 rimColor = _TBL_Color.rgb * WF_TEX2D_BACKLIT_MASK(d.uv_main) * lerp(ONE_VEC3, d.base_color.rgb, _TBL_TintBaseCol);
+
+            float3 ws_light_dir = d.ws_light_dir * float3(1, 0, 1);
+            float3 ws_backlit_normal = LERP_NORMAL_MAPS(d, _TBL_BlendNormal, _TBL_BlendNormal2);
+            float power = smoothstep(-_TBL_Feather, NZF, _TBL_Width + dot(ws_light_dir, ws_backlit_normal + (SafeNormalizeVec3(ws_light_dir) + d.ws_view_dir)))
+                * (1 - smoothstep(-1 - NZF, _TBL_Angle - 1, d.angle_light_camera)) * pow(saturate(1 - abs(ws_backlit_normal.y)), 2);
+
+            // 合成
+            d.color.rgb += max(ZERO_VEC3, rimColor * power * _TBL_Power);
+FEATURE_TGL_END
+        }
+
+    #else
+        #define drawBackLight(d)
     #endif
 
     ////////////////////////////

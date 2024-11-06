@@ -45,6 +45,7 @@
     DECL_SUB_TEX2D      (_TM_MaskTex);
     DECL_SUB_TEX2D      (_TR_MaskTex);
     DECL_SUB_TEX2D      (_TS_MaskTex);
+    DECL_SUB_TEX2D      (_TBL_MaskTex);
 #ifndef _WF_AO_ONLY_LMAP
     DECL_SUB_TEX2D      (_OcclusionMap);
 #endif
@@ -339,6 +340,19 @@
     half            _TM_WidthTop;
     half            _TM_WidthSide;
     half            _TM_WidthBottom;
+
+    // -------------------------
+
+    FEATURE_TGL    (_TBL_Enable);
+    half3           _TBL_Color;
+    half            _TBL_Power;
+    half            _TBL_Angle;
+    half            _TBL_Width;
+    half            _TBL_Feather;
+    half            _TBL_InvMaskVal;
+    half            _TBL_TintBaseCol;
+    half            _TBL_BlendNormal;
+    half            _TBL_BlendNormal2;
 
     // -------------------------
 
