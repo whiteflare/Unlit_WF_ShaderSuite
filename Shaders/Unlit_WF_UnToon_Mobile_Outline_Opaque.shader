@@ -231,7 +231,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_Opaque" {
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
         [WF_FixFloat(0.0)]
-            _GL_LevelTweak          ("Tweak Intensity", Float) = 0
+            _GL_LevelTweak          ("Tweak Intensity", Range(-1, 1)) = 0
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
