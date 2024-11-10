@@ -33,6 +33,8 @@ namespace UnlitWF.MA
         , VRC.SDKBase.IEditorOnly
 #endif
     {
+        public string menuName = "UnlitWF";
+
         [System.NonSerialized] public bool generateLitMin = false;
         [System.NonSerialized] public bool generateLitDirection = false;
         [System.NonSerialized] public bool generateLitOverride = false;

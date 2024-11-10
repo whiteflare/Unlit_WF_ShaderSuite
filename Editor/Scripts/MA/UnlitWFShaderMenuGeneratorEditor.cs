@@ -34,14 +34,27 @@ namespace UnlitWF.MA
     [CustomEditor(typeof(UnlitWFShaderMenuGenerator))]
     public class UnlitWFShaderMenuGeneratorEditor : Editor
     {
+        private SerializedProperty menuName;
+
+        public void OnEnable()
+        {
+            menuName = serializedObject.FindProperty("menuName");
+        }
+
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
             var component = target as UnlitWFShaderMenuGenerator;
             if (component == null)
             {
                 return;
             }
             EditorGUILayout.HelpBox("UnlitWF マテリアルを使用している場合、Exメニューに項目が追加されます", MessageType.Info);
+
+            EditorGUILayout.PropertyField(menuName);
+
+            serializedObject.ApplyModifiedProperties();
         }
 
 #if ENV_VRCSDK3_AVATAR

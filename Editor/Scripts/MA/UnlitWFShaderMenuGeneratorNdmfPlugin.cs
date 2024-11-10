@@ -97,7 +97,13 @@ namespace UnlitWF.MA
             goMenuRoot.AddComponent<ModularAvatarMenuGroup>();
             var pa = goMenuRoot.AddComponent<ModularAvatarParameters>();
 
-            var goMenuUnlitWF = CreateSubGameObject(goMenuRoot, "UnlitWF");
+            var menuName = component.menuName;
+            if (string.IsNullOrWhiteSpace(menuName))
+            {
+                menuName = "UnlitWF";
+            }
+
+            var goMenuUnlitWF = CreateSubGameObject(goMenuRoot, menuName);
             {
                 var mi = goMenuUnlitWF.AddComponent<ModularAvatarMenuItem>();
                 mi.Control.type = ControlType.SubMenu;
@@ -113,7 +119,7 @@ namespace UnlitWF.MA
             if (component.generateLitDirection)
             {
                 var text = lang == EditorLanguage.日本語 ? "ライト方向" : "Lit Direction";
-                AddMenuItem(goMenuUnlitWF, text, pa, PN_LitDirection, ParameterSyncType.Float, ControlType.RadialPuppet, 0f);
+                AddMenuItem(goMenuUnlitWF, text, pa, PN_LitDirection, ParameterSyncType.Float, ControlType.RadialPuppet, 0.5f);
             }
             if (component.generateLitOverride)
             {
