@@ -353,6 +353,7 @@
     half            _TBL_TintBaseCol;
     half            _TBL_BlendNormal;
     half            _TBL_BlendNormal2;
+    half            _TBL_CameraCorrection;
 
     // -------------------------
 

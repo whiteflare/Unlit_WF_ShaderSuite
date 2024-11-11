@@ -1347,7 +1347,7 @@ FEATURE_TGL_ON_BEGIN(_TBL_Enable)
             float3 ws_light_dir = SafeNormalizeVec3(d.ws_light_dir * float3(1, 0, 1));
             float3 ws_view_dir = SafeNormalizeVec3(d.ws_view_dir * float3(1, 0, 1));
             float3 ws_backlit_normal = LERP_NORMAL_MAPS(d, _TBL_BlendNormal, _TBL_BlendNormal2);
-            float power = smoothstep(-_TBL_Feather, NZF, _TBL_Width + dot(ws_light_dir, ws_backlit_normal + ws_light_dir + ws_view_dir))
+            float power = smoothstep(-_TBL_Feather, NZF, _TBL_Width + dot(ws_light_dir, ws_backlit_normal - (ws_light_dir + ws_view_dir) * _TBL_CameraCorrection))
                 * (1 - smoothstep(-1 - NZF, _TBL_Angle - 1, d.angle_light_camera)) * pow(saturate(1 - abs(ws_backlit_normal.y)), 2);
 
             // 合成
