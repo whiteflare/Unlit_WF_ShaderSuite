@@ -651,6 +651,7 @@ namespace UnlitWF
             new WFI18NTranslation("TBL", "Back Light Color", "バックライト色"),
             new WFI18NTranslation("TBL", "Angle of Visibility", "可視範囲"),
             new WFI18NTranslation("TBL", "Tint Base Color", "ベースカラーをバックライト色に乗算"),
+            new WFI18NTranslation("TBL", "Camera Correction", "カメラ補正"),
             // Overlay Texture
             new WFI18NTranslation("OVL", "Overlay Color", "オーバーレイ テクスチャ"),
             new WFI18NTranslation("OVL", "Overlay Texture", "オーバーレイ テクスチャ"),

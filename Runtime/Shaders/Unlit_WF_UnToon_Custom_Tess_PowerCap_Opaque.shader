@@ -409,16 +409,17 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [WFHeaderToggle(BackLight)]
             _TBL_Enable              ("[TBL] Enable", Float) = 0
+            _TBL_Power               ("[TBL] Power", Range(0, 1)) = 1
         [HDR]
             _TBL_Color               ("[TBL] Back Light Color", Color) = (1, 1, 1, 1)
-            _TBL_Power               ("[TBL] Power", Range(0, 1)) = 1
+        [ToggleUI]
+            _TBL_TintBaseCol         ("[TBL] Tint Base Color", Range(0, 1)) = 0
             _TBL_Angle               ("[TBL] Angle of Visibility", Range(0, 1)) = 0.3
             _TBL_Width               ("[TBL] Width", Range(0, 1)) = 0.1
             _TBL_Feather             ("[TBL] Feather", Range(0, 1)) = 0.05
+            _TBL_CameraCorrection    ("[TBL] Camera Correction", Range(-1, 1)) = 1
             _TBL_BlendNormal         ("[TBL] Blend Normal", Range(0, 1)) = 0.1
             _TBL_BlendNormal2        ("[TBL] Blend Normal 2nd", Range(0, 1)) = 0.1
-        [ToggleUI]
-            _TBL_TintBaseCol         ("[TBL] Tint Base Color", Range(0, 1)) = 0
         [NoScaleOffset]
             _TBL_MaskTex             ("[TBL] Mask Texture (RGB)", 2D) = "white" {}
         [ToggleUI]
