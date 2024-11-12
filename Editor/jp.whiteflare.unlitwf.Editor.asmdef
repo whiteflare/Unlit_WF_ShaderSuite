@@ -31,6 +31,11 @@
             "define": "ENV_VRCSDK3_AVATAR"
         },
         {
+            "name": "nadena.dev.ndmf",
+            "expression": "[1.5.0,2.0.0)",
+            "define": "ENV_NDMF"
+        },
+        {
             "name": "nadena.dev.modular-avatar",
             "expression": "[1.10.0,2.0.0)",
             "define": "ENV_MA"

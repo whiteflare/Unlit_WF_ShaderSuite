@@ -23,7 +23,7 @@
  *  distribution.
  */
 
-#if UNITY_EDITOR && ENV_VRCSDK3_AVATAR && ENV_MA
+#if UNITY_EDITOR && ENV_VRCSDK3_AVATAR && ENV_NDMF && ENV_MA
 
 using System.Collections.Generic;
 using System.Linq;
