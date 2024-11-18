@@ -24,6 +24,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ES_AU_DelayTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -52,6 +56,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TM_MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TR_MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -64,6 +72,7 @@ Material:
     - _AL_Fresnel: 0
     - _AL_InvMaskVal: 0
     - _AL_Power: 1
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_ZWrite: 0
     - _AO_Brightness: 0
@@ -76,6 +85,9 @@ Material:
     - _ES_AU_AlphaLink: 0
     - _ES_AU_Band: 0
     - _ES_AU_BlackOut: 0
+    - _ES_AU_DelayDir: 0
+    - _ES_AU_DelayHistory: 32
+    - _ES_AU_DelayReverse: 0
     - _ES_AU_MaxThreshold: 0.5
     - _ES_AU_MaxValue: 2
     - _ES_AU_MinThreshold: 0.1
@@ -93,13 +105,16 @@ Material:
     - _ES_SC_Speed: 2
     - _ES_SC_UVType: 0
     - _ES_ScrollEnable: 0
+    - _ES_TintBaseCol: 0
     - _GL_BlendPower: 0.8
     - _GL_CustomAltitude: 45
     - _GL_CustomAzimuth: 0
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _GL_NCC_Enable: 1
     - _HL_CapType: 0
     - _HL_ChangeAlpha: 0
@@ -121,18 +136,28 @@ Material:
     - _MT_InvMaskVal: 0
     - _MT_InvRoughnessMaskVal: 0
     - _MT_Metallic: 1
-    - _MT_MetallicMapType: 0
     - _MT_Monochrome: 0
     - _MT_ReflSmooth: 1
     - _MT_SpecSmooth: 0.8
     - _MT_Specular: 0
     - _QuestSupported: 0
+    - _TM_BlendNormal: 0
+    - _TM_BlendNormal2: 0
+    - _TM_Enable: 0
+    - _TM_Exponent: 1
+    - _TM_Feather: 0.1
+    - _TM_InvMaskVal: 0
+    - _TM_Width: 0
+    - _TM_WidthBottom: 1
+    - _TM_WidthSide: 1
+    - _TM_WidthTop: 0.5
     - _TR_BlendType: 0
     - _TR_DisableBackLit: 0
     - _TR_Enable: 0
     - _TR_Exponent: 1
     - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
+    - _TR_TintBaseCol: 0
     - _TR_Width: 0.1
     - _TR_WidthBottom: 1
     - _TR_WidthSide: 1
@@ -160,8 +185,9 @@ Material:
     - _GL_CustomLitPos: {r: 0, g: 3, b: 0, a: 1}
     - _HL_MatcapColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _HL_MedianColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _TM_Color: {r: 0, g: 0, b: 0, a: 1}
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.78705883, g: 0.55789506, b: 0.44011763, a: 1}
     - _TS_2ndColor: {r: 0.69960785, g: 0.4339459, b: 0.35623527, a: 1}
-    - _TS_3rdColor: {r: 0.5, g: 0.5, b: 0.7, a: 1}
+    - _TS_3rdColor: {r: 0.595, g: 0.595, b: 0.7, a: 1}
     - _TS_BaseColor: {r: 0.8745098, g: 0.74509805, b: 0.5764706, a: 1}

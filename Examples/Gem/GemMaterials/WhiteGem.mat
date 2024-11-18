@@ -31,6 +31,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ES_AU_DelayTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ES_SC_GradTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -47,6 +55,7 @@ Material:
     - _AL_Fresnel: 1
     - _AL_InvMaskVal: 0
     - _AL_Power: 1
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_ZWrite: 0
     - _AL_ZWriteBack: 0
@@ -62,6 +71,9 @@ Material:
     - _ES_AU_AlphaLink: 0
     - _ES_AU_Band: 0
     - _ES_AU_BlackOut: 0
+    - _ES_AU_DelayDir: 0
+    - _ES_AU_DelayHistory: 32
+    - _ES_AU_DelayReverse: 0
     - _ES_AU_MaxThreshold: 0.5
     - _ES_AU_MaxValue: 2
     - _ES_AU_MinThreshold: 0.1
@@ -79,6 +91,7 @@ Material:
     - _ES_SC_Speed: 2
     - _ES_SC_UVType: 0
     - _ES_ScrollEnable: 0
+    - _ES_TintBaseCol: 0
     - _FallBack: 0
     - _FlipMirror: 0
     - _GL_BlendPower: 0.8
@@ -87,7 +100,9 @@ Material:
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _GMB_BackCulllMode: 1
     - _GMB_Enable: 1
     - _GMF_BlendNormal: 0.1

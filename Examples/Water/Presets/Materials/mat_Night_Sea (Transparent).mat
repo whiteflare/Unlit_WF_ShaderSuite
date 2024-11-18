@@ -60,6 +60,7 @@ Material:
     - _AL_Fresnel: 1
     - _AL_InvMaskVal: 0
     - _AL_Power: 0.7
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_ZWrite: 0
     - _AO_Brightness: 0
