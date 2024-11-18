@@ -50,6 +50,7 @@ Material:
     - _AL_Fresnel: 0
     - _AL_InvMaskVal: 0
     - _AL_Power: 1
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_SrcAlpha: 5
     - _AL_ZTest: 4
@@ -68,7 +69,9 @@ Material:
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _GL_NCC_Enable: 0
     - _LBE_EmissionMultiplier: 1
     - _LBE_Enable: 0

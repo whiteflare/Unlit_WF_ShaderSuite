@@ -60,6 +60,7 @@ Material:
     - _AL_Fresnel: 0.8
     - _AL_InvMaskVal: 0
     - _AL_Power: 0.6
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_ZWrite: 0
     - _AO_Brightness: 0
@@ -70,6 +71,7 @@ Material:
     - _CRF_Distance: 0.2
     - _CRF_Enable: 1
     - _CRF_RefractiveIndex: 1.33
+    - _CRF_UseDepthTex: 0
     - _CullMode: 0
     - _CurrentVersion: 0
     - _Cutoff: 0.05
