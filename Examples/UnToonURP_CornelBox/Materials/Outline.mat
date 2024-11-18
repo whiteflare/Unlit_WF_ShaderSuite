@@ -32,7 +32,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _CullMode: 2
     - _CurrentVersion: 0
     - _GL_BlendPower: 0.8
     - _GL_CustomAltitude: 45
@@ -40,7 +39,9 @@ Material:
     - _GL_DisableBasePos: 1
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _TL_BlendBase: 0
     - _TL_BlendCustom: 0
     - _TL_Enable: 1

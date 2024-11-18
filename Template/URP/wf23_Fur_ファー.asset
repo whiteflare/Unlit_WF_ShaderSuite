@@ -35,6 +35,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _FUR_LenMaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _FUR_MaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -101,6 +105,7 @@ Material:
     - _CurrentVersion: 0
     - _Cutoff: 0.2
     - _FUR_Height: 0.01
+    - _FUR_InvLenMaskVal: 0
     - _FUR_InvMaskVal: 0
     - _FUR_Random: 0.2
     - _FUR_Repeat: 3
@@ -113,7 +118,9 @@ Material:
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _HL_CapType: 0
     - _HL_CapType_1: 0
     - _HL_Enable: 0
@@ -132,6 +139,7 @@ Material:
     - _TR_Exponent: 1
     - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
+    - _TR_TintBaseCol: 0
     - _TR_Width: 0.1
     - _TR_WidthBottom: 1
     - _TR_WidthSide: 1
@@ -163,7 +171,7 @@ Material:
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.9, g: 0.72933966, b: 0.72933966, a: 1}
     - _TS_2ndColor: {r: 0.8, g: 0.60830194, b: 0.60830194, a: 1}
-    - _TS_3rdColor: {r: 0.5, g: 0.5, b: 0.7, a: 1}
+    - _TS_3rdColor: {r: 0.595, g: 0.595, b: 0.7, a: 1}
     - _TS_BaseColor: {r: 1, g: 0.9103774, b: 0.9103774, a: 1}
 --- !u!114 &11400000
 MonoBehaviour:

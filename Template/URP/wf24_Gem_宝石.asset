@@ -39,6 +39,7 @@ Material:
     - _AL_Fresnel: 1
     - _AL_InvMaskVal: 0
     - _AL_Power: 1
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_ZWrite: 0
     - _AlphaFront: 0.5
@@ -52,7 +53,9 @@ Material:
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _GMF_BlendNormal: 0.1
     - _GMF_Enable: 1
     - _GMF_FlakeBrighten: 4
