@@ -26,6 +26,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay
   m_Shader: {fileID: 4800000, guid: d560a6c0fa7491e419a9f5e5f5db7bc1, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _GL_AUTO_ENABLE
   m_InvalidKeywords: []
@@ -35,6 +37,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -52,6 +55,7 @@ Material:
     - _AL_Fresnel: 0
     - _AL_InvMaskVal: 0
     - _AL_Power: 1
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_SrcAlpha: 5
     - _AL_ZTest: 4
@@ -69,7 +73,9 @@ Material:
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _LBE_EmissionMultiplier: 1
     - _LBE_Enable: 0
     - _LBE_IndirectChroma: 1

@@ -125,6 +125,10 @@
         #define WF_TEX2D_RIM_MASK(uv)           SAMPLE_MASK_VALUE(_TR_MaskTex, uv, _TR_InvMaskVal).rgb
     #endif
 
+    #ifndef WF_TEX2D_BACKLIT_MASK
+        #define WF_TEX2D_BACKLIT_MASK(uv)       SAMPLE_MASK_VALUE(_TBL_MaskTex, uv, _TBL_InvMaskVal).rgb
+    #endif
+
     #ifndef WF_TEX2D_RIM_SHADOW_MASK
         #define WF_TEX2D_RIM_SHADOW_MASK(uv)    SAMPLE_MASK_VALUE(_TM_MaskTex, uv, _TM_InvMaskVal).r
     #endif
@@ -355,36 +359,51 @@ FEATURE_TGL_END
 
 #if defined(_GL_AUTO_ENABLE)
 
-		if (TGL_OFF(_GL_LitOverride)) {
-	        uint mode = calcAutoSelectMainLight(ws_vertex);
-	        if (mode == LIT_MODE_ONLY_DIR_LIT) {
-	            return float4( getMainLightDirection() , +1 );
-	        }
-	        if (mode == LIT_MODE_ONLY_POINT_LIT) {
-	            return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
-	        }
-		}
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
+        if (TGL_OFF(_GL_LitOverride)) {
+            uint mode = calcAutoSelectMainLight(ws_vertex);
+            if (mode == LIT_MODE_ONLY_DIR_LIT) {
+                return float4( getMainLightDirection() , +1 );
+            }
+            else if (mode == LIT_MODE_ONLY_POINT_LIT) {
+                return float4( calcPointLight1WorldDir(ws_vertex) , -1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
+        }
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
+        }
 
 #elif defined(_GL_ONLYDIR_ENABLE)
 
-		if (TGL_OFF(_GL_LitOverride)) {
-	        float3 dir = getMainLightDirection();
-	        if (any(dir)) {
-	            return float4( dir , +1 );
-	        }
+        if (TGL_OFF(_GL_LitOverride)) {
+            float3 dir = getMainLightDirection();
+            if (any(dir)) {
+                return float4( dir , +1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
         }
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
+        }
 
 #elif defined(_GL_ONLYPOINT_ENABLE)
 
-		if (TGL_OFF(_GL_LitOverride)) {
-	        float3 dir = calcPointLight1WorldDir(ws_vertex);
-	        if (any(dir)) {
-	            return float4( dir , -1 );
-	        }
-	    }
-        return float4( calcWorldSpaceCustomSunDir() , 0 );
+        if (TGL_OFF(_GL_LitOverride)) {
+            float3 dir = calcPointLight1WorldDir(ws_vertex);
+            if (any(dir)) {
+                return float4( dir , -1 );
+            }
+            else {
+                return float4( calcWorldSpaceCustomSunDir() , 0 );
+            }
+        }
+        else {
+            return float4( calcWorldSpaceCustomSunDir() , 0 );
+        }
 
 #elif defined(_GL_WSDIR_ENABLE)
 
@@ -405,21 +424,21 @@ FEATURE_TGL_END
             mode = calcAutoSelectMainLight(ws_vertex);
         }
         if (mode == LIT_MODE_ONLY_DIR_LIT) {
-			if (TGL_OFF(_GL_LitOverride)) {
-	            float3 dir = getMainLightDirection();
-	            if (any(dir)) {
-	                return float4( dir , +1 );
-	            }
-	            mode = LIT_MODE_CUSTOM_WORLDSPACE;
-	        }
+            if (TGL_OFF(_GL_LitOverride)) {
+                float3 dir = getMainLightDirection();
+                if (any(dir)) {
+                    return float4( dir , +1 );
+                }
+                mode = LIT_MODE_CUSTOM_WORLDSPACE;
+            }
         }
         if (mode == LIT_MODE_ONLY_POINT_LIT) {
-			if (TGL_OFF(_GL_LitOverride)) {
-	            float3 dir = calcPointLight1WorldDir(ws_vertex);
-	            if (any(dir)) {
-	                return float4( dir , -1 );
-	            }
-	        }
+            if (TGL_OFF(_GL_LitOverride)) {
+                float3 dir = calcPointLight1WorldDir(ws_vertex);
+                if (any(dir)) {
+                    return float4( dir , -1 );
+                }
+            }
             mode = LIT_MODE_CUSTOM_WORLDSPACE;
         }
         if (mode == LIT_MODE_CUSTOM_WORLDSPACE) {
@@ -444,7 +463,7 @@ FEATURE_TGL_END
         float3 lightColorMain = sampleMainLightColor();
         float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
 
-        half level_min = GammaToCurrentColorSpace(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
+        half level_min = GammaToCurrentColorSpaceExact(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
         half level_max = _GL_LevelMax;
 
         float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
@@ -1312,6 +1331,32 @@ FEATURE_TGL_END
 
     #else
         #define drawRimLight(d)
+    #endif
+
+    ////////////////////////////
+    // Back Light
+    ////////////////////////////
+
+    #ifdef _TBL_ENABLE
+
+        void drawBackLight(inout drawing d) {
+FEATURE_TGL_ON_BEGIN(_TBL_Enable)
+            // 色計算
+            float3 rimColor = _TBL_Color.rgb * WF_TEX2D_BACKLIT_MASK(d.uv_main) * lerp(ONE_VEC3, d.base_color.rgb, _TBL_TintBaseCol);
+
+            float3 ws_light_dir = SafeNormalizeVec3(d.ws_light_dir * float3(1, 0, 1));
+            float3 ws_view_dir = SafeNormalizeVec3(d.ws_view_dir * float3(1, 0, 1));
+            float3 ws_backlit_normal = LERP_NORMAL_MAPS(d, _TBL_BlendNormal, _TBL_BlendNormal2);
+            float power = smoothstep(-_TBL_Feather, NZF, _TBL_Width + dot(ws_light_dir, ws_backlit_normal - (ws_light_dir + ws_view_dir) * _TBL_CameraCorrection))
+                * (1 - smoothstep(-1 - NZF, _TBL_Angle - 1, d.angle_light_camera)) * pow(saturate(1 - abs(ws_backlit_normal.y)), 2);
+
+            // 合成
+            d.color.rgb += max(ZERO_VEC3, rimColor * power * _TBL_Power);
+FEATURE_TGL_END
+        }
+
+    #else
+        #define drawBackLight(d)
     #endif
 
     ////////////////////////////

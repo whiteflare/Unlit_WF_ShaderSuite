@@ -9,17 +9,18 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_Gem_Transparent
   m_Shader: {fileID: 4800000, guid: eee9c1659f8a0434aac4790f35a6cc7c, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _GL_AUTO_ENABLE
-  m_InvalidKeywords:
-  - _GMF_ENABLE
-  - _GMR_ENABLE
+  m_InvalidKeywords: []
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -44,6 +45,7 @@ Material:
     - _AL_Fresnel: 1
     - _AL_InvMaskVal: 0
     - _AL_Power: 1
+    - _AL_PowerMin: 0
     - _AL_Source: 0
     - _AL_ZWrite: 0
     - _AlphaFront: 0.5
@@ -57,7 +59,9 @@ Material:
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _GMF_BlendNormal: 0.1
     - _GMF_Enable: 1
     - _GMF_FlakeBrighten: 4

@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: UnlitWF/WF_FakeFur_Mix
   m_Shader: {fileID: 4800000, guid: bfbc776efa55d10479fcf787cbc3ffd9, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _GL_AUTO_ENABLE
   - _TS_ENABLE
@@ -20,6 +22,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -36,6 +39,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FUR_BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FUR_LenMaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -106,6 +113,7 @@ Material:
     - _CurrentVersion: 0
     - _Cutoff: 0.2
     - _FUR_Height: 0.01
+    - _FUR_InvLenMaskVal: 0
     - _FUR_InvMaskVal: 0
     - _FUR_Random: 0.2
     - _FUR_Repeat: 3
@@ -118,7 +126,9 @@ Material:
     - _GL_DisableBasePos: 0
     - _GL_LevelMax: 0.8
     - _GL_LevelMin: 0.12499998
+    - _GL_LevelTweak: 0
     - _GL_LightMode: 0
+    - _GL_LitOverride: 0
     - _HL_CapType: 0
     - _HL_CapType_1: 0
     - _HL_Enable: 0
@@ -137,6 +147,7 @@ Material:
     - _TR_Exponent: 1
     - _TR_Feather: 0.05
     - _TR_InvMaskVal: 0
+    - _TR_TintBaseCol: 0
     - _TR_Width: 0.1
     - _TR_WidthBottom: 1
     - _TR_WidthSide: 1
@@ -168,7 +179,7 @@ Material:
     - _TR_Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _TS_1stColor: {r: 0.9, g: 0.72933966, b: 0.72933966, a: 1}
     - _TS_2ndColor: {r: 0.8, g: 0.60830194, b: 0.60830194, a: 1}
-    - _TS_3rdColor: {r: 0.5, g: 0.5, b: 0.7, a: 1}
+    - _TS_3rdColor: {r: 0.595, g: 0.595, b: 0.7, a: 1}
     - _TS_BaseColor: {r: 1, g: 0.9103774, b: 0.9103774, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &11400000
