@@ -68,6 +68,7 @@
 
     struct drawing {
         half4   color;
+        half4   base_color;
         float2  uv1;
         float2  uv2;
         float2  uv_main;
@@ -86,6 +87,7 @@
         drawing d = (drawing) 0;
 
         d.color         = half4(1, 1, 1, 1);
+        d.base_color    = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv2           = i.uv; // EmissiveScroll用にUV2を確保
         d.uv_main       = i.uv;
@@ -203,6 +205,9 @@
         drawMainTex(d);             // メインテクスチャ
         drawParticleFlipbookTex(d); // Particleテクスチャシートアニメーション
         drawParticleVertexColor(d); // 頂点カラー
+
+        // ベースカラー確定(UnToonとはタイミングが異なりPreMulAlphaの前に行う)
+        d.base_color = d.color;
 
 #ifdef _WF_PREMUL_ALPHA
         _WF_PREMUL_ALPHA

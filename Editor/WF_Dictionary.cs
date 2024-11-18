@@ -227,6 +227,7 @@ namespace UnlitWF
                 new WFShaderFunction("TM", "TM", "RimShadow"),
                 new WFShaderFunction("TL", "TL", "Outline"),
                 new WFShaderFunction("TFG", "TFG", "ToonFog"),
+                new WFShaderFunction("TBL", "TBL", "BackLight"),
 
                 // matcap一味
                 new WFShaderFunction("HL", "HL", "Light Matcap"),
@@ -306,6 +307,7 @@ namespace UnlitWF
             { "TS", HELP_URL_UNTOON + "#ToonShade" },
             { "TR", HELP_URL_UNTOON + "#RimLight" },
             { "TM", HELP_URL_UNTOON + "#RimShadow" },
+            { "TBL", HELP_URL_UNTOON + "#BackLight" },
             { "TL", HELP_URL_UNTOON + "#Outline" },
             { "TFG", HELP_URL_UNTOON + "#Fog" },
             { "HL", HELP_URL_UNTOON + "#LightMatcap" },
@@ -497,6 +499,7 @@ namespace UnlitWF
             new WFI18NTranslation("Refraction", "屈折"),
             new WFI18NTranslation("RimLight", "リムライト"),
             new WFI18NTranslation("RimShadow", "リムシャドウ"),
+            new WFI18NTranslation("BackLight", "逆光ライト"),
             new WFI18NTranslation("Specular", "光沢(スペキュラ)"),
             new WFI18NTranslation("Stencil Mask", "ステンシル"),
             new WFI18NTranslation("Tessellation", "細分化"),
@@ -554,6 +557,7 @@ namespace UnlitWF
             new WFI18NTranslation("Cast Shadows", "他の物体に影を落とす"),
             new WFI18NTranslation("Shadow Cutoff Threshold", "影のカットアウトしきい値"),
             new WFI18NTranslation("Use CameraDepthTexture", "CameraDepthTexture を使う"),
+            new WFI18NTranslation("Light Direction Override", "ライト方向をオーバーライド"),
             // Alpha
             new WFI18NTranslation("AL", "Alpha Source", "アルファソース"),
             new WFI18NTranslation("AL", "Alpha Mask Texture", "アルファマスク"),
@@ -636,14 +640,18 @@ namespace UnlitWF
             new WFI18NTranslation("TS", "Dont Ajust Contrast", "影コントラストを調整しない"),
             // RimLight
             new WFI18NTranslation("TR", "Rim Color", "リムライト色"),
-            new WFI18NTranslation("TR", "Width", "幅").AddTag("TM"),
+            new WFI18NTranslation("TR", "Width", "幅").AddTag("TM", "TBL"),
             new WFI18NTranslation("TR", "Width Top", "幅(上)").AddTag("TM"),
             new WFI18NTranslation("TR", "Width Side", "幅(横)").AddTag("TM"),
             new WFI18NTranslation("TR", "Width Bottom", "幅(下)").AddTag("TM"),
-            new WFI18NTranslation("TR", "Feather", "ぼかし幅").AddTag("TM"),
+            new WFI18NTranslation("TR", "Feather", "ぼかし幅").AddTag("TM", "TBL"),
             new WFI18NTranslation("TR", "Exponent", "ぼかし指数").AddTag("TM"),
             new WFI18NTranslation("TR", "Tint Base Color", "ベースカラーをリムライト色に混合"),
             new WFI18NTranslation("TM", "Rim Color", "リムシャドウ色"),
+            new WFI18NTranslation("TBL", "Back Light Color", "バックライト色"),
+            new WFI18NTranslation("TBL", "Angle of Visibility", "可視範囲"),
+            new WFI18NTranslation("TBL", "Tint Base Color", "ベースカラーをバックライト色に乗算"),
+            new WFI18NTranslation("TBL", "Camera Correction", "カメラ補正"),
             // Overlay Texture
             new WFI18NTranslation("OVL", "Overlay Color", "オーバーレイ テクスチャ"),
             new WFI18NTranslation("OVL", "Overlay Texture", "オーバーレイ テクスチャ"),
@@ -654,6 +662,7 @@ namespace UnlitWF
             // EmissiveScroll
             new WFI18NTranslation("ES", "Emission", "Emission テクスチャ"),
             new WFI18NTranslation("ES", "Emission Texture", "Emission テクスチャ"),
+            new WFI18NTranslation("ES", "Tint Base Color", "ベースカラーをEmission色に乗算"),
             new WFI18NTranslation("ES", "Enable EmissiveScroll", "スクロールを使用する"),
             new WFI18NTranslation("ES", "Wave Type", "波形"),
             new WFI18NTranslation("ES", "Wave Grad Tex", "波形グラデーションテクスチャ"),

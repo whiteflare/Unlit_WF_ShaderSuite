@@ -75,6 +75,29 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [HDR]
             _BKT_BackColor          ("[BKT] Back Color", Color) = (1, 1, 1, 1)
 
+        [WFHeaderToggle(Gradient Map)]
+            _CGR_Enable             ("[CGR] Enable", Float) = 0
+        [NoScaleOffset]
+            _CGR_GradMapTex         ("[CGR] Gradient Map", 2D) = "white" {}
+        [NoScaleOffset]
+            _CGR_MaskTex            ("[CGR] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CGR_InvMaskVal         ("[CGR] Invert Mask Value", Range(0, 1)) = 0
+
+        [WFHeaderToggle(Color Change)]
+            _CLC_Enable             ("[CLC] Enable", Float) = 0
+        [ToggleUI]
+            _CLC_Monochrome         ("[CLC] monochrome", Range(0, 1)) = 0
+            _CLC_DeltaH             ("[CLC] Hur", Range(0, 1)) = 0
+            _CLC_DeltaS             ("[CLC] Saturation", Range(-1, 1)) = 0
+            _CLC_DeltaV             ("[CLC] Brightness", Range(-1, 1)) = 0
+        [PowerSlider(2.0)]
+            _CLC_Gamma              ("[CLC] Gamma", Range(0, 4)) = 1
+        [NoScaleOffset]
+            _CLC_MaskTex            ("[CLC] Mask Texture (R)", 2D) = "white" {}
+        [ToggleUI]
+            _CLC_InvMaskVal         ("[CLC] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(NormalMap)]
             _NM_Enable              ("[NM] Enable", Float) = 0
         [NoScaleOffset]
@@ -272,6 +295,24 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [ToggleUI]
             _TR_DisableBackLit      ("[TR] Disable BackLit", Range(0, 1)) = 0
 
+        [WFHeaderToggle(BackLight)]
+            _TBL_Enable              ("[TBL] Enable", Float) = 0
+            _TBL_Power               ("[TBL] Power", Range(0, 1)) = 1
+        [HDR]
+            _TBL_Color               ("[TBL] Back Light Color", Color) = (1, 1, 1, 1)
+        [ToggleUI]
+            _TBL_TintBaseCol         ("[TBL] Tint Base Color", Range(0, 1)) = 0
+            _TBL_Angle               ("[TBL] Angle of Visibility", Range(0, 1)) = 0.3
+            _TBL_Width               ("[TBL] Width", Range(0, 1)) = 0.1
+            _TBL_Feather             ("[TBL] Feather", Range(0, 1)) = 0.05
+            _TBL_CameraCorrection    ("[TBL] Camera Correction", Range(-1, 1)) = 1
+            _TBL_BlendNormal         ("[TBL] Blend Normal", Range(0, 1)) = 0.1
+            _TBL_BlendNormal2        ("[TBL] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [NoScaleOffset]
+            _TBL_MaskTex             ("[TBL] Mask Texture (RGB)", 2D) = "white" {}
+        [ToggleUI]
+            _TBL_InvMaskVal          ("[TBL] Invert Mask Value", Range(0, 1)) = 0
+
         [WFHeaderToggle(Overlay Texture)]
             _OVL_Enable             ("[OVL] Enable", Float) = 0
         [Enum(UV1,0,UV2,1,SKYBOX,2,MATCAP,4,ANGEL_RING,3)]
@@ -310,12 +351,25 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
+        [WFHeaderToggle(Distance Fade)]
+            _DFD_Enable             ("[DFD] Enable", Float) = 0
+        [NoScaleOffset]
+            _DFD_ColorTex           ("[DFD] Color Texture", 2D) = "white" {}
+            _DFD_Color              ("[DFD] Color", Color) = (0.1, 0.1, 0.1, 1)
+            _DFD_MinDist            ("[DFD] Fade Distance (Near)", Range(0, 0.5)) = 0.02
+            _DFD_MaxDist            ("[DFD] Fade Distance (Far)", Range(0, 0.5)) = 0.08
+            _DFD_Power              ("[DFD] Power", Range(0, 1)) = 1
+        [ToggleUI]
+            _DFD_BackShadow         ("[DFD] BackFace Shadow", Float) = 1
+
         [WFHeaderToggle(Emission)]
             _ES_Enable              ("[ES] Enable", Float) = 0
         [HDR]
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
+        [ToggleUI]
+            _ES_TintBaseCol         ("[ES] Tint Base Color", Range(0, 1)) = 0
         [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
         [ToggleUI]
@@ -362,11 +416,23 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             _ES_AU_DelayReverse     ("[ES] Delay Reverse", Float) = 0
             _ES_AU_DelayHistory     ("[ES] Delay Length", Range(0,128)) = 32
 
+        [WFHeaderToggle(Dissolve)]
+            _DSV_Enable             ("[DSV] Enable", Float) = 0
+            _DSV_Dissolve           ("[DSV] Dissolve", Range(0, 1)) = 1.0
+        [ToggleUI]
+            _DSV_Invert             ("[DSV] Invert", Range(0, 1)) = 0
+            _DSV_CtrlTex            ("[DSV] Control Texture (R)", 2D) = "black" {}
+        [ToggleUI]
+            _DSV_TexIsSRGB          ("[DSV] sRGB", Range(0, 1)) = 1
+        [HDR]
+            _DSV_SparkColor         ("[DSV] Spark Color", Color) = (1, 1, 1, 1)
+            _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
+
         [WFHeader(Lit)]
-        [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
-        [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+        [WF_FixFloat(0.0)]
+            _GL_LevelTweak          ("Tweak Intensity", Range(-1, 1)) = 0
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
         [ToggleUI]
             _GL_CastShadow          ("Cast Shadows", Range(0, 1)) = 1
@@ -375,6 +441,8 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
             _GL_LightMode           ("Sun Source", Float) = 0
+        [WF_FixFloat(0.0)]
+            _GL_LitOverride         ("Light Direction Override", Float) = 0
             _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
@@ -392,7 +460,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/10/14 (2.4.0)", Float) = 0
+            _CurrentVersion         ("2024/11/23 (2.5.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
@@ -430,6 +498,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
             #define _WF_ALPHA_FRESNEL
 
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
@@ -449,6 +518,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CGL_ENABLE
+            #pragma shader_feature_local_fragment _CGR_ENABLE
+            #pragma shader_feature_local_fragment _CLC_ENABLE
+            #pragma shader_feature_local_fragment _DFD_ENABLE
+            #pragma shader_feature_local_fragment _DSV_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE
             #pragma shader_feature_local_fragment _HL_ENABLE_1
@@ -456,6 +529,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
             #pragma shader_feature_local_fragment _MT_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
+            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #define _WF_PB_GRAB_TEXTURE _UnToonFrostedGlass

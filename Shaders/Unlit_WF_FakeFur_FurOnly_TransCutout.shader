@@ -146,15 +146,17 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
             _DSV_SparkWidth         ("[DSV] Spark Width", Range(0, 0.2)) = 0
 
         [WFHeader(Lit)]
-        [Gamma]
             _GL_LevelMin            ("Unlit Intensity", Range(0, 1)) = 0.125
-        [Gamma]
             _GL_LevelMax            ("Saturate Intensity", Range(0, 1)) = 0.8
+        [WF_FixFloat(0.0)]
+            _GL_LevelTweak          ("Tweak Intensity", Range(-1, 1)) = 0
             _GL_BlendPower          ("Chroma Reaction", Range(0, 1)) = 0.8
 
         [WFHeader(Lit Advance)]
         [WF_Enum(UnlitWF.SunSourceMode)]
             _GL_LightMode           ("Sun Source", Float) = 0
+        [WF_FixFloat(0.0)]
+            _GL_LitOverride         ("Light Direction Override", Float) = 0
             _GL_CustomAzimuth       ("Custom Sun Azimuth", Range(0, 360)) = 0
             _GL_CustomAltitude      ("Custom Sun Altitude", Range(-90, 90)) = 45
         [WF_Vector3]
@@ -166,7 +168,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/10/14 (2.4.0)", Float) = 0
+            _CurrentVersion         ("2024/11/23 (2.5.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _VRCFallback            ("Hidden", Float) = 0

@@ -813,14 +813,30 @@ namespace UnlitWF.Converter
                             WFAccessor.CopyTextureValue(ctx.target, "_TS_2ndTex", "_TS_3rdTex");
                         }
                         // ただし _TS_BaseTex, _TS_1stTex, _TS_2ndTex, _TS_3rdTex が全て同じ Texture を指しているならば全てクリアする
-                        if (ctx.target.GetTexture("_TS_BaseTex") == ctx.target.GetTexture("_TS_1stTex")
-                            && ctx.target.GetTexture("_TS_1stTex") == ctx.target.GetTexture("_TS_2ndTex")
-                            && ctx.target.GetTexture("_TS_2ndTex") == ctx.target.GetTexture("_TS_3rdTex")) {
+                        if (WFAccessor.GetTexture(ctx.target, "_TS_BaseTex") == WFAccessor.GetTexture(ctx.target, "_TS_1stTex")
+                            && WFAccessor.GetTexture(ctx.target, "_TS_1stTex") == WFAccessor.GetTexture(ctx.target, "_TS_2ndTex")
+                            && WFAccessor.GetTexture(ctx.target, "_TS_2ndTex") == WFAccessor.GetTexture(ctx.target, "_TS_3rdTex")) {
                             WFAccessor.SetTexture(ctx.target, "_TS_BaseTex", null);
                             WFAccessor.SetTexture(ctx.target, "_TS_1stTex", null);
                             WFAccessor.SetTexture(ctx.target, "_TS_2ndTex", null);
                             WFAccessor.SetTexture(ctx.target, "_TS_3rdTex", null);
                         }
+                    }
+                },
+                ctx => {
+                    // エミッション
+                    var emc = WFAccessor.GetColor(ctx.target, "_EmissionColor", Color.black);
+                    if (emc.r == 0 && emc.g == 0 && emc.b == 0) {
+                        // エミッション色が黒ならばオフにする
+                        WFAccessor.SetBool(ctx.target, "_ES_Enable", false);
+                    }
+                    else if (emc.r != 1 || emc.g != 1 || emc.b != 1) {
+                        // エミッション色が白ではないならばオンにする
+                        WFAccessor.SetBool(ctx.target, "_ES_Enable", true);
+                    }
+                    if (WFAccessor.GetTexture(ctx.target, "_MainTex") != null && WFAccessor.GetTexture(ctx.target, "_EmissionMap") == null) {
+                        // メインテクスチャが設定されているのにEmissionMapが未設定の場合はオフにする
+                        WFAccessor.SetBool(ctx.target, "_ES_Enable", false);
                     }
                 },
                 ctx => {
@@ -857,7 +873,7 @@ namespace UnlitWF.Converter
                         PropertyNameReplacement.MatchIgnoreCase("_OutlineMask", "_TL_MaskTex")
                         );
                     if (HasNewPropertyValue(ctx, "_TL_CustomColorTex")) {
-                        if (ctx.target.GetTexture("_TL_CustomColorTex") == ctx.target.GetTexture("_MainTex"))
+                        if (WFAccessor.GetTexture(ctx.target, "_TL_CustomColorTex") == WFAccessor.GetTexture(ctx.target, "_MainTex"))
                         {
                             // CustomColorTex と MainTex が同一の場合、CustomColorTex を削除して BlendBase を調整する
                             WFAccessor.SetTexture(ctx.target, "_TL_CustomColorTex", null);

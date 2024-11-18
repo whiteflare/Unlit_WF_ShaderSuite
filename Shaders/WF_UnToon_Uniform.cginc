@@ -45,6 +45,7 @@
     DECL_SUB_TEX2D      (_TM_MaskTex);
     DECL_SUB_TEX2D      (_TR_MaskTex);
     DECL_SUB_TEX2D      (_TS_MaskTex);
+    DECL_SUB_TEX2D      (_TBL_MaskTex);
 #ifndef _WF_AO_ONLY_LMAP
     DECL_SUB_TEX2D      (_OcclusionMap);
 #endif
@@ -140,8 +141,10 @@
     half            _GL_ShadowCutoff;
     half            _GL_LevelMin;
     half            _GL_LevelMax;
+    half            _GL_LevelTweak;
     half            _GL_BlendPower;
     uint            _GL_LightMode;
+    half            _GL_LitOverride;
     half            _GL_CustomAzimuth;
     half            _GL_CustomAltitude;
     half3           _GL_CustomLitPos;
@@ -181,6 +184,7 @@
     half4           _EmissionColor;
     uint            _ES_BlendType;
     half            _ES_ChangeAlpha;
+    half            _ES_TintBaseCol;
 
     half            _ES_ScrollEnable;
     uint            _ES_SC_Shape;
@@ -336,6 +340,20 @@
     half            _TM_WidthTop;
     half            _TM_WidthSide;
     half            _TM_WidthBottom;
+
+    // -------------------------
+
+    FEATURE_TGL    (_TBL_Enable);
+    half3           _TBL_Color;
+    half            _TBL_Power;
+    half            _TBL_Angle;
+    half            _TBL_Width;
+    half            _TBL_Feather;
+    half            _TBL_InvMaskVal;
+    half            _TBL_TintBaseCol;
+    half            _TBL_BlendNormal;
+    half            _TBL_BlendNormal2;
+    half            _TBL_CameraCorrection;
 
     // -------------------------
 
