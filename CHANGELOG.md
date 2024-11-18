@@ -1,5 +1,24 @@
 # Change Log
 
+## 2024/11/23 (2.5.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241123
+
+### Added
+- Shader
+  - 逆光ライト機能を追加しました。従来のリムライト機能よりさらに明るい光を加算合成します。
+- GUI
+  - VRCSDK3 Avatars 向け、マテリアルの明るさ等を調整するメニューを追加する機能を追加しました。
+    - NDMFおよびModularAvatarと連携してExpressionメニューを追加します。それらが存在しないプロジェクトではメニュー追加機能のみ無効となります。
+    - UnlitWF のVPMパッケージ版に機能が含まれています。unitypackage版にはこの機能は含まれていません。
+
+### Changed
+- Shader
+  - エミッションでメインカラーを混合するToggleを追加しました。
+- Tool
+  - 「UnlitWFのマテリアルに変換する」にてエミッションの変換処理を改良しました。メインテクスチャが設定されているのにエミッションテクスチャが未設定のときにはエミッションをオフにするように変更しました。
+
+----
+
 ## 2024/10/14 (2.4.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241014
 

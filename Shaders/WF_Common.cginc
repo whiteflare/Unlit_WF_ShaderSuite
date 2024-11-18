@@ -59,7 +59,7 @@
     #define TGL_OFF(value)  (value < 0.5)
     #define TGL_01(value)   step(0.5, value)
 
-    float GammaToCurrentColorSpace(float v) {
+    float GammaToCurrentColorSpaceExact(float v) {
 #ifdef UNITY_COLORSPACE_GAMMA
         return v;
 #else
