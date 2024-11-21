@@ -113,7 +113,7 @@ namespace UnlitWF.MA
             var lang = WFEditorPrefs.LangMode;
             if (component.generateLitMin)
             {
-                var text = lang == EditorLanguage.日本語 ? "ライト明度" : "Lit Brightness";
+                var text = lang == EditorLanguage.日本語 ? "ライトなし明度" : "Unlit Intensity";
                 AddMenuItem(goMenuUnlitWF, text, pa, PN_LitMin, ParameterSyncType.Float, ControlType.RadialPuppet, 0.5f);
             }
             if (component.generateLitDirection)
