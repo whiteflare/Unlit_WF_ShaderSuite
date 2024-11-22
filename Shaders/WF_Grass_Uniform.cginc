@@ -47,6 +47,7 @@
     half                _GL_CastShadow;
     half                _GL_LevelMin;
     half                _GL_LevelMax;
+    half                _GL_LevelTweak;
     half                _GL_BlendPower;
 
     // 使わない変数は define で固定値を設定
@@ -55,6 +56,7 @@
     #define _GL_CustomAltitude  0
     #define _GL_CustomLitPos    0
     #define _GL_DisableBasePos  0
+    #define _GL_LitOverride     0
 
     // -------------------------
 

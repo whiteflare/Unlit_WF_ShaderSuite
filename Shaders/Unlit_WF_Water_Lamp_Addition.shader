@@ -84,7 +84,7 @@ Shader "UnlitWF/WF_Water_Lamp_Addition" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/10/14 (2.4.0)", Float) = 0
+            _CurrentVersion         ("2024/11/23 (2.5.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0

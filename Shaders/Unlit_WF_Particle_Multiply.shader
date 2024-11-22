@@ -45,6 +45,8 @@ Shader "UnlitWF/WF_Particle_Multiply" {
             _EmissionColor          ("[ES] Emission", Color) = (1, 1, 1, 1)
         [NoScaleOffset]
             _EmissionMap            ("[ES] Emission Texture", 2D) = "white" {}
+        [ToggleUI]
+            _ES_TintBaseCol         ("[ES] Tint Base Color", Range(0, 1)) = 0
         [WF_Enum(UnlitWF.BlendModeES,ADD,ALPHA,LEGACY_ALPHA)]
             _ES_BlendType           ("[ES] Blend Type", Float) = 0
 
@@ -88,7 +90,7 @@ Shader "UnlitWF/WF_Particle_Multiply" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/10/14 (2.4.0)", Float) = 0
+            _CurrentVersion         ("2024/11/23 (2.5.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
