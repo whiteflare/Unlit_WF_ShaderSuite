@@ -304,7 +304,7 @@ namespace UnlitWF.MA
 
             foreach(var r in targets)
             {
-                if (r.materials.Any(pred))
+                if (r.sharedMaterials.Any(pred))
                 {
                     var path = AnimationUtility.CalculateTransformPath(r.transform, root);
                     var binding = EditorCurveBinding.FloatCurve(path, r.GetType(), "material." + shaderParamName);
