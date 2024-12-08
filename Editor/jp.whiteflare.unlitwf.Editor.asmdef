@@ -3,7 +3,8 @@
     "references": [
         "GUID:b7ab6cb77569a58459a037b298aa8569",
         "GUID:62ced99b048af7f4d8dfe4bed8373d76",
-        "GUID:fc900867c0f47cd49b6e2ae4ef907300"
+        "GUID:fc900867c0f47cd49b6e2ae4ef907300",
+        "GUID:ac4815c6727e4e34b9e13bb042cbc029"
     ],
     "includePlatforms": [
         "Editor"
@@ -39,6 +40,11 @@
             "name": "nadena.dev.modular-avatar",
             "expression": "[1.10.0,2.0.0)",
             "define": "ENV_MA"
+        },
+        {
+            "name": "com.anatawa12.avatar-optimizer",
+            "expression": "[1.8.0,2.0.0)",
+            "define": "ENV_AAO"
         }
     ],
     "noEngineReferences": false
