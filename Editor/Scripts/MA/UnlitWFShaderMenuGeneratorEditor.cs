@@ -27,7 +27,6 @@
 
 using UnityEditor;
 using UnityEngine;
-using VRC.SDKBase;
 
 namespace UnlitWF.MA
 {
@@ -57,14 +56,14 @@ namespace UnlitWF.MA
             serializedObject.ApplyModifiedProperties();
         }
 
-#if ENV_VRCSDK3_AVATAR
+#if ENV_VRCSDK3_AVATAR && ENV_MA
         [MenuItem(WFMenu.GAMEOBJECT_AVATARMENU, priority = 11)] // GameObject/配下は priority の扱いがちょっと特殊
         private static void Generate_GameObject(MenuCommand menuCommand)
         {
             var go = menuCommand.context as GameObject;
             if (go != null)
             {
-                var desc = go.GetComponentInParent<VRC_AvatarDescriptor>(true);
+                var desc = go.GetComponentInParent<VRC.SDKBase.VRC_AvatarDescriptor>(true);
                 if (desc != null)
                 {
                     var menuGo = new GameObject();
