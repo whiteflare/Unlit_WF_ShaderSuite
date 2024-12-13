@@ -56,14 +56,19 @@ namespace UnlitWF.MA
             serializedObject.ApplyModifiedProperties();
         }
 
-#if ENV_VRCSDK3_AVATAR && ENV_MA
+#if ENV_VRCSDK3_AVATAR
         [MenuItem(WFMenu.GAMEOBJECT_AVATARMENU, priority = 11)] // GameObject/配下は priority の扱いがちょっと特殊
         private static void Generate_GameObject(MenuCommand menuCommand)
         {
             var go = menuCommand.context as GameObject;
             if (go != null)
             {
-                var desc = go.GetComponentInParent<VRC.SDKBase.VRC_AvatarDescriptor>(true);
+                var desc =
+#if UNITY_2020_1_OR_NEWER
+                    go.GetComponentInParent<VRC.SDKBase.VRC_AvatarDescriptor>(true);
+#else
+                    go.GetComponentInParent<VRC.SDKBase.VRC_AvatarDescriptor>();
+#endif
                 if (desc != null)
                 {
                     var menuGo = new GameObject();
