@@ -927,7 +927,7 @@ namespace UnlitWF
             Func<Material, Texture2D, Texture2D> saveTexture = null;
             Func<Material, Material, Material> saveMaterial = null;
 
-            switch(param.mode)
+            switch (param.mode)
             {
                 case BakeMainTextureMode.OnlyBakeTexture:
                     saveTexture = SaveTextureAsFile;
@@ -1110,22 +1110,21 @@ namespace UnlitWF
                 return -1; // 不要
             }
 
-            void CalcBakeTextureSize(Material mat, out int width, out int height)
+            void CalcBakeTextureSize(Material mat, out int w, out int h)
             {
-                width = 32;
-                height = 32;
+                w = 32;
+                h = 32;
                 foreach (var pn in new string[] { "_MainTex", "_AL_MaskTex", "_TX2_MainTex", "_TX2_MaskTex", "_CGR_MaskTex", "_CLC_MaskTex" })
                 {
                     var tex = WFAccessor.GetTexture(mat, pn);
                     if (tex != null)
                     {
-                        Debug.Log(pn + ", " + tex.width + ", " + tex.height);
-                        width = Math.Max(width, tex.width);
-                        height = Math.Max(height, tex.height);
+                        w = Math.Max(w, tex.width);
+                        h = Math.Max(h, tex.height);
                     }
                 }
-                width = Math.Min(width, 4096);
-                height = Math.Min(height, 4096);
+                w = Math.Min(w, 4096);
+                h = Math.Min(h, 4096);
             }
         }
 
@@ -1226,7 +1225,7 @@ namespace UnlitWF
                 this.ignoreCase = ignoreCase;
             }
 
-            public override bool IsMatch(string beforeName) => string.Equals(this.beforeName, beforeName, 
+            public override bool IsMatch(string beforeName) => string.Equals(this.beforeName, beforeName,
                 ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
             protected override string Replace(string beforeName) => afterName;
         }
@@ -1430,7 +1429,7 @@ namespace UnlitWF
 
         public string ParentName { get { return parent.name; } }
 
-        public int IntValue {  get { return (int)value.floatValue;  } set { this.value.floatValue = value;  } }
+        public int IntValue { get { return (int)value.floatValue; } set { this.value.floatValue = value; } }
         public float FloatValue { get { return value.floatValue; } set { this.value.floatValue = value; } }
         public Color ColorValue { get { return value.colorValue; } set { this.value.colorValue = value; } }
         public Vector4 VectorValue { get { return value.vector4Value; } set { this.value.vector4Value = value; } }
