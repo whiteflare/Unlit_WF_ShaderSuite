@@ -1,5 +1,28 @@
 # Change Log
 
+## 2024/12/15 (2.6.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241215
+
+### Added
+- Tool
+  - AAO(AvatarOptimizer)と連携するコードを追加しました。UnlitWFを利用したマテリアルでもAAOの「テクスチャを最適化する」を利用できます。
+- Other
+  - テクスチャ類に褐色用の加算マットキャップ、およびラバー用の加算マットキャップを追加しました。
+
+### Changed
+- GUI
+  - テクスチャをベイクする際、今まではメインテクスチャと同じ画像サイズのテクスチャを出力していましたが、マスクテクスチャを含めて設定されている画像の最大サイズで出力するよう変更しました。
+  - matcap を設定した際、今まではファイル名が "lcap_" で始まる場合に合成モードを「加算」に変更していましたが、"mcap_" で始まらない場合に加算に変更するよう変更しました。
+
+### Fixed
+- Shader
+  - Emissive AudioLink にて、ディレイが None の時にも「反転」が有効になっていた問題を修正しました。
+- GUI
+  - WFメニューを追加する際、コンソールにエラーが表示される場合があった問題を修正しました。
+  - Unity2019 + VPM + VRCSDK3Avatar 環境でスクリプトエラーが発生する問題を修正しました。
+
+----
+
 ## 2024/11/23 (2.5.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241123
 

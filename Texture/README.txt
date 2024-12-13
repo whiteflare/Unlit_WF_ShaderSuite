@@ -35,3 +35,6 @@ These matcap are created by 白砂ヌゥ @heiwa_ze (https://twitter.com/heiwa_ze
 
 lcap_WF_ラバー光沢15.png, lcap_WF_ラバー光沢16.png
 These matcap are created by 白砂ヌゥ @heiwa_ze (https://twitter.com/heiwa_ze/status/1376537008789626883)
+
+lcap_WF_ラバー光沢17.png, lcap_WF_ラバー光沢18.png, lcap_WF_ラバー光沢19.png, lcap_WF_ラバー光沢20.png
+These matcap are created by Tiasti 千鳥足 (https://tiasti.booth.pm/)
