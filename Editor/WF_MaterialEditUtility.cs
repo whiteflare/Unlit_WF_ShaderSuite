@@ -927,7 +927,7 @@ namespace UnlitWF
             Func<Material, Texture2D, Texture2D> saveTexture = null;
             Func<Material, Material, Material> saveMaterial = null;
 
-            switch(param.mode)
+            switch (param.mode)
             {
                 case BakeMainTextureMode.OnlyBakeTexture:
                     saveTexture = SaveTextureAsFile;
@@ -955,6 +955,7 @@ namespace UnlitWF
             {
                 return AssetFileSaver.SaveAsFile(tex, WFAccessor.GetTexture(srcMaterial, "_MainTex"), importer =>
                 {
+                    importer.maxTextureSize = tex.width <= 2048 && tex.height <= 2048 ? 2048 : 4096;
                     importer.sRGBTexture = true;
                     importer.alphaIsTransparency = true;
                     importer.alphaSource = TextureImporterAlphaSource.FromInput;
@@ -975,7 +976,7 @@ namespace UnlitWF
             }
         }
 
-        public static bool BakeMainTexture(Material srcMaterial, 
+        public static bool BakeMainTexture(Material srcMaterial,
             Func<Material, Texture2D, Texture2D> saveTexture, Func<Material, Material, Material> saveMaterial, bool quiet = false)
         {
             // 元マテリアルをもとに判定
@@ -985,7 +986,7 @@ namespace UnlitWF
             }
 
             // ベイクして見た目が変化する場合は警告する
-            switch(ValidateMaterial(srcMaterial))
+            switch (ValidateMaterial(srcMaterial))
             {
                 case -1: // 不要
                     return false;
@@ -1014,8 +1015,7 @@ namespace UnlitWF
             {
                 return false;
             }
-            var width = _MainTex.width;
-            var height = _MainTex.height;
+            CalcBakeTextureSize(tempMat, out var width, out var height);
 
             // ベイク用マテリアルの設定
             tempMat.SetTextureScale("_MainTex", Vector2.one);
@@ -1093,6 +1093,7 @@ namespace UnlitWF
                 if (
                     (_Color.r <= 1 && _Color.g <= 1 && _Color.b <= 1 && (_Color.r < 1 || _Color.g < 1 || _Color.b < 1))
                     || _AL_Source != 0
+                    || _TX2_Enable
                     || _CGR_Enable
                     || _CLC_Enable
                     )
@@ -1107,6 +1108,23 @@ namespace UnlitWF
                     return 0; // ベイク可能
                 }
                 return -1; // 不要
+            }
+
+            void CalcBakeTextureSize(Material mat, out int w, out int h)
+            {
+                w = 32;
+                h = 32;
+                foreach (var pn in new string[] { "_MainTex", "_AL_MaskTex", "_TX2_MainTex", "_TX2_MaskTex", "_CGR_MaskTex", "_CLC_MaskTex" })
+                {
+                    var tex = WFAccessor.GetTexture(mat, pn);
+                    if (tex != null)
+                    {
+                        w = Math.Max(w, tex.width);
+                        h = Math.Max(h, tex.height);
+                    }
+                }
+                w = Math.Min(w, 4096);
+                h = Math.Min(h, 4096);
             }
         }
 
@@ -1207,7 +1225,7 @@ namespace UnlitWF
                 this.ignoreCase = ignoreCase;
             }
 
-            public override bool IsMatch(string beforeName) => string.Equals(this.beforeName, beforeName, 
+            public override bool IsMatch(string beforeName) => string.Equals(this.beforeName, beforeName,
                 ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
             protected override string Replace(string beforeName) => afterName;
         }
@@ -1411,7 +1429,7 @@ namespace UnlitWF
 
         public string ParentName { get { return parent.name; } }
 
-        public int IntValue {  get { return (int)value.floatValue;  } set { this.value.floatValue = value;  } }
+        public int IntValue { get { return (int)value.floatValue; } set { this.value.floatValue = value; } }
         public float FloatValue { get { return value.floatValue; } set { this.value.floatValue = value; } }
         public Color ColorValue { get { return value.colorValue; } set { this.value.colorValue = value; } }
         public Vector4 VectorValue { get { return value.vector4Value; } set { this.value.vector4Value = value; } }

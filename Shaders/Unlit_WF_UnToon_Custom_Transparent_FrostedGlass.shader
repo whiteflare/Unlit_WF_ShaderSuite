@@ -460,7 +460,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Transparent_FrostedGlass" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/11/23 (2.5.0)", Float) = 0
+            _CurrentVersion         ("2024/12/15 (2.6.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
