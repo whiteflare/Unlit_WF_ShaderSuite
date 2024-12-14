@@ -628,28 +628,33 @@ FEATURE_TGL_END
         DECL_SUB_TEX2D  (_ES_AU_DelayTex);
 
         float calcEmissiveAudioLinkDelay(drawing d) {
-            float delay = 0;
-            if (_ES_AU_DelayDir == 1) {
-                delay = d.uv1.x;
+            if (_ES_AU_DelayDir == 0) {
+                return 0;
             }
-            else if (_ES_AU_DelayDir == 2) {
-                delay = d.uv1.y;
-            }
-            else if (_ES_AU_DelayDir == 3) {
-                delay = d.uv2.x;
-            }
-            else if (_ES_AU_DelayDir == 4) {
-                delay = d.uv2.y;
-            }
-            else if (_ES_AU_DelayDir == 5) {
+            else {
+                float delay = 0;
+                if (_ES_AU_DelayDir == 1) {
+                    delay = d.uv1.x;
+                }
+                else if (_ES_AU_DelayDir == 2) {
+                    delay = d.uv1.y;
+                }
+                else if (_ES_AU_DelayDir == 3) {
+                    delay = d.uv2.x;
+                }
+                else if (_ES_AU_DelayDir == 4) {
+                    delay = d.uv2.y;
+                }
+                else if (_ES_AU_DelayDir == 5) {
 #if defined(_ES_AULINKDTEX_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
-                delay = PICK_SUB_TEX2D(_ES_AU_DelayTex, _MainTex, d.uv_main).r;
+                    delay = PICK_SUB_TEX2D(_ES_AU_DelayTex, _MainTex, d.uv_main).r;
 #endif
+                }
+                if (TGL_ON(_ES_AU_DelayReverse)) {
+                    delay = 1 - delay;
+                }
+                return delay * _ES_AU_DelayHistory;
             }
-            if (TGL_ON(_ES_AU_DelayReverse)) {
-                delay = 1 - delay;
-            }
-            return delay * _ES_AU_DelayHistory;
         }
 
         float calcEmissiveAudioLinkPower(float au) {
