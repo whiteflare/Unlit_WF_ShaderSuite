@@ -153,13 +153,15 @@ namespace UnlitWF
                     var name = ctx.current.textureValue.name;
                     if (!string.IsNullOrWhiteSpace(name))
                     {
-                        if (name.StartsWith("lcap_", StringComparison.InvariantCultureIgnoreCase))
+                        if (name.StartsWith("mcap_", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            CompareAndSet(ctx.all, ctx.current.name.Replace("_MatcapTex", "_CapType"), 0, 1); // MCAP -> LCAP
-                        }
-                        else if (name.StartsWith("mcap_", StringComparison.InvariantCultureIgnoreCase))
-                        {
+                            // ファイル名が mcap_ で始まっているならば MCAP で設定
                             CompareAndSet(ctx.all, ctx.current.name.Replace("_MatcapTex", "_CapType"), 1, 0); // LCAP -> MCAP
+                        }
+                        else
+                        {
+                            // そうでないならば LCAP で設定
+                            CompareAndSet(ctx.all, ctx.current.name.Replace("_MatcapTex", "_CapType"), 0, 1); // MCAP -> LCAP
                         }
                     }
                 }
