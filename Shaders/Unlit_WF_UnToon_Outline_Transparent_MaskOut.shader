@@ -482,7 +482,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/12/15 (2.6.0)", Float) = 0
+            _CurrentVersion         ("2024/12/17 (2.6.1)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _ClearBgSupported       ("True", Float) = 0
