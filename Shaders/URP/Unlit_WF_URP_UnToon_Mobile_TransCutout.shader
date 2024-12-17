@@ -218,7 +218,7 @@ Shader "UnlitWF_URP/UnToon_Mobile/WF_UnToon_Mobile_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/12/15 (2.6.0)", Float) = 0
+            _CurrentVersion         ("2024/12/17 (2.6.1)", Float) = 0
     }
 
     SubShader {
