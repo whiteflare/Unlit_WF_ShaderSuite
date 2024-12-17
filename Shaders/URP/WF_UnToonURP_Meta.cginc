@@ -60,6 +60,7 @@
 
     struct drawing {
         half4   color;
+        half4   base_color;
         float2  uv1;
         float2  uv2;
         float2  uv_main;
@@ -73,6 +74,7 @@
         drawing d = (drawing) 0;
 
         d.color         = half4(1, 1, 1, 1);
+        d.base_color    = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.ws_vertex     = i.ws_vertex;
@@ -133,6 +135,9 @@
 #else
         o.Albedo  = d.color.rgb;
 #endif
+
+        // ベースカラー確定
+        d.base_color = d.color;
 
 #if UNITY_VERSION < 202103
         o.SpecularColor = o.Albedo;

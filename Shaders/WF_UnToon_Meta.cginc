@@ -64,6 +64,7 @@
 
     struct drawing {
         half4   color;
+        half4   base_color;
         float2  uv1;
         float2  uv2;
         float2  uv_main;
@@ -77,6 +78,7 @@
         drawing d = (drawing) 0;
 
         d.color         = half4(1, 1, 1, 1);
+        d.base_color    = half4(1, 1, 1, 1);
         d.uv1           = i.uv;
         d.uv_main       = i.uv;
         d.ws_vertex     = i.ws_vertex;
@@ -142,6 +144,8 @@
 
         // 単色化
         d.color.rgb = max(ZERO_VEC3, lerp(AVE_RGB(d.color.rgb).xxx, d.color.rgb, lerp(1, _LBE_IndirectChroma, _LBE_Enable)));
+        // ベースカラー確定
+        d.base_color = d.color;
 
         o.Albedo        = d.color.rgb * lerp(1, _LBE_IndirectMultiplier, _LBE_Enable);
         o.SpecularColor = o.Albedo;
