@@ -1193,9 +1193,8 @@ FEATURE_TGL_END
                 smoothstep(border, border + max(feather, 0.001), brightness) );
         }
 
-        float calcShadowBrightness(inout drawing d) {
+        float calcShadowBrightness(inout drawing d, float3 ws_shade_normal) {
             // 陰用法線とライト方向から Harf-Lambert
-            float3 ws_shade_normal = LERP_NORMAL_MAPS(d, _TS_BlendNormal, _TS_BlendNormal2);
             float brightness = lerp(dot(ws_shade_normal, d.ws_light_dir), 1, 0.5);  // 0.0 ～ 1.0
 
             // アンチシャドウマスク加算
@@ -1213,29 +1212,36 @@ FEATURE_TGL_END
         }
 
 #ifdef _TS_SDF_ENABLE
-        float calcShadowBrightnessSDF(inout drawing d) {
+        float calcShadowBrightnessSDF(inout drawing d, float3 ws_shade_normal) {
+            // 法線方向をカメラに向けたときにアバター左手側を求めたいので、ワールド下方向ベクトルを固定してクロス積を使用する
+            float3 bitangent = float3(0, -1, 0);
+            float3 tangent = cross(bitangent, ws_shade_normal);
+
             // ライト方向をワールド空間からタンジェント空間に転写
-            float3 ts_light_dir = transformTangentToWorldNormal(d.ws_light_dir, d.ws_normal, d.ws_tangent, d.ws_bitangent);
+            float3 ts_light_dir = transformTangentToWorldNormal(d.ws_light_dir, ws_shade_normal, tangent, bitangent);
+
             ts_light_dir *= float3(1, 0, 1);
             ts_light_dir = SafeNormalizeVec3(ts_light_dir);
 
             float2 sdf = WF_TEX2D_SHADE_SDF(d.uv_main);
-            return saturate((ts_light_dir.x > 0 ? sdf.r : sdf.g) + atan2(ts_light_dir.z, abs(ts_light_dir.x)) / UNITY_PI);
+            return saturate((ts_light_dir.x > 0 ? sdf.r : sdf.g) * 0.5 + atan2(ts_light_dir.z, abs(ts_light_dir.x)) / UNITY_PI + 0.25);
         }
 #endif
 
         void drawToonShade(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TS_Enable)
+            float3 ws_shade_normal = LERP_NORMAL_MAPS(d, _TS_BlendNormal, _TS_BlendNormal2);
+
             // 影強度計算 (0.0 ～ 1.0)
             float brightness =
 #ifndef _WF_LEGACY_FEATURE_SWITCH
-	#ifdef _TS_SDF_ENABLE
-                calcShadowBrightnessSDF(d);
-	#else
-                calcShadowBrightness(d);
-	#endif
+    #ifdef _TS_SDF_ENABLE
+                calcShadowBrightnessSDF(d, ws_shade_normal);
+    #else
+                calcShadowBrightness(d, ws_shade_normal);
+    #endif
 #else
-				_TS_MaskType == 1 ? calcShadowBrightnessSDF(d) : calcShadowBrightness(d);
+                _TS_MaskType == 1 ? calcShadowBrightnessSDF(d, ws_shade_normal) : calcShadowBrightness(d, ws_shade_normal);
 #endif
 
             // 影色計算

@@ -627,7 +627,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
@@ -641,6 +640,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_SDF_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
@@ -652,10 +652,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
-            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -692,7 +692,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
@@ -706,6 +705,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_SDF_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
@@ -717,10 +717,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
-            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #pragma multi_compile_fwdbase
@@ -756,7 +756,6 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
-            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
@@ -770,6 +769,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
             #pragma shader_feature_local_fragment _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local_fragment _ _MT_ONLY2ND_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_SDF_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
@@ -781,10 +781,10 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent3Pass" {
             #pragma shader_feature_local_fragment _HL_ENABLE_1
             #pragma shader_feature_local_fragment _LME_ENABLE
             #pragma shader_feature_local_fragment _MT_ENABLE
+            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TFG_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
-            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #pragma multi_compile_fwdbase
