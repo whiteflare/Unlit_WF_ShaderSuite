@@ -120,6 +120,9 @@
     #ifndef WF_TEX2D_SHADE_MASK
         #define WF_TEX2D_SHADE_MASK(uv)         SAMPLE_MASK_VALUE(_TS_MaskTex, uv, _TS_InvMaskVal).r
     #endif
+    #ifndef WF_TEX2D_SHADE_SDF
+        #define WF_TEX2D_SHADE_SDF(uv)          SAMPLE_MASK_VALUE(_TS_MaskTex, uv, _TS_InvMaskVal).rg
+    #endif
 
     #ifndef WF_TEX2D_RIM_MASK
         #define WF_TEX2D_RIM_MASK(uv)           SAMPLE_MASK_VALUE(_TR_MaskTex, uv, _TR_InvMaskVal).rgb
@@ -1190,13 +1193,7 @@ FEATURE_TGL_END
                 smoothstep(border, border + max(feather, 0.001), brightness) );
         }
 
-        void drawToonShade(inout drawing d) {
-FEATURE_TGL_ON_BEGIN(_TS_Enable)
-            half angle_light_camera = d.angle_light_camera;
-            if (isInMirror() || TGL_ON(_TS_DisableBackLit)) {
-                angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
-            }
-
+        float calcShadowBrightness(inout drawing d) {
             // 陰用法線とライト方向から Harf-Lambert
             float3 ws_shade_normal = LERP_NORMAL_MAPS(d, _TS_BlendNormal, _TS_BlendNormal2);
             float brightness = lerp(dot(ws_shade_normal, d.ws_light_dir), 1, 0.5);  // 0.0 ～ 1.0
@@ -1204,8 +1201,42 @@ FEATURE_TGL_ON_BEGIN(_TS_Enable)
             // アンチシャドウマスク加算
             float anti_shade = WF_TEX2D_SHADE_MASK(d.uv_main);
             brightness = lerp(brightness, lerp(brightness, 1, 0.5), anti_shade);
+
             // ビュー相対位置シフト
+            half angle_light_camera = d.angle_light_camera;
+            if (isInMirror() || TGL_ON(_TS_DisableBackLit)) {
+                angle_light_camera = 0; // 鏡の中のときは、視差問題が生じないように強制的に 0 にする
+            }
             brightness *= smoothstep(-1.01, -1.0 + (_TS_1stBorder + _TS_2ndBorder) / 2, angle_light_camera);
+
+            return brightness;
+        }
+
+#ifdef _TS_SDF_ENABLE
+        float calcShadowBrightnessSDF(inout drawing d) {
+            // ライト方向をワールド空間からタンジェント空間に転写
+            float3 ts_light_dir = transformTangentToWorldNormal(d.ws_light_dir, d.ws_normal, d.ws_tangent, d.ws_bitangent);
+            ts_light_dir *= float3(1, 0, 1);
+            ts_light_dir = SafeNormalizeVec3(ts_light_dir);
+
+            float2 sdf = WF_TEX2D_SHADE_SDF(d.uv_main);
+            return saturate((ts_light_dir.x > 0 ? sdf.r : sdf.g) + atan2(ts_light_dir.z, abs(ts_light_dir.x)) / UNITY_PI);
+        }
+#endif
+
+        void drawToonShade(inout drawing d) {
+FEATURE_TGL_ON_BEGIN(_TS_Enable)
+            // 影強度計算 (0.0 ～ 1.0)
+            float brightness =
+#ifndef _WF_LEGACY_FEATURE_SWITCH
+	#ifdef _TS_SDF_ENABLE
+                calcShadowBrightnessSDF(d);
+	#else
+                calcShadowBrightness(d);
+	#endif
+#else
+				_TS_MaskType == 1 ? calcShadowBrightnessSDF(d) : calcShadowBrightness(d);
+#endif
 
             // 影色計算
             float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(d.uv_main) );

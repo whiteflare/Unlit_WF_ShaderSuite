@@ -304,6 +304,7 @@
     half            _TS_3rdFeather;
     half            _TS_BlendNormal;
     half            _TS_BlendNormal2;
+    uint            _TS_MaskType;
     half            _TS_InvMaskVal;
     half            _TS_FixContrast;
     half            _TS_MinDist;

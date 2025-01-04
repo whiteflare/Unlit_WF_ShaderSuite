@@ -398,6 +398,9 @@ namespace UnlitWF
             new WFCustomKeywordSettingEnum("_MT_CubemapType", "_", "_", "_MT_ONLY2ND_ENABLE") {
                 enablePropName = "_MT_Enable",
             },
+            new WFCustomKeywordSettingEnum("_TS_MaskType", "_", "_TS_SDF_ENABLE") {
+                enablePropName = "_TS_Enable",
+            },
             new WFCustomKeywordSettingEnum("_TS_Steps", "_", "_TS_STEP1_ENABLE", "_TS_STEP2_ENABLE", "_TS_STEP3_ENABLE") {
                 enablePropName = "_TS_Enable",
             },
@@ -633,8 +636,11 @@ namespace UnlitWF
             new WFI18NTranslation("TS", "1st Feather", "1影の境界ぼかし強度"),
             new WFI18NTranslation("TS", "2nd Feather", "2影の境界ぼかし強度"),
             new WFI18NTranslation("TS", "3rd Feather", "3影の境界ぼかし強度"),
+            new WFI18NTranslation("TS", "Mask Type", "マスクの種類"),
             new WFI18NTranslation("TS", "Anti-Shadow Mask Texture", "アンチシャドウマスク"),
             new WFI18NTranslation("TS", "Anti-Shadow Mask Texture (R)", "アンチシャドウマスク (R)"),
+            new WFI18NTranslation("TS", "SDF Texture", "SDFテクスチャ"),
+            new WFI18NTranslation("TS", "SDF Texture (RG)", "SDFテクスチャ (RG)"),
             new WFI18NTranslation("TS", "Shade Color Suggest", "影色を自動設定する"),
             new WFI18NTranslation("TS", "Align the boundaries equally", "境界を等間隔に整列"),
             new WFI18NTranslation("TS", "Dont Ajust Contrast", "影コントラストを調整しない"),
@@ -898,6 +904,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.PlzDeprecatedFeature, "今後削除される予定の機能がマテリアルから使用されています。"),
 
             new WFI18NTranslation(WFMessageText.PsAntiShadowMask, "アンチシャドウマスクにはアバターの顔を白く塗ったマスクテクスチャを指定してください。マスク反転をチェックすることでマテリアル全体を顔とみなすこともできます。"),
+            new WFI18NTranslation(WFMessageText.PsSdfShadowMask, "SDFシャドウマスクフィールドには、身体の左側から当たる光をRチャンネル、身体の右側から当たる光をGチャンネルに格納した影テクスチャを設定してください。"),
             new WFI18NTranslation(WFMessageText.PsCapTypeMedian, "MEDIAN_CAPは灰色を基準とした加算＆減算合成を行うmatcapです"),
             new WFI18NTranslation(WFMessageText.PsCapTypeLight, "LIGHT_CAPは黒色を基準とした加算合成を行うmatcapです"),
             new WFI18NTranslation(WFMessageText.PsCapTypeShade, "SHADE_CAPは白色を基準とした乗算合成を行うmatcapです"),
@@ -1169,6 +1176,7 @@ namespace UnlitWF
         public static readonly string PlzQuestSupport = "This material uses a shader that does not support Quest.";
         public static readonly string PlzDeprecatedFeature = "Features that will be removed in the future are used from this material.";
         public static readonly string PsAntiShadowMask = "In the Anti-Shadow Mask field, specify a mask texture with the avatar face painted white. You can also check the InvertMask checkbox to make the entire material a face.";
+        public static readonly string PsSdfShadowMask = "In the SDF shadow mask field, set a shadow texture that stores the light hitting from the left side of the body in the R channel and the light hitting from the right side of the body in the G channel.";
         public static readonly string PsCapTypeMedian = "MEDIAN_CAP is a matcap that performs gray-based additive and subtractive blending.";
         public static readonly string PsCapTypeLight = "LIGHT_CAP is a matcap that performs black-based additive blending.";
         public static readonly string PsCapTypeShade = "SHADE_CAP is a matcap that performs white-based multiply blending.";

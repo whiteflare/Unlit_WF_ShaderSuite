@@ -186,6 +186,11 @@
         return mul(v, tangentTransform);
     }
 
+    float3 transformWorldToTangentNormal(float3 v, half3 ws_normal, half3 ws_tangent, half3 ws_bitangent) {
+        half3x3 tangentTransform = half3x3(ws_tangent, ws_bitangent, ws_normal);
+        return mul(tangentTransform, v);
+    }
+
     ////////////////////////////
     // Lighting
     ////////////////////////////

@@ -112,6 +112,9 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
         [ToggleUI]
             _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
+        [Header(Shade Mask)]
+        [Enum(ANTI_SHADE,0,SDF,1)]
+            _TS_MaskType            ("[TS] Mask Type", Float) = 0
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [ToggleUI]
@@ -202,6 +205,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma fragment frag_fakefur_cutoff
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
@@ -235,6 +239,7 @@ Shader "UnlitWF/WF_FakeFur_FurOnly_Mix" {
             #pragma fragment frag_fakefur
 
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _TS_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE

@@ -224,6 +224,9 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_BlendNormal         ("[TS] Blend Normal", Range(0, 1)) = 0.1
             _TS_BlendNormal2        ("[TS] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [Header(Shade Mask)]
+        [Enum(ANTI_SHADE,0,SDF,1)]
+            _TS_MaskType            ("[TS] Mask Type", Float) = 0
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [ToggleUI]
@@ -410,6 +413,7 @@ Shader "UnlitWF_URP/WF_UnToon_TransCutout" {
             #pragma shader_feature_local _ _MT_NORHMAP_ENABLE
             #pragma shader_feature_local _ _MT_ONLY2ND_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _BKT_ENABLE

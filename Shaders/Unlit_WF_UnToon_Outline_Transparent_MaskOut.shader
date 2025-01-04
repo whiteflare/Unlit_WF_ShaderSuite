@@ -251,6 +251,9 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
             _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_BlendNormal         ("[TS] Blend Normal", Range(0, 1)) = 0.1
             _TS_BlendNormal2        ("[TS] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [Header(Shade Mask)]
+        [Enum(ANTI_SHADE,0,SDF,1)]
+            _TS_MaskType            ("[TS] Mask Type", Float) = 0
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [ToggleUI]
@@ -643,6 +646,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE
@@ -711,6 +715,7 @@ Shader "UnlitWF/UnToon_Outline/WF_UnToon_Outline_Transparent_MaskOut" {
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _NM_ENABLE

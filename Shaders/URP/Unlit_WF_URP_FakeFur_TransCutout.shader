@@ -142,6 +142,9 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
             _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
         [ToggleUI]
             _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
+        [Header(Shade Mask)]
+        [Enum(ANTI_SHADE,0,SDF,1)]
+            _TS_MaskType            ("[TS] Mask Type", Float) = 0
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [ToggleUI]
@@ -230,6 +233,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local _CGR_ENABLE
             #pragma shader_feature_local _CLC_ENABLE
@@ -283,6 +287,7 @@ Shader "UnlitWF_URP/WF_FakeFur_TransCutout" {
 
             #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
+            #pragma shader_feature_local _ _TS_SDF_ENABLE
             #pragma shader_feature_local _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local _CGR_ENABLE
             #pragma shader_feature_local _CLC_ENABLE
