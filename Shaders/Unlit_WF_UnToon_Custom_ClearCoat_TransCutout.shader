@@ -226,10 +226,6 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
         [NoScaleOffset]
             _TS_3rdTex              ("[TS] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
-            _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
-            _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
-        [ToggleUI]
-            _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_BlendNormal         ("[TS] Blend Normal", Range(0, 1)) = 0.1
             _TS_BlendNormal2        ("[TS] Blend Normal 2nd", Range(0, 1)) = 0.1
         [Header(Shade Mask)]
@@ -246,6 +242,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
             _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+            _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
+            _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
+        [ToggleUI]
+            _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 

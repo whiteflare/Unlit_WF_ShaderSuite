@@ -113,10 +113,6 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             _TS_2ndColor            ("[TS] 2nd Shade Color", Color) = (0.68, 0.68, 0.8, 1)
             _TS_3rdColor            ("[TS] 3rd Shade Color", Color) = (0.595, 0.595, 0.7, 1)
             _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
-            _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
-            _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
-        [ToggleUI]
-            _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
         [Header(Shade Mask)]
         [Enum(ANTI_SHADE,0,SDF,1)]
             _TS_MaskType            ("[TS] Mask Type", Float) = 0
@@ -131,6 +127,10 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Outline_TransCutout" {
             _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+            _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
+            _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
+        [ToggleUI]
+            _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
