@@ -69,7 +69,6 @@ namespace UnlitWF
             new ConditionVisiblePropertyHook("_HL_MedianColor(_[0-9]+)?", ctx => IsAnyIntValue(ctx, ctx.current.name.Replace("_MedianColor", "_CapType"), p => p == 0)), // MEDIAN_CAP
             new ConditionVisiblePropertyHook("_.+_BlendNormal(_.+)?", ctx => IsAnyIntValue(ctx, "_NM_Enable", p => p != 0)),
             new ConditionVisiblePropertyHook("_.+_BlendNormal2(_.+)?", ctx => IsAnyIntValue(ctx, "_NS_Enable", p => p != 0)),
-            new ConditionVisiblePropertyHook("_TS_BlendNormal|_TS_BlendNormal2", ctx => IsAnyIntValue(ctx, "_TS_Enable", p => p != 0) && IsAnyIntValue(ctx, "_TS_MaskType", p => p == 0)),
             new ConditionVisiblePropertyHook("_ES_SC_.*", ctx => IsAnyIntValue(ctx, "_ES_ScrollEnable", p => p != 0)),
             new ConditionVisiblePropertyHook("_ES_SC_LevelOffset", ctx => IsAnyIntValue(ctx, "_ES_SC_Shape", p => p != 3), isRegex:false),
             new ConditionVisiblePropertyHook("_ES_SC_Sharpness", ctx => IsAnyIntValue(ctx, "_ES_SC_Shape", p => p != 3), isRegex:false),
