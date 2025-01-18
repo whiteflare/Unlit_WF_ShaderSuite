@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2024 whiteflare.
+ *  Copyright 2018-2025 whiteflare.
  *  Copyright 2021 ma1on.
  *
  *  This software is provided ‘as-is’, without any express or implied
