@@ -105,8 +105,8 @@ namespace UnlitWF
             // Gem 系列
             // ================
 
-            new WFShaderName("BRP", "Gem", "Basic", "Opaque",                                   "UnlitWF/WF_Gem_Opaque"),
-            new WFShaderName("BRP", "Gem", "Basic", "Transparent",                              "UnlitWF/WF_Gem_Transparent", represent: true),
+            new WFShaderName("BRP", "Gem", "Basic", "Opaque",                                   "UnlitWF/WF_Gem_Opaque", represent: true),
+            new WFShaderName("BRP", "Gem", "Basic", "Transparent",                              "UnlitWF/WF_Gem_Transparent"),
 
             // ================
             // Grass 系列
@@ -180,8 +180,8 @@ namespace UnlitWF
             // Gem 系列(URP)
             // ================
 
-            new WFShaderName("URP", "Gem", "Basic", "Opaque",                                   "UnlitWF_URP/WF_Gem_Opaque"),
-            new WFShaderName("URP", "Gem", "Basic", "Transparent",                              "UnlitWF_URP/WF_Gem_Transparent", represent: true),
+            new WFShaderName("URP", "Gem", "Basic", "Opaque",                                   "UnlitWF_URP/WF_Gem_Opaque", represent: true),
+            new WFShaderName("URP", "Gem", "Basic", "Transparent",                              "UnlitWF_URP/WF_Gem_Transparent"),
 
             // ================
             // Water 系列(URP)
