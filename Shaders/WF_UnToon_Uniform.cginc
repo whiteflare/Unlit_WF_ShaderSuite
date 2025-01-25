@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2024 whiteflare.
+ *  Copyright 2018-2025 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -304,6 +304,7 @@
     half            _TS_3rdFeather;
     half            _TS_BlendNormal;
     half            _TS_BlendNormal2;
+    uint            _TS_MaskType;
     half            _TS_InvMaskVal;
     half            _TS_FixContrast;
     half            _TS_MinDist;

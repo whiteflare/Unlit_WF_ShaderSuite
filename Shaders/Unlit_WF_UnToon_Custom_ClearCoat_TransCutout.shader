@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2024 whiteflare.
+ *  Copyright 2018-2025 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -226,12 +226,11 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
         [NoScaleOffset]
             _TS_3rdTex              ("[TS] 3rd Shade Texture", 2D) = "white" {}
             _TS_Power               ("[TS] Shade Power", Range(0, 2)) = 1
-            _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 1.0
-            _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
-        [ToggleUI]
-            _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
             _TS_BlendNormal         ("[TS] Blend Normal", Range(0, 1)) = 0.1
             _TS_BlendNormal2        ("[TS] Blend Normal 2nd", Range(0, 1)) = 0.1
+        [Header(Shade Mask)]
+        [Enum(ANTI_SHADE,0,SDF,1)]
+            _TS_MaskType            ("[TS] Mask Type", Float) = 0
         [NoScaleOffset]
             _TS_MaskTex             ("[TS] Anti-Shadow Mask Texture (R)", 2D) = "black" {}
         [ToggleUI]
@@ -243,6 +242,10 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
             _TS_1stFeather          ("[TS] 1st Feather", Range(0, 0.2)) = 0.05
             _TS_2ndFeather          ("[TS] 2nd Feather", Range(0, 0.2)) = 0.05
             _TS_3rdFeather          ("[TS] 3rd Feather", Range(0, 0.2)) = 0.05
+            _TS_MinDist             ("[TS] FadeOut Distance (Near)", Range(0, 15)) = 2.0
+            _TS_MaxDist             ("[TS] FadeOut Distance (Far)", Range(0, 15)) = 4.0
+        [ToggleUI]
+            _TS_FixContrast         ("[TS] Dont Ajust Contrast", Range(0, 1)) = 0
         [ToggleUI]
             _TS_DisableBackLit      ("[TS] Disable BackLit", Range(0, 1)) = 0
 
@@ -445,7 +448,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/12/17 (2.6.1)", Float) = 0
+            _CurrentVersion         ("2025/01/28 (2.7.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransCutout", Float) = 0
@@ -494,6 +497,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
             #pragma shader_feature_local_fragment _ _ES_AULINK_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLLGRAD_ENABLE
             #pragma shader_feature_local_fragment _ _ES_SCROLL_ENABLE
+            #pragma shader_feature_local_fragment _ _TS_SDF_ENABLE
             #pragma shader_feature_local_fragment _ _TS_STEP1_ENABLE _TS_STEP2_ENABLE _TS_STEP3_ENABLE
             #pragma shader_feature_local_fragment _BKT_ENABLE
             #pragma shader_feature_local_fragment _CGR_ENABLE
@@ -502,9 +506,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_TransCutout" {
             #pragma shader_feature_local_fragment _DSV_ENABLE
             #pragma shader_feature_local_fragment _ES_ENABLE
             #pragma shader_feature_local_fragment _LME_ENABLE
+            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TM_ENABLE
             #pragma shader_feature_local_fragment _TR_ENABLE
-            #pragma shader_feature_local_fragment _TBL_ENABLE
             #pragma shader_feature_local_fragment _TX2_ENABLE
 
             #pragma multi_compile_fwdbase

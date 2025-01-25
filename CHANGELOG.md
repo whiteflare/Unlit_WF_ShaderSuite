@@ -1,5 +1,20 @@
 # Change Log
 
+## 2025/01/28 (2.7.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250128
+
+### Added
+- Shader
+  - SDFテクスチャを使用して影を付ける機能を追加しました。
+
+### Changed
+- Shader
+  - ToonShade のフェードアウト距離(Min)初期値を `1.0` から `2.0` に調整しました。
+- GUI
+  - GemのデフォルトをTransparentからOpaqueに変更しました。
+
+----
+
 ## 2024/12/17 (2.6.1)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241217
 
