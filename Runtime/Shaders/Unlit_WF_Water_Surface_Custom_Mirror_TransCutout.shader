@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2024 whiteflare.
+ *  Copyright 2018-2025 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -128,7 +128,7 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2024/12/17 (2.6.1)", Float) = 0
+            _CurrentVersion         ("2025/01/28 (2.7.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
