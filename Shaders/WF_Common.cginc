@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2024 whiteflare.
+ *  Copyright 2018-2025 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -184,6 +184,11 @@
     float3 transformTangentToWorldNormal(float3 v, half3 ws_normal, half3 ws_tangent, half3 ws_bitangent) {
         half3x3 tangentTransform = half3x3(ws_tangent, ws_bitangent, ws_normal);
         return mul(v, tangentTransform);
+    }
+
+    float3 transformWorldToTangentNormal(float3 v, half3 ws_normal, half3 ws_tangent, half3 ws_bitangent) {
+        half3x3 tangentTransform = half3x3(ws_tangent, ws_bitangent, ws_normal);
+        return mul(tangentTransform, v);
     }
 
     ////////////////////////////
