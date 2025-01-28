@@ -13,7 +13,7 @@ UnlitWF/UnToon は、テクスチャをそのまま描画するUnlitシェーダ
 
 The zlib/libpng License
 
-Copyright 2018-2024 whiteflare.
+Copyright 2018-2025 whiteflare.
 
 This software is provided ‘as-is’, without any express or implied
 warranty. In no event will the authors be held liable for any damages

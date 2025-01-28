@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2024 whiteflare.
+ *  Copyright 2018-2025 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -125,7 +125,12 @@ namespace UnlitWF
             // ZWrite
             new ZWriteFrontBackPropertyHook("_AL_ZWrite", "_AL_ZWriteBack"),
 
-            // _OL_CustomParam1のディスプレイ名をカスタマイズ
+            // ディスプレイ名をカスタマイズ
+            new CustomPropertyHook("_TS_MaskTex", ctx => {
+                if (IsAnyIntValue(ctx, "_TS_MaskType", p => p == 1)) {
+                    ctx.guiContent = WFI18N.GetGUIContent("TS", "SDF Texture (RG)");
+                }
+            }, null, isRegex:false),
             new CustomPropertyHook("_OVL_CustomParam1", ctx => {
                 if (IsAnyIntValue(ctx, "_OVL_UVType", p => p == 3)) {
                     ctx.guiContent = WFI18N.GetGUIContent("OL", "UV2.y <-> Normal.y");
@@ -207,7 +212,15 @@ namespace UnlitWF
             new HelpBoxPropertyHook("_CRF_UseDepthTex|_CGL_UseDepthTex", ctx => ctx.current.floatValue == 0 ? null : WFI18N.Translate(WFMessageText.PsCameraDepthTex), MessageType.Info),
 
             // _TS_InvMaskVal の後に説明文を追加する
-            new HelpBoxPropertyHook("_TS_InvMaskVal", ctx => WFI18N.Translate(WFMessageText.PsAntiShadowMask), MessageType.Info, isRegex:false),
+            new HelpBoxPropertyHook("_TS_InvMaskVal", ctx => {
+                if (IsAnyIntValue(ctx, "_TS_MaskType", p => p == 0)) {
+                    return WFI18N.Translate(WFMessageText.PsAntiShadowMask);
+                }
+                if (IsAnyIntValue(ctx, "_TS_MaskType", p => p == 1)) {
+                    return WFI18N.Translate(WFMessageText.PsSdfShadowMask);
+                }
+                return null;
+            }, MessageType.Info, isRegex:false),
             // _HL_MatcapColor の後に説明文を追加する
             new HelpBoxPropertyHook("_HL_MatcapColor(_[0-9]+)?", ctx => {
                 var name = ctx.current.name.Replace("_MatcapColor", "_CapType");
