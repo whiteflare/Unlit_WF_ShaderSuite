@@ -37,6 +37,7 @@
 // VRCSDK有無の判定ここまで //////
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -47,7 +48,6 @@ using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 #else
 using UnityEditor.Experimental.SceneManagement;
-using System.IO;
 #endif
 
 namespace UnlitWF
