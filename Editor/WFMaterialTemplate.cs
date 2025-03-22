@@ -49,14 +49,10 @@ namespace UnlitWF
 
         public static void CreateAsset(Material copy)
         {
-            var path = EditorUtility.SaveFilePanel("Save WF Material Template", "Assets", "", "asset");
+            var path = AssetFileSaver.SaveFilePanelInProject("Save WF Material Template", "", "asset");
             if (string.IsNullOrWhiteSpace(path))
             {
                 return;
-            }
-            if (path.StartsWith(Application.dataPath, System.StringComparison.InvariantCultureIgnoreCase))
-            {
-                path = "Assets" + path.Substring(Application.dataPath.Length);
             }
             CreateAsset(copy, path);
         }

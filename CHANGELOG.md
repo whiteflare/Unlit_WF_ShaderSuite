@@ -1,5 +1,15 @@
 # Change Log
 
+## 2025/03/23 (2.8.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250323
+
+### Changed
+- GUI
+  - マテリアル複数選択時にコピーメニュー非活性化していたのを非活性化しないようにしました。複数選択時は先頭1件のマテリアルをコピーします。
+  - WFEditorSetting に「現在有効な設定ファイルを選択」ボタンを追加しました。
+
+----
+
 ## 2025/01/28 (2.7.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250128
 
