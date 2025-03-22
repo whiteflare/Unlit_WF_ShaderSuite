@@ -1818,17 +1818,10 @@ namespace UnlitWF
                 var menu = new GenericMenu();
 
                 // コピー
-                if (oneMaterial)
+                menu.AddItem(WFI18N.GetGUIContent("Copy material"), false, () =>
                 {
-                    menu.AddItem(WFI18N.GetGUIContent("Copy material"), false, () =>
-                    {
-                        copiedMaterial = currentMaterial;
-                    });
-                }
-                else
-                {
-                    menu.AddDisabledItem(WFI18N.GetGUIContent("Copy material"));
-                }
+                    copiedMaterial = editor.targets.FirstOrDefault(m => m is Material) as Material;
+                });
 
                 // ペースト
                 if (copiedMaterial != null)
@@ -1862,16 +1855,16 @@ namespace UnlitWF
                 {
                     var current_num = prefix.Replace("HL", "");
                     foreach (var entry in new Dictionary<string, string>
-                {
-                    { "", "Light Matcap" },
-                    { "_1", "Light Matcap 2" },
-                    { "_2", "Light Matcap 3" },
-                    { "_3", "Light Matcap 4" },
-                    { "_4", "Light Matcap 5" },
-                    { "_5", "Light Matcap 6" },
-                    { "_6", "Light Matcap 7" },
-                    { "_7", "Light Matcap 8" },
-                })
+                        {
+                            { "", "Light Matcap" },
+                            { "_1", "Light Matcap 2" },
+                            { "_2", "Light Matcap 3" },
+                            { "_3", "Light Matcap 4" },
+                            { "_4", "Light Matcap 5" },
+                            { "_5", "Light Matcap 6" },
+                            { "_6", "Light Matcap 7" },
+                            { "_7", "Light Matcap 8" },
+                        })
                     {
                         var other_num = entry.Key;
                         if (!currentMaterial.HasProperty("_HL_Enable" + other_num))

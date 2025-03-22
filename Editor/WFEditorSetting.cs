@@ -316,7 +316,9 @@ namespace UnlitWF
 
         public override void OnInspectorGUI()
         {
-            if (target == WFEditorSetting.GetOneOfSettings())
+            var isCurrentActive = target == WFEditorSetting.GetOneOfSettings();
+
+            if (isCurrentActive)
             {
                 var msg = WFI18N.Translate("WFEditorSetting", "This is the current setting used.");
                 EditorGUILayout.HelpBox(msg, MessageType.Info);
@@ -408,6 +410,12 @@ namespace UnlitWF
             EditorGUILayout.Space();
             GUI.Label(EditorGUILayout.GetControlRect(), "Other", EditorStyles.boldLabel);
 
+            using(new EditorGUI.DisabledGroupScope(isCurrentActive)) {
+                if (GUI.Button(EditorGUILayout.GetControlRect(), WFI18N.Translate("WFEditorSetting", "Select current setting asset")))
+                {
+                    Selection.activeObject = WFEditorSetting.GetOneOfSettings();
+                }
+            }
             if (GUI.Button(EditorGUILayout.GetControlRect(), WFI18N.Translate("WFEditorSetting", "Create New Settings asset")))
             {
                 CreateNewSettingsAsset();
