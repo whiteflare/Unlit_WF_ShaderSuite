@@ -590,7 +590,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_TransCutout" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2025/01/28 (2.7.0)", Float) = 0
+            _CurrentVersion         ("2025/03/23 (2.8.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/WF_UnToon_TransCutout", Float) = 0
