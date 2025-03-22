@@ -887,6 +887,7 @@ namespace UnlitWF
             new WFI18NTranslation("WFEditorSetting", "Enable Migration When Import", "マテリアルインポート時にマテリアルを最新化"),
             new WFI18NTranslation("WFEditorSetting", "Auto Switch Quest Shader", "Quest向けシェーダに自動で切り替える"),
             new WFI18NTranslation("WFEditorSetting", "Create New Settings asset", "設定アセットファイルを新規作成"),
+            new WFI18NTranslation("WFEditorSetting", "Select current setting asset", "現在アクティブな設定ファイルを選択"),
 
             // その他のテキスト
             new WFI18NTranslation(WFMessageText.NewerVersion, "新しいバージョンがリリースされています。\n最新版: "),
