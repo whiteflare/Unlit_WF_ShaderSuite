@@ -26,6 +26,7 @@
 #if UNITY_EDITOR
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -708,7 +709,7 @@ namespace UnlitWF
         }
     }
 
-    class AssetFileSaver
+    static class AssetFileSaver
     {
         public static Texture2D SaveAsFile(Texture2D tex, Texture template = null, System.Func<TextureImporter, bool> config = null)
         {
@@ -717,7 +718,7 @@ namespace UnlitWF
                 return null;
             }
 
-            var outputPath = EditorUtility.SaveFilePanelInProject("Save Texture", "", "png", "Save Texture");
+            var outputPath = SaveFilePanelInProject("Save Texture", "", "png");
             if (string.IsNullOrWhiteSpace(outputPath))
             {
                 return null;
@@ -769,7 +770,7 @@ namespace UnlitWF
                 return null;
             }
 
-            var outputPath = EditorUtility.SaveFilePanelInProject(title, "", ext, title);
+            var outputPath = SaveFilePanelInProject(title, "", ext);
             if (string.IsNullOrWhiteSpace(outputPath))
             {
                 return null;
@@ -790,6 +791,59 @@ namespace UnlitWF
                 AssetDatabase.CreateAsset(obj, outputPath);
                 return AssetDatabase.LoadAssetAtPath<T>(outputPath);
             }
+        }
+
+        private static string prevSavedFilePath = null;
+
+        /// <summary>
+        /// SaveFilePanelInProjectを開いて保存先ファイルパスを返す。
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="defaultName"></param>
+        /// <param name="extension"></param>
+        /// <param name="message"></param>
+        /// <returns>Assets/から始まるプロジェクト相対パス、または空文字列</returns>
+        public static string SaveFilePanelInProject(string title, string defaultName, string extension, string message = null)
+        {
+            if (message == null)
+            {
+                message = title;
+            }
+
+            var directoryPath = GetActiveFolderPath();
+            if (!string.IsNullOrWhiteSpace(prevSavedFilePath))
+            {
+                var path = Path.GetDirectoryName(prevSavedFilePath);
+                if (path != null && Directory.Exists(path))
+                {
+                    directoryPath = path;
+                }
+            }
+
+            var newFilePath = EditorUtility.SaveFilePanelInProject(title, defaultName, extension, message, directoryPath);
+
+            // EditorUtility.SaveFilePanelを使う時は絶対パスが返ってくるので相対パスに変換する。
+            //if (newFilePath.StartsWith(Application.dataPath, System.StringComparison.InvariantCultureIgnoreCase))
+            //{
+            //    newFilePath = "Assets" + newFilePath.Substring(Application.dataPath.Length);
+            //}
+
+            if (!string.IsNullOrEmpty(newFilePath))
+            {
+                prevSavedFilePath = newFilePath;
+            }
+            return newFilePath;
+        }
+
+        private static string GetActiveFolderPath()
+        {
+            var GetActiveFolderPath = typeof(ProjectWindowUtil).GetMethod("GetActiveFolderPath", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            if (GetActiveFolderPath == null)
+            {
+                Debug.LogWarning("Missing Method ProjectWindowUtil.GetActiveFolderPath");
+                return null;
+            }
+            return GetActiveFolderPath.Invoke(null, new object[0]) as string;
         }
     }
 }
