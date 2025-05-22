@@ -138,6 +138,10 @@
         return col;
     }
 
+    half3 sampleSHLightColor(float3 ws_vertex) {
+        return sampleSHLightColor();
+    }
+
     float3 getPoint1LightPos() {
         return 1 <= GetAdditionalLightsCount() ? _AdditionalLightsPosition[0].xyz : float3(0, 0, 0);
     }

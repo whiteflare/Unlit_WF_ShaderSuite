@@ -1588,7 +1588,7 @@ FEATURE_TGL_END
         #define drawOcclusion(d)
     #endif
 
-    float3 calcAmbientColorVertex(float2 uv_lmap) {
+    float3 calcAmbientColorVertex(float3 ws_vertex, float2 uv_lmap) {
         // ライトマップもしくは環境光を取得
         #ifdef _LMAP_ENABLE
             #ifdef _AO_ENABLE
@@ -1605,7 +1605,7 @@ FEATURE_TGL_END
                 return _AO_PICK_LMAP_LOD(uv_lmap);    // Lightmap が使えるがAOが無効のときは、Lightmap から明るさを取得
             #endif
         #else
-            return sampleSHLightColor();    // Lightmap が使えないときは SH を返す
+            return sampleSHLightColor(ws_vertex);    // Lightmap が使えないときは SH を返す
         #endif
     }
 
