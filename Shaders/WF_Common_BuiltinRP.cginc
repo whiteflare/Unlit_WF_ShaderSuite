@@ -96,19 +96,6 @@
         return col;
     }
 
-    #include "WF_Common_LightVolumes.cginc"
-
-    half3 sampleSHLightColor(float3 ws_vertex) {
-        if (!_UdonLightVolumeEnabled || _UdonLightVolumeCount == 0) {
-            return sampleSHLightColor();
-        }
-        else {
-            float3 L0, L1r, L1g, L1b;
-            LightVolumeSH(ws_vertex, L0, L1r, L1g, L1b);
-            return L0;
-        }
-    }
-
     float3 getPoint1LightPos() {
 #ifdef VERTEXLIGHT_ON
         return float3(unity_4LightPosX0.x, unity_4LightPosY0.x, unity_4LightPosZ0.x);

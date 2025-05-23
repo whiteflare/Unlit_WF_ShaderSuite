@@ -503,6 +503,25 @@ FEATURE_TGL_END
         #define affectNearClipCancel(vs_vertex)
     #endif
 
+#ifdef _GL_ULV_ENABLE
+    #include "WF_UnToon_LightVolumes.cginc"
+
+    half3 sampleSHLightColor(float3 ws_vertex) {
+        if (!_UdonLightVolumeEnabled || _UdonLightVolumeCount == 0) {
+            return sampleSHLightColor();
+        }
+        else {
+            float3 L0, L1r, L1g, L1b;
+            LightVolumeSH(ws_vertex, L0, L1r, L1g, L1b);
+            return L0;
+        }
+    }
+#else
+    half3 sampleSHLightColor(float3 ws_vertex) {
+        return sampleSHLightColor();
+    }
+#endif
+
     ////////////////////////////
     // Gradient Map
     ////////////////////////////
