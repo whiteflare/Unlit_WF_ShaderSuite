@@ -93,6 +93,7 @@ namespace UnlitWF
 
             // 条件付きHide(Common Material Settings)
             new ConditionVisiblePropertyHook("_GL_NCC_Enable", ctx =>  WFEditorSetting.GetOneOfSettings().GetEnableNccInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
+            new ConditionVisiblePropertyHook("_GL_ULV_Enable", ctx =>  WFEditorSetting.GetOneOfSettings().GetEnableVRCLightVolumesInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
             new ConditionVisiblePropertyHook("_CRF_UseDepthTex", ctx =>  WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.PerMaterial, isRegex:false),
             new ConditionVisiblePropertyHook("_CGL_UseDepthTex", ctx =>  WFEditorSetting.GetOneOfSettings().GetUseDepthTexInCurrentEnvironment() == MatForceSettingMode2.PerMaterial, isRegex:false),
             new ConditionVisiblePropertyHook("_TS_DisableBackLit", ctx =>  WFEditorSetting.GetOneOfSettings().GetDisableBackLitInCurrentEnvironment() == MatForceSettingMode3.PerMaterial, isRegex:false),
