@@ -503,6 +503,25 @@ FEATURE_TGL_END
         #define affectNearClipCancel(vs_vertex)
     #endif
 
+#ifdef _GL_ULV_ENABLE
+    #include "WF_UnToon_LightVolumes.cginc"
+
+    half3 sampleSHLightColor(float3 ws_vertex) {
+        if (!_UdonLightVolumeEnabled || _UdonLightVolumeCount == 0) {
+            return sampleSHLightColor();
+        }
+        else {
+            float3 L0, L1r, L1g, L1b;
+            LightVolumeSH(ws_vertex, L0, L1r, L1g, L1b);
+            return L0;
+        }
+    }
+#else
+    half3 sampleSHLightColor(float3 ws_vertex) {
+        return sampleSHLightColor();
+    }
+#endif
+
     ////////////////////////////
     // Gradient Map
     ////////////////////////////
@@ -1588,7 +1607,7 @@ FEATURE_TGL_END
         #define drawOcclusion(d)
     #endif
 
-    float3 calcAmbientColorVertex(float2 uv_lmap) {
+    float3 calcAmbientColorVertex(float3 ws_vertex, float2 uv_lmap) {
         // ライトマップもしくは環境光を取得
         #ifdef _LMAP_ENABLE
             #ifdef _AO_ENABLE
@@ -1605,7 +1624,7 @@ FEATURE_TGL_END
                 return _AO_PICK_LMAP_LOD(uv_lmap);    // Lightmap が使えるがAOが無効のときは、Lightmap から明るさを取得
             #endif
         #else
-            return sampleSHLightColor();    // Lightmap が使えないときは SH を返す
+            return sampleSHLightColor(ws_vertex);    // Lightmap が使えないときは SH を返す
         #endif
     }
 

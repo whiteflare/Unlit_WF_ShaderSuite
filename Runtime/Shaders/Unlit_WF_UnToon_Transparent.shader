@@ -525,6 +525,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
+            #pragma shader_feature_local _GL_ULV_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _OVL_ENABLE
@@ -587,6 +588,7 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _AO_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
+            #pragma shader_feature_local _GL_ULV_ENABLE
             #pragma shader_feature_local _NM_ENABLE
             #pragma shader_feature_local _NS_ENABLE
             #pragma shader_feature_local _OVL_ENABLE

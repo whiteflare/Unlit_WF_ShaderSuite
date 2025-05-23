@@ -1256,6 +1256,8 @@ namespace UnlitWF
                 "Unlit DoubleSided/Texture", "Unlit DoubleSided/Cutout", "Unlit DoubleSided/Transparent",
                 // Standard系列
                 "Standard DoubleSided/Opaque", "Standard DoubleSided/Cutout", "Standard DoubleSided/Fade", "Standard DoubleSided/Transparent",
+                // ToonStandard系列
+                "Toon/Standard", "Toon/StandardOutline",
                 // その他
                 "Hidden" };
         private static readonly string[] vrcFallbackActualTag = { "", "", "",
@@ -1267,6 +1269,8 @@ namespace UnlitWF
                 "UnlitDoubleSided", "UnlitCutoutDoubleSided", "UnlitTransparentDoubleSided",
                 // Standard系列
                 "StandardDoubleSided", "StandardCutoutDoubleSided", "StandardFadeDoubleSided", "StandardTransparentDoubleSided",
+                // ToonStandard系列
+                "ToonStandard", "ToonStandardOutline",
                 // その他
                 "Hidden" };
 
