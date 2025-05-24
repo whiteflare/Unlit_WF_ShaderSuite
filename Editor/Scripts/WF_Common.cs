@@ -327,6 +327,7 @@ namespace UnlitWF
             var changed = false;
             var settings = WFEditorSetting.GetOneOfSettings();
             changed |= SetupMaterial_CommonMaterialSettings(mat, "_GL_NCC_Enable", (int) settings.GetEnableNccInCurrentEnvironment());
+            changed |= SetupMaterial_CommonMaterialSettings(mat, "_GL_ULV_Enable", (int)settings.GetEnableVRCLightVolumesInCurrentEnvironment());
             changed |= SetupMaterial_CommonMaterialSettings(mat, "_CRF_UseDepthTex", (int)settings.GetUseDepthTexInCurrentEnvironment());
             changed |= SetupMaterial_CommonMaterialSettings(mat, "_CGL_UseDepthTex", (int)settings.GetUseDepthTexInCurrentEnvironment());
             changed |= SetupMaterial_CommonMaterialSettings(mat, "_TS_DisableBackLit", (int)settings.GetDisableBackLitInCurrentEnvironment());

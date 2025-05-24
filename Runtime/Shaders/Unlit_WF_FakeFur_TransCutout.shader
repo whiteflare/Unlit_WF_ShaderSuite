@@ -261,6 +261,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
 
             #pragma target 4.5
 
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _GL_ULV_ENABLE
@@ -298,6 +299,7 @@ Shader "UnlitWF/WF_FakeFur_TransCutout" {
             #pragma geometry geom_fakefur
             #pragma fragment frag_fakefur_cutoff
 
+            #pragma shader_feature_local _ _GL_AUTO_ENABLE _GL_ONLYDIR_ENABLE _GL_ONLYPOINT_ENABLE _GL_WSDIR_ENABLE _GL_LSDIR_ENABLE _GL_WSPOS_ENABLE
             #pragma shader_feature_local _ _TS_FIXC_ENABLE
             #pragma shader_feature_local _GL_NCC_ENABLE
             #pragma shader_feature_local _GL_ULV_ENABLE
