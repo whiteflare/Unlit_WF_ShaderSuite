@@ -147,7 +147,7 @@
         half4 ws_light_dir = calcWorldSpaceLightDir(o.ws_vertex);
         o.ws_light_dir = ws_light_dir.xyz;
         // 環境光取得
-        float3 ambientColor = sampleSHLightColor();
+        float3 ambientColor = sampleSHLightColor(o.ws_vertex.xyz);
         // 影コントラスト
         calcToonShadeContrast(o.ws_vertex, ws_light_dir, ambientColor, o.shadow_power);
         // Anti-Glare とライト色ブレンドを同時に計算

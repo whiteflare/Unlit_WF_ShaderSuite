@@ -202,7 +202,7 @@ FEATURE_TGL_END
         calcGrassWaveVertex(o.height, ws_vertex);
 
         // 環境光取得
-        float3 ambientColor = calcAmbientColorVertex(v.uv2);
+        float3 ambientColor = calcAmbientColorVertex(ws_vertex, v.uv2);
         // Anti-Glare とライト色ブレンドを同時に計算
         o.light_color = calcLightColorVertex(ws_vertex, ambientColor);
 
