@@ -330,6 +330,8 @@ namespace UnlitWF
             { "Lit", HELP_URL_UNTOON + "#Lit" },
             { "Lit Advance", HELP_URL_UNTOON + "#LitAdvance" },
             { "UnToon/Stencil Mask", HELP_URL_UNTOON + "#Stencil" },
+            { "CGL", HELP_URL_UNTOON + "#FrostedGlass" },
+            { "CRF", HELP_URL_UNTOON + "#Refraction" },
 
             // FakeFur
             { "FakeFur/Base", HELP_URL_FAKEFUR + "#Base" },
