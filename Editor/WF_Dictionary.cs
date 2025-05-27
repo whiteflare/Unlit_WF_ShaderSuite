@@ -330,6 +330,8 @@ namespace UnlitWF
             { "Lit", HELP_URL_UNTOON + "#Lit" },
             { "Lit Advance", HELP_URL_UNTOON + "#LitAdvance" },
             { "UnToon/Stencil Mask", HELP_URL_UNTOON + "#Stencil" },
+            { "CGL", HELP_URL_UNTOON + "#FrostedGlass" },
+            { "CRF", HELP_URL_UNTOON + "#Refraction" },
 
             // FakeFur
             { "FakeFur/Base", HELP_URL_FAKEFUR + "#Base" },
@@ -384,6 +386,7 @@ namespace UnlitWF
             new WFCustomKeywordSettingBool("_PA_UseFlipBook", "_PF_ENABLE"),
             new WFCustomKeywordSettingEnum("_GL_LightMode", "_GL_AUTO_ENABLE", "_GL_ONLYDIR_ENABLE", "_GL_ONLYPOINT_ENABLE", "_GL_WSDIR_ENABLE", "_GL_LSDIR_ENABLE", "_GL_WSPOS_ENABLE"),
             new WFCustomKeywordSettingBool("_GL_NCC_Enable", "_GL_NCC_ENABLE"),
+            new WFCustomKeywordSettingBool("_GL_ULV_Enable", "_GL_ULV_ENABLE"),
             new WFCustomKeywordSettingBool("_TL_LineType", "_TL_EDGE_ENABLE") {
                 enablePropName = "_TL_Enable",
             },
@@ -736,6 +739,7 @@ namespace UnlitWF
             new WFI18NTranslation("Disable BackLit", "逆光補正しない"),
             new WFI18NTranslation("Disable ObjectBasePos", "メッシュ原点を取得しない"),
             new WFI18NTranslation("Cancel Near Clipping", "カメラのニアクリップを無視"),
+            new WFI18NTranslation("Use VRC LightVolumes", "VRC LightVolumes を使う"),
             // Light Bake Effects
             new WFI18NTranslation("LBE", "Indirect Multiplier", "間接光の倍率"),
             new WFI18NTranslation("LBE", "Emission Multiplier", "Emissionの倍率"),

@@ -75,6 +75,7 @@
     }
 
     half3 sampleSHLightColor() {
+#ifdef _WF_LEGACY_SH
         float3 col = float3(0, 0, 0);
         col += ShadeSH9( half4(+1, 0, 0, 1) );
         col += ShadeSH9( half4(-1, 0, 0, 1) );
@@ -83,7 +84,16 @@
         col /= 4;
         col += ShadeSH9( half4(0, +1, 0, 1) );
         col += ShadeSH9( half4(0, -1, 0, 1) );
-        return col / 3;
+        col /= 3;
+#else
+        half3 col = half3(unity_SHAr.w, unity_SHAg.w, unity_SHAb.w);
+        col += half3(unity_SHBr.w, unity_SHBg.w, unity_SHBb.w) / 6;
+        col -= unity_SHC.rgb / 2;
+    #ifdef UNITY_COLORSPACE_GAMMA
+        col = LinearToGammaSpace(col);
+    #endif
+#endif
+        return col;
     }
 
     float3 getPoint1LightPos() {
