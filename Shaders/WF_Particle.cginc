@@ -183,7 +183,7 @@
 
 #ifdef _GL_ENABLE
         // 環境光取得
-        float3 ambientColor = sampleSHLightColor();
+        float3 ambientColor = sampleSHLightColor(o.ws_vertex.xyz);
         // Anti-Glare とライト色ブレンドを同時に計算
         o.light_color = calcLightColorVertex(o.ws_vertex, ambientColor);
 #endif

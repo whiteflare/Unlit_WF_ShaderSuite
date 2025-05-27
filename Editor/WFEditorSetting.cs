@@ -136,6 +136,19 @@ namespace UnlitWF
         /// </summary>
         public MatForceSettingMode2 useDepthTexInOther = MatForceSettingMode2.PerMaterial;
 
+        /// <summary>
+        /// VRC LightVolumes を使う(for VRC3Avatar)
+        /// </summary>
+        public MatForceSettingMode3 enableULVInVRC3Avatar = MatForceSettingMode3.ForceON;
+        /// <summary>
+        /// VRC LightVolumes を使う(for VRC3World)
+        /// </summary>
+        public MatForceSettingMode3 enableULVInVRC3World = MatForceSettingMode3.PerMaterial;
+        /// <summary>
+        /// VRC LightVolumes を使う(for OtherEnv)
+        /// </summary>
+        public MatForceSettingMode3 enableULVInOther = MatForceSettingMode3.PerMaterial;
+
         // ==================================================
 
         private static WFEditorSetting currentSettings = null;
@@ -182,6 +195,19 @@ namespace UnlitWF
             }
         }
 
+        public MatForceSettingMode3 GetEnableVRCLightVolumesInCurrentEnvironment()
+        {
+            switch (WFCommonUtility.GetCurrentEntironment())
+            {
+                case CurrentEntironment.VRCSDK3_Avatar:
+                    return enableULVInVRC3Avatar;
+                case CurrentEntironment.VRCSDK3_World:
+                    return enableULVInVRC3World;
+                default:
+                    return enableULVInOther;
+            }
+        }
+
         // ==================================================
 
         public static WFEditorSetting GetOneOfSettings(bool forceReload = false)
@@ -224,12 +250,18 @@ namespace UnlitWF
         }
     }
 
+    /// <summary>
+    /// PerMaterial / ForceOFF の二択
+    /// </summary>
     public enum MatForceSettingMode2
     {
         PerMaterial = -1,
         ForceOFF = 0,
     }
 
+    /// <summary>
+    /// PerMaterial / ForceOFF / ForceON の三択
+    /// </summary>
     public enum MatForceSettingMode3
     {
         PerMaterial = -1,
@@ -276,6 +308,9 @@ namespace UnlitWF
         SerializedProperty p_useDepthTexInVRC3Avatar;
         SerializedProperty p_useDepthTexInVRC3World;
         SerializedProperty p_useDepthTexInOther;
+        SerializedProperty p_enableULVInVRC3Avatar;
+        SerializedProperty p_enableULVInVRC3World;
+        SerializedProperty p_enableULVInOther;
 
         private void OnEnable()
         {
@@ -312,6 +347,11 @@ namespace UnlitWF
             this.p_useDepthTexInVRC3Avatar = serializedObject.FindProperty(nameof(WFEditorSetting.useDepthTexInVRC3Avatar));
             this.p_useDepthTexInVRC3World = serializedObject.FindProperty(nameof(WFEditorSetting.useDepthTexInVRC3World));
             this.p_useDepthTexInOther = serializedObject.FindProperty(nameof(WFEditorSetting.useDepthTexInOther));
+
+            // EnableULV
+            this.p_enableULVInVRC3Avatar = serializedObject.FindProperty(nameof(WFEditorSetting.enableULVInVRC3Avatar));
+            this.p_enableULVInVRC3World = serializedObject.FindProperty(nameof(WFEditorSetting.enableULVInVRC3World));
+            this.p_enableULVInOther = serializedObject.FindProperty(nameof(WFEditorSetting.enableULVInOther));
         }
 
         public override void OnInspectorGUI()
@@ -355,6 +395,7 @@ namespace UnlitWF
                     EditorGUILayout.PropertyField(p_enableNccInVRC3Avatar, new GUIContent(WFI18N.Translate("WFEditorSetting", "Cancel Near Clipping")));
                     EditorGUILayout.PropertyField(p_disableBackLitInVRC3Avatar, new GUIContent(WFI18N.Translate("WFEditorSetting", "Disable BackLit")));
                     EditorGUILayout.PropertyField(p_useDepthTexInVRC3Avatar, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use CameraDepthTexture")));
+                    EditorGUILayout.PropertyField(p_enableULVInVRC3Avatar, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use VRC LightVolumes")));
                 }
             }
 
@@ -366,6 +407,7 @@ namespace UnlitWF
                     EditorGUILayout.PropertyField(p_enableNccInVRC3World, new GUIContent(WFI18N.Translate("WFEditorSetting", "Cancel Near Clipping")));
                     EditorGUILayout.PropertyField(p_disableBackLitInVRC3World, new GUIContent(WFI18N.Translate("WFEditorSetting", "Disable BackLit")));
                     EditorGUILayout.PropertyField(p_useDepthTexInVRC3World, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use CameraDepthTexture")));
+                    EditorGUILayout.PropertyField(p_enableULVInVRC3World, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use VRC LightVolumes")));
                 }
             }
 
@@ -377,6 +419,7 @@ namespace UnlitWF
                     EditorGUILayout.PropertyField(p_enableNccInOther, new GUIContent(WFI18N.Translate("WFEditorSetting", "Cancel Near Clipping")));
                     EditorGUILayout.PropertyField(p_disableBackLitInOther, new GUIContent(WFI18N.Translate("WFEditorSetting", "Disable BackLit")));
                     EditorGUILayout.PropertyField(p_useDepthTexInOther, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use CameraDepthTexture")));
+                    EditorGUILayout.PropertyField(p_enableULVInOther, new GUIContent(WFI18N.Translate("WFEditorSetting", "Use VRC LightVolumes")));
                 }
             }
 
