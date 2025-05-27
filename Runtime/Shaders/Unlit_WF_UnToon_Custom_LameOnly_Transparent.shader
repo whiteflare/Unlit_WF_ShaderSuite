@@ -80,7 +80,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2025/03/23 (2.8.0)", Float) = 0
+            _CurrentVersion         ("2025/05/28 (2.9.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _Category               ("BRP|UnToon|Custom/LameOnly|Transparent", Float) = 0
