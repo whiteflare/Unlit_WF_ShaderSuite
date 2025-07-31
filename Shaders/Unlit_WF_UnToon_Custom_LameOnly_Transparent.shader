@@ -145,7 +145,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_LameOnly_Transparent" {
                 drawLame(d);
 
                 // Anti-Glare とライト色ブレンドを同時に計算
-                d.color.rgb *= d.light_color;
+                d.color.rgb *= calcLightColorFrag(d.ws_vertex, d.light_color);
 
                 // Alpha は 0-1 にクランプ
                 d.color.a = saturate(d.color.a);
