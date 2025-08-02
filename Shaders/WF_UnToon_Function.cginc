@@ -462,21 +462,6 @@ FEATURE_TGL_END
         return TGL_ON(-lightType) ? samplePoint1LightColor(ws_vertex) : sampleMainLightColor();
     }
 
-    float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
-        float3 lightColorMain = sampleMainLightColor();
-        float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
-
-        half level_min = GammaToCurrentColorSpaceExact(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
-        half level_max = _GL_LevelMax;
-
-        float3 color = NON_ZERO_VEC3(lightColorMain + lightColorSub4 + ambientColor);   // 合成
-        float power = MAX_RGB(color);                       // 明度
-        color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
-        color /= power;                                     // 正規化(colorはゼロではないのでpowerが0除算になることはない)
-        color *= lerp(saturate(power / NON_ZERO_FLOAT(level_max)), 1, level_min);  // 明度のsaturateと書き戻し
-        return color;
-    }
-
     float calcAngleLightCamera(float3 ws_vertex, half3 ws_light_dir) {
         // カメラとライトの位置関係: -1(逆光) ～ +1(順光)
         float2 xz_camera_pos = worldSpaceViewPointPos().xz - calcWorldSpaceBasePos(ws_vertex).xz;
@@ -507,13 +492,13 @@ FEATURE_TGL_END
     #include "WF_UnToon_LightVolumes.cginc"
 
     half3 sampleSHLightColor(float3 ws_vertex) {
-        if (!_UdonLightVolumeEnabled || _UdonLightVolumeCount == 0) {
+        if (!LightVolumesEnabled()) {
+            // VRC LightVolumes が無効のときは通常の環境光取得
             return sampleSHLightColor();
         }
         else {
-            float3 L0, L1r, L1g, L1b;
-            LightVolumeSH(ws_vertex, L0, L1r, L1g, L1b);
-            return L0;
+            // VRC LightVolumes が有効の時は環境光はゼロとして扱い、ピクセルシェーダ側で合成する
+            return ZERO_VEC3;
         }
     }
 #else
@@ -521,6 +506,31 @@ FEATURE_TGL_END
         return sampleSHLightColor();
     }
 #endif
+
+    float3 calcLightColorVertex(float3 ws_vertex, float3 ambientColor) {
+        float3 lightColorMain = sampleMainLightColor();
+        float3 lightColorSub4 = sampleAdditionalLightColor(ws_vertex);
+        return max(ZERO_VEC3, lightColorMain + lightColorSub4 + ambientColor);
+    }
+
+    float3 calcLightColorFrag(float3 ws_vertex, float3 light_color) {
+        half level_min = GammaToCurrentColorSpaceExact(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
+        half level_max = _GL_LevelMax;
+
+#ifdef _GL_ULV_ENABLE
+        // VRC LightVolumes が有効の時は、light_color に加算して用いる
+        float3 L0, L1r, L1g, L1b;
+        LightVolumeSH(ws_vertex, L0, L1r, L1g, L1b);
+        light_color += L0;
+#endif
+
+        float3 color = NON_ZERO_VEC3(light_color);   // 合成
+        float power = MAX_RGB(color);                       // 明度
+        color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
+        color /= power;                                     // 正規化(colorはゼロではないのでpowerが0除算になることはない)
+        color *= lerp(saturate(power / NON_ZERO_FLOAT(level_max)), 1, level_min);  // 明度のsaturateと書き戻し
+        return color;
+    }
 
     ////////////////////////////
     // Gradient Map
