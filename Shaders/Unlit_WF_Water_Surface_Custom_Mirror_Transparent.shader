@@ -133,7 +133,7 @@ Shader "UnlitWF/WF_Water_Surface_Custom_Mirror_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2025/05/28 (2.9.0)", Float) = 0
+            _CurrentVersion         ("2025/08/03 (2.10.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
