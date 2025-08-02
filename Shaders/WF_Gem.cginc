@@ -106,7 +106,7 @@
         drawGemFlake(d);            // フレーク
 
         // Anti-Glare とライト色ブレンドを同時に計算
-        d.color.rgb *= d.light_color;
+        d.color.rgb *= calcLightColorFrag(d.ws_vertex, d.light_color);
 
         drawEmissiveScroll(d);      // エミッション
         drawFresnelAlpha(d);        // フレネル
@@ -150,7 +150,7 @@
         drawGemFlake(d);            // フレーク
 
         // Anti-Glare とライト色ブレンドを同時に計算
-        d.color.rgb *= d.light_color;
+        d.color.rgb *= calcLightColorFrag(d.ws_vertex, d.light_color);
 
         drawEmissiveScroll(d);      // エミッション
         drawFresnelAlpha(d);        // フレネル
