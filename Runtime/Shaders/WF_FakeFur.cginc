@@ -282,7 +282,7 @@
         drawToonShade(d);           // 階調影
 
         // Anti-Glare とライト色ブレンドを同時に計算
-        d.color.rgb *= d.light_color;
+        d.color.rgb *= calcLightColorFrag(d.ws_vertex, d.light_color);
 
         drawDistanceFade(d);        // 距離フェード
         drawDissolve(d);            // ディゾルブ
