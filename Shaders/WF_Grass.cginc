@@ -55,8 +55,8 @@
 #endif
 #ifdef _GRS_ERSSIDE_ENABLE
         half3   ws_normal           : TEXCOORD2;
-        float3  ws_vertex           : TEXCOORD3;
 #endif
+        float3  ws_vertex           : TEXCOORD3;
         UNITY_FOG_COORDS(7)
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -70,8 +70,8 @@
         float2  uv2;
 #endif
         float2  uv_main;
-#ifdef _GRS_ERSSIDE_ENABLE
         float3  ws_vertex;
+#ifdef _GRS_ERSSIDE_ENABLE
         half3   ws_normal;
 #endif
         half3   ws_view_dir;
@@ -95,8 +95,8 @@
 #ifdef _V2F_HAS_UV_LMAP
         d.uv2           = i.uv2;
 #endif
-#ifdef _GRS_ERSSIDE_ENABLE
         d.ws_vertex     = i.ws_vertex;
+#ifdef _GRS_ERSSIDE_ENABLE
         d.ws_normal     = normalize(i.ws_normal);
         d.ws_view_dir   = worldSpaceViewPointDir(d.ws_vertex);
         d.ws_camera_dir = worldSpaceCameraDir(d.ws_vertex);
@@ -208,8 +208,8 @@ FEATURE_TGL_END
 
         o.vs_vertex = UnityWorldToClipPos(ws_vertex);
         o.uv = v.uv;
-#ifdef _GRS_ERSSIDE_ENABLE
         o.ws_vertex = ws_vertex;
+#ifdef _GRS_ERSSIDE_ENABLE
         o.ws_normal = UnityObjectToWorldNormal(v.normal);
 #endif
 #ifdef _V2F_HAS_VERTEXCOLOR
@@ -236,7 +236,8 @@ FEATURE_TGL_END
         drawVertexColor(d);         // 頂点カラー
 
         d.color.rgb *= lerp(_GRS_ColorBottom.rgb, _GRS_ColorTop.rgb, saturate(d.height));
-        d.color.rgb *= d.light_color;
+        // Anti-Glare とライト色ブレンドを同時に計算
+        d.color.rgb *= calcLightColorFrag(d.ws_vertex, d.light_color);
 
         drawOcclusion(d);           // オクルージョンとライトマップ
 
@@ -258,14 +259,14 @@ FEATURE_TGL_END
     ////////////////////////////
 
     struct v2f_shadow {
-        V2F_SHADOW_CASTER;  // TEXCOORD0
+        V2F_SHADOW_CASTER;          // TEXCOORD0
         float2 uv : TEXCOORD1;
 #ifdef _GRS_ERSSIDE_ENABLE
-        half3 ws_normal        : TEXCOORD2;
-        float3 ws_vertex        : TEXCOORD3;
+        half3 ws_normal             : TEXCOORD2;
 #endif
+        float3 ws_vertex            : TEXCOORD3;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        half4 vertex_color     : COLOR1;
+        half4 vertex_color          : COLOR1;
 #endif
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -290,8 +291,8 @@ FEATURE_TGL_END
         TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
 
         o.uv = v.uv;
-#ifdef _GRS_ERSSIDE_ENABLE
         o.ws_vertex = ws_vertex;
+#ifdef _GRS_ERSSIDE_ENABLE
         o.ws_normal = UnityObjectToWorldNormal(v.normal);
 #endif
 #ifdef _V2F_HAS_VERTEXCOLOR
@@ -333,15 +334,15 @@ FEATURE_TGL_END
 
 
     struct v2f_meta {
-        float4 pos              : SV_POSITION;
-        float2 uv               : TEXCOORD0;
-        half height           : COLOR0;
+        float4 pos                  : SV_POSITION;
+        float2 uv                   : TEXCOORD0;
+        half height                 : COLOR0;
 #ifdef _V2F_HAS_VERTEXCOLOR
-        half4 vertex_color     : COLOR1;
+        half4 vertex_color          : COLOR1;
 #endif
 #ifdef EDITOR_VISUALIZATION
-        float2 vizUV            : TEXCOORD1;
-        float4 lightCoord       : TEXCOORD2;
+        float2 vizUV                : TEXCOORD1;
+        float4 lightCoord           : TEXCOORD2;
 #endif
     };
 
