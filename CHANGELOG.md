@@ -1,6 +1,15 @@
 # Change Log
 
-## 2025/05/28 (2.10.0)
+## 2025/08/16 (2.10.1)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250816
+
+### Changed
+- Shader
+  - VRC LightVolumes 2.0.1 に対応しました。
+
+----
+
+## 2025/08/03 (2.10.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250803
 
 ### Changed
