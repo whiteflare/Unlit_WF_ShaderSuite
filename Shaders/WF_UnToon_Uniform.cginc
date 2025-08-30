@@ -237,8 +237,10 @@
 
     // -------------------------
 
+    DECL_SAMPLER(_linear_clamp_MatcapTex);
+
 #define WF_DECL_MATCAP(id)                  \
-    DECL_MAIN_TEX2D(_HL_MatcapTex##id);     \
+    DECL_SUB_TEX2D(_HL_MatcapTex##id);      \
     DECL_SUB_TEX2D(_HL_MaskTex##id);        \
     FEATURE_TGL(_HL_Enable##id);            \
     uint        _HL_CapType##id;            \

@@ -1065,7 +1065,7 @@ FEATURE_TGL_END
     #define WF_CALC_MATCAP_COLOR(id)                                                                                                                        \
         FEATURE_TGL_ON_BEGIN(_HL_Enable##id)                                                                                                                \
                     calcMatcapColor(                                                                                                                        \
-                        PICK_MAIN_TEX2D(_HL_MatcapTex##id,                                                                                                  \
+                        PICK_SUB_TEX2D(_HL_MatcapTex##id, _linear_clamp_MatcapTex,                                                                          \
                         saturate(calcMatcapVector(d.matcapVector, _HL_BlendNormal##id, _HL_BlendNormal2##id, _HL_Parallax##id).xy * 0.5 + 0.5)),            \
                         SAMPLE_MASK_VALUE(_HL_MaskTex##id, d.uv_main, _HL_InvMaskVal##id).rgb,                                                              \
                         _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, d.color);  \
