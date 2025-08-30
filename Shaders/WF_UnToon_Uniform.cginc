@@ -150,6 +150,9 @@
     half3           _GL_CustomLitPos;
     half            _GL_DisableBasePos;
     half            _GL_NCC_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく half で定義
+#ifndef _WF_PLATFORM_LWRP
+    uint            _UdonForceSceneLighting;
+#endif
 
     // -------------------------
 
