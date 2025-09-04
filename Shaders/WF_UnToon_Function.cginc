@@ -514,8 +514,17 @@ FEATURE_TGL_END
     }
 
     float3 calcLightColorFrag(float3 ws_vertex, float3 light_color) {
+
+#ifndef _WF_PLATFORM_LWRP
+        // ワールドにて変数設定されている場合は微調整を無効にする
+        half level_min = _UdonForceSceneLighting ? 0 : GammaToCurrentColorSpaceExact(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
+        half level_max = _UdonForceSceneLighting ? 1 : _GL_LevelMax;
+        half chromatic = _UdonForceSceneLighting ? 1 : _GL_BlendPower;
+#else
         half level_min = GammaToCurrentColorSpaceExact(_GL_LevelTweak < 0 ? lerp(_GL_LevelMin, 0, -_GL_LevelTweak) : lerp(_GL_LevelMin, 1, _GL_LevelTweak));
         half level_max = _GL_LevelMax;
+        half chromatic = _GL_BlendPower;
+#endif
 
 #ifdef _GL_ULV_ENABLE
         // VRC LightVolumes が有効の時は、light_color に加算して用いる
@@ -524,10 +533,10 @@ FEATURE_TGL_END
         light_color += L0;
 #endif
 
-        float3 color = NON_ZERO_VEC3(light_color);   // 合成
-        float power = MAX_RGB(color);                       // 明度
-        color = lerp( power.xxx, color, _GL_BlendPower);    // 色の混合
-        color /= power;                                     // 正規化(colorはゼロではないのでpowerが0除算になることはない)
+        float3 color = NON_ZERO_VEC3(light_color);  // 合成
+        float power = MAX_RGB(color);               // 明度
+        color = lerp( power.xxx, color, chromatic); // 色の混合
+        color /= power;                             // 正規化(colorはゼロではないのでpowerが0除算になることはない)
         color *= lerp(saturate(power / NON_ZERO_FLOAT(level_max)), 1, level_min);  // 明度のsaturateと書き戻し
         return color;
     }
@@ -1056,7 +1065,7 @@ FEATURE_TGL_END
     #define WF_CALC_MATCAP_COLOR(id)                                                                                                                        \
         FEATURE_TGL_ON_BEGIN(_HL_Enable##id)                                                                                                                \
                     calcMatcapColor(                                                                                                                        \
-                        PICK_MAIN_TEX2D(_HL_MatcapTex##id,                                                                                                  \
+                        PICK_SUB_TEX2D(_HL_MatcapTex##id, _linear_clamp_MatcapTex,                                                                          \
                         saturate(calcMatcapVector(d.matcapVector, _HL_BlendNormal##id, _HL_BlendNormal2##id, _HL_Parallax##id).xy * 0.5 + 0.5)),            \
                         SAMPLE_MASK_VALUE(_HL_MaskTex##id, d.uv_main, _HL_InvMaskVal##id).rgb,                                                              \
                         _HL_Power##id, _HL_MatcapMonochrome##id, _HL_MatcapColor##id, _HL_MedianColor##id, _HL_ChangeAlpha##id, _HL_CapType##id, d.color);  \
@@ -1607,7 +1616,13 @@ FEATURE_TGL_ON_BEGIN(_AO_Enable)
             }
     #endif
 #endif
-            occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, _GL_BlendPower); // 色の混合
+
+#ifndef _WF_PLATFORM_LWRP
+            half chromatic = _UdonForceSceneLighting ? 1 : _GL_BlendPower; // ワールドにて変数設定されている場合は微調整を無効にする
+#else
+            half chromatic = _GL_BlendPower;
+#endif
+            occlusion = lerp(AVE_RGB(occlusion).xxx, occlusion, chromatic); // 色の混合
             occlusion = (occlusion - 1) * _AO_Contrast + 1 + _AO_Brightness;
             d.color.rgb *= max(ZERO_VEC3, occlusion.rgb);
 FEATURE_TGL_END

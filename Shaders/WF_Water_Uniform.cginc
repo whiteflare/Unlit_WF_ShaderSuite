@@ -136,6 +136,9 @@
     half            _GL_CustomAzimuth;
     half            _GL_CustomAltitude;
     half3           _GL_CustomLitPos;
+#ifndef _WF_PLATFORM_LWRP
+    uint            _UdonForceSceneLighting;
+#endif
 
     // 使わない変数は define で固定値を設定
     #define _GL_CastShadow      0
