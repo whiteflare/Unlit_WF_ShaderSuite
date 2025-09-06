@@ -38,6 +38,8 @@
     // Texture Definition
     ////////////////////////////
 
+    #define DECL_SAMPLER(name)                          SAMPLER(sampler##name)
+
     #define DECL_MAIN_TEX2D(name)                       TEXTURE2D(name); SAMPLER(sampler##name)
     #define PICK_MAIN_TEX2D(tex, uv)                    SAMPLE_TEXTURE2D(tex, sampler##tex, uv)
 
