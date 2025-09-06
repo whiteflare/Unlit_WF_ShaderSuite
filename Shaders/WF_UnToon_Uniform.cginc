@@ -150,6 +150,9 @@
     half3           _GL_CustomLitPos;
     half            _GL_DisableBasePos;
     half            _GL_NCC_Enable; // ShadowCasterで参照するため FEATURE_TGL ではなく half で定義
+#ifndef _WF_PLATFORM_LWRP
+    uint            _UdonForceSceneLighting;
+#endif
 
     // -------------------------
 
@@ -234,8 +237,10 @@
 
     // -------------------------
 
+    DECL_SAMPLER(_linear_clamp_MatcapTex);
+
 #define WF_DECL_MATCAP(id)                  \
-    DECL_MAIN_TEX2D(_HL_MatcapTex##id);     \
+    DECL_SUB_TEX2D(_HL_MatcapTex##id);      \
     DECL_SUB_TEX2D(_HL_MaskTex##id);        \
     FEATURE_TGL(_HL_Enable##id);            \
     uint        _HL_CapType##id;            \

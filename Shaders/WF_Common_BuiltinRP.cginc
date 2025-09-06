@@ -33,6 +33,12 @@
     // Texture Definition
     ////////////////////////////
 
+#ifdef UNITY_SEPARATE_TEXTURE_SAMPLER
+    #define DECL_SAMPLER(name)                          SamplerState sampler##name
+#else
+    #define DECL_SAMPLER(name)
+#endif
+
     #define DECL_MAIN_TEX2D(name)                       UNITY_DECLARE_TEX2D(name)
     #define PICK_MAIN_TEX2D(tex, uv)                    UNITY_SAMPLE_TEX2D(tex, uv)
 
