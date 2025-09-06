@@ -90,7 +90,7 @@ Shader "UnlitWF/WF_Particle_Multiply" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2025/08/16 (2.10.1)", Float) = 0
+            _CurrentVersion         ("2025/09/06 (2.11.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0

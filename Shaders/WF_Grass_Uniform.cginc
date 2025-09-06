@@ -49,6 +49,9 @@
     half                _GL_LevelMax;
     half                _GL_LevelTweak;
     half                _GL_BlendPower;
+#ifndef _WF_PLATFORM_LWRP
+    uint                _UdonForceSceneLighting;
+#endif
 
     // 使わない変数は define で固定値を設定
     #define _GL_LightMode       0
