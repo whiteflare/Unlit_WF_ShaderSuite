@@ -273,14 +273,19 @@ namespace UnlitWF
     {
         public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromPath)
         {
-            foreach (var path in importedAssets)
+            if (importedAssets.Any(IsSettingAssetFilePath) || deletedAssets.Any(IsSettingAssetFilePath))
             {
-                if (string.IsNullOrWhiteSpace(path))
-                    continue;
-                if (AssetDatabase.LoadAssetAtPath<WFEditorSetting>(path) == null)
-                    continue;
                 WFEditorSetting.GetOneOfSettings(true);
             }
+        }
+
+        private static bool IsSettingAssetFilePath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+            return path.EndsWith(".asset", System.StringComparison.InvariantCultureIgnoreCase);
         }
     }
 
@@ -378,7 +383,9 @@ namespace UnlitWF
 
             // 優先度
 
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(p_settingPriority, toDisplay(p_settingPriority));
+            var changePriority = EditorGUI.EndChangeCheck(); // priority 変更時、ApplyModifiedProperties 後に設定リロードする
 
             // Common Material Settings
 
@@ -447,6 +454,11 @@ namespace UnlitWF
             EditorGUILayout.PropertyField(p_enableMigrationWhenImport, toDisplay(p_enableMigrationWhenImport));
 
             serializedObject.ApplyModifiedProperties();
+
+            if (changePriority)
+            {
+                WFEditorSetting.GetOneOfSettings(true);
+            }
 
             WFEditorPrefs.LangMode = (EditorLanguage)EditorGUILayout.EnumPopup("Editor language", WFEditorPrefs.LangMode);
 
