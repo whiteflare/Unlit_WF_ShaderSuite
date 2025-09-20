@@ -1,5 +1,14 @@
 # Change Log
 
+## 2025/09/21 (2.11.1)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250921
+
+### Fixed
+- GUI
+  - WFEditorSetting がインポートされたかどうかを全アセットに対して行っていた構造を見直し、最低限の監視に留めるようにしました。大量にアセットをインポートした際の安定性が向上し、クラッシュ確率が下がりました。
+
+----
+
 ## 2025/09/06 (2.11.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250906
 
