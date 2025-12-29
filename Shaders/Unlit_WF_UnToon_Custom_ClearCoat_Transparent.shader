@@ -344,9 +344,9 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_ClearCoat_Transparent" {
             _OcclusionMap           ("[AO] Occlusion Map (RGB)", 2D) = "white" {}
         [ToggleUI]
             _AO_UseGreenMap         ("[AO] Use Green Channel Only", Float) = 0
-            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
         [ToggleUI]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 

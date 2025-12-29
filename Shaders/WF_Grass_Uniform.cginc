@@ -97,5 +97,6 @@
     half                _AO_UseLightMap;
     half                _AO_Contrast;
     half                _AO_Brightness;
+    half4               _AO_TintColor;
 
 #endif

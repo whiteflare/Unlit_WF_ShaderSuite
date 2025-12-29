@@ -60,6 +60,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_TransparentOverlay" {
             _AO_Enable              ("[AO] Enable", Float) = 0
         [WF_FixUIToggle(1.0)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
