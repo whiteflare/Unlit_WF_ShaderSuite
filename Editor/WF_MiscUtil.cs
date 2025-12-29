@@ -170,6 +170,17 @@ namespace UnlitWF
             }
         }
 
+        private int GetMatFileCountFromProject(string[] folderPaths)
+        {
+            var guids = folderPaths.Length == 0 ?
+                AssetDatabase.FindAssets("t:Material") :
+                AssetDatabase.FindAssets("t:Material", folderPaths);
+            return guids
+                    .Select(AssetDatabase.GUIDToAssetPath)
+                    .Where(path => !string.IsNullOrWhiteSpace(path) && path.EndsWith(".mat"))
+                    .Distinct().Count();
+        }
+
         private static IEnumerable<Material> FilterNotVisited(IEnumerable<Material> src, HashSet<Material> visited)
         {
             foreach(var mat in src)
@@ -222,12 +233,7 @@ namespace UnlitWF
             // サブフォルダ含めて
             if ((mode & MatSelectMode.FromAssetDeep) == MatSelectMode.FromAssetDeep)
             {
-                var folderPaths = Selection.GetFiltered<DefaultAsset>(SelectionMode.Assets)
-                    .Select(asset => AssetDatabase.GetAssetPath(asset))
-                    .Where(path => !string.IsNullOrWhiteSpace(path))
-                    .Distinct()
-                    .Where(path => System.IO.File.GetAttributes(path).HasFlag(System.IO.FileAttributes.Directory))
-                    .ToArray();
+                var folderPaths = GetSelectedFolderPaths();
                 if (0 < folderPaths.Length)
                 {
                     foreach(var getter in IterateAllMaterialsFromProject(folderPaths, visited))
@@ -236,6 +242,34 @@ namespace UnlitWF
                     }
                 }
             }
+        }
+
+        public int GetMatFileCountInSelection()
+        {
+            int totalCount = 0;
+
+            // 選択されたアセット自体
+            totalCount += Selection.GetFiltered<Material>(SelectionMode.Assets).Distinct().Count();
+
+            // サブフォルダ含めて
+            var folderPaths = GetSelectedFolderPaths();
+            if (0 < folderPaths.Length)
+            {
+                totalCount += GetMatFileCountFromProject(folderPaths);
+                // 選択0件のときは GetMatFileCountFromProject が Asset 内の全件をカウントするので IterateAllMaterialsFromSelection の挙動と合わせて 0 件とする
+            }
+
+            return totalCount;
+        }
+
+        private string[] GetSelectedFolderPaths()
+        {
+            return Selection.GetFiltered<DefaultAsset>(SelectionMode.Assets)
+                .Select(asset => AssetDatabase.GetAssetPath(asset))
+                .Where(path => !string.IsNullOrWhiteSpace(path))
+                .Distinct()
+                .Where(path => System.IO.File.GetAttributes(path).HasFlag(System.IO.FileAttributes.Directory))
+                .ToArray();
         }
 
         #endregion

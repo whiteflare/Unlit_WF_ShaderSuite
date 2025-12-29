@@ -182,7 +182,31 @@ namespace UnlitWF
         private static void ExecuteAutoConvert(Material mat = null, Predicate<Material> filter = null)
         {
             var converter = new Converter.WFMaterialFromOtherShaderConverter();
-            Undo.SetCurrentGroupName("WF " + converter.GetShortName());
+
+            var total = 0;
+            if (mat != null)
+            {
+                Undo.SetCurrentGroupName("WF " + converter.GetShortName());
+                total += ExecuteAutoConvertOneMaterial(mat) ? 1 : 0;
+            }
+            else
+            {
+                var seeker = new MaterialSeeker();
+                seeker.progressBarTitle = WFCommonUtility.DialogTitle;
+                seeker.progressBarText = "Convert Materials...";
+                seeker.progressBarSpan = 2;
+                if (CanselIfManyMaterialFiles(seeker))
+                {
+                    return;
+                }
+                Undo.SetCurrentGroupName("WF " + converter.GetShortName());
+                total += seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, ExecuteAutoConvertOneMaterial);
+            }
+
+            if (0 < total)
+            {
+                Debug.LogFormat("[WF][Tool] {0}: total {1} material converted", converter.GetShortName(), total);
+            }
 
             bool ExecuteAutoConvertOneMaterial(Material m)
             {
@@ -192,25 +216,18 @@ namespace UnlitWF
                 }
                 return converter.ExecAutoConvert(m) != 0;
             }
+        }
 
-            var total = 0;
-            if (mat != null)
+        private static bool CanselIfManyMaterialFiles(MaterialSeeker seeker)
+        {
+            if (100 <= seeker.GetMatFileCountInSelection())
             {
-                total += ExecuteAutoConvertOneMaterial(mat) ? 1 : 0;
+                if (!EditorUtility.DisplayDialog(WFCommonUtility.DialogTitle, WFI18N.Translate(WFMessageText.DgManyMaterialConversion), "OK", "Cancel"))
+                {
+                    return true;
+                }
             }
-            else
-            {
-                var seeker = new MaterialSeeker();
-                seeker.progressBarTitle = WFCommonUtility.DialogTitle;
-                seeker.progressBarText = "Convert Materials...";
-                seeker.progressBarSpan = 2;
-                total += seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, ExecuteAutoConvertOneMaterial);
-            }
-
-            if (0 < total)
-            {
-                Debug.LogFormat("[WF][Tool] {0}: total {1} material converted", converter.GetShortName(), total);
-            }
+            return false;
         }
 
         #endregion
@@ -271,13 +288,19 @@ namespace UnlitWF
                 return;
             }
             var converter = new Converter.WFMaterialToMobileShaderConverter();
-            Undo.SetCurrentGroupName("WF " + converter.GetShortName());
 
             var seeker = new MaterialSeeker();
             seeker.progressBarTitle = WFCommonUtility.DialogTitle;
             seeker.progressBarText = "Convert Materials...";
             seeker.progressBarSpan = 2;
+            // DisplayDialog で確認しているのでここでは不要
+            //if (CanselIfManyMaterialFiles(seeker))
+            //{
+            //    return;
+            //}
+            Undo.SetCurrentGroupName("WF " + converter.GetShortName());
             var total = seeker.VisitAllMaterialsInSelection(MatSelectMode.FromAssetDeep, mat => converter.ExecAutoConvert(mat) != 0);
+
             if (0 < total)
             {
                 Debug.LogFormat("[WF][Tool] {0}: total {1} material converted", converter.GetShortName(), total);

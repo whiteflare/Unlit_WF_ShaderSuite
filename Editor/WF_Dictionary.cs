@@ -921,6 +921,7 @@ namespace UnlitWF
             new WFI18NTranslation(WFMessageText.DgMigrationManual, "プロジェクト内のマテリアルをスキャンして、最新のマテリアル値へと更新しますか？"),
             new WFI18NTranslation(WFMessageText.DgDontImportUnityPackage, "パッケージは UPM(VPM) で管理されています。\nunitypackage からインポートするかわりに VCC 等の管理ツールを使用してください。"),
             new WFI18NTranslation(WFMessageText.DgBakeWarning, "ベイクできない設定がマテリアルに含まれています。続行しますか？"),
+            new WFI18NTranslation(WFMessageText.DgManyMaterialConversion, "多数のマテリアルが選択されています。\n変換を続行しますか？"),
 
             new WFI18NTranslation(WFMessageText.LgWarnOlderVersion, "古いバージョンで作成されたマテリアルがあります。"),
             new WFI18NTranslation(WFMessageText.LgWarnNotSupportAndroid, "Android非対応のシェーダが使われているマテリアルがあります。"),
@@ -1192,6 +1193,7 @@ namespace UnlitWF
         public static readonly string DgMigrationManual = "Do you want to scan the materials in your project and update them to the latest material values?";
         public static readonly string DgDontImportUnityPackage = "The package is managed by UPM(VPM).\nUse a management tool such as VCC instead of importing from unitypackage.";
         public static readonly string DgBakeWarning = "Material contain settings that cannot be bakeable. Continue?";
+        public static readonly string DgManyMaterialConversion = "Many materials have been selected.\nDo you want to continue the conversion?";
         public static readonly string LgWarnOlderVersion = "A material was created with an older shader version.";
         public static readonly string LgWarnNotSupportAndroid = "A material uses a shader that is not supported by Android.";
         public static readonly string LgWarnCancelBakeTexture = "Material contains settings that cannot be bakeable. Bake canceled.";
