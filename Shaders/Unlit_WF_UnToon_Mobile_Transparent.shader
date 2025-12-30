@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2025 whiteflare.
+ *  Copyright 2018-2026 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -167,6 +167,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
             _AO_Enable              ("[AO] Enable", Float) = 0
         [WF_FixUIToggle(1.0)]
             _AO_UseLightMap         ("[AO] Use LightMap", Float) = 1
+            _AO_TintColor           ("[AO] Tint Color", Color) = (0, 0, 0, 1)
             _AO_Contrast            ("[AO] Contrast", Range(0, 2)) = 1
             _AO_Brightness          ("[AO] Brightness", Range(-1, 1)) = 0
 
@@ -253,7 +254,7 @@ Shader "UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2025/09/06 (2.11.1)", Float) = 0
+            _CurrentVersion         ("2026/01/01 (2.12.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
