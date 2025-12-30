@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2025 whiteflare.
+ *  Copyright 2018-2026 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -97,5 +97,6 @@
     half                _AO_UseLightMap;
     half                _AO_Contrast;
     half                _AO_Brightness;
+    half4               _AO_TintColor;
 
 #endif

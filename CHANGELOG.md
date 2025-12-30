@@ -1,6 +1,18 @@
 # Change Log
 
-## 2025/09/21 (2.11.1)
+## 2026-01-01 (2.12.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20260101
+
+### Changed
+- Shader
+  - AmbientOcclusionの色調整が、今までAOマップにだけ反映されていたところ、AOマップに加えてライトマップにも反映されるようになりました。
+- GUI
+  - UnlitWFマテリアルへ変換するとき、フォルダ内にmatファイルが100個以上存在するときは確認ダイアログを表示するようになりました。
+  - 韓国語の辞書マップを更新しました。
+
+----
+
+## 2025-09-21 (2.11.1)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250921
 
 ### Fixed
@@ -9,7 +21,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2025/09/06 (2.11.0)
+## 2025-09-06 (2.11.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250906
 
 ### Added
@@ -22,7 +34,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2025/08/16 (2.10.1)
+## 2025-08-16 (2.10.1)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250816
 
 ### Changed
@@ -31,7 +43,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2025/08/03 (2.10.0)
+## 2025-08-03 (2.10.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250803
 
 ### Changed
@@ -40,7 +52,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2025/05/28 (2.9.0)
+## 2025-05-28 (2.9.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250528
 
 ### Added
@@ -60,7 +72,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2025/03/23 (2.8.0)
+## 2025-03-23 (2.8.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250323
 
 ### Changed
@@ -70,7 +82,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2025/01/28 (2.7.0)
+## 2025-01-28 (2.7.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20250128
 
 ### Added
@@ -85,7 +97,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2024/12/17 (2.6.1)
+## 2024-12-17 (2.6.1)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241217
 
 ### Fixed
@@ -94,7 +106,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2024/12/15 (2.6.0)
+## 2024-12-15 (2.6.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241215
 
 ### Added
@@ -117,7 +129,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2024/11/23 (2.5.0)
+## 2024-11-23 (2.5.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241123
 
 ### Added
@@ -136,7 +148,7 @@ https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_2
 
 ----
 
-## 2024/10/14 (2.4.0)
+## 2024-10-14 (2.4.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20241014
 
 ### Added
