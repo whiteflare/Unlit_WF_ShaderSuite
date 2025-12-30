@@ -1,7 +1,7 @@
 ﻿/*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2025 whiteflare.
+ *  Copyright 2018-2026 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -1605,7 +1605,6 @@ FEATURE_TGL_ON_BEGIN(_AO_Enable)
             float2 uv_aomap = _AO_UVType == 1 ? d.uv2 : d.uv_main;
             float3 aomap_var = WF_TEX2D_OCCLUSION(uv_aomap);
             occlusion *= TGL_OFF(_AO_UseGreenMap) ? aomap_var.rgb : aomap_var.ggg;
-            occlusion = blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a);
 #endif
 #if defined(_LMAP_ENABLE) && !defined(_WF_EDITOR_HIDE_LMAP)
     #ifndef _WF_AO_ONLY_LMAP
@@ -1616,6 +1615,7 @@ FEATURE_TGL_ON_BEGIN(_AO_Enable)
             }
     #endif
 #endif
+            occlusion = max(ZERO_VEC3, blendColor_Screen(occlusion, _AO_TintColor.rgb, _AO_TintColor.a));
 
 #ifndef _WF_PLATFORM_LWRP
             half chromatic = _UdonForceSceneLighting ? 1 : _GL_BlendPower; // ワールドにて変数設定されている場合は微調整を無効にする
