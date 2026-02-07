@@ -527,10 +527,12 @@ FEATURE_TGL_END
 #endif
 
 #ifdef _GL_ULV_ENABLE
-        // VRC LightVolumes が有効の時は、light_color に加算して用いる
-        float3 L0, L1r, L1g, L1b;
-        LightVolumeSH(ws_vertex, L0, L1r, L1g, L1b);
-        light_color += L0;
+        if (LightVolumesEnabled()) {
+            // VRC LightVolumes が有効の時は、light_color に加算して用いる
+            float3 L0, L1r, L1g, L1b;
+            LightVolumeSH(ws_vertex, L0, L1r, L1g, L1b);
+            light_color += L0;
+        }
 #endif
 
         float3 color = NON_ZERO_VEC3(light_color);  // 合成
