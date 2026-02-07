@@ -581,7 +581,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_Tess_PowerCap_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2026/01/01 (2.12.0)", Float) = 0
+            _CurrentVersion         ("2026/02/08 (2.13.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Outline/WF_UnToon_Outline_Opaque", Float) = 0
