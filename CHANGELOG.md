@@ -1,5 +1,15 @@
 # Change Log
 
+## 2026-02-08 (2.13.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20260208
+
+### Fixed
+- Shader
+  - `WF_UnToon_Transparent` で LightVolumes が利用できなかった問題を修正
+  - LightVolumes が無効の場合に、ライトプローブを二重に取得してしまっていた問題を修正
+
+----
+
 ## 2026-01-01 (2.12.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20260101
 

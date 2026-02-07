@@ -392,7 +392,7 @@ void LV_PointLight(uint id, float3 worldPos, float4 occlusion, inout float3 L0, 
     [branch] if (pos.w < 0) { // It is a spot light
 
         float angle = color.w;
-        float spotMask = dot(ldir, -dirN) - angle;
+        float spotMask = dot(ldir.xyz, -dirN) - angle;
         [branch] if(customId >= 0 && spotMask < 0) return; // Spot cone based culling
         
         [branch] if (customId > 0) {  // If it uses Attenuation LUT
@@ -401,7 +401,7 @@ void LV_PointLight(uint id, float3 worldPos, float4 occlusion, inout float3 L0, 
             
         } else { // If it uses default parametric attenuation
 
-            float3 att = LV_PointLightAttenuation(sqlen, -pos.w, color, _UdonLightBrightnessCutoff, sqrRange);
+            float3 att = LV_PointLightAttenuation(sqlen, -pos.w, color.rgb, _UdonLightBrightnessCutoff, sqrRange);
 
             [branch] if (customId < 0) { // If uses cookie
                 
