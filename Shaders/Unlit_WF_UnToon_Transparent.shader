@@ -446,6 +446,8 @@ Shader "UnlitWF/WF_UnToon_Transparent" {
             _GL_DisableBasePos      ("Disable ObjectBasePos", Range(0, 1)) = 0
         [ToggleUI]
             _GL_NCC_Enable          ("Cancel Near Clipping", Range(0, 1)) = 0
+        [ToggleUI]
+            _GL_ULV_Enable          ("Use VRC LightVolumes", Range(0, 1)) = 0
 
         [WFHeaderToggle(Light Bake Effects)]
             _LBE_Enable             ("[LBE] Enable", Float) = 0
