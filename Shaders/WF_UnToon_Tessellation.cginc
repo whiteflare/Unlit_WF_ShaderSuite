@@ -49,7 +49,7 @@
 
     float4 worldDistanceBasedTess(float3 ws_vertex, float minDist, float maxDist, float tess) {
         float dist = distance(ws_vertex, worldSpaceViewPointPos());
-        float f = clamp(1.0 - (dist - minDist) / NON_ZERO_FLOAT(maxDist - minDist), 0.01, 1.0) * tess;
+        float f = clamp(1.0 - (dist - minDist) / UG_NZ(maxDist - minDist), 0.01, 1.0) * tess;
         return UnityCalcTriEdgeTessFactors(f.xxx);
     }
 

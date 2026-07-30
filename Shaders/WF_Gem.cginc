@@ -35,7 +35,7 @@
 
     void drawGemFlake(inout drawing d) {
         if (TGL_ON(_GMF_Enable)) {
-            float size = 1 / NON_ZERO_FLOAT(d.facing ? _GMF_FlakeSizeFront : _GMF_FlakeSizeBack);
+            float size = 1 / (d.facing ? UG_NZ(_GMF_FlakeSizeFront) : UG_NZ(_GMF_FlakeSizeBack));
             half3 ws_normal = lerpNormals(d.ws_normal, d.ws_bump_normal, _GMF_BlendNormal);
             float2 matcapVector = calcMatcapVector(d.ws_camera_dir, ws_normal).xy * size;
             float3 ls_camera_dir = SafeNormalizeVec3(worldSpaceViewPointPos() - calcWorldSpaceBasePos(d.ws_vertex));
@@ -62,7 +62,7 @@
         if (TGL_ON(_GMR_Enable)) {
             half3 ws_normal = lerpNormals(d.ws_normal, d.ws_bump_normal, _GMR_BlendNormal);
             float3 cubemap = pickReflectionCubemap(_GMR_Cubemap, _GMR_Cubemap_HDR, d.ws_vertex, ws_normal, 0); // smoothnessは1固定
-            float3 reflection = lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _GMR_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _GMR_CubemapPower;
+            float3 reflection = lerp(cubemap, pow(max(ZERO_VEC3, cubemap), UG_NZ(1 - _GMR_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _GMR_CubemapPower;
             reflection = lerp(reflection, calcBrightness(reflection), _GMR_Monochrome);
 
             // 合成
