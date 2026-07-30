@@ -535,11 +535,13 @@ FEATURE_TGL_END
         }
 #endif
 
-        float3 color = NON_ZERO_VEC3(light_color);  // 合成
+        float3 color = light_color;                 // 合成
         float power = MAX_RGB(color);               // 明度
         color = lerp( power.xxx, color, chromatic); // 色の混合
-        color /= power;                             // 正規化(colorはゼロではないのでpowerが0除算になることはない)
-        color *= lerp(saturate(power / NON_ZERO_FLOAT(level_max)), 1, level_min);  // 明度のsaturateと書き戻し
+        if (power <= 0.0)
+            color.rgb = level_min;
+        else
+            color *= lerp(saturate(power / NON_ZERO_FLOAT(level_max)), 1, level_min) / power;
         return color;
     }
 
