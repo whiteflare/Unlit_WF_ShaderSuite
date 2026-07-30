@@ -1347,7 +1347,7 @@ FEATURE_TGL_END
                 float rim_max = 1 - width * dir_pwr;
                 float rim_min = 1 - (width + _TM_Feather) * dir_pwr;
 
-                return pow(SafeSmoothStep(rim_min, rim_max, rimPower), UG_NZ(_TM_Exponent));
+                return pow(abs(SafeSmoothStep(rim_min, rim_max, rimPower)), UG_NZ(_TM_Exponent));
             }
         }
 
@@ -1385,7 +1385,7 @@ FEATURE_TGL_END
                 float rim_max = 1 - width * dir_pwr;
                 float rim_min = 1 - (width + _TR_Feather) * dir_pwr;
 
-                return pow(SafeSmoothStep(rim_min, rim_max, rimPower), UG_NZ(_TR_Exponent));
+                return pow(abs(SafeSmoothStep(rim_min, rim_max, rimPower)), UG_NZ(_TR_Exponent));
             }
         }
 
