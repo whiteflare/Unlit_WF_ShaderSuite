@@ -154,7 +154,7 @@
             return smoothstep(min, max, x);
         }
         else {
-            return min;
+            return 0;
         }
     }
 
