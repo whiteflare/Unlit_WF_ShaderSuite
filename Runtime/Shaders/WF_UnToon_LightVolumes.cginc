@@ -9,6 +9,8 @@
 #define VRCLV_MAX_VOLUMES_COUNT 32
 #define VRCLV_MAX_LIGHTS_COUNT 128
 
+CBUFFER_START(LightVolumeUniforms)
+
 // Are Light Volumes enabled on scene? can be 0 or 1
 uniform float _UdonLightVolumeEnabled;
     
@@ -86,6 +88,8 @@ uniform float _UdonLightBrightnessCutoff;
 // The number of volumes that provide occlusion data.
 // We use this to take faster paths when no occlusion is needed.
 uniform float _UdonLightVolumeOcclusionCount;
+
+CBUFFER_END
 
 // Main 3D Texture atlas
 uniform Texture3D _UdonLightVolume;

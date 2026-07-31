@@ -535,11 +535,13 @@ FEATURE_TGL_END
         }
 #endif
 
-        float3 color = NON_ZERO_VEC3(light_color);  // 合成
+        float3 color = light_color;                 // 合成
         float power = MAX_RGB(color);               // 明度
         color = lerp( power.xxx, color, chromatic); // 色の混合
-        color /= power;                             // 正規化(colorはゼロではないのでpowerが0除算になることはない)
-        color *= lerp(saturate(power / NON_ZERO_FLOAT(level_max)), 1, level_min);  // 明度のsaturateと書き戻し
+        if (power <= 0.0)
+            color.rgb = level_min;
+        else
+            color *= lerp(saturate(power / UG_NZ(level_max)), 1, level_min) / power;
         return color;
     }
 
@@ -581,7 +583,7 @@ FEATURE_TGL_ON_BEGIN(_CLC_Enable)
             hsv.r = frac(hsv.r);
             clc = saturate( hsv2rgb( saturate(hsv) ) );
             // ガンマ調整
-            clc = pow(clc, NON_ZERO_FLOAT(_CLC_Gamma));
+            clc = pow(clc, UG_NZ(_CLC_Gamma));
             // 合成
             d.color.rgb = lerp(d.color.rgb, clc, WF_TEX2D_CLC_MASK(d.uv_main));
 FEATURE_TGL_END
@@ -884,7 +886,7 @@ FEATURE_TGL_END
 #endif
 #if defined(_MT_ONLY2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
                 float3 cubemap = pickReflectionCubemap(_MT_Cubemap, _MT_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
-                color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
+                color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), UG_NZ(1 - _MT_CubemapHighCut)), step(ONE_VEC3, cubemap)) * _MT_CubemapPower;
 #endif
 #ifdef _WF_LEGACY_FEATURE_SWITCH
             }
@@ -1125,7 +1127,7 @@ FEATURE_TGL_ON_BEGIN(_LME_Enable)
                 float2 uv_lame = _LME_UVType == 1 ? d.uv2 : d.uv1;
                 uv_lame = TRANSFORM_TEX(uv_lame, _LME_Texture);
 
-                float   scale = NON_ZERO_FLOAT(_LME_Scale) / 100;
+                float   scale = UG_NZ(_LME_Scale) / 100;
                 float2  st = uv_lame / scale;
 
                 float2  ist = floor(st);
@@ -1145,7 +1147,7 @@ FEATURE_TGL_ON_BEGIN(_LME_Enable)
                 float3 ws_camera_vec = worldSpaceCameraVector(d.ws_vertex);
 
                 // アニメーション項
-                power *= _LME_AnimSpeed < NZF ? 1 : sin(frac(_Time.y * _LME_AnimSpeed + random2to1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
+                power *= _LME_AnimSpeed <= 1e-4 ? 1 : sin(frac(_Time.y * _LME_AnimSpeed + random2to1(min_pos.yx)) * UNITY_TWO_PI) / 2 + 0.5;
                 // Glitter項
                 power = lerp(power, max(power, pow(power + 0.1, 32)), _LME_Glitter);
                 // 密度項
@@ -1153,9 +1155,9 @@ FEATURE_TGL_ON_BEGIN(_LME_Enable)
                 // フレークのばらつき項
                 power *= random2to1(min_pos.xy);
                 // 距離フェード項
-                power *= 1 - smoothstep(_LME_MinDist, max(_LME_MinDist + NZF, _LME_MaxDist), length(ws_camera_vec));
+                power *= 1 - SafeSmoothStep(_LME_MinDist, _LME_MaxDist, length(ws_camera_vec));
                 // NdotV起因の強度項
-                power *= pow(abs(dot(normalize(ws_camera_vec), d.ws_normal)), NON_ZERO_FLOAT(_LME_Spot));
+                power *= pow(abs(dot(normalize(ws_camera_vec), d.ws_normal)), UG_NZ(_LME_Spot));
                 // 形状
                 power *= _LME_Shape == 0 ? 1 : step(min_pos.z, 0.2); // 通常の多角形 or 点
 
@@ -1200,7 +1202,7 @@ FEATURE_TGL_END
             if (TGL_OFF(_GL_DisableBasePos)) {  // BatchingStatic のときには DisableBasePos が ON になるのでそのときは影を弱めない
                 float3 cam_vec = worldSpaceViewPointPos() - calcWorldSpaceBasePos(ws_vertex);
                 half angle_light_camera = dot( SafeNormalizeVec2(ws_light_dir.xz), SafeNormalizeVec2(cam_vec.xz) );
-                shadow_power = min( shadow_power, 1 - smoothstep(_TS_MinDist, max(_TS_MinDist + NZF, _TS_MaxDist), length(cam_vec)) * saturate(-angle_light_camera) );
+                shadow_power = min( shadow_power, 1 - SafeSmoothStep(_TS_MinDist, _TS_MaxDist, length(cam_vec)) * saturate(-angle_light_camera) );
             }
 
             return shadow_power;
@@ -1228,7 +1230,7 @@ FEATURE_TGL_END
 
         void calcShadowColor(float3 color, float3 shadow_tex, float3 base_color, float power, float border, float feather, float brightness, inout float3 shadow_color) {
             shadow_color = lerp(
-                max(ZERO_VEC3, lerp(ONE_VEC3, color.rgb * shadow_tex / base_color, power * _TS_Power)),
+                max(ZERO_VEC3, lerp(ONE_VEC3, color.rgb * shadow_tex / UG_NBLACK(base_color), power * _TS_Power)),
                 shadow_color,
                 smoothstep(border, border + max(feather, 0.001), brightness) );
         }
@@ -1285,7 +1287,7 @@ FEATURE_TGL_ON_BEGIN(_TS_Enable)
 #endif
 
             // 影色計算
-            float3 base_color = NON_ZERO_VEC3( _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(d.uv_main) );
+            float3 base_color = _TS_BaseColor.rgb * WF_TEX2D_SHADE_BASE(d.uv_main);
             float3 shadow_color = ONE_VEC3;
 
 #ifndef _WF_LEGACY_FEATURE_SWITCH
@@ -1331,7 +1333,7 @@ FEATURE_TGL_END
 
         float calcRimShadowPower(float3 vs_normal) {
             float rimPower = length(vs_normal.xy);
-            if (rimPower < NZF) {
+            if (rimPower <= 0) {
                 return 0;
             }
             else {
@@ -1345,7 +1347,7 @@ FEATURE_TGL_END
                 float rim_max = 1 - width * dir_pwr;
                 float rim_min = 1 - (width + _TM_Feather) * dir_pwr;
 
-                return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TM_Exponent));
+                return pow(SafeSmoothStep(rim_min, rim_max, rimPower), UG_NZ(_TM_Exponent));
             }
         }
 
@@ -1369,7 +1371,7 @@ FEATURE_TGL_END
 
         float calcRimLightPower(float3 vs_normal) {
             float rimPower = length(vs_normal.xy);
-            if (rimPower < NZF) {
+            if (rimPower <= 0) {
                 return 0;
             }
             else {
@@ -1383,7 +1385,7 @@ FEATURE_TGL_END
                 float rim_max = 1 - width * dir_pwr;
                 float rim_min = 1 - (width + _TR_Feather) * dir_pwr;
 
-                return pow(smoothstep(rim_min - NZF, rim_max, rimPower), max(NZF, _TR_Exponent));
+                return pow(SafeSmoothStep(rim_min, rim_max, rimPower), UG_NZ(_TR_Exponent));
             }
         }
 
@@ -1429,8 +1431,8 @@ FEATURE_TGL_ON_BEGIN(_TBL_Enable)
             float3 ws_light_dir = SafeNormalizeVec3(d.ws_light_dir * float3(1, 0, 1));
             float3 ws_view_dir = SafeNormalizeVec3(d.ws_view_dir * float3(1, 0, 1));
             float3 ws_backlit_normal = LERP_NORMAL_MAPS(d, _TBL_BlendNormal, _TBL_BlendNormal2);
-            float power = smoothstep(-_TBL_Feather, NZF, _TBL_Width + dot(ws_light_dir, ws_backlit_normal - (ws_light_dir + ws_view_dir) * _TBL_CameraCorrection))
-                * (1 - smoothstep(-1 - NZF, _TBL_Angle - 1, d.angle_light_camera)) * pow(saturate(1 - abs(ws_backlit_normal.y)), 2);
+            float power = SafeSmoothStep(-_TBL_Feather, 0, _TBL_Width + dot(ws_light_dir, ws_backlit_normal - (ws_light_dir + ws_view_dir) * _TBL_CameraCorrection))
+                * (1 - SafeSmoothStep(-1, _TBL_Angle - 1, d.angle_light_camera)) * pow(saturate(1 - abs(ws_backlit_normal.y)), 2);
 
             // 合成
             d.color.rgb += max(ZERO_VEC3, rimColor * power * _TBL_Power);
@@ -1682,7 +1684,7 @@ FEATURE_TGL_ON_BEGIN(_DFD_Enable)
             if (!d.facing && TGL_ON(_DFD_BackShadow)) {
                 dist = 0;
             }
-            d.color.rgb = lerp(d.color.rgb, _DFD_Color.rgb * WF_TEX2D_DFD_COLOR(d.uv_main) * d.light_color, _DFD_Power * (1 - smoothstep(_DFD_MinDist, max(_DFD_MinDist + NZF, _DFD_MaxDist), dist)));
+            d.color.rgb = lerp(d.color.rgb, _DFD_Color.rgb * WF_TEX2D_DFD_COLOR(d.uv_main) * d.light_color, _DFD_Power * (1 - SafeSmoothStep(_DFD_MinDist, _DFD_MaxDist, dist)));
 FEATURE_TGL_END
         }
 
@@ -1698,10 +1700,10 @@ FEATURE_TGL_END
 
         void drawDissolve(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_DSV_Enable)
-            if (1 - NZF < _DSV_Dissolve) {
+            if (1 - UG_NZF < _DSV_Dissolve) {
                 // nop
             }
-            else if (_DSV_Dissolve < NZF) {
+            else if (_DSV_Dissolve < UG_NZF) {
                 discard;
             }
             else {
@@ -1714,7 +1716,7 @@ FEATURE_TGL_ON_BEGIN(_DSV_Enable)
                     discard;
                 }
 
-                d.color.rgb += _DSV_SparkColor * (1 - smoothstep(0, NON_ZERO_FLOAT(_DSV_SparkWidth), pos));
+                d.color.rgb += _DSV_SparkColor * (1 - SafeSmoothStep(0, _DSV_SparkWidth, pos));
             }
 FEATURE_TGL_END
         }
@@ -1732,14 +1734,14 @@ FEATURE_TGL_END
         void drawToonFog(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_TFG_Enable)
             float3 ws_base_position = UnityObjectToWorldPos(_TFG_BaseOffset);
-            float3 ws_offset_vertex = (d.ws_vertex - ws_base_position) / max(float3(NZF, NZF, NZF), _TFG_Scale);
+            float3 ws_offset_vertex = (d.ws_vertex - ws_base_position) / UG_NBLACK(_TFG_Scale);
             float power =
                 // 原点からの距離の判定
-                smoothstep(_TFG_MinDist, max(_TFG_MinDist + NZF, _TFG_MaxDist), length( ws_offset_vertex ))
+                SafeSmoothStep(_TFG_MinDist, _TFG_MaxDist, length( ws_offset_vertex ))
                 // 前後の判定
                 * smoothstep(0, 0.2, -dot(d.ws_view_dir.xz, ws_offset_vertex.xz))
                 // カメラと原点の水平距離の判定
-                * smoothstep(_TFG_MinDist, max(_TFG_MinDist + NZF, _TFG_MaxDist), length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
+                * SafeSmoothStep(_TFG_MinDist, _TFG_MaxDist, length( ws_base_position.xz - worldSpaceViewPointPos().xz ));
             d.color.rgb = lerp(d.color.rgb, _TFG_Color.rgb * d.light_color, _TFG_Color.a * pow(power, _TFG_Exponential));
 FEATURE_TGL_END
         }

@@ -1,5 +1,17 @@
 # Change Log
 
+## 2026-08-02 (2.14.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20260802
+
+### Fixed
+- Shader
+  - 特定の環境(Android環境にて、リアルタイムライトなし、かつ環境光が完全黒色もしくはVRC LightVolumes有効の場合)にて、シェーダ内でゼロ除算が発生し、不正な色が出力されていた問題を修正しました。
+    - この問題はバージョン 2021-12-04 にて混入したものです。PC(Windows) および iOS および WebGL 環境では発生しません。
+- Tool
+  - AAO(AvatarOptimizer)と連携するコードを最新化しました。
+
+----
+
 ## 2026-02-08 (2.13.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20260208
 
