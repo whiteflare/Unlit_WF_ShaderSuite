@@ -394,7 +394,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_GhostOpaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2026/02/08 (2.13.0)", Float) = 0
+            _CurrentVersion         ("2026/08/02 (2.14.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Transparent", Float) = 0
