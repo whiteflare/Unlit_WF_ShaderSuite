@@ -87,13 +87,17 @@
     #define SAMPLE_MASK_VALUE(tex, uv, inv)         INVERT_MASK_VALUE( PICK_SUB_TEX2D(tex, _MainTex, uv), inv )
     #define SAMPLE_MASK_VALUE_LOD(tex, uv, inv)     INVERT_MASK_VALUE( PICK_VERT_TEX2D_LOD(tex, uv, 0), inv )
 
-    #define NZF                                     0.000001
-    #define NON_ZERO_FLOAT(v)                       max(v, NZF)
-    #define NON_ZERO_VEC3(v)                        max(v, float3(NZF, NZF, NZF))
     #define ZERO_VEC3                               half3(0, 0, 0)
     #define ZERO_VEC4                               half4(0, 0, 0, 0)
     #define ONE_VEC3                                half3(1, 1, 1)
     #define ONE_VEC4                                half4(1, 1, 1, 1)
+
+    // uniform guard マクロ「非ゼロの正の数」
+    #define UG_NZF                                  1e-4
+    // uniform guard マクロ「ゼロではない正の数に補正」
+    #define UG_NZ(v)                                max(v, UG_NZF)
+    // uniform guard マクロ「黒ではないRGBに補正」
+    #define UG_NBLACK(c)                            max(c, half3(UG_NZF, UG_NZF, UG_NZF))
 
     #define DISCARD_VS_VERTEX_ZERO                  UnityObjectToClipPos( float3(0, 0, 0) )
 
@@ -123,26 +127,35 @@
 
     float2 SafeNormalizeVec2(float2 in_vec) {
         float lenSq = dot(in_vec, in_vec);
-        if (lenSq < NZF) {
-            return float2(0, 0);
+        if (0.0 < lenSq) {
+            return in_vec * rsqrt(lenSq);
         }
-        return in_vec * rsqrt(lenSq);
+        return float2(0, 0);
     }
 
     float3 SafeNormalizeVec3(float3 in_vec) {
         float lenSq = dot(in_vec, in_vec);
-        if (lenSq < NZF) {
-            return float3(0, 0, 0);
+        if (0.0 < lenSq) {
+            return in_vec * rsqrt(lenSq);
         }
-        return in_vec * rsqrt(lenSq);
+        return float3(0, 0, 0);
     }
 
     float3 SafeNormalizeVec3Normal(float3 in_vec) {
         float lenSq = dot(in_vec, in_vec);
-        if (lenSq < NZF) {
-            return float3(0, 0, 1);
+        if (0.0 < lenSq) {
+            return in_vec * rsqrt(lenSq);
         }
-        return in_vec * rsqrt(lenSq);
+        return float3(0, 0, 1);
+    }
+
+    float SafeSmoothStep(float min, float max, float x) {
+        if (min < max) {
+            return smoothstep(min, max, x);
+        }
+        else {
+            return 0;
+        }
     }
 
     float3 lerpNormals(float3 n1, float3 n2, float v) {
