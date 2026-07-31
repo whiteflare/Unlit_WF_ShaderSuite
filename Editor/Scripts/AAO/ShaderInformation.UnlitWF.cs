@@ -1,7 +1,7 @@
 /*
  *  The zlib/libpng License
  *
- *  Copyright 2018-2024 whiteflare.
+ *  Copyright 2018-2026 whiteflare.
  *
  *  This software is provided ‘as-is’, without any express or implied
  *  warranty. In no event will the authors be held liable for any damages
@@ -37,27 +37,40 @@ namespace UnlitWF.AAO
         [InitializeOnLoadMethod]
         public static void Register()
         {
-            foreach(var sn in WFShaderNameDictionary.GetCurrentRpNames())
+            foreach (var sn in WFShaderNameDictionary.GetCurrentRpNames())
             {
                 if (sn.Familly == "UnToon" || sn.Familly == "FakeFur" || sn.Familly == "Gem")
                 {
                     var sh = WFCommonUtility.FindShader(sn.Name);
                     if (WFCommonUtility.IsSupportedShader(sh))
                     {
-                        ShaderInformationRegistry.RegisterShaderInformation(sh, new UnlitWFShaderInformation(sh));
+                        ShaderInformationRegistry.RegisterShaderInformation(sh, new UnlitWFShaderInformation(sh,
+                            sn.Familly == "FakeFur" // FakeFurはファーのランダム化に SV_VertexID を用いているのでtrue
+                            ));
                     }
                 }
             }
         }
 
         private readonly Shader shader;
+        private readonly bool useVertexIndex;
 
-        public UnlitWFShaderInformation(Shader shader)
+        public UnlitWFShaderInformation(Shader shader, bool useVertexIndex)
         {
             this.shader = shader;
+            this.useVertexIndex = useVertexIndex;
         }
 
-        public override ShaderInformationKind SupportedInformationKind => ShaderInformationKind.VertexIndexUsage | ShaderInformationKind.TextureAndUVUsage;
+        public override ShaderInformationKind SupportedInformationKind
+        {
+            get
+            {
+                if (useVertexIndex)
+                    return ShaderInformationKind.VertexIndexUsage | ShaderInformationKind.TextureAndUVUsage;
+                else
+                    return ShaderInformationKind.TextureAndUVUsage;
+            }
+        }
 
         public override void GetMaterialInformation(MaterialInformationCallback matInfo)
         {
@@ -67,7 +80,7 @@ namespace UnlitWF.AAO
             }
 
             var _MainTex_ST = GetST(matInfo, "_MainTex");
-            if (RegisterTextureUVUsage(matInfo,"_MainTex", "_MainTex", UsingUVChannels.UV0, _MainTex_ST))
+            if (RegisterTextureUVUsage(matInfo, "_MainTex", "_MainTex", UsingUVChannels.UV0, _MainTex_ST))
             {
                 // マスク系
                 RegisterTextureUVUsage(matInfo, "_AL_MaskTex", "_MainTex", UsingUVChannels.UV0, _MainTex_ST, () => IsIntValue(matInfo, "_AL_Source", 1, 2));
@@ -124,14 +137,15 @@ namespace UnlitWF.AAO
             RegisterTextureUVUsage(matInfo, "_OVL_OverlayTex", "_OVL_OverlayTex", GetOVLUVType(matInfo, "_OVL_UVType"), GetST(matInfo, "_OVL_OverlayTex"), "_OVL_Enable");
 
             // Matcap
-            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex", "_HL_MatcapTex", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable");
-            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_1", "_HL_MatcapTex_1", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_1");
-            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_2", "_HL_MatcapTex_2", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_2");
-            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_3", "_HL_MatcapTex_3", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_3");
-            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_4", "_HL_MatcapTex_4", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_4");
-            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_5", "_HL_MatcapTex_5", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_5");
-            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_6", "_HL_MatcapTex_6", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_6");
-            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_7", "_HL_MatcapTex_7", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_7");
+            SamplerStateInformation linearClampSampler = SamplerStateInformation.LinearClampSampler;
+            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex", linearClampSampler, UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable");
+            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_1", linearClampSampler, UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_1");
+            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_2", linearClampSampler, UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_2");
+            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_3", linearClampSampler, UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_3");
+            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_4", linearClampSampler, UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_4");
+            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_5", linearClampSampler, UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_5");
+            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_6", linearClampSampler, UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_6");
+            RegisterTextureUVUsage(matInfo, "_HL_MatcapTex_7", linearClampSampler, UsingUVChannels.NonMesh, Matrix2x3.Identity, "_HL_Enable_7");
 
             // GradMap
             RegisterTextureUVUsage(matInfo, "_CGR_GradMapTex", "_CGR_GradMapTex", UsingUVChannels.NonMesh, Matrix2x3.Identity, "_CGR_Enable");
@@ -146,10 +160,12 @@ namespace UnlitWF.AAO
             RegisterOtherUVUsage(matInfo, UsingUVChannels.UV1, Eq("_ES_Enable", 1), Eq("_ES_AuLinkEnable", 1), Eq("_ES_AU_DelayDir", 3, 4));
 
             RegisterOtherUVUsage(matInfo, UsingUVChannels.UV1, Eq("_OVL_Enable", 1), Eq("_OVL_UVType", 3)); // AngelRing
-            RegisterOtherUVUsage(matInfo, UsingUVChannels.UV0, Eq("_OVL_Enable", 1), Eq("_OVL_UVType", 0), _ => {
+            RegisterOtherUVUsage(matInfo, UsingUVChannels.UV0, Eq("_OVL_Enable", 1), Eq("_OVL_UVType", 0), _ =>
+            {
                 return HasShaderProperty(matInfo, "_OVL_UVScroll") && matInfo.GetVector("_OVL_UVScroll") is { } uvScroll && (uvScroll.x != 0f || uvScroll.y != 0f);
             });
-            RegisterOtherUVUsage(matInfo, UsingUVChannels.UV1, Eq("_OVL_Enable", 1), Eq("_OVL_UVType", 1), _ => {
+            RegisterOtherUVUsage(matInfo, UsingUVChannels.UV1, Eq("_OVL_Enable", 1), Eq("_OVL_UVType", 1), _ =>
+            {
                 return HasShaderProperty(matInfo, "_OVL_UVScroll") && matInfo.GetVector("_OVL_UVScroll") is { } uvScroll && (uvScroll.x != 0f || uvScroll.y != 0f);
             });
 
@@ -157,7 +173,7 @@ namespace UnlitWF.AAO
             RegisterOtherUVUsage(matInfo, UsingUVChannels.UV1, Eq("_LME_Enable", 1), Eq("_LME_UVType", 1));
         }
 
-        private bool RegisterTextureUVUsage(MaterialInformationCallback matInfo, string propName, string samplerName, UsingUVChannels uv, Matrix2x3? st, System.Func<bool> cond = null)
+        private bool RegisterTextureUVUsage(MaterialInformationCallback matInfo, string propName, SamplerStateInformation samplerName, UsingUVChannels uv, Matrix2x3? st, System.Func<bool> cond = null)
         {
             if (HasShaderProperty(matInfo, propName))
             {
@@ -170,14 +186,14 @@ namespace UnlitWF.AAO
             return false;
         }
 
-        private bool RegisterTextureUVUsage(MaterialInformationCallback matInfo, string propName, string samplerName, UsingUVChannels uv, Matrix2x3? st, string enablePropName)
+        private bool RegisterTextureUVUsage(MaterialInformationCallback matInfo, string propName, SamplerStateInformation samplerName, UsingUVChannels uv, Matrix2x3? st, string enablePropName)
         {
             return RegisterTextureUVUsage(matInfo, propName, samplerName, uv, st, () => IsIntValue(matInfo, enablePropName, 1));
         }
 
         private bool RegisterOtherUVUsage(MaterialInformationCallback matInfo, UsingUVChannels uv, params System.Func<MaterialInformationCallback, bool>[] preds)
         {
-            foreach(var p in preds)
+            foreach (var p in preds)
             {
                 if (!p(matInfo))
                 {
@@ -231,7 +247,7 @@ namespace UnlitWF.AAO
         {
             if (HasShaderProperty(matInfo, propName))
             {
-                switch(matInfo.GetInt(propName))
+                switch (matInfo.GetInt(propName))
                 {
                     case 0:
                         return UsingUVChannels.UV0;
