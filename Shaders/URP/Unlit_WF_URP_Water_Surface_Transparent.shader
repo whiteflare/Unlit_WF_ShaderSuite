@@ -133,7 +133,7 @@ Shader "UnlitWF_URP/WF_Water_Surface_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2026/02/08 (2.13.0)", Float) = 0
+            _CurrentVersion         ("2026/08/02 (2.14.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
