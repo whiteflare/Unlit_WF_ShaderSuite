@@ -479,7 +479,7 @@ FEATURE_TGL_END
 #endif
 #if defined(_WAM_ONLY2ND_ENABLE) || defined(_WF_LEGACY_FEATURE_SWITCH)
             float3 cubemap = pickReflectionCubemap(_WAM_Cubemap, _WAM_Cubemap_HDR, ws_vertex, ws_normal, metal_lod);
-            color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), NON_ZERO_FLOAT(1 - _WAM_CubemapHighCut)), step(ONE_VEC3, cubemap));
+            color += lerp(cubemap, pow(max(ZERO_VEC3, cubemap), UG_NZ(1 - _WAM_CubemapHighCut)), step(ONE_VEC3, cubemap));
 #endif
 #ifdef _WF_LEGACY_FEATURE_SWITCH
         }
@@ -513,7 +513,7 @@ FEATURE_TGL_END
         void drawWaterDistanceFade(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_WAD_Enable)
             float dist = sqrt(calcDistanceFadeDistanceSq(d.ws_vertex.xyz));
-            d.color.rgb *= lerp(ONE_VEC3, _WAD_Color.rgb * unity_ColorSpaceDouble.rgb, _WAD_Power * smoothstep(_WAD_MinDist, max(_WAD_MinDist + NZF, _WAD_MaxDist), dist));
+            d.color.rgb *= lerp(ONE_VEC3, _WAD_Color.rgb * unity_ColorSpaceDouble.rgb, _WAD_Power * SafeSmoothStep(_WAD_MinDist, _WAD_MaxDist, dist));
 FEATURE_TGL_END
         }
     #else
@@ -557,7 +557,7 @@ FEATURE_TGL_END
         void drawLampReflection(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_WAR_Enable)
             float3 view_dir = normalize(d.ws_vertex - _WorldSpaceCameraPos.xyz);
-            float3 refl_dir = normalize(reflect(view_dir, lerpNormals(d.ws_normal, d.ws_bump_normal, _WAR_BlendNormal))) / NON_ZERO_FLOAT(_WAR_Size);
+            float3 refl_dir = normalize(reflect(view_dir, lerpNormals(d.ws_normal, d.ws_bump_normal, _WAR_BlendNormal))) / UG_NZ(_WAR_Size);
 
 #ifdef _WF_WATER_LAMP_DIR
             float3 base_dir = calcHorizontalCoordSystem(_WAR_Azimuth, _WAR_Altitude);
@@ -569,7 +569,7 @@ FEATURE_TGL_ON_BEGIN(_WAR_Enable)
                 discard;
                 return;
             }
-            float power = _WAR_Power * (1 - smoothstep(0, NON_ZERO_FLOAT(_WAR_MaxDist - _WAR_MinDist), length(d.ws_base_pos.xyz - d.ws_vertex.xyz) - _WAR_MinDist));
+            float power = _WAR_Power * (1 - smoothstep(0, UG_NZ(_WAR_MaxDist - _WAR_MinDist), length(d.ws_base_pos.xyz - d.ws_vertex.xyz) - _WAR_MinDist));
 #endif
 
             // リフレクション空間の三軸を計算(うち一軸はbase_dir)
@@ -725,8 +725,10 @@ FEATURE_TGL_END
 
         prepareMainTex(i, d);
 
+        const float EPS = 1e-4;
+
         float y = _WaterLevel - d.ws_vertex.y;
-        if (y <= NZF) {
+        if (y <= EPS) {
             // メッシュが水上のときは描画しない
             return half4(1, 1, 1, 0);
         }
@@ -735,9 +737,9 @@ FEATURE_TGL_END
             float ey = ws_viewpos.y - _WaterLevel;
             float dist = length(d.ws_vertex - ws_viewpos);
 
-            dist *= ey <= NZF ? 1   // 視点が水面下のときは dist をそのまま採用する
+            dist *= ey <= EPS ? 1   // 視点が水面下のときは dist をそのまま採用する
                 : y / (y + ey);     // そうではないときは水中の距離を計算する
-            d.color.a *= saturate(dist / NON_ZERO_FLOAT(_WaterTransparency));
+            d.color.a *= saturate(dist / UG_NZ(_WaterTransparency));
 
             // UNITY_APPLY_FOG(i.fogCoord, d.color); // DepthFog は Fog には対応しない
             return d.color;
