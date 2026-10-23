@@ -158,9 +158,13 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             #pragma geometry geom_outline
             #pragma fragment frag_depth
 
+            #pragma target 4.5
+            #pragma require geometry
+
             #define _WF_ALPHA_CUTFADE
             #define _WF_PLATFORM_LWRP
 
+            #pragma shader_feature_local _ _TL_EDGE_ENABLE
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
@@ -187,9 +191,13 @@ Shader "UnlitWF_URP/UnToon_Outline/WF_UnToon_OutlineOnly_TransCutout" {
             #pragma geometry geom_outline
             #pragma fragment frag_depth
 
+            #pragma target 4.5
+            #pragma require geometry
+
             #define _WF_ALPHA_CUTFADE
             #define _WF_PLATFORM_LWRP
 
+            #pragma shader_feature_local _ _TL_EDGE_ENABLE
             #pragma shader_feature_local _TL_ENABLE
             #pragma shader_feature_local _VC_ENABLE
 
