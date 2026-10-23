@@ -846,6 +846,13 @@ namespace UnlitWF
             new WFI18NTranslation("Swap value/Light Matcap 8", "入れ替え/マットキャップ 8"),
 
             // 列挙体
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.ALPHA", "アルファ合成"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.ADD", "加算"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.MUL", "乗算"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.ADD_AND_SUB", "加算・減算"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.SCREEN", "スクリーン"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.OVERLAY", "オーバーレイ"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.HARD_LIGHT", "ハードライト"),
             new WFI18NTranslation("UnlitWF.BlendModeOVL.ALPHA", "アルファ合成"),
             new WFI18NTranslation("UnlitWF.BlendModeOVL.ADD", "加算"),
             new WFI18NTranslation("UnlitWF.BlendModeOVL.MUL", "乗算"),
@@ -1331,6 +1338,13 @@ namespace UnlitWF
             new WFI18NTranslation("Swap value/Light Matcap 8", "교체/매트캡 8"),
 
             // 열거형
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.ALPHA", "알파 합성"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.ADD", "가산"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.MUL", "곱셈"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.ADD_AND_SUB", "가산・감산"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.SCREEN", "스크린"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.OVERLAY", "오버레이"),
+            new WFI18NTranslation("UnlitWF.BlendModeTX2.HARD_LIGHT", "하드 라이트"),
             new WFI18NTranslation("UnlitWF.BlendModeOVL.ALPHA", "알파 합성"),
             new WFI18NTranslation("UnlitWF.BlendModeOVL.ADD", "가산"),
             new WFI18NTranslation("UnlitWF.BlendModeOVL.MUL", "곱셈"),

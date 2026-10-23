@@ -326,6 +326,19 @@
         return lerp(base, c, power);
     }
 
+    inline half3 blendColor(uint mode, float3 base, half3 over, float power) {
+        return
+              mode == 0 ? blendColor_Alpha(base, over, power)
+            : mode == 1 ? blendColor_Add(base, over, power)
+            : mode == 2 ? blendColor_Mul(base, over, power)
+            : mode == 3 ? blendColor_AddAndSub(base, over, power)
+            : mode == 4 ? blendColor_Screen(base, over, power)
+            : mode == 5 ? blendColor_Overlay(base, over, power)
+            : mode == 6 ? blendColor_HardLight(base, over, power)
+            : base  // 何もしない
+            ;
+    }
+
     ////////////////////////////
     // Matcap
     ////////////////////////////

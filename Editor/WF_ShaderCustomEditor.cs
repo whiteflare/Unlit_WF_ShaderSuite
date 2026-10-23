@@ -2507,7 +2507,18 @@ namespace UnlitWF
         }
     }
 
-#endregion
+    #endregion
+
+    public enum BlendModeTX2
+    {
+        ALPHA = 0,
+        ADD = 1,
+        MUL = 2,
+        ADD_AND_SUB = 3,
+        SCREEN = 4,
+        OVERLAY = 5,
+        HARD_LIGHT = 6
+    }
 
     public enum BlendModeOVL
     {
