@@ -2517,7 +2517,8 @@ namespace UnlitWF
         ADD_AND_SUB = 3,
         SCREEN = 4,
         OVERLAY = 5,
-        HARD_LIGHT = 6
+        HARD_LIGHT = 6,
+        LINEAR_BURN = 7,
     }
 
     public enum BlendModeOVL
@@ -2528,7 +2529,8 @@ namespace UnlitWF
         ADD_AND_SUB = 3,
         SCREEN = 4,
         OVERLAY = 5,
-        HARD_LIGHT = 6
+        HARD_LIGHT = 6,
+        LINEAR_BURN = 7,
     }
 
     public enum BlendModeHL

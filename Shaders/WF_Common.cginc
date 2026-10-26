@@ -279,31 +279,31 @@
     inline half3 blendColor_Alpha(half3 base, half3 over, float power) {
         // アルファブレンド
         half3 c = over;
-        return lerp(base, c, power);
+        return max(ZERO_VEC3, lerp(base, c, power));
     }
 
     inline half3 blendColor_Add(half3 base, half3 over, float power) {
         // 加算
         half3 c = base + over;
-        return lerp(base, c, power);
+        return max(ZERO_VEC3, lerp(base, c, power));
     }
 
     inline half3 blendColor_Mul(half3 base, half3 over, float power) {
         // 乗算
         half3 c = base * over;
-        return lerp(base, c, power);
+        return max(ZERO_VEC3, lerp(base, c, power));
     }
 
     inline half3 blendColor_AddAndSub(half3 base, half3 over, float power) {
         // 半加算
         half3 c = base + over - MEDIAN_GRAY;
-        return lerp(base, c, power);
+        return max(ZERO_VEC3, lerp(base, c, power));
     }
 
     inline half3 blendColor_Screen(half3 base, half3 over, float power) {
         // スクリーン
         half3 c = 1 - (1 - base) * (1 - over);
-        return lerp(base, c, power);
+        return max(ZERO_VEC3, lerp(base, c, power));
     }
 
     inline half3 blendColor_Overlay(half3 base, half3 over, float power) {
@@ -313,7 +313,7 @@
                 1 - 2 * (1 - base) * (1 - over.rgb),
                 step(AVE_RGB(base), 0.5)
             );
-        return lerp(base, c, power);
+        return max(ZERO_VEC3, lerp(base, c, power));
     }
 
     inline half3 blendColor_HardLight(half3 base, half3 over, float power) {
@@ -323,7 +323,13 @@
                 1 - 2 * (1 - base) * (1 - over.rgb),
                 step(AVE_RGB(over), 0.5)
             );
-        return lerp(base, c, power);
+        return max(ZERO_VEC3, lerp(base, c, power));
+    }
+
+    inline half3 blendColor_LinearBurn(half3 base, half3 over, float power) {
+        // 焼き込みリニア
+        half3 c = base + over - half3(1, 1, 1);
+        return max(ZERO_VEC3, lerp(base, c, power));
     }
 
     inline half3 blendColor(uint mode, float3 base, half3 over, float power) {
@@ -335,6 +341,7 @@
             : mode == 4 ? blendColor_Screen(base, over, power)
             : mode == 5 ? blendColor_Overlay(base, over, power)
             : mode == 6 ? blendColor_HardLight(base, over, power)
+            : mode == 7 ? blendColor_LinearBurn(base, over, power)
             : base  // 何もしない
             ;
     }
