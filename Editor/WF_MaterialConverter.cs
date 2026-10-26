@@ -669,6 +669,10 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
+                    // プロパティ名変更開始
+                    WFMaterialEditUtility.BeginReplacePropertyNames(ctx.target);
+                },
+                ctx => {
                     // もしTransparentかつQueueが2450未満のときは、2460に設定する
                     if (ctx.renderType == ShaderType.Transparent)
                     {
@@ -715,8 +719,35 @@ namespace UnlitWF.Converter
                     }
                 },
                 ctx => {
-                    // プロパティ名変更開始
-                    WFMaterialEditUtility.BeginReplacePropertyNames(ctx.target);
+                    if (HasOldPropertyValue(ctx, "_UseMain2ndTex") && HasOldPropertyValue(ctx, "_Main2ndTex")) {
+                        // メインテクスチャ2ndがあるならば設定する
+                        WFAccessor.SetBool(ctx.target, "_TX2_Enable", true);
+                        WFMaterialEditUtility.ReplacePropertyNamesWithoutUndo(ctx.target,
+                            PropertyNameReplacement.MatchIgnoreCase("_Color2nd", "_TX2_Color"),
+                            PropertyNameReplacement.MatchIgnoreCase("_Main2ndTex", "_TX2_MainTex"),
+                            PropertyNameReplacement.MatchIgnoreCase("_Main2ndBlendMask", "_TX2_MaskTex"),
+                            PropertyNameReplacement.MatchIgnoreCase("_Main2ndTex_UVMode", "_TX2_UVType"),
+                            PropertyNameReplacement.MatchIgnoreCase("_Main2ndTexBlendMode", "_TX2_BlendType"));
+                        // 値の違いを吸収
+                        if (WFAccessor.GetInt(ctx.target, "_TX2_UVType", 0) != 1) { // UV1でなければUV0にする
+                            WFAccessor.SetInt(ctx.target, "_TX2_UVType", 0);
+                        }
+                        switch (WFAccessor.GetInt(ctx.target, "_TX2_BlendType", 0))
+                        {
+                            case 1: // 加算
+                                WFAccessor.SetInt(ctx.target, "_TX2_BlendType", 1); // 加算
+                                break;
+                            case 2: // スクリーン
+                                WFAccessor.SetInt(ctx.target, "_TX2_BlendType", 4); // スクリーン
+                                break;
+                            case 3: // 乗算
+                                WFAccessor.SetInt(ctx.target, "_TX2_BlendType", 2); // 乗算
+                                break;
+                            default:
+                                WFAccessor.SetInt(ctx.target, "_TX2_BlendType", 0); // 通常
+                                break;
+                        }
+                    }
                 },
                 ctx => {
                     // アルファマスク
