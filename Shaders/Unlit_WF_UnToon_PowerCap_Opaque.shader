@@ -38,6 +38,8 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
             _TX2_Enable             ("[TX2] Enable", Float) = 0
         [Enum(UV1,0,UV2,1)]
             _TX2_UVType             ("[TX2] UV Type", Float) = 0
+        [WF_Enum(UnlitWF.BlendModeTX2)]
+            _TX2_BlendType          ("[TX2] Blend Type", Float) = 0
             _TX2_MainTex            ("[TX2] Main Texture 2nd", 2D) = "white" {}
         [HDR]
             _TX2_Color              ("[TX2] Color 2nd", Color) = (1, 1, 1, 1)
@@ -556,7 +558,7 @@ Shader "UnlitWF/UnToon_PowerCap/WF_UnToon_PowerCap_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2026/08/02 (2.14.0)", Float) = 0
+            _CurrentVersion         ("2026/11/01 (2.15.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0

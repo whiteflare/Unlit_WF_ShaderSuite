@@ -32,3 +32,6 @@ MonoBehaviour:
   useDepthTexInVRC3Avatar: 0
   useDepthTexInVRC3World: -1
   useDepthTexInOther: -1
+  enableULVInVRC3Avatar: 1
+  enableULVInVRC3World: -1
+  enableULVInOther: -1
