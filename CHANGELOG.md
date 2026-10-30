@@ -1,5 +1,25 @@
 # Change Log
 
+## 2026-11-01 (2.15.0)
+https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20261101
+
+### Added
+- Shader
+  - メインテクスチャ2ndに混合モードを追加しました。加算・乗算・スクリーンなどから合成方法を選ぶことが出来ます。
+  - オーバーレイテクスチャの混合モードに `焼き込みリニア` を追加しました。
+
+### Changed
+- Shader
+  - VRC LightVolumes 3.0.1 に対応しました。
+- Tool
+  - lilToonマテリアルからUnlitWFマテリアルに変換する時に、メインテクスチャ2ndを考慮するようにしました。
+
+### Fixed
+- Shader
+  - `WF_UnToon_Custom_ClearCoat_Transparent` およびURP系シェーダの一部で、シェーダキーワード定義漏れにより描画不良が発生していた問題を修正しました。
+
+----
+
 ## 2026-08-02 (2.14.0)
 https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/tag/UnlitWF_Shader_20260802
 

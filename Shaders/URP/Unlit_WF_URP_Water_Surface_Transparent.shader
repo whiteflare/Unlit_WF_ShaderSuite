@@ -133,7 +133,7 @@ Shader "UnlitWF_URP/WF_Water_Surface_Transparent" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2026/08/02 (2.14.0)", Float) = 0
+            _CurrentVersion         ("2026/11/01 (2.15.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _QuestSupported         ("True", Float) = 0
@@ -224,8 +224,6 @@ Shader "UnlitWF_URP/WF_Water_Surface_Transparent" {
             #define _WF_WATER_CUTOUT
             #define _WF_PLATFORM_LWRP
 
-            #pragma shader_feature_local _VC_ENABLE
-
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_Water.cginc"
@@ -252,8 +250,6 @@ Shader "UnlitWF_URP/WF_Water_Surface_Transparent" {
             #define _WF_WATER_CUTOUT
             #define _WF_PLATFORM_LWRP
 
-            #pragma shader_feature_local _VC_ENABLE
-
             #pragma multi_compile_instancing
 
             #include "../WF_INPUT_Water.cginc"
@@ -277,9 +273,6 @@ Shader "UnlitWF_URP/WF_Water_Surface_Transparent" {
 
             #define _WF_ALPHA_BLEND
             #define _WF_PLATFORM_LWRP
-
-            #pragma shader_feature_local _ES_ENABLE
-            #pragma shader_feature_local _VC_ENABLE
 
             #include "../WF_INPUT_Water.cginc"
             #include "WF_UnToonURP_Meta.cginc"
