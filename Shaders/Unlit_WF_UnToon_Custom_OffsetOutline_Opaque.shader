@@ -409,7 +409,7 @@ Shader "UnlitWF/Custom/WF_UnToon_Custom_OffsetOutline_Opaque" {
 
         [HideInInspector]
         [WF_FixFloat(0.0)]
-            _CurrentVersion         ("2026/08/02 (2.14.0)", Float) = 0
+            _CurrentVersion         ("2026/11/01 (2.15.0)", Float) = 0
         [HideInInspector]
         [WF_FixFloat(0.0)]
             _FallBack               ("UnlitWF/UnToon_Mobile/WF_UnToon_Mobile_Opaque", Float) = 0
