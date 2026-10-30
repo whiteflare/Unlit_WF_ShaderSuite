@@ -200,8 +200,8 @@ FEATURE_TGL_ON_BEGIN(_TX2_Enable)
             float2 uv_main2 = _TX2_UVType == 1 ? d.uv2 : d.uv1;
             uv_main2 = TRANSFORM_TEX(uv_main2, _TX2_MainTex);
             float4 tex = PICK_SUB_TEX2D(_TX2_MainTex, _MainTex, uv_main2);
-            float alpha = tex.a * _TX2_Color.a * WF_TEX2D_MAIN_2ND_MASK(d.uv_main);
-            d.color.rgb = lerp(d.color.rgb, tex.rgb * _TX2_Color.rgb, alpha);
+            float power = tex.a * _TX2_Color.a * WF_TEX2D_MAIN_2ND_MASK(d.uv_main);
+            d.color.rgb = blendColor(_TX2_BlendType, d.color.rgb, tex.rgb * _TX2_Color.rgb, power);
 FEATURE_TGL_END
         }
 
@@ -1463,28 +1463,14 @@ FEATURE_TGL_END
             return float2(vs_normal.x / 2 + 0.5, lerp(uv2.y, vs_normal.y / 2 + 0.5, _OVL_CustomParam1));
         }
 
-        float3 blendOverlayColor(float3 base, float4 decal, float power) {
-            power *= decal.a;
-            return
-                  _OVL_BlendType == 0 ? blendColor_Alpha(base, decal.rgb, power)
-                : _OVL_BlendType == 1 ? blendColor_Add(base, decal.rgb, power)
-                : _OVL_BlendType == 2 ? blendColor_Mul(base, decal.rgb, power)
-                : _OVL_BlendType == 3 ? blendColor_AddAndSub(base, decal.rgb, power)
-                : _OVL_BlendType == 4 ? blendColor_Screen(base, decal.rgb, power)
-                : _OVL_BlendType == 5 ? blendColor_Overlay(base, decal.rgb, power)
-                : _OVL_BlendType == 6 ? blendColor_HardLight(base, decal.rgb, power)
-                : base  // 何もしない
-                ;
-        }
-
         void drawOverlayTexture(inout drawing d) {
 FEATURE_TGL_ON_BEGIN(_OVL_Enable)
             float2 uv_overlay =
-                _OVL_UVType == 1 ? d.uv2                                                 // UV2
-                : _OVL_UVType == 2 ? computeOverlayTex(d.ws_vertex)                          // SKYBOX
-                : _OVL_UVType == 3 ? computeAngelRingUV(calcMatcapVector(d.matcapVector, 1, 1, 0.5), d.uv2)                // ANGELRING
-                : _OVL_UVType == 4 ? calcMatcapVector(d.matcapVector, 1, 1, 0.5).xy / 2 + 0.5                                  // MATCAP
-                : d.uv1                                                                      // UV1
+                _OVL_UVType == 1 ? d.uv2                                                                    // UV2
+                : _OVL_UVType == 2 ? computeOverlayTex(d.ws_vertex)                                         // SKYBOX
+                : _OVL_UVType == 3 ? computeAngelRingUV(calcMatcapVector(d.matcapVector, 1, 1, 0.5), d.uv2) // ANGELRING
+                : _OVL_UVType == 4 ? calcMatcapVector(d.matcapVector, 1, 1, 0.5).xy / 2 + 0.5               // MATCAP
+                : d.uv1                                                                                     // UV1
                 ;
             uv_overlay = TRANSFORM_TEX(uv_overlay, _OVL_OverlayTex);
             if (_OVL_OutUVType == 1) {  // Clip
@@ -1502,7 +1488,7 @@ FEATURE_TGL_ON_BEGIN(_OVL_Enable)
             ov_color *= lerp(ONE_VEC4, d.vertex_color, _OVL_VertColToDecal);
             ov_power *= lerp(1, saturate(TGL_OFF(_OVL_InvMaskVal) ? d.vertex_color.r : 1 - d.vertex_color.r), _OVL_VertColToMask);
 
-            d.color.rgb = blendOverlayColor(d.color.rgb, ov_color, ov_power);
+            d.color.rgb = blendColor(_OVL_BlendType, d.color.rgb, ov_color.rgb, ov_color.a * ov_power);
 FEATURE_TGL_END
         }
 

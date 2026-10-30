@@ -113,6 +113,7 @@
     float4          _TX2_MainTex_ST;
     half4           _TX2_Color;
     uint            _TX2_UVType;
+    uint            _TX2_BlendType;
     half            _TX2_InvMaskVal;
 #endif
 
